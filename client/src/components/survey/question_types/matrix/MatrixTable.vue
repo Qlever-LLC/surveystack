@@ -173,32 +173,39 @@ export default {
   methods: {
     onScrollX() {
       // make sure it only runs once per RAF
-      if (!this.rafIdScrollX) {
-        this.rafIdScrollX = window.requestAnimationFrame(() => {
-          const body = this.$refs.body;
-
-          this.isLeftFloating = !this.isMobile && body.scrollLeft > 0;
-          const scrollLeftMax = body.scrollWidth - body.clientWidth;
-          this.isRightFloating = !this.isMobile && scrollLeftMax > body.scrollLeft;
-
-          this.$refs.headerCells.forEach((el, colIdx) => {
-            el.style.left = `${this.fixColMask[colIdx] ? 0 : -body.scrollLeft}px`;
-          });
-          this.updateCellVisibilityMask();
-          this.rafIdScrollX = null;
-        });
+      if (this.rafIdScrollX) {
+        return;
       }
+
+      this.rafIdScrollX = window.requestAnimationFrame(() => {
+        const body = this.$refs.body;
+        if (!body) {
+          return;
+        }
+
+        this.isLeftFloating = !this.isMobile && body.scrollLeft > 0;
+        const scrollLeftMax = body.scrollWidth - body.clientWidth;
+        this.isRightFloating = !this.isMobile && scrollLeftMax > body.scrollLeft;
+
+        this.$refs.headerCells.forEach((el, colIdx) => {
+          el.style.left = `${this.fixColMask[colIdx] ? 0 : -body.scrollLeft}px`;
+        });
+        this.updateCellVisibilityMask();
+        this.rafIdScrollX = null;
+      });
     },
     onScrollY() {
       // make sure it only runs once per RAF
-      if (!this.rafIdScrollY) {
-        this.rafIdScrollY = window.requestAnimationFrame(() => {
-          const { top } = this.$el.getBoundingClientRect();
-          this.isHeaderFloating = top < 0;
-          this.updateCellVisibilityMask();
-          this.rafIdScrollY = null;
-        });
+      if (this.rafIdScrollY) {
+        return;
       }
+
+      this.rafIdScrollY = window.requestAnimationFrame(() => {
+        const { top } = this.$el.getBoundingClientRect();
+        this.isHeaderFloating = top < 0;
+        this.updateCellVisibilityMask();
+        this.rafIdScrollY = null;
+      });
     },
     shouldRenderCell(rowIdx, colIdx) {
       return (

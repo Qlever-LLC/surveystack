@@ -121,20 +121,14 @@ export default {
       this.$emit('close-dialog');
     },
     async surveyChanged(version) {
-      const { data } = await api.get(`/surveys/${this.surveyId}`);
+      const versionParam = version || 'latest';
+      const { data } = await api.get(`/surveys/${this.surveyId}?version=${versionParam}`);
       if (!version) {
         this.surveyVersion = data.latestVersion;
       }
 
-      const revision = data.revisions.find((r) => {
-        if (version) {
-          return r.version === version;
-        }
-        return r.version === this.surveyVersion;
-      });
-
       const tree = new TreeModel();
-      const root = tree.parse({ name: 'data', children: revision.controls });
+      const root = tree.parse({ name: 'data', children: data.revisions[0].controls });
       const paths = [];
       root.walk((node) => {
         if (node.isRoot()) {

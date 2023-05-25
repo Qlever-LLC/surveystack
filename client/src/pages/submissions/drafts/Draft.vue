@@ -10,7 +10,9 @@
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
     </div>
-    <div v-else-if="hasError" class="text-center mt-8">Error Loading Draft Submission or Survey</div>
+    <div v-else-if="hasError" class="text-center mt-8">
+      Error Loading Draft Submission or Survey. Click <a @click="$router.back()">here</a> to go back to Survey.
+    </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
       Are you sure you want to exit this draft?
@@ -177,10 +179,7 @@ export default {
     try {
       this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
     } catch (error) {
-      console.log('Error: submission not found');
-      this.hasError = true;
-      this.loading = false;
-      return;
+      console.warn('Submission not found', id);
     }
 
     if (!this.submission) {
@@ -194,7 +193,10 @@ export default {
       this.showResubmissionDialog = true;
     }
 
-    this.survey = await this.$store.dispatch('surveys/fetchSurvey', this.submission.meta.survey.id);
+    this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
+      id: this.submission.meta.survey.id,
+      version: this.submission.meta.survey.version,
+    });
     const cleanSubmission = createSubmissionFromSurvey({
       survey: this.survey,
       version: this.submission.meta.survey.version,
@@ -207,21 +209,24 @@ export default {
       this.hasError = true;
     }
 
+    // Set proxy header if resubmit by proxy or admin.
+    // Otherwise, remove it
     if (this.submission.meta.submitAsUser) {
       api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
+    } else {
+      api.removeHeader('x-delegate-to');
     }
 
     this.loading = false;
   },
   beforeRouteLeave(to, from, next) {
-    if (this.submission && this.survey && !this.isSubmitted) {
+    if (this.submission && this.survey && !this.isSubmitted && !this.hasError) {
       this.$refs.confirmLeaveDialog.open(next);
       return;
     }
 
-    if (this.submission.meta.submitAsUser) {
-      api.removeHeader('x-delegate-to');
-    }
+    api.removeHeader('x-delegate-to');
+
     next(true);
   },
 };

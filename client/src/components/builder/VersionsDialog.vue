@@ -14,7 +14,15 @@
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
                 :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'"
               >
-                {{ revision.version }}</v-chip
+                Version
+                {{
+                  revision.version +
+                  (revision.version > survey.latestVersion
+                    ? ' (draft)'
+                    : revision.version === survey.latestVersion
+                    ? ' (published) '
+                    : '')
+                }}</v-chip
               >
               <span class="ml-2"
                 >{{ getSubmissionCount(revision.version) || 'no' }} submission{{
@@ -40,7 +48,6 @@
               <v-checkbox
                 v-model="selectedVersionsToDelete"
                 :value="String(revision.version)"
-                :disabled="!isVersionDeletable(revision.version)"
                 hide-details
                 title="Delete version"
                 class="mt-0"
@@ -112,33 +119,22 @@ export default {
       type: Boolean,
       required: true,
     },
-    survey: {
-      type: Object,
+    surveyId: {
+      type: String,
       required: true,
     },
   },
   setup(props, { emit }) {
-    const initialCleanupInfo = {
-      versionsToKeep: [],
-      versionsToDelete: [],
-      surveyVersions: props.survey.revisions.map(({ version }) => String(version)),
-      surveySubmissionsVersionCounts: {},
-    };
-
-    const initialDeleteVersions = {
-      deletedVersions: [],
-      keptVersions: [],
-    };
-
+    const survey = ref({});
     const cleanupInfoIsLoading = ref(false);
     const cleanupInfoHasLoaded = ref(false);
     const cleanupInfoHasError = ref(false);
-    const cleanupInfoResponse = ref({ ...initialCleanupInfo });
+    const cleanupInfoResponse = ref({});
 
     const deleteVersionsIsLoading = ref(false);
     const deleteVersionsHasLoaded = ref(false);
     const deleteVersionsHasError = ref(false);
-    const deleteVersionsResponse = ref({ ...initialDeleteVersions });
+    const deleteVersionsResponse = ref({ deletedVersions: [], keptVersions: [] });
 
     const selectedVersionsToDelete = ref([]);
 
@@ -147,15 +143,25 @@ export default {
     const compareRevisions = ref([]);
     const surveyDiffDialogVisible = ref(false);
 
-    fetchCleanupInfo();
+    fetchData();
 
-    async function fetchCleanupInfo() {
+    async function fetchData() {
+      //fetch survey with all revisions
+      const { data } = await api.get(`/surveys/${props.surveyId}?version=all`);
+      survey.value = data;
+
+      //fetch cleanup info
       cleanupInfoIsLoading.value = true;
       cleanupInfoHasError.value = false;
       cleanupInfoHasLoaded.value = false;
-      cleanupInfoResponse.value = { ...initialCleanupInfo };
+      cleanupInfoResponse.value = {
+        versionsToKeep: [],
+        versionsToDelete: [],
+        surveyVersions: survey.value.revisions.map(({ version }) => String(version)),
+        surveySubmissionsVersionCounts: {},
+      };
       try {
-        const { data: submissionUsageInfo } = await api.get(`/surveys/cleanup/${props.survey._id}`);
+        const { data: submissionUsageInfo } = await api.get(`/surveys/cleanup/${props.surveyId}`);
         cleanupInfoResponse.value = submissionUsageInfo;
         selectedVersionsToDelete.value = [...cleanupInfoResponse.value.versionsToDelete];
         libraryConsumers.value = cleanupInfoResponse.value.libraryConsumersByVersion;
@@ -172,11 +178,11 @@ export default {
         deleteVersionsIsLoading.value = true;
         deleteVersionsHasError.value = false;
         deleteVersionsHasLoaded.value = false;
-        deleteVersionsResponse.value = { ...initialDeleteVersions };
+        deleteVersionsResponse.value = { deletedVersions: [], keptVersions: [] };
 
         const queryParams = new URLSearchParams();
         selectedVersionsToDelete.value.forEach((v) => queryParams.append('versions[]', v));
-        const { data } = await api.post(`/surveys/cleanup/${props.survey._id}?${queryParams}`);
+        const { data } = await api.post(`/surveys/cleanup/${props.surveyId}?${queryParams}`);
         deleteVersionsResponse.value = data;
       } catch {
         deleteVersionsHasError.value = true;
@@ -185,7 +191,7 @@ export default {
         deleteVersionsIsLoading.value = false;
         compareRevisions.value = []; //clear compare selections as they may contain a deleted revision
       }
-      await fetchCleanupInfo();
+      await fetchData();
       emit('reload-survey');
     }
 
@@ -208,6 +214,7 @@ export default {
     }
 
     return {
+      survey,
       cleanupInfoIsLoading,
       cleanupInfoHasLoaded,
       cleanupInfoHasError,

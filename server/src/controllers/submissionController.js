@@ -27,8 +27,10 @@ const sanitize = async (entity) => {
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
   entity.meta.dateModified = new Date(entity.meta.dateModified);
   entity.meta.dateSubmitted = new Date();
-
   entity.meta.survey.id = new ObjectId(entity.meta.survey.id);
+
+  // Delete temporal data that is used in client to render Proxy data
+  delete entity.meta.submitAsUser;
 
   if (entity.meta.group) {
     if (entity.meta.group.id) {
@@ -139,7 +141,7 @@ const createRedactStage = (user, roles) => {
           // => submission_role = "admin@/oursci/lab/testing/"
           // A user role of "admin@/oursci/" can view, since
           // "admin@/oursci/lab/testing" is a regexMatch of "^admin@/oursci/"
-          // TODO: with this case branch, we probably dont even need the one from before
+          // TODO: with this case branch, we probably don't even need the one from before
           {
             case: {
               $anyElementTrue: {
@@ -183,18 +185,6 @@ const createRelevanceStage = () => {
     $redact: {
       $cond: {
         if: { $eq: ['$meta.relevant', false] },
-        then: '$$PRUNE',
-        else: '$$DESCEND',
-      },
-    },
-  };
-};
-
-const createDataMetaStage = () => {
-  return {
-    $redact: {
-      $cond: {
-        if: { $eq: ['$CURRENT', false] },
         then: '$$PRUNE',
         else: '$$DESCEND',
       },
@@ -327,12 +317,12 @@ export const buildPipeline = async (req, res) => {
         sort = s;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter sort: ${sort}`);
+      throw boom.badRequest(`Bad query parameter sort: ${sort}`);
     }
 
     _.forOwn(sort, (v) => {
       if (v !== -1 && v !== 1) {
-        throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
+        throw boom.badRequest(`Bad query parameter sort, value must be either 1 or -1`);
       }
     });
   }
@@ -343,6 +333,32 @@ export const buildPipeline = async (req, res) => {
     });
   }
   return pipeline;
+};
+
+const addCreatorDetailStage = (pipeline, user) => {
+  pipeline.push(
+    {
+      $lookup: {
+        from: 'users',
+        let: { creatorId: '$meta.creator' },
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                { $expr: { $eq: ['$_id', '$$creatorId'] } },
+                { $expr: { $ne: ['$$creatorId', new ObjectId(user)] } },
+              ],
+            },
+          },
+          { $project: { name: 1, email: 1, _id: 1 } },
+        ],
+        as: 'meta.submitAsUser',
+      },
+    },
+    {
+      $unwind: { path: '$meta.submitAsUser', preserveNullAndEmptyArrays: true },
+    }
+  );
 };
 
 const addUserDetailsStage = (pipeline) => {
@@ -406,7 +422,7 @@ const getSubmissionsPage = async (req, res) => {
         skip = querySkip;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
     }
   }
 
@@ -418,7 +434,7 @@ const getSubmissionsPage = async (req, res) => {
         limit = queryLimit;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
     }
   }
 
@@ -473,7 +489,7 @@ const getSubmissions = async (req, res) => {
         pipeline.push({ $skip: skip });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
     }
   }
 
@@ -486,7 +502,7 @@ const getSubmissions = async (req, res) => {
         pipeline.push({ $limit: limit });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
     }
   }
 
@@ -510,7 +526,7 @@ const addSkipToPipeline = (pipeline, reqSkip) => {
         pipeline.push({ $skip: skip });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
     }
   }
 };
@@ -525,7 +541,7 @@ const addLimitToPipeline = (pipeline, reqLimit) => {
         pipeline.push({ $limit: limit });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
     }
   }
 };
@@ -601,14 +617,22 @@ const getSubmission = async (req, res) => {
     roles.push(...userRoles);
   }
 
-  // Add creator details if request has admin rights on survey.
-  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
-  if (user && !queryParam(req.query.pure)) {
-    const groupId = res.locals.existing.meta.group.id;
-    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+  if (user) {
+    // Add creator details as `meta.submitAsUser` if pure=1 is set (re-submissions)
+    // This will allow admin/proxy can resubmit with correct request header
+    if (queryParam(req.query.pure)) {
+      addCreatorDetailStage(pipeline, user);
+    }
 
-    if (hasAdminRights) {
-      addUserDetailsStage(pipeline);
+    // Add creator details if request has admin rights on survey.
+    // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+    else {
+      const groupId = res.locals.existing.meta.group.id;
+      const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+
+      if (hasAdminRights) {
+        addUserDetailsStage(pipeline);
+      }
     }
   }
 
@@ -619,9 +643,13 @@ const getSubmission = async (req, res) => {
     pipeline.push(relevanceStage);
   }
 
+  // Fetch by id
   pipeline.push({ $match: { _id: new ObjectId(id) } });
+
+  // Redact
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
+
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();
   if (!entity) {
     throw boom.notFound(`No entity found for id: ${id}`);
@@ -658,7 +686,7 @@ const handleApiCompose = async (submissionEntities, user) => {
   submissionEntities = cloneDeep(submissionEntities);
 
   // HOTFIX: do hylo first because farmos handler remove all apiCompose outputs from the submission
-  // TODO: solve this in a cleaner way. Create utiliti functions for apiCompose handlers
+  // TODO: solve this in a cleaner way. Create utility functions for apiCompose handlers
   let hyloResults;
   try {
     hyloResults = await Promise.all(
