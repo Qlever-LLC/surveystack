@@ -172,21 +172,6 @@ async function getResource(resources, source) {
   return [];
 }
 
-const SEPARATOR = '.';
-
-// http://blog.nicohaemhouts.com/2015/08/03/accessing-nested-javascript-objects-with-string-key/
-function getNested(obj, path, fallback = undefined) {
-  try {
-    return path
-      .replace('[', SEPARATOR)
-      .replace(']', '')
-      .split(SEPARATOR)
-      .reduce((item, property) => (item[property] === undefined ? fallback : item[property]), obj);
-  } catch (err) {
-    return fallback;
-  }
-}
-
 async function getSubmissionUniqueItems(surveyId, path) {
   const data = await db
     .collection('submissions')
@@ -196,7 +181,7 @@ async function getSubmissionUniqueItems(surveyId, path) {
 
   const items = data
     .map((item) => {
-      const value = getNested(item, `${path}.value`, null);
+      const value = getProperty(item, `${path}.value`, null);
       return {
         id: item._id,
         label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
@@ -215,10 +200,7 @@ async function getSubmissionUniqueItems(surveyId, path) {
       }))
       .filter((v) => v.value);
 
-  const explodedItems = items
-    .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
-    .reduce((acc, curr) => [...acc, ...curr], []);
-
+  const explodedItems = items.flatMap((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]));
   const uniqueItems = Object.values(groupBy(explodedItems, 'label')).map((group) => ({
     ...group[0],
     label: group[0].label,
