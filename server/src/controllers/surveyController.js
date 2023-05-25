@@ -60,6 +60,30 @@ const sanitize = async (entity) => {
   return entity;
 };
 
+const getSurveys = async (req, res) => {
+  const filter = {};
+  const project = {};
+
+  const { q, projections } = req.query;
+
+  if (q) {
+    if (ObjectId.isValid(q)) {
+      filter._id = new ObjectId(q);
+    } else {
+      filter.name = { $regex: q, $options: 'i' };
+    }
+  }
+
+  if (projections) {
+    projections.forEach((projection) => {
+      project[projection] = 1;
+    });
+  }
+
+  const entities = await db.collection(SURVEYS_COLLECTION).find(filter).project(project).toArray();
+  return res.send(entities);
+};
+
 const buildPipelineForGetSurveyPage = ({
   q,
   groups,
@@ -810,6 +834,7 @@ const deleteArchivedTestSubmissions = async (surveyId, surveyVersions) => {
 };
 
 export default {
+  getSurveys,
   getSurveyPage,
   getPinned,
   getSurveyListPage,

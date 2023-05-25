@@ -52,7 +52,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase('fields')],
+  mixins: [baseQuestionComponent, farmosBase()],
   async created() {
     await this.fetchAreas();
   },
