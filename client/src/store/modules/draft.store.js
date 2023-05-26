@@ -263,7 +263,11 @@ const actions = {
         .map((n) => n.model.name)
         .join('.');
       const field = surveyStackUtils.getNested(state.submission, nextNodePath);
-      if (field.value === null || field.value === undefined) {
+      if (
+        field.value === null ||
+        field.value === undefined ||
+        (Array.isArray(field.value) && field.value.length === 0)
+      ) {
         await dispatch('initialize', nextNode);
       }
 
