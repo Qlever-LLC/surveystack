@@ -386,6 +386,11 @@ export default {
 
     this.isFarmOsLoading = false;
   },
+  watch: {
+    value() {
+      this.rows = this.value || [];
+    },
+  },
 };
 </script>
 

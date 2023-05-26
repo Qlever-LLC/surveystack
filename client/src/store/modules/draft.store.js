@@ -175,7 +175,6 @@ const actions = {
     await dispatch('calculateRelevance');
     await dispatch('next');
   },
-  //TODO check - could this be removed? does not seem to be referenced
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
@@ -265,10 +264,7 @@ const actions = {
         .join('.');
       const field = surveyStackUtils.getNested(state.submission, nextNodePath);
       if (field.value === null || field.value === undefined) {
-        const [initialize] = await codeEvaluator.calculateInitialize([nextNode], state.submission, state.survey); // eslint-disable-line
-        if (initialize && initialize.result) {
-          commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
-        }
+        await dispatch('initialize', nextNode);
       }
 
       commit('NEXT', nextNode);
@@ -403,8 +399,9 @@ const actions = {
       }
     });
   },
-  async initialize({ commit, state }) {
-    const [initialize] = await codeEvaluator.calculateInitialize([state.node], state.submission, state.survey); // eslint-disable-line
+  async initialize({ commit, state }, nextNode) {
+    //calculate nextNode if passed, or state.node
+    const [initialize] = await codeEvaluator.calculateInitialize([nextNode || state.node], state.submission, state.survey); // eslint-disable-line
     if (initialize && initialize.result) {
       commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
     }

@@ -48,7 +48,7 @@
         <component
           :is="getComponentName(control)"
           :control="control"
-          :value="$store.getters['draft/property'](path) ? $store.getters['draft/property'](path).value : null"
+          :value="value"
           :index="path"
           :key="path"
           :resources="survey.resources"
@@ -121,6 +121,10 @@ export default {
     },
     meta() {
       return this.$store.getters['draft/property'](`${this.path}.meta`);
+    },
+    value() {
+      const property = this.$store.getters['draft/property'](this.path);
+      return property ? property.value : null;
     },
   },
   methods: {
