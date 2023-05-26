@@ -301,7 +301,7 @@
           <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
         </div>
 
-        <div v-if="!isPage && !isGroup">
+        <div v-if="isText || isNumber || isDate || isMatrix || isOntology || isSelect">
           <checkbox
             label="Initialize Expression"
             v-model="initialize.enabled"
