@@ -70,6 +70,7 @@ const connectDatabase = async () => {
   await migrateGroups_VXtoV2();
   await migrateLibraryIds();
   await migrateResourceLibraryIds();
+  await migrateSurveyPrintOptions();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -259,6 +260,54 @@ const migrateResourceLibraryIds = async () => {
 
   if (modifiedCount > 0) {
     console.log('Migrated resource.library to objectId of this many surveys', modifiedCount);
+  }
+};
+
+const migrateSurveyPrintOptions = async () => {
+  // Insert print options if doesn't have one
+  let modifiedCount = 0;
+
+  let res = await db.collection('surveys').updateMany(
+    {
+      options: { $eq: null },
+      'meta.printOptions': { $eq: null },
+    },
+    [
+      {
+        $set: {
+          'meta.printOptions': {
+            showInstruction: true,
+            showUnanswered: false,
+          },
+        },
+      },
+    ]
+  );
+  modifiedCount += res.modifiedCount;
+
+  // Move `survey.option` to `survey.meta.printOptions`
+  res = await db.collection('surveys').updateMany(
+    {
+      options: { $ne: null },
+    },
+    [
+      {
+        $set: {
+          'meta.printOptions': '$options',
+        },
+      },
+      {
+        $unset: 'options',
+      },
+    ]
+  );
+  modifiedCount += res.modifiedCount;
+
+  if (modifiedCount > 0) {
+    console.log(
+      'Migrated `survey.options` to `survey.meta.printOptions` for many surveys:',
+      modifiedCount
+    );
   }
 };
 

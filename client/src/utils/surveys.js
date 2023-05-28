@@ -1048,12 +1048,12 @@ export function createSurvey({ creator = null, group = null, specVersion = SPEC_
       creator,
       group,
       specVersion,
+      printOptions: {
+        showInstruction: true,
+        showUnanswered: false,
+      },
     },
     resources: [],
-    options: {
-      showInstruction: true,
-      showUnanswered: false,
-    },
     revisions: [
       {
         dateCreated: currentDate,

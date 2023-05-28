@@ -785,11 +785,8 @@ export default {
       }
 
       if (!this.editMode) {
-        // if survey changed
-        if (
-          this.initialSurvey.name !== this.survey.name ||
-          JSON.stringify(this.initialSurvey.options) !== JSON.stringify(this.survey.options)
-        ) {
+        // if survey new
+        if (this.initialSurvey.name !== this.survey.name) {
           return true;
         }
       }
@@ -924,14 +921,14 @@ export default {
           this.surveyUnchanged = true;
         }
 
-        const optionsAreEqual = isEqual(this.initialSurvey.options, newVal.options);
         const resourcesAreEqual = isEqual(this.initialSurvey.resources, newVal.resources);
         const revisionsAreEqual = isEqual(this.initialSurvey.revisions, newVal.revisions);
         const surveyDetailsAreEquivalent =
           this.initialSurvey.name === newVal.name &&
+          this.initialSurvey.description === newVal.description &&
           isEqual(this.initialSurvey.meta.group, newVal.meta.group) &&
-          this.initialSurvey.description === newVal.description;
-        this.surveyUnchanged = revisionsAreEqual && surveyDetailsAreEquivalent && resourcesAreEqual && optionsAreEqual;
+          isEqual(this.initialSurvey.meta.printOptions, newVal.meta.printOptions);
+        this.surveyUnchanged = revisionsAreEqual && surveyDetailsAreEquivalent && resourcesAreEqual;
 
         const current = newVal.revisions[newVal.revisions.length - 1];
         if (current.controls.length === 0) {

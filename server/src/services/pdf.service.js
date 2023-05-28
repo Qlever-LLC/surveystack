@@ -219,12 +219,6 @@ class PdfGenerator {
     this.initialize();
     this.survey = survey;
     this.submission = submission;
-    if (!this.survey.options) {
-      this.survey.options = {
-        showInstruction: true,
-        showUnanswered: false,
-      };
-    }
     this.options = {
       printable: false,
       ...options,
@@ -1044,7 +1038,7 @@ class PdfGenerator {
 
     if (!this.options.printable) {
       // Filter instructions
-      if (!this.survey.options.showInstruction) {
+      if (!this.survey.meta.printOptions.showInstruction) {
         validControls = validControls.filter(
           (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
         );
@@ -1056,7 +1050,7 @@ class PdfGenerator {
       );
 
       // Filter unanswered
-      if (!this.survey.options.showUnanswered) {
+      if (!this.survey.meta.printOptions.showUnanswered) {
         validControls = validControls.filter((control) => this.hasAnswer.bind(this)(control, path));
       }
     }

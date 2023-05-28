@@ -145,7 +145,7 @@
           :library-survey="value"
           @cancel="libraryConsumersDialogIsVisible = false"
         />
-        <survey-settings-dialog v-model="printSettingDialogIsVisible" :survey="survey" />
+        <print-settings-dialog v-model="printSettingDialogIsVisible" :survey="survey" />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
@@ -261,7 +261,7 @@ import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
-import SurveySettingsDialog from './SurveySettingsDialog.vue';
+import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 
 const availableSubmissions = [
@@ -321,7 +321,7 @@ export default {
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,
-    SurveySettingsDialog,
+    PrintSettingsDialog,
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
