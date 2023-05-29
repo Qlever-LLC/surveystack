@@ -426,11 +426,6 @@ export default {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
   },
-  created() {
-    // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
-    this.value.content = [...this.value.content].map(cleanupAutocompleteMatrix);
-    this.$emit('input', this.value);
-  },
   MATRIX_COLUMN_TYPES,
 };
 </script>

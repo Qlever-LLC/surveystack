@@ -646,13 +646,6 @@ export default {
       this.scriptSourceId = this.control.options.source;
       this.scriptParams = this.getScriptParams();
     },
-    validateOptions() {
-      // Adjust autocomplete option value to be compatible with original `ontology` question type
-      // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
-      if (typeof this.control.options.allowAutocomplete !== 'boolean') {
-        this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
-      }
-    },
   },
   watch: {
     'control.name': {
@@ -666,14 +659,11 @@ export default {
         if (this.isScript && newVal !== oldVal) {
           this.updateScript();
         }
-
-        this.validateOptions();
       },
     },
   },
   created() {
     this.updateScript();
-    this.validateOptions();
   },
 };
 </script>

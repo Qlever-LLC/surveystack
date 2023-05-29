@@ -266,13 +266,8 @@ export default {
       return this.control.options.source;
     },
     headers() {
-      return (
-        this.source.content
-          // remove all hidden headers
-          .filter((header) => !header.hidden)
-          // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
-          .map(cleanupAutocompleteMatrix)
-      );
+      // remove all hidden headers
+      return this.source.content.filter((header) => !header.hidden);
     },
     fields() {
       return this.source.content.map((col) => col.value);

@@ -72,6 +72,7 @@ const connectDatabase = async () => {
   await migrateResourceLibraryIds();
   await migrateSurveyPrintOptions();
   await migrateControlPrintLayout();
+  await migrateOntologyQuestionOptions();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -339,11 +340,11 @@ const migrateControlPrintLayout = async () => {
 
     modifiedCount++;
 
-    console.log('Migrated `control.options.printLayout` to the survey', survey.name);
+    console.log('Migrated `control.options.printLayout` to the survey:', survey.name);
   }
 
   if (modifiedCount > 0) {
-    console.log('Migrated `control.options.printLayout` to many surveys', modifiedCount);
+    console.log('Migrated `control.options.printLayout` to many surveys:', modifiedCount);
   }
 };
 
@@ -379,7 +380,92 @@ const addControlPrintLayout = (control) => {
   return 0;
 };
 
-const migrateOntologyQuestionOptions = async () => {};
+// https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
+const migrateOntologyQuestionOptions = async () => {
+  const surveys = await db.collection('surveys').find({}).toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    let modifiedControlsCount = 0;
+    for (const revision of survey.revisions) {
+      for (const control of revision.controls) {
+        modifiedControlsCount += addOntologyAutocompleteOption(control);
+      }
+    }
+
+    if (modifiedControlsCount === 0) {
+      continue;
+    }
+
+    await db.collection('surveys').findOneAndUpdate(
+      { _id: new ObjectId(survey._id) },
+      { $set: survey },
+      {
+        returnOriginal: false,
+      }
+    );
+
+    modifiedCount++;
+
+    console.log('Migrated dropdown options to the survey:', survey.name);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated dropdown options to many surveys:', modifiedCount);
+  }
+};
+
+const addOntologyAutocompleteOption = (control) => {
+  // Skip if already set
+  if (typeof control.options.allowAutocomplete === 'boolean') {
+    return 0;
+  }
+
+  // Add `options.allowAutocomplete if ontology
+  if (control.type === 'ontology') {
+    control.options.allowAutocomplete = control.options.allowCustomSelection || false;
+    return 1;
+  }
+
+  // 1. Add `autocomplete`, `custom` option if `dropdown`
+  // 2. Add `autocomplete` option, replace type with `dropdown` if `autocomplete`
+  if (control.type === 'matrix') {
+    let isModified = false;
+    for (const content of control.options.source.content) {
+      // Already set
+      if (typeof content.custom === 'boolean' && typeof content.autocomplete === 'boolean') {
+        continue;
+      }
+
+      if (content.type === 'dropdown') {
+        content.custom = false;
+        content.autocomplete = false;
+      } else if (content.type === 'autocomplete') {
+        content.type = 'dropdown';
+        content.autocomplete = true;
+      } else {
+        continue;
+      }
+
+      if (!isModified) {
+        isModified = true;
+      }
+    }
+
+    return isModified ? 1 : 0;
+  }
+
+  if (Array.isArray(control.children)) {
+    let modifiedCount = 0;
+    for (const child of control.children) {
+      modifiedCount += addOntologyAutocompleteOption(child);
+    }
+    return modifiedCount;
+  }
+
+  return 0;
+};
 
 export const getDb = () => db;
 export const disconnect = async () => await mongoClient.close();
