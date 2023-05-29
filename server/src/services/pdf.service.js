@@ -312,7 +312,7 @@ class PdfGenerator {
     if (this.submission) {
       metaBody.push(
         ['Submitted to', `${this.submission.meta.group.name} (${this.submission.meta.group.path})`],
-        ['Submitted on', this.getSubmissionDate()],
+        ['Submitted on', formatDate(this.getSubmissionDate())],
         [
           'Submitted by',
           {
