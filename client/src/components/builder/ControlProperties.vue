@@ -344,7 +344,7 @@
           <div v-if="isMatrix">
             <checkbox
               label="Table format"
-              v-model="control.options.layout.table"
+              v-model="control.options.printLayout.table"
               helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
             />
           </div>
@@ -352,7 +352,7 @@
           <div v-if="isFile">
             <checkbox
               label="Show preview"
-              v-model="control.options.layout.preview"
+              v-model="control.options.printLayout.preview"
               helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
             />
           </div>
@@ -360,7 +360,7 @@
           <div v-if="isSelect || isOntology">
             <checkbox
               label="Show all answers"
-              v-model="control.options.layout.showAll"
+              v-model="control.options.printLayout.showAll"
               helper-text="Show full answers list, highlight the selected answer(s)"
             />
           </div>
@@ -368,7 +368,7 @@
           <div v-if="isSelect || isOntology">
             <checkbox
               label="Hide Answer List"
-              v-model="control.options.layout.hideList"
+              v-model="control.options.printLayout.hideList"
               helper-text='Do not show the complete list of answers when printing a fresh survey (the "Print Survey" button)'
             />
           </div>
@@ -376,7 +376,7 @@
           <v-select
             v-if="isSelect || isOntology"
             label="Answer layout"
-            v-model="control.options.layout.columns"
+            v-model="control.options.printLayout.columns"
             :items="[1, 2, 3, 4, 5]"
             color="focus"
             :menu-props="{ contentClass: 'layout-select' }"
@@ -651,16 +651,6 @@ export default {
       // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
       if (typeof this.control.options.allowAutocomplete !== 'boolean') {
         this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
-      }
-
-      if (typeof this.control.options.layout === 'undefined') {
-        this.$set(this.control.options, 'layout', {
-          showAll: false,
-          hideList: false,
-          columns: 3,
-          preview: false,
-          table: true,
-        });
       }
     },
   },

@@ -71,6 +71,7 @@ const connectDatabase = async () => {
   await migrateLibraryIds();
   await migrateResourceLibraryIds();
   await migrateSurveyPrintOptions();
+  await migrateControlPrintLayout();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -310,6 +311,75 @@ const migrateSurveyPrintOptions = async () => {
     );
   }
 };
+
+const migrateControlPrintLayout = async () => {
+  const surveys = await db.collection('surveys').find({}).toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    let modifiedControlsCount = 0;
+    for (const revision of survey.revisions) {
+      for (const control of revision.controls) {
+        modifiedControlsCount += addControlPrintLayout(control);
+      }
+    }
+
+    if (modifiedControlsCount === 0) {
+      continue;
+    }
+
+    await db.collection('surveys').findOneAndUpdate(
+      { _id: new ObjectId(survey._id) },
+      { $set: survey },
+      {
+        returnOriginal: false,
+      }
+    );
+
+    modifiedCount++;
+
+    console.log('Migrated `control.options.printLayout` to the survey', survey.name);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated `control.options.printLayout` to many surveys', modifiedCount);
+  }
+};
+
+const addControlPrintLayout = (control) => {
+  if (control.options.printLayout) {
+    return 0;
+  }
+
+  const printLayout = {};
+  if (control.type === 'matrix') {
+    printLayout.table = true;
+  } else if (control.type === 'file' || control.type === 'image') {
+    printLayout.preview = false;
+  } else if (/select/i.test(control.type) || control.type === 'ontology') {
+    printLayout.showAll = false;
+    printLayout.hideList = false;
+    printLayout.columns = 3;
+  }
+
+  if (Object.keys(printLayout).length > 0) {
+    control.options.printLayout = printLayout;
+    return 1;
+  }
+
+  if (Array.isArray(control.children)) {
+    let modifiedCount = 0;
+    for (const child of control.children) {
+      modifiedCount += addControlPrintLayout(child);
+    }
+    return modifiedCount;
+  }
+
+  return 0;
+};
+
+const migrateOntologyQuestionOptions = async () => {};
 
 export const getDb = () => db;
 export const disconnect = async () => await mongoClient.close();

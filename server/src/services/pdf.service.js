@@ -409,7 +409,7 @@ class PdfGenerator {
 
     const { name, label, type, hint, moreInfo, options } = control;
 
-    const layout = this.getControlLayout(control);
+    const layout = control.options.printLayout;
     const source = await this.getControlSource(control);
 
     const len = this.docDefinition.content.length;
@@ -1078,27 +1078,6 @@ class PdfGenerator {
     this.resourcesMap[source] = resource;
 
     return resource;
-  }
-
-  getControlLayout(control) {
-    const { hidden, showAll, hideList, columns, preview, table } = {
-      hidden: false,
-      showAll: false,
-      hideList: false,
-      columns: 3,
-      preview: false,
-      table: true,
-      ...control.options.layout,
-    };
-
-    return {
-      hidden,
-      columns,
-      showAll,
-      hideList,
-      preview,
-      table,
-    };
   }
 
   getSubmissionDate() {
