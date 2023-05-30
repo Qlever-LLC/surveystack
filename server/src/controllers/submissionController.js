@@ -1270,7 +1270,7 @@ const getSubmissionPdf = async (req, res) => {
   try {
     const fileName = pdfService.getPdfName(survey, submission);
 
-    pdfService.getPdfBase64(survey, submission, null, (data) => {
+    pdfService.getPdfBase64(survey, submission, (data) => {
       res.attachment(fileName);
       if (queryParam(req.query.base64)) {
         res.send('data:application/pdf;base64,' + data);
@@ -1314,7 +1314,7 @@ const postSubmissionPdf = async (req, res) => {
   try {
     const fileName = pdfService.getPdfName(survey, submission);
 
-    pdfService.getPdfBase64(survey, submission, null, (data) => {
+    pdfService.getPdfBase64(survey, submission, (data) => {
       res.attachment(fileName);
       if (queryParam(req.query.base64)) {
         res.send('data:application/pdf;base64,' + data);

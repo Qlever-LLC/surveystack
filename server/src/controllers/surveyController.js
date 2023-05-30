@@ -502,7 +502,7 @@ const getSurveyPdf = async (req, res) => {
   try {
     const fileName = pdfService.getPdfName(entity);
 
-    pdfService.getPdfBase64(entity, null, { printable: 1 }, (data) => {
+    pdfService.getPdfBase64(entity, null, (data) => {
       res.attachment(fileName);
       res.send('data:application/pdf;base64,' + data);
     });

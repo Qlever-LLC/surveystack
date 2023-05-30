@@ -152,7 +152,7 @@ async function getResource(resources, source) {
     return [];
   }
 
-  const resource = resources.find((resource) => resource.id === source);
+  const resource = resources.find((resource) => String(resource.id) === String(source));
   if (!resource) {
     return [];
   }
@@ -211,7 +211,7 @@ async function getSubmissionUniqueItems(surveyId, path) {
 }
 
 class PdfGenerator {
-  constructor(survey, submission, options) {
+  constructor(survey, submission) {
     if (!survey) {
       throw new Error('Invalid survey');
     }
@@ -219,10 +219,7 @@ class PdfGenerator {
     this.initialize();
     this.survey = survey;
     this.submission = submission;
-    this.options = {
-      printable: false,
-      ...options,
-    };
+    this.printable = !submission; // No submission means print PDF
   }
 
   initialize() {
@@ -253,15 +250,11 @@ class PdfGenerator {
   }
 
   async generate() {
-    if (!this.options.printable && !this.submission) {
-      return null;
-    }
-
     this.initialize();
     this.generateInfo();
     this.generateMeta();
 
-    const revision = this.options.printable
+    const revision = this.printable
       ? this.survey.revisions.find((revision) => revision.version === this.survey.latestVersion)
       : this.survey.revisions.find(
           (revision) => revision.version === this.submission.meta.survey.version
@@ -447,7 +440,7 @@ class PdfGenerator {
     /*
      **  Printable version
      */
-    if (this.options.printable) {
+    if (this.printable) {
       if (type === 'instructions') {
         def = this.getInstructionDef(control);
       } else if (type === 'instructionsImageSplit') {
@@ -673,6 +666,12 @@ class PdfGenerator {
       options.push({ value: custom, label: custom });
     }
 
+    /*
+     * Make vertical direction columns
+     *  item 1    item 4    item 7
+     *  item 2    item 5    item 8
+     *  item 3    item 6
+     */
     const group = [];
     const perColumns = Math.floor(options.length / cols);
     const remain = options.length % cols;
@@ -781,6 +780,7 @@ class PdfGenerator {
 
     return [emptyCell, ...emptyCells].slice(0, -1);
   }
+
   async getMatrixTableDef(answer, options) {
     const cols = getProperty(options, 'source.content');
     if (!Array.isArray(cols)) {
@@ -790,7 +790,6 @@ class PdfGenerator {
     const headers = cols.map((header) => header.label || header.value);
     const rows = [];
     const value = toArray(answer);
-    const isPrintable = this.options.printable;
 
     for (const item of value) {
       const row = [];
@@ -814,7 +813,7 @@ class PdfGenerator {
     }
 
     if (rows.length === 0) {
-      if (isPrintable) {
+      if (this.printable) {
         rows.push(...Array(10).fill(this.getEmptyDataRowDef(cols.length)));
       } else {
         rows.push(this.getNoDataRowDef(cols.length));
@@ -833,14 +832,14 @@ class PdfGenerator {
           return i === 0 || i === 1 || i === node.table.body.length ? colors.darkGray : colors.gray;
         },
         hLineStyle: function (i, node) {
-          return !isPrintable || i === 0 || i === 1 || i === node.table.body.length
+          return !this.printable || i === 0 || i === 1 || i === node.table.body.length
             ? null
             : lines.dash;
         },
         fillColor: function (rowIndex) {
           return rowIndex === 0
             ? colors.table.headerColor
-            : isPrintable
+            : this.printable
             ? colors.white
             : rowIndex % 2 === 1
             ? colors.table.oddColor
@@ -1036,7 +1035,7 @@ class PdfGenerator {
     // Filter hidden
     let validControls = controls.filter((control) => !this.isHiddenControl.bind(this)(control));
 
-    if (!this.options.printable) {
+    if (!this.printable) {
       // Filter instructions
       if (!this.survey.meta.printOptions.showInstruction) {
         validControls = validControls.filter(
@@ -1127,8 +1126,8 @@ class PdfGenerator {
   }
 }
 
-function getPdfBase64(survey, submission, options, callback) {
-  const generator = new PdfGenerator(survey, submission, options);
+function getPdfBase64(survey, submission, callback) {
+  const generator = new PdfGenerator(survey, submission);
   generator.generateBase64(callback);
 }
 
@@ -1138,6 +1137,9 @@ function getPdfName(survey, submission) {
 }
 
 export default {
+  formatDate,
+  transformValueToLabel,
+  PdfGenerator,
   getPdfBase64,
   getPdfName,
 };

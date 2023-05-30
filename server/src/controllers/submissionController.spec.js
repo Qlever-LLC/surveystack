@@ -67,9 +67,9 @@ describe('submissionController', () => {
       const expected =
         '_id,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.version,meta.revision,meta.permissions,meta.status.0.type,meta.status.0.value.at,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
         `${submission._id},` +
-        `${submission.meta.dateCreated.toISOString()},` +
-        `${submission.meta.dateModified.toISOString()},` +
-        `${submission.meta.dateSubmitted.toISOString()},` +
+        `${new Date(submission.meta.dateCreated).toISOString()},` +
+        `${new Date(submission.meta.dateModified).toISOString()},` +
+        `${new Date(submission.meta.dateSubmitted).toISOString()},` +
         `${submission.meta.survey.id},` +
         `2,1,,READY_TO_SUBMIT,` +
         `${submission.meta.status[0].value.at.toISOString()},` +
