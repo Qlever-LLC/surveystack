@@ -501,11 +501,9 @@ const getSurveyPdf = async (req, res) => {
 
   try {
     const fileName = pdfService.getPdfName(entity);
-
-    pdfService.getPdfBase64(entity, null, (data) => {
-      res.attachment(fileName);
-      res.send('data:application/pdf;base64,' + data);
-    });
+    const data = await pdfService.getPdfBase64(entity, null);
+    res.attachment(fileName);
+    res.send('data:application/pdf;base64,' + data);
   } catch (e) {
     throw boom.internal(e);
   }

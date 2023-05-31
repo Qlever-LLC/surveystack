@@ -233,20 +233,16 @@ class PdfGenerator {
     };
   }
 
-  async generateBlob(callback) {
-    const pdf = await this.generate();
-    if (!pdf) {
-      return null;
+  async generateBase64(onSuccess, onError) {
+    try {
+      const pdf = await this.generate();
+      if (!pdf) {
+        onError(new Error('Failed to generate PDF'));
+      }
+      pdf.getBase64(onSuccess);
+    } catch (e) {
+      onError(e);
     }
-    pdf.getBlob(callback);
-  }
-
-  async generateBase64(callback) {
-    const pdf = await this.generate();
-    if (!pdf) {
-      return null;
-    }
-    pdf.getBase64(callback);
   }
 
   async generate() {
@@ -1126,9 +1122,11 @@ class PdfGenerator {
   }
 }
 
-function getPdfBase64(survey, submission, callback) {
-  const generator = new PdfGenerator(survey, submission);
-  generator.generateBase64(callback);
+function getPdfBase64(survey, submission) {
+  return new Promise((resolve, reject) => {
+    const generator = new PdfGenerator(survey, submission);
+    generator.generateBase64(resolve, reject);
+  });
 }
 
 function getPdfName(survey, submission) {

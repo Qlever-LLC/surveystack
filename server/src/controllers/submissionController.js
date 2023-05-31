@@ -1238,7 +1238,7 @@ const getSubmissionPdf = async (req, res) => {
           as: 'user',
         },
       },
-      { $unwind: '$user' },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: 'groups',
@@ -1247,7 +1247,7 @@ const getSubmissionPdf = async (req, res) => {
           as: 'group',
         },
       },
-      { $unwind: '$group' },
+      { $unwind: { path: '$group', preserveNullAndEmptyArrays: true } },
       {
         $set: {
           'meta.group.name': '$group.name',
@@ -1269,15 +1269,13 @@ const getSubmissionPdf = async (req, res) => {
 
   try {
     const fileName = pdfService.getPdfName(survey, submission);
-
-    pdfService.getPdfBase64(survey, submission, (data) => {
-      res.attachment(fileName);
-      if (queryParam(req.query.base64)) {
-        res.send('data:application/pdf;base64,' + data);
-      } else {
-        res.send(Buffer.from(data, 'base64'));
-      }
-    });
+    const data = await pdfService.getPdfBase64(survey, submission);
+    res.attachment(fileName);
+    if (queryParam(req.query.base64)) {
+      res.send('data:application/pdf;base64,' + data);
+    } else {
+      res.send(Buffer.from(data, 'base64'));
+    }
   } catch (e) {
     throw boom.internal(e);
   }
@@ -1313,15 +1311,13 @@ const postSubmissionPdf = async (req, res) => {
   // Generate PDF
   try {
     const fileName = pdfService.getPdfName(survey, submission);
-
-    pdfService.getPdfBase64(survey, submission, (data) => {
-      res.attachment(fileName);
-      if (queryParam(req.query.base64)) {
-        res.send('data:application/pdf;base64,' + data);
-      } else {
-        res.send(Buffer.from(data, 'base64'));
-      }
-    });
+    const data = await pdfService.getPdfBase64(survey, submission);
+    res.attachment(fileName);
+    if (queryParam(req.query.base64)) {
+      res.send('data:application/pdf;base64,' + data);
+    } else {
+      res.send(Buffer.from(data, 'base64'));
+    }
   } catch (e) {
     throw boom.internal(e);
   }

@@ -294,6 +294,7 @@ export const createSurvey = async (control = '', overrides = {}) => {
         dateSubmitted: now,
         survey: {
           id: insertedId,
+          name: survey.name,
           version: 2,
         },
         revision: 1,
@@ -363,6 +364,7 @@ export const createRes = async ({ user = null } = {}) => ({
   cookie: jest.fn(),
   status: jest.fn().mockReturnThis(),
   set: jest.fn(),
+  attachment: jest.fn(),
   locals: {
     auth: {
       isAuthenticated: !!user,
