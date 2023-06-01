@@ -31,23 +31,11 @@ export default {
     };
   },
   methods: {
-    clearAll() {
+    async clearAll() {
       try {
-        db.clearAllSubmissions();
-      } catch (error) {
-        console.log(error);
-      }
-
-      try {
-        db.clearAllSurveys();
-      } catch (error) {
-        console.log(error);
-      }
-
-      try {
-        db.clearAllResources();
-      } catch (error) {
-        console.log(error);
+        await Promise.all([db.deleteAllSubmissions(), db.deleteAllSurveys(), db.deleteAllResources()]);
+      } catch (e) {
+        console.warn(e);
       }
     },
     async submit() {

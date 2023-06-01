@@ -32,13 +32,12 @@ const actions = {
     commit('RESET');
   },
   async initFromIndexedDB({ commit }) {
-    //TODO maybe better initFromIndexedDB by the store itself on first access
-    const response = await new Promise((resolve) => {
-      db.openDb(() => {
-        db.getAllResources((results) => resolve(results));
-      });
-    });
-    commit('SET_RESOURCES', response);
+    try {
+      const resources = await db.getAllResources();
+      commit('SET_RESOURCES', resources);
+    } catch (e) {
+      console.warn('Failed to get all resources from the IDB', e);
+    }
   },
   // eslint-disable-next-line no-unused-vars
   async addRemoteResource({ commit, dispatch }, file) {
@@ -66,7 +65,7 @@ const actions = {
         contentType: file.type,
         fileData: file,
       };
-      db.persistResource(resource);
+      await db.persistResource(resource);
       commit('ADD_RESOURCE', resource);
       return resource;
     } catch (error) {
@@ -81,7 +80,7 @@ const actions = {
         resource.key = replaceLabelInKey(resource.key, labelNew);
         resource.label = labelNew;
         resource.name = slugify(labelNew);
-        db.persistResource(resource);
+        await db.persistResource(resource);
         commit('REMOVE_RESOURCE', resource._id);
         commit('ADD_RESOURCE', resource);
       } else {
@@ -98,7 +97,7 @@ const actions = {
       let resource = getters['getResourceByKey'](resourceKey);
       if (resource) {
         resource.state = stateNew;
-        db.persistResource(resource);
+        await db.persistResource(resource);
         commit('REMOVE_RESOURCE', resource._id);
         commit('ADD_RESOURCE', resource);
       }
@@ -111,7 +110,7 @@ const actions = {
     let resource = getters['getResourceByKey'](resourceKey);
     if (resource) {
       try {
-        await db.removeFromIndexedDB(db.stores.RESOURCES, resource._id);
+        await db.deleteResource(resource._id);
       } catch (error) {
         dispatch('feedback/add', error, { root: true });
         throw error;
@@ -149,7 +148,7 @@ const actions = {
           validateStatus: false,
         });
         resource.fileData = new Blob([binaryResult], { type: resource.contentType });
-        db.persistResource(resource);
+        await db.persistResource(resource);
         commit('ADD_RESOURCE', resource);
       }
       return resource;

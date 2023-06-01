@@ -9,7 +9,7 @@ const PER_PAGE = 10;
 
 export const SubmissionTypes = {
   LOCAL_DRAFTS: 'Drafts on local',
-  REMOTE_DRAFTS: 'Drafts on server',
+  SERVER_DRAFTS: 'Drafts on server',
   SUBMITTED: 'Submitted',
   SUBMITTED_AS_PROXY: 'Submitted as proxy',
   RESUBMITTED: 'Resubmitted',
@@ -37,10 +37,11 @@ const createInitialState = () => ({
   submissions: [],
   surveys: [],
   localTotal: 0,
-  remoteTotal: 0,
+  serverTotal: 0,
   filter: {
     type: [],
     survey: [],
+    hideArchived: true,
   },
   loading: {},
 });
@@ -50,7 +51,7 @@ const initialState = createInitialState();
 const getters = {
   submissions: (state) => state.submissions,
   surveys: (state) => state.surveys,
-  total: (state) => state.remoteTotal + state.localTotal,
+  total: (state) => state.serverTotal + state.localTotal,
   filter: (state) => state.filter,
   isLoading: (state) => Object.values(state.loading).filter(Boolean).length > 0,
   getLoading: (state) => (id) => state.loading[id] || false,
@@ -91,8 +92,8 @@ const mutations = {
     state.localDrafts = state.localDrafts.filter((item) => item._id !== id);
     state.localTotal = state.localDrafts.length || -1;
   },
-  SET_REMOTE_TOTAL: (state, remoteTotal) => {
-    state.remoteTotal = remoteTotal;
+  SET_SERVER_TOTAL: (state, serverTotal) => {
+    state.serverTotal = serverTotal;
   },
   SET_SURVEYS: (state, surveys) => {
     state.surveys = surveys;
@@ -113,34 +114,6 @@ const actions = {
     commit('RESET');
   },
 
-  async delete({ commit, state }, id) {
-    commit('SET_LOADING', { [id]: SubmissionLoadingActions.DELETE });
-
-    const isLocal = state.localDrafts.some((item) => item._id === id);
-    if (isLocal) {
-      try {
-        await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
-        commit('DELETE_LOCAL_DRAFT', id);
-        commit('DELETE_SUBMISSION', id);
-        return true;
-      } catch (e) {
-        console.warn('Failed to delete submission from the IDB', e);
-      }
-    } else {
-      try {
-        await api.delete(`/drafts/${id}`);
-        commit('DELETE_SUBMISSION', id);
-        return true;
-      } catch (e) {
-        console.warn('Failed to delete submission from the Server', e);
-      }
-    }
-
-    commit('RESET_LOADING', id);
-
-    return false;
-  },
-
   setFilter({ commit, state, dispatch }, filter) {
     // Not changed
     const newFilter = { ...state.filter, ...filter };
@@ -152,29 +125,45 @@ const actions = {
     dispatch('fetchSubmissions', true);
   },
 
+  async delete({ commit }, id) {
+    commit('SET_LOADING', { [id]: SubmissionLoadingActions.DELETE });
+
+    try {
+      await db.deleteSubmission(id);
+      commit('DELETE_LOCAL_DRAFT', id);
+      commit('DELETE_SUBMISSION', id);
+    } catch (e) {
+      console.warn('Failed to delete submission from the IDB', e);
+    }
+
+    try {
+      await api.delete(`/drafts/${id}`);
+      commit('DELETE_SUBMISSION', id);
+    } catch (e) {
+      console.warn('Failed to delete submission from the Server', e);
+    }
+
+    commit('RESET_LOADING', id);
+  },
+
   async saveToLocal({ commit }, submission) {
     commit('SET_LOADING', { [submission._id]: SubmissionLoadingActions.SAVE_TO_LOCAL });
 
-    const newSubmission = { ...submission, options: { draft: true, ...submission.options, local: true } };
     try {
-      // Save to IDB
-      await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
-
-      // Update states
-      commit('ADD_OR_UPDATE_LOCAL_DRAFT', newSubmission);
+      await db.persistSubmission(sanitize(submission));
+      commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
     } catch (e) {
       console.warn('Failed to save submission into IDB', e);
       return null;
     }
 
     try {
-      // Delete from remote
       await api.delete(`/drafts/${submission._id}`);
     } catch (e) {
       console.warn('Failed to delete draft from the server', e);
     }
 
-    // Update states
+    const newSubmission = { ...submission, options: { ...submission.options, local: true } };
     commit('ADD_OR_UPDATE_SUBMISSION', newSubmission);
     commit('RESET_LOADING', submission._id);
 
@@ -185,27 +174,21 @@ const actions = {
     commit('SET_LOADING', { [submission._id]: SubmissionLoadingActions.SAVE_TO_SERVER });
 
     try {
-      // Submit to remote
-      await api.post('/drafts', submission);
+      await api.post('/drafts', sanitize(submission));
     } catch (e) {
       console.warn('Failed to save submission to server', e);
       return null;
     }
 
     try {
-      // Delete from IDB
-      await db.removeFromIndexedDB(db.stores.SUBMISSIONS, submission._id);
-
-      // Update states
+      await db.deleteSubmission(submission._id);
       commit('DELETE_LOCAL_DRAFT', submission._id);
     } catch (e) {
       console.warn('Failed to delete draft from IDB', e);
     }
 
-    // Update states
     const newSubmission = { ...submission, options: { ...submission.options, local: false } };
     commit('ADD_OR_UPDATE_SUBMISSION', newSubmission);
-
     commit('RESET_LOADING', submission._id);
 
     return newSubmission;
@@ -225,8 +208,8 @@ const actions = {
     });
 
     try {
-      await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
-      commit('ADD_OR_UPDATE_LOCAL_DRAFT', sanitize(submission));
+      await db.persistSubmission(sanitize(submission));
+      commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
       commit('ADD_OR_UPDATE_SUBMISSION', submission);
     } catch (e) {
       console.warn('Failed to save submission to IDB', e);
@@ -239,22 +222,6 @@ const actions = {
     });
   },
 
-  async resubmit({ commit }, id) {
-    commit('SET_LOADING', { [id]: SubmissionLoadingActions.RESUBMIT });
-
-    const { data } = await api.get(`/submissions/${id}?pure=1`);
-    commit('ADD_OR_UPDATE_LOCAL_DRAFT', data);
-    commit('ADD_OR_UPDATE_SUBMISSION', { ...data, options: { draft: false, local: false } });
-
-    commit('RESET_LOADING', id);
-
-    router.push({
-      name: 'submissions-drafts-detail',
-      params: { id },
-      query: { minimal_ui: router.currentRoute.query.minimal_ui },
-    });
-  },
-
   async fetchLocalDrafts({ commit, state, rootGetters }) {
     if (state.loading[SubmissionLoadingActions.FETCH_LOCAL_DRAFTS]) {
       return;
@@ -262,22 +229,23 @@ const actions = {
 
     commit('SET_LOADING', { [SubmissionLoadingActions.FETCH_LOCAL_DRAFTS]: true });
 
-    const response = await new Promise((resolve) => {
-      db.openDb(() => {
-        db.getAllSubmissions(resolve);
-      });
-    });
+    let submissions = [];
+    try {
+      submissions = await db.getAllSubmissions();
+    } catch (e) {
+      console.warn('Failed to get all submissions from the IDB', e);
+    }
 
     // Filter my submissions
     const user = rootGetters['auth/user']._id;
-    const mySubmissions = response.filter(
+    const mySubmissions = submissions.filter(
       (item) => item.meta.resubmitter === user || item.meta.proxyUserId === user || item.meta.creator === user
     );
 
     commit('SET_LOCAL_DRAFTS', mySubmissions);
     commit('RESET_LOADING', SubmissionLoadingActions.FETCH_LOCAL_DRAFTS);
 
-    return response;
+    return submissions;
   },
 
   async fetchSubmissions({ commit, state }, reset = false) {
@@ -289,18 +257,19 @@ const actions = {
 
     if (reset) {
       commit('SET_SUBMISSIONS', []);
-      commit('SET_REMOTE_TOTAL', 0);
+      commit('SET_SERVER_TOTAL', 0);
     }
 
     const isLocal = state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS);
-    const isRemote = state.filter.type.length !== 1 || !isLocal;
+    const isServer = state.filter.type.length !== 1 || !isLocal;
 
     const [lastSubmission] = state.submissions.slice(-1);
     let localData = [];
-    let remoteData = [];
+    let serverData = [];
 
     // Fetch if local has data
     if (isLocal && state.localTotal >= 0) {
+      // Add options for the front-end side usage, this will be sanitized in the back-end.
       localData = state.localDrafts.map((item) => ({ ...item, options: { draft: true, local: true } }));
 
       // Filter by `dateModified` is older than the last element from the list
@@ -315,15 +284,15 @@ const actions = {
       }
     }
 
-    // Fetch if remote has data
-    if (isRemote && state.remoteTotal >= 0) {
+    // Fetch if server has data
+    if (isServer && state.serverTotal >= 0) {
       const params = new URLSearchParams();
       params.append('limit', PER_PAGE.toString());
 
       if (lastSubmission) {
         params.append('lastDateModified', lastSubmission.meta.dateModified);
       }
-      if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.REMOTE_DRAFTS)) {
+      if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SERVER_DRAFTS)) {
         params.append('draft', '1');
       }
       if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED)) {
@@ -335,14 +304,17 @@ const actions = {
       if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.RESUBMITTED)) {
         params.append('resubmitter', '1');
       }
+      if (state.filter.hideArchived) {
+        params.append('hideArchived', '1');
+      }
       state.filter.survey.forEach((id) => {
         params.append('surveyIds[]', id);
       });
 
       try {
         const { data } = await api.get(`/drafts?${params}`);
-        remoteData = data.submissions;
-        commit('SET_REMOTE_TOTAL', data.total || -1);
+        serverData = data.submissions;
+        commit('SET_SERVER_TOTAL', data.total || -1);
       } catch (e) {
         console.warn('Failed to fetch drafts with filter', state.filter, e);
       }
@@ -353,9 +325,18 @@ const actions = {
 
     // Resolve conflicts by choosing the latest date modified submission
     const uniqueSubmissions = [];
-    const newSubmissions = [...remoteData, ...localData].sort(sortByModifiedDate);
+    const deleteFromLocal = [];
+    const deleteFromServer = [];
+    const newSubmissions = [...serverData, ...localData].sort(sortByModifiedDate);
     newSubmissions.forEach((item) => {
+      // Already win draft exist - means we have duplicated submission in both server and local.
+      // So, we should remove one of them to ensure the source of truth.
       if (uniqueSubmissions.some((i) => i._id === item._id)) {
+        if (item.options.draft) {
+          deleteFromLocal.push(item._id);
+        } else {
+          deleteFromServer.push(item._id);
+        }
         return;
       }
 
@@ -367,6 +348,24 @@ const actions = {
 
       uniqueSubmissions.push(match[0]);
     });
+
+    // Delete lose drafts from local
+    if (deleteFromLocal.length > 0) {
+      try {
+        await Promise.all(deleteFromLocal.map(db.deleteSubmission));
+      } catch (e) {
+        console.warn('Failed to delete drafts from IDB', e);
+      }
+    }
+
+    // Delete lose drafts from serer
+    if (deleteFromServer.length > 0) {
+      try {
+        await api.post(`/drafts/bulk-delete`, { ids: deleteFromServer });
+      } catch (e) {
+        console.warn('Failed to delete drafts from server', e);
+      }
+    }
 
     // Append the new data
     commit('SET_SUBMISSIONS', [...state.submissions, ...uniqueSubmissions.slice(0, PER_PAGE)]);
@@ -387,7 +386,7 @@ const actions = {
         params.append('localSurveyIds[]', item.meta.survey.id);
       });
     }
-    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.REMOTE_DRAFTS)) {
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SERVER_DRAFTS)) {
       params.append('draft', '1');
     }
     if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED)) {
@@ -398,6 +397,9 @@ const actions = {
     }
     if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.RESUBMITTED)) {
       params.append('resubmitter', '1');
+    }
+    if (state.filter.hideArchived) {
+      params.append('hideArchived','1')
     }
 
     try {

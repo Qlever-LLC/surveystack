@@ -81,16 +81,16 @@ const actions = {
     commit('RESET');
   },
   async [types.actions.fetchLocalSubmissions]({ commit } /* , userId */) {
-    // const response = await api.get('/submissions');
+    try {
+      const submissions = await db.getAllSubmissions();
+      commit(types.mutations.SET_SUBMISSIONS, submissions);
 
-    // TODO reject if timeout here
-    const response = await new Promise((resolve) => {
-      db.openDb(() => {
-        db.getAllSubmissions((results) => resolve(results));
-      });
-    });
-    commit(types.mutations.SET_SUBMISSIONS, response);
-    return response;
+      return submissions;
+    } catch (e) {
+      console.warn('Failed to get all submissions from the IDB', e);
+    }
+
+    return null;
   },
   [types.actions.add]({ commit }, submission) {
     // TODO: submissions should be a unique collection, we shouldn't just push
@@ -98,7 +98,7 @@ const actions = {
   },
   async [types.actions.remove]({ commit }, id) {
     try {
-      await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
+      await db.delete(db.stores.SUBMISSIONS, id);
     } catch (err) {
       console.warn('unable to remove submission from IDB');
     }
@@ -126,7 +126,7 @@ const actions = {
     });
 
     try {
-      await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+      await db.persistSubmission(submission);
     } catch (err) {
       console.warn('failed to save submission to IDB');
     }
@@ -139,8 +139,12 @@ const actions = {
     });
   },
   async [types.actions.update]({ commit }, submission) {
-    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
-    commit(types.mutations.UPDATE_SUBMISSION, submission);
+    try {
+      await db.persistSubmission(submission);
+      commit(types.mutations.UPDATE_SUBMISSION, submission);
+    } catch (err) {
+      console.warn('unable to persist submission to IDB');
+    }
     return submission;
   },
   async [types.actions.fetchRemoteSubmission]({ commit }, id) {

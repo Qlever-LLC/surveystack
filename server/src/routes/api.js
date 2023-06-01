@@ -148,10 +148,24 @@ router.post(
 );
 
 /** Drafts */
-router.get('/drafts', catchErrors(draftController.getDrafts));
-router.get('/drafts/surveys', catchErrors(draftController.getSurveys));
+router.get('/drafts', [assertAuthenticated], catchErrors(draftController.getDrafts));
+router.get('/drafts/surveys', [assertAuthenticated], catchErrors(draftController.getSurveys));
 router.post('/drafts', [assertAuthenticated], catchErrors(draftController.createDrafts));
-router.delete('/drafts/:id', [assertAuthenticated], catchErrors(draftController.deleteDraft));
+router.delete(
+  '/drafts/:id',
+  [assertAuthenticated, assertEntityExists({ collection: 'drafts' }), assertEntityRights],
+  catchErrors(draftController.deleteDrafts)
+);
+router.post(
+  '/drafts/bulk-delete',
+  [
+    assertAuthenticated,
+    assertHasIds,
+    assertEntitiesExist({ collection: 'drafts' }),
+    assertEntitiesRights,
+  ],
+  catchErrors(draftController.deleteDrafts)
+);
 
 /** Surveys */
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));

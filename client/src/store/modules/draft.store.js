@@ -176,11 +176,11 @@ const actions = {
     await dispatch('next');
   },
   //TODO check - could this be removed? does not seem to be referenced
-  setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
+  async setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
       try {
-        db.persistSubmission(state.submission);
+        await db.persistSubmission(state.submission);
       } catch (err) {
         console.warn('unable to persist submission to IDB');
       }
@@ -190,6 +190,9 @@ const actions = {
     }
   },
   async next({ commit, state, dispatch }) {
+    // Save current step into the IDB
+    dispatch('submissions/saveToLocal', state.submission, { root: true });
+
     dispatch('calculateApiCompose');
 
     const traversal = [];

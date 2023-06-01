@@ -37,7 +37,9 @@ export default defineComponent({
     const checked = ref([]);
 
     const handleCheck = (submission) => {
-      if (checked.value.includes(submission)) {
+      if (submission.meta.archived) {
+        return;
+      } else if (checked.value.includes(submission)) {
         checked.value = checked.value.filter((i) => i !== submission);
       } else {
         checked.value.push(submission);

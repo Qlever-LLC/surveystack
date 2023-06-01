@@ -4,7 +4,6 @@ import { db, mongoClient } from '../db';
 import { withSession, withTransaction } from '../db/helpers';
 import { queryParam } from '../helpers';
 import assert from 'assert';
-import rolesService from '../services/roles.service';
 
 const col = 'drafts';
 const DEFAULT_LIMIT = 100000;
@@ -45,23 +44,6 @@ const isSubmitted = (req) =>
   queryParam(req.query.creator) ||
   queryParam(req.query.proxyUserId) ||
   queryParam(req.query.resubmitter);
-
-const isUserAllowedToModifyDraft = async (draft, user) => {
-  if (draft.meta.creator === user) {
-    return true; // user may delete their own draft
-  }
-
-  if (draft.meta.proxyUserId === user) {
-    return true; // proxy user may delete their draft
-  }
-
-  const hasAdminRole = await rolesService.hasAdminRole(user, draft.meta.group.id);
-  if (hasAdminRole) {
-    return true; // group admins may delete surveys
-  }
-
-  return false;
-};
 
 const paginationStages = (req) => {
   const skip = req.query.skip ? Number(req.query.skip) : 0;
@@ -184,6 +166,9 @@ const surveyStages = (req, res) => {
                               : []),
                           ],
                         },
+                        ...(queryParam(req.query.hideArchived)
+                          ? [{ $ne: ['$meta.archived', true] }]
+                          : []),
                       ],
                     },
                   },
@@ -255,6 +240,7 @@ const createDrafts = async (req, res) => {
  *   creator:           boolean,         // Fetch the submissions that is submitted by me
  *   proxyUserId:       boolean,         // Fetch the submissions that is submitted by me as a proxy
  *   resubmitter:       boolean,         // Fetch the submissions that is resubmitted by me
+ *   hideArchive:       boolean,         // Exclude archived submissions
  *   surveyIds:         array,           // Filter by survey(s)
  * } req
  * @param {*} res
@@ -276,6 +262,14 @@ const getDrafts = async (req, res) => {
     match = {
       ...match,
       'meta.dateModified': { $lt: new Date(req.query.lastDateModified) },
+    };
+  }
+
+  // Hide archived
+  if (queryParam(req.query.hideArchived)) {
+    match = {
+      ...match,
+      'meta.archived': { $ne: true },
     };
   }
 
@@ -345,6 +339,7 @@ const getDrafts = async (req, res) => {
  *   creator:           boolean,         // Fetch the submissions that is submitted by me
  *   proxyUserId:       boolean,         // Fetch the submissions that is submitted by me as a proxy
  *   resubmitter:       boolean,         // Fetch the submissions that is resubmitted by me
+ *   hideArchive:       boolean,         // Exclude archived submissions
  *   localSurveyIds:    array,           // Survey ID(s) of the local drafts
  * } req
  * @param {*} res
@@ -364,22 +359,16 @@ const getSurveys = async (req, res) => {
   return res.send(surveys);
 };
 
-const deleteDraft = async (req, res) => {
+const deleteDrafts = async (req, res) => {
   const { id } = req.params;
-
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  if (!existing) {
-    throw boom.notFound(`No entity with _id exists: ${id}`);
-  }
-
-  const isAllowed = await isUserAllowedToModifyDraft(existing, res.locals.auth.user._id);
-  if (!isAllowed) {
-    throw boom.unauthorized(`You are not authorized to delete draft: ${id}`);
+  let { ids } = req.body;
+  if (!ids) {
+    ids = [id];
   }
 
   try {
-    const result = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, result.deletedCount);
+    const result = await db.collection(col).deleteMany({ _id: { $in: ids.map(ObjectId) } });
+    assert.equal(ids.length, result.deletedCount);
   } catch (e) {
     throw boom.internal('Unknown internal error', e);
   }
@@ -387,4 +376,4 @@ const deleteDraft = async (req, res) => {
   return res.send({ message: 'OK' });
 };
 
-export default { createDrafts, getDrafts, getSurveys, deleteDraft };
+export default { createDrafts, getDrafts, getSurveys, deleteDrafts };

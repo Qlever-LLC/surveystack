@@ -33,7 +33,7 @@
       clearable
       outlined
       hide-details
-      @change="onChange"
+      @change="handleSurveyChange"
     >
       <template v-slot:selection="{ item, index }">
         <span v-if="index === 0">{{ item.name }}</span>
@@ -42,6 +42,8 @@
         </span>
       </template>
     </v-autocomplete>
+
+    <v-checkbox v-model="hideArchived" label="Hide Archived"></v-checkbox>
   </v-card>
 </template>
 
@@ -51,6 +53,11 @@ import { SubmissionLoadingActions, SubmissionTypes } from '@/store/modules/submi
 
 export default defineComponent({
   setup(props, { root }) {
+    const isSurveyLoading = computed(() =>
+      root.$store.getters['submissions/getLoading'](SubmissionLoadingActions.FETCH_SURVEYS)
+    );
+    const comboboxSearch = ref('');
+
     const types = Object.values(SubmissionTypes);
     const type = computed({
       get() {
@@ -61,9 +68,7 @@ export default defineComponent({
         root.$store.dispatch('submissions/fetchSurveys');
       },
     });
-    const isSurveyLoading = computed(() =>
-      root.$store.getters['submissions/getLoading'](SubmissionLoadingActions.FETCH_SURVEYS)
-    );
+
     const surveys = computed(() => root.$store.getters['submissions/surveys']);
     const survey = computed({
       get() {
@@ -73,19 +78,29 @@ export default defineComponent({
         root.$store.dispatch('submissions/setFilter', { survey });
       },
     });
-    const comboboxSearch = ref('');
-    const onChange = () => {
+
+    const hideArchived = computed({
+      get() {
+        return root.$store.getters['submissions/filter'].hideArchived;
+      },
+      set(hideArchived) {
+        root.$store.dispatch('submissions/setFilter', { hideArchived });
+      },
+    });
+
+    const handleSurveyChange = () => {
       comboboxSearch.value = '';
     };
 
     return {
       isSurveyLoading,
+      comboboxSearch,
       types,
       type,
       surveys,
       survey,
-      comboboxSearch,
-      onChange,
+      hideArchived,
+      handleSurveyChange,
     };
   },
 });
@@ -100,9 +115,8 @@ export default defineComponent({
   gap: 16px;
   z-index: 10;
 
-  & > .v-input {
-    flex: 1 1 0% !important;
-    flex-shrink: 0;
+  & > .v-select {
+    flex: 1 1 0%;
   }
 }
 

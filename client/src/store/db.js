@@ -1,17 +1,3 @@
-const surveys = [];
-
-const invites = [];
-
-const dashboards = [];
-
-const submissions = [];
-
-const users = [];
-
-const scripts = [];
-
-const groups = [];
-
 let db = null;
 
 const stores = {
@@ -22,275 +8,195 @@ const stores = {
 
 const DATABASE_NAME = 'Database';
 
-// Opening a Database
-function openDb(onSuccess) {
-  const request = indexedDB.open(DATABASE_NAME, 8);
-  db = this.result;
+// OPEN
+function openDb(onSuccess, version = 8) {
+  if (db && typeof onSuccess === 'function') {
+    return onSuccess();
+  }
 
-  request.onerror = (event) => {
-    console.log(`Error: ${event}`);
-  };
+  const request = indexedDB.open(DATABASE_NAME, version);
 
-  request.onsuccess = (event) => {
-    console.log('IDB Success', event);
-    db = event.target.result;
-    if (onSuccess) {
-      onSuccess();
-    }
-  };
-
-  // OnUpgradeNeeded Handler
   request.onupgradeneeded = (event) => {
-    console.log('On Upgrade Needed');
+    console.log('IDB - Upgrade Needed');
 
     db = event.target.result;
-    // eslint-disable-next-line no-unused-vars
+
     try {
       console.log('creating submission store');
       db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
-    } catch (error) {
-      // ignore
+    } catch (e) {
+      console.warn('IDB - Failed to create submission store', e);
     }
 
     try {
       console.log('creating survey store');
       db.createObjectStore(stores.SURVEYS, { keyPath: '_id' });
-    } catch (error) {
-      // ignore
+    } catch (e) {
+      console.warn('IDB - Failed to create survey store', e);
     }
 
     try {
       console.log('creating resources store');
       db.createObjectStore(stores.RESOURCES, { keyPath: '_id' });
-    } catch (error) {
-      // ignore
+    } catch (e) {
+      console.warn('IDB - Failed to create resources store', e);
     }
+  };
+
+  request.onsuccess = (event) => {
+    console.log('IDB - success', event);
+    db = event.target.result;
+    db.close = () => {
+      db = null;
+    };
+    if (typeof onSuccess === 'function') {
+      onSuccess();
+    }
+  };
+
+  request.onerror = (event) => {
+    console.warn('IDB - Failed', request.error);
   };
 }
 
 function getObjectStore(storeName, mode) {
-  const tx = db.transaction(storeName, mode);
-  return tx.objectStore(storeName);
+  const transaction = db.transaction([storeName], mode);
+  return transaction.objectStore(storeName);
 }
 
-function clearObjectStore(storeName) {
-  try {
-    // Get the ObjectStore
-    const store = getObjectStore(storeName, 'readwrite');
-    // Clear the ObjectStore
-    const req = store.clear();
-    // Success Handler
-    req.onsuccess = (event) => {
-      console.log(`clear successful: ${event}`);
-    };
-    // Error Handler
-    req.onerror = (event) => {
-      console.log(`clear failed: ${event}`);
-    };
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-function clearAllSubmissions() {
-  clearObjectStore(stores.SUBMISSIONS);
-}
-
-function clearAllSurveys() {
-  clearObjectStore(stores.SURVEYS);
-}
-
-function clearAllResources() {
-  clearObjectStore(stores.RESOURCES);
-}
-
+// INSERT/UPDATE
 function persist(storeName, obj) {
-  try {
-    const store = getObjectStore(storeName, 'readwrite');
-    let req;
-
-    req = store.put(obj);
-
-    req.onsuccess = (evt) => {
-      console.log(`Insertion in DB successful: ${evt}`);
-    };
-    req.onerror = () => {
-      console.log('Insertion in DB Failed ', this.error);
-    };
-  } catch (err) {
-    console.warn('unable to persist to IDB');
-  }
+  return new Promise((resolve, reject) => {
+    openDb(() => {
+      const objectStore = getObjectStore(storeName, 'readwrite');
+      const request = objectStore.put(obj);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  });
 }
 
 function persistSubmission(submission) {
-  persist(stores.SUBMISSIONS, submission);
+  return persist(stores.SUBMISSIONS, submission);
 }
 
 function persistSurvey(survey) {
-  persist(stores.SURVEYS, survey);
+  return persist(stores.SURVEYS, survey);
 }
 
 function persistResource(resource) {
-  persist(stores.RESOURCES, resource);
+  return persist(stores.RESOURCES, resource);
 }
 
-function getResults(storeName, success) {
-  // Create an array
-  const results = [];
-  // Get the ObjectStore
-  const objectStore = getObjectStore(storeName, 'readwrite');
-
-  // Open the Cursor on the ObjectStore
-  objectStore.openCursor().onsuccess = (event) => {
-    const cursor = event.target.result;
-    // If there is a next item, add it to the array
-    if (cursor) {
-      results.push(cursor.value);
-      // console.log(cursor.value);
-      cursor.continue();
-    } else {
-      success(results);
-    }
-  };
-
-  objectStore.openCursor().onerror = (event) => {
-    console.log(`Error: ${event}`);
-    success(results);
-  };
-}
-
-// Read All data in ObjectStore
-function getAllSubmissions(onSuccess) {
-  getResults(stores.SUBMISSIONS, onSuccess);
-}
-
-function getAllSurveys(onSuccess) {
-  getResults(stores.SURVEYS, onSuccess);
-}
-
-function getAllResources(onSuccess) {
-  getResults(stores.RESOURCES, onSuccess);
-}
-
-/*
-  https://stackoverflow.com/questions/41586400/using-indexeddb-asynchronously
-  Maybe we could use "idb" which is a wrapper for IndexedDB but with promises?
-  Also, we may want to add a "db" module to the Vuex store?
-*/
-function loadFromIndexedDB(storeName, id) {
+// READ
+function get(storeName, id) {
   return new Promise((resolve, reject) => {
-    const dbRequest = indexedDB.open(DATABASE_NAME);
-
-    dbRequest.onerror = (ev) => {
-      reject(Error('Error text'));
-    };
-
-    dbRequest.onupgradeneeded = (ev) => {
-      // Objectstore does not exist. Nothing to load
-      ev.target.transaction.abort();
-      reject(Error('Not found'));
-    };
-
-    dbRequest.onsuccess = (ev) => {
-      const database = ev.target.result;
-      const transaction = database.transaction([storeName]);
-      const objectStore = transaction.objectStore(storeName);
-      const objectRequest = objectStore.get(id);
-
-      objectRequest.onerror = () => {
-        reject(Error('Error text'));
-      };
-
-      objectRequest.onsuccess = () => {
-        if (objectRequest.result) resolve(objectRequest.result);
-        else reject(Error('object not found'));
-      };
-    };
+    openDb(() => {
+      const objectStore = getObjectStore(storeName);
+      const request = objectStore.get(id);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
   });
 }
 
-function saveToIndexedDB(storeName, object) {
+function getAll(storeName) {
   return new Promise((resolve, reject) => {
-    const dbRequest = indexedDB.open(DATABASE_NAME);
-
-    if (object._id === undefined) reject(Error('object has no _id.'));
-
-    dbRequest.onerror = (ev) => {
-      reject(Error('IndexedDB database error'));
-    };
-
-    dbRequest.onupgradeneeded = (ev) => {
-      const database = ev.target.result;
-      const objectStore = database.createObjectStore(storeName, { keyPath: '_id' });
-    };
-
-    dbRequest.onsuccess = (event) => {
-      const database = event.target.result;
-      const transaction = database.transaction(storeName, 'readwrite');
-      const objectStore = transaction.objectStore(storeName);
-      const objectRequest = objectStore.put(object); // Overwrite if exists
-
-      objectRequest.onerror = (ev) => {
-        reject(Error('Error text'));
-      };
-
-      objectRequest.onsuccess = (ev) => {
-        resolve('Data saved OK');
-      };
-    };
+    openDb(() => {
+      const objectStore = getObjectStore(storeName);
+      const request = objectStore.getAll();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
   });
 }
 
-function removeFromIndexedDB(storeName, id) {
+function getSubmission(id) {
+  return get(stores.SUBMISSIONS, id);
+}
+
+function getAllSubmissions() {
+  return getAll(stores.SUBMISSIONS);
+}
+
+function getSurvey(id) {
+  return get(stores.SURVEYS, id);
+}
+
+function getAllSurveys() {
+  return getAll(stores.SURVEYS);
+}
+
+function getResource(id) {
+  return get(stores.RESOURCES, id);
+}
+
+function getAllResources() {
+  return getAll(stores.RESOURCES);
+}
+
+// DELETE
+function remove(storeName, id) {
   return new Promise((resolve, reject) => {
-    const dbRequest = indexedDB.open(DATABASE_NAME);
-
-    dbRequest.onerror = (ev) => {
-      reject(Error('IndexedDB database error'));
-    };
-
-    dbRequest.onupgradeneeded = (ev) => {
-      const database = ev.target.result;
-      database.createObjectStore(storeName, { keyPath: '_id' });
-    };
-
-    dbRequest.onsuccess = (event) => {
-      const database = event.target.result;
-      const transaction = database.transaction(storeName, 'readwrite');
-      const objectStore = transaction.objectStore(storeName);
-      const objectRequest = objectStore.delete(id);
-
-      objectRequest.onerror = (ev) => {
-        reject(Error(`Error deleting ID ${id} from ${storeName}`));
-      };
-
-      objectRequest.onsuccess = (ev) => {
-        resolve(`Success deleting ID ${id} from ${storeName}`);
-      };
-    };
+    openDb(() => {
+      const objectStore = getObjectStore(storeName, 'readwrite');
+      const request = objectStore.delete(id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
   });
+}
+
+function clear(storeName) {
+  return new Promise((resolve, reject) => {
+    openDb(() => {
+      const objectStore = getObjectStore(storeName, 'readwrite');
+      const request = objectStore.clear();
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
+}
+
+function deleteSubmission(id) {
+  return remove(stores.SUBMISSIONS, id);
+}
+
+function deleteAllSubmissions() {
+  return clear(stores.SUBMISSIONS);
+}
+
+function deleteSurvey(id) {
+  return remove(stores.SURVEYS, id);
+}
+
+function deleteAllSurveys() {
+  return clear(stores.SURVEYS);
+}
+
+function deleteResource(id) {
+  return remove(stores.RESOURCES, id);
+}
+
+function deleteAllResources() {
+  return clear(stores.RESOURCES);
 }
 
 export {
-  surveys,
-  submissions,
-  invites,
-  dashboards,
-  users,
-  groups,
-  scripts,
   openDb,
   persistSubmission,
-  persistResource,
   persistSurvey,
+  persistResource,
+  getSubmission,
   getAllSubmissions,
-  clearAllSubmissions,
+  getSurvey,
   getAllSurveys,
-  clearAllSurveys,
+  getResource,
   getAllResources,
-  clearAllResources,
-  loadFromIndexedDB,
-  saveToIndexedDB,
-  stores,
-  removeFromIndexedDB,
+  deleteSubmission,
+  deleteAllSubmissions,
+  deleteSurvey,
+  deleteAllSurveys,
+  deleteResource,
+  deleteAllResources,
 };
