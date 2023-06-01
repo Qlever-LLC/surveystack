@@ -105,7 +105,7 @@ export default {
       // is sure they want to leave. User can click 'cancel' when prompted whether they want to "Confirm editing submitted",
       // which deleted the submission from the store, then when prompted whether they want to leave the current draft
       // they can also click cancel, which may cause an error
-      this.$router.push({ name: 'my-submissions' });
+      this.$router.push({ name: 'my-submissions-list' });
     },
     addReadyToSubmit(status) {
       return [

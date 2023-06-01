@@ -22,102 +22,36 @@
       <span class="ml-2">{{ submission.meta.status.map((i) => i.type).join(', ') }}</span>
       <v-spacer></v-spacer>
 
-      <!-- Save to serer -->
       <span v-if="isArchived" class="grey--text"> {{ submission.meta.archivedReason }}</span>
-      <template v-else>
-        <!-- Continue draft -->
-        <continue v-if="isDraft && !isReadyToSubmit" :submission="submission" />
-        <submit v-if="isDraft && isReadyToSubmit" :submission="submission" />
 
-        <!-- Resubmit submission -->
-        <v-btn v-else color="primary" elevation="0" rounded small outlined>
-          <v-icon left small>mdi-redo-variant</v-icon>
-          Resubmit
-        </v-btn>
+      <template v-else-if="isDraft">
+        <continue v-if="!isReadyToSubmit" :submission="submission"></continue>
+        <submit v-if="isReadyToSubmit" :submission="submission"></submit>
+        <upload v-if="isLocal" :submission="submission"> </upload>
+        <download v-if="!isLocal" :submission="submission"></download>
+        <delete :submission="submission"></delete>
+      </template>
 
-        <v-btn
-          v-if="isDraft && isLocal"
-          color="primary"
-          rounded
-          small
-          icon
-          text
-          outlined
-          :disabled="!!loading"
-          :loading="isUploading"
-          @click="handleUpload"
-        >
-          <v-icon small>mdi-upload-outline</v-icon>
-        </v-btn>
-
-        <!-- Download to local -->
-        <v-btn
-          v-if="isDraft && !isLocal"
-          rounded
-          small
-          icon
-          text
-          outlined
-          :disabled="!!loading"
-          :loading="isDownloading"
-          @click="handleDownload"
-        >
-          <v-icon small>mdi-download-outline</v-icon>
-        </v-btn>
-
-        <!-- Delete/Archive -->
-        <delete :submission="submission">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              color="error"
-              elevation="0"
-              rounded
-              small
-              icon
-              text
-              outlined
-              :disabled="!!loading"
-              v-on="on"
-            >
-              <v-icon small>{{ isDraft ? 'mdi-delete-outline' : 'mdi-archive-outline' }}</v-icon>
-            </v-btn>
-          </template>
-        </delete>
+      <template v-else-if="isCreator || isAdmin">
+        <resubmit :submission="submission"></resubmit>
+        <archive :submission="submission"></archive>
       </template>
     </div>
 
-    <v-divider />
+    <v-divider></v-divider>
 
     <div class="bottom">
-      <v-chip :input-value="true" small @click.stop="handleStatusChip(isLocal ? 'Local' : 'Server')">
-        {{ isLocal ? 'Local' : 'Server' }}
-      </v-chip>
-      <v-chip
-        v-if="isDraft"
-        color="light-blue lighten-4"
-        :input-value="true"
-        small
-        @click.stop="handleStatusChip('Draft')"
-      >
-        Draft
-      </v-chip>
-      <v-chip v-if="isProxy" color="yellow lighten-4" :input-value="true" small @click.stop="handleStatusChip('Proxy')">
-        Proxy
-      </v-chip>
-      <v-chip v-else color="light-green lighten-4" :input-value="true" small @click.stop="handleStatusChip('Creator')">
-        Creator
-      </v-chip>
-      <v-chip
-        v-if="isResubmitted"
-        color="brown lighten-4"
-        :input-value="true"
-        small
-        @click.stop="handleStatusChip('Resubmitter')"
-      >
-        Resubmitter
-      </v-chip>
+      <status-chip v-if="isLocal" label="Local"></status-chip>
+      <status-chip v-else label="Server"></status-chip>
+      <status-chip v-if="isDraft" label="Draft" color="light-blue lighten-4"></status-chip>
+      <template v-else>
+        <status-chip v-if="isCreator" label="Creator" color="light-green lighten-4"></status-chip>
+        <status-chip v-if="isProxy" label="Proxy" color="yellow lighten-4"></status-chip>
+        <status-chip v-if="isResubmitter" label="Resubmitter" color="brown lighten-4"></status-chip>
+      </template>
+
       <v-spacer></v-spacer>
+
       <span v-if="dateSubmitted" class="text-caption">
         <span class="blue-grey--text">Submitted:</span>
         {{ dateSubmitted }}
@@ -132,12 +66,16 @@
 </template>
 
 <script>
+import * as dateFns from 'date-fns';
 import { computed } from '@vue/composition-api';
+import Download from './actions/Download.vue';
+import Upload from './actions/Upload.vue';
 import Delete from './actions/Delete.vue';
+import Archive from './actions/Archive.vue';
 import Continue from './actions/Continue.vue';
 import Submit from './actions/Submit.vue';
-import * as dateFns from 'date-fns';
-import { SubmissionLoadingActions, SubmissionTypes } from '@/store/modules/submissions.store';
+import Resubmit from './actions/Resubmit.vue';
+import StatusChip from './StatusChip.vue';
 
 const formatDate = (date) => {
   const parsedDate = dateFns.parseISO(date);
@@ -146,9 +84,14 @@ const formatDate = (date) => {
 
 export default {
   components: {
+    Download,
+    Upload,
     Delete,
+    Archive,
     Continue,
     Submit,
+    Resubmit,
+    StatusChip,
   },
   props: {
     submission: {
@@ -164,20 +107,24 @@ export default {
     const chipColor = computed(() => (props.checked ? 'secondary' : undefined));
     const isLocal = computed(() => props.submission.options.local);
     const isDraft = computed(() => props.submission.options.draft);
+    const isCreator = computed(() => props.submission.meta.creator === userId.value);
     const isProxy = computed(() => props.submission.meta.proxyUserId === userId.value);
-    const isResubmitted = computed(() => props.submission.meta.resubmitter === userId.value);
+    const isResubmitter = computed(() => props.submission.meta.resubmitter === userId.value);
     const isArchived = computed(() => !!props.submission.meta.archived);
     const isReadyToSubmit = computed(() =>
       props.submission.meta.status.some((item) => item.type === 'READY_TO_SUBMIT')
     );
+    const isAdmin = computed(() => {
+      const memberships = root.$store.getters['memberships/memberships'];
+      return memberships.some(
+        (membership) => membership.group._id === props.submission.meta.group.id && membership.role === 'admin'
+      );
+    });
     const dateSubmitted = computed(() => formatDate(props.submission.meta.dateSubmitted));
     const dateModified = computed(() => formatDate(props.submission.meta.dateModified));
     const survey = computed(() =>
       root.$store.getters['submissions/surveys'].find((item) => item._id === props.submission.meta.survey.id)
     );
-    const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isDownloading = computed(() => loading.value === SubmissionLoadingActions.SAVE_TO_LOCAL);
-    const isUploading = computed(() => loading.value === SubmissionLoadingActions.SAVE_TO_SERVER);
 
     const classes = computed(() => {
       const bar = [];
@@ -185,7 +132,7 @@ export default {
         bar.push('light-blue darken-3');
       } else if (isProxy.value) {
         bar.push('yellow darken-1');
-      } else {
+      } else if (isCreator.value) {
         bar.push('green darken-1');
       }
 
@@ -196,7 +143,7 @@ export default {
         surveyName.push('blue--text text--darken-2');
       } else if (isProxy.value) {
         surveyName.push('yellow--text text--darken-3');
-      } else {
+      } else if (isCreator.value) {
         surveyName.push('green--text text--darken-2');
       }
 
@@ -206,65 +153,20 @@ export default {
       };
     });
 
-    const handleDownload = () => {
-      root.$store.dispatch('submissions/saveToLocal', props.submission);
-    };
-
-    const handleUpload = () => {
-      root.$store.dispatch('submissions/saveToServer', props.submission);
-    };
-
-    const handleStatusChip = (type) => {
-      if (type === 'Local') {
-        root.$store.dispatch('submissions/setFilter', {
-          type: [SubmissionTypes.LOCAL_DRAFTS],
-        });
-      } else if (type === 'Server') {
-        root.$store.dispatch('submissions/setFilter', {
-          type: [
-            SubmissionTypes.SERVER_DRAFTS,
-            SubmissionTypes.SUBMITTED,
-            SubmissionTypes.SUBMITTED_AS_PROXY,
-            SubmissionTypes.RESUBMITTED,
-          ],
-        });
-      } else if (type === 'Draft') {
-        root.$store.dispatch('submissions/setFilter', {
-          type: [SubmissionTypes.LOCAL_DRAFTS, SubmissionTypes.SERVER_DRAFTS],
-        });
-      } else if (type === 'Creator') {
-        root.$store.dispatch('submissions/setFilter', {
-          type: [SubmissionTypes.SUBMITTED],
-        });
-      } else if (type === 'Proxy') {
-        root.$store.dispatch('submissions/setFilter', {
-          type: [SubmissionTypes.SUBMITTED_AS_PROXY],
-        });
-      } else if (type === 'Resubmitter') {
-        root.$store.dispatch('submissions/setFilter', {
-          type: [SubmissionTypes.RESUBMITTED],
-        });
-      }
-    };
-
     return {
       classes,
       survey,
       chipColor,
       isLocal,
       isDraft,
+      isCreator,
       isProxy,
-      isResubmitted,
+      isResubmitter,
       isArchived,
       isReadyToSubmit,
+      isAdmin,
       dateSubmitted,
       dateModified,
-      loading,
-      isDownloading,
-      isUploading,
-      handleDownload,
-      handleUpload,
-      handleStatusChip,
     };
   },
 };

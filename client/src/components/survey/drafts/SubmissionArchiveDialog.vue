@@ -17,8 +17,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="$emit('cancel')">Cancel</v-btn>
-        <v-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
+        <v-btn text :disabled="!!loading" @click="$emit('cancel')">Cancel</v-btn>
+        <v-btn text @click="confirm" color="error" :loading="!!loading">{{ labelConfirm || 'OK' }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -42,6 +42,10 @@ export default {
     reason: {
       type: String,
       default: 'TEST_DATA',
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

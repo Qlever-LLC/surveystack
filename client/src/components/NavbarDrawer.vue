@@ -104,13 +104,13 @@ export default {
           },
           {
             type: 'link',
-            label: 'Drafts',
-            to: { name: 'drafts-list' },
+            label: 'My Submissions',
+            to: { name: 'my-submissions-list' },
             icon: 'mdi-clipboard',
           },
           {
             type: 'link',
-            label: 'My Submissions',
+            label: 'My Submissions - old',
             to: { name: 'my-submissions' },
             icon: 'mdi-clipboard',
           },

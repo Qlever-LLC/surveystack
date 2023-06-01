@@ -24,7 +24,7 @@ import scriptRoutes from './script';
 import submissionRoutes from './submission';
 import surveyRoutes from './survey';
 import userRoutes from './user';
-import draftRoutes from './draft';
+import mySubmissionsRoute from './mySubmission';
 
 import { getComponents, superGuard } from './helper';
 
@@ -131,7 +131,7 @@ const routes = [
   ...submissionRoutes,
   ...surveyRoutes,
   ...userRoutes,
-  ...draftRoutes,
+  ...mySubmissionsRoute,
 ];
 
 if (process.env.NODE_ENV !== 'production') {

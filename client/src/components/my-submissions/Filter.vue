@@ -1,5 +1,5 @@
 <template>
-  <v-card class="filter-bar px-6 py-4">
+  <v-card class="filter-bar d-flex flex-column flex-md-row align-md-center px-6 py-4">
     Filter by:
     <v-select
       v-model="type"
@@ -43,7 +43,7 @@
       </template>
     </v-autocomplete>
 
-    <v-checkbox v-model="hideArchived" label="Hide Archived"></v-checkbox>
+    <v-checkbox v-model="hideArchived" label="Hide Archived" class="mt-0" hide-details></v-checkbox>
   </v-card>
 </template>
 
@@ -85,6 +85,7 @@ export default defineComponent({
       },
       set(hideArchived) {
         root.$store.dispatch('submissions/setFilter', { hideArchived });
+        root.$store.dispatch('submissions/fetchSurveys');
       },
     });
 
@@ -108,12 +109,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .filter-bar {
-  position: sticky;
-  top: 0px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  z-index: 10;
+  row-gap: 16px;
+  column-gap: 8px;
+  z-index: 1;
 
   & > .v-select {
     flex: 1 1 0%;
@@ -127,6 +125,13 @@ export default defineComponent({
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+}
+
+@media (min-width: 960px) {
+  .filter-bar {
+    position: sticky;
+    top: 0px;
   }
 }
 </style>

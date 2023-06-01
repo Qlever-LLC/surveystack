@@ -25,9 +25,6 @@ export default {
   },
   created() {
     domainHandler.install(this);
-    // Testing: http://gm.localhost:9020/surveys/5ec83ee6c4431b000146046e
-    // TODO: figure out whether we need openDb?
-    db.openDb(() => {});
   },
   mounted() {
     this.fetchPinnedSurveys();

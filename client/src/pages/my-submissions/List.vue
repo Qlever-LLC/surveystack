@@ -1,6 +1,6 @@
 <template>
-  <div class="background wrapper">
-    <v-container class="text-center pb-8">
+  <div class="wrapper background">
+    <v-container class="pb-8">
       <draft-filter></draft-filter>
 
       <div class="mt-8">
@@ -9,7 +9,7 @@
           :key="submission._id"
           :submission="submission"
           :checked="checked.includes(submission)"
-          @click.native="handleCheck(submission)"
+          @click.native="handleCardCheck(submission)"
         >
         </draft-card>
 
@@ -19,24 +19,34 @@
       <v-progress-circular v-if="isLoading" :size="30" color="primary" class="my-4" indeterminate></v-progress-circular>
       <div ref="lastEl" v-else-if="hasMoreData"></div>
     </v-container>
+
+    <v-fab-transition>
+      <v-btn v-show="showTopButton" color="pink" dark fixed right fab small @click="handleToTop">
+        <v-icon>mdi-arrow-up</v-icon>
+      </v-btn>
+    </v-fab-transition>
   </div>
 </template>
 
 <script>
-import { computed, defineComponent, ref, watch } from '@vue/composition-api';
-import DraftFilter from '@/components/drafts/Filter.vue';
-import DraftCard from '@/components/drafts/Card.vue';
+import { computed, defineComponent, onUnmounted, onUpdated, ref, watch } from '@vue/composition-api';
+import DraftFilter from '@/components/my-submissions/Filter.vue';
+import DraftCard from '@/components/my-submissions/Card.vue';
 
 export default defineComponent({
-  components: { DraftFilter, DraftCard },
+  components: {
+    DraftFilter,
+    DraftCard,
+  },
   setup(props, { root }) {
     const isLoading = computed(() => root.$store.getters['submissions/isFetching']);
     const hasMoreData = computed(() => root.$store.getters['submissions/hasMoreData']);
     const submissions = computed(() => root.$store.getters['submissions/submissions']);
     const lastEl = ref();
     const checked = ref([]);
+    const showTopButton = ref(false);
 
-    const handleCheck = (submission) => {
+    const handleCardCheck = (submission) => {
       if (submission.meta.archived) {
         return;
       } else if (checked.value.includes(submission)) {
@@ -45,6 +55,22 @@ export default defineComponent({
         checked.value.push(submission);
       }
     };
+
+    const handleToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleScroll = () => {
+      showTopButton.value = window.scrollY > 400;
+    };
+
+    onUpdated(() => {
+      window.addEventListener('scroll', handleScroll);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
 
     let cleanup = undefined;
     watch(
@@ -89,7 +115,9 @@ export default defineComponent({
       submissions,
       lastEl,
       checked,
-      handleCheck,
+      showTopButton,
+      handleCardCheck,
+      handleToTop,
     };
   },
 });
@@ -104,6 +132,11 @@ export default defineComponent({
   .container {
     position: relative;
     flex: 1 1 0%;
+    max-width: 1280px;
+  }
+
+  .v-btn--fab {
+    bottom: 28px;
   }
 }
 </style>

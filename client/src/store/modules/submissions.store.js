@@ -125,6 +125,14 @@ const actions = {
     dispatch('fetchSubmissions', true);
   },
 
+  removeSubmission({ commit }, id) {
+    commit('DELETE_SUBMISSION', id);
+  },
+
+  setSubmission({ commit }, submission) {
+    commit('ADD_OR_UPDATE_SUBMISSION', submission);
+  },
+
   async delete({ commit }, id) {
     commit('SET_LOADING', { [id]: SubmissionLoadingActions.DELETE });
 
@@ -399,7 +407,7 @@ const actions = {
       params.append('resubmitter', '1');
     }
     if (state.filter.hideArchived) {
-      params.append('hideArchived','1')
+      params.append('hideArchived', '1');
     }
 
     try {

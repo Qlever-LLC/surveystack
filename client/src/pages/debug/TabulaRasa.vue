@@ -31,13 +31,6 @@ export default {
     };
   },
   methods: {
-    async clearAll() {
-      try {
-        await Promise.all([db.deleteAllSubmissions(), db.deleteAllSurveys(), db.deleteAllResources()]);
-      } catch (e) {
-        console.warn(e);
-      }
-    },
     async submit() {
       try {
         await api.post('/debug/tabularasa');
@@ -46,7 +39,11 @@ export default {
         return;
       }
 
-      db.openDb(this.clearAll);
+      try {
+        await Promise.all([db.deleteAllSubmissions(), db.deleteAllSurveys(), db.deleteAllResources()]);
+      } catch (e) {
+        console.warn(e);
+      }
 
       this.$router.push('/surveys/browse');
     },
