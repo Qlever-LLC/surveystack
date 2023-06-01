@@ -51,6 +51,7 @@ const initialState = createInitialState();
 const getters = {
   submissions: (state) => state.submissions,
   surveys: (state) => state.surveys,
+  submission: (state) => (id) => state.submissions.find((submission) => submission._id === id),
   total: (state) => state.serverTotal + state.localTotal,
   filter: (state) => state.filter,
   isLoading: (state) => Object.values(state.loading).filter(Boolean).length > 0,

@@ -176,12 +176,7 @@ export default {
     this.loading = true;
     const { id } = this.$route.params;
 
-    try {
-      this.submission = await this.$store.dispatch('mySubmissions/fetchLocalSubmission', id);
-    } catch (error) {
-      console.warn('Submission not found', id);
-    }
-
+    this.submission = this.$store.getters['submissions/submission'](id);
     if (!this.submission) {
       console.log('Error: submission not found');
       this.hasError = true;
