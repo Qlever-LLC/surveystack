@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { createSurvey, getControlGenerator } from '../testUtils';
 import pdfService from './pdf.service';
 import mockAxios from 'axios';
@@ -215,7 +216,7 @@ describe('pdf.service', () => {
           getControlGenerator('instructions')(),
           getControlGenerator('instructionsImageSplit')(),
         ];
-        const surveyEntity = { ...survey };
+        const surveyEntity = cloneDeep(survey);
         surveyEntity.meta.printOptions.showInstruction = false;
         surveyEntity.meta.printOptions.showUnanswered = true;
         const generator = new pdfService.PdfGenerator(surveyEntity, submission);
@@ -229,11 +230,11 @@ describe('pdf.service', () => {
           getControlGenerator('number')({ name: 'number_6' }),
           getControlGenerator('date')({ name: 'date_7' }),
         ];
-        const surveyEntity = { ...survey };
+        const surveyEntity = cloneDeep(survey);
         surveyEntity.meta.printOptions.showInstruction = true;
         surveyEntity.meta.printOptions.showUnanswered = true;
 
-        const submissionEntity = { ...submission };
+        const submissionEntity = cloneDeep(submission);
         submissionEntity.data.text_5.meta.relevant = false;
 
         const generator = new pdfService.PdfGenerator(surveyEntity, submissionEntity);
@@ -248,11 +249,11 @@ describe('pdf.service', () => {
           getControlGenerator('text')({ name: 'text_5' }),
           getControlGenerator('number')({ name: 'number_6' }),
         ];
-        const surveyEntity = { ...survey };
+        const surveyEntity = cloneDeep(survey);
         surveyEntity.meta.printOptions.showInstruction = true;
         surveyEntity.meta.printOptions.showUnanswered = false;
 
-        const submissionEntity = { ...submission };
+        const submissionEntity = cloneDeep(submission);
         submissionEntity.data.instructions_split_4.value = null;
         submissionEntity.data.text_5.value = null;
 

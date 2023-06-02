@@ -1340,51 +1340,52 @@ const sendPdfLink = async (req, res) => {
     btnText: 'Download',
   });
 
-  /* TODO: - Do we need to send pdf link to creator now ?
-   * Note that there's no email subscription options there in the app
-   * Or just comment this out this block in this release?
-   */
+  
+  // /* TODO: - Do we need to send pdf link to creator now ?
+  //  * Note that there's no email subscription options there in the app
+  //  * Or just comment this out this block in this release?
+  //  */
 
-  //  Fetch creator of the survey
-  const [survey] = await db
-    .collection('surveys')
-    .aggregate([
-      {
-        $lookup: {
-          from: 'users',
-          let: { creatorId: '$meta.creator' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
-            { $project: { email: 1 } },
-          ],
-          as: 'creator',
-        },
-      },
-      {
-        $unwind: { path: '$creator', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $match: {
-          _id: new ObjectId(submission.meta.survey.id),
-          'meta.creator': { $ne: new ObjectId(res.locals.auth.user._id) },
-        },
-      },
-      { $project: { creator: 1 } },
-    ])
-    .toArray();
+  // //  Fetch creator of the survey
+  // const [survey] = await db
+  //   .collection('surveys')
+  //   .aggregate([
+  //     {
+  //       $lookup: {
+  //         from: 'users',
+  //         let: { creatorId: '$meta.creator' },
+  //         pipeline: [
+  //           { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+  //           { $project: { email: 1 } },
+  //         ],
+  //         as: 'creator',
+  //       },
+  //     },
+  //     {
+  //       $unwind: { path: '$creator', preserveNullAndEmptyArrays: true },
+  //     },
+  //     {
+  //       $match: {
+  //         _id: new ObjectId(submission.meta.survey.id),
+  //         'meta.creator': { $ne: new ObjectId(res.locals.auth.user._id) },
+  //       },
+  //     },
+  //     { $project: { creator: 1 } },
+  //   ])
+  //   .toArray();
 
-  // Send to creator of the survey
-  // No error thrown even the creator was not found
-  if (survey && survey.creator) {
-    await mailService.sendLink({
-      from: 'noreply@surveystack.io',
-      to: survey.creator.email,
-      subject: `Survey report - ${submission.meta.survey.name}`,
-      link: new URL(`/api/submissions/${req.params.id}/pdf`, getServerSelfOrigin(req)).toString(),
-      actionDescriptionHtml: `${res.locals.auth.user.name} has submitted new submission. You can download a copy by clicking the button below.`,
-      btnText: 'Download',
-    });
-  }
+  // // Send to creator of the survey
+  // // No error thrown even the creator was not found
+  // if (survey && survey.creator) {
+  //   await mailService.sendLink({
+  //     from: 'noreply@surveystack.io',
+  //     to: survey.creator.email,
+  //     subject: `Survey report - ${submission.meta.survey.name}`,
+  //     link: new URL(`/api/submissions/${req.params.id}/pdf`, getServerSelfOrigin(req)).toString(),
+  //     actionDescriptionHtml: `${res.locals.auth.user.name} has submitted new submission. You can download a copy by clicking the button below.`,
+  //     btnText: 'Download',
+  //   });
+  // }
 
   return res.send({ success: true });
 };

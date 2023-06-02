@@ -133,7 +133,6 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
-import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {

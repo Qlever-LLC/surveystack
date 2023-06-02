@@ -70,9 +70,9 @@ const connectDatabase = async () => {
   await migrateGroups_VXtoV2();
   await migrateLibraryIds();
   await migrateResourceLibraryIds();
-  await migrateSurveyPrintOptions();
-  await migrateControlPrintLayout();
-  await migrateOntologyQuestionOptions();
+  await migrateSurveyPrintOptions_VXtoV5();
+  await migrateSurveyControlPrintLayout_VXtoV6();
+  await migrateSurveyOntologyOptions_VXtoV7();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -265,18 +265,20 @@ const migrateResourceLibraryIds = async () => {
   }
 };
 
-const migrateSurveyPrintOptions = async () => {
-  // Insert print options if doesn't have one
+const migrateSurveyPrintOptions_VXtoV5 = async () => {
   let modifiedCount = 0;
 
+  // Insert print options if doesn't have one
   let res = await db.collection('surveys').updateMany(
     {
+      'meta.specVersion': { $lte: 4 },
       options: { $eq: null },
       'meta.printOptions': { $eq: null },
     },
     [
       {
         $set: {
+          'meta.specVersion': 5,
           'meta.printOptions': {
             showInstruction: true,
             showUnanswered: false,
@@ -287,14 +289,16 @@ const migrateSurveyPrintOptions = async () => {
   );
   modifiedCount += res.modifiedCount;
 
-  // Move `survey.option` to `survey.meta.printOptions`
+  // Move `survey.options` to `survey.meta.printOptions`
   res = await db.collection('surveys').updateMany(
     {
+      'meta.specVersion': { $lte: 4 },
       options: { $ne: null },
     },
     [
       {
         $set: {
+          'meta.specVersion': 5,
           'meta.printOptions': '$options',
         },
       },
@@ -313,8 +317,11 @@ const migrateSurveyPrintOptions = async () => {
   }
 };
 
-const migrateControlPrintLayout = async () => {
-  const surveys = await db.collection('surveys').find({}).toArray();
+const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({ 'meta.specVersion': { $lte: 5 } })
+    .toArray();
 
   let modifiedCount = 0;
 
@@ -327,16 +334,26 @@ const migrateControlPrintLayout = async () => {
     }
 
     if (modifiedControlsCount === 0) {
+      await db
+        .collection('surveys')
+        .findOneAndUpdate(
+          { _id: new ObjectId(survey._id) },
+          { $set: { 'meta.specVersion': 6 } },
+          { returnOriginal: false }
+        );
+
       continue;
     }
 
-    await db.collection('surveys').findOneAndUpdate(
-      { _id: new ObjectId(survey._id) },
-      { $set: survey },
-      {
-        returnOriginal: false,
-      }
-    );
+    survey.meta.specVersion = 6;
+
+    await db
+      .collection('surveys')
+      .findOneAndUpdate(
+        { _id: new ObjectId(survey._id) },
+        { $set: survey },
+        { returnOriginal: false }
+      );
 
     modifiedCount++;
 
@@ -381,8 +398,11 @@ const addControlPrintLayout = (control) => {
 };
 
 // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
-const migrateOntologyQuestionOptions = async () => {
-  const surveys = await db.collection('surveys').find({}).toArray();
+const migrateSurveyOntologyOptions_VXtoV7 = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({ 'meta.specVersion': { $lte: 6 } })
+    .toArray();
 
   let modifiedCount = 0;
 
@@ -395,16 +415,26 @@ const migrateOntologyQuestionOptions = async () => {
     }
 
     if (modifiedControlsCount === 0) {
+      await db
+        .collection('surveys')
+        .findOneAndUpdate(
+          { _id: new ObjectId(survey._id) },
+          { $set: { 'meta.specVersion': 7 } },
+          { returnOriginal: false }
+        );
+
       continue;
     }
 
-    await db.collection('surveys').findOneAndUpdate(
-      { _id: new ObjectId(survey._id) },
-      { $set: survey },
-      {
-        returnOriginal: false,
-      }
-    );
+    survey.meta.specVersion = 7;
+
+    await db
+      .collection('surveys')
+      .findOneAndUpdate(
+        { _id: new ObjectId(survey._id) },
+        { $set: survey },
+        { returnOriginal: false }
+      );
 
     modifiedCount++;
 
