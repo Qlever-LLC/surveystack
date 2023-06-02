@@ -1340,7 +1340,6 @@ const sendPdfLink = async (req, res) => {
     btnText: 'Download',
   });
 
-  
   // /* TODO: - Do we need to send pdf link to creator now ?
   //  * Note that there's no email subscription options there in the app
   //  * Or just comment this out this block in this release?
