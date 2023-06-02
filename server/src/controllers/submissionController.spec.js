@@ -222,20 +222,21 @@ describe('submissionController', () => {
       );
     });
 
-    it("should send email to both of survey creator and submission submitter if they're different", async () => {
-      await createUser({ _id: survey.meta.creator, email: 'survey-creator-email' });
-      const req = createReq({ params: { id: submission._id } });
-      const res = await createRes({
-        user: {
-          _id: submission.meta.creator,
-          email: 'submission-submitter-email',
-          permissions: [],
-        },
-      });
-      await sendPdfLink(req, res);
+    // TODO: - Uncomment if we do subscribe option later
+    // it("should send email to both of survey creator and submission submitter if they're different", async () => {
+    //   await createUser({ _id: survey.meta.creator, email: 'survey-creator-email' });
+    //   const req = createReq({ params: { id: submission._id } });
+    //   const res = await createRes({
+    //     user: {
+    //       _id: submission.meta.creator,
+    //       email: 'submission-submitter-email',
+    //       permissions: [],
+    //     },
+    //   });
+    //   await sendPdfLink(req, res);
 
-      expect(mailService.sendLink).toHaveBeenCalledTimes(2);
-    });
+    //   expect(mailService.sendLink).toHaveBeenCalledTimes(2);
+    // });
 
     it('should send email only once if survey creator and submission submitter are same', async () => {
       const req = createReq({ params: { id: submission._id } });
