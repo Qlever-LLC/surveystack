@@ -8,7 +8,7 @@
           <checkbox
             v-model="survey.meta.printOptions.showInstruction"
             label="Show Instructions"
-            helper-text="Display instructions question on PDFs of completed submissions."
+            helper-text="Display instructions questions on PDFs of completed submissions."
           />
         </div>
         <div class="d-flex">
