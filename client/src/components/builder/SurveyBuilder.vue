@@ -300,7 +300,6 @@ export default {
     appDraftComponent,
     consoleLog,
     appCodeView,
-    // ConfirmLeaveDialog,
     appExamplesView,
   },
   props: ['survey', 'editMode', 'freshImport'],
@@ -955,16 +954,6 @@ export default {
     this.createInstance();
     this.checkForLibraryUpdates(this.survey);
   },
-
-  // TODO: get route guard to work here, or move dirty flag up to Builder.vue
-  // beforeRouteLeave(to, from, next) {
-  //   console.log('hello');
-  //   if (true) {
-  //     this.$refs.confirmLeaveDialog.open(next);
-  //     return;
-  //   }
-  //   next(true);
-  // },
 };
 </script>
 

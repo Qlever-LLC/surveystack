@@ -50,7 +50,8 @@ describe('Draft', () => {
       router: router,
       store: {
         actions: {
-          'mySubmissions/fetchLocalSubmission': jest.fn(() => ({ ...badSubmission })),
+          'submissions/getDraft': jest.fn(() => ({ ...badSubmission })),
+          'submissions/saveToLocal': jest.fn,
           'appui/reset': jest.fn,
           'surveys/fetchSurvey': jest.fn(() => ({ ...survey })),
         },

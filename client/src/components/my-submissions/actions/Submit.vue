@@ -4,6 +4,7 @@
     elevation="0"
     rounded
     small
+    outlined
     :disabled="!!loading"
     :loading="isSubmitting"
     @click.stop="handleSubmit"
@@ -26,10 +27,10 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isSubmitting = computed(() => loading.value === SubmissionLoadingActions.DELETE);
+    const isSubmitting = computed(() => loading.value === SubmissionLoadingActions.SUBMIT);
 
     const handleSubmit = () => {
-      //
+      root.$store.dispatch('submissions/submitDrafts', [props.submission._id]);
     };
 
     return {

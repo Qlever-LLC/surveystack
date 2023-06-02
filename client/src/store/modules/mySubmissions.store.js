@@ -98,7 +98,7 @@ const actions = {
   },
   async [types.actions.remove]({ commit }, id) {
     try {
-      await db.delete(db.stores.SUBMISSIONS, id);
+      await db.deleteSubmission(id);
     } catch (err) {
       console.warn('unable to remove submission from IDB');
     }

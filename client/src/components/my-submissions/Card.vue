@@ -19,13 +19,12 @@
         </div>
       </div>
 
-      <span class="ml-2">{{ submission.meta.status.map((i) => i.type).join(', ') }}</span>
       <v-spacer></v-spacer>
 
       <span v-if="isArchived" class="grey--text"> {{ submission.meta.archivedReason }}</span>
 
       <template v-else-if="isDraft">
-        <continue v-if="!isReadyToSubmit" :submission="submission"></continue>
+        <continue :submission="submission"></continue>
         <submit v-if="isReadyToSubmit" :submission="submission"></submit>
         <upload v-if="isLocal" :submission="submission"> </upload>
         <download v-if="!isLocal" :submission="submission"></download>
@@ -79,7 +78,7 @@ import StatusChip from './StatusChip.vue';
 
 const formatDate = (date) => {
   const parsedDate = dateFns.parseISO(date);
-  return dateFns.isValid(parsedDate) ? dateFns.format(parsedDate, 'MMM d, yyyy h:mm a') : '';
+  return dateFns.isValid(parsedDate) ? dateFns.format(parsedDate, 'M/d/yyyy h:mm:ss a') : '';
 };
 
 export default {

@@ -1,9 +1,10 @@
-require('fake-indexeddb/auto');
 import { mount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import FileComp from './File.vue';
 import { Blob } from 'buffer';
 import store from '@/store';
+
+jest.mock('@/store/db');
 
 const vuetify = new Vuetify();
 
@@ -54,9 +55,12 @@ describe('File question', () => {
       });
     };
 
-    test('selected single file', () => rendersValue(['resources/62398a1e977e7a0001718ef6/test.jpg']));
-    test('selected multiple files', () =>
-      rendersValue(['resources/62398a1e977e7a0001718ee6/test2.jpg', 'resources/62398a1e977e7a0001718fe6/test3.jpg']));
+    test('selected single file', () => {
+      rendersValue(['resources/62398a1e977e7a0001718ef6/test.jpg']);
+    });
+    test('selected multiple files', () => {
+      rendersValue(['resources/62398a1e977e7a0001718ee6/test2.jpg', 'resources/62398a1e977e7a0001718fe6/test3.jpg']);
+    });
   });
   describe('adding', () => {
     test('a file with an allowed type is added to value', async () => {

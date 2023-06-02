@@ -1,5 +1,11 @@
 <template>
-  <v-btn color="primary" elevation="0" rounded small @click.stop="handleClick">
+  <v-btn
+    color="primary"
+    elevation="0"
+    rounded
+    small
+    @click.stop="$router.push(`/submissions/drafts/${submission._id}`)"
+  >
     <v-icon left small>mdi-play</v-icon>
     Continue
   </v-btn>
@@ -14,19 +20,6 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-  },
-  setup(props, { root }) {
-    const handleClick = async () => {
-      // If server draft, download to local in order to save a draft real time
-      if (!props.submission.options.local) {
-        await root.$store.dispatch('submissions/saveToLocal', props.submission);
-      }
-      root.$router.push(`/submissions/drafts/${props.submission._id}`);
-    };
-
-    return {
-      handleClick,
-    };
   },
 });
 </script>

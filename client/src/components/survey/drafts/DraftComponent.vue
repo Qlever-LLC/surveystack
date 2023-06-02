@@ -199,6 +199,9 @@ export default {
   },
   methods: {
     next() {
+      // Save current draft submission to IDB
+      this.$store.dispatch('submissions/saveToLocal', this.submission);
+
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
       window.scrollTo(0, 0);

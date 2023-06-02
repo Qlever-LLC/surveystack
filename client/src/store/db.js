@@ -10,8 +10,12 @@ const DATABASE_NAME = 'Database';
 
 // OPEN
 function openDb(onSuccess, version = 8) {
-  if (db && typeof onSuccess === 'function') {
-    return onSuccess();
+  if (db) {
+    if (typeof onSuccess === 'function') {
+      return onSuccess();
+    }
+
+    return;
   }
 
   const request = indexedDB.open(DATABASE_NAME, version);
@@ -44,7 +48,7 @@ function openDb(onSuccess, version = 8) {
   };
 
   request.onsuccess = (event) => {
-    console.log('IDB - success', event);
+    console.log('IDB - success');
     db = event.target.result;
     db.close = () => {
       db = null;
@@ -54,7 +58,7 @@ function openDb(onSuccess, version = 8) {
     }
   };
 
-  request.onerror = (event) => {
+  request.onerror = () => {
     console.warn('IDB - Failed', request.error);
   };
 }

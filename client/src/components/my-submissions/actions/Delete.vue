@@ -50,10 +50,10 @@ export default defineComponent({
   setup(props, { root }) {
     const isOpen = ref(false);
     const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isDeleting = computed(() => loading.value === SubmissionLoadingActions.DELETE);
+    const isDeleting = computed(() => loading.value === SubmissionLoadingActions.DELETE_DRAFT);
 
     const handleDelete = async () => {
-      root.$store.dispatch('submissions/delete', props.submission._id);
+      root.$store.dispatch('submissions/deleteDrafts', [props.submission._id]);
     };
 
     return {

@@ -10,6 +10,7 @@ import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { createStoreObject } from '@/store';
 
 jest.mock('../../services/api.service.js');
+jest.mock('@/store/db');
 
 // setup the default api mocks for all tests
 beforeEach(() => api.get.mockImplementation(createApiGetMock()));

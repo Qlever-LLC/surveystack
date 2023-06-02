@@ -6,7 +6,7 @@
       <div class="mt-8">
         <draft-card
           v-for="submission in submissions"
-          :key="submission._id"
+          :key="submission._id + submission.options.draft"
           :submission="submission"
           :checked="checked.includes(submission)"
           @click.native="handleCardCheck(submission)"
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, onUnmounted, onUpdated, ref, watch } from '@vue/composition-api';
+import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/composition-api';
 import DraftFilter from '@/components/my-submissions/Filter.vue';
 import DraftCard from '@/components/my-submissions/Card.vue';
 
@@ -41,7 +41,7 @@ export default defineComponent({
   setup(props, { root }) {
     const isLoading = computed(() => root.$store.getters['submissions/isFetching']);
     const hasMoreData = computed(() => root.$store.getters['submissions/hasMoreData']);
-    const submissions = computed(() => root.$store.getters['submissions/submissions']);
+    const submissions = computed(() => root.$store.getters['submissions/mySubmissions']);
     const lastEl = ref();
     const checked = ref([]);
     const showTopButton = ref(false);
@@ -64,7 +64,7 @@ export default defineComponent({
       showTopButton.value = window.scrollY > 400;
     };
 
-    onUpdated(() => {
+    onMounted(() => {
       window.addEventListener('scroll', handleScroll);
     });
 
@@ -118,6 +118,7 @@ export default defineComponent({
       showTopButton,
       handleCardCheck,
       handleToTop,
+      handleScroll,
     };
   },
 });

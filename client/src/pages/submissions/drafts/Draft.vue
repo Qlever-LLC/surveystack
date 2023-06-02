@@ -14,9 +14,7 @@
       Error Loading Draft Submission or Survey. Click <a @click="$router.back()">here</a> to go back to Survey.
     </div>
 
-    <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
-      Are you sure you want to exit this draft?
-    </confirm-leave-dialog>
+    <confirm-leave-dialog v-if="submission && survey" ref="confirmLeaveDialog" :submission="submission" />
 
     <app-submission-archive-dialog
       v-if="submission && survey"
@@ -68,13 +66,13 @@ import resultMixin from '@/components/ui/ResultsMixin';
 
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
-import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
+import ConfirmLeaveDialog from '@/components/survey/drafts/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
-import { defaultsDeep } from 'lodash';
+import { defaultsDeep, get } from 'lodash';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -176,7 +174,7 @@ export default {
     this.loading = true;
     const { id } = this.$route.params;
 
-    this.submission = this.$store.getters['submissions/submission'](id);
+    this.submission = await this.$store.dispatch('submissions/getDraft', id);
     if (!this.submission) {
       console.log('Error: submission not found');
       this.hasError = true;
@@ -184,7 +182,7 @@ export default {
       return;
     }
 
-    if (this.submission && this.submission.meta && this.submission.meta.dateSubmitted) {
+    if (get(this.submission, 'meta.dateSubmitted', false)) {
       this.showResubmissionDialog = true;
     }
 

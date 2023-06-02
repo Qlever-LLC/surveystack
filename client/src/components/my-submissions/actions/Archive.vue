@@ -22,16 +22,15 @@
       @cancel="isOpen = false"
       @confirm="handleArchive"
     >
-      <template v-slot:title>Confirm Submission Archiving</template>
+      <template #title>Archive Submission</template>
     </submission-archive-dialog>
   </div>
 </template>
 
 <script>
-import { get } from 'lodash';
 import { computed, defineComponent, ref } from '@vue/composition-api';
 import SubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
-import api from '@/services/api.service';
+import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
 
 export default defineComponent({
   components: {
@@ -45,31 +44,14 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const isOpen = ref(false);
-    const isArchiving = ref(false);
     const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
+    const isArchiving = computed(() => loading.value === SubmissionLoadingActions.ARCHIVE);
 
-    const handleArchive = async (reason) => {
-      try {
-        isArchiving.value = true;
-
-        await api.post(`/submissions/bulk-archive?set=true&reason=${reason}`, {
-          ids: [props.submission._id],
-        });
-
-        const hideArchived = root.$store.getters['submissions/filter'].hideArchived;
-        if (hideArchived) {
-          root.$store.dispatch('submissions/removeSubmission', props.submission._id);
-        } else {
-          root.$store.dispatch('submissions/setSubmission', {
-            ...props.submission,
-            meta: { ...props.submission.meta, archived: true },
-          });
-        }
-      } catch (e) {
-        root.$store.dispatch('feedback/add', get(e, 'response.data.message', 'Failed to archive submission'));
-      } finally {
-        isArchiving.value = false;
-      }
+    const handleArchive = (reason) => {
+      root.$store.dispatch('submissions/archiveSubmissions', {
+        ids: [props.submission._id],
+        reason,
+      });
     };
 
     return {
