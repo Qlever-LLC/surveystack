@@ -40,7 +40,7 @@ const sortByModifiedDate = (a, b) => new Date(b.meta.dateModified).valueOf() - n
 const createInitialState = () => ({
   localDrafts: [], // drafts in IDB
   mySubmissions: [], // submitted submissions + local drafts + server drafts
-  surveys: [], // surveys of submissions
+  surveys: [], // surveys of mySubmissions
   localTotal: 0, // total count of drafts in IDB (-1 if no data)
   serverTotal: 0, // total count of drafts + submissions on Server (-1 if no data)
   filter: {

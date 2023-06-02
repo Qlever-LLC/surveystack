@@ -1,4 +1,3 @@
-import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { linearControls } from '@/utils/submissions';
 

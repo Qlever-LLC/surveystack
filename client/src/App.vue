@@ -14,7 +14,6 @@
 import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
-import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
 
 export default {

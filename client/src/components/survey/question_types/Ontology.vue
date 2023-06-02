@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import { isNil, sortBy, uniq, without } from 'lodash';
+import { isNil, uniq, without } from 'lodash';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';

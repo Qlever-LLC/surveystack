@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import { cloneDeep, isNil, sortBy, uniq, without } from 'lodash';
+import { cloneDeep, isNil, uniq, without } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/matrix/MatrixCell.vue';
 import appMatrixTable from '@/components/survey/question_types/matrix/MatrixTable.vue';

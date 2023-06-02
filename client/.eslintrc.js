@@ -19,6 +19,8 @@ module.exports = {
     'vue/no-unused-components': 'warn',
     'vue/multi-word-component-names': 0,
     'vue/no-v-text-v-html-on-component': 0,
+    'vue/valid-v-slot': 0,
+    'vue/no-unused-vars': 0,
     'vue/no-mutating-props': 0,
     'unused-imports/no-unused-imports': 'warn',
     'unused-imports/no-unused-vars': [

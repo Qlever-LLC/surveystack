@@ -4,7 +4,6 @@ import VueCompositionApi from '@vue/composition-api';
 Vue.use(VueCompositionApi);
 
 import FarmosRegister from '../pages/farmos-manage/FarmOSRegister.vue';
-import { action } from '@storybook/addon-actions';
 
 export default {
   title: 'FarmOS Register Page',
