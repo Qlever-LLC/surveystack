@@ -261,7 +261,6 @@ import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
-import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 import { getValueOrNull } from '@/utils/surveyStack';
 
 const MATRIX_COLUMN_TYPES = [
