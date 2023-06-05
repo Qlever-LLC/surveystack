@@ -209,11 +209,11 @@ export default {
           },
         };
         const response = await api.post('/submissions', submission);
-        try {
-          this.result({ response });
-        } catch (error) {
-          console.log('error parsing result from server', error);
-        }
+
+        // Delete draft after submit
+        await this.$store.dispatch('submissions/deleteDrafts', [payload._id]);
+
+        this.result({ response });
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;

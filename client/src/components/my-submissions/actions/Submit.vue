@@ -9,7 +9,7 @@
     :loading="isSubmitting"
     @click.stop="handleSubmit"
   >
-    <v-icon left small>mdi-check-bold</v-icon>
+    <v-icon left small>mdi-cloud-upload-outline</v-icon>
     Submit
   </v-btn>
 </template>
@@ -30,7 +30,7 @@ export default defineComponent({
     const isSubmitting = computed(() => loading.value === SubmissionLoadingActions.SUBMIT);
 
     const handleSubmit = () => {
-      root.$store.dispatch('submissions/submitDrafts', [props.submission._id]);
+      root.$store.dispatch('submissions/submitDrafts', [props.submission]);
     };
 
     return {

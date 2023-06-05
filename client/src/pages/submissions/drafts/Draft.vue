@@ -148,6 +148,10 @@ export default {
         const response = payload.meta.dateSubmitted
           ? await api.put(`/submissions/${payload._id}`, payload)
           : await api.post('/submissions', payload);
+
+        // Delete draft after submit
+        await this.$store.dispatch('submissions/deleteDrafts', [payload._id]);
+
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('mySubmissions/remove', this.submission._id);

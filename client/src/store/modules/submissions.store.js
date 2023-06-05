@@ -56,6 +56,8 @@ const initialState = createInitialState();
 const getters = {
   mySubmissions: (state) => state.mySubmissions,
   surveys: (state) => state.surveys,
+  localTotal: (state) => state.localTotal,
+  serverTotal: (state) => state.serverTotal,
   total: (state) => state.serverTotal + state.localTotal,
   filter: (state) => state.filter,
   isLoading: (state) => Object.values(state.loading).filter(Boolean).length > 0,
@@ -110,11 +112,15 @@ const mutations = {
   SET_FILTER: (state, filter) => {
     state.filter = { ...state.filter, ...filter };
   },
-  SET_LOADING: (state, loading) => {
-    state.loading = { ...state.loading, ...loading };
+  SET_LOADING: (state, [id, loading]) => {
+    if (state.loading[id] === undefined) {
+      state.loading = { ...state.loading, [id]: loading };
+    }
   },
-  RESET_LOADING: (state, id) => {
-    state.loading = { ...state.loading, [id]: undefined };
+  RESET_LOADING: (state, [id, loading]) => {
+    if (state.loading[id] === loading) {
+      state.loading = { ...state.loading, [id]: undefined };
+    }
   },
 };
 
@@ -134,56 +140,111 @@ const actions = {
     dispatch('fetchSubmissions', true);
   },
 
-  async saveToLocal({ commit }, submission) {
-    commit('SET_LOADING', { [submission._id]: SubmissionLoadingActions.SAVE_TO_LOCAL });
+  async saveToLocal({ state, commit, dispatch }, submission) {
+    commit('SET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
 
     try {
       await db.persistSubmission(sanitize(submission));
       commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
     } catch (e) {
       console.warn('Failed to save submission into IDB', e);
-      commit('RESET_LOADING', submission._id);
+      commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
 
       return null;
     }
 
+    // Try to delete from server to ensure single source of truth
     try {
       await api.delete(`/drafts/${submission._id}`);
     } catch (e) {
-      console.warn('Failed to delete draft from the server', e);
+      console.log("%s doesn't exist on Server - it's okay", submission._id);
+    }
+
+    // Update surveys if needed
+    const surveyExist = state.surveys.some((survey) => survey._id === submission.meta.survey.id);
+    if (!surveyExist) {
+      await dispatch('fetchSurveys');
     }
 
     const newSubmission = { ...submission, options: { draft: true, local: true } };
     commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
-    commit('RESET_LOADING', submission._id);
+    commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
+    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
 
     return newSubmission;
   },
 
-  async saveToServer({ commit }, submission) {
-    commit('SET_LOADING', { [submission._id]: SubmissionLoadingActions.SAVE_TO_SERVER });
+  async saveToServer({ state, commit, dispatch }, submission) {
+    commit('SET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_SERVER]);
 
     try {
       await api.post('/drafts', sanitize(submission));
     } catch (e) {
       console.warn('Failed to save submission to server', e);
-      commit('RESET_LOADING', submission._id);
+      commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_SERVER]);
 
       return null;
     }
 
+    // Try to delete from IDB to ensure single source of truth
     try {
       await db.deleteSubmission(submission._id);
       commit('DELETE_LOCAL_DRAFT', submission._id);
     } catch (e) {
-      console.warn('Failed to delete draft from IDB', e);
+      console.log("%s doesn't exist on IDB - it's okay", submission._id);
+    }
+
+    // Update surveys if needed
+    const surveyExist = state.surveys.some((survey) => survey._id === submission.meta.survey.id);
+    if (!surveyExist) {
+      await dispatch('fetchSurveys');
     }
 
     const newSubmission = { ...submission, options: { draft: true, local: false } };
     commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
-    commit('RESET_LOADING', submission._id);
+    commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_SERVER]);
+    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
 
     return newSubmission;
+  },
+
+  async deleteDrafts({ commit, state }, ids) {
+    ids.forEach((id) => commit('SET_LOADING', [id, SubmissionLoadingActions.DELETE_DRAFT]));
+
+    let result = false;
+    try {
+      const localIds = ids.filter((id) =>
+        state.mySubmissions.some(
+          (submission) => submission._id === id && submission.options.draft && submission.options.local
+        )
+      );
+      const serverIds = ids.filter((id) =>
+        state.mySubmissions.some(
+          (submission) => submission._id === id && submission.options.draft && !submission.options.local
+        )
+      );
+
+      const deleteQueue = localIds.map((id) => db.deleteSubmission(id));
+      if (serverIds.length > 0) {
+        deleteQueue.push(api.post('/drafts/bulk-delete', { ids: serverIds }));
+      }
+
+      await Promise.all(deleteQueue);
+
+      ids.forEach((id) => {
+        commit('DELETE_LOCAL_DRAFT', id);
+        commit('DELETE_MY_SUBMISSION', { id, draft: true });
+      });
+
+      result = true;
+    } catch (e) {
+      console.warn('Failed to delete submissions', ...ids);
+    }
+
+    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
+    ids.forEach((id) => commit('RESET_LOADING', [id, SubmissionLoadingActions.DELETE_DRAFT]));
+
+    return result;
   },
 
   async getDraft({ dispatch, state }, id) {
@@ -212,7 +273,7 @@ const actions = {
   },
 
   async archiveSubmissions({ commit, state }, { ids, reason }) {
-    ids.forEach((id) => commit('SET_LOADING', { [id]: SubmissionLoadingActions.DELETE_DRAFT }));
+    ids.forEach((id) => commit('SET_LOADING', [id, SubmissionLoadingActions.ARCHIVE]));
 
     let result = false;
     try {
@@ -232,46 +293,13 @@ const actions = {
       console.warn('Failed to archive submissions', ...ids);
     }
 
-    ids.forEach((id) => commit('RESET_LOADING', id));
+    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
+    ids.forEach((id) => commit('RESET_LOADING', [id, SubmissionLoadingActions.ARCHIVE]));
 
     return result;
   },
 
-  async deleteDrafts({ commit, state }, ids) {
-    ids.forEach((id) => commit('SET_LOADING', { [id]: SubmissionLoadingActions.DELETE_DRAFT }));
-
-    let result = false;
-    try {
-      const localIds = ids.filter((id) =>
-        state.mySubmissions.some((submission) => submission._id === id && submission.options.local)
-      );
-      const serverIds = ids.filter((id) =>
-        state.mySubmissions.some((submission) => submission._id === id && !submission.options.local)
-      );
-
-      const deleteQueue = localIds.map((id) => db.deleteSubmission(id));
-      if (serverIds.length > 0) {
-        deleteQueue.push(api.post('/drafts/bulk-delete', { ids: serverIds }));
-      }
-
-      await Promise.all(deleteQueue);
-
-      ids.forEach((id) => {
-        commit('DELETE_LOCAL_DRAFT', id);
-        commit('DELETE_MY_SUBMISSION', { id, draft: true });
-      });
-
-      result = true;
-    } catch (e) {
-      console.warn('Failed to delete submissions', ...ids);
-    }
-
-    ids.forEach((id) => commit('RESET_LOADING', id));
-
-    return result;
-  },
-
-  async startDraft({ dispatch, commit }, { survey, submitAsUser = undefined, version = 0 }) {
+  async startDraft({ state, dispatch, commit }, { survey, submitAsUser = undefined, version = 0 }) {
     const activeVersion = version || survey.latestVersion;
     const surveyEntity = await dispatch(
       'surveys/fetchSurvey',
@@ -292,6 +320,8 @@ const actions = {
       console.warn('Failed to save submission to IDB', e);
     }
 
+    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
+
     router.push({
       name: 'submissions-drafts-detail',
       params: { id: submission._id },
@@ -299,13 +329,16 @@ const actions = {
     });
   },
 
-  async submitDrafts({ commit, dispatch }, drafts) {
-    drafts.forEach((submission) => commit('SET_LOADING', { [submission._id]: SubmissionLoadingActions.SUBMIT }));
+  async submitDrafts({ state, commit, dispatch }, drafts) {
+    drafts.forEach((submission) => commit('SET_LOADING', [submission._id, SubmissionLoadingActions.SUBMIT]));
 
     let result = false;
     try {
+      // Cache for surveys
       let surveysMap = {};
-      const uploadResources = drafts.map(async (submission) => {
+
+      // Upload resources
+      const uploadResourceQueue = drafts.map(async (submission) => {
         const { id, version } = submission.meta.survey;
         if (!surveysMap[id]) {
           surveysMap = {
@@ -319,19 +352,28 @@ const actions = {
 
       const putDrafts = drafts.filter((submission) => !!submission.meta.dateSubmitted);
       const postDrafts = drafts.filter((submission) => !submission.meta.dateSubmitted);
+      // Update if already submitted
       const submitQueue = putDrafts.map((submission) => api.put(`/submissions/${submission._id}`, submission));
+      // Create if new submission
       if (postDrafts.length > 0) {
         submitQueue.push(api.post('/submissions', postDrafts));
       }
 
-      await new Promise.all([...uploadResources, ...submitQueue]);
+      await Promise.all([...uploadResourceQueue, ...submitQueue]);
+
+      // After submit, delete drafts from either local or server
+      await dispatch(
+        'deleteDrafts',
+        drafts.map((submission) => submission._id)
+      );
 
       result = true;
     } catch (e) {
-      console.warn('Failed to submit drafts', drafts);
+      console.warn('Failed to submit drafts', e, drafts);
     }
 
-    drafts.forEach((submission) => commit('RESET_LOADING', submission._id));
+    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
+    drafts.forEach((submission) => commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SUBMIT]));
 
     return result;
   },
@@ -341,7 +383,7 @@ const actions = {
       return state.localDrafts;
     }
 
-    commit('SET_LOADING', { [SubmissionLoadingActions.FETCH_LOCAL_DRAFTS]: true });
+    commit('SET_LOADING', [SubmissionLoadingActions.FETCH_LOCAL_DRAFTS, true]);
 
     let submissions = [];
     try {
@@ -357,7 +399,7 @@ const actions = {
     );
 
     commit('SET_LOCAL_DRAFTS', mySubmissions);
-    commit('RESET_LOADING', SubmissionLoadingActions.FETCH_LOCAL_DRAFTS);
+    commit('RESET_LOADING', [SubmissionLoadingActions.FETCH_LOCAL_DRAFTS, true]);
 
     return mySubmissions;
   },
@@ -367,7 +409,7 @@ const actions = {
       return;
     }
 
-    commit('SET_LOADING', { [SubmissionLoadingActions.FETCH_SUBMISSIONS]: true });
+    commit('SET_LOADING', [SubmissionLoadingActions.FETCH_SUBMISSIONS, true]);
 
     if (reset) {
       commit('SET_MY_SUBMISSIONS', []);
@@ -475,7 +517,7 @@ const actions = {
 
     // Append the new data
     commit('SET_MY_SUBMISSIONS', [...state.mySubmissions, ...uniqueSubmissions.slice(0, PER_PAGE)]);
-    commit('RESET_LOADING', SubmissionLoadingActions.FETCH_SUBMISSIONS);
+    commit('RESET_LOADING', [SubmissionLoadingActions.FETCH_SUBMISSIONS, true]);
   },
 
   async fetchSurveys({ commit, state }) {
@@ -483,7 +525,7 @@ const actions = {
       return;
     }
 
-    commit('SET_LOADING', { [SubmissionLoadingActions.FETCH_SURVEYS]: true });
+    commit('SET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);
     commit('SET_SURVEYS', []);
 
     const params = new URLSearchParams();
@@ -515,7 +557,7 @@ const actions = {
       console.warn('Failed to fetch surveys of my submissions', state.filter, e);
     }
 
-    commit('RESET_LOADING', SubmissionLoadingActions.FETCH_SURVEYS);
+    commit('RESET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);
   },
 };
 
