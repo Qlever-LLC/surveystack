@@ -267,8 +267,6 @@ import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
 import { createResource, removeResource, resourceLocations, resourceTypes, setResource } from '@/utils/resources';
-import { cleanupAutocompleteMatrix } from '@/utils/surveys';
-import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 
 const MATRIX_COLUMN_TYPES = [
