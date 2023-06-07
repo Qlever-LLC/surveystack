@@ -28,6 +28,7 @@ const send = async ({ to, subject, text }) => {
  * Sends a simple action-link email in html and text format
  */
 const sendLink = async ({
+  from = process.env.SMTP_DEFAULT_SENDER,
   to,
   subject,
   link,
@@ -44,7 +45,7 @@ const sendLink = async ({
   const btnColor = '#225034';
 
   await transport.sendMail({
-    from: process.env.SMTP_DEFAULT_SENDER,
+    from,
     to,
     subject,
     // Note: Basic html email. We should probably use some templating engine if we decide to create more complicated emails

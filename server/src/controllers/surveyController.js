@@ -7,6 +7,7 @@ import _ from 'lodash';
 
 import { changeRecursive, changeRecursiveAsync, checkSurvey } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
+import pdfService from '../services/pdf.service';
 
 const SURVEYS_COLLECTION = 'surveys';
 const SUBMISSIONS_COLLECTION = 'submissions';
@@ -323,13 +324,73 @@ const getSurveyListPage = async (req, res) => {
 
 const getSurvey = async (req, res) => {
   const { id } = req.params;
-  const entity = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
+  const { version } = req.query;
 
-  if (!entity) {
+  const pipeline = [{ $match: { _id: new ObjectId(id) } }];
+
+  if (version === undefined || version === 'latest') {
+    // caller only requests the LATEST PUBLISHED survey revision with version=latestVersion, exclude all others and also exclude drafts
+    pipeline.push({
+      $project: {
+        name: 1,
+        latestVersion: 1,
+        meta: 1,
+        description: 1,
+        resources: 1,
+        revisions: {
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $eq: ['$$revision.version', '$latestVersion'] },
+          },
+        },
+      },
+    });
+  } else if (version === 'latestPublishedOrDraft') {
+    // caller only requests the latest survey revision which may be published or draft, exclude all other revisions
+    pipeline.push({
+      $project: {
+        name: 1,
+        latestVersion: 1,
+        meta: 1,
+        description: 1,
+        resources: 1,
+        revisions: {
+          $slice: ['$revisions', -1],
+        },
+      },
+    });
+  } else if (version === 'all') {
+    // caller explicitly wants to get all version, thus projection is not required
+  } else {
+    // caller only requests the survey revision with the passed version, exclude all others
+    pipeline.push({
+      $project: {
+        name: 1,
+        latestVersion: 1,
+        meta: 1,
+        description: 1,
+        resources: 1,
+        revisions: {
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $eq: ['$$revision.version', Number(version)] },
+          },
+        },
+      },
+    });
+  }
+
+  const entities = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+
+  if (entities.length === 0) {
     return res.status(404).send({
       message: `No entity with _id exists: ${id}`,
     });
   }
+
+  const entity = entities[0];
 
   return res.send(entity);
 };
@@ -430,6 +491,24 @@ const getSurveyLibraryConsumers = async (req, res) => {
   return res.send(await getSurveyLibraryConsumersInternal(id));
 };
 
+const getSurveyPdf = async (req, res) => {
+  const { id } = req.params;
+  const entity = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
+
+  if (!entity) {
+    return res.status(404).send({ message: `No entity with _id exists: ${id}` });
+  }
+
+  try {
+    const fileName = pdfService.getPdfName(entity);
+    const data = await pdfService.getPdfBase64(entity, null);
+    res.attachment(fileName);
+    res.send('data:application/pdf;base64,' + data);
+  } catch (e) {
+    throw boom.internal(e);
+  }
+};
+
 const createSurvey = async (req, res) => {
   const entity = await sanitize(req.body);
   // apply creator (endpoint already has assertAuthenticated, so auth.user._id must exist)
@@ -479,6 +558,11 @@ const updateSurvey = async (req, res) => {
     throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
   }
 
+  // restore old revisions which may be missing in the passed survey
+  const changedRevision = entity.revisions[entity.revisions.length - 1];
+  const historicRevisions = existing.revisions.filter((r) => r.version < changedRevision.version);
+  entity.revisions = [...historicRevisions, changedRevision];
+
   try {
     let updated = await db.collection(SURVEYS_COLLECTION).findOneAndUpdate(
       { _id: new ObjectId(id) },
@@ -489,7 +573,7 @@ const updateSurvey = async (req, res) => {
     );
     return res.send(updated);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
 };
@@ -575,8 +659,6 @@ const getPinned = async (req, res) => {
     .find({ user: new ObjectId(userId) })
     .project({ group: 1 })
     .toArray();
-
-  // console.log('memberships', memberships);
 
   const groupIds = _.uniq(memberships.map((m) => m.group)).map((g) => new ObjectId(g));
   const groupsPinned = await db
@@ -757,6 +839,7 @@ export default {
   getSurvey,
   getSurveyLibraryConsumers,
   getSurveyInfo,
+  getSurveyPdf,
   createSurvey,
   updateSurvey,
   deleteSurvey,

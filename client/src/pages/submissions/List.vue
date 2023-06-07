@@ -58,7 +58,7 @@
             color="secondary"
             class="ml-2"
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
-            @click="startDraft(survey)"
+            @click="startDraft(surveyEntity)"
           >
             <v-icon left>mdi-plus</v-icon>
             New submission
@@ -225,6 +225,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
+import downloadExternal from '@/utils/downloadExternal';
 
 const defaultPageSize = 10;
 
@@ -537,17 +538,7 @@ export default {
       this.dateTableProps = props;
     },
     async startDownload() {
-      const element = document.createElement('a');
-
-      element.setAttribute('href', this.apiDownloadUrl);
-      element.setAttribute('download', `${this.surveyEntity.name}.${this.apiDownloadFormat}`);
-
-      element.style.display = 'none';
-      document.body.appendChild(element);
-
-      element.click();
-
-      document.body.removeChild(element);
+      downloadExternal(this.apiDownloadUrl, `${this.surveyEntity.name}.${this.apiDownloadFormat}`);
     },
   },
   watch: {
@@ -570,7 +561,7 @@ export default {
   },
   async created() {
     this.survey = this.$route.query.survey;
-    const { data: surveyEntity } = await api.get(`/surveys/${this.survey}`);
+    const { data: surveyEntity } = await api.get(`/surveys/${this.survey}?version=latest`);
     this.surveyEntity = surveyEntity;
     await this.fetchData();
   },

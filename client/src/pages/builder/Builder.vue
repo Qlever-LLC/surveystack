@@ -56,12 +56,16 @@
       :items="resultItems"
       title="Result of Submission"
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      :survey="survey"
+      :submission="submission"
     />
 
     <result-dialog
       v-model="showApiComposeErrors"
       :items="apiComposeErrors"
       title="ApiCompose Errors"
+      :survey="survey"
+      :submission="submission"
       @close="showApiComposeErrors = false"
     />
 
@@ -69,7 +73,7 @@
       v-if="versionsDialogIsVisible"
       v-model="versionsDialogIsVisible"
       @cancel="versionsDialogIsVisible = false"
-      :survey="survey"
+      :survey-id="survey._id"
       @reload-survey="onReloadSurvey"
     />
 
@@ -101,17 +105,16 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import api from '@/services/api.service';
-
 import appDialog from '@/components/ui/Dialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
-
+import VersionsDialog from '@/components/builder/VersionsDialog';
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import VersionsDialog from '@/components/builder/VersionsDialog';
+import downloadExternal from '@/utils/downloadExternal';
+import api from '@/services/api.service';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -134,6 +137,7 @@ export default {
         creator: this.$store.state.auth.user._id,
         group: this.getActiveGroupSimpleObject(),
       }),
+      submission: null,
       showSnackbar: false,
       snackbarMessage: '',
       showDeleteModal: false,
@@ -191,6 +195,7 @@ export default {
       }
     },
     async submitSubmission({ payload }) {
+      this.submission = null;
       this.apiComposeErrors = getApiComposeErrors(this.survey, payload);
       if (this.apiComposeErrors.length > 0) {
         this.showApiComposeErrors = true;
@@ -200,7 +205,7 @@ export default {
       this.submitting = true;
       try {
         await uploadFileResources(this.$store, this.survey, payload, false);
-        const submission = {
+        this.submission = {
           ...payload,
           meta: {
             ...payload.meta,
@@ -208,7 +213,7 @@ export default {
             archivedReason: 'SUBMISSION_FROM_BUILDER',
           },
         };
-        const response = await api.post('/submissions', submission);
+        const response = await api.post('/submissions', this.submission);
         try {
           this.result({ response });
         } catch (error) {
@@ -327,24 +332,16 @@ export default {
         this.snack(`error parsing Survey file:${err}`);
       }
     },
-    exportSurvey() {
-      const data = JSON.stringify(this.survey, null, 4);
-      const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
-      element.setAttribute('download', `${this.survey.name}.json`);
-
-      element.style.display = 'none';
-      document.body.appendChild(element);
-
-      element.click();
-
-      document.body.removeChild(element);
+    async exportSurvey() {
+      const { data } = await api.get(`/surveys/${this.survey._id}?version=all`);
+      const dataString = JSON.stringify(data, null, 4);
+      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`, `${this.survey.name}.json`);
     },
     async fetchData() {
       try {
         const { id } = this.$route.params;
         this.survey._id = id;
-        const { data } = await api.get(`/surveys/${this.survey._id}`);
+        const { data } = await api.get(`/surveys/${this.survey._id}?version=latestPublishedOrDraft`);
         this.survey = { ...this.survey, ...data };
         // Fetch all resources into local storage
         if (this.survey.resources) {

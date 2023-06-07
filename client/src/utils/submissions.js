@@ -1,10 +1,11 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
-import { cloneDeep, groupBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import groupBy from 'lodash/groupBy';
 import * as constants from '@/constants';
 import api from '@/services/api.service';
-import { getNested } from '@/utils/surveyStack';
 import { AuthService } from '@/services/storage.service';
+import { get } from 'lodash';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -92,7 +93,7 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
     dateCreated: dateNow,
     dateModified: dateNow,
     dateSubmitted: null,
-    survey: { id: survey._id, version },
+    survey: { id: survey._id, name: survey.name, version: version },
     revision: 1,
     permissions: [],
     status: [],
@@ -240,7 +241,7 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
   const { data } = await api.get(`/submissions?survey=${surveyId}${query}`);
   const items = data
     .map((item) => {
-      const value = getNested(item, `${path}.value`, null);
+      const value = get(item, `${path}.value`, null);
       return {
         id: item._id,
         label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
@@ -259,14 +260,12 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
       }))
       .filter((v) => v.value);
 
-  const explodedItems = items
-    .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
-    .reduce((acc, curr) => [...acc, ...curr], []);
-
+  const explodedItems = items.flatMap((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]));
   const uniqueItems = Object.values(groupBy(explodedItems, 'label')).map((group) => ({
     ...group[0],
     label: group[0].label,
     count: group.length,
   }));
+
   return uniqueItems;
 }

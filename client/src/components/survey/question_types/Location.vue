@@ -43,7 +43,7 @@
       </app-gps>
     </div>
 
-    <v-overlay class="text-center" :value="!gpsLocation && !mapError && !geolocationError" light absolute>
+    <v-overlay class="text-center" :value="!value && !gpsLocation && !mapError && !geolocationError" light absolute>
       <v-card light>
         <v-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>

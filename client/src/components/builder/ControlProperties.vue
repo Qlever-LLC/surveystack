@@ -215,7 +215,7 @@
       <!-- Control options -->
       <v-spacer></v-spacer>
       <checkbox
-        v-if="showRequiredOption"
+        v-if="hasRequiredOption"
         label="Required"
         v-model="control.options.required"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
@@ -287,9 +287,10 @@
 
       <!-- Advanced properties -->
       <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
-        advanced
+        Advanced
       </v-btn>
-      <div v-else class="advanced pb-6">
+      <div v-else class="extra-options">
+        <v-spacer></v-spacer>
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
@@ -337,8 +338,91 @@
           </v-icon>
         </div>
       </div>
+
+      <!-- Print layout -->
+      <template v-if="hasLayoutOptions">
+        <v-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
+          Print Layout
+        </v-btn>
+        <div v-else class="extra-options">
+          <v-spacer></v-spacer>
+          <div>
+            <v-card-title class="px-0 py-0">Print Layout</v-card-title>
+            <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
+          </div>
+
+          <div v-if="isMatrix">
+            <checkbox
+              label="Table format"
+              v-model="control.options.printLayout.table"
+              helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
+            />
+          </div>
+
+          <div v-if="isFile">
+            <checkbox
+              label="Show preview"
+              v-model="control.options.printLayout.preview"
+              helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
+            />
+          </div>
+
+          <div v-if="isSelect || isOntology">
+            <checkbox
+              label="Show all answers"
+              v-model="control.options.printLayout.showAll"
+              helper-text="Show full answers list, highlight the selected answer(s)"
+            />
+          </div>
+
+          <div v-if="isSelect || isOntology">
+            <checkbox
+              label="Hide Answer List"
+              v-model="control.options.printLayout.hideList"
+              helper-text='Do not show the complete list of answers when printing a fresh survey (the "Print Survey" button)'
+            />
+          </div>
+
+          <v-select
+            v-if="isSelect || isOntology"
+            label="Answer layout"
+            v-model="control.options.printLayout.columns"
+            :items="[1, 2, 3, 4, 5]"
+            color="focus"
+            :menu-props="{ contentClass: 'layout-select' }"
+            hide-details
+          >
+            <template v-slot:selection="{ item, index }">
+              {{ item === 1 ? '1 column' : `${item} columns` }}
+            </template>
+
+            <template v-slot:item="{ item, on, attrs }">
+              <div class="d-flex align-center col">
+                <div class="col-label">
+                  {{ item === 1 ? '1 column' : `${item} columns` }}
+                </div>
+                <div class="ml-2" :class="`col-item cols-${item}`" v-on="on" v-bind="attrs">
+                  <div v-for="letter in 'ABCDE'.split('')" :key="letter">
+                    {{ letter }}
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <template #append-outer>
+              <v-tooltip max-width="400" transition="slide-x-transition" right>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+                </template>
+                Set the number of items in a row
+              </v-tooltip>
+            </template>
+          </v-select>
+        </div>
+      </template>
+
+      <v-spacer></v-spacer>
     </v-form>
-    <div v-else>...</div>
   </div>
 </template>
 <script>
@@ -352,7 +436,7 @@ import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/builder/Checkbox.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
 import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
@@ -392,6 +476,7 @@ export default {
   data() {
     return {
       showAdvanced: false,
+      showLayout: false,
       // if we migrate to using Vue Composition API, the script functionality could be extracted out into a `useScriptProperties` hook
       scriptSourceId: null,
       scriptParams: this.getScriptParams(),
@@ -487,11 +572,14 @@ export default {
     isFarmOsUuid() {
       return this.control.type === 'farmOsUuid';
     },
-    showRequiredOption() {
+    hasRequiredOption() {
       return (
         this.control.options.required ||
         !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
       );
+    },
+    hasLayoutOptions() {
+      return this.isSelect || this.isOntology || this.isFile || this.isMatrix;
     },
   },
   methods: {
@@ -588,12 +676,6 @@ export default {
   },
   created() {
     this.updateScript();
-
-    // Adjust autocomplete option value to be compatible with original `ontology` question type
-    // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
-    if (typeof this.control.options.allowAutocomplete !== 'boolean') {
-      this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
-    }
   },
 };
 </script>
@@ -606,7 +688,7 @@ export default {
 }
 
 .property-panel form > * + *,
-.property-panel form > .advanced > * + * {
+.property-panel form > .extra-options > * + * {
   margin-top: 16px;
 }
 
@@ -618,17 +700,59 @@ export default {
   height: 4px;
 }
 
-.property-panel form > .advanced > div {
+.property-panel form > .extra-options > div {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.property-panel form > .advanced .v-input--selection-controls {
+.property-panel form > .extra-options .v-input--selection-controls {
   margin-top: 0;
 }
 
 .property-panel .v-input--selection-controls {
   padding-top: 0;
+}
+
+.layout-select .v-list-item > div.col {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.layout-select .v-list-item > div.col > .col-label {
+  width: 80px;
+}
+
+.layout-select .v-list-item > div.col > .col-item {
+  flex-grow: 1;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.layout-select .v-list-item > div.col > .col-item > * {
+  border: 2px solid #bdbdbd;
+  text-align: center;
+  padding: 2px;
+}
+
+.layout-select .v-list-item > div.col > .col-item.cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.layout-select .v-list-item > div.col > .col-item.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.layout-select .v-list-item > div.col > .col-item.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.layout-select .v-list-item > div.col > .col-item.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.layout-select .v-list-item > div.col > .col-item.cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 </style>

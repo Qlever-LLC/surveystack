@@ -11,8 +11,11 @@ import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import * as hyloService from '../services/hylo.service';
 import rolesService from '../services/roles.service';
+import mailService from '../services/mail/mail.service';
+import pdfService from '../services/pdf.service';
 import { queryParam } from '../helpers';
 import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
+import { getServerSelfOrigin } from '../services/auth.service';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
@@ -335,22 +338,18 @@ export const buildPipeline = async (req, res) => {
   return pipeline;
 };
 
-// Attach 'meta.submitAsUser' if proxy
-const addCreatorDetailStage = (pipeline) => {
+const addCreatorDetailStage = (pipeline, user) => {
   pipeline.push(
     {
       $lookup: {
         from: 'users',
-        let: {
-          creatorId: '$meta.creator',
-          proxyUserId: '$meta.proxyUserId',
-        },
+        let: { creatorId: '$meta.creator' },
         pipeline: [
           {
             $match: {
               $and: [
                 { $expr: { $eq: ['$_id', '$$creatorId'] } },
-                { $expr: { $eq: [{ $type: '$$proxyUserId' }, 'objectId'] } },
+                { $expr: { $ne: ['$$creatorId', new ObjectId(user)] } },
               ],
             },
           },
@@ -621,14 +620,22 @@ const getSubmission = async (req, res) => {
     roles.push(...userRoles);
   }
 
-  // Add creator details if request has admin rights on survey.
-  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
-  if (user && !queryParam(req.query.pure)) {
-    const groupId = res.locals.existing.meta.group.id;
-    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+  if (user) {
+    // Add creator details as `meta.submitAsUser` if pure=1 is set (re-submissions)
+    // This will allow admin/proxy can resubmit with correct request header
+    if (queryParam(req.query.pure)) {
+      addCreatorDetailStage(pipeline, user);
+    }
 
-    if (hasAdminRights) {
-      addUserDetailsStage(pipeline);
+    // Add creator details if request has admin rights on survey.
+    // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+    else {
+      const groupId = res.locals.existing.meta.group.id;
+      const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+
+      if (hasAdminRights) {
+        addUserDetailsStage(pipeline);
+      }
     }
   }
 
@@ -641,9 +648,6 @@ const getSubmission = async (req, res) => {
 
   // Fetch by id
   pipeline.push({ $match: { _id: new ObjectId(id) } });
-
-  // Attach proxy details
-  addCreatorDetailStage(pipeline);
 
   // Redact
   const redactStage = createRedactStage(user, roles);
@@ -1221,6 +1225,170 @@ const deleteSubmissions = async (req, res) => {
   return res.send({ message: 'OK' });
 };
 
+const getSubmissionPdf = async (req, res) => {
+  const [submission] = await db
+    .collection(col)
+    .aggregate([
+      { $match: { _id: new ObjectId(req.params.id) } },
+      {
+        $lookup: {
+          from: 'users',
+          let: { userId: '$meta.creator' },
+          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$userId'] } } }],
+          as: 'user',
+        },
+      },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'groups',
+          let: { groupId: '$meta.group.id' },
+          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
+          as: 'group',
+        },
+      },
+      { $unwind: { path: '$group', preserveNullAndEmptyArrays: true } },
+      {
+        $set: {
+          'meta.group.name': '$group.name',
+          'meta.creator': '$user',
+        },
+      },
+      { $project: { user: 0, group: 0 } },
+    ])
+    .toArray();
+
+  if (!submission) {
+    throw boom.notFound(`No entity found for id: ${req.params.id}`);
+  }
+
+  const survey = await db.collection('surveys').findOne({ _id: submission.meta.survey.id });
+  if (!survey) {
+    throw boom.notFound(`No survey found with id: ${submission.meta.survey.id}`);
+  }
+
+  try {
+    const fileName = pdfService.getPdfName(survey, submission);
+    const data = await pdfService.getPdfBase64(survey, submission);
+    res.attachment(fileName);
+    if (queryParam(req.query.base64)) {
+      res.send('data:application/pdf;base64,' + data);
+    } else {
+      res.send(Buffer.from(data, 'base64'));
+    }
+  } catch (e) {
+    throw boom.internal(e);
+  }
+};
+
+const postSubmissionPdf = async (req, res) => {
+  const { survey, submission } = req.body;
+  if (!survey) {
+    throw boom.badRequest('No survey found in the request body');
+  }
+  if (!submission) {
+    throw boom.badRequest('No submission found in the request body');
+  }
+
+  // Fetch group name
+  const group = await db
+    .collection('groups')
+    .findOne({ _id: new ObjectId(submission.meta.group.id) });
+
+  if (!group) {
+    throw boom.notFound(`No group found with id: ${submission.meta.group.id}`);
+  }
+
+  submission.meta.group.name = group.name;
+
+  // Fetch submitter by considering proxy
+  const creator = await db
+    .collection('users')
+    .findOne({ _id: new ObjectId(submission.meta.creator) });
+
+  submission.meta.creator = creator;
+
+  // Generate PDF
+  try {
+    const fileName = pdfService.getPdfName(survey, submission);
+    const data = await pdfService.getPdfBase64(survey, submission);
+    res.attachment(fileName);
+    if (queryParam(req.query.base64)) {
+      res.send('data:application/pdf;base64,' + data);
+    } else {
+      res.send(Buffer.from(data, 'base64'));
+    }
+  } catch (e) {
+    throw boom.internal(e);
+  }
+};
+
+const sendPdfLink = async (req, res) => {
+  const submission = await db.collection(col).findOne({ _id: new ObjectId(req.params.id) });
+  if (!submission) {
+    throw boom.notFound(`No entity found for id: ${req.params.id}`);
+  }
+
+  // Send to submitter
+  await mailService.sendLink({
+    from: 'noreply@surveystack.io',
+    to: res.locals.auth.user.email,
+    subject: `Survey report - ${submission.meta.survey.name}`,
+    link: new URL(`/api/submissions/${req.params.id}/pdf`, getServerSelfOrigin(req)).toString(),
+    actionDescriptionHtml:
+      'Thank you for taking the time to complete our survey. You can download a copy of your submission by clicking the button below.',
+    btnText: 'Download',
+  });
+
+  // /* TODO: - Do we need to send pdf link to creator now ?
+  //  * Note that there's no email subscription options there in the app
+  //  * Or just comment this out this block in this release?
+  //  */
+
+  // //  Fetch creator of the survey
+  // const [survey] = await db
+  //   .collection('surveys')
+  //   .aggregate([
+  //     {
+  //       $lookup: {
+  //         from: 'users',
+  //         let: { creatorId: '$meta.creator' },
+  //         pipeline: [
+  //           { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+  //           { $project: { email: 1 } },
+  //         ],
+  //         as: 'creator',
+  //       },
+  //     },
+  //     {
+  //       $unwind: { path: '$creator', preserveNullAndEmptyArrays: true },
+  //     },
+  //     {
+  //       $match: {
+  //         _id: new ObjectId(submission.meta.survey.id),
+  //         'meta.creator': { $ne: new ObjectId(res.locals.auth.user._id) },
+  //       },
+  //     },
+  //     { $project: { creator: 1 } },
+  //   ])
+  //   .toArray();
+
+  // // Send to creator of the survey
+  // // No error thrown even the creator was not found
+  // if (survey && survey.creator) {
+  //   await mailService.sendLink({
+  //     from: 'noreply@surveystack.io',
+  //     to: survey.creator.email,
+  //     subject: `Survey report - ${submission.meta.survey.name}`,
+  //     link: new URL(`/api/submissions/${req.params.id}/pdf`, getServerSelfOrigin(req)).toString(),
+  //     actionDescriptionHtml: `${res.locals.auth.user.name} has submitted new submission. You can download a copy by clicking the button below.`,
+  //     btnText: 'Download',
+  //   });
+  // }
+
+  return res.send({ success: true });
+};
+
 export default {
   getSubmissions,
   getSubmissionsPage,
@@ -1233,4 +1401,7 @@ export default {
   archiveSubmissions,
   deleteSubmissions,
   prepareSubmissionsToQSLs,
+  getSubmissionPdf,
+  postSubmissionPdf,
+  sendPdfLink,
 };
