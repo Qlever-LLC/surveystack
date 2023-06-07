@@ -1,5 +1,5 @@
 <template>
-  <v-btn rounded small icon text outlined :disabled="!!loading" :loading="isUploading" @click="handleUpload">
+  <v-btn rounded small icon text outlined :disabled="!!loading" :loading="isUploading" @click.stop="handleUpload">
     <v-icon small>mdi-upload-outline</v-icon>
   </v-btn>
 </template>

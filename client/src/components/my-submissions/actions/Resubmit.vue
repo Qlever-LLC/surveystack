@@ -4,7 +4,7 @@
     elevation="0"
     rounded
     small
-    outlined
+    :outlined="!primary"
     :disabled="!!loading"
     :loading="isSaving"
     @click.stop="handleClick"
@@ -23,6 +23,10 @@ export default defineComponent({
     submission: {
       type: Object,
       required: true,
+    },
+    primary: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props, { root }) {

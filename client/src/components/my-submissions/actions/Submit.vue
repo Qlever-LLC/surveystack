@@ -4,12 +4,12 @@
     elevation="0"
     rounded
     small
-    outlined
+    :outlined="!primary"
     :disabled="!!loading"
     :loading="isSubmitting"
     @click.stop="handleSubmit"
   >
-    <v-icon left small>mdi-cloud-upload-outline</v-icon>
+    <v-icon left small>{{ primary ? 'mdi-cloud-upload' : 'mdi-cloud-upload-outline' }}</v-icon>
     Submit
   </v-btn>
 </template>
@@ -23,6 +23,10 @@ export default defineComponent({
     submission: {
       type: Object,
       required: true,
+    },
+    primary: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props, { root }) {

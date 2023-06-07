@@ -1,12 +1,5 @@
 <template>
-  <v-card
-    class="draft-card"
-    :class="{
-      checked,
-      invalid: !survey,
-      archived: isArchived,
-    }"
-  >
+  <v-card class="draft-card" :class="{ checked, invalid: !survey }">
     <div class="top">
       <div v-if="!isArchived" class="status-bar" :class="classes.bar"></div>
       <div class="d-flex flex-column align-start">
@@ -24,8 +17,8 @@
       <span v-if="isArchived" class="grey--text"> {{ submission.meta.archivedReason }}</span>
 
       <template v-else-if="isDraft">
-        <continue :submission="submission"></continue>
-        <submit v-if="isReadyToSubmit" :submission="submission"></submit>
+        <continue :submission="submission" :primary="!isReadyToSubmit"></continue>
+        <submit :submission="submission" :primary="isReadyToSubmit"></submit>
         <upload v-if="isLocal" :submission="submission"> </upload>
         <download v-if="!isLocal" :submission="submission"></download>
         <delete :submission="submission"></delete>
@@ -178,10 +171,7 @@ export default {
   transition-property: box-shadow, border;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-
-  &:not(.archived) {
-    cursor: pointer;
-  }
+  cursor: pointer;
 
   &.invalid {
     background: linear-gradient(0deg, rgba(222, 115, 146, 0.08), rgba(222, 115, 146, 0.08)), #ffffff;

@@ -4,9 +4,10 @@
     elevation="0"
     rounded
     small
+    :outlined="!primary"
     @click.stop="$router.push(`/submissions/drafts/${submission._id}`)"
   >
-    <v-icon left small>mdi-play</v-icon>
+    <v-icon left small>{{ primary ? 'mdi-play' : 'mdi-play-outline' }}</v-icon>
     Continue
   </v-btn>
 </template>
@@ -19,6 +20,10 @@ export default defineComponent({
     submission: {
       type: Object,
       required: true,
+    },
+    primary: {
+      type: Boolean,
+      default: false,
     },
   },
 });
