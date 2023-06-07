@@ -464,7 +464,7 @@ const mutations = {
     const childKey = keys.pop();
     const parent = get(state.submission, keys, null);
     if (!parent) {
-      throw new Error(`Trying to set property for invalid path: ${path}`);
+      throw new Error(`Trying to set property for the invalid path: ${path}`);
     }
 
     Vue.set(parent, childKey, value);
