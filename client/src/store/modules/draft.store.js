@@ -83,9 +83,10 @@ const getters = {
           .getPath()
           .map((n) => n.model.name)
           .join('.')
-          .replaceAll('[', '.')
-          .replaceAll(']', '')
+          .replace('[', '.')
+          .replace(']', '')
       : null,
+
   atStart: (state) => state.node === state.firstNode,
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
