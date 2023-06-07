@@ -115,11 +115,22 @@ router.post(
   ],
   catchErrors(submissionController.bulkReassignSubmissions)
 );
+router.post(
+  '/submissions/:id/send-email',
+  [assertAuthenticated, assertEntityExists({ collection: 'submissions' })],
+  catchErrors(submissionController.sendPdfLink)
+);
 router.get(
   '/submissions/:id',
   [assertEntityExists({ collection: 'submissions' })],
   catchErrors(submissionController.getSubmission)
 );
+router.get(
+  '/submissions/:id/pdf',
+  [assertEntityExists({ collection: 'submissions' })],
+  catchErrors(submissionController.getSubmissionPdf)
+);
+router.post('/submissions/pdf', catchErrors(submissionController.postSubmissionPdf));
 router.post(
   '/submissions',
   [assertSubmissionRights],
@@ -179,6 +190,7 @@ router.get(
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/pinned', catchErrors(surveyController.getPinned));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
+router.get('/surveys/:id/pdf', catchErrors(surveyController.getSurveyPdf));
 router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
 router.post(
   '/surveys',

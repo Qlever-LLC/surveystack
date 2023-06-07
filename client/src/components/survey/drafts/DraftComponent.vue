@@ -1,5 +1,5 @@
 <template>
-  <div class="draft-component-wrapper draft wrapper" :class="{ builder: builder }" v-if="control" ref="wrapper">
+  <div class="draft-component-wrapper draft wrapper" :class="{ builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-if="showConfirmSubmission"
@@ -187,8 +187,9 @@ export default {
       const vm = this;
       vm.overflowing = false;
       setTimeout(() => {
-        const body = document.getElementsByTagName('body')[0];
-        const { clientHeight, scrollHeight } = body;
+        const previewDom = document.querySelector('#previewSurvey');
+        const el = previewDom || document.body;
+        const { clientHeight, scrollHeight } = el;
         if (scrollHeight - 100 > clientHeight) {
           vm.overflowing = true;
         } else {
@@ -196,20 +197,33 @@ export default {
         }
       }, 500);
     },
+    overflowing(val, oldVal) {
+      if (val && !oldVal) {
+        this.scrollTop();
+      }
+    },
   },
   methods: {
+    scrollTop() {
+      const previewDom = document.querySelector('#previewSurvey');
+      if (previewDom) {
+        previewDom.scrollTo(0, 0);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    },
     next() {
       // Save current draft submission to IDB
       this.$store.dispatch('submissions/saveToLocal', this.submission);
 
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
-      window.scrollTo(0, 0);
+      this.scrollTop();
     },
     prev() {
       // this.$store.dispatch('draft/prev')
       queueAction(this.$store, 'draft/prev');
-      window.scrollTo(0, 0);
+      this.scrollTop();
     },
     goto(path) {
       this.$store.dispatch('draft/goto', path);
@@ -255,15 +269,17 @@ export default {
       return scrollHeight > clientHeight || scrollWidth > clientWidth;
     },
     scrollY(val) {
-      window.scrollBy({ top: val, left: 0, behavior: 'smooth' });
+      const previewDom = document.querySelector('#previewSurvey');
+      if (previewDom) {
+        previewDom.scrollBy({ top: val, left: 0, behavior: 'smooth' });
+      } else {
+        window.scrollBy({ top: val, left: 0, behavior: 'smooth' });
+      }
     },
   },
   created() {
     const { survey, submission, persist } = this;
     this.$store.dispatch('draft/init', { survey, submission, persist });
-  },
-  mounted() {
-    // console.log('wrapper', this.$refs.wrapper.clientHeight, this.$refs.wrapper.scrollHeight);
   },
 };
 </script>
