@@ -133,7 +133,6 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
-import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -266,13 +265,8 @@ export default {
       return this.control.options.source;
     },
     headers() {
-      return (
-        this.source.content
-          // remove all hidden headers
-          .filter((header) => !header.hidden)
-          // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
-          .map(cleanupAutocompleteMatrix)
-      );
+      // remove all hidden headers
+      return this.source.content.filter((header) => !header.hidden);
     },
     fields() {
       return this.source.content.map((col) => col.value);

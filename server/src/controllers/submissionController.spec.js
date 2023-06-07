@@ -3,12 +3,22 @@ import {
   createReq,
   createRes,
   createSurvey,
+  createUser,
   getControlGenerator,
   getSubmissionDataGenerator,
 } from '../testUtils';
+import mailService from '../services/mail/mail.service';
 const { ObjectId } = jest.requireActual('mongodb');
 
-const { getSubmissionsCsv, prepareSubmissionsToQSLs } = submissionController;
+jest.mock('../services/mail/mail.service');
+
+const {
+  getSubmissionsCsv,
+  prepareSubmissionsToQSLs,
+  getSubmissionPdf,
+  postSubmissionPdf,
+  sendPdfLink,
+} = submissionController;
 
 async function mockControlsAndSubmission() {
   const { survey, createSubmission } = await createSurvey(['text', 'number']);
@@ -65,12 +75,12 @@ describe('submissionController', () => {
       const mockRes = await createRes();
       await getSubmissionsCsv(mockReq, mockRes);
       const expected =
-        '_id,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.version,meta.revision,meta.permissions,meta.status.0.type,meta.status.0.value.at,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
+        '_id,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.name,meta.survey.version,meta.revision,meta.permissions,meta.status.0.type,meta.status.0.value.at,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
         `${submission._id},` +
-        `${submission.meta.dateCreated.toISOString()},` +
-        `${submission.meta.dateModified.toISOString()},` +
-        `${submission.meta.dateSubmitted.toISOString()},` +
-        `${submission.meta.survey.id},` +
+        `${new Date(submission.meta.dateCreated).toISOString()},` +
+        `${new Date(submission.meta.dateModified).toISOString()},` +
+        `${new Date(submission.meta.dateSubmitted).toISOString()},` +
+        `${submission.meta.survey.id},Mock Survey Name,` +
         `2,1,,READY_TO_SUBMIT,` +
         `${submission.meta.status[0].value.at.toISOString()},` +
         `${submission.meta.group.id},` +
@@ -99,6 +109,152 @@ describe('submissionController', () => {
       const { controls, submission } = await mockControlsAndSubmission();
       const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
       expect(QSLSubmissions[1].data.text_1.meta.permissions).toStrictEqual(['admin']);
+    });
+  });
+
+  describe('getSubmissionPdf', () => {
+    let submission;
+
+    beforeEach(async () => {
+      const { createSubmission } = await createSurvey(['instructions', 'text', 'ontology']);
+      const { submission: _submission } = await createSubmission();
+      submission = _submission;
+    });
+
+    it('should return PDF base64 when `base64=1` if success', async () => {
+      await createUser({ _id: submission.meta.creator });
+      const req = createReq({ params: { id: submission._id }, query: { base64: '1' } });
+      const res = await createRes({
+        user: { _id: submission.meta.creator, permissions: [] },
+      });
+      await getSubmissionPdf(req, res);
+
+      expect(res.attachment).toHaveBeenCalledWith(expect.stringContaining('Mock Survey Name'));
+      expect(res.send).toHaveBeenCalledWith(
+        expect.stringContaining('data:application/pdf;base64,')
+      );
+    });
+
+    it('should return PDF buffer when `base64=0` if success', async () => {
+      await createUser({ _id: submission.meta.creator });
+      const req = createReq({ params: { id: submission._id } });
+      const res = await createRes({
+        user: { _id: submission.meta.creator, permissions: [] },
+      });
+      await getSubmissionPdf(req, res);
+
+      expect(res.attachment).toHaveBeenCalledWith(expect.stringContaining('Mock Survey Name'));
+      expect(res.send).toHaveBeenCalledWith(expect.anything());
+    });
+
+    it('should throw error if not found submission', async () => {
+      const req = createReq({ params: { id: 'non-exist-id' }, query: { base64: '1' } });
+      const res = await createRes({
+        user: { _id: 'mock-user-id', permissions: [] },
+      });
+
+      await expect(getSubmissionPdf(req, res)).rejects.toThrow(/non-exist-id/);
+    });
+
+    it('should throw error if PDF generate failed', async () => {
+      const req = createReq({ params: { id: submission._id }, query: { base64: '1' } });
+      const res = await createRes({
+        user: { _id: submission.meta.creator, permissions: [] },
+      });
+
+      await expect(getSubmissionPdf(req, res)).rejects.toThrow();
+    });
+  });
+
+  describe('postSubmissionPdf', () => {
+    it('should return PDF base64 when `base64=1` if success', async () => {
+      const { survey, createSubmission } = await createSurvey(['instructions', 'text', 'ontology']);
+      const { submission } = await createSubmission();
+      await createUser({ _id: submission.meta.creator });
+      const req = createReq({ body: { survey, submission }, query: { base64: '1' } });
+      const res = await createRes({
+        user: { _id: submission.meta.creator, permissions: [] },
+      });
+      await postSubmissionPdf(req, res);
+
+      expect(res.attachment).toHaveBeenCalledWith(expect.stringContaining('Mock Survey Name'));
+      expect(res.send).toHaveBeenCalledWith(
+        expect.stringContaining('data:application/pdf;base64,')
+      );
+    });
+
+    it('should throw error if PDF generate failed', async () => {
+      const { survey, createSubmission } = await createSurvey(['instructions', 'text', 'ontology']);
+      const { submission } = await createSubmission();
+      const req = createReq({ body: { survey, submission }, query: { base64: '1' } });
+      const res = await createRes({
+        user: { _id: submission.meta.creator, permissions: [] },
+      });
+
+      await expect(postSubmissionPdf(req, res)).rejects.toThrow();
+    });
+  });
+
+  describe('sendPdfLink', () => {
+    let survey, submission;
+
+    beforeEach(async () => {
+      const { survey: _survey, createSubmission } = await createSurvey('text');
+      const { submission: _submission } = await createSubmission();
+      survey = _survey;
+      submission = _submission;
+    });
+
+    it('should send email correctly if success', async () => {
+      const req = createReq({ params: { id: submission._id } });
+      const res = await createRes({
+        user: { _id: submission.meta.creator, email: 'user-email', permissions: [] },
+      });
+      await sendPdfLink(req, res);
+
+      expect(mailService.sendLink).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: 'noreply@surveystack.io',
+          to: 'user-email',
+          subject: 'Survey report - Mock Survey Name',
+          link: expect.stringContaining(`/api/submissions/${submission._id}/pdf`),
+        })
+      );
+    });
+
+    // TODO: - Uncomment if we do subscribe option later
+    // it("should send email to both of survey creator and submission submitter if they're different", async () => {
+    //   await createUser({ _id: survey.meta.creator, email: 'survey-creator-email' });
+    //   const req = createReq({ params: { id: submission._id } });
+    //   const res = await createRes({
+    //     user: {
+    //       _id: submission.meta.creator,
+    //       email: 'submission-submitter-email',
+    //       permissions: [],
+    //     },
+    //   });
+    //   await sendPdfLink(req, res);
+
+    //   expect(mailService.sendLink).toHaveBeenCalledTimes(2);
+    // });
+
+    it('should send email only once if survey creator and submission submitter are same', async () => {
+      const req = createReq({ params: { id: submission._id } });
+      const res = await createRes({
+        user: { _id: survey.meta.creator, email: 'survey-creator-email', permissions: [] },
+      });
+      await sendPdfLink(req, res);
+
+      expect(mailService.sendLink).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw error if not found submission', async () => {
+      const req = createReq({ params: { id: 'non-exist-id' }, query: { base64: '1' } });
+      const res = await createRes({
+        user: { _id: 'mock-user-id', permissions: [] },
+      });
+
+      await expect(sendPdfLink(req, res)).rejects.toThrow(/non-exist-id/);
     });
   });
 });

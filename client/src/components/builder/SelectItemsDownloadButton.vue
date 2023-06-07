@@ -7,6 +7,7 @@
 
 <script>
 import { createResourceCsv } from '@/services/csv.service';
+import downloadExternal from '@/utils/downloadExternal';
 
 export default {
   props: {
@@ -25,17 +26,7 @@ export default {
     },
     async download() {
       const csv = createResourceCsv(this.items);
-
-      const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`);
-      element.setAttribute('download', `${this.resourceName}.csv`);
-
-      element.style.display = 'none';
-      document.body.appendChild(element);
-
-      element.click();
-
-      document.body.removeChild(element);
+      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`, `${this.resourceName}.csv`);
     },
   },
 };
