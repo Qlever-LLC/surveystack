@@ -23,10 +23,11 @@ export const SubmissionLoadingActions = {
   SAVE_TO_LOCAL: 'save-to-local',
   SAVE_TO_SERVER: 'save-to-server',
   DELETE_DRAFT: 'delete-draft',
-  ARCHIVE: 'archive',
-  START: 'start',
-  SUBMIT: 'submit',
-  RESUBMIT: 'resubmit',
+  ARCHIVE_SUBMISSION: 'archive-submission',
+  DELETE_SUBMISSION: 'delete-submission',
+  START_DRAFT: 'start-draft',
+  SUBMIT_DRAFT: 'submit-draft',
+  RESUBMIT_SUBMISSION: 'resubmit-submission',
 };
 
 const sanitize = (submission) => {
@@ -140,6 +141,45 @@ const actions = {
     dispatch('fetchSubmissions', true);
   },
 
+  refreshMySubmissions({ state, commit, rootGetters }) {
+    const user = rootGetters['auth/user']._id;
+    let submissions = [];
+
+    if (state.filter.type.length !== 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
+      submissions.push(...state.mySubmissions.filter((item) => item.options.draft && item.options.local));
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SERVER_DRAFTS)) {
+      submissions.push(...state.mySubmissions.filter((item) => item.options.draft && !item.options.local));
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED)) {
+      submissions.push(...state.mySubmissions.filter((item) => !item.options.draft && item.meta.creator === user));
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED_AS_PROXY)) {
+      submissions.push(...state.mySubmissions.filter((item) => !item.options.draft && item.meta.proxyUserId === user));
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.RESUBMITTED)) {
+      submissions.push(...state.mySubmissions.filter((item) => !item.options.draft && item.meta.resubmitter === user));
+    }
+    if (state.filter.hideArchived) {
+      submissions = submissions.filter((item) => !item.meta.archived);
+    }
+    if (state.filter.survey.length > 0) {
+      const surveyIds = state.filter.survey.map((item) => item._id);
+      submissions = submissions.filter((item) => surveyIds.includes(item.meta.survey.id));
+    }
+
+    submissions = submissions
+      // Remove duplication
+      .filter(
+        (item, index, ary) =>
+          ary.findIndex((i) => i._id === item._id && i.options.draft === item.options.draft) === index
+      )
+      // Always sort by date modified DESC
+      .sort(sortByModifiedDate);
+
+    commit('SET_MY_SUBMISSIONS', submissions);
+  },
+
   async saveToLocal({ state, commit, dispatch }, submission) {
     commit('SET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
 
@@ -153,11 +193,13 @@ const actions = {
       return null;
     }
 
-    // Try to delete from server to ensure single source of truth
-    try {
-      await api.delete(`/drafts/${submission._id}`);
-    } catch (e) {
-      console.log("%s doesn't exist on Server - it's okay", submission._id);
+    // Delete server draft if exists
+    if (state.mySubmissions.some((item) => item._id === submission._id && item.options.draft && !item.options.local)) {
+      try {
+        await api.delete(`/drafts/${submission._id}`);
+      } catch (e) {
+        console.log("%s doesn't exist on Server - it's okay", submission._id);
+      }
     }
 
     // Update surveys if needed
@@ -169,7 +211,7 @@ const actions = {
     const newSubmission = { ...submission, options: { draft: true, local: true } };
     commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
     commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
-    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
+    dispatch('refreshMySubmissions');
 
     return newSubmission;
   },
@@ -186,12 +228,14 @@ const actions = {
       return null;
     }
 
-    // Try to delete from IDB to ensure single source of truth
-    try {
-      await db.deleteSubmission(submission._id);
-      commit('DELETE_LOCAL_DRAFT', submission._id);
-    } catch (e) {
-      console.log("%s doesn't exist on IDB - it's okay", submission._id);
+    // Delete local draft if exists
+    if (state.localDrafts.some((item) => item._id === submission._id)) {
+      try {
+        await db.deleteSubmission(submission._id);
+        commit('DELETE_LOCAL_DRAFT', submission._id);
+      } catch (e) {
+        console.log("%s doesn't exist on IDB - it's okay", submission._id);
+      }
     }
 
     // Update surveys if needed
@@ -203,12 +247,16 @@ const actions = {
     const newSubmission = { ...submission, options: { draft: true, local: false } };
     commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
     commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_SERVER]);
-    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
+    dispatch('refreshMySubmissions');
 
     return newSubmission;
   },
 
   async deleteDrafts({ commit, state }, ids) {
+    if (ids.length === 0) {
+      return;
+    }
+
     ids.forEach((id) => commit('SET_LOADING', [id, SubmissionLoadingActions.DELETE_DRAFT]));
 
     let result = false;
@@ -241,8 +289,58 @@ const actions = {
       console.warn('Failed to delete submissions', ...ids);
     }
 
-    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
     ids.forEach((id) => commit('RESET_LOADING', [id, SubmissionLoadingActions.DELETE_DRAFT]));
+
+    return result;
+  },
+
+  async archiveSubmissions({ commit, state, dispatch }, { ids, reason }) {
+    ids.forEach((id) => commit('SET_LOADING', [id, SubmissionLoadingActions.ARCHIVE_SUBMISSION]));
+
+    let result = false;
+    try {
+      await api.post(`/submissions/bulk-archive?set=true&reason=${reason}`, { ids });
+
+      // Set `submission.meta.archived=true`
+      ids.forEach((id) => {
+        const match = state.mySubmissions.find((item) => item._id === id && !item.options.draft);
+        if (match) {
+          const newSubmission = { ...match, meta: { ...match.meta, archived: true } };
+          commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
+        }
+      });
+      dispatch('refreshMySubmissions');
+      result = true;
+    } catch (e) {
+      console.warn('Failed to archive submissions', ...ids);
+    }
+
+    ids.forEach((id) => commit('RESET_LOADING', [id, SubmissionLoadingActions.ARCHIVE_SUBMISSION]));
+
+    return result;
+  },
+
+  async deleteSubmissions({ commit }, ids) {
+    if (ids.length === 0) {
+      return;
+    }
+
+    ids.forEach((id) => commit('SET_LOADING', [id, SubmissionLoadingActions.DELETE_SUBMISSION]));
+
+    let result = false;
+    try {
+      await api.post('/submissions/bulk-delete', { ids });
+
+      ids.forEach((id) => {
+        commit('DELETE_MY_SUBMISSION', { id, draft: false });
+      });
+
+      result = true;
+    } catch (e) {
+      console.warn('Failed to delete submissions', ...ids);
+    }
+
+    ids.forEach((id) => commit('RESET_LOADING', [id, SubmissionLoadingActions.DELETE_SUBMISSION]));
 
     return result;
   },
@@ -272,34 +370,7 @@ const actions = {
     return null;
   },
 
-  async archiveSubmissions({ commit, state }, { ids, reason }) {
-    ids.forEach((id) => commit('SET_LOADING', [id, SubmissionLoadingActions.ARCHIVE]));
-
-    let result = false;
-    try {
-      await api.post(`/submissions/bulk-archive?set=true&reason=${reason}`, { ids });
-
-      if (state.filter.hideArchived) {
-        ids.forEach((id) => commit('DELETE_MY_SUBMISSION', { id, draft: false }));
-      } else {
-        state.mySubmissions
-          .filter((submission) => ids.includes(submission._id))
-          .map((submission) => ({ ...submission, meta: { ...submission.meta, archive: true } }))
-          .forEach((submission) => commit('ADD_OR_UPDATE_MY_SUBMISSION', submission));
-      }
-
-      result = true;
-    } catch (e) {
-      console.warn('Failed to archive submissions', ...ids);
-    }
-
-    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
-    ids.forEach((id) => commit('RESET_LOADING', [id, SubmissionLoadingActions.ARCHIVE]));
-
-    return result;
-  },
-
-  async startDraft({ state, dispatch, commit }, { survey, submitAsUser = undefined, version = 0 }) {
+  async startDraft({ dispatch, commit }, { survey, submitAsUser = undefined, version = 0 }) {
     const activeVersion = version || survey.latestVersion;
     const surveyEntity = await dispatch(
       'surveys/fetchSurvey',
@@ -316,11 +387,10 @@ const actions = {
       await db.persistSubmission(sanitize(submission));
       commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
       commit('ADD_OR_UPDATE_MY_SUBMISSION', submission);
+      dispatch('refreshMySubmissions');
     } catch (e) {
       console.warn('Failed to save submission to IDB', e);
     }
-
-    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
 
     router.push({
       name: 'submissions-drafts-detail',
@@ -329,8 +399,8 @@ const actions = {
     });
   },
 
-  async submitDrafts({ state, commit, dispatch }, drafts) {
-    drafts.forEach((submission) => commit('SET_LOADING', [submission._id, SubmissionLoadingActions.SUBMIT]));
+  async submitDrafts({ commit, dispatch }, drafts) {
+    drafts.forEach((submission) => commit('SET_LOADING', [submission._id, SubmissionLoadingActions.SUBMIT_DRAFT]));
 
     let result = false;
     try {
@@ -372,8 +442,7 @@ const actions = {
       console.warn('Failed to submit drafts', e, drafts);
     }
 
-    commit('SET_MY_SUBMISSIONS', state.mySubmissions.sort(sortByModifiedDate));
-    drafts.forEach((submission) => commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SUBMIT]));
+    drafts.forEach((submission) => commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SUBMIT_DRAFT]));
 
     return result;
   },

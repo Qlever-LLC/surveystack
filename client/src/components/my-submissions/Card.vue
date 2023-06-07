@@ -1,12 +1,18 @@
 <template>
-  <v-card class="draft-card" :class="{ checked, invalid: !survey }">
+  <v-card
+    class="draft-card"
+    :class="{
+      checked,
+      invalid: !survey || isArchived,
+    }"
+  >
     <div class="top">
       <div v-if="!isArchived" class="status-bar" :class="classes.bar"></div>
       <div class="d-flex flex-column align-start">
         <v-chip :color="chipColor" :input-value="true" label small @click.stop>
           {{ submission._id }}
         </v-chip>
-        <div class="mt-2 d-flex align-center text-h6 font-weight-regular" :class="classes.surveyName">
+        <div class="mt-2 d-flex align-center text-h6" :class="classes.surveyName">
           <v-icon v-if="!survey" class="mr-1" small>mdi-alert-outline</v-icon>
           {{ survey ? survey.name : 'No survey found' }}
         </div>
@@ -14,19 +20,20 @@
 
       <v-spacer></v-spacer>
 
-      <span v-if="isArchived" class="grey--text"> {{ submission.meta.archivedReason }}</span>
-
-      <template v-else-if="isDraft">
-        <continue :submission="submission" :primary="!isReadyToSubmit"></continue>
-        <submit :submission="submission" :primary="isReadyToSubmit"></submit>
-        <upload v-if="isLocal" :submission="submission"> </upload>
-        <download v-if="!isLocal" :submission="submission"></download>
-        <delete :submission="submission"></delete>
+      <template v-if="isDraft">
+        <draft-continue :submission="submission" :primary="!isReadyToSubmit"></draft-continue>
+        <draft-submit :submission="submission" :primary="isReadyToSubmit"></draft-submit>
+        <draft-upload v-if="isLocal" :submission="submission"> </draft-upload>
+        <draft-download v-if="!isLocal" :submission="submission"></draft-download>
+        <draft-delete :submission="submission"></draft-delete>
       </template>
-
-      <template v-else-if="isCreator || isAdmin">
-        <resubmit :submission="submission"></resubmit>
-        <archive :submission="submission"></archive>
+      <template v-else>
+        <span v-if="isArchived" class="grey--text"> {{ submission.meta.archivedReason }}</span>
+        <template v-if="isCreator || isAdmin">
+          <submission-resubmit :submission="submission"></submission-resubmit>
+          <submission-delete v-if="isArchived" :submission="submission"></submission-delete>
+          <submission-archive v-else :submission="submission"></submission-archive>
+        </template>
       </template>
     </div>
 
@@ -60,13 +67,14 @@
 <script>
 import * as dateFns from 'date-fns';
 import { computed } from '@vue/composition-api';
-import Download from './actions/Download.vue';
-import Upload from './actions/Upload.vue';
-import Delete from './actions/Delete.vue';
-import Archive from './actions/Archive.vue';
-import Continue from './actions/Continue.vue';
-import Submit from './actions/Submit.vue';
-import Resubmit from './actions/Resubmit.vue';
+import DraftContinue from './actions/DraftContinue.vue';
+import DraftDelete from './actions/DraftDelete.vue';
+import DraftDownload from './actions/DraftDownload.vue';
+import DraftUpload from './actions/DraftUpload.vue';
+import DraftSubmit from './actions/DraftSubmit.vue';
+import SubmissionArchive from './actions/SubmissionArchive.vue';
+import SubmissionDelete from './actions/SubmissionDelete.vue';
+import SubmissionResubmit from './actions/SubmissionResubmit.vue';
 import StatusChip from './StatusChip.vue';
 
 const formatDate = (date) => {
@@ -76,13 +84,14 @@ const formatDate = (date) => {
 
 export default {
   components: {
-    Download,
-    Upload,
-    Delete,
-    Archive,
-    Continue,
-    Submit,
-    Resubmit,
+    DraftDownload,
+    DraftUpload,
+    DraftDelete,
+    DraftContinue,
+    DraftSubmit,
+    SubmissionArchive,
+    SubmissionDelete,
+    SubmissionResubmit,
     StatusChip,
   },
   props: {
@@ -132,11 +141,11 @@ export default {
       if (!survey.value || isArchived.value) {
         surveyName.push('blue-grey--text text--lighten-2 font-weight-light');
       } else if (isDraft.value) {
-        surveyName.push('blue--text text--darken-2');
+        surveyName.push('blue--text text--darken-2 font-weight-regular');
       } else if (isProxy.value) {
-        surveyName.push('yellow--text text--darken-3');
+        surveyName.push('yellow--text text--darken-3 font-weight-regular');
       } else if (isCreator.value) {
-        surveyName.push('green--text text--darken-2');
+        surveyName.push('green--text text--darken-2 font-weight-regular');
       }
 
       return {

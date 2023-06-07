@@ -31,7 +31,7 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isSubmitting = computed(() => loading.value === SubmissionLoadingActions.SUBMIT);
+    const isSubmitting = computed(() => loading.value === SubmissionLoadingActions.SUBMIT_DRAFT);
 
     const handleSubmit = () => {
       root.$store.dispatch('submissions/submitDrafts', [props.submission]);

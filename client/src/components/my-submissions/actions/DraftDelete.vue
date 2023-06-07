@@ -20,10 +20,7 @@
     <v-card class="d-flex flex-column">
       <v-card-title> Delete Draft </v-card-title>
 
-      <v-card-text class="pt-0">
-        <p>The draft will be deleted permanently from your device and you will no longer be able to recover it.</p>
-        Are you sure you want to delete?
-      </v-card-text>
+      <v-card-text class="pt-0"> This action cannot be undone. Are you sure you want to delete? </v-card-text>
 
       <v-spacer></v-spacer>
 

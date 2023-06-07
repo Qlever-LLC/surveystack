@@ -45,7 +45,7 @@ export default defineComponent({
   setup(props, { root }) {
     const isOpen = ref(false);
     const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isArchiving = computed(() => loading.value === SubmissionLoadingActions.ARCHIVE);
+    const isArchiving = computed(() => loading.value === SubmissionLoadingActions.ARCHIVE_SUBMISSION);
 
     const handleArchive = (reason) => {
       root.$store.dispatch('submissions/archiveSubmissions', {
