@@ -262,12 +262,13 @@
 import Draggable from 'vuedraggable';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/builder/Checkbox.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
 import { createResource, removeResource, resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import { cleanupAutocompleteMatrix } from '@/utils/surveys';
+import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 
 const MATRIX_COLUMN_TYPES = [
@@ -458,11 +459,6 @@ export default {
         this.colIndex = -1;
       }
     },
-  },
-  created() {
-    // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
-    this.value.content = [...this.value.content].map(cleanupAutocompleteMatrix);
-    this.$emit('input', this.value);
   },
   MATRIX_COLUMN_TYPES,
 };

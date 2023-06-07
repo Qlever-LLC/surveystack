@@ -160,7 +160,7 @@
     :disabled="disabled || loading"
   >
     <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+      <matrix-cell-selection-label :html="item.label" :index="index" :value="value" />
     </template>
 
     <template v-slot:item="data" v-if="!!header.multiple">

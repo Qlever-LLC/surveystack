@@ -56,10 +56,18 @@
             </v-list-item>
           </v-list>
         </btn-dropdown>
-        <div class="mt-2 text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
+
+        <div class="my-3 d-flex justify-center">
+          <v-btn color="primary" text large :loading="download.loading" @click="downloadPrintablePdf(entity._id)">
+            Print Survey
+          </v-btn>
+        </div>
+
+        <div class="text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
           {{ submissionRightsHint }}
         </div>
-        <app-member-selector
+
+        <member-selector
           :show="showSelectMember"
           @hide="showSelectMember = false"
           @selected="startDraftAs(entity, $event)"
@@ -69,16 +77,19 @@
   </v-container>
   <v-container fill-height v-else>
     <v-layout column justify-center align-center>
-      <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular
-    ></v-layout>
+      <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
+    </v-layout>
   </v-container>
 </template>
 
 <script>
-import api from '@/services/api.service';
-import appMemberSelector from '@/components/shared/MemberSelector.vue';
-import { autoSelectActiveGroup } from '@/utils/memberships';
+import { parse as parseDisposition } from 'content-disposition';
+import MemberSelector from '@/components/shared/MemberSelector.vue';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import { autoSelectActiveGroup } from '@/utils/memberships';
+import downloadExternal from '@/utils/downloadExternal';
+import api from '@/services/api.service';
+import { get } from 'lodash';
 
 export default {
   props: {
@@ -90,7 +101,7 @@ export default {
   },
   components: {
     BtnDropdown,
-    appMemberSelector,
+    MemberSelector,
   },
   data() {
     return {
@@ -98,6 +109,10 @@ export default {
       surveyInfo: null,
       show: false,
       showSelectMember: false,
+      download: {
+        loading: false,
+        error: null,
+      },
     };
   },
   methods: {
@@ -108,6 +123,28 @@ export default {
       this.showSelectMember = false;
       if (selectedMember.user) {
         this.$store.dispatch('submissions/startDraft', { survey, submitAsUser: selectedMember.user });
+      }
+    },
+    async downloadPrintablePdf(survey) {
+      this.download.loading = true;
+      this.download.error = null;
+
+      try {
+        const { headers, data } = await api.get(`/surveys/${survey}/pdf`);
+        const disposition = parseDisposition(headers['content-disposition']);
+        downloadExternal(data, disposition.parameters.filename);
+      } catch (e) {
+        console.error('Failed to download printable PDF', e);
+        this.$store.dispatch(
+          'feedback/add',
+          get(
+            e,
+            'response.data.message',
+            'Sorry, something went wrong while downloading a PDF of paper version. Try again later.'
+          )
+        );
+      } finally {
+        this.download.loading = false;
       }
     },
   },

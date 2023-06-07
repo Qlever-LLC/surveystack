@@ -48,6 +48,8 @@
           query: { minimal_ui: $route.query.minimal_ui },
         }
       "
+      :survey="survey"
+      :submission="submission"
       @close="onCloseResultDialog"
     />
 
@@ -55,6 +57,8 @@
       v-model="showApiComposeErrors"
       :items="apiComposeErrors"
       title="ApiCompose Errors"
+      :survey="survey"
+      :submission="submission"
       @close="showApiComposeErrors = false"
     />
   </div>
@@ -63,9 +67,7 @@
 <script>
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
-import * as db from '@/store/db';
 import resultMixin from '@/components/ui/ResultsMixin';
-
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
@@ -74,7 +76,8 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
-import { defaultsDeep } from 'lodash';
+import * as db from '@/store/db';
+import defaultsDeep from 'lodash/defaultsDeep';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -141,9 +144,6 @@ export default {
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
-      // clear submitAsUser as this transient local information
-      delete this.submission.meta.submitAsUser;
-
       let message;
       try {
         await uploadFileResources(this.$store, this.survey, payload, true);
@@ -209,8 +209,12 @@ export default {
       this.hasError = true;
     }
 
+    // Set proxy header if resubmit by proxy or admin.
+    // Otherwise, remove it
     if (this.submission.meta.submitAsUser) {
       api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
+    } else {
+      api.removeHeader('x-delegate-to');
     }
 
     this.loading = false;

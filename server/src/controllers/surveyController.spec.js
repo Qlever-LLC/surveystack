@@ -16,6 +16,7 @@ const {
   cleanupSurvey,
   getSurveyAndCleanupInfo,
   deleteArchivedTestSubmissions,
+  getSurveyPdf,
 } = surveyController;
 
 /**
@@ -168,6 +169,7 @@ describe('surveyController', () => {
       expect(returnedSurvey.revisions[0].version).toBe(4);
     });
   });
+
   describe('update', () => {
     let surveyStored, surveyToBeUpdated;
     beforeEach(async () => {
@@ -466,6 +468,22 @@ describe('surveyController', () => {
         );
         expect(deleteCount).toBe(0);
       });
+    });
+  });
+
+  describe('getSurveyPdf', () => {
+    it('should return PDF base64 if success', async () => {
+      const { survey } = await createSurvey(['instructions', 'text', 'ontology']);
+      const req = createReq({ params: { id: survey._id } });
+      const res = await createRes({
+        user: { _id: survey.meta.creator, permissions: [] },
+      });
+      await getSurveyPdf(req, res);
+
+      expect(res.attachment).toHaveBeenCalledWith('Mock Survey Name - SurveyStack.pdf');
+      expect(res.send).toHaveBeenCalledWith(
+        expect.stringContaining('data:application/pdf;base64,')
+      );
     });
   });
 });
