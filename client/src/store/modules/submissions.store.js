@@ -56,6 +56,7 @@ const initialState = createInitialState();
 
 const getters = {
   mySubmissions: (state) => state.mySubmissions,
+  selected: (state) => state.mySubmissions.filter((submission) => submission.options.selected),
   surveys: (state) => state.surveys,
   localTotal: (state) => state.localTotal,
   serverTotal: (state) => state.serverTotal,
@@ -73,16 +74,16 @@ const mutations = {
   SET_MY_SUBMISSIONS: (state, submissions) => {
     state.mySubmissions = submissions;
   },
-  ADD_OR_UPDATE_MY_SUBMISSION: (state, submission) => {
+  ADD_OR_UPDATE_MY_SUBMISSION: (state, { submission, newSubmission = submission }) => {
     // It is possible to have 2 items with same ID in the list - submitted submission and local/server draft.
     // So we should identify not only id but also draft flag.
     let index = state.mySubmissions.findIndex(
       (item) => item._id === submission._id && item.options.draft === submission.options.draft
     );
     if (index >= 0) {
-      Vue.set(state.mySubmissions, index, submission);
+      Vue.set(state.mySubmissions, index, newSubmission);
     } else {
-      state.mySubmissions = [submission, ...state.mySubmissions].sort(sortByModifiedDate);
+      state.mySubmissions = [newSubmission, ...state.mySubmissions].sort(sortByModifiedDate);
     }
   },
   DELETE_MY_SUBMISSION: (state, { id, draft }) => {
@@ -141,11 +142,27 @@ const actions = {
     dispatch('fetchSubmissions', true);
   },
 
+  setMySubmission({ commit }, { submission, newSubmission }) {
+    commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission, newSubmission });
+  },
+
+  clearSelection({ state, commit }) {
+    commit(
+      'SET_MY_SUBMISSIONS',
+      state.mySubmissions.map((item) => ({
+        ...item,
+        options: {
+          ...item.options,
+          selected: false,
+        },
+      }))
+    );
+  },
+
   refreshMySubmissions({ state, commit, rootGetters }) {
     const user = rootGetters['auth/user']._id;
     let submissions = [];
-
-    if (state.filter.type.length !== 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
       submissions.push(...state.mySubmissions.filter((item) => item.options.draft && item.options.local));
     }
     if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SERVER_DRAFTS)) {
@@ -185,7 +202,7 @@ const actions = {
 
     try {
       await db.persistSubmission(sanitize(submission));
-      commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
+      commit('ADD_OR_UPDATE_LOCAL_DRAFT', sanitize(submission));
     } catch (e) {
       console.warn('Failed to save submission into IDB', e);
       commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
@@ -208,8 +225,15 @@ const actions = {
       await dispatch('fetchSurveys');
     }
 
-    const newSubmission = { ...submission, options: { draft: true, local: true } };
-    commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
+    const newSubmission = {
+      ...submission,
+      options: {
+        draft: true,
+        local: true,
+        selected: submission.options.selected,
+      },
+    };
+    commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission, newSubmission });
     commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
     dispatch('refreshMySubmissions');
 
@@ -244,8 +268,15 @@ const actions = {
       await dispatch('fetchSurveys');
     }
 
-    const newSubmission = { ...submission, options: { draft: true, local: false } };
-    commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
+    const newSubmission = {
+      ...submission,
+      options: {
+        draft: true,
+        local: false,
+        selected: submission.options.selected,
+      },
+    };
+    commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission, newSubmission });
     commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_SERVER]);
     dispatch('refreshMySubmissions');
 
@@ -306,7 +337,7 @@ const actions = {
         const match = state.mySubmissions.find((item) => item._id === id && !item.options.draft);
         if (match) {
           const newSubmission = { ...match, meta: { ...match.meta, archived: true } };
-          commit('ADD_OR_UPDATE_MY_SUBMISSION', newSubmission);
+          commit('ADD_OR_UPDATE_MY_SUBMISSION', { match, newSubmission });
         }
       });
       dispatch('refreshMySubmissions');
@@ -385,8 +416,8 @@ const actions = {
 
     try {
       await db.persistSubmission(sanitize(submission));
-      commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
-      commit('ADD_OR_UPDATE_MY_SUBMISSION', submission);
+      commit('ADD_OR_UPDATE_LOCAL_DRAFT', sanitize(submission));
+      commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission });
       dispatch('refreshMySubmissions');
     } catch (e) {
       console.warn('Failed to save submission to IDB', e);
@@ -495,7 +526,14 @@ const actions = {
     // Fetch if local has data
     if (isLocal && state.localTotal >= 0) {
       // Add options for the front-end side usage, this will be sanitized in the back-end.
-      localData = state.localDrafts.map((item) => ({ ...item, options: { draft: true, local: true } }));
+      localData = state.localDrafts.map((item) => ({
+        ...item,
+        options: {
+          draft: true,
+          local: true,
+          selected: false,
+        },
+      }));
 
       // Filter by `dateModified` is older than the last element from the list
       if (lastSubmission) {

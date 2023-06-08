@@ -7,27 +7,39 @@
       }"
     >
       <draft-filter></draft-filter>
+
       <div class="mt-8">
         <draft-card
           v-for="submission in submissions"
           :key="submission._id + submission.options.draft"
           :submission="submission"
-          :checked="selected.includes(submission)"
-          @click.native="handleCardCheck(submission)"
         >
         </draft-card>
-
-        <p v-if="submissions.length === 0" class="text-center">No matching submissions found.</p>
       </div>
 
-      <v-progress-circular v-if="isLoading" :size="30" color="primary" class="my-4" indeterminate></v-progress-circular>
+      <div v-if="isLoading" class="d-flex justify-center my-8">
+        <v-progress-circular :size="30" color="primary" indeterminate></v-progress-circular>
+      </div>
       <div ref="lastEl" v-else-if="hasMoreData"></div>
+      <p v-else-if="submissions.length === 0" class="text-center">No matching submissions found.</p>
     </v-container>
 
-    <draft-footer :submissions="selected" @openChange="isFooterOpen = $event" />
+    <draft-footer @openChange="isFooterOpen = $event" />
 
     <v-fab-transition>
-      <v-btn v-show="showTopButton" color="pink" dark fixed right fab small @click="handleToTop">
+      <v-btn
+        v-show="showTopButton"
+        :class="{
+          'mb-12': isFooterOpen,
+        }"
+        color="pink"
+        dark
+        fixed
+        right
+        fab
+        small
+        @click="handleToTop"
+      >
         <v-icon>mdi-arrow-up</v-icon>
       </v-btn>
     </v-fab-transition>
@@ -39,6 +51,7 @@ import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@
 import DraftFilter from '@/components/my-submissions/Filter.vue';
 import DraftCard from '@/components/my-submissions/Card.vue';
 import DraftFooter from '@/components/my-submissions/Footer.vue';
+import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
 
 export default defineComponent({
   components: {
@@ -48,21 +61,13 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const isFooterOpen = ref(false);
-    const isLoading = computed(() => root.$store.getters['submissions/isFetching']);
+    const isLoading = computed(() =>
+      root.$store.getters['submissions/getLoading'](SubmissionLoadingActions.FETCH_SUBMISSIONS)
+    );
     const hasMoreData = computed(() => root.$store.getters['submissions/hasMoreData']);
     const submissions = computed(() => root.$store.getters['submissions/mySubmissions']);
-    const filter = computed(() => root.$store.getters['submissions/filter']);
     const lastEl = ref();
-    const selected = ref([]);
     const showTopButton = ref(false);
-
-    const handleCardCheck = (submission) => {
-      if (selected.value.includes(submission)) {
-        selected.value = selected.value.filter((i) => i !== submission);
-      } else {
-        selected.value.push(submission);
-      }
-    };
 
     // Scroll to top
     const handleToTop = () => {
@@ -80,15 +85,6 @@ export default defineComponent({
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll);
     });
-
-    // Reset select
-    watch(
-      filter,
-      () => {
-        selected.value = [];
-      },
-      { deep: true }
-    );
 
     // Infinite scrolling
     let cleanup = undefined;
@@ -134,9 +130,7 @@ export default defineComponent({
       hasMoreData,
       submissions,
       lastEl,
-      selected,
       showTopButton,
-      handleCardCheck,
       handleToTop,
       handleScroll,
     };

@@ -296,6 +296,7 @@ const getDrafts = async (req, res) => {
         options: {
           draft: true,
           local: false,
+          selected: false,
         },
       }));
       total += entities.pagination.total;
@@ -317,6 +318,7 @@ const getDrafts = async (req, res) => {
         options: {
           draft: false,
           local: false,
+          selected:false,
         },
       }));
       total += entities.pagination.total;

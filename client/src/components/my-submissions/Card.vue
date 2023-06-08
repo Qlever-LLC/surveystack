@@ -2,9 +2,10 @@
   <v-card
     class="draft-card"
     :class="{
-      checked,
+      selected: submission.options.selected,
       invalid: !survey || isArchived,
     }"
+    @click.native="handleSelect"
   >
     <div class="top">
       <div v-if="!isArchived" class="status-bar" :class="classes.bar"></div>
@@ -99,13 +100,10 @@ export default {
       type: Object,
       required: true,
     },
-    checked: {
-      type: Boolean,
-    },
   },
   setup(props, { root }) {
     const userId = computed(() => root.$store.getters['auth/user']._id);
-    const chipColor = computed(() => (props.checked ? 'secondary' : undefined));
+    const chipColor = computed(() => (props.submission.options.selected ? 'secondary' : undefined));
     const isLocal = computed(() => props.submission.options.local);
     const isDraft = computed(() => props.submission.options.draft);
     const isCreator = computed(() => props.submission.meta.creator === userId.value);
@@ -154,6 +152,19 @@ export default {
       };
     });
 
+    const handleSelect = () => {
+      root.$store.dispatch('submissions/setMySubmission', {
+        submission: props.submission,
+        newSubmission: {
+          ...props.submission,
+          options: {
+            ...props.submission.options,
+            selected: !props.submission.options.selected,
+          },
+        },
+      });
+    };
+
     return {
       classes,
       survey,
@@ -168,6 +179,7 @@ export default {
       isAdmin,
       dateSubmitted,
       dateModified,
+      handleSelect,
     };
   },
 };
@@ -187,7 +199,7 @@ export default {
     border-color: rgba(222, 115, 146, 0.08);
   }
 
-  &.checked {
+  &.selected {
     box-shadow: none;
     border-color: var(--v-secondary-lighten2);
 

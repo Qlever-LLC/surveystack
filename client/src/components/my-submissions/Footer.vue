@@ -1,15 +1,27 @@
 <template>
   <footer v-if="isOpen" class="action-bar">
-    <v-btn v-if="draftsToSubmit.length > 0" color="primary" dark> Submit drafts ({{ draftsToSubmit.length }})</v-btn>
-    <v-btn v-if="draftsToDelete.length > 0" color="red lighten-2" dark>
-      Delete drafts ({{ draftsToDelete.length }})</v-btn
-    >
-    <v-btn v-if="submissionsToArchive.length > 0" color="orange darken-1" dark>
-      Archive submissions ({{ submissionsToArchive.length }})
-    </v-btn>
-    <v-btn v-if="submissionsToDelete.length > 0" color="red lighten-2" dark>
-      Delete submissions ({{ submissionsToDelete.length }})
-    </v-btn>
+    <v-container>
+      <span class="flex-grow-1">Selected: {{ selected.length }}</span>
+
+      <div class="buttons">
+        <v-btn v-if="draftsToSubmit.length > 0" color="primary" dark>
+          Submit drafts ({{ draftsToSubmit.length }})</v-btn
+        >
+        <v-btn v-if="draftsToDelete.length > 0" color="red lighten-2" dark>
+          Delete drafts ({{ draftsToDelete.length }})</v-btn
+        >
+        <v-btn v-if="submissionsToArchive.length > 0" color="orange darken-1" dark>
+          Archive submissions ({{ submissionsToArchive.length }})
+        </v-btn>
+        <v-btn v-if="submissionsToDelete.length > 0" color="red lighten-2" dark>
+          Delete submissions ({{ submissionsToDelete.length }})
+        </v-btn>
+      </div>
+
+      <div class="flex-grow-1 text-end">
+        <v-btn text @click="handleClear">Clear all</v-btn>
+      </div>
+    </v-container>
   </footer>
 </template>
 
@@ -17,20 +29,15 @@
 import { computed, defineComponent, watch } from '@vue/composition-api';
 
 export default defineComponent({
-  props: {
-    submissions: {
-      type: Array,
-      required: true,
-    },
-  },
   emits: ['openChange'],
   setup(props, { root, emit }) {
+    const selected = computed(() => root.$store.getters['submissions/selected']);
     const memberships = computed(() => root.$store.getters['memberships/memberships']);
     const userId = computed(() => root.$store.getters['auth/user']._id);
-    const draftsToSubmit = computed(() => props.submissions.filter((item) => item.options.draft));
-    const draftsToDelete = computed(() => props.submissions.filter((item) => item.options.draft));
+    const draftsToSubmit = computed(() => selected.value.filter((item) => item.options.draft));
+    const draftsToDelete = computed(() => selected.value.filter((item) => item.options.draft));
     const submissionsToArchive = computed(() =>
-      props.submissions.filter(
+      selected.value.filter(
         (item) =>
           // not archived
           !item.meta.archived &&
@@ -44,7 +51,7 @@ export default defineComponent({
       )
     );
     const submissionsToDelete = computed(() =>
-      props.submissions.filter(
+      selected.value.filter(
         (item) =>
           // archived
           item.meta.archived &&
@@ -58,15 +65,11 @@ export default defineComponent({
       )
     );
 
-    const isOpen = computed(
-      () =>
-        props.submissions.length > 1 &&
-        draftsToSubmit.value.length +
-          submissionsToArchive.value.length +
-          draftsToDelete.value.length +
-          submissionsToArchive.value.length >
-          1
-    );
+    const handleClear = () => {
+      root.$store.dispatch('submissions/clearSelection');
+    };
+
+    const isOpen = computed(() => selected.value.length > 1);
 
     watch(isOpen, (val) => {
       emit('openChange', val);
@@ -74,10 +77,12 @@ export default defineComponent({
 
     return {
       isOpen,
+      selected,
       draftsToSubmit,
       draftsToDelete,
       submissionsToArchive,
       submissionsToDelete,
+      handleClear,
     };
   },
 });
@@ -92,11 +97,18 @@ export default defineComponent({
   background-color: white;
   box-shadow: 0px -6px 8px rgba(71, 89, 118, 0.12);
   border-top: 1px solid var(--v-secondary-lighten4);
-  padding: 16px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 12px;
   z-index: 1;
+
+  .container {
+    display: flex;
+    align-items: center;
+    max-width: 1280px;
+
+    .buttons > * + * {
+      margin-left: 12px;
+    }
+  }
 }
 </style>
