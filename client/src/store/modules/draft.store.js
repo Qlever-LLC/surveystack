@@ -77,16 +77,16 @@ const getters = {
   submission: (state) => state.submission,
   property: (state) => (path, fallback) => get(state.submission, path, fallback),
   control: (state) => state.node && state.node.model, // current survey control
-  path: (state) => {
-    if (!state.node) {
-      return null;
-    }
-    const p = state.node
-      .getPath()
-      .map((n) => n.model.name)
-      .join('.');
-    return p;
-  },
+  path: (state) =>
+    state.node
+      ? state.node
+          .getPath()
+          .map((n) => n.model.name)
+          .join('.')
+          .replace('[', '.')
+          .replace(']', '')
+      : null,
+
   atStart: (state) => state.node === state.firstNode,
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
@@ -463,9 +463,14 @@ const mutations = {
       });
   },
   SET_PROPERTY(state, { path, value }) {
-    const newValue = state.submission;
-    set(newValue, path, value);
-    Vue.set(state, 'submission', newValue);
+    const keys = path.split('.');
+    const childKey = keys.pop();
+    const parent = get(state.submission, keys, null);
+    if (!parent) {
+      throw new Error(`Trying to set property for the invalid path: ${path}`);
+    }
+
+    Vue.set(parent, childKey, value);
   },
   NEXT(state, node) {
     // console.log('next', node, state);
