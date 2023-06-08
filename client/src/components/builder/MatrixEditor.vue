@@ -259,9 +259,8 @@ import Draggable from 'vuedraggable';
 import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/builder/Checkbox.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
-import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 import { getValueOrNull } from '@/utils/surveyStack';
 
 const MATRIX_COLUMN_TYPES = [
@@ -425,11 +424,6 @@ export default {
     isValidNumber(val) {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
-  },
-  created() {
-    // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
-    this.value.content = [...this.value.content].map(cleanupAutocompleteMatrix);
-    this.$emit('input', this.value);
   },
   MATRIX_COLUMN_TYPES,
 };

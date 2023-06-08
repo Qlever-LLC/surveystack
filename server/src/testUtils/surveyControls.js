@@ -143,6 +143,11 @@ const selectSingleControl = (overrides = {}, index = 1) => ({
   options: {
     ...defaultOptions,
     source: defaultChoiceSource,
+    printLayout: {
+      showAll: false,
+      hideList: false,
+      columns: 3,
+    },
   },
   hint: '',
   value: null,
@@ -156,6 +161,11 @@ const selectMultipleControl = (overrides = {}, index = 1) => ({
   options: {
     ...defaultOptions,
     source: defaultChoiceSource,
+    printLayout: {
+      showAll: false,
+      hideList: false,
+      columns: 3,
+    },
   },
   hint: '',
   value: null,
@@ -169,6 +179,13 @@ const ontologyControl = (overrides = {}, index = 1, source = uniqueId()) => ({
   options: {
     ...defaultOptions,
     source,
+    printLayout: {
+      showAll: false,
+      hideList: false,
+      columns: 3,
+    },
+    allowAutocomplete: false,
+    hasMultipleSelections: true,
   },
   hint: '',
   value: null,
@@ -189,7 +206,7 @@ const matrixControl = (overrides = {}, index = 1) => ({
       content: [
         {
           label: 'Sample',
-          value: 'sample',
+          value: 'property_1',
           tags: '',
           type: 'number',
           resource: '',
@@ -200,7 +217,7 @@ const matrixControl = (overrides = {}, index = 1) => ({
         },
         {
           label: 'Description',
-          value: 'description',
+          value: 'property_2',
           tags: '',
           type: 'text',
           resource: '',
@@ -210,6 +227,9 @@ const matrixControl = (overrides = {}, index = 1) => ({
           scaleWidth: 100,
         },
       ],
+    },
+    printLayout: {
+      table: true,
     },
   },
   hint: '',
@@ -224,6 +244,9 @@ const imageControl = (overrides = {}, index = 1) => ({
   options: {
     ...defaultOptions,
     source: { ...defaultFileSource, types: ['image/*'] },
+    printLayout: {
+      preview: false,
+    },
   },
   hint: '',
   value: null,
@@ -237,6 +260,9 @@ const fileControl = (overrides = {}, index = 1) => ({
   options: {
     ...defaultOptions,
     source: { ...defaultFileSource, typesImmutable: false },
+    printLayout: {
+      preview: false,
+    },
   },
   hint: '',
   value: null,

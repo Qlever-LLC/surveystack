@@ -239,7 +239,7 @@
 </template>
 
 <script>
-import { cloneDeep, isEqual, isEqualWith, uniqBy } from 'lodash';
+import { cloneDeep, get, isEqual, isEqualWith, uniqBy } from 'lodash';
 import { Pane, Splitpanes } from 'splitpanes';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
@@ -256,7 +256,6 @@ import slugify from '@/utils/slugify';
 import { defaultApiCompose } from '@/utils/apiCompose';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
-import * as surveyStackUtils from '@/utils/surveyStack';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 import {
   executeUnsafe,
@@ -270,6 +269,7 @@ import {
   isResourceReferenced,
 } from '@/utils/surveys';
 import api from '@/services/api.service';
+import { getParentPath } from '@/utils/surveyStack';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -759,16 +759,6 @@ export default {
         ? true
         : 'Questions list contains an invalid data name';
     },
-    setSurveyName(value) {
-      this.$set(this.survey, 'name', value);
-      this.$forceUpdate();
-    },
-    setSurveyGroup(value) {
-      this.$set(this.survey, 'group', value);
-    },
-    setSurveyDescription(value) {
-      this.$set(this.survey, 'description', value);
-    },
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
 
@@ -892,8 +882,8 @@ export default {
     parent() {
       const position = getPosition(this.control, this.currentControls);
       const path = getFlatName(this.currentControls, position);
-      const parentPath = surveyStackUtils.getParentPath(path);
-      const parentData = surveyStackUtils.getNested(this.instance, parentPath);
+      const parentPath = getParentPath(path);
+      const parentData = get(this.instance, parentPath);
       return parentData;
     },
   },
@@ -989,8 +979,9 @@ export default {
         const revisionsAreEqual = isEqual(this.initialSurvey.revisions, newVal.revisions);
         const surveyDetailsAreEquivalent =
           this.initialSurvey.name === newVal.name &&
+          this.initialSurvey.description === newVal.description &&
           isEqual(this.initialSurvey.meta.group, newVal.meta.group) &&
-          this.initialSurvey.description === newVal.description;
+          isEqual(this.initialSurvey.meta.printOptions, newVal.meta.printOptions);
         this.surveyUnchanged = revisionsAreEqual && surveyDetailsAreEquivalent && resourcesAreEqual;
 
         const current = newVal.revisions[newVal.revisions.length - 1];

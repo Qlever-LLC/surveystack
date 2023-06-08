@@ -2,6 +2,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
+import { get } from 'lodash';
 import * as surveyUtils from './surveys';
 import * as surveyStackUtils from './surveyStack';
 
@@ -12,7 +13,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
       .map((n) => n.model.name)
       .join('.');
     const control = node.model;
-    const field = surveyStackUtils.getNested(submission, path);
+    const field = get(submission, path);
 
     // if control is hidden set relevance to false
     if (fname === 'relevance' && control.options.hidden) {
@@ -82,7 +83,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
 
     try {
       const parentPath = surveyStackUtils.getParentPath(item.path);
-      const parentData = surveyStackUtils.getNested(submission, parentPath);
+      const parentData = get(submission, parentPath);
       const result = await surveyUtils.executeUnsafe({
         code: item.code,
         fname,
