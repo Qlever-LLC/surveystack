@@ -381,7 +381,7 @@ class PdfGenerator {
         return;
       }
 
-      const validControls = this.getValidControls(control.children);
+      const validControls = this.getValidControls(control.children, [...path, control.name]);
       for (let index = 0; index < validControls.length; index += 1) {
         const child = validControls[index];
         await this.generateControl(
@@ -1118,7 +1118,15 @@ class PdfGenerator {
       answerKey.push('geometry', 'coordinates');
     }
     let answer = getProperty(this.submission.data, answerKey);
-    return toArray(answer).length > 0;
+    const answered = toArray(answer).length > 0;
+
+    if (!answered && this.isContainerControl(control)) {
+      return control.children.some((child) =>
+        this.hasAnswer.bind(this)(child, [...path, control.name])
+      );
+    }
+
+    return answered;
   }
 }
 
