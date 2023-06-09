@@ -13,6 +13,7 @@
           v-for="submission in submissions"
           :key="submission._id + submission.options.draft"
           :submission="submission"
+          @submit-draft="setDraftToSubmit"
         >
         </draft-card>
       </div>
@@ -24,11 +25,11 @@
       <p v-else-if="submissions.length === 0" class="text-center">No matching submissions found.</p>
     </v-container>
 
-    <draft-footer @openChange="isFooterOpen = $event" />
+    <draft-footer @open-change="isFooterOpen = $event" />
 
     <v-fab-transition>
       <v-btn
-        v-show="showTopButton"
+        v-show="isTopButtonVisible"
         :class="{
           'mb-12': isFooterOpen,
         }"
@@ -43,10 +44,23 @@
         <v-icon>mdi-arrow-up</v-icon>
       </v-btn>
     </v-fab-transition>
+
+    <confirm-submission-dialog
+      v-if="draftToSubmit"
+      v-model="isSubmitDialogOpen"
+      :id="draftToSubmit._id"
+      :groupId="draftToSubmit.meta.group.id"
+      :submitAsUser="draftToSubmit.meta.submitAsUser"
+      :dateSubmitted="draftToSubmit.meta.dateSubmitted"
+      @set-group="setGroup"
+      @close="closeSubmitDraft"
+      @submit="submitDraft"
+    />
   </div>
 </template>
 
 <script>
+import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/composition-api';
 import DraftFilter from '@/components/my-submissions/Filter.vue';
 import DraftCard from '@/components/my-submissions/Card.vue';
@@ -58,6 +72,7 @@ export default defineComponent({
     DraftFilter,
     DraftCard,
     DraftFooter,
+    ConfirmSubmissionDialog,
   },
   setup(props, { root }) {
     const isFooterOpen = ref(false);
@@ -67,7 +82,31 @@ export default defineComponent({
     const hasMoreData = computed(() => root.$store.getters['submissions/hasMoreData']);
     const submissions = computed(() => root.$store.getters['submissions/mySubmissions']);
     const lastEl = ref();
-    const showTopButton = ref(false);
+    const isTopButtonVisible = ref(false);
+    const isSubmitDialogOpen = ref(false);
+    const draftToSubmit = ref();
+
+    const setGroup = (id) => {
+      if (draftToSubmit.value) {
+        draftToSubmit.value.meta.group = { id };
+      }
+    };
+
+    const setDraftToSubmit = (draft) => {
+      draftToSubmit.value = draft;
+      isSubmitDialogOpen.value = true;
+    };
+
+    const submitDraft = async () => {
+      await root.$store.dispatch('submissions/submitDrafts', [draftToSubmit.value]);
+      draftToSubmit.value = undefined;
+    };
+
+    const closeSubmitDraft = ({ done }) => {
+      if (done) {
+        draftToSubmit.value = undefined;
+      }
+    };
 
     // Scroll to top
     const handleToTop = () => {
@@ -75,7 +114,7 @@ export default defineComponent({
     };
 
     const handleScroll = () => {
-      showTopButton.value = window.scrollY > 400;
+      isTopButtonVisible.value = window.scrollY > 400;
     };
 
     onMounted(() => {
@@ -130,7 +169,13 @@ export default defineComponent({
       hasMoreData,
       submissions,
       lastEl,
-      showTopButton,
+      isTopButtonVisible,
+      draftToSubmit,
+      isSubmitDialogOpen,
+      setGroup,
+      setDraftToSubmit,
+      submitDraft,
+      closeSubmitDraft,
       handleToTop,
       handleScroll,
     };

@@ -74,8 +74,8 @@
     </v-dialog>
     <result-dialog
       v-model="showSubmitResult"
-      :items="submitResults"
       title="Call for Submissions"
+      :items="submitResults"
       @close="showSubmitResult = false"
     />
   </v-container>

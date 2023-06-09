@@ -22,14 +22,21 @@
       <v-spacer></v-spacer>
 
       <template v-if="isDraft">
+        <draft-submit
+          v-if="isReadyToSubmit"
+          :submission="submission"
+          primary
+          @click="$emit('submit-draft', submission)"
+        ></draft-submit>
         <draft-continue :submission="submission" :primary="!isReadyToSubmit"></draft-continue>
-        <draft-submit :submission="submission" :primary="isReadyToSubmit"></draft-submit>
         <draft-upload v-if="isLocal" :submission="submission"> </draft-upload>
         <draft-download v-if="!isLocal" :submission="submission"></draft-download>
         <draft-delete :submission="submission"></draft-delete>
       </template>
       <template v-else>
-        <span v-if="isArchived" class="grey--text"> {{ submission.meta.archivedReason }}</span>
+        <span v-if="isArchived" class="mr-4 grey--text font-weight-light body-2">
+          {{ submission.meta.archivedReason }}
+        </span>
         <template v-if="isCreator || isAdmin">
           <submission-resubmit :submission="submission"></submission-resubmit>
           <submission-delete v-if="isArchived" :submission="submission"></submission-delete>
@@ -66,7 +73,6 @@
 </template>
 
 <script>
-import * as dateFns from 'date-fns';
 import { computed } from '@vue/composition-api';
 import DraftContinue from './actions/DraftContinue.vue';
 import DraftDelete from './actions/DraftDelete.vue';
@@ -77,11 +83,6 @@ import SubmissionArchive from './actions/SubmissionArchive.vue';
 import SubmissionDelete from './actions/SubmissionDelete.vue';
 import SubmissionResubmit from './actions/SubmissionResubmit.vue';
 import StatusChip from './StatusChip.vue';
-
-const formatDate = (date) => {
-  const parsedDate = dateFns.parseISO(date);
-  return dateFns.isValid(parsedDate) ? dateFns.format(parsedDate, 'M/d/yyyy h:mm:ss a') : '';
-};
 
 export default {
   components: {
@@ -101,6 +102,7 @@ export default {
       required: true,
     },
   },
+  emits: ['submit-draft'],
   setup(props, { root }) {
     const userId = computed(() => root.$store.getters['auth/user']._id);
     const chipColor = computed(() => (props.submission.options.selected ? 'secondary' : undefined));
@@ -119,8 +121,12 @@ export default {
         (membership) => membership.group._id === props.submission.meta.group.id && membership.role === 'admin'
       );
     });
-    const dateSubmitted = computed(() => formatDate(props.submission.meta.dateSubmitted));
-    const dateModified = computed(() => formatDate(props.submission.meta.dateModified));
+    const dateSubmitted = computed(() =>
+      props.submission.meta.dateSubmitted ? new Date(props.submission.meta.dateSubmitted).toLocaleString() : undefined
+    );
+    const dateModified = computed(() =>
+      props.submission.meta.dateModified ? new Date(props.submission.meta.dateModified).toLocaleString() : undefined
+    );
     const survey = computed(() =>
       root.$store.getters['submissions/surveys'].find((item) => item._id === props.submission.meta.survey.id)
     );
@@ -137,13 +143,13 @@ export default {
 
       const surveyName = [];
       if (!survey.value || isArchived.value) {
-        surveyName.push('blue-grey--text text--lighten-2 font-weight-light');
+        surveyName.push('blue-grey--text font-weight-light');
       } else if (isDraft.value) {
-        surveyName.push('blue--text text--darken-2 font-weight-regular');
+        surveyName.push('blue--text text--darken-4 font-weight-medium');
       } else if (isProxy.value) {
-        surveyName.push('yellow--text text--darken-3 font-weight-regular');
+        surveyName.push('yellow--text text--darken-4 font-weight-medium');
       } else if (isCreator.value) {
-        surveyName.push('green--text text--darken-2 font-weight-regular');
+        surveyName.push('green--text text--darken-4 font-weight-medium');
       }
 
       return {

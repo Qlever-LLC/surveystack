@@ -1,28 +1,22 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
+  <v-dialog :value="value" @input="$emit('input', $event)" width="400">
     <v-card>
       <v-card-title> Confirm Submission </v-card-title>
-      <v-card-text v-if="!groupChangeAllowed"> Submit Survey </v-card-text>
+      <v-card-text v-if="!canEditGroup"> Submit Survey </v-card-text>
       <v-card-text v-else>
-        Submit this draft <strong>{{ id }}</strong> to
-        <strong v-if="groupName">{{ groupName }}</strong>
-        <strong v-else>no group</strong>
-        <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
-          <active-group-selector label="Group" class="d-inline-block" :value="groupId" @input="setGroup" />
-          <v-btn icon @click="handleCloseGroupEditor">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
+        Submit this draft <strong v-if="id">{{ id }}</strong> to <strong>{{ groupName || 'no group' }}</strong>
+        <div v-if="isGroupEdit" class="d-inline-flex align-end">
+          <active-group-selector v-model="group" label="Group" class="d-inline-block mb-2" />
+          <v-btn icon @click="isGroupEdit = false"> <v-icon>mdi-close</v-icon> </v-btn>
         </div>
-        <v-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
-          <v-icon small>mdi-pencil</v-icon>
-        </v-btn>
-        <div v-if="submitAsUser">
+        <v-btn v-else-if="canEditGroup" icon @click="isGroupEdit = true"> <v-icon small>mdi-pencil</v-icon> </v-btn>
+        <p v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
-        </div>
-        <div v-if="dateSubmitted">
-          This submission was previously submitted on
-          {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
-        </div>
+        </p>
+        <p v-if="dateSubmitted">
+          This submission was previously submitted on {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will
+          archive the previous submission.
+        </p>
         <div v-if="additionalMessage">
           {{ additionalMessage }}
         </div>
@@ -39,14 +33,11 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
+import { computed, defineComponent, ref, watch } from '@vue/composition-api';
 
-export default {
-  data() {
-    return {
-      groupEditorIsVisible: false,
-      groupName: null,
-      groupChangeAllowed: false,
-    };
+export default defineComponent({
+  components: {
+    ActiveGroupSelector,
   },
   props: {
     value: {
@@ -74,40 +65,50 @@ export default {
       type: String,
     },
   },
-  components: {
-    ActiveGroupSelector,
+  emits: ['input', 'submit', 'close'],
+  setup(props, { root, emit }) {
+    const isGroupEdit = ref(false);
+    const groupName = ref('');
+    const canEditGroup = computed(() => root.$store.getters['auth/isLoggedIn']);
+
+    const group = computed({
+      get() {
+        return props.groupId;
+      },
+      set(val) {
+        setGroupName(val);
+        emit('set-group', val);
+      },
+    });
+
+    const handleConfirm = () => {
+      emit('input', false);
+      emit('submit');
+      emit('close', { done: false });
+    };
+
+    const handleAbort = () => {
+      emit('input', false);
+      emit('close', { done: true });
+    };
+
+    const setGroupName = (groupId) => {
+      if (groupId) {
+        getGroupNameById(groupId).then((res) => (groupName.value = res));
+      }
+    };
+
+    setGroupName(props.groupId);
+    watch(() => props.groupId, setGroupName);
+
+    return {
+      isGroupEdit,
+      groupName,
+      canEditGroup,
+      group,
+      handleConfirm,
+      handleAbort,
+    };
   },
-  created() {
-    if (this.groupId) {
-      getGroupNameById(this.groupId).then((response) => (this.groupName = response));
-    }
-    if (this.$store.getters['auth/isLoggedIn']) {
-      this.groupChangeAllowed = true;
-    } else {
-      this.groupChangeAllowed = false;
-    }
-  },
-  computed: {},
-  methods: {
-    handleConfirm() {
-      this.$emit('input', false);
-      this.$emit('submit');
-      this.$emit('close', { done: false });
-    },
-    handleAbort() {
-      this.$emit('input', false);
-      this.$emit('close', { done: true });
-    },
-    async setGroup(v) {
-      await getGroupNameById(v).then((response) => (this.groupName = response));
-      this.$emit('set-group', v);
-    },
-    handleEditGroup() {
-      this.groupEditorIsVisible = true;
-    },
-    handleCloseGroupEditor() {
-      this.groupEditorIsVisible = false;
-    },
-  },
-};
+});
 </script>

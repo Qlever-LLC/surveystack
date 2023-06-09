@@ -10,6 +10,7 @@
       :outlined="outlined"
       hide-details
       color="focus"
+      :dense="$attrs.dense"
     >
       <template v-slot:item="{ item }">
         <span :class="item.className" :style="item.style">{{ item.text }}</span>

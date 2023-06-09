@@ -32,8 +32,9 @@ const sanitize = async (entity) => {
   entity.meta.dateSubmitted = new Date();
   entity.meta.survey.id = new ObjectId(entity.meta.survey.id);
 
-  // Delete temporal data that is used in client to render Proxy data
+  // Delete temporal data that is used in the client
   delete entity.meta.submitAsUser;
+  delete entity.options;
 
   if (entity.meta.group) {
     if (entity.meta.group.id) {

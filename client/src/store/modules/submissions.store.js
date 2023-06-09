@@ -33,6 +33,7 @@ export const SubmissionLoadingActions = {
 const sanitize = (submission) => {
   const newSubmission = { ...submission };
   delete newSubmission.options;
+  delete newSubmission.meta.archived;
   return newSubmission;
 };
 
@@ -78,7 +79,7 @@ const mutations = {
     // It is possible to have 2 items with same ID in the list - submitted submission and local/server draft.
     // So we should identify not only id but also draft flag.
     let index = state.mySubmissions.findIndex(
-      (item) => item._id === submission._id && item.options.draft === submission.options.draft
+      (item) => item._id === submission._id && submission.options && item.options.draft === submission.options.draft
     );
     if (index >= 0) {
       Vue.set(state.mySubmissions, index, newSubmission);
@@ -159,7 +160,7 @@ const actions = {
     );
   },
 
-  refreshMySubmissions({ state, commit, rootGetters }) {
+  refreshMySubmissions({ state, commit, dispatch, rootGetters }) {
     const user = rootGetters['auth/user']._id;
     let submissions = [];
     if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
@@ -195,6 +196,9 @@ const actions = {
       .sort(sortByModifiedDate);
 
     commit('SET_MY_SUBMISSIONS', submissions);
+
+    // Refresh surveys
+    dispatch('fetchSurveys');
   },
 
   async saveToLocal({ state, commit, dispatch }, submission) {
@@ -219,21 +223,23 @@ const actions = {
       }
     }
 
-    // Update surveys if needed
-    const surveyExist = state.surveys.some((survey) => survey._id === submission.meta.survey.id);
-    if (!surveyExist) {
-      await dispatch('fetchSurveys');
-    }
-
     const newSubmission = {
       ...submission,
       options: {
         draft: true,
         local: true,
-        selected: submission.options.selected,
+        selected: submission.options ? submission.options.selected : false,
       },
     };
-    commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission, newSubmission });
+    delete newSubmission.meta.archived;
+
+    if (submission.options && !submission.options.draft) {
+      // If submission, just add draft
+      commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission: newSubmission });
+    } else {
+      // If draft, replace
+      commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission, newSubmission });
+    }
     commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_LOCAL]);
     dispatch('refreshMySubmissions');
 
@@ -262,21 +268,23 @@ const actions = {
       }
     }
 
-    // Update surveys if needed
-    const surveyExist = state.surveys.some((survey) => survey._id === submission.meta.survey.id);
-    if (!surveyExist) {
-      await dispatch('fetchSurveys');
-    }
-
     const newSubmission = {
       ...submission,
       options: {
         draft: true,
         local: false,
-        selected: submission.options.selected,
+        selected: submission.options ? submission.options.selected : false,
       },
     };
-    commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission, newSubmission });
+    delete newSubmission.meta.archived;
+
+    if (submission.options && !submission.options.draft) {
+      // If submission, just add draft
+      commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission: newSubmission });
+    } else {
+      // If draft, replace
+      commit('ADD_OR_UPDATE_MY_SUBMISSION', { submission, newSubmission });
+    }
     commit('RESET_LOADING', [submission._id, SubmissionLoadingActions.SAVE_TO_SERVER]);
     dispatch('refreshMySubmissions');
 
@@ -451,8 +459,15 @@ const actions = {
         return uploadFileResources(this, surveysMap[id], submission, true);
       });
 
-      const putDrafts = drafts.filter((submission) => !!submission.meta.dateSubmitted);
-      const postDrafts = drafts.filter((submission) => !submission.meta.dateSubmitted);
+      const putDrafts = [];
+      const postDrafts = [];
+      drafts.map(sanitize).forEach((submission) => {
+        if (!submission.meta.dateSubmitted) {
+          postDrafts.push(submission);
+        } else {
+          putDrafts.push(submission);
+        }
+      });
       // Update if already submitted
       const submitQueue = putDrafts.map((submission) => api.put(`/submissions/${submission._id}`, submission));
       // Create if new submission
@@ -504,7 +519,7 @@ const actions = {
     return mySubmissions;
   },
 
-  async fetchSubmissions({ commit, state }, reset = false) {
+  async fetchSubmissions({ commit, state, dispatch }, reset = false) {
     if (state.loading[SubmissionLoadingActions.FETCH_SUBMISSIONS]) {
       return;
     }
@@ -625,6 +640,9 @@ const actions = {
     // Append the new data
     commit('SET_MY_SUBMISSIONS', [...state.mySubmissions, ...uniqueSubmissions.slice(0, PER_PAGE)]);
     commit('RESET_LOADING', [SubmissionLoadingActions.FETCH_SUBMISSIONS, true]);
+
+    // Refresh surveys
+    dispatch('fetchSurveys');
   },
 
   async fetchSurveys({ commit, state }) {
@@ -632,36 +650,27 @@ const actions = {
       return;
     }
 
-    commit('SET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);
-    commit('SET_SURVEYS', []);
+    const ids = [...new Set(state.mySubmissions.map((submission) => submission.meta.survey.id))];
+    const validSurveys = state.surveys.filter((survey) => ids.some((id) => id === survey._id));
+    const idsToFetch = ids.filter((id) => state.surveys.every((survey) => survey._id !== id));
 
-    const params = new URLSearchParams();
-    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
-      state.localDrafts.forEach((item) => {
-        params.append('localSurveyIds[]', item.meta.survey.id);
+    if (idsToFetch.length > 0) {
+      commit('SET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);
+      const params = new URLSearchParams();
+      params.append('projections[]', '_id');
+      params.append('projections[]', 'name');
+      idsToFetch.forEach((id) => {
+        params.append('q[]', id);
       });
-    }
-    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SERVER_DRAFTS)) {
-      params.append('draft', '1');
-    }
-    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED)) {
-      params.append('creator', '1');
-    }
-    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED_AS_PROXY)) {
-      params.append('proxyUserId', '1');
-    }
-    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.RESUBMITTED)) {
-      params.append('resubmitter', '1');
-    }
-    if (state.filter.hideArchived) {
-      params.append('hideArchived', '1');
-    }
 
-    try {
-      const { data } = await api.get(`/drafts/surveys?${params}`);
-      commit('SET_SURVEYS', data);
-    } catch (e) {
-      console.warn('Failed to fetch surveys of my submissions', state.filter, e);
+      try {
+        const { data } = await api.get(`/surveys?${params}`);
+        commit('SET_SURVEYS', [...validSurveys, ...data]);
+      } catch (e) {
+        console.warn('Failed to fetch surveys of my submissions', state.filter, e);
+      }
+    } else {
+      commit('SET_SURVEYS', validSurveys);
     }
 
     commit('RESET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);

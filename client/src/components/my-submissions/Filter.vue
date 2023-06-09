@@ -65,7 +65,6 @@ export default defineComponent({
       },
       set(type) {
         root.$store.dispatch('submissions/setFilter', { type, survey: [] });
-        root.$store.dispatch('submissions/fetchSurveys');
       },
     });
 
@@ -85,7 +84,6 @@ export default defineComponent({
       },
       set(hideArchived) {
         root.$store.dispatch('submissions/setFilter', { hideArchived });
-        root.$store.dispatch('submissions/fetchSurveys');
       },
     });
 

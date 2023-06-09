@@ -135,10 +135,10 @@
       <submitting-dialog v-model="this.isSubmitting" />
       <result-dialog
         v-model="showResult"
-        :items="resultItems"
-        @input="handleResultDialogInput"
         title="Result of Submission"
+        :items="resultItems"
         persistent
+        @input="handleResultDialogInput"
       />
     </v-container>
   </div>

@@ -7,7 +7,7 @@
     :outlined="!primary"
     :disabled="!!loading"
     :loading="isSubmitting"
-    @click.stop="handleSubmit"
+    @click.stop="$emit('click')"
   >
     <v-icon left small>{{ primary ? 'mdi-cloud-upload' : 'mdi-cloud-upload-outline' }}</v-icon>
     Submit
@@ -15,8 +15,8 @@
 </template>
 
 <script>
+import { computed, defineComponent, ref } from '@vue/composition-api';
 import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
-import { computed, defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
   props: {
@@ -29,18 +29,16 @@ export default defineComponent({
       default: false,
     },
   },
+  emits: ['click'],
   setup(props, { root }) {
+    const isOpen = ref(false);
     const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
     const isSubmitting = computed(() => loading.value === SubmissionLoadingActions.SUBMIT_DRAFT);
 
-    const handleSubmit = () => {
-      root.$store.dispatch('submissions/submitDrafts', [props.submission]);
-    };
-
     return {
+      isOpen,
       loading,
       isSubmitting,
-      handleSubmit,
     };
   },
 });

@@ -53,19 +53,19 @@
 
     <result-dialog
       v-model="showResult"
-      :items="resultItems"
       title="Result of Submission"
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
       :survey="survey"
       :submission="submission"
+      :items="resultItems"
     />
 
     <result-dialog
       v-model="showApiComposeErrors"
-      :items="apiComposeErrors"
       title="ApiCompose Errors"
       :survey="survey"
       :submission="submission"
+      :items="apiComposeErrors"
       @close="showApiComposeErrors = false"
     />
 

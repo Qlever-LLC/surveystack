@@ -36,27 +36,20 @@
     <submitting-dialog v-model="submitting" />
     <result-dialog
       v-model="showResult"
-      :items="resultItems"
       title="Result of Submission"
-      persistent
-      :to="
-        survey && {
-          name: 'surveys-detail',
-          params: { id: survey._id },
-          query: { minimal_ui: $route.query.minimal_ui },
-        }
-      "
       :survey="survey"
       :submission="submission"
+      :items="resultItems"
+      persistent
       @close="onCloseResultDialog"
     />
 
     <result-dialog
       v-model="showApiComposeErrors"
-      :items="apiComposeErrors"
       title="ApiCompose Errors"
       :survey="survey"
       :submission="submission"
+      :items="apiComposeErrors"
       @close="showApiComposeErrors = false"
     />
   </div>

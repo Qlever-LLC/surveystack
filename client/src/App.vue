@@ -45,7 +45,6 @@ export default {
     fetchMySubmissions() {
       this.$store.dispatch('submissions/fetchLocalDrafts').then(() => {
         this.$store.dispatch('submissions/fetchSubmissions', true);
-        this.$store.dispatch('submissions/fetchSurveys');
       });
     },
   },
