@@ -250,6 +250,7 @@ export default {
       this.$store.dispatch('surveys/fetchPinned');
       this.$store.dispatch('submissions/fetchLocalDrafts').then(() => {
         this.$store.dispatch('submissions/fetchSubmissions', true);
+        this.$store.dispatch('submissions/fetchSurveys');
       });
 
       if (this.$route.params.redirect) {

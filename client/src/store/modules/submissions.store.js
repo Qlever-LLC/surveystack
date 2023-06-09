@@ -196,9 +196,6 @@ const actions = {
       .sort(sortByModifiedDate);
 
     commit('SET_MY_SUBMISSIONS', submissions);
-
-    // Refresh surveys
-    dispatch('fetchSurveys');
   },
 
   async saveToLocal({ state, commit, dispatch }, submission) {
@@ -468,6 +465,7 @@ const actions = {
           putDrafts.push(submission);
         }
       });
+
       // Update if already submitted
       const submitQueue = putDrafts.map((submission) => api.put(`/submissions/${submission._id}`, submission));
       // Create if new submission
@@ -640,9 +638,6 @@ const actions = {
     // Append the new data
     commit('SET_MY_SUBMISSIONS', [...state.mySubmissions, ...uniqueSubmissions.slice(0, PER_PAGE)]);
     commit('RESET_LOADING', [SubmissionLoadingActions.FETCH_SUBMISSIONS, true]);
-
-    // Refresh surveys
-    dispatch('fetchSurveys');
   },
 
   async fetchSurveys({ commit, state }) {
@@ -650,27 +645,36 @@ const actions = {
       return;
     }
 
-    const ids = [...new Set(state.mySubmissions.map((submission) => submission.meta.survey.id))];
-    const validSurveys = state.surveys.filter((survey) => ids.some((id) => id === survey._id));
-    const idsToFetch = ids.filter((id) => state.surveys.every((survey) => survey._id !== id));
+    commit('SET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);
+    commit('SET_SURVEYS', []);
 
-    if (idsToFetch.length > 0) {
-      commit('SET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);
-      const params = new URLSearchParams();
-      params.append('projections[]', '_id');
-      params.append('projections[]', 'name');
-      idsToFetch.forEach((id) => {
-        params.append('q[]', id);
+    const params = new URLSearchParams();
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
+      state.localDrafts.forEach((item) => {
+        params.append('localSurveyIds[]', item.meta.survey.id);
       });
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SERVER_DRAFTS)) {
+      params.append('draft', '1');
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED)) {
+      params.append('creator', '1');
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED_AS_PROXY)) {
+      params.append('proxyUserId', '1');
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.RESUBMITTED)) {
+      params.append('resubmitter', '1');
+    }
+    if (state.filter.hideArchived) {
+      params.append('hideArchived', '1');
+    }
 
-      try {
-        const { data } = await api.get(`/surveys?${params}`);
-        commit('SET_SURVEYS', [...validSurveys, ...data]);
-      } catch (e) {
-        console.warn('Failed to fetch surveys of my submissions', state.filter, e);
-      }
-    } else {
-      commit('SET_SURVEYS', validSurveys);
+    try {
+      const { data } = await api.get(`/drafts/surveys?${params}`);
+      commit('SET_SURVEYS', data);
+    } catch (e) {
+      console.warn('Failed to fetch surveys of my submissions', state.filter, e);
     }
 
     commit('RESET_LOADING', [SubmissionLoadingActions.FETCH_SURVEYS, true]);

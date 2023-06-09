@@ -160,6 +160,7 @@ router.post(
 
 /** Drafts */
 router.get('/drafts', [assertAuthenticated], catchErrors(draftController.getDrafts));
+router.get('/drafts/surveys', [assertAuthenticated], catchErrors(draftController.getSurveys));
 router.post('/drafts', [assertAuthenticated], catchErrors(draftController.createDrafts));
 router.delete(
   '/drafts/:id',

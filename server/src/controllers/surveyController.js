@@ -69,8 +69,6 @@ const getSurveys = async (req, res) => {
   if (q) {
     if (ObjectId.isValid(q)) {
       filter._id = new ObjectId(q);
-    } else if (Array.isArray(q)) {
-      filter._id = { $in: q.filter(ObjectId.isValid).map((id) => new ObjectId(id)) };
     } else {
       filter.name = { $regex: q, $options: 'i' };
     }

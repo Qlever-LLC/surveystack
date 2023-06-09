@@ -331,6 +331,36 @@ const getDrafts = async (req, res) => {
   });
 };
 
+/**
+ * Fetch the surveys of my submissions
+ * - What is 'my submissions'? - creator, proxyUserId, resubmitter are my user ID
+ * - Why fetch surveys? - We have survey filters and it is changed based on the parameters
+ *
+ * @param {
+ *   draft:             boolean,         // Fetch draft submissions
+ *   creator:           boolean,         // Fetch the submissions that is submitted by me
+ *   proxyUserId:       boolean,         // Fetch the submissions that is submitted by me as a proxy
+ *   resubmitter:       boolean,         // Fetch the submissions that is resubmitted by me
+ *   hideArchive:       boolean,         // Exclude archived submissions
+ *   localSurveyIds:    array,           // Survey ID(s) of the local drafts
+ * } req
+ * @param {*} res
+ * @returns             array,          // Surveys { ID, name }
+ */
+const getSurveys = async (req, res) => {
+  let surveys = [];
+
+  // At least one parameter should be set
+  if (!isDraft(req) && !isSubmitted(req) && !req.query.localSurveyIds) {
+    return res.send(surveys);
+  }
+
+  const pipeline = surveyStages(req, res);
+  surveys = await db.collection('surveys').aggregate(pipeline).toArray();
+
+  return res.send(surveys);
+};
+
 const deleteDrafts = async (req, res) => {
   const { id } = req.params;
   let { ids } = req.body;
@@ -348,4 +378,4 @@ const deleteDrafts = async (req, res) => {
   return res.send({ message: 'OK' });
 };
 
-export default { createDrafts, getDrafts, deleteDrafts };
+export default { createDrafts, getDrafts, getSurveys, deleteDrafts };
