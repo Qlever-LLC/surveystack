@@ -476,7 +476,7 @@ export default {
       this.selectedSubmissions = submissions;
     },
     startDraft(survey) {
-      this.$store.dispatch('mySubmissions/startDraft', { survey });
+      this.$store.dispatch('submissions/startDraft', { survey });
     },
     async resubmit(submission) {
       await this.$store.dispatch('mySubmissions/fetchRemoteSubmission', submission._id);

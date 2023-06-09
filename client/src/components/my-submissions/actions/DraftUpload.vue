@@ -1,11 +1,11 @@
 <template>
-  <v-btn rounded small icon text outlined :disabled="!!loading" :loading="isUploading" @click.stop="handleUpload">
+  <v-btn rounded small icon text outlined :disabled="!!loading" :loading="isDraftUploading" @click.stop="uploadDraft">
     <v-icon small>mdi-upload-outline</v-icon>
   </v-btn>
 </template>
 
 <script>
-import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
+import { useSubmissionAction } from '@/store/modules/submissions.store';
 import { computed, defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
@@ -16,17 +16,13 @@ export default defineComponent({
     },
   },
   setup(props, { root }) {
-    const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isUploading = computed(() => loading.value === SubmissionLoadingActions.SAVE_TO_SERVER);
-
-    const handleUpload = () => {
-      root.$store.dispatch('submissions/saveToServer', props.submission);
-    };
+    const submission = computed(() => props.submission);
+    const { loading, isDraftUploading, uploadDraft } = useSubmissionAction(root.$store, submission);
 
     return {
       loading,
-      isUploading,
-      handleUpload,
+      isDraftUploading,
+      uploadDraft,
     };
   },
 });

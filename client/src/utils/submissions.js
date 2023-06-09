@@ -269,3 +269,42 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
 
   return uniqueItems;
 }
+
+export function parseSubmitResponse(response, submissionId = '') {
+  const resultItems = [];
+
+  if (Array.isArray(response.data.farmos)) {
+    response.data.farmos
+      .filter((farmos) => farmos && farmos.status === 'error')
+      .forEach((farmos) => {
+        const key = farmos.error.isBoom === true ? farmos.error.output.payload.error : farmos.error.message;
+        const value = farmos.error.isBoom === true ? farmos.error.output.payload.message : farmos.error.config.data;
+
+        resultItems.push({
+          title: 'Error submitting to FarmOS',
+          body: `${key}: ${value}`,
+          error: true,
+        });
+      });
+  }
+
+  if (resultItems.length === 0) {
+    const getLogsOf = (key) => get(response, ['data', key], []).flatMap((h) => h.logs || []);
+
+    resultItems.push({
+      title: 'Success',
+      body: 'Successful submission',
+      response,
+      logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
+    });
+  }
+
+  if (submissionId) {
+    return resultItems.map((item) => ({
+      ...item,
+      body: `${item.body} - ${submissionId}`,
+    }));
+  }
+
+  return resultItems;
+}

@@ -3,47 +3,27 @@
     <v-container>
       <span class="flex-grow-1">Selected: {{ selected.length }}</span>
 
-      <div class="buttons">
-        <v-btn
-          v-if="draftsToSubmit.length > 0"
-          color="primary"
-          dark
-          :disabled="!!loading"
-          :loading="isSubmitDraft"
-          @click.stop="handleSubmitDrafts"
-        >
-          Submit drafts ({{ draftsToSubmit.length }})
-        </v-btn>
-        <v-btn
-          v-if="draftsToDelete.length > 0"
-          color="red lighten-2"
-          dark
-          :disabled="!!loading"
-          :loading="isDeleteDraft"
-          @click.stop="handleDeleteDrafts"
-        >
-          Delete drafts ({{ draftsToDelete.length }})
-        </v-btn>
-        <v-btn
-          v-if="submissionsToArchive.length > 0"
-          color="orange darken-1"
-          dark
-          :disabled="!!loading"
-          :loading="isArchiveSubmission"
-          @click.stop="handleArchiveSubmissions"
-        >
-          Archive submissions ({{ submissionsToArchive.length }})
-        </v-btn>
-        <v-btn
-          v-if="submissionsToDelete.length > 0"
-          color="red lighten-2"
-          dark
-          :disabled="!!loading"
-          :loading="isDeleteSubmission"
-          @click.stop="handleDeleteSubmissions"
-        >
-          Delete submissions ({{ submissionsToDelete.length }})
-        </v-btn>
+      <div class="buttons d-flex align-center">
+        <draft-submit-bulk
+          :drafts="draftsToSubmit"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></draft-submit-bulk>
+        <draft-delete-bulk
+          :drafts="draftsToDelete"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></draft-delete-bulk>
+        <submission-archive-bulk
+          :submissions="submissionsToArchive"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></submission-archive-bulk>
+        <submission-delete-bulk
+          :submissions="submissionsToDelete"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></submission-delete-bulk>
       </div>
 
       <div class="flex-grow-1 text-end">
@@ -54,21 +34,35 @@
 </template>
 
 <script>
-import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
 import { computed, defineComponent, ref, watch } from '@vue/composition-api';
+import DraftSubmitBulk from './actions/DraftSubmitBulk.vue';
+import DraftDeleteBulk from './actions/DraftDeleteBulk.vue';
+import SubmissionArchiveBulk from './actions/SubmissionArchiveBulk.vue';
+import SubmissionDeleteBulk from './actions/SubmissionDeleteBulk.vue';
 
 export default defineComponent({
+  components: {
+    DraftSubmitBulk,
+    DraftDeleteBulk,
+    SubmissionArchiveBulk,
+    SubmissionDeleteBulk,
+  },
   emits: ['open-change'],
   setup(props, { root, emit }) {
-    const loading = ref();
-    const isSubmitDraft = computed(() => loading.value === SubmissionLoadingActions.SUBMIT_DRAFT);
-    const isDeleteDraft = computed(() => loading.value === SubmissionLoadingActions.DELETE_DRAFT);
-    const isArchiveSubmission = computed(() => loading.value === SubmissionLoadingActions.ARCHIVE_SUBMISSION);
-    const isDeleteSubmission = computed(() => loading.value === SubmissionLoadingActions.DELETE_SUBMISSION);
     const selected = computed(() => root.$store.getters['submissions/selected']);
     const memberships = computed(() => root.$store.getters['memberships/memberships']);
     const userId = computed(() => root.$store.getters['auth/user']._id);
-    const draftsToSubmit = computed(() => selected.value.filter((item) => item.options.draft));
+    const isLoading = ref(false);
+    const isOpen = computed(() => selected.value.length > 0);
+    const draftsToSubmit = computed(() =>
+      selected.value.filter(
+        (item) =>
+          // Draft
+          item.options.draft &&
+          // Ready to submit
+          item.meta.status.some((item) => item.type === 'READY_TO_SUBMIT')
+      )
+    );
     const draftsToDelete = computed(() => selected.value.filter((item) => item.options.draft));
     const submissionsToArchive = computed(() =>
       selected.value.filter(
@@ -99,50 +93,24 @@ export default defineComponent({
       )
     );
 
-    const handleSubmitDrafts = async () => {
-      loading.value = SubmissionLoadingActions.SUBMIT_DRAFT;
-      await root.$store.dispatch('submissions/submitDrafts', draftsToSubmit.value);
-      loading.value = undefined;
-    };
-
-    const handleDeleteDrafts = () => {
-      //
-    };
-
-    const handleDeleteSubmissions = () => {
-      //
-    };
-
-    const handleArchiveSubmissions = () => {
-      //
-    };
-
     const handleClear = () => {
       root.$store.dispatch('submissions/clearSelection');
     };
-
-    const isOpen = computed(() => selected.value.length > 1);
 
     watch(isOpen, (val) => {
       emit('open-change', val);
     });
 
     return {
-      loading,
-      isSubmitDraft,
-      isDeleteDraft,
-      isArchiveSubmission,
-      isDeleteSubmission,
-      isOpen,
       selected,
+      memberships,
+      userId,
+      isLoading,
+      isOpen,
       draftsToSubmit,
       draftsToDelete,
       submissionsToArchive,
       submissionsToDelete,
-      handleSubmitDrafts,
-      handleDeleteDrafts,
-      handleDeleteSubmissions,
-      handleArchiveSubmissions,
       handleClear,
     };
   },
@@ -169,8 +137,10 @@ export default defineComponent({
     align-items: center;
     max-width: 1280px;
 
-    .buttons > * + * {
-      margin-left: 12px;
+    .buttons {
+      & > * + * {
+        margin-left: 12px;
+      }
     }
   }
 }

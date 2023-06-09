@@ -27,7 +27,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn text :disabled="!!loading" @click.stop="isOpen = false"> Cancel </v-btn>
-        <v-btn text color="red" :loading="isDeleting" @click.stop="handleDelete"> Delete </v-btn>
+        <v-btn text color="red" :loading="isSubmissionDeleting" @click.stop="deleteSubmission"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -35,7 +35,7 @@
 
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api';
-import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
+import { useSubmissionAction } from '@/store/modules/submissions.store';
 
 export default defineComponent({
   props: {
@@ -46,18 +46,14 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const isOpen = ref(false);
-    const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isDeleting = computed(() => loading.value === SubmissionLoadingActions.DELETE_SUBMISSION);
-
-    const handleDelete = async () => {
-      root.$store.dispatch('submissions/deleteSubmissions', [props.submission._id]);
-    };
+    const submission = computed(() => props.submission);
+    const { loading, isSubmissionDeleting, deleteSubmission } = useSubmissionAction(root.$store, submission);
 
     return {
       isOpen,
       loading,
-      isDeleting,
-      handleDelete,
+      isSubmissionDeleting,
+      deleteSubmission,
     };
   },
 });

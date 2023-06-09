@@ -18,9 +18,9 @@
       v-model="isOpen"
       maxWidth="50rem"
       labelConfirm="Archive"
-      :loading="isArchiving"
+      :loading="isSubmissionArchiving"
       @cancel="isOpen = false"
-      @confirm="handleArchive"
+      @confirm="archiveSubmission"
     >
       <template #title>Archive Submission</template>
     </submission-archive-dialog>
@@ -30,7 +30,7 @@
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api';
 import SubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
-import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
+import { useSubmissionAction } from '@/store/modules/submissions.store';
 
 export default defineComponent({
   components: {
@@ -44,21 +44,14 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const isOpen = ref(false);
-    const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isArchiving = computed(() => loading.value === SubmissionLoadingActions.ARCHIVE_SUBMISSION);
-
-    const handleArchive = (reason) => {
-      root.$store.dispatch('submissions/archiveSubmissions', {
-        ids: [props.submission._id],
-        reason,
-      });
-    };
+    const submission = computed(() => props.submission);
+    const { loading, isSubmissionArchiving, archiveSubmission } = useSubmissionAction(root.$store, submission);
 
     return {
       isOpen,
       loading,
-      isArchiving,
-      handleArchive,
+      isSubmissionArchiving,
+      archiveSubmission,
     };
   },
 });

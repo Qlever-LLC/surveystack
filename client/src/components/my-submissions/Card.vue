@@ -145,11 +145,11 @@ export default {
       if (!survey.value || isArchived.value) {
         surveyName.push('blue-grey--text font-weight-light');
       } else if (isDraft.value) {
-        surveyName.push('blue--text text--darken-4 font-weight-medium');
+        surveyName.push('blue--text text--darken-3 font-weight-medium');
       } else if (isProxy.value) {
-        surveyName.push('yellow--text text--darken-4 font-weight-medium');
+        surveyName.push('yellow--text text--darken-3 font-weight-medium');
       } else if (isCreator.value) {
-        surveyName.push('green--text text--darken-4 font-weight-medium');
+        surveyName.push('green--text text--darken-3 font-weight-medium');
       }
 
       return {

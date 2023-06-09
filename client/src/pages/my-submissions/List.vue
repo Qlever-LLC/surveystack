@@ -56,16 +56,28 @@
       @close="closeSubmitDraft"
       @submit="submitDraft"
     />
+
+    <result-dialog
+      v-if="draftToSubmit"
+      v-model="isResultDialogOpen"
+      title="Result of Submission"
+      :items="resultItems"
+      :survey="surveyToSubmit"
+      :submission="draftToSubmit"
+      persistent
+      @input="handleResultDialogInput"
+    />
   </div>
 </template>
 
 <script>
-import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/composition-api';
+import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
 import DraftFilter from '@/components/my-submissions/Filter.vue';
 import DraftCard from '@/components/my-submissions/Card.vue';
 import DraftFooter from '@/components/my-submissions/Footer.vue';
-import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
+import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
+import ResultDialog from '@/components/ui/ResultDialog.vue';
 
 export default defineComponent({
   components: {
@@ -73,6 +85,7 @@ export default defineComponent({
     DraftCard,
     DraftFooter,
     ConfirmSubmissionDialog,
+    ResultDialog,
   },
   setup(props, { root }) {
     const isFooterOpen = ref(false);
@@ -84,7 +97,10 @@ export default defineComponent({
     const lastEl = ref();
     const isTopButtonVisible = ref(false);
     const isSubmitDialogOpen = ref(false);
+    const isResultDialogOpen = ref(false);
     const draftToSubmit = ref();
+    const surveyToSubmit = ref();
+    const resultItems = ref([]);
 
     const setGroup = (id) => {
       if (draftToSubmit.value) {
@@ -92,19 +108,32 @@ export default defineComponent({
       }
     };
 
-    const setDraftToSubmit = (draft) => {
+    const setDraftToSubmit = async (draft) => {
+      console.log(22222222,draft);
       draftToSubmit.value = draft;
+
+      const { id, version } = draft.meta.survey;
+      surveyToSubmit.value = await root.$store.dispatch('surveys/fetchSurvey', { id, version });
+
       isSubmitDialogOpen.value = true;
     };
 
     const submitDraft = async () => {
-      await root.$store.dispatch('submissions/submitDrafts', [draftToSubmit.value]);
-      draftToSubmit.value = undefined;
+      resultItems.value = await root.$store.dispatch('submissions/submitDrafts', [draftToSubmit.value]);
+      isResultDialogOpen.value = true;
     };
 
     const closeSubmitDraft = ({ done }) => {
       if (done) {
         draftToSubmit.value = undefined;
+        surveyToSubmit.value = undefined;
+      }
+    };
+
+    const handleResultDialogInput = (val) => {
+      if (!val) {
+        draftToSubmit.value = undefined;
+        surveyToSubmit.value = undefined;
       }
     };
 
@@ -171,11 +200,15 @@ export default defineComponent({
       lastEl,
       isTopButtonVisible,
       draftToSubmit,
+      surveyToSubmit,
       isSubmitDialogOpen,
+      isResultDialogOpen,
+      resultItems,
       setGroup,
       setDraftToSubmit,
       submitDraft,
       closeSubmitDraft,
+      handleResultDialogInput,
       handleToTop,
       handleScroll,
     };
