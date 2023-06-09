@@ -258,12 +258,14 @@ class PdfGenerator {
 
     if (revision && Array.isArray(revision.controls)) {
       const validControls = this.getValidControls(revision.controls);
+      const siblingsHasChildren = validControls.some(this.isContainerControl);
 
       for (let index = 0; index < validControls.length; index += 1) {
         const control = validControls[index];
         await this.generateControl({
           ...control,
           index: [index + 1],
+          siblingsHasChildren,
         });
       }
     }
@@ -372,7 +374,7 @@ class PdfGenerator {
   /********************     Control generators     *******************/
   /*******************************************************************/
 
-  async generateControl(control, path = []) {
+  async generateControl(control, path = [], siblingsHasChildren) {
     // Group, Page
     if (this.isContainerControl(control)) {
       this.docDefinition.content.push(this.getSectionDef(control));
@@ -380,8 +382,8 @@ class PdfGenerator {
       if (!Array.isArray(control.children)) {
         return;
       }
-
-      const validControls = this.getValidControls(control.children);
+      const validControls = this.getValidControls(control.children, [...path, control.name]);
+      const siblingsHasChildren = validControls.some(this.isContainerControl);
       for (let index = 0; index < validControls.length; index += 1) {
         const child = validControls[index];
         await this.generateControl(
@@ -389,7 +391,8 @@ class PdfGenerator {
             ...child,
             index: [...control.index, index + 1],
           },
-          [...path, control.name]
+          [...path, control.name],
+          siblingsHasChildren
         );
       }
 
@@ -402,7 +405,7 @@ class PdfGenerator {
     const source = await this.getControlSource(control);
 
     const len = this.docDefinition.content.length;
-    if (this.isRootControl(control)) {
+    if (this.isRootControl(control) || siblingsHasChildren) {
       // Root
       this.docDefinition.content.push(this.getSectionDef(control));
     } else if (label) {
@@ -559,7 +562,7 @@ class PdfGenerator {
         body: [
           [
             {
-              text: `${control.index.join('.')}${control.label ? `. ${control.label}` : ''}`,
+              text: `${control.index.join('.')}${control.label ? `. ${control.label}` : ''}`.trim(),
               style: 'section',
               fontSize: fontSizes.sm,
             },
@@ -1118,7 +1121,15 @@ class PdfGenerator {
       answerKey.push('geometry', 'coordinates');
     }
     let answer = getProperty(this.submission.data, answerKey);
-    return toArray(answer).length > 0;
+    const answered = toArray(answer).length > 0;
+
+    if (!answered && this.isContainerControl(control)) {
+      return control.children.some((child) =>
+        this.hasAnswer.bind(this)(child, [...path, control.name])
+      );
+    }
+
+    return answered;
   }
 }
 
