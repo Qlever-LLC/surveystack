@@ -263,7 +263,7 @@ const actions = {
         .getPath()
         .map((n) => n.model.name)
         .join('.');
-      const field = surveyStackUtils.getNested(state.submission, nextNodePath);
+      const field = get(state.submission, nextNodePath);
       if (
         field.value === null ||
         field.value === undefined ||
