@@ -375,57 +375,60 @@
             />
           </div>
 
-          <div v-if="isSelect || isOntology">
-            <checkbox
-              label="Show all answers"
-              v-model="control.options.printLayout.showAll"
-              helper-text="Show full answers list, highlight the selected answer(s)"
-            />
-          </div>
+          <template v-if="isSelect || isOntology">
+            <div>Blank Survey (from title page)</div>
+            <div class="mt-2">
+              <checkbox
+                label="Show all resource list options"
+                v-model="control.options.printLayout.hideList"
+                helper-text='Do not show the complete resource list when printing a fresh survey (the "Print Blank Survey" button)'
+              />
+            </div>
 
-          <div v-if="isSelect || isOntology">
-            <checkbox
-              label="Hide Answer List"
-              v-model="control.options.printLayout.hideList"
-              helper-text='Do not show the complete list of answers when printing a fresh survey (the "Print Survey" button)'
-            />
-          </div>
+            <div>Filled Submission</div>
+            <div class="mt-2">
+              <checkbox
+                label="Show all resource list options"
+                v-model="control.options.printLayout.showAll"
+                helper-text="Show all resource list, highlight the selected answer(s)"
+              />
+            </div>
 
-          <v-select
-            v-if="isSelect || isOntology"
-            label="Answer layout"
-            v-model="control.options.printLayout.columns"
-            :items="[1, 2, 3, 4, 5]"
-            color="focus"
-            :menu-props="{ contentClass: 'layout-select' }"
-            hide-details
-          >
-            <template v-slot:selection="{ item, index }">
-              {{ item === 1 ? '1 column' : `${item} columns` }}
-            </template>
+            <v-select
+              label="Answer layout"
+              v-model="control.options.printLayout.columns"
+              :items="[1, 2, 3, 4, 5]"
+              color="focus"
+              :menu-props="{ contentClass: 'layout-select' }"
+              hide-details
+            >
+              <template v-slot:selection="{ item, index }">
+                {{ item === 1 ? '1 column' : `${item} columns` }}
+              </template>
 
-            <template v-slot:item="{ item, on, attrs }">
-              <div class="d-flex align-center col">
-                <div class="col-label">
-                  {{ item === 1 ? '1 column' : `${item} columns` }}
-                </div>
-                <div class="ml-2" :class="`col-item cols-${item}`" v-on="on" v-bind="attrs">
-                  <div v-for="letter in 'ABCDE'.split('')" :key="letter">
-                    {{ letter }}
+              <template v-slot:item="{ item, on, attrs }">
+                <div class="d-flex align-center col">
+                  <div class="col-label">
+                    {{ item === 1 ? '1 column' : `${item} columns` }}
+                  </div>
+                  <div class="ml-2" :class="`col-item cols-${item}`" v-on="on" v-bind="attrs">
+                    <div v-for="letter in 'ABCDE'.split('')" :key="letter">
+                      {{ letter }}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </template>
+              </template>
 
-            <template #append-outer>
-              <v-tooltip max-width="400" transition="slide-x-transition" right>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
-                </template>
-                Set the number of items in a row
-              </v-tooltip>
-            </template>
-          </v-select>
+              <template #append-outer>
+                <v-tooltip max-width="400" transition="slide-x-transition" right>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+                  </template>
+                  Set the number of items in a row
+                </v-tooltip>
+              </template>
+            </v-select>
+          </template>
         </div>
       </template>
 
