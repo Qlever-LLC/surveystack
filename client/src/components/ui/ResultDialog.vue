@@ -61,10 +61,10 @@
 
           <div v-if="survey && submission" class="mt-6 d-flex flex-column align-stretch">
             <v-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
-              Download survey
+              Download Submission
             </v-btn>
             <v-btn class="mt-3" color="primary" depressed dense :loading="emailing.loading" @click="emailMe">
-              Email me survey
+              Email Submission
             </v-btn>
           </div>
         </v-card-text>
