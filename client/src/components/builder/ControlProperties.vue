@@ -363,7 +363,7 @@
               <checkbox
                 label="Show all resource list options"
                 v-model="control.options.printLayout.hideList"
-                helper-text='Do not show the complete list of answers when printing a fresh survey (the "Print Blank Survey" button)'
+                helper-text='Do not show the complete resource list when printing a fresh survey (the "Print Blank Survey" button)'
               />
             </div>
 
