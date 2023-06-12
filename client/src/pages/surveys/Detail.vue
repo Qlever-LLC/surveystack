@@ -59,7 +59,7 @@
 
         <div class="my-3 d-flex justify-center">
           <v-btn color="primary" text large :loading="download.loading" @click="downloadPrintablePdf(entity._id)">
-            Print Survey
+            Print Blank Survey
           </v-btn>
         </div>
 
