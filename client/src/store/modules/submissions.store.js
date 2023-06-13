@@ -45,7 +45,8 @@ const createInitialState = () => ({
   mySubmissions: [], // submitted submissions + local drafts + server drafts
   surveys: [], // surveys of mySubmissions
   localTotal: 0, // total count of drafts in IDB (-1 if no data)
-  serverTotal: 0, // total count of drafts + submissions on Server (-1 if no data)
+  serverTotal: 0, // total count of drafts + submissions on Server
+  serverRemain: 0, // remain count of drafts + submissions on Server (-1 if no data)
   filter: {
     type: [],
     survey: [],
@@ -60,9 +61,15 @@ const getters = {
   mySubmissions: (state) => state.mySubmissions,
   selected: (state) => state.mySubmissions.filter((submission) => submission.options.selected),
   surveys: (state) => state.surveys,
-  localTotal: (state) => state.localTotal,
-  serverTotal: (state) => state.serverTotal,
-  total: (state) => state.serverTotal + state.localTotal,
+  readyToSubmitCount: (state) =>
+    state.localDrafts.filter((draft) => draft.meta.status.some((item) => item.type === 'READY_TO_SUBMIT')).length,
+  localTotal: (state) => Math.max(state.localTotal, 0),
+  serverTotal: (state) => Math.max(state.serverTotal, 0),
+  total: (state) =>
+    state.loading[SubmissionLoadingActions.FETCH_LOCAL_DRAFTS] ||
+    (state.loading[SubmissionLoadingActions.FETCH_SUBMISSIONS] && state.mySubmissions.length === 0)
+      ? 'Loading...'
+      : state.serverTotal + state.localTotal,
   filter: (state) => state.filter,
   isLoading: (state) => Object.values(state.loading).filter(Boolean).length > 0,
   getLoading: (state) => (id) => state.loading[id] || false,
@@ -102,6 +109,7 @@ const mutations = {
     } else {
       state.localDrafts.push(submission);
     }
+    state.localTotal = state.localDrafts.length || -1;
   },
   DELETE_LOCAL_DRAFT: (state, id) => {
     state.localDrafts = state.localDrafts.filter((item) => item._id !== id);
@@ -109,6 +117,9 @@ const mutations = {
   },
   SET_SERVER_TOTAL: (state, serverTotal) => {
     state.serverTotal = serverTotal;
+  },
+  SET_SERVER_REMAIN: (state, serverRemain) => {
+    state.serverRemain = serverRemain;
   },
   SET_SURVEYS: (state, surveys) => {
     state.surveys = surveys;
@@ -589,6 +600,7 @@ const actions = {
     if (reset) {
       commit('SET_MY_SUBMISSIONS', []);
       commit('SET_SERVER_TOTAL', 0);
+      commit('SET_SERVER_REMAIN', 0);
     }
 
     const isAllTypes = state.filter.type.length === 0;
@@ -654,7 +666,10 @@ const actions = {
       try {
         const { data } = await api.get(`/drafts?${params}`);
         serverData = data.submissions;
-        commit('SET_SERVER_TOTAL', data.total || -1);
+        commit('SET_SERVER_REMAIN', data.total || -1);
+        if (!lastSubmission) {
+          commit('SET_SERVER_TOTAL', data.total);
+        }
       } catch (e) {
         console.warn('Failed to fetch drafts with filter', state.filter, e);
       }

@@ -11,7 +11,12 @@
       :disabled="!!loading"
       @click.stop="isOpen = true"
     >
-      <v-icon small>mdi-archive-outline</v-icon>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon v-bind="attrs" small v-on="on">mdi-archive-outline</v-icon>
+        </template>
+        <span>Archive submission</span>
+      </v-tooltip>
     </v-btn>
 
     <submission-archive-dialog

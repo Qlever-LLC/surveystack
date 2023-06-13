@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-if="drafts.length > 0" v-model="isOpen" max-width="400">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" color="red lighten-2" :disabled="disabled" :loading="isLoading" dark v-on="on">
+      <v-btn v-bind="attrs" color="red lighten-2" :disabled="disabled" :loading="isLoading" dark small v-on="on">
         Delete drafts ({{ drafts.length }})
       </v-btn>
     </template>

@@ -17,11 +17,12 @@
             <v-list-item-title>
               {{ item.label }}
               <v-chip
-                v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+                v-if="item.to && item.to.name === 'my-submissions-list' && readyToSubmitCount"
                 color="accent"
                 small
-                >{{ readyToSubmitCount }}</v-chip
               >
+                {{ readyToSubmitCount }}
+              </v-chip>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -153,17 +154,13 @@ export default {
           {
             type: 'link',
             label: 'Users',
-            to: {
-              name: 'users-list',
-            },
+            to: { name: 'users-list' },
             icon: 'mdi-account-search',
           },
           {
             type: 'link',
             label: 'FarmOS',
-            to: {
-              name: 'farmos-manage',
-            },
+            to: { name: 'farmos-manage' },
             icon: 'mdi-leaf-circle-outline',
           },
         ],
@@ -172,7 +169,7 @@ export default {
   },
   computed: {
     readyToSubmitCount() {
-      return this.$store.getters['mySubmissions/readyToSubmit'].length;
+      return this.$store.getters['submissions/readyToSubmitCount'];
     },
     items() {
       const items = [];

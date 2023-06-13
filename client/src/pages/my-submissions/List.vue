@@ -6,7 +6,7 @@
         'mb-4 pb-16': isFooterOpen,
       }"
     >
-      <draft-filter></draft-filter>
+      <draft-header></draft-header>
 
       <div class="mt-8">
         <draft-card
@@ -64,7 +64,6 @@
       :items="resultItems"
       :survey="surveyToSubmit"
       :submission="draftToSubmit"
-      persistent
       @input="handleResultDialogInput"
     />
   </div>
@@ -73,7 +72,7 @@
 <script>
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/composition-api';
 import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
-import DraftFilter from '@/components/my-submissions/Filter.vue';
+import DraftHeader from '@/components/my-submissions/Header.vue';
 import DraftCard from '@/components/my-submissions/Card.vue';
 import DraftFooter from '@/components/my-submissions/Footer.vue';
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
@@ -81,7 +80,7 @@ import ResultDialog from '@/components/ui/ResultDialog.vue';
 
 export default defineComponent({
   components: {
-    DraftFilter,
+    DraftHeader,
     DraftCard,
     DraftFooter,
     ConfirmSubmissionDialog,
@@ -109,7 +108,6 @@ export default defineComponent({
     };
 
     const setDraftToSubmit = async (draft) => {
-      console.log(22222222,draft);
       draftToSubmit.value = draft;
 
       const { id, version } = draft.meta.survey;

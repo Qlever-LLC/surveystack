@@ -40,6 +40,13 @@
       :survey="survey"
       :submission="submission"
       :items="resultItems"
+      :to="
+        survey && {
+          name: 'surveys-detail',
+          params: { id: survey._id },
+          query: { minimal_ui: $route.query.minimal_ui },
+        }
+      "
       persistent
       @close="onCloseResultDialog"
     />

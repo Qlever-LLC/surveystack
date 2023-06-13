@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-if="submissions.length > 0" v-model="isOpen" max-width="400">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" color="red lighten-2" dark :disabled="disabled" :loading="isLoading" v-on="on">
+      <v-btn v-bind="attrs" color="red lighten-2" dark small :disabled="disabled" :loading="isLoading" v-on="on">
         Delete submissions ({{ submissions.length }})
       </v-btn>
     </template>

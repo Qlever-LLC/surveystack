@@ -1,16 +1,23 @@
 <template>
-  <v-btn
-    rounded
-    small
-    icon
-    text
-    outlined
-    :disabled="!!loading"
-    :loading="isDraftDownloading"
-    @click.stop="downloadDraft"
-  >
-    <v-icon small>mdi-download-outline</v-icon>
-  </v-btn>
+  <v-tooltip bottom>
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn
+        v-bind="attrs"
+        rounded
+        small
+        icon
+        text
+        outlined
+        :disabled="!!loading"
+        :loading="isDraftDownloading"
+        v-on="on"
+        @click.stop="downloadDraft"
+      >
+        <v-icon small>mdi-download-outline</v-icon>
+      </v-btn>
+    </template>
+    <span>Download draft</span>
+  </v-tooltip>
 </template>
 
 <script>

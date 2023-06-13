@@ -1,6 +1,6 @@
 <template>
   <div v-if="submissions.length > 0">
-    <v-btn color="orange darken-1" dark :disabled="disabled" :loading="isLoading" @click.stop="isOpen = true">
+    <v-btn color="orange darken-1" dark small :disabled="disabled" :loading="isLoading" @click.stop="isOpen = true">
       Archive submissions ({{ submissions.length }})
     </v-btn>
 

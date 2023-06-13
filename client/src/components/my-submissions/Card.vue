@@ -31,6 +31,7 @@
         <draft-continue :submission="submission" :primary="!isReadyToSubmit"></draft-continue>
         <draft-upload v-if="isLocal" :submission="submission"> </draft-upload>
         <draft-download v-if="!isLocal" :submission="submission"></draft-download>
+        <export-json :submission="submission"></export-json>
         <draft-delete :submission="submission"></draft-delete>
       </template>
       <template v-else>
@@ -39,6 +40,9 @@
         </span>
         <template v-if="isCreator || isAdmin">
           <submission-resubmit :submission="submission"></submission-resubmit>
+        </template>
+        <export-json :submission="submission"></export-json>
+        <template v-if="isCreator || isAdmin">
           <submission-delete v-if="isArchived" :submission="submission"></submission-delete>
           <submission-archive v-else :submission="submission"></submission-archive>
         </template>
@@ -82,6 +86,7 @@ import DraftSubmit from './actions/DraftSubmit.vue';
 import SubmissionArchive from './actions/SubmissionArchive.vue';
 import SubmissionDelete from './actions/SubmissionDelete.vue';
 import SubmissionResubmit from './actions/SubmissionResubmit.vue';
+import ExportJson from './actions/ExportJSON.vue';
 import StatusChip from './StatusChip.vue';
 
 export default {
@@ -94,6 +99,7 @@ export default {
     SubmissionArchive,
     SubmissionDelete,
     SubmissionResubmit,
+    ExportJson,
     StatusChip,
   },
   props: {

@@ -27,7 +27,7 @@
       </div>
 
       <div class="flex-grow-1 text-end">
-        <v-btn text dark @click="handleClear">Clear all</v-btn>
+        <v-btn text dark small @click="handleClear">Clear all</v-btn>
       </div>
     </v-container>
   </footer>

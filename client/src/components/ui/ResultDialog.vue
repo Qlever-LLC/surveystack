@@ -97,6 +97,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    to: {
+      type: Object,
+      default: () => ({}),
+    },
     additionalMessage: {
       type: String,
     },
@@ -206,7 +210,7 @@ export default {
       if (!this.persistent) {
         return;
       }
-      this.$router.back();
+      this.$router.push(this.to);
     },
   },
 };

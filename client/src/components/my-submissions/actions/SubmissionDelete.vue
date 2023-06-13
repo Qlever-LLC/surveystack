@@ -13,7 +13,12 @@
         :disabled="!!loading"
         v-on="on"
       >
-        <v-icon small>mdi-delete-outline</v-icon>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-bind="attrs" small v-on="on">mdi-delete-outline</v-icon>
+          </template>
+          <span>Delete submission</span>
+        </v-tooltip>
       </v-btn>
     </template>
 
