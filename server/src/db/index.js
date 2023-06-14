@@ -73,6 +73,7 @@ const connectDatabase = async () => {
   await migrateSurveyPrintOptions_VXtoV5();
   await migrateSurveyControlPrintLayout_VXtoV6();
   await migrateSurveyOntologyOptions_VXtoV7();
+  await migrateSurveyControlPrintLayout_VXtoV9();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -490,6 +491,79 @@ const addOntologyAutocompleteOption = (control) => {
     let modifiedCount = 0;
     for (const child of control.children) {
       modifiedCount += addOntologyAutocompleteOption(child);
+    }
+    return modifiedCount;
+  }
+
+  return 0;
+};
+
+// https://gitlab.com/our-sci/software/surveystack/-/issues/253
+const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({ 'meta.specVersion': { $lte: 8 } })
+    .toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    let modifiedControlsCount = 0;
+    for (const revision of survey.revisions) {
+      for (const control of revision.controls) {
+        modifiedControlsCount += changePrintLayoutShowAllOptionName(control);
+      }
+    }
+
+    if (modifiedControlsCount === 0) {
+      await db
+        .collection('surveys')
+        .findOneAndUpdate(
+          { _id: new ObjectId(survey._id) },
+          { $set: { 'meta.specVersion': 9 } },
+          { returnOriginal: false }
+        );
+
+      continue;
+    }
+
+    survey.meta.specVersion = 9;
+
+    await db
+      .collection('surveys')
+      .findOneAndUpdate(
+        { _id: new ObjectId(survey._id) },
+        { $set: survey },
+        { returnOriginal: false }
+      );
+
+    modifiedCount++;
+
+    console.log('Migrated print layout options of control to the survey:', survey.name);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated print layout options of control to many surveys:', modifiedCount);
+  }
+};
+
+/*
+ *   control.options.printLayout.hideList => (invert) control.options.printLayout.showAllOptionsPrintable
+ *   control.options.printLayout.showAll => control.options.printLayout.showAllOptions
+ */
+const changePrintLayoutShowAllOptionName = (control) => {
+  if (/select/i.test(control.type) || control.type === 'ontology') {
+    control.options.printLayout.showAllOptionsPrintable = !control.options.printLayout.hideList;
+    control.options.printLayout.showAllOptions = control.options.printLayout.showAll;
+    delete control.options.printLayout.hideList;
+    delete control.options.printLayout.showAll;
+    return 1;
+  }
+
+  if (Array.isArray(control.children)) {
+    let modifiedCount = 0;
+    for (const child of control.children) {
+      modifiedCount += changePrintLayoutShowAllOptionName(child);
     }
     return modifiedCount;
   }
