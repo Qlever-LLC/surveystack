@@ -140,8 +140,8 @@ const selectSingleControl = (overrides = {}, index = 1) => ({
     ...defaultOptions,
     source: defaultChoiceSource,
     printLayout: {
-      showAll: false,
-      hideList: false,
+      showAllOptionsPrintable: true,
+      showAllOptions: false,
       columns: 3,
     },
   },
@@ -158,8 +158,8 @@ const selectMultipleControl = (overrides = {}, index = 1) => ({
     ...defaultOptions,
     source: defaultChoiceSource,
     printLayout: {
-      showAll: false,
-      hideList: false,
+      showAllOptionsPrintable: true,
+      showAllOptions: false,
       columns: 3,
     },
   },
@@ -176,8 +176,8 @@ const ontologyControl = (overrides = {}, index = 1, source = uniqueId()) => ({
     ...defaultOptions,
     source,
     printLayout: {
-      showAll: false,
-      hideList: false,
+      showAllOptionsPrintable: true,
+      showAllOptions: false,
       columns: 3,
     },
     allowAutocomplete: false,

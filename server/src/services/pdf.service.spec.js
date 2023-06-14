@@ -265,12 +265,12 @@ describe('pdf.service', () => {
 
     // Test control level options
     describe('control.options.printLayout', () => {
-      describe('showAll', () => {
-        it('should render all options for selectSingle/selectMultiple/ontology questions when `showAll=true`', async () => {
+      describe('showAllOptions', () => {
+        it('should render all options for selectSingle/selectMultiple/ontology questions when `showAllOptions=true`', async () => {
           const { survey, createSubmission } = await createSurvey('selectSingle');
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
-          control.options.printLayout.showAll = true;
+          control.options.printLayout.showAllOptions = true;
           control.options.printLayout.columns = 1;
           control.index = [1];
 
@@ -302,11 +302,11 @@ describe('pdf.service', () => {
           );
         });
 
-        it('should render value(s) only for selectSingle/selectMultiple/ontology questions when `showAll=false`', async () => {
+        it('should render value(s) only for selectSingle/selectMultiple/ontology questions when `showAllOptions=false`', async () => {
           const { survey, createSubmission } = await createSurvey('selectMultiple');
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
-          control.options.printLayout.showAll = false;
+          control.options.printLayout.showAllOptions = false;
           control.index = [1];
 
           const generator = new pdfService.PdfGenerator(survey, submission);
@@ -325,7 +325,7 @@ describe('pdf.service', () => {
           const { survey, createSubmission } = await createSurvey('ontology');
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
-          control.options.printLayout.showAll = true;
+          control.options.printLayout.showAllOptions = true;
           control.options.printLayout.columns = 2;
           control.options.source =
             control.options.source instanceof ObjectId
@@ -364,11 +364,48 @@ describe('pdf.service', () => {
         });
       });
 
-      describe('hideList', () => {
-        it('should render empty space for selectSingle/selectMultiple/ontology questions when `hideList=true` if paper PDF', async () => {
+      describe('showAllOptionsPrintable', () => {
+        it('should render all options for selectSingle/selectMultiple/ontology questions when `showAllOptionsPrintable=true` if paper PDF', async () => {
+          const { survey } = await createSurvey('selectMultiple');
+          const control = survey.revisions[1].controls[0];
+          control.options.printLayout.showAllOptionsPrintable = true;
+          control.options.printLayout.columns = 2;
+          control.index = [1];
+
+          const generator = new pdfService.PdfGenerator(survey);
+
+          await generator.generateControl(control);
+
+          expect(generator.docDefinition.content).toContainEqual(
+            expect.objectContaining({
+              columns: [
+                [
+                  {
+                    table: {
+                      widths: [12, 'auto'],
+                      body: [expect.arrayContaining([expect.objectContaining({ text: 'Item 1' })])],
+                    },
+                    layout: 'noBorders',
+                  },
+                ],
+                [
+                  {
+                    table: {
+                      widths: [12, 'auto'],
+                      body: [expect.arrayContaining([expect.objectContaining({ text: 'Item 2' })])],
+                    },
+                    layout: 'noBorders',
+                  },
+                ],
+              ],
+            })
+          );
+        });
+
+        it('should render empty space for selectSingle/selectMultiple/ontology questions when `showAllOptionsPrintable=false` if paper PDF', async () => {
           const { survey } = await createSurvey('selectSingle');
           const control = survey.revisions[1].controls[0];
-          control.options.printLayout.hideList = true;
+          control.options.printLayout.showAllOptionsPrintable = false;
           control.index = [1];
 
           const generator = new pdfService.PdfGenerator(survey);
@@ -402,43 +439,6 @@ describe('pdf.service', () => {
             },
             margin: [12, 0, 0, 0],
           });
-        });
-
-        it('should render all options for selectSingle/selectMultiple/ontology questions when `hideList=false` if paper PDF', async () => {
-          const { survey } = await createSurvey('selectMultiple');
-          const control = survey.revisions[1].controls[0];
-          control.options.printLayout.hideList = false;
-          control.options.printLayout.columns = 2;
-          control.index = [1];
-
-          const generator = new pdfService.PdfGenerator(survey);
-
-          await generator.generateControl(control);
-
-          expect(generator.docDefinition.content).toContainEqual(
-            expect.objectContaining({
-              columns: [
-                [
-                  {
-                    table: {
-                      widths: [12, 'auto'],
-                      body: [expect.arrayContaining([expect.objectContaining({ text: 'Item 1' })])],
-                    },
-                    layout: 'noBorders',
-                  },
-                ],
-                [
-                  {
-                    table: {
-                      widths: [12, 'auto'],
-                      body: [expect.arrayContaining([expect.objectContaining({ text: 'Item 2' })])],
-                    },
-                    layout: 'noBorders',
-                  },
-                ],
-              ],
-            })
-          );
         });
       });
 
