@@ -66,8 +66,8 @@ export const createControlInstance = (control) => {
   } else if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
     cloneWithDefaultOptions.options.printLayout = {
-      showAll: false,
-      hideList: false,
+      showAllOptionsPrintable: true,
+      showAllOptions: false,
       columns: 3,
     };
   } else if (control.type === 'matrix') {
@@ -78,8 +78,8 @@ export const createControlInstance = (control) => {
   } else if (control.type === 'ontology') {
     cloneWithDefaultOptions.options.source = '';
     cloneWithDefaultOptions.options.printLayout = {
-      showAll: false,
-      hideList: false,
+      showAllOptionsPrintable: true,
+      showAllOptions: false,
       columns: 3,
     };
   } else if (control.type === 'instructions') {

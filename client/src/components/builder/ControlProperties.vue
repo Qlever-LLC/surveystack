@@ -362,8 +362,8 @@
             <div class="mt-2">
               <checkbox
                 label="Show all resource list options"
-                v-model="control.options.printLayout.hideList"
-                helper-text='Do not show the complete resource list when printing a fresh survey (the "Print Blank Survey" button)'
+                v-model="control.options.printLayout.showAllOptionsPrintable"
+                helper-text="Show the complete list of possible options when printing a fresh survey"
               />
             </div>
 
@@ -371,8 +371,8 @@
             <div class="mt-2">
               <checkbox
                 label="Show all resource list options"
-                v-model="control.options.printLayout.showAll"
-                helper-text="Show all resource list, highlight the selected answer(s)"
+                v-model="control.options.printLayout.showAllOptions"
+                helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
               />
             </div>
 
