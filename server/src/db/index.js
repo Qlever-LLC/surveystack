@@ -73,7 +73,7 @@ const connectDatabase = async () => {
   await migrateSurveyPrintOptions_VXtoV5();
   await migrateSurveyControlPrintLayout_VXtoV6();
   await migrateSurveyOntologyOptions_VXtoV7();
-  await migrateSurveyControlPrintLayout_VXtoV8();
+  await migrateSurveyControlPrintLayout_VXtoV9();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -499,10 +499,10 @@ const addOntologyAutocompleteOption = (control) => {
 };
 
 // https://gitlab.com/our-sci/software/surveystack/-/issues/253
-const migrateSurveyControlPrintLayout_VXtoV8 = async () => {
+const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
   const surveys = await db
     .collection('surveys')
-    .find({ 'meta.specVersion': { $lte: 7 } })
+    .find({ 'meta.specVersion': { $lte: 8 } })
     .toArray();
 
   let modifiedCount = 0;
@@ -520,14 +520,14 @@ const migrateSurveyControlPrintLayout_VXtoV8 = async () => {
         .collection('surveys')
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
-          { $set: { 'meta.specVersion': 8 } },
+          { $set: { 'meta.specVersion': 9 } },
           { returnOriginal: false }
         );
 
       continue;
     }
 
-    survey.meta.specVersion = 8;
+    survey.meta.specVersion = 9;
 
     await db
       .collection('surveys')
@@ -563,7 +563,7 @@ const changePrintLayoutShowAllOptionName = (control) => {
   if (Array.isArray(control.children)) {
     let modifiedCount = 0;
     for (const child of control.children) {
-      modifiedCount += addControlPrintLayout(child);
+      modifiedCount += changePrintLayoutShowAllOptionName(child);
     }
     return modifiedCount;
   }
