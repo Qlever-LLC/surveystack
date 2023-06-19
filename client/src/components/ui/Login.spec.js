@@ -204,9 +204,7 @@ describe('Login component', () => {
           actions: {
             'auth/login': authLoginMock,
             'surveys/fetchPinned': jest.fn(),
-            'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-            'submissions/fetchSubmissions': jest.fn(),
-            'submissions/fetchSurveys': jest.fn(),
+            'submissions/initialize': jest.fn(),
           },
           propsData: { defaultUsePassword: true },
         });
@@ -233,9 +231,7 @@ describe('Login component', () => {
           actions: {
             'auth/login': authLoginMock,
             'surveys/fetchPinned': jest.fn(),
-            'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-            'submissions/fetchSubmissions': jest.fn(),
-            'submissions/fetchSurveys': jest.fn(),
+            'submissions/initialize': jest.fn(),
           },
           propsData: { defaultUsePassword: true },
         });
@@ -263,9 +259,7 @@ describe('Login component', () => {
             actions: {
               'auth/login': authLoginMock,
               'surveys/fetchPinned': jest.fn(),
-              'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-              'submissions/fetchSubmissions': jest.fn(),
-              'submissions/fetchSurveys': jest.fn(),
+              'submissions/initialize': jest.fn(),
             },
           },
           propsData: { defaultUsePassword: true },
@@ -313,9 +307,7 @@ describe('Login component', () => {
           actions: {
             'auth/login': login,
             'surveys/fetchPinned': jest.fn(),
-            'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-            'submissions/fetchSubmissions': jest.fn(),
-            'submissions/fetchSurveys': jest.fn(),
+            'submissions/initialize': jest.fn(),
           },
         },
         mocks: {
@@ -371,9 +363,7 @@ describe('Login component', () => {
         actions: {
           'auth/login': login,
           'surveys/fetchPinned': jest.fn(),
-          'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-          'submissions/fetchSubmissions': jest.fn(),
-          'submissions/fetchSurveys': jest.fn(),
+          'submissions/initialize': jest.fn(),
         },
         propsData: { defaultUsePassword: true },
         $router: {
@@ -413,9 +403,7 @@ describe('Login component', () => {
           actions: {
             'auth/login': login,
             'surveys/fetchPinned': jest.fn(),
-            'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-            'submissions/fetchSubmissions': jest.fn(),
-            'submissions/fetchSurveys': jest.fn(),
+            'submissions/initialize': jest.fn(),
           },
         },
         mocks: {
@@ -464,9 +452,7 @@ describe('Login component', () => {
           actions: {
             'auth/login': jest.fn(() => Promise.resolve()),
             'surveys/fetchPinned': jest.fn(),
-            'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-            'submissions/fetchSubmissions': jest.fn(),
-            'submissions/fetchSurveys': jest.fn(),
+            'submissions/initialize': jest.fn(),
           },
         },
         mocks: {
@@ -506,9 +492,7 @@ describe('Login component', () => {
         actions: {
           'auth/login': jest.fn(() => Promise.resolve()),
           'surveys/fetchPinned': jest.fn(),
-          'submissions/fetchLocalDrafts': jest.fn(() => Promise.resolve()),
-          'submissions/fetchSubmissions': jest.fn(),
-          'submissions/fetchSurveys': jest.fn(),
+          'submissions/initialize': jest.fn(),
         },
         params: { redirect: true },
         propsData: { defaultUsePassword: true },

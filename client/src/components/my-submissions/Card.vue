@@ -4,6 +4,7 @@
     :class="{
       selected: submission.options.selected,
       invalid: !survey || isArchived,
+      disabled: !!loading,
     }"
     @click.native="handleSelect"
   >
@@ -29,24 +30,44 @@
           @click="$emit('submit-draft', submission)"
         ></draft-submit>
         <draft-continue :submission="submission" :primary="!isReadyToSubmit"></draft-continue>
-        <draft-upload v-if="isLocal" :submission="submission"> </draft-upload>
-        <draft-download v-if="!isLocal" :submission="submission"></draft-download>
-        <export-json :submission="submission"></export-json>
-        <draft-delete :submission="submission"></draft-delete>
       </template>
       <template v-else>
         <span v-if="isArchived" class="mr-4 grey--text font-weight-light body-2">
           {{ submission.meta.archivedReason }}
         </span>
-        <template v-if="isCreator || isAdmin">
-          <submission-resubmit :submission="submission"></submission-resubmit>
-        </template>
-        <export-json :submission="submission"></export-json>
-        <template v-if="isCreator || isAdmin">
-          <submission-delete v-if="isArchived" :submission="submission"></submission-delete>
-          <submission-archive v-else :submission="submission"></submission-archive>
-        </template>
+        <submission-resubmit v-if="isCreator || isAdmin" :submission="submission"></submission-resubmit>
       </template>
+
+      <v-menu offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn v-bind="attrs" rounded small icon text outlined v-on="on">
+            <v-icon small>mdi-dots-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item v-if="isDraft && isLocal" @click="uploadDraft()">
+            <v-list-item-title>Upload</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="isDraft && !isLocal" @click="downloadDraft()">
+            <v-list-item-title>Download</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="exportJSON()">
+            <v-list-item-title>Export as JSON</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="isDraft" @click="isOpen.deleteDraft = true">
+            <v-list-item-title class="red--text">Delete</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="!isDraft && (isCreator || isAdmin) && isArchived" @click="isOpen.deleteSubmission = true">
+            <v-list-item-title class="red--text">Delete</v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            v-if="!isDraft && (isCreator || isAdmin) && !isArchived"
+            @click="isOpen.archiveSubmission = true"
+          >
+            <v-list-item-title class="red--text">Archive</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </div>
 
     <v-divider></v-divider>
@@ -73,33 +94,47 @@
         {{ dateModified }}
       </span>
     </div>
+
+    <v-overlay :value="!!loading" absolute>
+      <div class="loading">
+        <p class="mb-2 text-center">{{ loading }}</p>
+        <v-progress-linear indeterminate color="white"></v-progress-linear>
+      </div>
+    </v-overlay>
+
+    <draft-delete v-model="isOpen.deleteDraft" :submission="submission"></draft-delete>
+    <submission-delete v-model="isOpen.deleteSubmission" :submission="submission"></submission-delete>
+    <submission-archive-dialog
+      v-model="isOpen.archiveSubmission"
+      maxWidth="50rem"
+      labelConfirm="Archive"
+      @cancel="isOpen.archiveSubmission = false"
+      @confirm="archiveSubmission"
+    >
+      <template #title>Archive Submission</template>
+    </submission-archive-dialog>
   </v-card>
 </template>
 
 <script>
-import { computed } from '@vue/composition-api';
+import { computed, reactive } from '@vue/composition-api';
+import SubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import DraftContinue from './actions/DraftContinue.vue';
 import DraftDelete from './actions/DraftDelete.vue';
-import DraftDownload from './actions/DraftDownload.vue';
-import DraftUpload from './actions/DraftUpload.vue';
 import DraftSubmit from './actions/DraftSubmit.vue';
-import SubmissionArchive from './actions/SubmissionArchive.vue';
 import SubmissionDelete from './actions/SubmissionDelete.vue';
 import SubmissionResubmit from './actions/SubmissionResubmit.vue';
-import ExportJson from './actions/ExportJSON.vue';
 import StatusChip from './StatusChip.vue';
+import { useSubmissionAction } from '@/store/modules/submissions.store';
 
 export default {
   components: {
-    DraftDownload,
-    DraftUpload,
     DraftDelete,
     DraftContinue,
     DraftSubmit,
-    SubmissionArchive,
     SubmissionDelete,
     SubmissionResubmit,
-    ExportJson,
+    SubmissionArchiveDialog,
     StatusChip,
   },
   props: {
@@ -110,6 +145,15 @@ export default {
   },
   emits: ['submit-draft'],
   setup(props, { root }) {
+    const { loading, uploadDraft, downloadDraft, archiveSubmission, exportJSON } = useSubmissionAction(
+      root.$store,
+      props.submission
+    );
+    const isOpen = reactive({
+      deleteDraft: false,
+      deleteSubmission: false,
+      archiveSubmission: false,
+    });
     const userId = computed(() => root.$store.getters['auth/user']._id);
     const chipColor = computed(() => (props.submission.options.selected ? 'secondary' : undefined));
     const isLocal = computed(() => props.submission.options.local);
@@ -165,6 +209,10 @@ export default {
     });
 
     const handleSelect = () => {
+      if (loading.value) {
+        return;
+      }
+
       root.$store.dispatch('submissions/setMySubmission', {
         submission: props.submission,
         newSubmission: {
@@ -181,6 +229,7 @@ export default {
       classes,
       survey,
       chipColor,
+      isOpen,
       isLocal,
       isDraft,
       isCreator,
@@ -191,6 +240,11 @@ export default {
       isAdmin,
       dateSubmitted,
       dateModified,
+      loading,
+      uploadDraft,
+      downloadDraft,
+      archiveSubmission,
+      exportJSON,
       handleSelect,
     };
   },
@@ -204,7 +258,10 @@ export default {
   transition-property: box-shadow, border;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-  cursor: pointer;
+
+  &:not(.disabled) {
+    cursor: pointer;
+  }
 
   &.invalid {
     background: linear-gradient(0deg, rgba(222, 115, 146, 0.08), rgba(222, 115, 146, 0.08)), #ffffff;
@@ -229,7 +286,8 @@ export default {
     }
   }
 
-  & > div {
+  & > .top,
+  & > .bottom {
     padding: 8px 16px;
     position: relative;
     display: flex;
@@ -237,10 +295,8 @@ export default {
     gap: 8px;
   }
 
-  &:hover .top {
-    .status-bar {
-      opacity: 1;
-    }
+  &:not(.disabled):hover .top .status-bar {
+    opacity: 1;
   }
 
   .top {
@@ -265,11 +321,13 @@ export default {
     }
   }
 
-  .bottom {
-    .v-divider {
-      height: 16px;
-      align-self: center;
-    }
+  .bottom .v-divider {
+    height: 16px;
+    align-self: center;
+  }
+
+  .v-overlay .loading {
+    width: 240px;
   }
 }
 

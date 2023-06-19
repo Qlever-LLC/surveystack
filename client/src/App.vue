@@ -42,11 +42,8 @@ export default {
         api.get('farmos/assets?bundle=plant');
       }
     },
-    fetchMySubmissions() {
-      this.$store.dispatch('submissions/fetchLocalDrafts').then(() => {
-        this.$store.dispatch('submissions/fetchSubmissions', true);
-        this.$store.dispatch('submissions/fetchSurveys');
-      });
+    async fetchMySubmissions() {
+      await this.$store.dispatch('submissions/initialize');
     },
   },
 };

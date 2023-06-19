@@ -4,6 +4,9 @@
       <v-col>
         Submissions: <span>{{ totalCount }}</span>
       </v-col>
+      <v-col>
+        Loaded: <span>{{ loadedCount }}</span>
+      </v-col>
     </v-row>
 
     <div class="filter-bar mt-2 d-flex flex-column flex-md-row align-md-center">
@@ -63,9 +66,13 @@ import { SubmissionLoadingActions, SubmissionTypes } from '@/store/modules/submi
 
 export default defineComponent({
   setup(props, { root }) {
-    const totalCount = computed(() => root.$store.getters['submissions/total']);
+    const totalCount = computed(() => {
+      const count = root.$store.getters['submissions/total'];
+      return count < 0 ? 'Loading...' : count;
+    });
+    const loadedCount = computed(() => root.$store.getters['submissions/mySubmissions'].length);
     const isSurveyLoading = computed(() =>
-      root.$store.getters['submissions/getLoading'](SubmissionLoadingActions.FETCH_SURVEYS)
+      root.$store.getters['submissions/getLoading'](SubmissionLoadingActions.LOAD_SURVEYS)
     );
     const comboboxSearch = ref('');
 
@@ -83,10 +90,10 @@ export default defineComponent({
     const surveys = computed(() => root.$store.getters['submissions/surveys']);
     const survey = computed({
       get() {
-        return root.$store.getters['submissions/filter'].survey;
+        return root.$store.getters['submissions/filter'].surveyIds;
       },
-      set(survey) {
-        root.$store.dispatch('submissions/setFilter', { survey });
+      set(surveyIds) {
+        root.$store.dispatch('submissions/setFilter', { surveyIds });
       },
     });
 
@@ -106,6 +113,7 @@ export default defineComponent({
 
     return {
       totalCount,
+      loadedCount,
       isSurveyLoading,
       comboboxSearch,
       types,

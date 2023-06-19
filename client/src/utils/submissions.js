@@ -1,11 +1,9 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
-import cloneDeep from 'lodash/cloneDeep';
-import groupBy from 'lodash/groupBy';
 import * as constants from '@/constants';
 import api from '@/services/api.service';
 import { AuthService } from '@/services/storage.service';
-import { get } from 'lodash';
+import { cloneDeep, get, groupBy } from 'lodash';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -123,19 +121,16 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
     if (flattenedInstance) {
       const keys = Object.keys(flattenedInstance).filter((o) => o.startsWith(`${flatName}.value`));
       if (keys.length === 1) {
-        // eslint-disable-next-line prefer-destructuring
         v = flattenedInstance[keys[0]];
       } else {
         // if this is an object
         const inner = {};
-        // eslint-disable-next-line no-restricted-syntax
         for (const k of keys) {
           const len = `${flatName}.value`.length;
           const updatedKey = k.substring(len + 1); // '.' char
           inner[updatedKey] = flattenedInstance[k];
         }
         v = unflatten(inner);
-        // console.log('unflattened');
       }
     }
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
@@ -307,4 +302,11 @@ export function parseSubmitResponse(response, submissionId = '') {
   }
 
   return resultItems;
+}
+
+export function sanitizeSubmission(submission) {
+  const newSubmission = cloneDeep(submission);
+  delete newSubmission.options;
+  delete newSubmission.meta.archived;
+  return newSubmission;
 }

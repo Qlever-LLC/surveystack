@@ -71,7 +71,6 @@
 
 <script>
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/composition-api';
-import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
 import DraftHeader from '@/components/my-submissions/Header.vue';
 import DraftCard from '@/components/my-submissions/Card.vue';
 import DraftFooter from '@/components/my-submissions/Footer.vue';
@@ -88,9 +87,7 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const isFooterOpen = ref(false);
-    const isLoading = computed(() =>
-      root.$store.getters['submissions/getLoading'](SubmissionLoadingActions.FETCH_SUBMISSIONS)
-    );
+    const isLoading = computed(() => root.$store.getters['submissions/isLoading']);
     const hasMoreData = computed(() => root.$store.getters['submissions/hasMoreData']);
     const submissions = computed(() => root.$store.getters['submissions/mySubmissions']);
     const lastEl = ref();
