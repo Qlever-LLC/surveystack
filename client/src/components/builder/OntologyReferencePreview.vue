@@ -28,8 +28,7 @@
 <script>
 import { computed, defineComponent, ref, watchEffect } from '@vue/composition-api';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
-import { groupBy } from 'lodash';
-import { getNested } from '@/utils/surveyStack';
+import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
 
 export default defineComponent({
@@ -62,7 +61,7 @@ export default defineComponent({
       const { data } = await api.get(`/submissions?survey=${surveyId}${query}`);
       const submissions = data
         .map((item) => {
-          const value = getNested(item, `${path}.value`, null);
+          const value = get(item, `${path}.value`, null);
           return {
             id: item._id,
             label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
@@ -81,14 +80,11 @@ export default defineComponent({
           }))
           .filter((v) => v.value);
 
-      const explodedItems = submissions
-        .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
-        .reduce((acc, curr) => [...acc, ...curr], []);
-
+      const explodedItems = submissions.flatMap((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]));
       const uniqueItems = Object.values(groupBy(explodedItems, 'label')).map((group) => group[0]);
 
-      loading.value = false;
       items.value = uniqueItems;
+      loading.value = false;
     };
 
     watchEffect(() => {

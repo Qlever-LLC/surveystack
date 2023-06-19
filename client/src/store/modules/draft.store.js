@@ -3,6 +3,7 @@ import TreeModel from 'tree-model';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
+import { get, set } from 'lodash';
 import api from '@/services/api.service';
 import Vue from 'vue';
 
@@ -74,18 +75,18 @@ const initialState = createInitialState();
 const getters = {
   survey: (state) => state.survey,
   submission: (state) => state.submission,
-  property: (state) => (path, fallback) => surveyStackUtils.getNested(state.submission, path, fallback),
+  property: (state) => (path, fallback) => get(state.submission, path, fallback),
   control: (state) => state.node && state.node.model, // current survey control
-  path: (state) => {
-    if (!state.node) {
-      return null;
-    }
-    const p = state.node
-      .getPath()
-      .map((n) => n.model.name)
-      .join('.');
-    return p;
-  },
+  path: (state) =>
+    state.node
+      ? state.node
+          .getPath()
+          .map((n) => n.model.name)
+          .join('.')
+          .replace('[', '.')
+          .replace(']', '')
+      : null,
+
   atStart: (state) => state.node === state.firstNode,
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
@@ -175,7 +176,6 @@ const actions = {
     await dispatch('calculateRelevance');
     await dispatch('next');
   },
-  //TODO check - could this be removed? does not seem to be referenced
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
@@ -226,7 +226,7 @@ const actions = {
             .getPath()
             .map((n) => n.model.name)
             .join('.');
-          if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
+          if (!get(state.submission, `${parentPath}.meta.relevant`, true)) {
             return true;
           }
           return false;
@@ -300,7 +300,7 @@ const actions = {
             .getPath()
             .map((n) => n.model.name)
             .join('.');
-          if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
+          if (!get(state.submission, `${parentPath}.meta.relevant`, true)) {
             return true;
           }
           return false;
@@ -460,7 +460,14 @@ const mutations = {
       });
   },
   SET_PROPERTY(state, { path, value }) {
-    surveyStackUtils.setNested(state.submission, path, value);
+    const keys = path.split('.');
+    const childKey = keys.pop();
+    const parent = get(state.submission, keys, null);
+    if (!parent) {
+      throw new Error(`Trying to set property for the invalid path: ${path}`);
+    }
+
+    Vue.set(parent, childKey, value);
   },
   NEXT(state, node) {
     // console.log('next', node, state);

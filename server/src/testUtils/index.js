@@ -165,6 +165,10 @@ export const createSurvey = async (control = '', overrides = {}) => {
         path: group.path,
       },
       specVersion: 4,
+      printOptions: {
+        showInstruction: true,
+        showUnanswered: false,
+      },
     },
     resources: [
       {
@@ -245,7 +249,10 @@ export const createSurvey = async (control = '', overrides = {}) => {
     surveyDoc.latestVersion = 2;
   }
 
-  const survey = await getDb().collection('surveys').insertOne(surveyDoc);
+  const {
+    ops: [survey],
+    insertedId,
+  } = await getDb().collection('surveys').insertOne(surveyDoc);
 
   const createSubmission = async (_overrides = {}) => {
     let data = {};
@@ -281,12 +288,15 @@ export const createSurvey = async (control = '', overrides = {}) => {
     });
 
     const submissionDoc = {
-      _id: new ObjectId(),
       meta: {
         dateCreated: now,
         dateModified: now,
         dateSubmitted: now,
-        survey: { id: survey.insertedId, version: 2 },
+        survey: {
+          id: insertedId,
+          name: survey.name,
+          version: 2,
+        },
         revision: 1,
         permissions: [],
         status: [
@@ -304,16 +314,22 @@ export const createSurvey = async (control = '', overrides = {}) => {
       ..._overrides,
     };
 
-    const submission = await getDb().collection('submissions').insertOne(submissionDoc);
+    const {
+      ops: [submission],
+    } = await getDb().collection('submissions').insertOne(submissionDoc);
+
+    submission.meta.dateCreated = submission.meta.dateCreated.toISOString();
+    submission.meta.dateModified = submission.meta.dateModified.toISOString();
+    submission.meta.dateSubmitted = submission.meta.dateSubmitted.toISOString();
 
     return {
-      submission: submission.ops[0],
+      submission,
       headers,
     };
   };
 
   return {
-    survey: survey.ops[0],
+    survey,
     createSubmission,
   };
 };
@@ -348,6 +364,7 @@ export const createRes = async ({ user = null } = {}) => ({
   cookie: jest.fn(),
   status: jest.fn().mockReturnThis(),
   set: jest.fn(),
+  attachment: jest.fn(),
   locals: {
     auth: {
       isAuthenticated: !!user,

@@ -65,10 +65,23 @@ export const createControlInstance = (control) => {
     cloneWithDefaultOptions.options.compact = false;
   } else if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
+    cloneWithDefaultOptions.options.printLayout = {
+      showAllOptionsPrintable: true,
+      showAllOptions: false,
+      columns: 3,
+    };
   } else if (control.type === 'matrix') {
     cloneWithDefaultOptions.options.source = createDefaultMatrixSource();
+    cloneWithDefaultOptions.options.printLayout = {
+      table: true,
+    };
   } else if (control.type === 'ontology') {
     cloneWithDefaultOptions.options.source = '';
+    cloneWithDefaultOptions.options.printLayout = {
+      showAllOptionsPrintable: true,
+      showAllOptions: false,
+      columns: 3,
+    };
   } else if (control.type === 'instructions') {
     cloneWithDefaultOptions.options.source = '';
   } else if (control.type === 'geoJSON') {
@@ -89,11 +102,17 @@ export const createControlInstance = (control) => {
       typesImmutable: false,
       allowMultiple: false,
     };
+    cloneWithDefaultOptions.options.printLayout = {
+      preview: false,
+    };
   } else if (control.type === 'image') {
     cloneWithDefaultOptions.options.source = {
       types: ['image/*'],
       typesImmutable: true,
       allowMultiple: false,
+    };
+    cloneWithDefaultOptions.options.printLayout = {
+      preview: false,
     };
   } else if (control.type === 'farmOsUuid') {
     cloneWithDefaultOptions.options.farmOsTypes = ['field', 'planting'];
