@@ -164,10 +164,15 @@ export const createBasicQueryList = (survey, version = 1) => {
   return items;
 };
 
+export function isOnline() {
+  return window.navigator.onLine;
+}
+
 export default {
   getAllNodes,
   queueAction,
   isAnswered,
   getValueOrNull,
   createBasicQueryList,
+  isOnline,
 };
