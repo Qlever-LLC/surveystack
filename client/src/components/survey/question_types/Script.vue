@@ -296,7 +296,7 @@ export default {
       let script;
       if (scriptResource) {
         //load script from store
-        let resourceContainingScriptData = await store.dispatch('resources/fetchScriptResource', scriptResource);
+        let resourceContainingScriptData = await this.$store.dispatch('resources/fetchScriptResource', scriptResource);
         script = resourceContainingScriptData.fileData;
       } else {
         //fallback to directly using script id in case of legacy survey
