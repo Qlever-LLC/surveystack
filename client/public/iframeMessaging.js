@@ -42,10 +42,7 @@ export function requestFetchSubmissions() {
 
   return new Promise((resolve, reject) => {
     window.addEventListener('message', (event) => {
-      if (!event.data || !event.data.type || event.data.type !== 'RETURN_FETCH_SUBMISSION') {
-        return;
-      }
-      if (event.data && event.data.type && event.data.type === 'RETURN_FETCH_SUBMISSION') {
+      if (event && event.data && event.data.type && event.data.type === 'RETURN_FETCH_SUBMISSION') {
         resolve(event.data.payload);
       }
     });

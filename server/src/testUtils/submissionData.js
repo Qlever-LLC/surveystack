@@ -107,7 +107,7 @@ const selectMultipleData = (overrides = {}, index = 1) => ({
 
 const ontologyData = (overrides = {}, index = 1) => ({
   [`dropdown_${index}`]: {
-    value: ['item_1'],
+    value: ['item_1', 'item_2'],
     meta: {
       type: 'ontology',
       dateModified: now,
@@ -119,8 +119,8 @@ const ontologyData = (overrides = {}, index = 1) => ({
 const matrixData = (overrides = {}, index = 1) => ({
   [`matrix_${index}`]: {
     value: [
-      { property_1: { value: 'Mock property 1-1' }, property_2: { value: 'Mock Property 2-1' } },
-      { property_1: { value: 'Mock property 1-2' }, property_2: { value: 'Mock Property 2-2' } },
+      { property_1: { value: 1 }, property_2: { value: 'ABC' } },
+      { property_1: { value: 2 }, property_2: { value: 'def' } },
     ],
     meta: {
       type: 'matrix',
@@ -132,7 +132,7 @@ const matrixData = (overrides = {}, index = 1) => ({
 
 const imageData = (overrides = {}, index = 1) => ({
   [`image_${index}`]: {
-    value: [`resources/${new ObjectId()}/file1.jpg`],
+    value: ['resources/mock-resource-id/file1.jpg'],
     meta: {
       type: 'image',
       dateModified: now,
@@ -143,7 +143,7 @@ const imageData = (overrides = {}, index = 1) => ({
 
 const fileData = (overrides = {}, index = 1) => ({
   [`file_${index}`]: {
-    value: [`resources/${new ObjectId()}/file1.jpg`],
+    value: ['resources/mock-resource-id/file1.jpg'],
     meta: {
       type: 'file',
       dateModified: now,

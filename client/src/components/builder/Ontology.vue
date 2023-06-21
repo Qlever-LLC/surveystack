@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import { isNil, sortBy, uniq, without } from 'lodash';
+import { isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
