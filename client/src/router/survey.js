@@ -1,15 +1,9 @@
-import SurveyMySubmissions from '@/pages/surveys/MySubmissions.vue';
 import SurveyBrowse from '@/pages/surveys/Browse.vue';
 import SurveyBuilder from '@/pages/builder/Builder.vue';
 import SurveyDetail from '@/pages/surveys/Detail.vue';
 import { getComponents, guard } from './helper';
 
 export default [
-  {
-    path: '/surveys/my-submissions',
-    name: 'my-submissions',
-    components: getComponents(SurveyMySubmissions),
-  },
   {
     path: '/surveys/browse',
     name: 'surveys-browse',

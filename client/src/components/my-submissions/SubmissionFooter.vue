@@ -5,17 +5,20 @@
 
       <div class="buttons d-flex align-center">
         <submission-archive-bulk
-          :submissions="submissionsToArchive"
+          :submissions="unArchived"
           :disabled="isLoading"
           @loading-change="isLoading = $event"
-          @error="error = { title: 'Archive Submissions Error', message: $event }"
-        />
+        ></submission-archive-bulk>
+        <submission-restore-bulk
+          :submissions="archived"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></submission-restore-bulk>
         <submission-delete-bulk
-          :submissions="submissionsToDelete"
+          :submissions="archived"
           :disabled="isLoading"
           @loading-change="isLoading = $event"
-          @error="error = { title: 'Delete Submissions Error', message: $event }"
-        />
+        ></submission-delete-bulk>
         <export-json-bulk :submissions="selected" :disabled="isLoading" />
       </div>
 
@@ -23,22 +26,6 @@
         <v-btn text dark small @click="handleClear">Clear all</v-btn>
       </div>
     </v-container>
-
-    <v-dialog v-if="error" :value="!!error" max-width="400" @input="error = null">
-      <v-card class="d-flex flex-column">
-        <v-card-title> {{ error.title }} </v-card-title>
-        <v-card-text class="pa-0">
-          <v-alert type="error" class="ma-4 d-flex justify-center">
-            {{ error.message }}
-          </v-alert>
-        </v-card-text>
-        <v-spacer></v-spacer>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click.stop="error = null"> Close </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </footer>
 </template>
 
@@ -46,23 +33,24 @@
 import { computed, defineComponent, ref } from '@vue/composition-api';
 import SubmissionArchiveBulk from './actions/SubmissionArchiveBulk.vue';
 import SubmissionDeleteBulk from './actions/SubmissionDeleteBulk.vue';
+import SubmissionRestoreBulk from './actions/SubmissionRestoreBulk.vue';
 import ExportJsonBulk from './actions/ExportJsonBulk.vue';
 
 export default defineComponent({
   components: {
     SubmissionArchiveBulk,
     SubmissionDeleteBulk,
+    SubmissionRestoreBulk,
     ExportJsonBulk,
   },
   setup(props, { root }) {
     const selected = computed(() => root.$store.getters['mySubmissions/selected']);
-    const error = ref(null);
     const isLoading = ref(false);
     const isOpen = computed(() => selected.value.length > 0);
     const memberships = computed(() => root.$store.getters['memberships/memberships']);
     const userId = computed(() => root.$store.getters['auth/user']._id);
 
-    const submissionsToArchive = computed(() =>
+    const unArchived = computed(() =>
       selected.value.filter(
         (item) =>
           // not archived
@@ -75,7 +63,7 @@ export default defineComponent({
       )
     );
 
-    const submissionsToDelete = computed(() =>
+    const archived = computed(() =>
       selected.value.filter(
         (item) =>
           // archived
@@ -94,12 +82,11 @@ export default defineComponent({
 
     return {
       selected,
-      error,
       userId,
       isLoading,
       isOpen,
-      submissionsToArchive,
-      submissionsToDelete,
+      unArchived,
+      archived,
       handleClear,
     };
   },

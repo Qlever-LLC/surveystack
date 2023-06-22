@@ -1,11 +1,11 @@
 <template>
   <div :class="{ 'mb-16': showFooter }">
-    <draft-filter></draft-filter>
+    <draft-filter class="mb-6"></draft-filter>
 
     <div v-if="isLoading && drafts.length === 0" class="d-flex justify-center my-8">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
     </div>
-    <p v-else-if="drafts.length === 0" class="my-8 text-center">No matching submissions found.</p>
+    <p v-else-if="drafts.length === 0" class="my-8 text-center">No matching drafts found.</p>
     <template v-else>
       <draft-card
         v-for="draft in drafts"

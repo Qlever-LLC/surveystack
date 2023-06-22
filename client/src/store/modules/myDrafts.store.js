@@ -32,8 +32,7 @@ const getters = {
   isLoading: (state) => state.isLoading,
   page: (state) => state.page,
   totalPage: (state, getters) => (state.isLoading ? 1 : Math.ceil(getters.drafts.length / PER_PAGE)),
-  readyToSubmitCount: (state) =>
-    state.drafts.filter((item) => item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT')).length,
+  readyToSubmit: (state) => state.drafts.filter((item) => item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT')),
   surveys: (state) => state.surveys,
   drafts: (state, getters) => {
     let drafts = state.drafts;
@@ -161,24 +160,25 @@ const actions = {
    * - Saving remote drafts
    * - Losing on conflicts
    */
-  async deleteLocalDrafts({ state, dispatch }, ids) {
-    const validIds = state.localDrafts.map((item) => item._id).filter((id) => ids.includes(id));
-    if (validIds.length === 0) {
+  async deleteLocalDrafts({ dispatch }, ids) {
+    if (ids.length === 0) {
       return true;
     }
 
     let success = true;
-    for (const id of validIds) {
+    for (const id of ids) {
       try {
         await db.deleteSubmission(id);
       } catch (e) {
-        console.log('Failed to delete draft from IDB', id);
+        console.warn('Failed to delete draft from IDB', id);
         success = false;
       }
     }
 
-    await dispatch('fetchLocalDrafts');
-    await dispatch('refreshDrafts');
+    if (success) {
+      await dispatch('fetchLocalDrafts');
+      await dispatch('refreshDrafts');
+    }
 
     return success;
   },
@@ -200,21 +200,20 @@ const actions = {
       }
     }
 
+    await dispatch('fetchLocalDrafts');
+
     // Delete from remote
     await dispatch(
       'deleteRemoteDrafts',
       submissions.map((item) => item._id)
     );
 
-    await dispatch('fetchLocalDrafts');
-    await dispatch('refreshDrafts');
-
     return success;
   },
 
   async fetchRemoteDrafts({ commit }) {
     try {
-      const { data } = await api.get('/drafts');
+      const { data } = await api.get('/drafts/my-drafts');
       commit('SET_REMOTE_DRAFTS', data);
 
       return data;
@@ -232,13 +231,12 @@ const actions = {
    * - Losing on conflicts
    */
   async deleteRemoteDrafts({ state, commit, dispatch }, ids) {
-    const validIds = state.remoteDrafts.map((item) => item._id).filter((id) => ids.includes(id));
-    if (validIds.length === 0) {
+    if (ids.length === 0) {
       return true;
     }
 
     try {
-      await api.post('/drafts/bulk-delete', { ids: validIds });
+      await api.post('/drafts/bulk-delete', { ids });
       commit(
         'SET_REMOTE_DRAFTS',
         state.remoteDrafts.filter((item) => ids.every((id) => id !== item._id))
@@ -278,8 +276,6 @@ const actions = {
       console.warn('Failed to save the submission to the server', e);
       success = false;
     }
-
-    await dispatch('refreshDrafts');
 
     return success;
   },

@@ -164,7 +164,8 @@ router.post(
 );
 
 /** Drafts */
-router.get('/drafts', [assertAuthenticated], catchErrors(draftController.getDrafts));
+router.get('/drafts/page', catchErrors(draftController.getDraftsPage));
+router.get('/drafts/my-drafts', [assertAuthenticated], catchErrors(draftController.getMyDrafts));
 router.post('/drafts', [assertAuthenticated], catchErrors(draftController.createDrafts));
 router.delete(
   '/drafts/:id',

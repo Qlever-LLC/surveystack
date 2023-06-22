@@ -4,36 +4,23 @@
       <span class="flex-grow-1">Selected: {{ selected.length }}</span>
 
       <div class="buttons d-flex align-center">
-        <draft-submit-bulk :drafts="draftsToSubmit" :disabled="isLoading" @loading-change="isLoading = $event" />
+        <draft-submit-bulk
+          :drafts="draftsToSubmit"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></draft-submit-bulk>
         <draft-delete-bulk
           :drafts="selected"
           :disabled="isLoading"
           @loading-change="isLoading = $event"
-          @error="error = { title: 'Delete Drafts Error', message: $event }"
-        />
-        <export-json-bulk :submissions="selected" :disabled="isLoading" />
+        ></draft-delete-bulk>
+        <export-json-bulk :submissions="selected" :disabled="isLoading"></export-json-bulk>
       </div>
 
       <div class="flex-grow-1 text-end">
         <v-btn text dark small @click="handleClear">Clear all</v-btn>
       </div>
     </v-container>
-
-    <v-dialog v-if="error" :value="!!error" max-width="400" @input="error = null">
-      <v-card class="d-flex flex-column">
-        <v-card-title> {{ error.title }} </v-card-title>
-        <v-card-text>
-          <v-alert type="error" class="ma-4 d-flex justify-center">
-            {{ error.message }}
-          </v-alert>
-        </v-card-text>
-        <v-spacer></v-spacer>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click.stop="error = null"> Close </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </footer>
 </template>
 
@@ -51,7 +38,6 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const selected = computed(() => root.$store.getters['myDrafts/selected']);
-    const error = ref(null);
     const isLoading = ref(false);
     const isOpen = computed(() => selected.value.length > 0);
     const draftsToSubmit = computed(() =>
@@ -64,7 +50,6 @@ export default defineComponent({
 
     return {
       selected,
-      error,
       isLoading,
       isOpen,
       draftsToSubmit,

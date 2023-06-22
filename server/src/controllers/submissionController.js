@@ -87,7 +87,7 @@ const sanitizeMatch = (obj) => {
   });
 };
 
-const createRedactStage = (user, roles) => {
+export const createRedactStage = (user, roles) => {
   return {
     $redact: {
       $switch: {
@@ -184,7 +184,7 @@ const createRedactStage = (user, roles) => {
   };
 };
 
-const createRelevanceStage = () => {
+export const createRelevanceStage = () => {
   return {
     $redact: {
       $cond: {
@@ -365,7 +365,7 @@ const addCreatorDetailStage = (pipeline, user) => {
   );
 };
 
-const addUserDetailsStage = (pipeline) => {
+export const addUserDetailsStage = (pipeline) => {
   pipeline.push({
     $lookup: {
       from: 'users',

@@ -2,7 +2,7 @@
   <v-dialog v-if="submissions.length > 0" v-model="isOpen" max-width="400">
     <template v-slot:activator="{ on, attrs }">
       <v-btn v-bind="attrs" color="red lighten-2" dark :disabled="disabled" :loading="isLoading" v-on="on">
-        Delete submissions ({{ submissions.length }})
+        Delete ({{ submissions.length }})
       </v-btn>
     </template>
 
@@ -33,7 +33,7 @@ export default defineComponent({
     },
     disabled: { type: Boolean },
   },
-  emits: ['loading-change', 'error'],
+  emits: ['loading-change'],
   setup(props, { root, emit }) {
     const isOpen = ref(false);
     const isLoading = ref(false);
@@ -46,8 +46,8 @@ export default defineComponent({
       isLoading.value = false;
 
       if (!success) {
-        emit(
-          'error',
+        root.$store.dispatch(
+          'feedback/add',
           `Something went wrong while deleting ${ids.length === 1 ? 'the submission' : ids.length + ' submissions'}.`
         );
       }

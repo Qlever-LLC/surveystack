@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrapper">
     <app-submission-archive-dialog
       v-model="showArchiveModal"
       maxWidth="50rem"
@@ -10,13 +10,19 @@
       <template v-slot:title>Confirm Submission Archiving</template>
     </app-submission-archive-dialog>
 
-    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
+    <app-dialog
+      v-model="showDeleteModal"
+      maxWidth="400"
+      @cancel="showDeleteModal = false"
+      @confirm="deleteSubmissions(selected)"
+    >
       <template v-slot:title>Confirm deletion</template>
       <template> Are you sure you want to delete this submission? This can not be undone. </template>
     </app-dialog>
 
     <app-dialog
       v-model="reassignment.showModal"
+      maxWidth="50rem"
       @cancel="reassignment.showModal = false"
       @confirm="reassign(selected)"
       labelConfirm="Reassign"
@@ -45,7 +51,7 @@
       </template>
     </app-dialog>
 
-    <v-container>
+    <v-container fluid>
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
@@ -145,7 +151,7 @@
       </v-card>
     </v-container>
 
-    <v-container>
+    <v-container fluid>
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -153,9 +159,10 @@
         <v-tabs-items v-model="tab" touchless>
           <v-tab-item>
             <app-submissions-table-client-csv
-              :submissions="submissions"
               v-if="submissions"
+              :submissions="submissions"
               :selected.sync="selected"
+              :drafts="filter.showDrafts"
               :archived="filter.showArchived"
               :dataTableProps="dateTableProps"
               @onDataTablePropsChanged="onDataTablePropsChanged"
@@ -164,12 +171,14 @@
               :loading="loading"
               style="margin: 3px 2px"
               :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
-              @showDeleteModal="showDeleteModal = true"
+              @deleteSubmissions="showDeleteModal = true"
               @archiveSubmissions="archiveSubmissions(selected, '', false)"
               @showArchiveModal="showArchiveModal = true"
               @reassignment="reassignment.showModal = true"
               @resubmit="resubmit(selected[0])"
+              @showDrafts="filter.showDrafts = $event"
               @showArchived="filter.showArchived = $event"
+              @reloadData="fetchData()"
             />
           </v-tab-item>
           <v-tab-item>
@@ -235,6 +244,7 @@ const createDefaultFilter = () => ({
   sort: '{}',
   skip: 0,
   limit: defaultPageSize,
+  showDrafts: false,
   showArchived: false,
   showIrrelevant: false,
   showCsvDataMeta: false,
@@ -322,10 +332,10 @@ export default {
   computed: {
     validQuery() {
       try {
-        const match = JSON.parse(this.filter.match);
-        const sort = JSON.parse(this.filter.sort);
-        const project = JSON.parse(this.filter.project);
-      } catch (error) {
+        JSON.parse(this.filter.match);
+        JSON.parse(this.filter.sort);
+        JSON.parse(this.filter.project);
+      } catch {
         return false;
       }
 
@@ -352,7 +362,26 @@ export default {
         .join('&');
     },
     apiFetchRequest() {
-      return `/submissions/page?${this.apiFetchParams}`;
+      if (!this.filter.showDrafts) {
+        return `/submissions/page?${this.apiFetchParams}`;
+      }
+
+      const params = new URLSearchParams();
+      params.append('survey', this.survey);
+      if (this.filter.skip > 0) {
+        params.append('skip', this.filter.skip);
+      }
+      if (this.filter.limit > 0) {
+        params.append('limit', this.filter.limit);
+      }
+      if (this.filter.sort !== '{}') {
+        params.append('sort', this.filter.sort);
+      }
+      if (this.filter.showCsvDataMeta) {
+        params.append('showCsvDataMeta', '1');
+      }
+
+      return `/drafts/page?${params}`;
     },
     apiEndpoint() {
       let endpoint;
@@ -476,10 +505,9 @@ export default {
       this.selectedSubmissions = submissions;
     },
     startDraft(survey) {
-      this.$store.dispatch('submissions/startDraft', { survey });
+      this.$store.dispatch('myDrafts/startDraft', { survey });
     },
     async resubmit(submission) {
-      await this.$store.dispatch('myOldSubmissions/fetchRemoteSubmission', submission._id);
       this.$router.push(`/submissions/drafts/${submission._id}`);
     },
     async reassign(submissions) {
@@ -542,12 +570,14 @@ export default {
     },
   },
   watch: {
-    // eslint-disable-next-line func-names
     'filter.showArchived': function () {
       this.selected = [];
       this.fetchData();
     },
-    // eslint-disable-next-line func-names
+    'filter.showDrafts': function () {
+      this.selected = [];
+      this.fetchData();
+    },
     'reassignment.group': function (val) {
       this.reassignment.user = null;
 
@@ -568,7 +598,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 body {
   font-family: Menlo, Consolas, monospace;
   color: #444;
@@ -587,5 +617,27 @@ ul {
 
 >>> .v-window {
   overflow: unset;
+}
+
+.wrapper > .container {
+  max-width: min(calc(100vw - 72px), 1785px);
+}
+
+@media (max-width: 1280px) {
+  .wrapper > .container {
+    max-width: calc(100vw - 48px);
+  }
+}
+
+@media (max-width: 960px) {
+  .wrapper > .container {
+    max-width: calc(100vw - 36px);
+  }
+}
+
+@media (max-width: 960px) {
+  .wrapper > .container {
+    max-width: 100vw;
+  }
 }
 </style>

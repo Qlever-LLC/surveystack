@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'mb-16': showFooter }">
-    <submission-filter></submission-filter>
+    <submission-filter class="mb-6"></submission-filter>
 
     <div v-if="isLoading && submissions.length === 0" class="d-flex justify-center my-8">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
@@ -15,7 +15,7 @@
         :selected="isSelected(submission._id)"
         @change-select="handleSelect(submission, $event)"
       ></submission-card>
-      <v-pagination v-model="page" :length="totalPage"></v-pagination>
+      <v-pagination v-model="page" :length="totalPage" class="mt-4"></v-pagination>
     </template>
 
     <submission-footer></submission-footer>

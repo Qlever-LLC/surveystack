@@ -2,9 +2,11 @@
   <div>
     <v-dialog v-if="drafts.length > 0" v-model="isOpen" max-width="400">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" color="primary" dark :disabled="disabled" :loading="isLoading" v-on="on">
-          Submit drafts ({{ drafts.length }})
-        </v-btn>
+        <slot :on="on" :attrs="attrs">
+          <v-btn v-bind="attrs" color="primary" dark :disabled="disabled" :loading="isLoading" v-on="on">
+            Submit ({{ drafts.length }})
+          </v-btn>
+        </slot>
       </template>
 
       <v-card class="d-flex flex-column">
@@ -49,7 +51,7 @@ export default defineComponent({
     },
     disabled: { type: Boolean },
   },
-  emits: ['loading-change'],
+  emits: ['loading-change', 'success'],
   setup(props, { root, emit }) {
     const isOpen = ref(false);
     const isLoading = ref(false);
@@ -67,6 +69,10 @@ export default defineComponent({
 
     const handleResultDialogInput = (val) => {
       if (!val) {
+        const success = resultItems.value.filter((item) => item.error).length === 0;
+        if (success) {
+          emit('success');
+        }
         resultItems.value = [];
       }
     };

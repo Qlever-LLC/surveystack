@@ -1,7 +1,7 @@
 <template>
   <div v-if="submissions.length > 0">
     <v-btn color="orange darken-1" dark :disabled="disabled" :loading="isLoading" @click.stop="isOpen = true">
-      Archive submissions ({{ submissions.length }})
+      Archive ({{ submissions.length }})
     </v-btn>
 
     <submission-archive-dialog
@@ -31,7 +31,7 @@ export default defineComponent({
     },
     disabled: { type: Boolean },
   },
-  emits: ['loading-change', 'error'],
+  emits: ['loading-change'],
   setup(props, { root, emit }) {
     const isOpen = ref(false);
     const isLoading = ref(false);
@@ -44,8 +44,8 @@ export default defineComponent({
       isLoading.value = false;
 
       if (!success) {
-        emit(
-          'error',
+        root.$store.dispatch(
+          'feedback/add',
           `Something went wrong while archiving ${ids.length === 1 ? 'the submission' : ids.length + ' submissions'}.`
         );
       }

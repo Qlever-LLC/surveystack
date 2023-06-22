@@ -82,7 +82,7 @@ export default defineComponent({
   }
 
   .survey-select {
-    min-width: 300px;
+    min-width: 350px;
   }
 }
 </style>

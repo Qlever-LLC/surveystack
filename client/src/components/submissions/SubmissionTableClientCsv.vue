@@ -22,79 +22,87 @@
       hide-default-footer
     >
       <template v-slot:top>
-        <v-toolbar flat class="my-5">
-          <v-row>
-            <v-col>
-              <div class="d-flex justify-space-between align-center">
-                <div class="d-flex justify-space-between align-center mt-5">
-                  <v-switch
-                    :input-value="!excludeMeta"
-                    @change="$emit('excludeMetaChange', $event)"
-                    label="Show metadata"
-                    class="mt-2"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="archived"
-                    @change="$emit('showArchived', $event)"
-                    label="View archived only"
-                    class="mt-2 ml-5"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="isExpandMatrix"
-                    @change="isExpandMatrix = $event"
-                    label="Expand matrix questions"
-                    class="mt-2 ml-5"
-                  ></v-switch>
-                </div>
-                <div class="d-flex align-center" v-if="selected.length > 0">
-                  <div>
-                    {{ `${selected.length} ${selected.length === 1 ? 'submission' : 'submissions'} selected` }}
-                  </div>
-                  <div class="ml-auto d-flex flex-column flex-sm-row">
-                    <v-btn
-                      v-if="selected[0]['meta.archived'] === 'true'"
-                      :disabled="actionsAreDisabled"
-                      color="error"
-                      text
-                      @click="$emit('showDeleteModal', $event)"
-                    >
-                      DELETE
-                    </v-btn>
-                    <v-btn
-                      v-if="selected[0]['meta.archived'] === 'true'"
-                      :disabled="actionsAreDisabled"
-                      text
-                      @click="$emit('archiveSubmissions', $event)"
-                    >
-                      RESTORE
-                    </v-btn>
-                    <v-btn
-                      v-if="selected[0]['meta.archived'] !== 'true'"
-                      :disabled="actionsAreDisabled"
-                      color="error"
-                      text
-                      @click="$emit('showArchiveModal', $event)"
-                    >
-                      ARCHIVE
-                    </v-btn>
-                    <v-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
-                      >REASSIGN</v-btn
-                    >
-                    <v-btn
-                      v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
-                      :disabled="actionsAreDisabled"
-                      text
-                      color="primary"
-                      @click="$emit('resubmit', $event)"
-                    >
-                      RESUBMIT
-                    </v-btn>
-                  </div>
-                </div>
-              </div>
-            </v-col>
-          </v-row>
-        </v-toolbar>
+        <div class="table-toolbar px-4 py-3 d-flex flex-wrap align-center grey lighten-4">
+          <div class="d-flex flex-column flex-sm-row align-sm-center flex-sm-grow-1">
+            <v-switch
+              label="Show metadata"
+              :input-value="!excludeMeta"
+              @change="$emit('excludeMetaChange', $event)"
+              hide-details
+            ></v-switch>
+            <v-switch
+              label="Show drafts"
+              :input-value="drafts"
+              @change="$emit('showDrafts', $event)"
+              hide-details
+            ></v-switch>
+            <v-switch
+              v-if="!drafts"
+              label="View archived only"
+              :input-value="archived"
+              @change="$emit('showArchived', $event)"
+              hide-details
+            ></v-switch>
+            <v-switch v-model="isExpandMatrix" label="Expand matrix questions" hide-details></v-switch>
+          </div>
+
+          <div
+            v-if="selected.length > 0"
+            class="d-flex d-flex flex-column flex-sm-row align-start align-sm-center mt-4 mt-sm-0"
+          >
+            <div>
+              {{ `${selected.length} ${drafts ? 'draft' : 'submission'}${selected.length === 1 ? '' : 's'} selected` }}
+            </div>
+            <div v-if="drafts" class="d-flex flex-column flex-sm-row">
+              <draft-delete-bulk v-slot="{ on, attrs }" :drafts="selected" @success="$emit('reloadData')">
+                <v-btn v-bind="attrs" color="error" text v-on="on"> Delete </v-btn>
+              </draft-delete-bulk>
+              <draft-submit-bulk
+                v-if="readyToSubmitDrafts.length > 0"
+                v-slot="{ on, attrs }"
+                :drafts="readyToSubmitDrafts"
+                @success="$emit('reloadData')"
+              >
+                <v-btn v-bind="attrs" color="primary" text v-on="on"> Submit </v-btn>
+              </draft-submit-bulk>
+            </div>
+            <div v-else class="d-flex flex-column flex-sm-row">
+              <v-btn
+                v-if="archived"
+                color="error"
+                text
+                :disabled="actionsAreDisabled"
+                @click="$emit('deleteSubmissions', $event)"
+              >
+                Delete
+              </v-btn>
+              <v-btn v-if="archived" text :disabled="actionsAreDisabled" @click="$emit('archiveSubmissions', $event)">
+                Restore
+              </v-btn>
+              <v-btn
+                v-if="!archived"
+                color="error"
+                text
+                :disabled="actionsAreDisabled"
+                @click="$emit('showArchiveModal', $event)"
+              >
+                Archive
+              </v-btn>
+              <v-btn color="secondary" text :disabled="actionsAreDisabled" @click="$emit('reassignment', $event)">
+                Reassign
+              </v-btn>
+              <v-btn
+                v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
+                color="primary"
+                text
+                :disabled="actionsAreDisabled"
+                @click="$emit('resubmit', $event)"
+              >
+                Resubmit
+              </v-btn>
+            </div>
+          </div>
+        </div>
       </template>
 
       <template v-slot:header.data-table-select="{ props }">
@@ -206,11 +214,10 @@ import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
-import parseISO from 'date-fns/parseISO';
-import isValid from 'date-fns/isValid';
-import format from 'date-fns/format';
-import cloneDeep from 'lodash/cloneDeep';
-import omit from 'lodash/omit';
+import { format, isValid, parseISO } from 'date-fns';
+import { cloneDeep, omit } from 'lodash';
+import DraftDeleteBulk from '@/components/my-submissions/actions/DraftDeleteBulk.vue';
+import DraftSubmitBulk from '@/components/my-submissions/actions/DraftSubmitBulk.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -273,6 +280,8 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 export default {
   components: {
     SubmissionTableCellModal,
+    DraftDeleteBulk,
+    DraftSubmitBulk,
   },
   props: {
     actionsAreDisabled: {
@@ -284,6 +293,10 @@ export default {
     selected: {
       type: Array,
       required: true,
+    },
+    drafts: {
+      type: Boolean,
+      default: false,
     },
     archived: {
       type: Boolean,
@@ -387,6 +400,11 @@ export default {
     },
     userMemberships() {
       return this.$store.getters['memberships/memberships'];
+    },
+    readyToSubmitDrafts() {
+      return this.selected
+        .map((item) => this.submissions.content.find((i) => i._id === item._id))
+        .filter((item) => item && item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT'));
     },
   },
   watch: {
@@ -544,9 +562,6 @@ export default {
 </script>
 
 <style scoped>
->>> .v-toolbar__content {
-  background: #f5f5f5 !important;
-}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;
@@ -621,5 +636,23 @@ export default {
 .v-data-table >>> td.expand-cell tr:not(.last-row):last-child td.matrix-cell div::after {
   height: calc(100% + 1px);
   border-bottom: thin solid rgba(0, 0, 0, 0.12);
+}
+
+.table-toolbar {
+  min-height: 64px;
+  width: 100%;
+  white-space: nowrap;
+  row-gap: 8px;
+  column-gap: 24px;
+}
+
+.table-toolbar > div:first-child {
+  column-gap: 16px;
+  row-gap: 8px;
+}
+
+.table-toolbar .v-input--selection-controls {
+  margin-top: 0;
+  padding: 0;
 }
 </style>

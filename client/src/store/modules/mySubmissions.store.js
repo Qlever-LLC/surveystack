@@ -176,7 +176,30 @@ const actions = {
       await api.post(`/submissions/bulk-archive?set=true&reason=${reason}`, { ids });
       await dispatch('fetchSubmissions');
     } catch (e) {
-      console.warn('Failed to archive submissions', ...ids);
+      console.warn('Failed to archive submissions', ...ids, e);
+      success = false;
+    }
+
+    return success;
+  },
+
+  /*
+   * Restore multiple submissions
+   * - Bulk restore from the selection
+   * - Restore from the item card
+   */
+  async restoreSubmissions({ dispatch }, ids) {
+    if (ids.length === 0) {
+      return true;
+    }
+
+    let success = true;
+    try {
+      // Bulk restore
+      await api.post('/submissions/bulk-archive?set=false', { ids });
+      await dispatch('fetchSubmissions');
+    } catch (e) {
+      console.warn('Failed to restore submissions', ...ids, e);
       success = false;
     }
 

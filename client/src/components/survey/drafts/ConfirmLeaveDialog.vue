@@ -5,8 +5,8 @@
       <v-card-text>
         <p>Do you want to save this draft?</p>
         <v-radio-group v-model="action">
-          <v-radio label="Save" value="server"></v-radio>
-          <v-radio label="Keep Draft" value="local"></v-radio>
+          <v-radio label="Save to server" value="server"></v-radio>
+          <v-radio label="Keep draft on my local" value="local"></v-radio>
           <v-radio label="Discard changes" value="discard"></v-radio>
         </v-radio-group>
       </v-card-text>

@@ -1,9 +1,11 @@
 <template>
   <v-dialog v-if="drafts.length > 0" v-model="isOpen" max-width="400">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" color="red lighten-2" dark :disabled="disabled" :loading="isLoading" v-on="on">
-        Delete drafts ({{ drafts.length }})
-      </v-btn>
+      <slot :attrs="attrs" :on="on">
+        <v-btn v-bind="attrs" color="red lighten-2" dark :disabled="disabled" :loading="isLoading" v-on="on">
+          Delete ({{ drafts.length }})
+        </v-btn>
+      </slot>
     </template>
 
     <v-card class="d-flex flex-column">
@@ -33,7 +35,7 @@ export default defineComponent({
     },
     disabled: { type: Boolean },
   },
-  emits: ['loading-change', 'error'],
+  emits: ['loading-change', 'success'],
   setup(props, { root, emit }) {
     const isOpen = ref(false);
     const isLoading = ref(false);
@@ -46,10 +48,12 @@ export default defineComponent({
       isLoading.value = false;
 
       if (!success) {
-        emit(
-          'error',
+        root.$store.dispatch(
+          'feedback/add',
           `Something went wrong while deleting ${ids.length === 1 ? 'the draft' : ids.length + ' drafts'}.`
         );
+      } else {
+        emit('success');
       }
     };
 

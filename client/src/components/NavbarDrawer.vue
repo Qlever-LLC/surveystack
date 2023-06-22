@@ -111,12 +111,6 @@ export default {
           },
           {
             type: 'link',
-            label: 'My Submissions - old',
-            to: { name: 'my-submissions' },
-            icon: 'mdi-clipboard',
-          },
-          {
-            type: 'link',
             label: 'Browse',
             to: { name: 'surveys-browse' },
             icon: 'mdi-magnify',
@@ -169,7 +163,7 @@ export default {
   },
   computed: {
     readyToSubmitCount() {
-      return this.$store.getters['myDrafts/readyToSubmitCount'];
+      return this.$store.getters['myDrafts/readyToSubmit'].length;
     },
     items() {
       const items = [];

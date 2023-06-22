@@ -15,6 +15,15 @@
           </div>
         </v-tab>
       </v-tabs>
+
+      <v-spacer />
+
+      <draft-submit-bulk v-if="tab === 0 && readyToSubmit.length > 0" v-slot="{ on, attrs }" :drafts="readyToSubmit">
+        <v-btn v-bind="attrs" color="primary" v-on="on">
+          <v-icon class="mr-2">mdi-cloud-upload-outline</v-icon>
+          Submit Completed ({{ readyToSubmit.length }})
+        </v-btn>
+      </draft-submit-bulk>
     </v-card>
 
     <v-container class="flex-grow-1">
@@ -34,13 +43,16 @@
 import { computed, defineComponent, watch } from '@vue/composition-api';
 import DraftsList from './DraftsList.vue';
 import SubmissionsList from './SubmissionsList.vue';
+import DraftSubmitBulk from '@/components/my-submissions/actions/DraftSubmitBulk.vue';
 
 export default defineComponent({
   components: {
     DraftsList,
     SubmissionsList,
+    DraftSubmitBulk,
   },
   setup(props, { root }) {
+    const readyToSubmit = computed(() => root.$store.getters['myDrafts/readyToSubmit']);
     const tab = computed({
       get() {
         return root.$store.getters['mySubmissions/isDraftTab'] ? 0 : 1;
@@ -50,6 +62,7 @@ export default defineComponent({
       },
     });
 
+    // Refetch data
     watch(tab, (val, val1) => {
       // skip first loading - means previous tab is `undefined`
       if (typeof val1 === 'undefined') {
@@ -67,6 +80,7 @@ export default defineComponent({
 
     return {
       tab,
+      readyToSubmit,
     };
   },
 });
@@ -83,10 +97,6 @@ export default defineComponent({
   .container {
     position: relative;
     max-width: 1280px;
-
-    .search-bar .survey-select {
-      min-width: 300px;
-    }
   }
 }
 

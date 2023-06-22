@@ -101,7 +101,7 @@ export default {
   },
   methods: {
     abortEditSubmitted() {
-      this.$router.push({ name: 'my-submissions-list' });
+      this.$router.back();
     },
     addReadyToSubmit(status) {
       return [

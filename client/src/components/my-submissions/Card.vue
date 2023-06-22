@@ -72,18 +72,18 @@
       <template v-if="draft">
         <v-chip v-if="local" color="light-blue lighten-4" small @click.stop="setFilerLocal"> Local </v-chip>
         <v-chip v-else color="light-blue lighten-4" small @click.stop="setFilerServer"> Server </v-chip>
-        <v-chip v-if="isCreator" color="light-green lighten-3" small :input-value="true"> Creator </v-chip>
+        <v-chip v-if="isCreator" color="light-blue lighten-4" small :input-value="true"> Creator </v-chip>
         <v-chip v-if="isProxy" color="lime lighten-2" small :input-value="true"> Proxy </v-chip>
-        <v-chip v-if="isResubmitter" color="brown lighten-4" small :input-value="true"> Resubmitter </v-chip>
+        <v-chip v-if="isResubmitter" color="light-green lighten-3" small :input-value="true"> Resubmitter </v-chip>
       </template>
       <template v-else>
-        <v-chip v-if="isCreator" color="light-green lighten-3" small @click.stop="setFilerCreator"> Creator </v-chip>
+        <v-chip v-if="isCreator" color="light-blue lighten-4" small @click.stop="setFilerCreator"> Creator </v-chip>
         <v-chip v-if="isProxy" color="lime lighten-2" small @click.stop="setFilerProxy"> Proxy </v-chip>
-        <v-chip v-if="isResubmitter" color="brown lighten-4" small @click.stop="setFilerResubmitter">
+        <v-chip v-if="isResubmitter" color="light-green lighten-3" small @click.stop="setFilerResubmitter">
           Resubmitter
         </v-chip>
       </template>
-      <v-chip v-if="isAdmin" color="light-blue lighten-4" small :input-value="true"> Admin </v-chip>
+      <v-chip v-if="isAdmin" color="teal lighten-4" small :input-value="true"> Admin </v-chip>
 
       <v-spacer></v-spacer>
 
@@ -221,23 +221,19 @@ export default {
 
     const classes = computed(() => {
       const bar = [];
-      if (props.draft) {
+      if (props.draft || isCreator.value) {
         bar.push('light-blue darken-3');
       } else if (isProxy.value) {
-        bar.push('yellow darken-1');
-      } else if (isCreator.value) {
-        bar.push('green darken-1');
+        bar.push('lime darken-1');
       }
 
       const surveyName = [];
       if (!survey.value || isArchived.value) {
         surveyName.push('blue-grey--text font-weight-light');
-      } else if (props.draft) {
-        surveyName.push('blue--text text--darken-3 font-weight-medium');
       } else if (isProxy.value) {
-        surveyName.push('yellow--text text--darken-3 font-weight-medium');
+        surveyName.push('lime--text text--darken-2 font-weight-medium');
       } else if (isCreator.value) {
-        surveyName.push('green--text text--darken-3 font-weight-medium');
+        surveyName.push('blue--text text--darken-3 font-weight-medium');
       }
 
       return {
@@ -281,38 +277,48 @@ export default {
       );
     };
 
-    const setFilerLocal = () =>
+    const setFilerLocal = () => {
       root.$store.dispatch('myDrafts/setFilter', {
         local: true,
         remote: false,
       });
+      root.$store.dispatch('myDrafts/fetchSurveys');
+    };
 
-    const setFilerServer = () =>
+    const setFilerServer = () => {
       root.$store.dispatch('myDrafts/setFilter', {
         local: false,
         remote: true,
       });
+      root.$store.dispatch('myDrafts/fetchSurveys');
+    };
 
-    const setFilerCreator = () =>
+    const setFilerCreator = () => {
       root.$store.dispatch('mySubmissions/setFilter', {
         resubmitter: false,
         proxyUserId: false,
         creator: true,
       });
+      root.$store.dispatch('mySubmissions/fetchSurveys');
+    };
 
-    const setFilerProxy = () =>
+    const setFilerProxy = () => {
       root.$store.dispatch('mySubmissions/setFilter', {
         resubmitter: false,
         proxyUserId: true,
         creator: false,
       });
+      root.$store.dispatch('mySubmissions/fetchSurveys');
+    };
 
-    const setFilerResubmitter = () =>
+    const setFilerResubmitter = () => {
       root.$store.dispatch('mySubmissions/setFilter', {
         resubmitter: true,
         proxyUserId: false,
         creator: false,
       });
+      root.$store.dispatch('mySubmissions/fetchSurveys');
+    };
 
     return {
       isOpen,
