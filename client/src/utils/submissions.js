@@ -100,7 +100,7 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
       path: survey.meta.group.path,
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
-    submitAsUser: submitAsUser,
+    submitAsUser,
     creator,
   };
 
@@ -302,11 +302,4 @@ export function parseSubmitResponse(response, submissionId = '') {
   }
 
   return resultItems;
-}
-
-export function sanitizeSubmission(submission) {
-  const newSubmission = cloneDeep(submission);
-  delete newSubmission.options;
-  delete newSubmission.meta.archived;
-  return newSubmission;
 }

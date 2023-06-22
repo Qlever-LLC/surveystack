@@ -3,7 +3,7 @@ import TreeModel from 'tree-model';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 import api from '@/services/api.service';
 import Vue from 'vue';
 
@@ -191,7 +191,7 @@ const actions = {
   },
   async next({ commit, state, dispatch }) {
     // Save current step into the IDB
-    dispatch('submissions/saveToLocal', state.submission, { root: true });
+    dispatch('myDrafts/saveLocalDrafts', [state.submission], { root: true });
 
     dispatch('calculateApiCompose');
 

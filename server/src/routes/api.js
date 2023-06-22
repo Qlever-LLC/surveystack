@@ -91,6 +91,11 @@ router.post(
 router.get('/submissions', catchErrors(submissionController.getSubmissions));
 router.get('/submissions/page', catchErrors(submissionController.getSubmissionsPage));
 router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCsv));
+router.get(
+  '/submissions/my-submissions',
+  [assertAuthenticated],
+  catchErrors(submissionController.getMySubmissions)
+);
 router.post(
   '/submissions/:id/archive',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
@@ -160,7 +165,6 @@ router.post(
 
 /** Drafts */
 router.get('/drafts', [assertAuthenticated], catchErrors(draftController.getDrafts));
-router.get('/drafts/surveys', [assertAuthenticated], catchErrors(draftController.getSurveys));
 router.post('/drafts', [assertAuthenticated], catchErrors(draftController.createDrafts));
 router.delete(
   '/drafts/:id',
@@ -180,6 +184,16 @@ router.post(
 
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
+router.get(
+  '/surveys/my-submissions',
+  [assertAuthenticated],
+  catchErrors(surveyController.getSurveysForMySubmissions)
+);
+router.get(
+  '/surveys/my-drafts',
+  [assertAuthenticated],
+  catchErrors(surveyController.getSurveysForMyDrafts)
+);
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
 router.get(

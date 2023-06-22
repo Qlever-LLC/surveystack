@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { changeRecursive, changeRecursiveAsync, checkSurvey } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 import pdfService from '../services/pdf.service';
+import { queryParam } from '../helpers';
 
 const SURVEYS_COLLECTION = 'surveys';
 const SUBMISSIONS_COLLECTION = 'submissions';
@@ -82,6 +83,124 @@ const getSurveys = async (req, res) => {
 
   const entities = await db.collection(SURVEYS_COLLECTION).find(filter).project(project).toArray();
   return res.send(entities);
+};
+
+const buildPipelineForGetSurveysForMySubmissions = (req, res) => {
+  const user = res.locals.auth.user._id;
+
+  return [
+    // Join `submissions`
+    {
+      $lookup: {
+        from: 'submissions',
+        let: { surveyId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: ['$meta.survey.id', '$$surveyId'],
+                  },
+                  {
+                    $or: [
+                      ...(queryParam(req.query.resubmitter)
+                        ? [{ $eq: ['$meta.resubmitter', user] }]
+                        : []),
+                      ...(queryParam(req.query.proxyUserId)
+                        ? [{ $eq: ['$meta.proxyUserId', user] }]
+                        : []),
+                      ...(queryParam(req.query.creator) ? [{ $eq: ['$meta.creator', user] }] : []),
+                    ],
+                  },
+                  ...(queryParam(req.query.hideArchived)
+                    ? [{ $ne: ['$meta.archived', true] }]
+                    : []),
+                ],
+              },
+            },
+          },
+        ],
+        as: 'submitted',
+      },
+    },
+    {
+      $match: {
+        submitted: { $exists: true, $ne: [] },
+      },
+    },
+    {
+      $project: { _id: 1, name: 1 },
+    },
+    {
+      $sort: { name: 1 },
+    },
+  ];
+};
+
+/**
+ * Fetch all surveys of my drafts and submissions
+ *
+ * @param {
+ *   hideArchive:       boolean,         // Exclude archived submissions
+ *   localSurveyIds:    array,           // Survey ID(s) of the local drafts
+ * } req
+ * @param {*} res
+ * @returns             array,          // Surveys { ID, name }
+ */
+const getSurveysForMySubmissions = async (req, res) => {
+  if (
+    !queryParam(req.query.resubmitter) &&
+    !queryParam(req.query.proxyUserId) &&
+    !queryParam(req.query.creator)
+  ) {
+    throw boom.badRequest(
+      "Bad query parameter, at least one flag should be set among the 'resubmitter', 'proxyUserId', 'creator'"
+    );
+  }
+
+  const pipeline = buildPipelineForGetSurveysForMySubmissions(req, res);
+  const surveys = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+
+  return res.send(surveys);
+};
+
+/**
+ * Fetch all surveys of my drafts
+ *
+ * @param {
+ *   ids:                array,           // Survey ID(s) of the drafts
+ * } req
+ * @param {*} res
+ * @returns             array,          // Surveys { ID, name }
+ */
+const getSurveysForMyDrafts = async (req, res) => {
+  if (!Array.isArray(req.query.ids)) {
+    throw boom.badRequest('Bad query parameter ids: ', req.query.ids);
+  }
+
+  if (req.query.ids.length === 0) {
+    return res.send([]);
+  }
+
+  const surveys = await db
+    .collection(SURVEYS_COLLECTION)
+    .aggregate(
+      {
+        $match: {
+          _id: { $in: req.query.ids.map((id) => new ObjectId(id)) },
+        },
+      },
+      {
+        $project: { _id: 1, name: 1 },
+      },
+      {
+        $sort: { name: 1 },
+      }
+    )
+    .toArray();
+
+  return res.send(surveys);
 };
 
 const buildPipelineForGetSurveyPage = ({
@@ -833,6 +952,8 @@ const deleteArchivedTestSubmissions = async (surveyId, surveyVersions) => {
 
 export default {
   getSurveys,
+  getSurveysForMySubmissions,
+  getSurveysForMyDrafts,
   getSurveyPage,
   getPinned,
   getSurveyListPage,

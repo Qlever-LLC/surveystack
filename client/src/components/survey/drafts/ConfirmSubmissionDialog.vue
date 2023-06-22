@@ -4,12 +4,15 @@
       <v-card-title> Confirm Submission </v-card-title>
       <v-card-text v-if="!canEditGroup"> Submit Survey </v-card-text>
       <v-card-text v-else>
-        Submit this draft <strong v-if="id">{{ id }}</strong> to <strong>{{ groupName || 'no group' }}</strong>
+        Submit this draft <strong v-if="id">{{ id }}</strong> to
         <div v-if="isGroupEdit" class="d-inline-flex align-end">
           <active-group-selector v-model="group" label="Group" class="d-inline-block mb-2" />
           <v-btn icon @click="isGroupEdit = false"> <v-icon>mdi-close</v-icon> </v-btn>
         </div>
-        <v-btn v-else-if="canEditGroup" icon @click="isGroupEdit = true"> <v-icon small>mdi-pencil</v-icon> </v-btn>
+        <template v-else>
+          <strong>{{ groupName || 'no group' }}</strong>
+          <v-btn v-if="canEditGroup" icon @click="isGroupEdit = true"> <v-icon small>mdi-pencil</v-icon> </v-btn>
+        </template>
         <p v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
         </p>

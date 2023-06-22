@@ -247,8 +247,9 @@ export default {
         return;
       }
 
-      this.$store.dispatch('surveys/fetchPinned');
-      this.$store.dispatch('submissions/initialize');
+      await this.$store.dispatch('surveys/fetchPinned');
+      await this.$store.dispatch('myDrafts/fetchDrafts');
+      await this.$store.dispatch('myDrafts/fetchSurveys');
 
       if (this.$route.params.redirect) {
         this.$router.push(this.$route.params.redirect);

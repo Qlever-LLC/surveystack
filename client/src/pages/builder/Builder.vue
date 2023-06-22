@@ -215,11 +215,10 @@ export default {
         };
 
         const response = await api.post('/submissions', this.submission);
+        this.result({ response });
 
         // Delete draft after submit
-        await this.$store.dispatch('submissions/deleteDrafts', [payload._id]);
-
-        this.result({ response });
+        await this.$store.dispatch('myDrafts/deleteDrafts', [payload._id]);
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;

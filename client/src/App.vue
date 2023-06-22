@@ -43,7 +43,8 @@ export default {
       }
     },
     async fetchMySubmissions() {
-      await this.$store.dispatch('submissions/initialize');
+      await this.$store.dispatch('myDrafts/fetchDrafts');
+      await this.$store.dispatch('myDrafts/fetchSurveys');
     },
   },
 };

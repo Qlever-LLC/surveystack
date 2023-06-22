@@ -479,7 +479,7 @@ export default {
       this.$store.dispatch('submissions/startDraft', { survey });
     },
     async resubmit(submission) {
-      await this.$store.dispatch('mySubmissions/fetchRemoteSubmission', submission._id);
+      await this.$store.dispatch('myOldSubmissions/fetchRemoteSubmission', submission._id);
       this.$router.push(`/submissions/drafts/${submission._id}`);
     },
     async reassign(submissions) {

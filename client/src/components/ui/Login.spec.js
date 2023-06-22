@@ -5,6 +5,7 @@ import { RouterLinkStub } from '@vue/test-utils';
 import mockAxios from 'axios';
 jest.mock('@/utils/memberships');
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import { nextTick } from 'vue';
 
 const TransitionStub = {
   render(h) {
@@ -204,7 +205,8 @@ describe('Login component', () => {
           actions: {
             'auth/login': authLoginMock,
             'surveys/fetchPinned': jest.fn(),
-            'submissions/initialize': jest.fn(),
+            'myDrafts/fetchDrafts': jest.fn(),
+            'myDrafts/fetchSurveys': jest.fn(),
           },
           propsData: { defaultUsePassword: true },
         });
@@ -231,7 +233,8 @@ describe('Login component', () => {
           actions: {
             'auth/login': authLoginMock,
             'surveys/fetchPinned': jest.fn(),
-            'submissions/initialize': jest.fn(),
+            'myDrafts/fetchDrafts': jest.fn(),
+            'myDrafts/fetchSurveys': jest.fn(),
           },
           propsData: { defaultUsePassword: true },
         });
@@ -259,7 +262,8 @@ describe('Login component', () => {
             actions: {
               'auth/login': authLoginMock,
               'surveys/fetchPinned': jest.fn(),
-              'submissions/initialize': jest.fn(),
+              'myDrafts/fetchDrafts': jest.fn(),
+              'myDrafts/fetchSurveys': jest.fn(),
             },
           },
           propsData: { defaultUsePassword: true },
@@ -306,8 +310,9 @@ describe('Login component', () => {
           },
           actions: {
             'auth/login': login,
-            'surveys/fetchPinned': jest.fn(),
-            'submissions/initialize': jest.fn(),
+            'surveys/fetchPinned': jest.fn(() => Promise.resolve()),
+            'myDrafts/fetchDrafts': jest.fn(() => Promise.resolve()),
+            'myDrafts/fetchSurveys': jest.fn(() => Promise.resolve()),
           },
         },
         mocks: {
@@ -336,11 +341,12 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
+
       expect(login).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
       );
-      expect(push).toHaveBeenCalledWith('/');
+      await waitFor(() => expect(push).toHaveBeenCalledWith('/'));
     });
 
     it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled BUT post throw an error', async () => {
@@ -363,7 +369,8 @@ describe('Login component', () => {
         actions: {
           'auth/login': login,
           'surveys/fetchPinned': jest.fn(),
-          'submissions/initialize': jest.fn(),
+          'myDrafts/fetchDrafts': jest.fn(),
+          'myDrafts/fetchSurveys': jest.fn(),
         },
         propsData: { defaultUsePassword: true },
         $router: {
@@ -403,7 +410,8 @@ describe('Login component', () => {
           actions: {
             'auth/login': login,
             'surveys/fetchPinned': jest.fn(),
-            'submissions/initialize': jest.fn(),
+            'myDrafts/fetchDrafts': jest.fn(),
+            'myDrafts/fetchSurveys': jest.fn(),
           },
         },
         mocks: {
@@ -436,7 +444,7 @@ describe('Login component', () => {
         expect.anything(),
         expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
       );
-      expect(push).toHaveBeenCalledWith('/');
+      await waitFor(() => expect(push).toHaveBeenCalledWith('/'));
     });
   });
 
@@ -452,7 +460,8 @@ describe('Login component', () => {
           actions: {
             'auth/login': jest.fn(() => Promise.resolve()),
             'surveys/fetchPinned': jest.fn(),
-            'submissions/initialize': jest.fn(),
+            'myDrafts/fetchDrafts': jest.fn(),
+            'myDrafts/fetchSurveys': jest.fn(),
           },
         },
         mocks: {
@@ -492,7 +501,8 @@ describe('Login component', () => {
         actions: {
           'auth/login': jest.fn(() => Promise.resolve()),
           'surveys/fetchPinned': jest.fn(),
-          'submissions/initialize': jest.fn(),
+          'myDrafts/fetchDrafts': jest.fn(),
+          'myDrafts/fetchSurveys': jest.fn(),
         },
         params: { redirect: true },
         propsData: { defaultUsePassword: true },

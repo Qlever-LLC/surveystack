@@ -169,7 +169,7 @@ export default {
   },
   computed: {
     readyToSubmitCount() {
-      return this.$store.getters['submissions/readyToSubmitCount'];
+      return this.$store.getters['myDrafts/readyToSubmitCount'];
     },
     items() {
       const items = [];

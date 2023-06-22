@@ -4,73 +4,69 @@
       <span class="flex-grow-1">Selected: {{ selected.length }}</span>
 
       <div class="buttons d-flex align-center">
-        <draft-submit-bulk
-          :drafts="draftsToSubmit"
-          :disabled="isLoading"
-          @loading-change="isLoading = $event"
-        ></draft-submit-bulk>
-        <draft-delete-bulk
-          :drafts="draftsToDelete"
-          :disabled="isLoading"
-          @loading-change="isLoading = $event"
-        ></draft-delete-bulk>
         <submission-archive-bulk
           :submissions="submissionsToArchive"
           :disabled="isLoading"
           @loading-change="isLoading = $event"
-        ></submission-archive-bulk>
+          @error="error = { title: 'Archive Submissions Error', message: $event }"
+        />
         <submission-delete-bulk
           :submissions="submissionsToDelete"
           :disabled="isLoading"
           @loading-change="isLoading = $event"
-        ></submission-delete-bulk>
+          @error="error = { title: 'Delete Submissions Error', message: $event }"
+        />
+        <export-json-bulk :submissions="selected" :disabled="isLoading" />
       </div>
 
       <div class="flex-grow-1 text-end">
         <v-btn text dark small @click="handleClear">Clear all</v-btn>
       </div>
     </v-container>
+
+    <v-dialog v-if="error" :value="!!error" max-width="400" @input="error = null">
+      <v-card class="d-flex flex-column">
+        <v-card-title> {{ error.title }} </v-card-title>
+        <v-card-text class="pa-0">
+          <v-alert type="error" class="ma-4 d-flex justify-center">
+            {{ error.message }}
+          </v-alert>
+        </v-card-text>
+        <v-spacer></v-spacer>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click.stop="error = null"> Close </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </footer>
 </template>
 
 <script>
-import { computed, defineComponent, ref, watch } from '@vue/composition-api';
-import DraftSubmitBulk from './actions/DraftSubmitBulk.vue';
-import DraftDeleteBulk from './actions/DraftDeleteBulk.vue';
+import { computed, defineComponent, ref } from '@vue/composition-api';
 import SubmissionArchiveBulk from './actions/SubmissionArchiveBulk.vue';
 import SubmissionDeleteBulk from './actions/SubmissionDeleteBulk.vue';
+import ExportJsonBulk from './actions/ExportJsonBulk.vue';
 
 export default defineComponent({
   components: {
-    DraftSubmitBulk,
-    DraftDeleteBulk,
     SubmissionArchiveBulk,
     SubmissionDeleteBulk,
+    ExportJsonBulk,
   },
-  emits: ['open-change'],
-  setup(props, { root, emit }) {
-    const selected = computed(() => root.$store.getters['submissions/selected']);
-    const memberships = computed(() => root.$store.getters['memberships/memberships']);
-    const userId = computed(() => root.$store.getters['auth/user']._id);
+  setup(props, { root }) {
+    const selected = computed(() => root.$store.getters['mySubmissions/selected']);
+    const error = ref(null);
     const isLoading = ref(false);
     const isOpen = computed(() => selected.value.length > 0);
-    const draftsToSubmit = computed(() =>
-      selected.value.filter(
-        (item) =>
-          // Draft
-          item.options.draft &&
-          // Ready to submit
-          item.meta.status.some((item) => item.type === 'READY_TO_SUBMIT')
-      )
-    );
-    const draftsToDelete = computed(() => selected.value.filter((item) => item.options.draft));
+    const memberships = computed(() => root.$store.getters['memberships/memberships']);
+    const userId = computed(() => root.$store.getters['auth/user']._id);
+
     const submissionsToArchive = computed(() =>
       selected.value.filter(
         (item) =>
           // not archived
           !item.meta.archived &&
-          // not a draft
-          !item.options.draft &&
           // admin or creator
           (item.meta.creator === userId.value ||
             memberships.value.some(
@@ -78,13 +74,12 @@ export default defineComponent({
             ))
       )
     );
+
     const submissionsToDelete = computed(() =>
       selected.value.filter(
         (item) =>
           // archived
           item.meta.archived &&
-          // not a draft
-          !item.options.draft &&
           // admin or creator
           (item.meta.creator === userId.value ||
             memberships.value.some(
@@ -94,21 +89,15 @@ export default defineComponent({
     );
 
     const handleClear = () => {
-      root.$store.dispatch('submissions/clearSelection');
+      root.$store.dispatch('mySubmissions/clearSelection');
     };
-
-    watch(isOpen, (val) => {
-      emit('open-change', val);
-    });
 
     return {
       selected,
-      memberships,
+      error,
       userId,
       isLoading,
       isOpen,
-      draftsToSubmit,
-      draftsToDelete,
       submissionsToArchive,
       submissionsToDelete,
       handleClear,

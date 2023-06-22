@@ -602,6 +602,91 @@ const getSubmissionsCsv = async (req, res) => {
   return res.send(csv);
 };
 
+/**
+ * Fetch all my submissions (creator, proxyUserId, resubmitter)
+ *
+ * @param {
+ *   resubmitter:        boolean,         // Submissions which is resubmitted by me
+ *   proxyUserId:        boolean,         // Submissions which is submitted by me as a proxy
+ *   creator:            boolean,         // Submissions which is submitted by me
+ *   hideArchived:       boolean,         // Exclude archived submissions
+ *   surveyIds:          array,           // Filter by surveys
+ *   skip:               number,          // Pagination
+ *   limit:              number,          // Pagination
+ * } req
+ * @param {*} res
+ * @returns {
+ *   content:            array,           // Array of submission
+ *   pagination:         object,          // Pagination
+ * }
+ */
+const getMySubmissions = async (req, res) => {
+  const skip = req.query.skip ? Number(req.query.skip) : 0;
+  if (isNaN(skip) || skip < 0) {
+    throw boom.badRequest(`Bad query parameter skip: ${skip}`);
+  }
+
+  const limit = req.query.limit ? Number(req.query.limit) : DEFAULT_LIMIT;
+  if (isNaN(limit) || limit === 0) {
+    throw boom.badRequest(`Bad query parameter limit: ${limit}`);
+  }
+
+  let match = {};
+
+  // Hide archived
+  if (queryParam(req.query.hideArchived)) {
+    match = {
+      ...match,
+      'meta.archived': { $ne: true },
+    };
+  }
+
+  // Filter by survey
+  if (Array.isArray(req.query.surveyIds) && req.query.surveyIds.length > 0) {
+    match = {
+      ...match,
+      'meta.survey.id': { $in: req.query.surveyIds.map((id) => new ObjectId(id)) },
+    };
+  }
+
+  const user = res.locals.auth.user._id;
+
+  const pipeline = [
+    {
+      $sort: { 'meta.dateModified': -1 },
+    },
+    {
+      $match: {
+        $or: [
+          ...(queryParam(req.query.resubmitter) ? [{ 'meta.resubmitter': user }] : []),
+          ...(queryParam(req.query.proxyUserId) ? [{ 'meta.proxyUserId': user }] : []),
+          ...(queryParam(req.query.creator) ? [{ 'meta.creator': user }] : []),
+        ],
+        ...match,
+      },
+    },
+    // Pagination
+    {
+      $facet: {
+        content: [{ $skip: skip }, { $limit: limit }],
+        pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
+      },
+    },
+    { $unwind: '$pagination' },
+  ];
+
+  const [entities] = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+
+  if (!entities) {
+    return res.send({
+      content: [],
+      pagination: { total: 0, skip: 0, limit: DEFAULT_LIMIT },
+    });
+  }
+
+  return res.send(entities);
+};
+
 const getSubmission = async (req, res) => {
   const { id } = req.params;
   const pipeline = [];
@@ -1394,6 +1479,7 @@ export default {
   getSubmissions,
   getSubmissionsPage,
   getSubmissionsCsv,
+  getMySubmissions,
   getSubmission,
   createSubmission,
   updateSubmission,

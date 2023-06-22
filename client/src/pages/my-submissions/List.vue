@@ -1,211 +1,72 @@
 <template>
-  <div class="wrapper background">
-    <v-container
-      :class="{
-        'pb-8': !isFooterOpen,
-        'mb-4 pb-16': isFooterOpen,
-      }"
-    >
-      <draft-header></draft-header>
+  <div class="wrapper background flex flex-column">
+    <v-card class="d-flex align-center px-6 space-x-4">
+      <v-tabs v-model="tab" :height="72">
+        <v-tab>
+          <div class="d-flex align-center">
+            <v-icon class="mr-2">mdi-file-document-edit</v-icon>
+            My Drafts
+          </div>
+        </v-tab>
+        <v-tab>
+          <div class="d-flex align-center">
+            <v-icon class="mr-2">mdi-email-check</v-icon>
+            My Submissions
+          </div>
+        </v-tab>
+      </v-tabs>
+    </v-card>
 
-      <div class="mt-8">
-        <draft-card
-          v-for="submission in submissions"
-          :key="submission._id + submission.options.draft"
-          :submission="submission"
-          @submit-draft="setDraftToSubmit"
-        >
-        </draft-card>
-      </div>
-
-      <div v-if="isLoading" class="d-flex justify-center my-8">
-        <v-progress-circular :size="30" color="primary" indeterminate></v-progress-circular>
-      </div>
-      <div ref="lastEl" v-else-if="hasMoreData"></div>
-      <p v-else-if="submissions.length === 0" class="text-center">No matching submissions found.</p>
+    <v-container class="flex-grow-1">
+      <v-tabs-items v-model="tab" class="background mt-4">
+        <v-tab-item>
+          <drafts-list></drafts-list>
+        </v-tab-item>
+        <v-tab-item>
+          <submissions-list></submissions-list>
+        </v-tab-item>
+      </v-tabs-items>
     </v-container>
-
-    <draft-footer @open-change="isFooterOpen = $event" />
-
-    <v-fab-transition>
-      <v-btn
-        v-show="isTopButtonVisible"
-        :class="{
-          'mb-12': isFooterOpen,
-        }"
-        color="pink"
-        dark
-        fixed
-        right
-        fab
-        small
-        @click="handleToTop"
-      >
-        <v-icon>mdi-arrow-up</v-icon>
-      </v-btn>
-    </v-fab-transition>
-
-    <confirm-submission-dialog
-      v-if="draftToSubmit"
-      v-model="isSubmitDialogOpen"
-      :id="draftToSubmit._id"
-      :groupId="draftToSubmit.meta.group.id"
-      :submitAsUser="draftToSubmit.meta.submitAsUser"
-      :dateSubmitted="draftToSubmit.meta.dateSubmitted"
-      @set-group="setGroup"
-      @close="closeSubmitDraft"
-      @submit="submitDraft"
-    />
-
-    <result-dialog
-      v-if="draftToSubmit"
-      v-model="isResultDialogOpen"
-      title="Result of Submission"
-      :items="resultItems"
-      :survey="surveyToSubmit"
-      :submission="draftToSubmit"
-      @input="handleResultDialogInput"
-    />
   </div>
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/composition-api';
-import DraftHeader from '@/components/my-submissions/Header.vue';
-import DraftCard from '@/components/my-submissions/Card.vue';
-import DraftFooter from '@/components/my-submissions/Footer.vue';
-import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
-import ResultDialog from '@/components/ui/ResultDialog.vue';
+import { computed, defineComponent, watch } from '@vue/composition-api';
+import DraftsList from './DraftsList.vue';
+import SubmissionsList from './SubmissionsList.vue';
 
 export default defineComponent({
   components: {
-    DraftHeader,
-    DraftCard,
-    DraftFooter,
-    ConfirmSubmissionDialog,
-    ResultDialog,
+    DraftsList,
+    SubmissionsList,
   },
   setup(props, { root }) {
-    const isFooterOpen = ref(false);
-    const isLoading = computed(() => root.$store.getters['submissions/isLoading']);
-    const hasMoreData = computed(() => root.$store.getters['submissions/hasMoreData']);
-    const submissions = computed(() => root.$store.getters['submissions/mySubmissions']);
-    const lastEl = ref();
-    const isTopButtonVisible = ref(false);
-    const isSubmitDialogOpen = ref(false);
-    const isResultDialogOpen = ref(false);
-    const draftToSubmit = ref();
-    const surveyToSubmit = ref();
-    const resultItems = ref([]);
-
-    const setGroup = (id) => {
-      if (draftToSubmit.value) {
-        draftToSubmit.value.meta.group = { id };
-      }
-    };
-
-    const setDraftToSubmit = async (draft) => {
-      draftToSubmit.value = draft;
-
-      const { id, version } = draft.meta.survey;
-      surveyToSubmit.value = await root.$store.dispatch('surveys/fetchSurvey', { id, version });
-
-      isSubmitDialogOpen.value = true;
-    };
-
-    const submitDraft = async () => {
-      resultItems.value = await root.$store.dispatch('submissions/submitDrafts', [draftToSubmit.value]);
-      isResultDialogOpen.value = true;
-    };
-
-    const closeSubmitDraft = ({ done }) => {
-      if (done) {
-        draftToSubmit.value = undefined;
-        surveyToSubmit.value = undefined;
-      }
-    };
-
-    const handleResultDialogInput = (val) => {
-      if (!val) {
-        draftToSubmit.value = undefined;
-        surveyToSubmit.value = undefined;
-      }
-    };
-
-    // Scroll to top
-    const handleToTop = () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleScroll = () => {
-      isTopButtonVisible.value = window.scrollY > 400;
-    };
-
-    onMounted(() => {
-      window.addEventListener('scroll', handleScroll);
-    });
-
-    onUnmounted(() => {
-      window.removeEventListener('scroll', handleScroll);
-    });
-
-    // Infinite scrolling
-    let cleanup = undefined;
-    watch(
-      lastEl,
-      (val) => {
-        if (cleanup) {
-          cleanup();
-        }
-
-        if (!val) {
-          return;
-        }
-
-        const observer = new IntersectionObserver(
-          ([{ isIntersecting }]) => {
-            if (isIntersecting) {
-              root.$store.dispatch('submissions/fetchSubmissions');
-            }
-          },
-          {
-            rootMargin: '0px',
-            threshold: 0.1,
-          }
-        );
-
-        observer.observe(val);
-
-        cleanup = () => {
-          observer.disconnect();
-          cleanup = undefined;
-        };
+    const tab = computed({
+      get() {
+        return root.$store.getters['mySubmissions/isDraftTab'] ? 0 : 1;
       },
-      {
-        immediate: true,
-        flush: 'post',
+      set(val) {
+        root.$store.dispatch('mySubmissions/setIsDraftTab', val === 0);
+      },
+    });
+
+    watch(tab, (val, val1) => {
+      // skip first loading - means previous tab is `undefined`
+      if (typeof val1 === 'undefined') {
+        return;
       }
-    );
+
+      if (val === 0) {
+        root.$store.dispatch('myDrafts/fetchDrafts');
+        root.$store.dispatch('myDrafts/fetchSurveys');
+      } else {
+        root.$store.dispatch('mySubmissions/fetchSubmissions');
+        root.$store.dispatch('mySubmissions/fetchSurveys');
+      }
+    });
 
     return {
-      isFooterOpen,
-      isLoading,
-      hasMoreData,
-      submissions,
-      lastEl,
-      isTopButtonVisible,
-      draftToSubmit,
-      surveyToSubmit,
-      isSubmitDialogOpen,
-      isResultDialogOpen,
-      resultItems,
-      setGroup,
-      setDraftToSubmit,
-      submitDraft,
-      closeSubmitDraft,
-      handleResultDialogInput,
-      handleToTop,
-      handleScroll,
+      tab,
     };
   },
 });
@@ -213,18 +74,23 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .wrapper {
-  display: flex;
-  flex-direction: column;
   min-height: 100%;
+
+  .header {
+    border-radius: 0px;
+  }
 
   .container {
     position: relative;
-    flex: 1 1 0%;
     max-width: 1280px;
-  }
 
-  .v-btn--fab {
-    bottom: 28px;
+    .search-bar .survey-select {
+      min-width: 300px;
+    }
   }
+}
+
+.space-x-4 > * + * {
+  margin-left: 16px;
 }
 </style>

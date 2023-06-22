@@ -101,11 +101,6 @@ export default {
   },
   methods: {
     abortEditSubmitted() {
-      this.$store.dispatch('mySubmissions/remove', this.submission._id);
-      // TODO: should we remove the router guard in this situation? otherwise it pops up a modal asking if the user
-      // is sure they want to leave. User can click 'cancel' when prompted whether they want to "Confirm editing submitted",
-      // which deleted the submission from the store, then when prompted whether they want to leave the current draft
-      // they can also click cancel, which may cause an error
       this.$router.push({ name: 'my-submissions-list' });
     },
     addReadyToSubmit(status) {
@@ -149,12 +144,11 @@ export default {
           ? await api.put(`/submissions/${payload._id}`, payload)
           : await api.post('/submissions', payload);
 
-        // Delete draft after submit
-        await this.$store.dispatch('submissions/deleteDrafts', [payload._id]);
-
         this.result({ response });
         this.isSubmitted = true;
-        await this.$store.dispatch('mySubmissions/remove', this.submission._id);
+
+        // Delete draft after submit
+        await this.$store.dispatch('myDrafts/deleteDrafts', [payload._id]);
         message = {
           type: 'SUBMISSION_SUBMIT_SUCCESS',
           payload: { submissionId: this.submission._id },
@@ -178,7 +172,7 @@ export default {
     this.loading = true;
     const { id } = this.$route.params;
 
-    this.submission = await this.$store.dispatch('submissions/getDraft', id);
+    this.submission = await this.$store.dispatch('myDrafts/getDraft', id);
     if (!this.submission) {
       console.log('Error: submission not found');
       this.hasError = true;

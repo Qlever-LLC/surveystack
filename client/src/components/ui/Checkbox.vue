@@ -11,8 +11,7 @@
         <template v-slot:activator="{ on, attrs }">
           <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
         </template>
-        <slot name="helper-text"></slot>
-        <span v-if="helperText">{{ helperText }}</span>
+        <slot name="helper-text">{{ helperText }}</slot>
       </v-tooltip>
     </template>
   </v-checkbox>

@@ -17,8 +17,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text :disabled="!!loading" @click="$emit('cancel')">Cancel</v-btn>
-        <v-btn text @click="confirm" color="error" :loading="!!loading">{{ labelConfirm || 'OK' }}</v-btn>
+        <v-btn text :disabled="loading" @click="$emit('cancel')">Cancel</v-btn>
+        <v-btn text @click="confirm" color="error" :loading="loading">{{ labelConfirm || 'OK' }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -1,6 +1,6 @@
 <template>
   <div v-if="submissions.length > 0">
-    <v-btn color="orange darken-1" dark small :disabled="disabled" :loading="isLoading" @click.stop="isOpen = true">
+    <v-btn color="orange darken-1" dark :disabled="disabled" :loading="isLoading" @click.stop="isOpen = true">
       Archive submissions ({{ submissions.length }})
     </v-btn>
 
@@ -31,7 +31,7 @@ export default defineComponent({
     },
     disabled: { type: Boolean },
   },
-  emits: ['loading-change'],
+  emits: ['loading-change', 'error'],
   setup(props, { root, emit }) {
     const isOpen = ref(false);
     const isLoading = ref(false);
@@ -40,8 +40,15 @@ export default defineComponent({
       isOpen.value = false;
       isLoading.value = true;
       const ids = props.submissions.map((item) => item._id);
-      root.$store.dispatch('submissions/archiveSubmissions', { ids, reason });
+      const success = root.$store.dispatch('mySubmissions/archiveSubmissions', { ids, reason });
       isLoading.value = false;
+
+      if (!success) {
+        emit(
+          'error',
+          `Something went wrong while archiving ${ids.length === 1 ? 'the submission' : ids.length + ' submissions'}.`
+        );
+      }
     };
 
     watch(isLoading, (val) => {

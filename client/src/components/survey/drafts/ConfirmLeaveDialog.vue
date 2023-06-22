@@ -12,7 +12,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text :disabled="!!loading" @click.stop="handleCancel"> Cancel </v-btn>
+        <v-btn text :disabled="isLoading" @click.stop="handleCancel"> Cancel </v-btn>
         <v-btn text color="primary" :loading="isLoading" @click.stop="handleExit"> Exit </v-btn>
       </v-card-actions>
     </v-card>
@@ -21,8 +21,7 @@
 
 <script>
 import api from '@/services/api.service';
-import { SubmissionLoadingActions } from '@/store/modules/submissions.store';
-import { computed, defineComponent, ref } from '@vue/composition-api';
+import { defineComponent, ref } from '@vue/composition-api';
 
 export default defineComponent({
   props: {
@@ -32,12 +31,7 @@ export default defineComponent({
     },
   },
   setup(props, { root }) {
-    const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isLoading = computed(
-      () =>
-        loading.value === SubmissionLoadingActions.SAVE_TO_SERVER ||
-        loading.value === SubmissionLoadingActions.DELETE_DRAFT
-    );
+    const isLoading = ref(false);
     const isOpen = ref(false);
     const action = ref('server');
     const next = ref(null);
@@ -49,16 +43,19 @@ export default defineComponent({
     };
 
     const handleExit = async () => {
+      isLoading.value = true;
+
       // Remove proxy header
       api.removeHeader('x-delegate-to');
 
       // Save to server
       if (action.value === 'server') {
-        await root.$store.dispatch('submissions/saveToServer', props.submission);
+        await root.$store.dispatch('myDrafts/saveRemoteDrafts', [props.submission]);
       } else if (action.value === 'discard') {
-        await root.$store.dispatch('submissions/deleteDrafts', [props.submission._id]);
+        await root.$store.dispatch('myDrafts/deleteDrafts', [props.submission._id]);
       }
 
+      isLoading.value = false;
       isOpen.value = false;
       if (typeof next.value === 'function') {
         next.value(true);
@@ -73,7 +70,6 @@ export default defineComponent({
     };
 
     return {
-      loading,
       isLoading,
       isOpen,
       action,

@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-if="drafts.length > 0" v-model="isOpen" max-width="400">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" color="primary" dark small :disabled="disabled" :loading="isLoading" v-on="on">
+        <v-btn v-bind="attrs" color="primary" dark :disabled="disabled" :loading="isLoading" v-on="on">
           Submit drafts ({{ drafts.length }})
         </v-btn>
       </template>
@@ -58,18 +58,15 @@ export default defineComponent({
     const submittedCount = computed(() => props.drafts.filter((item) => !!item.meta.dateSubmitted).length);
 
     const handleSubmitDrafts = async () => {
-      console.log(1111111);
       isOpen.value = false;
       isLoading.value = true;
-      resultItems.value = await root.$store.dispatch('submissions/submitDrafts', props.drafts);
+      resultItems.value = await root.$store.dispatch('myDrafts/submitDrafts', props.drafts);
       isLoading.value = false;
-      console.log(222222222);
       showResult.value = true;
     };
 
     const handleResultDialogInput = (val) => {
       if (!val) {
-        console.log(3333333);
         resultItems.value = [];
       }
     };

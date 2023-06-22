@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-if="drafts.length > 0" v-model="isOpen" max-width="400">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" color="red lighten-2" :disabled="disabled" :loading="isLoading" dark small v-on="on">
+      <v-btn v-bind="attrs" color="red lighten-2" dark :disabled="disabled" :loading="isLoading" v-on="on">
         Delete drafts ({{ drafts.length }})
       </v-btn>
     </template>
@@ -33,7 +33,7 @@ export default defineComponent({
     },
     disabled: { type: Boolean },
   },
-  emits: ['loading-change'],
+  emits: ['loading-change', 'error'],
   setup(props, { root, emit }) {
     const isOpen = ref(false);
     const isLoading = ref(false);
@@ -42,8 +42,15 @@ export default defineComponent({
       isOpen.value = false;
       isLoading.value = true;
       const ids = props.drafts.map((item) => item._id);
-      await root.$store.dispatch('submissions/deleteDrafts', ids);
+      const success = await root.$store.dispatch('myDrafts/deleteDrafts', ids);
       isLoading.value = false;
+
+      if (!success) {
+        emit(
+          'error',
+          `Something went wrong while deleting ${ids.length === 1 ? 'the draft' : ids.length + ' drafts'}.`
+        );
+      }
     };
 
     watch(isLoading, (val) => {
