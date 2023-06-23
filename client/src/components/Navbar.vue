@@ -10,7 +10,7 @@
       </v-toolbar-title>
 
       <v-spacer />
-      <v-icon v-if="!isOnline()" size="22" title="device is offline" color="warning" class="px-1">mdi-wifi-off</v-icon>
+      <offline-indicator />
       <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
         <v-icon size="22">mdi-help-circle-outline</v-icon>
       </v-btn>
@@ -24,10 +24,11 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import { isOnline } from '@/utils/surveyStack';
+import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
 
 export default {
-  methods: { isOnline },
   components: {
+    OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,
   },
