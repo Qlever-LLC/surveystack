@@ -244,6 +244,8 @@ export const buildPipeline = async (req, res) => {
     user = req.cookies.user;
     const userRoles = await rolesService.getRoles(user);
     roles.push(...userRoles);
+    res.locals.auth.user._id = user;
+    res.locals.auth.isSuperAdmin = await rolesService.hasSuperAdminRole(user);
   }
 
   // Add creator details if request has admin rights on survey.
@@ -251,7 +253,7 @@ export const buildPipeline = async (req, res) => {
   if (user && req.query.survey && !queryParam(req.query.pure)) {
     const survey = await db.collection('surveys').findOne({ _id: new ObjectId(req.query.survey) });
     const groupId = survey.meta.group.id;
-    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+    const hasAdminRights = await rolesService.hasAdminRoleForRequest(res, groupId);
 
     if (hasAdminRights) {
       addUserDetailsStage(pipeline);
@@ -618,6 +620,8 @@ const getSubmission = async (req, res) => {
     user = req.cookies.user;
     const userRoles = await rolesService.getRoles(user);
     roles.push(...userRoles);
+    res.locals.auth.user._id = user;
+    res.locals.auth.isSuperAdmin = await rolesService.hasSuperAdminRole(user);
   }
 
   if (user) {
@@ -631,7 +635,7 @@ const getSubmission = async (req, res) => {
     // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
     else {
       const groupId = res.locals.existing.meta.group.id;
-      const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+      const hasAdminRights = await rolesService.hasAdminRoleForRequest(res, groupId);
 
       if (hasAdminRights) {
         addUserDetailsStage(pipeline);
