@@ -1196,7 +1196,8 @@ describe('farmos-controller', () => {
         body: {
           userId: user.user._id + '',
           instanceName: instanceName,
-          groupIds: updated.map((g) => g._id + ''),
+          initialGroupIds: initial.map((g) => g._id + ''),
+          groupIdsAfter: updated.map((g) => g._id + ''),
         },
       });
       await updateGroupsForUser(req, res);

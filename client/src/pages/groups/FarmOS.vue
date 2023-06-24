@@ -424,7 +424,7 @@ export default {
       this.showDisonnectDialog = true;
     },
     async updateGroups(args) {
-      const [instanceName, groupIds] = args;
+      const [instanceName, initialGroupIds, groupIdsAfter] = args;
       const userId = this.disconnectUserId;
       const groupId = this.groupId;
 
@@ -434,14 +434,13 @@ export default {
         const resp = await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
           userId,
           instanceName,
-          groupIds,
+          initialGroupIds,
+          groupIdsAfter,
         });
         this.success(resp.data.status);
 
-        const initialGroupIds = resp.data.initialGroupIds;
-
-        this.differenceRemovedGroupIds = initialGroupIds.filter((x) => !groupIds.includes(x));
-        const resultingGroupIdsInitiallyPresent = groupIds.every((x) => initialGroupIds.includes(x));
+        this.differenceRemovedGroupIds = initialGroupIds.filter((x) => !groupIdsAfter.includes(x));
+        const resultingGroupIdsInitiallyPresent = groupIdsAfter.every((x) => initialGroupIds.includes(x));
         if (this.differenceRemovedGroupIds.length > 0 && resultingGroupIdsInitiallyPresent) {
           //only if remove happened
           this.showRemoveNoteDialog = true;
