@@ -1366,39 +1366,34 @@ export const updateGroupsForUser = async (req, res) => {
   // a, b, c => a (removed from a and b)
   // a, b, c => a, d (moved from a, b, c to a and d)
 
-  const { userId, instanceName, groupIds, tree } = await requireGroup(req, {
+  const { userId, instanceName, initialGroupIds, groupIdsAfter, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
-    groupIds: Joi.array().items(Joi.objectId()).required(),
+    initialGroupIds: Joi.array().items(Joi.objectId()).required(),
+    groupIdsAfter: Joi.array().items(Joi.objectId()).required(),
   });
 
   const { origin } = req.headers;
 
   await assertUserInSubGroup(userId, tree);
-  await assertGroupsInTree(groupIds, tree);
+  await assertGroupsInTree(initialGroupIds, tree);
+  await assertGroupsInTree(groupIdsAfter, tree);
 
   // find out in which group(s) the instance was initially located
-  const initialGroupMappings = await db
-    .collection('farmos-group-mapping')
-    .find({
-      instanceName: instanceName,
-    })
-    .toArray();
   const initialGroups = await db
     .collection('groups')
     .find({
       _id: {
-        $in: initialGroupMappings.map((grp) => asMongoId(grp.groupId)),
+        $in: initialGroupIds.map((i) => asMongoId(i)),
       },
     })
     .toArray();
-  const initialGroupIds = initialGroups.map((el) => el._id);
 
   const resultGroups = await db
     .collection('groups')
     .find({
       _id: {
-        $in: groupIds.map((i) => asMongoId(i)),
+        $in: groupIdsAfter.map((i) => asMongoId(i)),
       },
     })
     .toArray();
@@ -1412,9 +1407,9 @@ export const updateGroupsForUser = async (req, res) => {
   });
 
   // add all
-  if (groupIds.length > 0) {
+  if (groupIdsAfter.length > 0) {
     await db.collection('farmos-group-mapping').insertMany(
-      groupIds.map((gid) => ({
+      groupIdsAfter.map((gid) => ({
         _id: new ObjectId(),
         groupId: new ObjectId(gid),
         instanceName,

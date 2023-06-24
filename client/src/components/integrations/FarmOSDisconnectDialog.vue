@@ -51,7 +51,8 @@ export default {
   },
   methods: {
     updateGroups() {
-      this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroups]);
+      // emit instance, initial selected group Ids and selected group Ids before clicking update
+      this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroupIds, this.selectedGroups]);
       this.selectedGroups = [];
     },
     cancelUpdate() {
