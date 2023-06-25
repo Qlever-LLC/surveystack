@@ -77,6 +77,9 @@ const mutations = {
   DESELECT_SUBMISSION: (state, submission) => {
     state.selectedIds = state.selectedIds.filter((id) => id !== submission._id);
   },
+  SET_SELECTION: (state, selection) => {
+    state.selectedIds = selection;
+  },
   CLEAR_SELECTION: (state) => {
     state.selectedIds = [];
   },
@@ -152,7 +155,11 @@ const actions = {
       const { data } = await api.get(`/submissions/my-submissions?${params}`);
       commit('SET_SUBMISSIONS', data.content);
       commit('SET_TOTAL_PAGE', Math.ceil(data.pagination.total / PER_PAGE));
-      commit('CLEAR_SELECTION');
+      const ids = data.content.map((item) => item._id);
+      commit(
+        'SET_SELECTION',
+        state.selectedIds.filter((id) => ids.includes(id))
+      );
     } catch (e) {
       console.warn('Failed to fetch my submissions', params.toString());
     }

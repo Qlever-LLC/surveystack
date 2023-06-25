@@ -95,6 +95,9 @@ const mutations = {
   DESELECT_DRAFT: (state, draft) => {
     state.selectedIds = state.selectedIds.filter((id) => id !== draft._id);
   },
+  SET_SELECTION: (state, selection) => {
+    state.selectedIds = selection;
+  },
   CLEAR_SELECTION: (state) => {
     state.selectedIds = [];
   },
@@ -316,7 +319,11 @@ const actions = {
     await dispatch('deleteRemoteDrafts', remoteIdsToDelete);
 
     commit('SET_DRAFTS', drafts);
-    commit('CLEAR_SELECTION');
+    const ids = drafts.map((item) => item._id);
+    commit(
+      'SET_SELECTION',
+      state.selectedIds.filter((id) => ids.includes(id))
+    );
   },
 
   /*

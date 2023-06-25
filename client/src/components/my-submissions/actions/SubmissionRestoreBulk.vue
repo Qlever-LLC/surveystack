@@ -1,7 +1,7 @@
 <template>
   <v-btn
     v-if="submissions.length > 0"
-    color="green darken-2"
+    color="primary"
     dark
     :disabled="disabled"
     :loading="isLoading"

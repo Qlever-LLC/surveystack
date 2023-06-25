@@ -55,16 +55,27 @@
             </div>
             <div v-if="drafts" class="d-flex flex-column flex-sm-row">
               <draft-delete-bulk v-slot="{ on, attrs }" :drafts="selected" @success="$emit('reloadData')">
-                <v-btn v-bind="attrs" color="error" text v-on="on"> Delete </v-btn>
+                <v-btn v-bind="attrs" color="error" text :disabled="actionsAreDisabled" v-on="on"> Delete </v-btn>
               </draft-delete-bulk>
               <draft-submit-bulk
-                v-if="readyToSubmitDrafts.length > 0"
+                v-if="draftsToSubmit.length > 0"
                 v-slot="{ on, attrs }"
-                :drafts="readyToSubmitDrafts"
+                :drafts="draftsToSubmit"
                 @success="$emit('reloadData')"
               >
-                <v-btn v-bind="attrs" color="primary" text v-on="on"> Submit </v-btn>
+                <v-btn v-bind="attrs" color="primary" text :disabled="actionsAreDisabled" v-on="on"> Submit </v-btn>
               </draft-submit-bulk>
+              <v-btn
+                v-if="selected.length === 1"
+                color="primary"
+                text
+                :disabled="actionsAreDisabled"
+                @click="$router.push(`/submissions/drafts/${selected[0]._id}`)"
+              >
+                Continue
+              </v-btn>
+              <export-json-bulk :submissions="selectedSubmissions" text>Export JSON</export-json-bulk>
+              <export-pdf-bulk :submissions="selectedSubmissions" text>Export PDF</export-pdf-bulk>
             </div>
             <div v-else class="d-flex flex-column flex-sm-row">
               <v-btn
@@ -92,7 +103,7 @@
                 Reassign
               </v-btn>
               <v-btn
-                v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
+                v-if="!archived && selected.length === 1"
                 color="primary"
                 text
                 :disabled="actionsAreDisabled"
@@ -100,6 +111,8 @@
               >
                 Resubmit
               </v-btn>
+              <export-json-bulk :submissions="selectedSubmissions" text>Export JSON</export-json-bulk>
+              <export-pdf-bulk :submissions="selectedSubmissions" text>Export PDF</export-pdf-bulk>
             </div>
           </div>
         </div>
@@ -218,6 +231,8 @@ import { format, isValid, parseISO } from 'date-fns';
 import { cloneDeep, omit } from 'lodash';
 import DraftDeleteBulk from '@/components/my-submissions/actions/DraftDeleteBulk.vue';
 import DraftSubmitBulk from '@/components/my-submissions/actions/DraftSubmitBulk.vue';
+import ExportJsonBulk from '@/components/my-submissions/actions/ExportJsonBulk.vue';
+import ExportPdfBulk from '@/components/my-submissions/actions/ExportPdfBulk.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -282,6 +297,8 @@ export default {
     SubmissionTableCellModal,
     DraftDeleteBulk,
     DraftSubmitBulk,
+    ExportJsonBulk,
+    ExportPdfBulk,
   },
   props: {
     actionsAreDisabled: {
@@ -401,10 +418,13 @@ export default {
     userMemberships() {
       return this.$store.getters['memberships/memberships'];
     },
-    readyToSubmitDrafts() {
+    draftsToSubmit() {
       return this.selected
         .map((item) => this.submissions.content.find((i) => i._id === item._id))
         .filter((item) => item && item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT'));
+    },
+    selectedSubmissions() {
+      return this.selected.map((item) => this.submissions.content.find((i) => i._id === item._id)).filter(Boolean);
     },
   },
   watch: {

@@ -19,7 +19,11 @@
           :disabled="isLoading"
           @loading-change="isLoading = $event"
         ></submission-delete-bulk>
-        <export-json-bulk :submissions="selected" :disabled="isLoading" />
+        <export-json-bulk :submissions="selected" :disabled="isLoading" /><export-pdf-bulk
+          :submissions="selected"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></export-pdf-bulk>
       </div>
 
       <div class="flex-grow-1 text-end">
@@ -35,6 +39,7 @@ import SubmissionArchiveBulk from './actions/SubmissionArchiveBulk.vue';
 import SubmissionDeleteBulk from './actions/SubmissionDeleteBulk.vue';
 import SubmissionRestoreBulk from './actions/SubmissionRestoreBulk.vue';
 import ExportJsonBulk from './actions/ExportJsonBulk.vue';
+import ExportPdfBulk from './actions/ExportPdfBulk.vue';
 
 export default defineComponent({
   components: {
@@ -42,6 +47,7 @@ export default defineComponent({
     SubmissionDeleteBulk,
     SubmissionRestoreBulk,
     ExportJsonBulk,
+    ExportPdfBulk,
   },
   setup(props, { root }) {
     const selected = computed(() => root.$store.getters['mySubmissions/selected']);

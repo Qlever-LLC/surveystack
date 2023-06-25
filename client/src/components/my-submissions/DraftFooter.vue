@@ -15,6 +15,11 @@
           @loading-change="isLoading = $event"
         ></draft-delete-bulk>
         <export-json-bulk :submissions="selected" :disabled="isLoading"></export-json-bulk>
+        <export-pdf-bulk
+          :submissions="selected"
+          :disabled="isLoading"
+          @loading-change="isLoading = $event"
+        ></export-pdf-bulk>
       </div>
 
       <div class="flex-grow-1 text-end">
@@ -29,12 +34,14 @@ import { computed, defineComponent, ref } from '@vue/composition-api';
 import DraftSubmitBulk from './actions/DraftSubmitBulk.vue';
 import DraftDeleteBulk from './actions/DraftDeleteBulk.vue';
 import ExportJsonBulk from './actions/ExportJsonBulk.vue';
+import ExportPdfBulk from './actions/ExportPdfBulk.vue';
 
 export default defineComponent({
   components: {
     DraftSubmitBulk,
     DraftDeleteBulk,
     ExportJsonBulk,
+    ExportPdfBulk,
   },
   setup(props, { root }) {
     const selected = computed(() => root.$store.getters['myDrafts/selected']);

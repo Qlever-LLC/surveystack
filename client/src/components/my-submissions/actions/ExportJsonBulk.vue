@@ -1,6 +1,6 @@
 <template>
-  <v-btn color="primary" dark :disabled="disabled" @click="handleExport">
-    Export JSON ({{ submissions.length }})
+  <v-btn v-bind="$attrs" color="primary" dark :disabled="disabled" @click="handleExport">
+    <slot> Export JSON ({{ submissions.length }}) </slot>
   </v-btn>
 </template>
 

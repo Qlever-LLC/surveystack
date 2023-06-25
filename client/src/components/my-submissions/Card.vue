@@ -53,14 +53,20 @@
           <v-list-item @click="handleExportJSON()">
             <v-list-item-title>Export as JSON</v-list-item-title>
           </v-list-item>
+          <v-list-item @click="handleExportPDF()">
+            <v-list-item-title>Export as PDF</v-list-item-title>
+          </v-list-item>
           <v-list-item v-if="draft" @click="isOpen.deleteDraft = true">
             <v-list-item-title class="red--text">Delete</v-list-item-title>
           </v-list-item>
+          <v-list-item v-if="!draft && (isCreator || isAdmin) && isArchived" @click="handleRestoreSubmission">
+            <v-list-item-title> Restore </v-list-item-title>
+          </v-list-item>
           <v-list-item v-if="!draft && (isCreator || isAdmin) && isArchived" @click="isOpen.deleteSubmission = true">
-            <v-list-item-title class="red--text">Delete</v-list-item-title>
+            <v-list-item-title class="red--text"> Delete </v-list-item-title>
           </v-list-item>
           <v-list-item v-if="!draft && (isCreator || isAdmin) && !isArchived" @click="isOpen.archiveSubmission = true">
-            <v-list-item-title class="red--text">Archive</v-list-item-title>
+            <v-list-item-title class="red--text"> Archive </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -143,6 +149,8 @@ import SubmissionResubmit from './actions/SubmissionResubmit.vue';
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import downloadExternal from '@/utils/downloadExternal';
+import api from '@/services/api.service';
+import { parse as parseDisposition } from 'content-disposition';
 
 export default {
   components: {
@@ -269,12 +277,54 @@ export default {
       });
     };
 
+    const handleRestoreSubmission = () => {
+      root.$store.dispatch('mySubmissions/restoreSubmissions', [props.submission._id]);
+    };
+
     const handleExportJSON = () => {
       const dataString = JSON.stringify(props.submission, null, 2);
       downloadExternal(
         `data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`,
         `${props.submission._id}.json`
       );
+    };
+
+    const handleExportPDF = async () => {
+      // Fetch survey
+      let survey = null;
+      const { id, version } = props.submission.meta.survey;
+      survey = root.$store.getters['surveys/getSurvey'](id);
+      if (!survey) {
+        survey = await root.$store.dispatch('surveys/fetchSurvey', { id, version });
+      }
+
+      if (!survey) {
+        console.log('Failed to fetch survey', id, version);
+        return;
+      }
+
+      // Download PDF
+      try {
+        const res = await api.post(`/submissions/pdf?base64=1`, {
+          survey,
+          submission: {
+            ...props.submission,
+            meta: {
+              ...props.submission.meta,
+              creator: props.submission.meta.submitAsUser
+                ? props.submission.meta.submitAsUser._id
+                : props.submission.meta.creator,
+            },
+          },
+        });
+
+        if (res) {
+          const disposition = parseDisposition(res.headers['content-disposition']);
+          downloadExternal(res.data, disposition.parameters.filename);
+        }
+      } catch (e) {
+        console.log('Failed to download PDF of submission', props.submission._id);
+      }
     };
 
     const setFilerLocal = () => {
@@ -339,7 +389,9 @@ export default {
       handleSubmitDraft,
       handleSetGroup,
       handleArchiveSubmission,
+      handleRestoreSubmission,
       handleExportJSON,
+      handleExportPDF,
       setFilerLocal,
       setFilerServer,
       setFilerCreator,
