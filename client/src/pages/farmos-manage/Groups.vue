@@ -40,6 +40,8 @@
       </v-col>
     </v-row> -->
 
+    <div v-if="!loading && !!selectedGroup" class="px-3">{{ amountMappedInstances }}</div>
+
     <v-divider class="my-4"></v-divider>
 
     <v-simple-table v-if="!loading">
@@ -47,17 +49,11 @@
         <thead>
           <tr>
             <th class="text-left">Instance Name</th>
+            <th class="text-left">Mappings</th>
             <th class="text-left">Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(instance, idx) in mappedInstances" :key="`grp-${idx}`">
-            <td>{{ instance.instanceName }}</td>
-            <td>
-              <v-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</v-btn>
-            </td>
-          </tr>
-
           <tr>
             <td>
               <v-autocomplete
@@ -72,8 +68,43 @@
                 :items="instances"
               ></v-autocomplete>
             </td>
+            <td></td>
             <td>
               <v-btn color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)">Map</v-btn>
+            </td>
+          </tr>
+
+          <tr v-for="(instance, idx) in mappedInstances" :key="`grp-${idx}`">
+            <td>{{ instance.instanceName }}</td>
+            <td>
+              <div>
+                <v-chip
+                  small
+                  class="ma-1"
+                  dark
+                  color="blue"
+                  v-for="(userMapping, uidx) in instance.userMappings"
+                  :key="`instance-${idx}-user-${uidx}`"
+                >
+                  {{ userMapping.user }}
+                </v-chip>
+              </div>
+
+              <div>
+                <v-chip
+                  class="ma-1"
+                  small
+                  dark
+                  color="green"
+                  v-for="(groupMapping, gidx) in instance.groupMappings"
+                  :key="`instance-${idx}-group-${gidx}`"
+                >
+                  {{ groupMapping.group }}
+                </v-chip>
+              </div>
+            </td>
+            <td>
+              <v-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</v-btn>
             </td>
           </tr>
         </tbody>
@@ -86,6 +117,7 @@
 export default {
   props: {
     groups: Array,
+    users: Array,
     plans: Array,
     mappings: Object,
     loading: Boolean,
@@ -110,11 +142,44 @@ export default {
         return [];
       }
 
-      return this.mappings.surveystackFarms
+      const farms = this.mappings.surveystackFarms
         .filter((farm) => farm.groupId === this.selectedGroup)
-        .map((farm) => ({
-          instanceName: farm.instanceName,
-        }));
+        .map((farm) => farm.instanceName);
+
+      const mappings = [];
+
+      for (const farm of farms) {
+        const userMappings = this.mappings.surveystackUserFarms
+          .filter((f) => f.instanceName === farm)
+          .map((m) => ({
+            instanceName: m.instanceName,
+            user: this.users.find((u) => u._id === m.userId).email,
+          }));
+
+        const groupMappings = this.mappings.surveystackFarms
+          .filter((f) => f.instanceName === farm)
+          .map((group) => ({
+            instanceName: group.instanceName,
+            group: this.groups.find((g) => g._id === group.groupId).path,
+          }));
+
+        mappings.push({
+          instanceName: farm,
+          userMappings,
+          groupMappings,
+        });
+      }
+
+      return mappings;
+    },
+    amountMappedInstances() {
+      if (this.mappedInstances.length === 0) {
+        return `0 Instance`;
+      } else if (this.mappedInstances.length === 1) {
+        return `1 Instance`;
+      } else {
+        return `${this.mappedInstances.length} Instances`;
+      }
     },
     instances() {
       return this.mappings.aggregatorFarms.map((farm) => ({

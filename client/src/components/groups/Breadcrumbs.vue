@@ -15,6 +15,10 @@ export default {
       type: String,
       default: '/',
     },
+    disabledSuffix: {
+      type: String,
+      default: null,
+    },
   },
   computed: {
     links() {
@@ -44,6 +48,10 @@ export default {
         exact: true,
         text: 'groups',
       };
+
+      if (this.disabledSuffix) {
+        links.push({ disabled: true, exact: true, text: this.disabledSuffix });
+      }
 
       return links;
     },

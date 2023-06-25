@@ -1,5 +1,8 @@
 <template>
   <v-container v-if="farmosEnabled" class="max-800">
+    <div class="d-flex justify-space-between align-center">
+      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+    </div>
     <v-alert
       v-if="successMessage"
       class="mt-4"
@@ -63,16 +66,26 @@
       v-model="showConnectDialog"
       :farmInstances="farmInstances"
       :allowCreate="allowCreate"
+      :loadingOwners="loadingOwners"
       @connect="connectFarms"
       @create="createFarm"
     />
 
     <FarmOSDisconnectDialog
       v-model="showDisonnectDialog"
+      :loading="loading"
       :updateFarmInstanceName="updateFarmInstanceName"
       :allGroups="allGroups"
       :selectedGroupIds="selectedGroupIds"
       @updateGroups="updateGroups"
+      @cancelUpdate="cancelUpdate"
+    />
+
+    <FarmOSRemoveNoteDialog
+      v-model="showRemoveNoteDialog"
+      :loading="loading"
+      @addNote="addNote"
+      @cancelNote="cancelNote"
     />
 
     <FarmOSGroupSettings
@@ -94,6 +107,9 @@
   </v-container>
 
   <v-container v-else>
+    <div class="d-flex justify-space-between align-center">
+      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+    </div>
     <v-row v-if="loading">
       <v-col>
         <v-progress-linear indeterminate class="mb-0" />
@@ -126,7 +142,10 @@ import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSett
 import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue';
 import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDisconnectDialog.vue';
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
+import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
+import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
   props: {
@@ -137,7 +156,9 @@ export default {
     FarmOSConnectDialog,
     FarmOSCreateDialog,
     FarmOSDisconnectDialog,
+    FarmOSRemoveNoteDialog,
     appDialog,
+    appGroupBreadcrumbs,
   },
   computed: {
     superAdmin() {
@@ -154,14 +175,19 @@ export default {
     return {
       groupInfos: null,
       groupId: null,
+      groupPath: '',
+      suffixPart: '',
       farmosEnabled: false,
       loading: true,
       message: '',
       btnEnable: false,
       btnContact: true,
       showConnectDialog: false,
+      loadingOwners: false,
       showCreateDialog: false,
       showDisonnectDialog: false,
+      showRemoveNoteDialog: false,
+      differenceRemovedGroupIds: [],
       selectedUser: null,
       farmInstances: [],
 
@@ -172,6 +198,7 @@ export default {
       disconnectUserId: '',
       plans: [],
       createViewModel: {},
+      timeoutID: null,
       successMessage: null,
       errorMessage: null,
 
@@ -186,6 +213,14 @@ export default {
     // setup function
     // fetch group settings
     await this.init();
+
+    try {
+      const { data } = await api.get(`/groups/${this.groupId}?populate=true`);
+      this.groupPath = data.path;
+      this.suffixPart = 'farmOS Integration';
+    } catch (e) {
+      console.log('something went wrong:', e);
+    }
 
     /*
     this.groupInfos.value.members.forEach((el) => {
@@ -253,7 +288,6 @@ export default {
     async init() {
       const { id: groupId } = this.$route.params;
       this.groupId = groupId;
-
       try {
         const { data: res } = await api.get(`/farmos/group-manage/${groupId}/domain`);
         if (res.domain) {
@@ -301,16 +335,30 @@ export default {
         this.loading = false;
       }
     },
-    connect(userId) {
+    async connect(userId) {
       const user = this.groupInfos.members.find((m) => m.user === userId);
       this.selectedUser = user;
       console.log('connecting user', this.selectedUser);
+      this.loadingOwners = true;
       this.showConnectDialog = true;
 
-      this.farmInstances = _.uniq([
+      const farmInstancesWithoutOwnerPart = _.uniq([
         ...user.connectedFarms.filter((f) => f.owner == true).flatMap((f) => f.instanceName),
         ...this.groupInfos.unassignedInstances.flatMap((f) => f.instanceName),
       ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
+
+      try {
+        const response = await api.post(`/farmos/group-manage/get-owners-from-instances`, {
+          groupId: this.groupId, // for assertion
+          instances: farmInstancesWithoutOwnerPart,
+        });
+        this.farmInstances = response.data;
+      } catch (error) {
+        this.error(error + '');
+        this.showConnectDialog = false;
+      }
+
+      this.loadingOwners = false;
     },
     async enable() {
       await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
@@ -342,10 +390,11 @@ export default {
 
       for (const farm of farms) {
         try {
-          await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
+          const resp = await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
             userId: this.selectedUser.user,
             instanceName: farm,
           });
+          this.success(resp.data.status);
         } catch (error) {
           this.error(error + '');
         }
@@ -375,19 +424,27 @@ export default {
       this.showDisonnectDialog = true;
     },
     async updateGroups(args) {
-      const [instanceName, groupIds] = args;
+      const [instanceName, initialGroupIds, groupIdsAfter] = args;
       const userId = this.disconnectUserId;
       const groupId = this.groupId;
 
       this.loading = true;
 
       try {
-        await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
+        const resp = await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
           userId,
           instanceName,
-          groupIds,
+          initialGroupIds,
+          groupIdsAfter,
         });
-        this.success('Succefully umapped groups');
+        this.success(resp.data.status);
+
+        this.differenceRemovedGroupIds = initialGroupIds.filter((x) => !groupIdsAfter.includes(x));
+        const resultingGroupIdsInitiallyPresent = groupIdsAfter.every((x) => initialGroupIds.includes(x));
+        if (this.differenceRemovedGroupIds.length > 0 && resultingGroupIdsInitiallyPresent) {
+          //only if remove happened
+          this.showRemoveNoteDialog = true;
+        }
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
@@ -395,8 +452,43 @@ export default {
           this.error(error.message);
         }
       }
-
       this.showDisonnectDialog = false;
+      await this.init();
+      this.loading = false;
+    },
+    async addNote(arg) {
+      const note = arg;
+      const instanceName = this.updateFarmInstanceName;
+      const groupIds = this.differenceRemovedGroupIds; // find associated name on server side
+      const parentGroupId = this.groupId;
+      this.loading = true;
+      const timestamp = getCurrentDateAsString();
+
+      try {
+        await api.post(`/farmos/group-manage/add-notes`, {
+          note,
+          instanceName,
+          parentGroupId,
+          groupIds,
+          timestamp,
+        });
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
+      this.showRemoveNoteDialog = false;
+      await this.init();
+      this.loading = false;
+    },
+    async cancelUpdate() {
+      this.showDisonnectDialog = false;
+      await this.init();
+    },
+    async cancelNote() {
+      this.showRemoveNoteDialog = false;
       await this.init();
     },
     async openFarm(item) {
@@ -587,14 +679,28 @@ export default {
       await this.init();
     },
     success(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.successMessage = msg;
       this.errorMessage = null;
-      window.scrollTo(0, 0);
+      this.timeoutID = window.scrollTo(0, 0);
+      setTimeout(() => {
+        this.successMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
     error(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.errorMessage = msg;
       this.successMessage = null;
       window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.errorMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
   },
 };

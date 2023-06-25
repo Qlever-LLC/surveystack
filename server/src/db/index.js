@@ -41,6 +41,8 @@ const connectDatabase = async () => {
   await db.collection('farmos-instances').createIndex({ userId: 1 });
   await db.collection('farmos-instances').createIndex({ instanceName: 1 });
 
+  await db.collection('farmos-instance-notes').createIndex({ instanceName: 1 }, { unique: true });
+
   await db.collection(COLL_GROUPS_HYLO_MAPPINGS).createIndex({ groupId: 1 }, { unique: true });
   // await db.collection(COLL_GROUPS_HYLO_MAPPINGS).dropIndex({ hyloGroupId: 1 });
 

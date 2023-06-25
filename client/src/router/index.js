@@ -15,6 +15,7 @@ import AppInfo from '@/pages/app/AppInfo.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import ResourceList from '@/pages/resources/ResourceList.vue';
 import FarmosManage from '@/pages/farmos-manage/FarmosManage.vue';
+import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 import Kit from '@/pages/Kit.vue';
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
@@ -88,6 +89,7 @@ const routes = [
       window.location.replace(`${location.origin}${landingPath}`);
     },
   },
+  // users
   {
     path: '/unauthorized',
     name: 'unauthorized',
@@ -114,6 +116,11 @@ const routes = [
     name: 'farmos-manage',
     components: getComponents(FarmosManage),
     beforeEnter: superGuard,
+  },
+  {
+    path: '/farmos/profile',
+    name: 'farmos-profile',
+    components: getComponents(FarmOSProfile),
   },
   {
     path: '/app/info',
