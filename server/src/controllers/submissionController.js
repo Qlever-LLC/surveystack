@@ -34,7 +34,6 @@ const sanitize = async (entity) => {
 
   // Delete temporal data that is used in the client
   delete entity.meta.submitAsUser;
-  delete entity.options;
 
   if (entity.meta.group) {
     if (entity.meta.group.id) {
