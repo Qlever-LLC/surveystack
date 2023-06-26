@@ -1,5 +1,5 @@
 <template>
-  <v-card class="search-bar d-flex align-center px-6 py-4">
+  <v-card class="search-bar d-flex flex-column flex-md-row align-md-center px-6 py-4">
     <v-autocomplete
       v-model="survey"
       class="survey-select flex-grow-0"
@@ -92,12 +92,17 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .search-bar {
-  & > * + * {
-    margin-left: 16px;
-  }
+  column-gap: 16px;
+  row-gap: 12px;
 
   .survey-select {
     min-width: 350px;
+  }
+}
+
+@media (max-width: 960px) {
+  .search-bar .survey-select {
+    min-width: 0px;
   }
 }
 </style>

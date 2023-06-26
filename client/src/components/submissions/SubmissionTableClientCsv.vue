@@ -22,8 +22,8 @@
       hide-default-footer
     >
       <template v-slot:top>
-        <div class="table-toolbar px-4 py-3 d-flex flex-wrap align-center grey lighten-4">
-          <div class="d-flex flex-column flex-sm-row align-sm-center flex-sm-grow-1">
+        <div class="table-toolbar px-4 py-3 d-flex flex-column flex-xl-row align-xl-center grey lighten-4">
+          <div class="d-flex align-center flex-lg-grow-1 flex-wrap flex-md-nowrap py-2">
             <v-switch
               label="Show metadata"
               :input-value="!excludeMeta"
@@ -46,73 +46,74 @@
             <v-switch v-model="isExpandMatrix" label="Expand matrix questions" hide-details></v-switch>
           </div>
 
-          <div
-            v-if="selected.length > 0"
-            class="d-flex d-flex flex-column flex-sm-row align-start align-sm-center mt-4 mt-sm-0"
-          >
-            <div>
+          <v-divider v-if="selected.length > 0" :vertical="$vuetify.breakpoint.xlOnly"></v-divider>
+
+          <div v-if="selected.length > 0" class="d-flex flex-column flex-sm-row align-sm-center">
+            <div class="mr-4">
               {{ `${selected.length} ${drafts ? 'draft' : 'submission'}${selected.length === 1 ? '' : 's'} selected` }}
             </div>
-            <div v-if="drafts" class="d-flex flex-column flex-sm-row">
-              <draft-delete-bulk v-slot="{ on, attrs }" :drafts="selected" @success="$emit('reloadData')">
-                <v-btn v-bind="attrs" color="error" text :disabled="actionsAreDisabled" v-on="on"> Delete </v-btn>
-              </draft-delete-bulk>
-              <draft-submit-bulk
-                v-if="draftsToSubmit.length > 0"
-                v-slot="{ on, attrs }"
-                :drafts="draftsToSubmit"
-                @success="$emit('reloadData')"
-              >
-                <v-btn v-bind="attrs" color="primary" text :disabled="actionsAreDisabled" v-on="on"> Submit </v-btn>
-              </draft-submit-bulk>
-              <v-btn
-                v-if="selected.length === 1"
-                color="primary"
-                text
-                :disabled="actionsAreDisabled"
-                @click="$router.push(`/submissions/drafts/${selected[0]._id}`)"
-              >
-                Continue
-              </v-btn>
-              <export-json-bulk :submissions="selectedSubmissions" text>Export JSON</export-json-bulk>
-              <export-pdf-bulk :submissions="selectedSubmissions" text>Export PDF</export-pdf-bulk>
-            </div>
-            <div v-else class="d-flex flex-column flex-sm-row">
-              <v-btn
-                v-if="archived"
-                color="error"
-                text
-                :disabled="actionsAreDisabled"
-                @click="$emit('deleteSubmissions', $event)"
-              >
-                Delete
-              </v-btn>
-              <v-btn v-if="archived" text :disabled="actionsAreDisabled" @click="$emit('archiveSubmissions', $event)">
-                Restore
-              </v-btn>
-              <v-btn
-                v-if="!archived"
-                color="error"
-                text
-                :disabled="actionsAreDisabled"
-                @click="$emit('showArchiveModal', $event)"
-              >
-                Archive
-              </v-btn>
-              <v-btn color="secondary" text :disabled="actionsAreDisabled" @click="$emit('reassignment', $event)">
-                Reassign
-              </v-btn>
-              <v-btn
-                v-if="!archived && selected.length === 1"
-                color="primary"
-                text
-                :disabled="actionsAreDisabled"
-                @click="$emit('resubmit', $event)"
-              >
-                Resubmit
-              </v-btn>
-              <export-json-bulk :submissions="selectedSubmissions" text>Export JSON</export-json-bulk>
-              <export-pdf-bulk :submissions="selectedSubmissions" text>Export PDF</export-pdf-bulk>
+            <div class="d-flex align-center flex-wrap flex-md-nowrap">
+              <export-json-bulk :submissions="selectedSubmissions" color="secondary" text>
+                Export JSON
+              </export-json-bulk>
+              <export-pdf-bulk :submissions="selectedSubmissions" color="secondary" text> Export PDF </export-pdf-bulk>
+              <template v-if="drafts">
+                <draft-delete-bulk v-slot="{ on, attrs }" :drafts="selected" @success="$emit('reloadData')">
+                  <v-btn v-bind="attrs" color="error" text :disabled="actionsAreDisabled" v-on="on"> Delete </v-btn>
+                </draft-delete-bulk>
+                <draft-submit-bulk
+                  v-if="draftsToSubmit.length > 0"
+                  v-slot="{ on, attrs }"
+                  :drafts="draftsToSubmit"
+                  @success="$emit('reloadData')"
+                >
+                  <v-btn v-bind="attrs" color="primary" text :disabled="actionsAreDisabled" v-on="on"> Submit </v-btn>
+                </draft-submit-bulk>
+                <v-btn
+                  v-if="selected.length === 1"
+                  color="primary"
+                  text
+                  :disabled="actionsAreDisabled"
+                  @click="$router.push(`/submissions/drafts/${selected[0]._id}`)"
+                >
+                  Continue
+                </v-btn>
+              </template>
+              <template v-else>
+                <v-btn
+                  v-if="archived"
+                  color="error"
+                  text
+                  :disabled="actionsAreDisabled"
+                  @click="$emit('deleteSubmissions', $event)"
+                >
+                  Delete
+                </v-btn>
+                <v-btn v-if="archived" text :disabled="actionsAreDisabled" @click="$emit('archiveSubmissions', $event)">
+                  Restore
+                </v-btn>
+                <v-btn
+                  v-if="!archived"
+                  color="error"
+                  text
+                  :disabled="actionsAreDisabled"
+                  @click="$emit('showArchiveModal', $event)"
+                >
+                  Archive
+                </v-btn>
+                <v-btn color="secondary" text :disabled="actionsAreDisabled" @click="$emit('reassignment', $event)">
+                  Reassign
+                </v-btn>
+                <v-btn
+                  v-if="!archived && selected.length === 1"
+                  color="primary"
+                  text
+                  :disabled="actionsAreDisabled"
+                  @click="$emit('resubmit', $event)"
+                >
+                  Resubmit
+                </v-btn>
+              </template>
             </div>
           </div>
         </div>
@@ -664,11 +665,16 @@ export default {
   white-space: nowrap;
   row-gap: 8px;
   column-gap: 24px;
-}
 
-.table-toolbar > div:first-child {
-  column-gap: 16px;
-  row-gap: 8px;
+  .d-flex {
+    row-gap: 0px;
+    column-gap: 8px;
+
+    &.flex-lg-grow-1 {
+      column-gap: 16px;
+      row-gap: 8px;
+    }
+  }
 }
 
 .table-toolbar .v-input--selection-controls {

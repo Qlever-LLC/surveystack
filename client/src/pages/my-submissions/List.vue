@@ -1,24 +1,28 @@
 <template>
   <div class="wrapper background flex flex-column">
-    <v-card class="d-flex align-center px-6 space-x-4">
-      <v-tabs v-model="tab" :height="72">
+    <v-card class="d-flex align-center px-sm-6 space-x-4">
+      <v-tabs v-model="tab" :height="72" :grow="!readyToSubmitShowOnTabs">
         <v-tab>
-          <div class="d-flex align-center">
+          <div class="d-flex flex-column flex-sm-row align-center">
             <v-icon class="mr-2">mdi-file-document-edit</v-icon>
             My Drafts
           </div>
         </v-tab>
         <v-tab>
-          <div class="d-flex align-center">
+          <div class="d-flex flex-column flex-sm-row align-center">
             <v-icon class="mr-2">mdi-email-check</v-icon>
             My Submissions
           </div>
         </v-tab>
       </v-tabs>
 
-      <v-spacer />
+      <v-spacer v-if="readyToSubmitShow && readyToSubmitShowOnTabs" />
 
-      <draft-submit-bulk v-if="tab === 0 && readyToSubmit.length > 0" v-slot="{ on, attrs }" :drafts="readyToSubmit">
+      <draft-submit-bulk
+        v-if="readyToSubmitShow && readyToSubmitShowOnTabs"
+        v-slot="{ on, attrs }"
+        :drafts="readyToSubmit"
+      >
         <v-btn v-bind="attrs" color="primary" v-on="on">
           <v-icon class="mr-2">mdi-cloud-upload-outline</v-icon>
           Submit Completed ({{ readyToSubmit.length }})
@@ -27,6 +31,18 @@
     </v-card>
 
     <v-container class="flex-grow-1">
+      <draft-submit-bulk
+        v-if="readyToSubmitShow && !readyToSubmitShowOnTabs"
+        class="d-flex justify-end"
+        v-slot="{ on, attrs }"
+        :drafts="readyToSubmit"
+      >
+        <v-btn v-bind="attrs" color="primary" v-on="on">
+          <v-icon class="mr-2">mdi-cloud-upload-outline</v-icon>
+          Submit Completed ({{ readyToSubmit.length }})
+        </v-btn>
+      </draft-submit-bulk>
+
       <v-tabs-items v-model="tab" class="background mt-4">
         <v-tab-item>
           <drafts-list></drafts-list>
@@ -52,7 +68,6 @@ export default defineComponent({
     DraftSubmitBulk,
   },
   setup(props, { root }) {
-    const readyToSubmit = computed(() => root.$store.getters['myDrafts/readyToSubmit']);
     const tab = computed({
       get() {
         return root.$store.getters['mySubmissions/isDraftTab'] ? 0 : 1;
@@ -61,6 +76,9 @@ export default defineComponent({
         root.$store.dispatch('mySubmissions/setIsDraftTab', val === 0);
       },
     });
+    const readyToSubmit = computed(() => root.$store.getters['myDrafts/readyToSubmit']);
+    const readyToSubmitShow = computed(() => tab.value === 0 && readyToSubmit.value.length > 0);
+    const readyToSubmitShowOnTabs = computed(() => !root.$vuetify.breakpoint.smAndDown);
 
     // Refetch data
     watch(tab, (val, val1) => {
@@ -81,6 +99,8 @@ export default defineComponent({
     return {
       tab,
       readyToSubmit,
+      readyToSubmitShow,
+      readyToSubmitShowOnTabs,
     };
   },
 });

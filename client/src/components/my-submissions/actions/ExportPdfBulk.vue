@@ -1,5 +1,5 @@
 <template>
-  <v-btn v-bind="$attrs" color="primary" dark :disabled="disabled" @click="handleExport">
+  <v-btn v-bind="$attrs" :disabled="disabled" @click="handleExport">
     <slot> Export PDF ({{ submissions.length }}) </slot>
   </v-btn>
 </template>

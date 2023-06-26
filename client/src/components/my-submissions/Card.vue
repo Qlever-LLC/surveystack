@@ -7,7 +7,7 @@
     }"
     @click.native="$emit('change-select', !selected)"
   >
-    <div class="top">
+    <div class="top d-flex flex-column flex-sm-row align-sm-center">
       <div v-if="!isArchived" class="status-bar" :class="classes.bar"></div>
       <div class="d-flex flex-column align-start">
         <v-chip :color="chipColor" :input-value="true" label small @click.stop>
@@ -21,87 +21,105 @@
 
       <v-spacer></v-spacer>
 
-      <template v-if="draft && survey">
-        <draft-submit
-          v-if="isReadyToSubmit"
-          :submission="submission"
-          primary
-          @click="isOpen.submitDraft = true"
-        ></draft-submit>
-        <draft-continue :submission="submission" :primary="!isReadyToSubmit"></draft-continue>
-      </template>
-      <template v-else-if="survey">
-        <span v-if="isArchived" class="mr-4 grey--text font-weight-light body-2">
-          {{ submission.meta.archivedReason }}
-        </span>
-        <submission-resubmit v-if="isCreator || isAdmin" :submission="submission"></submission-resubmit>
-      </template>
-
-      <v-menu offset-y>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" rounded small icon text outlined v-on="on">
-            <v-icon small>mdi-dots-horizontal</v-icon>
-          </v-btn>
+      <div class="d-flex align-center justify-end">
+        <template v-if="draft && survey">
+          <draft-submit
+            v-if="isReadyToSubmit"
+            :submission="submission"
+            class="flex-grow-1 flex-sm-grow-0"
+            primary
+            @click="isOpen.submitDraft = true"
+          ></draft-submit>
+          <draft-continue
+            :submission="submission"
+            :primary="!isReadyToSubmit"
+            class="flex-grow-1 flex-sm-grow-0"
+          ></draft-continue>
         </template>
-        <v-list>
-          <v-list-item v-if="draft && local && survey" @click="handleUploadDraft">
-            <v-list-item-title>Upload</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="draft && !local && survey" @click="handleDownloadDraft">
-            <v-list-item-title>Download</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="handleExportJSON()">
-            <v-list-item-title>Export as JSON</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="handleExportPDF()">
-            <v-list-item-title>Export as PDF</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="draft" @click="isOpen.deleteDraft = true">
-            <v-list-item-title class="red--text">Delete</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="!draft && (isCreator || isAdmin) && isArchived" @click="handleRestoreSubmission">
-            <v-list-item-title> Restore </v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="!draft && (isCreator || isAdmin) && isArchived" @click="isOpen.deleteSubmission = true">
-            <v-list-item-title class="red--text"> Delete </v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="!draft && (isCreator || isAdmin) && !isArchived" @click="isOpen.archiveSubmission = true">
-            <v-list-item-title class="red--text"> Archive </v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+        <template v-else-if="survey">
+          <span v-if="isArchived" class="mr-4 grey--text font-weight-light body-2">
+            {{ submission.meta.archivedReason }}
+          </span>
+          <submission-resubmit
+            v-if="isCreator || isAdmin"
+            :submission="submission"
+            class="flex-grow-1 flex-sm-grow-0"
+          ></submission-resubmit>
+        </template>
+
+        <v-menu offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn v-bind="attrs" rounded small icon text outlined v-on="on">
+              <v-icon small>mdi-dots-horizontal</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item v-if="draft && local && survey" @click="handleUploadDraft">
+              <v-list-item-title>Upload</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="draft && !local && survey" @click="handleDownloadDraft">
+              <v-list-item-title>Download</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="handleExportJSON()">
+              <v-list-item-title>Export as JSON</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="handleExportPDF()">
+              <v-list-item-title>Export as PDF</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="draft" @click="isOpen.deleteDraft = true">
+              <v-list-item-title class="red--text">Delete</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="!draft && (isCreator || isAdmin) && isArchived" @click="handleRestoreSubmission">
+              <v-list-item-title> Restore </v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="!draft && (isCreator || isAdmin) && isArchived" @click="isOpen.deleteSubmission = true">
+              <v-list-item-title class="red--text"> Delete </v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              v-if="!draft && (isCreator || isAdmin) && !isArchived"
+              @click="isOpen.archiveSubmission = true"
+            >
+              <v-list-item-title class="red--text"> Archive </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
     </div>
 
     <v-divider></v-divider>
 
-    <div class="bottom">
-      <template v-if="draft">
-        <v-chip v-if="local" color="light-blue lighten-4" small @click.stop="setFilerLocal"> Local </v-chip>
-        <v-chip v-else color="light-blue lighten-4" small @click.stop="setFilerServer"> Server </v-chip>
-        <v-chip v-if="isCreator" color="light-blue lighten-4" small :input-value="true"> Creator </v-chip>
-        <v-chip v-if="isProxy" color="lime lighten-2" small :input-value="true"> Proxy </v-chip>
-        <v-chip v-if="isResubmitter" color="light-green lighten-3" small :input-value="true"> Resubmitter </v-chip>
-      </template>
-      <template v-else>
-        <v-chip v-if="isCreator" color="light-blue lighten-4" small @click.stop="setFilerCreator"> Creator </v-chip>
-        <v-chip v-if="isProxy" color="lime lighten-2" small @click.stop="setFilerProxy"> Proxy </v-chip>
-        <v-chip v-if="isResubmitter" color="light-green lighten-3" small @click.stop="setFilerResubmitter">
-          Resubmitter
-        </v-chip>
-      </template>
-      <v-chip v-if="isAdmin" color="teal lighten-4" small :input-value="true"> Admin </v-chip>
+    <div class="bottom d-flex flex-column flex-md-row align-md-center">
+      <div class="d-flex align-center">
+        <template v-if="draft">
+          <v-chip v-if="local" color="light-blue lighten-4" small @click.stop="setFilerLocal"> Local </v-chip>
+          <v-chip v-else color="light-blue lighten-4" small @click.stop="setFilerServer"> Server </v-chip>
+          <v-chip v-if="isCreator" color="light-blue lighten-4" small :input-value="true"> Creator </v-chip>
+          <v-chip v-if="isProxy" color="lime lighten-2" small :input-value="true"> Proxy </v-chip>
+          <v-chip v-if="isResubmitter" color="light-green lighten-3" small :input-value="true"> Resubmitter </v-chip>
+        </template>
+        <template v-else>
+          <v-chip v-if="isCreator" color="light-blue lighten-4" small @click.stop="setFilerCreator"> Creator </v-chip>
+          <v-chip v-if="isProxy" color="lime lighten-2" small @click.stop="setFilerProxy"> Proxy </v-chip>
+          <v-chip v-if="isResubmitter" color="light-green lighten-3" small @click.stop="setFilerResubmitter">
+            Resubmitter
+          </v-chip>
+        </template>
+        <v-chip v-if="isAdmin" color="teal lighten-4" small :input-value="true"> Admin </v-chip>
+      </div>
 
       <v-spacer></v-spacer>
 
-      <span v-if="dateSubmitted" class="text-caption">
-        <span class="blue-grey--text">Submitted:</span>
-        {{ dateSubmitted }}
-      </span>
-      <v-divider v-if="dateSubmitted && dateModified" vertical></v-divider>
-      <span v-if="dateModified" class="text-caption">
-        <span class="blue-grey--text">Modified:</span>
-        {{ dateModified }}
-      </span>
+      <div class="d-flex flex-column flex-sm-row align-sm-center">
+        <span v-if="dateSubmitted" class="text-caption">
+          <span class="blue-grey--text">Submitted:</span>
+          {{ dateSubmitted }}
+        </span>
+        <v-divider v-if="dateSubmitted && dateModified && $vuetify.breakpoint.smAndUp" vertical></v-divider>
+        <span v-if="dateModified" class="text-caption">
+          <span class="blue-grey--text">Modified:</span>
+          {{ dateModified }}
+        </span>
+      </div>
     </div>
 
     <draft-delete v-model="isOpen.deleteDraft" :submission="submission"></draft-delete>
@@ -428,26 +446,11 @@ export default {
     }
   }
 
-  &:hover .top {
-    .status-bar {
-      opacity: 1;
-    }
-    .spacer + .v-btn {
-      display: block;
-    }
-  }
-
   & > .top,
   & > .bottom {
     padding: 8px 16px;
     position: relative;
-    display: flex;
-    align-items: center;
     gap: 8px;
-  }
-
-  &:not(.disabled):hover .top .status-bar {
-    opacity: 1;
   }
 
   .top {
@@ -464,17 +467,25 @@ export default {
       left: -2px;
       top: 50%;
       border-radius: 4px;
-      opacity: 0;
       transform: translateY(-50%);
-      transition-property: opacity, left;
       transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
       transition-duration: 150ms;
     }
+
+    .spacer + .d-flex {
+      gap: 8px;
+    }
   }
 
-  .bottom .v-divider {
-    height: 16px;
-    align-self: center;
+  .bottom {
+    & > .d-flex {
+      gap: 8px;
+    }
+
+    .v-divider {
+      height: 16px;
+      align-self: center;
+    }
   }
 }
 
