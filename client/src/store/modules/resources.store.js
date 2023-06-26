@@ -12,6 +12,7 @@ import axios from 'axios';
 import ObjectId from 'bson-objectid';
 import slugify from '@/utils/slugify';
 import { cloneDeep } from 'lodash';
+import { isOnline } from '@/utils/surveyStack';
 
 const createInitialState = () => ({
   resources: [],
@@ -165,12 +166,14 @@ const actions = {
   async fetchScriptResource({ commit, getters, dispatch }, resource) {
     try {
       let resourceStored = getters['getResource'](resource.id);
-      if (!resourceStored) {
+      if (isOnline()) {
+        //always load latest script version if online
         const { data: scriptCode } = await api.get(`/scripts/${resource.content}`);
         resourceStored = cloneDeep(resource);
         resourceStored._id = resourceStored.id; //_id is required to be stored in idb
         resourceStored.fileData = scriptCode;
         db.persistResource(resourceStored);
+        commit('REMOVE_RESOURCE', resource._id);
         commit('ADD_RESOURCE', resourceStored);
       }
       return resourceStored;

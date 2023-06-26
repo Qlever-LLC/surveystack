@@ -251,16 +251,16 @@ export default {
     }
 
     const { data: entity } = await api.get(`/surveys/${id}?version=latest`);
-    
+
     if (entity.resources) {
-      //also fetch resources here in case survey is not pinned, so it's available if devices goes offline
+      //also fetch resources here in case survey is not pinned, so it's available if device goes offline
       await this.$store.dispatch('resources/fetchResources', entity.resources);
     }
 
     this.entity = entity;
 
     try {
-      // load date of latestSubmission and number of submissions. This is not prefetched, so it will throw when offline
+      // load date of latestSubmission and number of submissions. This is not prefetched by means, so it will throw when offline
       const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
       this.surveyInfo = surveyInfo;
     } catch (error) {
