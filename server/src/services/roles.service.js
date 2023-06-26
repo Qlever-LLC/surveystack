@@ -93,12 +93,12 @@ export const hasRole = async (userId, groupId, role) => {
 const hasSuperAdminRole = async (userId) => {
   const userObjectId = typeof userId === 'string' ? new ObjectId(userId) : userId;
 
-  return Boolean(
-    await db.collection('users').findOne({
-      _id: userObjectId,
-      permissions: 'super-admin',
-    })
-  );
+  return (await db.collection('users').findOne({
+    _id: userObjectId,
+    permissions: 'super-admin',
+  }))
+    ? true
+    : false;
 };
 
 export const hasAdminRoleForRequest = async (res, groupId) => {
