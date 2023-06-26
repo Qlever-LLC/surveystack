@@ -244,7 +244,11 @@ export const buildPipeline = async (req, res) => {
     user = req.cookies.user;
     const userRoles = await rolesService.getRoles(user);
     roles.push(...userRoles);
-    res.locals.auth.user = { _id: user };
+    if (res.locals.auth.user) {
+      res.locals.auth.user._id = user;
+    } else {
+      res.locals.auth.user = { _id: user };
+    }
     res.locals.auth.isSuperAdmin = await rolesService.hasSuperAdminRole(user);
   }
 
@@ -620,7 +624,11 @@ const getSubmission = async (req, res) => {
     user = req.cookies.user;
     const userRoles = await rolesService.getRoles(user);
     roles.push(...userRoles);
-    res.locals.auth.user = { _id: user };
+    if (res.locals.auth.user) {
+      res.locals.auth.user._id = user;
+    } else {
+      res.locals.auth.user = { _id: user };
+    }
     res.locals.auth.isSuperAdmin = await rolesService.hasSuperAdminRole(user);
   }
 
