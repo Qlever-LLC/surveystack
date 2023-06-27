@@ -50,6 +50,9 @@ export default function buildScriptQuestionIframeContents({
           }
         }
 
+        window.log = requestLogMessage;
+        window.runSurveyStackKit = requestRunSurveyStackKit;
+        
         loadLibs();
 
         function getInitialState() {
