@@ -95,7 +95,7 @@ const hasSuperAdminRole = async (userId) => {
 
   return (await db.collection('users').findOne({
     _id: userObjectId,
-    permissions: { $eleMatch: { $eq: 'super-admin' } },
+    permissions: 'super-admin',
   }))
     ? true
     : false;
