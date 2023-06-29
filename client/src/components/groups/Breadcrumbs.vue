@@ -19,6 +19,10 @@ export default {
       type: String,
       default: null,
     },
+    adminGroupId: {
+      type: String,
+      default: null,
+    },
   },
   computed: {
     links() {
@@ -48,6 +52,10 @@ export default {
         exact: true,
         text: 'groups',
       };
+
+      if (this.adminGroupId) {
+        links.push({ to: '/groups/edit/' + this.adminGroupId, exact: true, text: 'edit group' });
+      }
 
       if (this.disabledSuffix) {
         links.push({ disabled: true, exact: true, text: this.disabledSuffix });

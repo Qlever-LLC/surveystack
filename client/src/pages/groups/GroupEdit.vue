@@ -28,7 +28,7 @@
     </app-dialog>
 
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="entity.path" />
+      <app-group-breadcrumbs :path="entity.path" :adminGroupId="entity._id" />
     </div>
 
     <div class="d-flex justify-space-between">

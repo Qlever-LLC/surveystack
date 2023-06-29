@@ -1,7 +1,7 @@
 <template>
   <v-container v-if="farmosEnabled" class="max-800">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <app-group-breadcrumbs :path="groupPath" :adminGroupId="groupId" :disabledSuffix="suffixPart" />
     </div>
     <v-alert
       v-if="successMessage"
