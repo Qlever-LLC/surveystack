@@ -54,7 +54,7 @@ export default {
       };
 
       if (this.adminGroupId) {
-        links.push({ to: '/groups/edit/' + this.adminGroupId, exact: true, text: 'edit group' });
+        links.push({ to: '/groups/edit/' + this.adminGroupId, exact: true, text: 'admin page' });
       }
 
       if (this.disabledSuffix) {
