@@ -108,7 +108,7 @@
         append-outer-icon="mdi-open-in-new"
         @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
         @focus="handleScriptSourceFocus"
-        @change="(id) => $emit('set-control-source', id)"
+        @change="handleScriptSourceChange"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         hide-details
       >
@@ -597,7 +597,7 @@ export default {
       });
     },
     async fetchScripts() {
-      // TODO: use Mongo project to limit results, only get script name and id,
+      // TODO: use Mongo project to limit results, only get script name and id
       // so we're not fetching all the script bodies in the database.
       // Then fetch the body of the selected script once it's selected.
       this.scriptSourceIsLoading = true;
@@ -609,7 +609,15 @@ export default {
       this.fetchScripts();
     },
     handleScriptSourceChange(id) {
-      this.$emit('set-control-source', id);
+      if (!id) {
+        //no script selected
+        return;
+      }
+      const name = this.scriptSourceItems.find((i) => i._id === id).name;
+      this.$emit('set-control-source', {
+        id: id,
+        name: name,
+      });
     },
     handleScriptParamsChange(params) {
       // Validate params is valid json object
@@ -646,7 +654,13 @@ export default {
       if (this.isScript) {
         this.fetchScripts();
       }
-      this.scriptSourceId = this.control.options.source;
+      const scriptResource = this.survey.resources.find((r) => r.id === this.control.options.source);
+      if (scriptResource) {
+        this.scriptSourceId = scriptResource.content;
+      } else {
+        //fallback to directly using script id in case of legacy survey
+        this.scriptSourceId = this.control.options.source;
+      }
       this.scriptParams = this.getScriptParams();
     },
   },

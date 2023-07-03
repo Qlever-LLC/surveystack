@@ -59,7 +59,7 @@
           </div>
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
-          <div v-if="survey && submission" class="mt-6 d-flex flex-column align-stretch">
+          <div v-if="survey && submission && isOnline()" class="mt-6 d-flex flex-column align-stretch">
             <v-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
               Download Submission
             </v-btn>
@@ -82,6 +82,7 @@
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import { isOnline } from '@/utils/surveyStack';
 
 export default {
   props: {
@@ -149,6 +150,7 @@ export default {
     },
   },
   methods: {
+    isOnline,
     async downloadSubmission() {
       this.download.loading = true;
       this.download.error = null;
