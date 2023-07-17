@@ -184,7 +184,8 @@
                 <v-btn
                   v-if="!isNew"
                   :dark="enableUpdate"
-                  :disabled="!enableUpdate"
+                  :disabled="!enableUpdate || isSaving"
+                  :loading="isUpdating"
                   @click="$emit('update')"
                   color="primary"
                   class="my-1 mr-1"
@@ -226,7 +227,8 @@
                   :dark="enableSaveDraft"
                   @click="$emit('saveDraft')"
                   color="primary"
-                  :disabled="!enableSaveDraft"
+                  :disabled="!enableSaveDraft || isUpdating"
+                  :loading="isSaving"
                   class="my-1 mr-1"
                 >
                   <v-icon class="mr-1">mdi-content-save</v-icon>
@@ -294,6 +296,8 @@ export default {
     'survey',
     'value',
     'isNew',
+    'isSaving',
+    'isUpdating',
     'dirty',
     'enableUpdate',
     'enableSaveDraft',
