@@ -750,13 +750,13 @@ export default {
       return this.isDraft;
     },
     isDraft() {
-      if (!this.survey.revisions) {
+      const len = this.survey.revisions.length;
+
+      if (!this.survey.revisions || len === 0) {
         return false;
       }
 
-      const len = this.survey.revisions.length;
-
-      return len === 0 || this.survey.revisions[len - 1].version !== this.survey.latestVersion;
+      return this.survey.revisions[len - 1].version !== this.survey.latestVersion;
     },
     enableUpdate() {
       if (!this.surveyIsValid) {
