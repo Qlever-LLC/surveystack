@@ -14,7 +14,7 @@ const SUBMISSIONS_COLLECTION = 'submissions';
 
 const DEFAULT_LIMIT = 20;
 
-const sanitize = async (entity) => {
+const sanitize = async (entity, version = 1) => {
   entity._id = new ObjectId(entity._id);
 
   entity.revisions.forEach((version) => {
@@ -55,7 +55,7 @@ const sanitize = async (entity) => {
     }
   }
 
-  checkSurvey(entity, entity.latestVersion);
+  checkSurvey(entity, version);
 
   return entity;
 };
@@ -510,7 +510,7 @@ const getSurveyPdf = async (req, res) => {
 };
 
 const createSurvey = async (req, res) => {
-  const entity = await sanitize(req.body);
+  const entity = await sanitize(req.body, req.body.latestVersion);
   // apply creator (endpoint already has assertAuthenticated, so auth.user._id must exist)
   entity.meta.creator = res.locals.auth.user._id;
 
@@ -548,7 +548,10 @@ const isUserAllowedToModifySurvey = async (survey, res) => {
 
 const updateSurvey = async (req, res) => {
   const { id } = req.params;
-  const entity = await sanitize(req.body);
+  const entity = await sanitize(
+    req.body,
+    req.body.revisions[req.body.revisions.length - 1].version
+  );
 
   const existing = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!existing) {
