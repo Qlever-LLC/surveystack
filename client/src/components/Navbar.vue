@@ -9,7 +9,8 @@
         <div class="app-bar-subtitle subtitle py-0 my-0" v-html="appSubtitle" />
       </v-toolbar-title>
 
-      <v-spacer></v-spacer>
+      <v-spacer />
+      <offline-indicator />
       <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
         <v-icon size="22">mdi-help-circle-outline</v-icon>
       </v-btn>
@@ -22,9 +23,12 @@
 <script>
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
+import { isOnline } from '@/utils/surveyStack';
+import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
 
 export default {
   components: {
+    OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,
   },

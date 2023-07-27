@@ -1,5 +1,25 @@
 export const types = {};
 
+export function getLibraries() {
+  window.parent.postMessage(
+    {
+      type: 'REQUEST_LIBRARIES',
+      payload: {},
+    },
+    '*'
+  );
+
+  return new Promise(function (resolve, reject) {
+    const handler = function (event) {
+      if (event.data && event.data.type === 'RETURN_LIBRARIES' && event.data.payload) {
+        resolve(event.data.payload);
+        window.removeEventListener('message', handler);
+      }
+    };
+    window.addEventListener('message', handler);
+  });
+}
+
 export function requestFetchSubmissions() {
   // let origin;
 
@@ -22,10 +42,7 @@ export function requestFetchSubmissions() {
 
   return new Promise((resolve, reject) => {
     window.addEventListener('message', (event) => {
-      if (!event.data || !event.data.type || event.data.type !== 'RETURN_FETCH_SUBMISSION') {
-        return;
-      }
-      if (event.data && event.data.type && event.data.type === 'RETURN_FETCH_SUBMISSION') {
+      if (event && event.data && event.data.type && event.data.type === 'RETURN_FETCH_SUBMISSION') {
         resolve(event.data.payload);
       }
     });
@@ -267,52 +284,3 @@ export const runScript = (process, render, props) => async (state) => {
   updateParentState(nextState);
   renderScript(process, render, props)(nextState);
 };
-
-// const runScriptFromState = runScript3(process, render, props);
-// const renderScriptFromState = renderScript2(process, render, props);
-// const runScript3 = (process, renderScriptFromState, props) => (state) => {
-//   const nextState = process(props, state);
-//   updateParentState(nextState);
-//   renderScriptFromState(nextState);
-// };
-
-export function createUI(queue = []) {
-  return {
-    renderQueue: queue,
-    enqueue(...items) {
-      this.renderQueue = [...this.renderQueue, ...items];
-      return this.renderQueue;
-    },
-    dequeue() {
-      const [item, ...rest] = this.renderQueue;
-      this.renderQueue = rest;
-      return item;
-    },
-    executeRenderQueue() {
-      return this.renderQueue.map((item) => item());
-    },
-    plot(x, y) {
-      const node = document.createElement('div');
-      node.className = 'plot';
-      node.style.border = '1px solid red';
-      node.style.borderLeftColor = 'black';
-      node.style.borderBottomColor = 'black';
-      node.innerHTML = 'plot <br/> x <br/> o';
-      return node;
-    },
-    info(message) {
-      const node = document.createElement('div');
-      node.className = 'info';
-      node.style.border = '1px solid blue';
-      node.innerHTML = message;
-      return node;
-    },
-    addPlot(x, y) {
-      return this.enqueue(() => this.plot(x, y));
-    },
-    addInfo(message) {
-      // TODO: figure out how to make this store actual values passed in, instead of variable name when stringified
-      return this.enqueue(() => this.info(message));
-    },
-  };
-}
