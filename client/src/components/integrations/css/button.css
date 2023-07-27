@@ -40,3 +40,14 @@
   font-size: large !important;
   font-weight: bold !important;
 }
+
+.button--autocomplete {
+  min-height: 40px;
+  align-items: center;
+  display: flex;
+  position: sticky;
+  top: 0px;
+  z-index: 5;
+  justify-content: center;
+  width: 100%;
+}

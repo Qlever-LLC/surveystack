@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
+  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <v-card class="pa-4">
       <v-card-title class="headline"> Manage Groups </v-card-title>
       <v-card-text>
@@ -16,17 +16,34 @@
           v-model="selectedGroups"
           dense
           open-on-clear
-        />
-        <v-btn block @click="updateGroups" color="primary">Update Groups</v-btn>
+        >
+          <template slot="prepend-item">
+            <v-btn
+              :disabled="loading"
+              :loading="loading"
+              @click="updateGroups"
+              color="primary"
+              class="button--autocomplete"
+            >
+              Update Groups
+            </v-btn>
+          </template>
+        </v-autocomplete>
+        <div class="d-flex justify-space-around">
+          <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
+          <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
+        </div>
       </v-card-text>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import './css/button.css';
+
 export default {
-  emits: ['updateGroups'],
-  props: ['updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
+  emits: ['updateGroups', 'cancelUpdate'],
+  props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {
       selectedGroups: [],
@@ -34,7 +51,12 @@ export default {
   },
   methods: {
     updateGroups() {
-      this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroups]);
+      // emit instance, initial selected group Ids and selected group Ids before clicking update
+      this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroupIds, this.selectedGroups]);
+      this.selectedGroups = [];
+    },
+    cancelUpdate() {
+      this.$emit('cancelUpdate');
       this.selectedGroups = [];
     },
   },

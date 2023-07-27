@@ -42,6 +42,8 @@
             v-model="survey"
             :survey="survey"
             :isNew="!editMode"
+            :isSaving="isSaving"
+            :isUpdating="isUpdating"
             :dirty="dirty"
             :enableUpdate="enableUpdate"
             :enableSaveDraft="enableSaveDraft"
@@ -305,7 +307,7 @@ export default {
     // ConfirmLeaveDialog,
     appExamplesView,
   },
-  props: ['survey', 'editMode', 'freshImport'],
+  props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {
     return {
       tabMap,
@@ -791,11 +793,12 @@ export default {
       return this.isDraft;
     },
     isDraft() {
-      if (!this.survey.revisions || this.survey.revisions.length < 2) {
+      const len = this.survey.revisions.length;
+
+      if (!this.survey.revisions || len === 0) {
         return false;
       }
 
-      const len = this.survey.revisions.length;
       return this.survey.revisions[len - 1].version !== this.survey.latestVersion;
     },
     enableUpdate() {

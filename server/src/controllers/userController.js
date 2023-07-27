@@ -54,6 +54,143 @@ const getUser = async (req, res) => {
   return res.send(entity);
 };
 
+/**
+ * returns true if the user owns an instance at least once
+ */
+const isUserOwner = async (req, res) => {
+  const { userId } = req.params;
+  const ownership = await db.collection('farmos-instances').findOne({
+    userId: new ObjectId(userId),
+    owner: true,
+  });
+  const response = !!ownership;
+  return res.send(response);
+};
+
+// getOwnership response structure
+/*
+  [
+    { 
+      instanceName: "instanceName", 
+      isOwner: true, 
+      groups: [
+        { "groupId":"string id", "groupName": "name"},
+        { "groupId":"string id", "groupName": "name"},
+      ], 
+      otherUsers: [
+        { "userId":"string id", "userEmail": "email", owner: true},
+        { "userId":"string id", "userEmail": "email", owner: false},
+      ]
+    }
+    { 
+      instanceName: "instanceName",
+      isOwner: false
+    }
+  ]
+*/
+const getOwnership = async (req, res) => {
+  const { userId } = req.params;
+  const data = [];
+  const groupCompl = [];
+  const userCompl = [];
+
+  const instances = await db
+    .collection('farmos-instances')
+    .find({
+      userId: new ObjectId(userId),
+    })
+    .toArray();
+  instances.map((obj) => {
+    data.push({
+      instanceName: obj.instanceName,
+      isOwner: !!obj.owner,
+    });
+  });
+
+  const instancesWhereOwner = instances.filter((el) => el.owner);
+
+  // groups part
+  const groupsMapped = await db
+    .collection('farmos-group-mapping')
+    .find({
+      instanceName: { $in: instancesWhereOwner.map((obj) => obj.instanceName) },
+    })
+    .toArray();
+  const groupIds = groupsMapped.map((el) => el.groupId);
+  const groupsAffected = await db
+    .collection('groups')
+    .find(
+      {
+        _id: { $in: groupIds.map((id) => new ObjectId(id)) },
+      },
+      {
+        name: 1,
+      }
+    )
+    .toArray();
+
+  for (const inst of instancesWhereOwner) {
+    const groupMappings = groupsMapped
+      .filter((e) => e.instanceName === inst.instanceName)
+      .map((f) => ({
+        groupId: groupsAffected.find((g) => String(g._id) === String(f.groupId))._id,
+        groupName: groupsAffected.find((g) => String(g._id) === String(f.groupId)).name,
+      }));
+
+    groupCompl.push({
+      instanceName: inst.instanceName,
+      groups: groupMappings,
+    });
+  }
+
+  // otherUsers part
+  const usersMapped = await db
+    .collection('farmos-instances')
+    .find({
+      instanceName: { $in: instancesWhereOwner.map((obj) => obj.instanceName) },
+    })
+    .toArray();
+  const userIds = usersMapped.map((el) => el.userId);
+  const usersAffected = await db
+    .collection('users')
+    .find(
+      {
+        _id: { $in: userIds.map((id) => new ObjectId(id)) },
+      },
+      {
+        email: 1,
+      }
+    )
+    .toArray();
+
+  for (const inst of instancesWhereOwner) {
+    const userMappings = usersMapped
+      .filter((e) => e.instanceName === inst.instanceName)
+      .map((f) => ({
+        userId: f.userId,
+        userEmail: usersAffected.find((g) => String(g._id) === String(f.userId))?.email,
+        owner: f.owner,
+      }));
+
+    userCompl.push({
+      instanceName: inst.instanceName,
+      otherUsers: userMappings,
+    });
+  }
+
+  // merge data with all complements arrays
+  const mergeById = (array1, array2) =>
+    array1.map((itm) => ({
+      ...array2.find((item) => item.instanceName === itm.instanceName),
+      ...itm,
+    }));
+
+  const mergedGroupData = mergeById(data, groupCompl);
+  const mergedData = mergeById(mergedGroupData, userCompl);
+
+  res.send(mergedData);
+};
+
 const createUser = async (req, res) => {
   const entity = req.body;
 
@@ -159,6 +296,8 @@ const deleteUser = async (req, res) => {
 export default {
   getUsers,
   getUser,
+  isUserOwner,
+  getOwnership,
   createUser,
   updateUser,
   deleteUser,
