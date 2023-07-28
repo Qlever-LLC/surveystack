@@ -121,7 +121,7 @@ const createMembership = async (req, res) => {
     throw boom.badRequest('Need to supply an email address');
   }
 
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const adminAccess = await rolesService.hasAdminRoleForRequest(res, entity.group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can create memberships`);
   }
@@ -217,7 +217,7 @@ const sendMembershipInvitation = async ({ membership, origin }) => {
 
 const resendInvitation = async (req, res) => {
   const membership = res.locals.existing;
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
+  const adminAccess = await rolesService.hasAdminRoleForRequest(res, membership.group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can resend membership invitations`);
   }
@@ -236,7 +236,7 @@ const updateMembership = async (req, res) => {
   const { id } = req.params;
   const { group } = req.body;
 
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
+  const adminAccess = await rolesService.hasAdminRoleForRequest(res, group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can update memberships`);
   }
@@ -264,14 +264,15 @@ const deleteMembership = async (req, res, _, hook) => {
     throw boom.notFound(`No membership found: ${id}`);
   }
 
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
+  const adminAccess = await rolesService.hasAdminRoleForRequest(res, membership.group);
   const userAccess = res.locals.auth.user._id.equals(membership.user);
   if (!adminAccess && !userAccess) {
     throw boom.unauthorized(`Only group admins or oneself can delete memberships`);
   }
 
   try {
-    await hook(membership); // hook before removal
+    const { origin } = req.headers;
+    await hook(membership, origin); // hook before removal
 
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
@@ -323,9 +324,9 @@ const activateMembershipByAdmin = async (req, res) => {
   }
 
   const membership = await db.collection(col).findOne({ _id: ObjectId(membershipId) });
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
+  const adminAccess = await rolesService.hasAdminRoleForRequest(res, membership.group);
   if (!adminAccess) {
-    throw boom.unauthorized(`Only group admins can create memberships`);
+    throw boom.unauthorized(`Only group admins can activate memberships`);
   }
 
   await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
@@ -340,9 +341,9 @@ const createConfirmedMembership = async (req, res) => {
   sanitize(entity);
   const { origin } = req.headers;
 
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const adminAccess = await rolesService.hasAdminRoleForRequest(res, entity.group);
   if (!adminAccess) {
-    throw boom.unauthorized(`Only group admins can create memberships`);
+    throw boom.unauthorized(`Only group admins can confirm memberships`);
   }
 
   if (!entity.meta?.invitationEmail) {

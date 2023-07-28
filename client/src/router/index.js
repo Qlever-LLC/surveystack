@@ -17,6 +17,7 @@ import UserList from '@/pages/users/UserList.vue';
 import User from '@/pages/users/User.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
 import Profile from '@/pages/users/Profile.vue';
+import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 
 const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
 
@@ -198,6 +199,11 @@ const routes = [
       landingPath = decodeURIComponent(landingPath);
       window.location.replace(`${location.origin}${landingPath}`);
     },
+  },
+  {
+    path: '/farmos/profile',
+    name: 'farmos-profile',
+    components: getComponents(FarmOSProfile),
   },
   // users
   {

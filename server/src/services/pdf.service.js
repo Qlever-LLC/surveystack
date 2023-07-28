@@ -453,10 +453,10 @@ class PdfGenerator {
       else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
         const multiple =
           type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
-        if (layout.hideList) {
-          def = this.getPrintableAnswerDef();
-        } else {
+        if (layout.showAllOptionsPrintable) {
           def = this.getSelectDef('', source, layout.columns, multiple);
+        } else {
+          def = this.getPrintableAnswerDef();
         }
       }
       // Number
@@ -505,7 +505,7 @@ class PdfGenerator {
       const multiple =
         type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
 
-      if (layout.showAll) {
+      if (layout.showAllOptions) {
         def = this.getSelectDef(answer, source, layout.columns, multiple);
       } else {
         const value = transformValueToLabel(answer, source);

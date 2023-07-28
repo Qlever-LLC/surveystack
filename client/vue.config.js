@@ -79,6 +79,7 @@ module.exports = {
       // ...other Workbox options...
       clientsClaim: true,
       skipWaiting: true,
+      navigateFallback: 'index.html',
       runtimeCaching: [
         {
           urlPattern: /\/api\/.*$/,

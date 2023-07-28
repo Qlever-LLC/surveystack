@@ -30,7 +30,7 @@ const getIntegrations = async (req, res) => {
 
   const options = { projection: { data: 0 } }; // TODO: find better way to hide secrets
   if (populate && res.locals.auth.user && res.locals.auth.user._id) {
-    const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
+    const access = await rolesService.hasAdminRoleForRequest(res, group);
     if (access) {
       options.projection = {};
     }
@@ -45,7 +45,7 @@ const getIntegration = async (req, res) => {
 
   let entity;
   entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const access = await rolesService.hasAdminRoleForRequest(res, entity.group);
   if (!access) {
     throw boom.unauthorized();
   }
@@ -57,7 +57,7 @@ const createIntegration = async (req, res) => {
   const entity = req.body;
   sanitizeIntegration(entity);
 
-  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const access = await rolesService.hasAdminRoleForRequest(res, entity.group);
   if (!access) {
     throw boom.unauthorized();
   }
@@ -81,7 +81,7 @@ const updateIntegration = async (req, res) => {
 
   sanitizeIntegration(entity);
 
-  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const access = await rolesService.hasAdminRoleForRequest(res, entity.group);
   if (!access) {
     throw boom.unauthorized();
   }
@@ -106,7 +106,7 @@ const deleteIntegration = async (req, res) => {
   const { id } = req.params;
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, existing.group);
+  const access = await rolesService.hasAdminRoleForRequest(res, existing.group);
   if (!access) {
     throw boom.unauthorized();
   }
