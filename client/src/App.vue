@@ -29,6 +29,9 @@ export default {
     this.fetchPinnedSurveys();
     this.fetchFarmOsAssets();
     this.fetchMySubmissions();
+    //prefetch plotly which currently needs to be provided for all scripts
+    //TODO with https://gitlab.com/our-sci/software/surveystack/-/issues/177, this will be replaced by fetching the union set of all pinned survey's script-dependencies
+    fetch('https://cdn.plot.ly/plotly-2.18.2.min.js');
   },
   methods: {
     async fetchPinnedSurveys() {

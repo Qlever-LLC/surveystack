@@ -246,15 +246,26 @@ export default {
     const { group } = this.$route.query;
 
     if (group) {
-      this.$store.dispatch('surveys/fetchPinned'); // TODO do we need fetchPinned?
+      // see analysis in https://gitlab.com/our-sci/software/surveystack/-/merge_requests/230#note_1286909610
       await autoSelectActiveGroup(this.$store, group);
     }
 
     const { data: entity } = await api.get(`/surveys/${id}?version=latest`);
+
+    if (entity.resources) {
+      //also fetch resources here in case survey is not pinned, so it's available if device goes offline
+      await this.$store.dispatch('resources/fetchResources', entity.resources);
+    }
+
     this.entity = entity;
 
-    const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
-    this.surveyInfo = surveyInfo;
+    try {
+      // load date of latestSubmission and number of submissions. This is not prefetched by means, so it will throw when offline
+      const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
+      this.surveyInfo = surveyInfo;
+    } catch (error) {
+      console.warn('unable to get survey stats infos. Maybe device is offline.');
+    }
 
     const user = this.$store.getters['auth/user'];
     this.$store.dispatch('memberships/getUserMemberships', user._id);

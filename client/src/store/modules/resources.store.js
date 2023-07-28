@@ -11,6 +11,8 @@ import api from '@/services/api.service';
 import axios from 'axios';
 import ObjectId from 'bson-objectid';
 import slugify from '@/utils/slugify';
+import { cloneDeep } from 'lodash';
+import { isOnline } from '@/utils/surveyStack';
 
 const createInitialState = () => ({
   resources: [],
@@ -160,6 +162,28 @@ const actions = {
       throw error;
     }
   },
+  async fetchScriptResource({ commit, getters, dispatch }, resource) {
+    try {
+      let resourceStored = getters['getResource'](resource.id);
+      if (isOnline()) {
+        //always load latest script version if online
+        const { data: scriptCode } = await api.get(`/scripts/${resource.content}`);
+        resourceStored = cloneDeep(resource);
+        resourceStored._id = resourceStored.id; //_id is required to be stored in idb
+        resourceStored.fileData = scriptCode;
+        db.persistResource(resourceStored);
+        commit('REMOVE_RESOURCE', resource._id);
+        commit('ADD_RESOURCE', resourceStored);
+      }
+      return resourceStored;
+    } catch (error) {
+      dispatch('feedback/add', `Could not fetch resource ${resource.id}. This problem is reported automatically.`, {
+        root: true,
+      });
+      console.error(error);
+      throw error;
+    }
+  },
   async fetchResources({ commit, dispatch }, surveyResource) {
     try {
       let promises = [];
@@ -167,6 +191,8 @@ const actions = {
         if (r.location === resourceLocations.REMOTE && r.type === resourceTypes.FILE) {
           //Hint: survey resources's primary key is called id, not _id
           promises.push(dispatch('fetchResource', r.id));
+        } else if (r.location === resourceLocations.REMOTE && r.type === resourceTypes.SCRIPT_REFERENCE) {
+          promises.push(dispatch('fetchScriptResource', r));
         }
       }
       await Promise.all(promises);

@@ -3,6 +3,7 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
+import { isOnline } from '@/utils/surveyStack';
 
 const requestWakeLock = async () => {
   try {
@@ -50,6 +51,7 @@ export default {
       marker: null,
       ctrl: null,
       mapError: false,
+      offlineMode: false,
       location: null,
       gpsLocation: null,
       gpsTimer: 0,
@@ -168,11 +170,23 @@ export default {
         console.log(err);
         this.mapError = true;
         this.usingGPS = true;
+        if (!isOnline()) {
+          this.loadCurrentPositionOffline();
+        }
       });
 
       this.map.on('drag', () => {
         this.usingGPS = false;
       });
+    },
+    loadCurrentPositionOffline() {
+      if (navigator.geolocation) {
+        this.offlineMode = true;
+        navigator.geolocation.getCurrentPosition((position) => {
+          this.gpsLocation = geoJsonFromPosition(position);
+          this.changed(this.gpsLocation);
+        });
+      }
     },
   },
   computed: {

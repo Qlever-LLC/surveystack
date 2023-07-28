@@ -184,10 +184,17 @@ export default {
       this.showResubmissionDialog = true;
     }
 
+    //first fetch latest version to allow cache hit on prefetched pinned survey in offline state
     this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
       id: this.submission.meta.survey.id,
-      version: this.submission.meta.survey.version,
     });
+    //cover edge case of a submission based on an old survey version (leads to error due to cache-miss in offline state)
+    if (this.survey.latestVersion !== this.submission.meta.survey.version) {
+      this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
+        id: this.submission.meta.survey.id,
+        version: this.submission.meta.survey.version,
+      });
+    }
     const cleanSubmission = createSubmissionFromSurvey({
       survey: this.survey,
       version: this.submission.meta.survey.version,

@@ -8,6 +8,7 @@ export function onMessage(type, callback) {
       callback(event.data.payload);
     }
   }
+
   window.addEventListener('message', handler);
   return handler;
 }
@@ -21,12 +22,15 @@ export default function buildScriptQuestionIframeContents({
   contextJSON,
   controlJSON,
   paramsJSON,
+  iframeMessagingSource,
+  markedSource,
+  iframeUISource,
+  sandboxUtilsSource,
+  iframeStyles,
 }) {
-  let baseURL = window.location.origin;
-
   return `
   <head>
-    <link href="${baseURL}/iframeStyles.css" rel="stylesheet">
+   <style type="text/css">${iframeStyles}</style>
   </head>
   <body>
       <div class="spinner-container">
@@ -34,29 +38,22 @@ export default function buildScriptQuestionIframeContents({
       </div>
       <div id="root"></div>
       <script type="module">
-        import {
-          requestFetchSubmissions,
-          requestSetStatus,
-          requestSetValue,
-          requestSetContext,
-          requestSetRenderQueue,
-          requestLogMessage,
-          requestRunSurveyStackKit,
-          onMessage,
-          handleLoaded,
-          statusTypes,
-          renderScript,
-          runScript,
-          resetDOM,
-          // createUI,
-        } from '${baseURL}/iframeMessaging.js';
+        ${markedSource}
+        ${iframeUISource}
+        ${sandboxUtilsSource}
+        ${iframeMessagingSource}
 
-        import { createUI } from '${baseURL}/iframeUI.js';
-        import * as ui from '${baseURL}/iframeUI.js';
-        import * as utils from '${baseURL}/sandboxUtils.js';
+        async function loadLibs() {
+          const libraries = await getLibraries();
+          for await (const lib of libraries) {
+            await import(/* webpackIgnore: true */'data:text/javascript;base64,'+lib);
+          }
+        }
 
         window.log = requestLogMessage;
         window.runSurveyStackKit = requestRunSurveyStackKit;
+        
+        loadLibs();
 
         function getInitialState() {
           return {
@@ -81,6 +78,5 @@ export default function buildScriptQuestionIframeContents({
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
       </script>
-      <script async src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </body>`;
 }

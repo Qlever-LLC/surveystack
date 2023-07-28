@@ -1,9 +1,11 @@
 <template>
   <div v-if="!showInvalidPlatformModal">
     <survey-builder
-      v-if="!loading"
+      v-if="!loading.fetch"
       :key="sessionId"
       :survey="survey"
+      :isSaving="loading.save"
+      :isUpdating="loading.publish"
       :editMode="editMode"
       :freshImport="freshImport"
       @submit="submitSubmission"
@@ -131,7 +133,11 @@ export default {
       editMode: true,
       showConflictModal: false,
       sessionId: new ObjectId().toString(),
-      loading: false,
+      loading: {
+        save: false,
+        publish: false,
+        fetch: false,
+      },
       instance: {},
       survey: createSurvey({
         creator: this.$store.state.auth.user._id,
@@ -231,6 +237,12 @@ export default {
       this.submitting = false;
     },
     async submitSurvey(isDraft) {
+      if (isDraft) {
+        this.loading.save = true;
+      } else {
+        this.loading.update = true;
+      }
+
       this.freshImport = false;
       const tmp = { ...this.survey };
 
@@ -254,6 +266,9 @@ export default {
         }
 
         this.snack(isDraft ? 'Saved Draft' : 'Published Survey');
+
+        this.sessionId = new ObjectId().toString();
+        this.survey = { ...tmp };
       } catch (error) {
         if (error && error.response && error.response.status === 409) {
           this.showConflictModal = true;
@@ -263,11 +278,13 @@ export default {
         } else {
           console.error(error);
         }
-        return;
       }
 
-      this.sessionId = new ObjectId().toString();
-      this.survey = { ...tmp };
+      if (isDraft) {
+        this.loading.save = false;
+      } else {
+        this.loading.update = false;
+      }
     },
     async importSurvey({
       target: {
@@ -347,7 +364,7 @@ export default {
         console.log('something went wrong:', e);
       }
       this.sessionId = new ObjectId().toString();
-      this.loading = false;
+      this.loading.fetch = false;
     },
     onReloadSurvey() {
       this.fetchData();
@@ -359,7 +376,7 @@ export default {
     this.survey._id = new ObjectId();
 
     if (this.editMode) {
-      this.loading = true;
+      this.loading.fetch = true;
       await this.fetchData();
     }
   },

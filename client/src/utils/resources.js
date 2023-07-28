@@ -10,6 +10,7 @@ export const resourceTypes = {
   IMAGE: 'IMAGE',
   SURVEY_REFERENCE: 'SURVEY_REFERENCE',
   FILE: 'FILE',
+  SCRIPT_REFERENCE: 'SCRIPT_REFERENCE',
 };
 
 export const resourceLocations = {
