@@ -205,7 +205,7 @@
       <!-- Control options -->
       <v-spacer></v-spacer>
       <checkbox
-        v-if="showRequiredOption"
+        v-if="hasRequiredOption"
         label="Required"
         v-model="control.options.required"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
