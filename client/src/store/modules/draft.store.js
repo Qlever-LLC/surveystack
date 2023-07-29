@@ -258,17 +258,13 @@ const actions = {
         continue;
       }
 
-      //initialize value if value is nullish
+      //initialize value if it has not been modified by the user yet
       const nextNodePath = nextNode
         .getPath()
         .map((n) => n.model.name)
         .join('.');
       const field = get(state.submission, nextNodePath);
-      if (
-        field.value === null ||
-        field.value === undefined ||
-        (Array.isArray(field.value) && field.value.length === 0)
-      ) {
+      if (!field.meta.dateModified) {
         await dispatch('initialize', nextNode);
       }
 
@@ -409,6 +405,8 @@ const actions = {
     const [initialize] = await codeEvaluator.calculateInitialize([nextNode || state.node], state.submission, state.survey); // eslint-disable-line
     if (initialize && initialize.result) {
       commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
+      //also set dateModified to null which is required in case of the value being re-initialized manually
+      commit('SET_PROPERTY', { path: `${initialize.path}.meta.dateModified`, value: null });
     }
   },
   async calculateApiCompose({ commit, state }) {
