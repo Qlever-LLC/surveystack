@@ -80,7 +80,7 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: true,
       navigateFallback: 'index.html',
-      navigateFallbackDenylist: /\/static\/.*$/,
+      navigateFallbackDenylist: [/\/static\/.*$/],
       runtimeCaching: [
         {
           urlPattern: /\/api\/.*$/,
