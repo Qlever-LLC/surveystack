@@ -346,8 +346,8 @@ const getSurvey = async (req, res) => {
         },
       },
     });
-  } else if (version === 'latestPublishedOrDraft') {
-    // caller only requests the latest survey revision which may be published or draft, exclude all other revisions
+  } else if (version === 'latestPublishedAndDraft') {
+    // caller only requests the LATEST PUBLISHED survey revision AND DRAFT versions, exclude all other revisions
     pipeline.push({
       $project: {
         name: 1,
@@ -356,7 +356,11 @@ const getSurvey = async (req, res) => {
         description: 1,
         resources: 1,
         revisions: {
-          $slice: ['$revisions', -1],
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $gte: ['$$revision.version', '$latestVersion'] },
+          },
         },
       },
     });

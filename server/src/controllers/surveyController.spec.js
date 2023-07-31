@@ -242,10 +242,10 @@ describe('surveyController', () => {
       );
     });
 
-    it('returns the latest revision (last array position) if version=latestPublishedOrDraft is passed', async () => {
-      const returnedSurvey = await loadSurvey('latestPublishedOrDraft');
-      expect(returnedSurvey.revisions.length).toBe(1);
-      expect(returnedSurvey.revisions[returnedSurvey.revisions.length - 1].version).toBe(4);
+    it('returns the latest published revision and a draft version (if existing) if version=latestPublishedAndDraft is passed', async () => {
+      const returnedSurvey = await loadSurvey('latestPublishedAndDraft');
+      expect(returnedSurvey.revisions.length).toBe(2);
+      expect(returnedSurvey.revisions[returnedSurvey.revisions.length - 2].version).toBe(4);
     });
 
     it('returns all revisions if version=all is passed', async () => {
@@ -341,7 +341,7 @@ describe('surveyController', () => {
         //fetch a reduced survey like builder does it
         const req1 = createReq({
           params: { id: surveyStored._id },
-          query: { version: 'latestPublishedOrDraft' },
+          query: { version: 'latestPublishedAndDraft' },
         });
         const res1 = await createRes({
           user: { _id: surveyStored.meta.creator, permissions: [] },
@@ -372,7 +372,7 @@ describe('surveyController', () => {
         //fetch a reduced survey like builder does it
         const req1 = createReq({
           params: { id: surveyStored._id },
-          query: { version: 'latestPublishedOrDraft' },
+          query: { version: 'latestPublishedAndDraft' },
         });
         const res1 = await createRes({
           user: { _id: surveyStored.meta.creator, permissions: [] },
