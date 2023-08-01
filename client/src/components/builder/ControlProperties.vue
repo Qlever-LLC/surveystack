@@ -118,7 +118,7 @@
         append-outer-icon="mdi-open-in-new"
         @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
         @focus="handleScriptSourceFocus"
-        @change="(id) => $emit('set-control-source', id)"
+        @change="handleScriptSourceChange"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         hide-details
       >
@@ -367,57 +367,60 @@
             />
           </div>
 
-          <div v-if="isSelect || isOntology">
-            <checkbox
-              label="Show all answers"
-              v-model="control.options.printLayout.showAll"
-              helper-text="Show full answers list, highlight the selected answer(s)"
-            />
-          </div>
+          <template v-if="isSelect || isOntology">
+            <div>Blank Survey (from title page)</div>
+            <div class="mt-2">
+              <checkbox
+                label="Show all resource list options"
+                v-model="control.options.printLayout.showAllOptionsPrintable"
+                helper-text="Show the complete list of possible options when printing a fresh survey"
+              />
+            </div>
 
-          <div v-if="isSelect || isOntology">
-            <checkbox
-              label="Hide Answer List"
-              v-model="control.options.printLayout.hideList"
-              helper-text='Do not show the complete list of answers when printing a fresh survey (the "Print Survey" button)'
-            />
-          </div>
+            <div>Filled Submission</div>
+            <div class="mt-2">
+              <checkbox
+                label="Show all resource list options"
+                v-model="control.options.printLayout.showAllOptions"
+                helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
+              />
+            </div>
 
-          <v-select
-            v-if="isSelect || isOntology"
-            label="Answer layout"
-            v-model="control.options.printLayout.columns"
-            :items="[1, 2, 3, 4, 5]"
-            color="focus"
-            :menu-props="{ contentClass: 'layout-select' }"
-            hide-details
-          >
-            <template v-slot:selection="{ item, index }">
-              {{ item === 1 ? '1 column' : `${item} columns` }}
-            </template>
+            <v-select
+              label="Answer layout"
+              v-model="control.options.printLayout.columns"
+              :items="[1, 2, 3, 4, 5]"
+              color="focus"
+              :menu-props="{ contentClass: 'layout-select' }"
+              hide-details
+            >
+              <template v-slot:selection="{ item, index }">
+                {{ item === 1 ? '1 column' : `${item} columns` }}
+              </template>
 
-            <template v-slot:item="{ item, on, attrs }">
-              <div class="d-flex align-center col">
-                <div class="col-label">
-                  {{ item === 1 ? '1 column' : `${item} columns` }}
-                </div>
-                <div class="ml-2" :class="`col-item cols-${item}`" v-on="on" v-bind="attrs">
-                  <div v-for="letter in 'ABCDE'.split('')" :key="letter">
-                    {{ letter }}
+              <template v-slot:item="{ item, on, attrs }">
+                <div class="d-flex align-center col">
+                  <div class="col-label">
+                    {{ item === 1 ? '1 column' : `${item} columns` }}
+                  </div>
+                  <div class="ml-2" :class="`col-item cols-${item}`" v-on="on" v-bind="attrs">
+                    <div v-for="letter in 'ABCDE'.split('')" :key="letter">
+                      {{ letter }}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </template>
+              </template>
 
-            <template #append-outer>
-              <v-tooltip max-width="400" transition="slide-x-transition" right>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
-                </template>
-                Set the number of items in a row
-              </v-tooltip>
-            </template>
-          </v-select>
+              <template #append-outer>
+                <v-tooltip max-width="400" transition="slide-x-transition" right>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+                  </template>
+                  Set the number of items in a row
+                </v-tooltip>
+              </template>
+            </v-select>
+          </template>
         </div>
       </template>
 
@@ -606,7 +609,7 @@ export default {
       });
     },
     async fetchScripts() {
-      // TODO: use Mongo project to limit results, only get script name and id,
+      // TODO: use Mongo project to limit results, only get script name and id
       // so we're not fetching all the script bodies in the database.
       // Then fetch the body of the selected script once it's selected.
       this.scriptSourceIsLoading = true;
@@ -618,7 +621,15 @@ export default {
       this.fetchScripts();
     },
     handleScriptSourceChange(id) {
-      this.$emit('set-control-source', id);
+      if (!id) {
+        //no script selected
+        return;
+      }
+      const name = this.scriptSourceItems.find((i) => i._id === id).name;
+      this.$emit('set-control-source', {
+        id: id,
+        name: name,
+      });
     },
     handleScriptParamsChange(params) {
       // Validate params is valid json object
@@ -655,7 +666,13 @@ export default {
       if (this.isScript) {
         this.fetchScripts();
       }
-      this.scriptSourceId = this.control.options.source;
+      const scriptResource = this.survey.resources.find((r) => r.id === this.control.options.source);
+      if (scriptResource) {
+        this.scriptSourceId = scriptResource.content;
+      } else {
+        //fallback to directly using script id in case of legacy survey
+        this.scriptSourceId = this.control.options.source;
+      }
       this.scriptParams = this.getScriptParams();
     },
   },
