@@ -347,7 +347,7 @@ const getSurvey = async (req, res) => {
       },
     });
   } else if (version === 'latestPublishedOrDraft') {
-    // caller only requests the LATEST PUBLISHED survey revision AND DRAFT versions, exclude all other revisions
+    // caller only requests the latest survey revision which may be published or draft, exclude all other revisions
     pipeline.push({
       $project: {
         name: 1,
