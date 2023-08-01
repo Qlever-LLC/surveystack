@@ -1,35 +1,5 @@
-/* eslint no-restricted-syntax: 0 */
-import Vue from 'vue';
-// TODO: try to get rid of Vue import
-// But we kind of need Vue.set for setting new properties without losing reactivity
-
 import TreeModel from 'tree-model';
-
-const SEPARATOR = '.';
-
-// http://blog.nicohaemhouts.com/2015/08/03/accessing-nested-javascript-objects-with-string-key/
-export function getNested(obj, path, fallback = undefined) {
-  try {
-    return path
-      .replace('[', SEPARATOR)
-      .replace(']', '')
-      .split(SEPARATOR)
-      .reduce((item, property) => (item[property] === undefined ? fallback : item[property]), obj);
-  } catch (err) {
-    return fallback;
-  }
-}
-
-export function setNested(obj, path, value) {
-  const parentPath = path.replace('[', SEPARATOR).replace(']', '').split(SEPARATOR);
-  const subKey = parentPath.pop();
-  const parent = getNested(obj, parentPath.join(SEPARATOR), null);
-  // parent[subKey] = value; // not reactive if setting properties which do not exist yet
-  if (parent === null) {
-    throw new Error(`invalid path ${path} does not exist on obj`);
-  }
-  Vue.set(parent, subKey, value);
-}
+import { get } from 'lodash';
 
 export const getAllNodes = (root) => {
   const nodes = [];
@@ -69,7 +39,7 @@ export function getRelevance(submission, path, fallback = true) {
   const splits = path.split('.');
   while (splits.length > 1) {
     const p = splits.join('.');
-    const relevant = getNested(submission, `${p}.meta.relevant`, fallback);
+    const relevant = get(submission, `${p}.meta.relevant`, fallback);
     if (!relevant) {
       return false;
     }
@@ -98,7 +68,7 @@ export function isAnswered(node, submission) {
     .getPath()
     .map((n) => n.model.name)
     .join('.');
-  const value = getNested(submission, `${path}.value`, null);
+  const value = get(submission, `${path}.value`, null);
 
   if (type === 'matrix') {
     if (!value || (Array.isArray(value) && value.length === 0)) {
@@ -194,12 +164,15 @@ export const createBasicQueryList = (survey, version = 1) => {
   return items;
 };
 
+export function isOnline() {
+  return window.navigator.onLine;
+}
+
 export default {
-  getNested,
-  setNested,
   getAllNodes,
   queueAction,
   isAnswered,
   getValueOrNull,
   createBasicQueryList,
+  isOnline,
 };

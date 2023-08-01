@@ -3,7 +3,7 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <div :id="`map-question-geocoder-${index}`" class="geocoder" style="z-index: 200" />
+    <div v-show="!offlineMode" :id="`map-question-geocoder-${index}`" class="geocoder" style="z-index: 200" />
 
     <div class="map-container my-2" v-if="!mapError">
       <app-gps class="gps-info" :expanded="false" :location="currentLocation.location">
@@ -36,6 +36,28 @@
       </div>
     </div>
 
+    <div id="map-error-alert" class="my-4" v-else-if="offlineMode">
+      <v-alert type="info" border="right" prominent>
+        <b>Offline-Mode</b>: Map unavailable, but position can be determined if permission is granted
+      </v-alert>
+      <div>
+        Current location:
+        <samp v-if="currentLocation && currentLocation.location">
+          <br />
+          lng:&nbsp;{{ currentLocation.location.geometry.coordinates[0].toFixed(5) }}
+          <br />
+          lat:&nbsp;{{ currentLocation.location.geometry.coordinates[1].toFixed(5) }}
+          <br />
+          <span v-if="currentLocation.location.properties.accuracy">
+            acc:&nbsp;{{ currentLocation.location.properties.accuracy.toFixed(2) }}
+          </span>
+          <br />
+          <v-btn @click="loadCurrentPositionOffline()">Refresh Location</v-btn>
+        </samp>
+        <samp v-else>unavailable</samp>
+      </div>
+    </div>
+
     <div id="map-error-alert" class="my-4" v-else>
       <v-alert type="info" border="right" prominent> Error loading map. </v-alert>
       <app-gps :expanded="true" :location="currentLocation.location">
@@ -43,7 +65,7 @@
       </app-gps>
     </div>
 
-    <v-overlay class="text-center" :value="!gpsLocation && !mapError && !geolocationError" light absolute>
+    <v-overlay class="text-center" :value="!value && !gpsLocation && !mapError && !geolocationError" light absolute>
       <v-card light>
         <v-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>

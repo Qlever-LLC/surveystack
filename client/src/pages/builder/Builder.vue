@@ -1,9 +1,11 @@
 <template>
   <div v-if="!showInvalidPlatformModal">
     <survey-builder
-      v-if="!loading"
+      v-if="!loading.fetch"
       :key="sessionId"
       :survey="survey"
+      :isSaving="loading.save"
+      :isUpdating="loading.publish"
       :editMode="editMode"
       :freshImport="freshImport"
       @submit="submitSubmission"
@@ -56,12 +58,16 @@
       :items="resultItems"
       title="Result of Submission"
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      :survey="survey"
+      :submission="submission"
     />
 
     <result-dialog
       v-model="showApiComposeErrors"
       :items="apiComposeErrors"
       title="ApiCompose Errors"
+      :survey="survey"
+      :submission="submission"
       @close="showApiComposeErrors = false"
     />
 
@@ -101,17 +107,16 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import api from '@/services/api.service';
-
 import appDialog from '@/components/ui/Dialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
-
+import VersionsDialog from '@/components/builder/VersionsDialog';
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import VersionsDialog from '@/components/builder/VersionsDialog';
+import downloadExternal from '@/utils/downloadExternal';
+import api from '@/services/api.service';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -128,12 +133,17 @@ export default {
       editMode: true,
       showConflictModal: false,
       sessionId: new ObjectId().toString(),
-      loading: false,
+      loading: {
+        save: false,
+        publish: false,
+        fetch: false,
+      },
       instance: {},
       survey: createSurvey({
         creator: this.$store.state.auth.user._id,
         group: this.getActiveGroupSimpleObject(),
       }),
+      submission: null,
       showSnackbar: false,
       snackbarMessage: '',
       showDeleteModal: false,
@@ -191,6 +201,7 @@ export default {
       }
     },
     async submitSubmission({ payload }) {
+      this.submission = null;
       this.apiComposeErrors = getApiComposeErrors(this.survey, payload);
       if (this.apiComposeErrors.length > 0) {
         this.showApiComposeErrors = true;
@@ -200,7 +211,7 @@ export default {
       this.submitting = true;
       try {
         await uploadFileResources(this.$store, this.survey, payload, false);
-        const submission = {
+        this.submission = {
           ...payload,
           meta: {
             ...payload.meta,
@@ -208,7 +219,7 @@ export default {
             archivedReason: 'SUBMISSION_FROM_BUILDER',
           },
         };
-        const response = await api.post('/submissions', submission);
+        const response = await api.post('/submissions', this.submission);
         try {
           this.result({ response });
         } catch (error) {
@@ -226,6 +237,12 @@ export default {
       this.submitting = false;
     },
     async submitSurvey(isDraft) {
+      if (isDraft) {
+        this.loading.save = true;
+      } else {
+        this.loading.update = true;
+      }
+
       this.freshImport = false;
       const tmp = { ...this.survey };
 
@@ -249,6 +266,9 @@ export default {
         }
 
         this.snack(isDraft ? 'Saved Draft' : 'Published Survey');
+
+        this.sessionId = new ObjectId().toString();
+        this.survey = { ...tmp };
       } catch (error) {
         if (error && error.response && error.response.status === 409) {
           this.showConflictModal = true;
@@ -258,11 +278,13 @@ export default {
         } else {
           console.error(error);
         }
-        return;
       }
 
-      this.sessionId = new ObjectId().toString();
-      this.survey = { ...tmp };
+      if (isDraft) {
+        this.loading.save = false;
+      } else {
+        this.loading.update = false;
+      }
     },
     async importSurvey({
       target: {
@@ -330,16 +352,7 @@ export default {
     async exportSurvey() {
       const { data } = await api.get(`/surveys/${this.survey._id}?version=all`);
       const dataString = JSON.stringify(data, null, 4);
-      //create temporary download link
-      const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`);
-      element.setAttribute('download', `${this.survey.name}.json`);
-      element.style.display = 'none';
-      document.body.appendChild(element);
-      //click the download lonk
-      element.click();
-      //remove the link
-      document.body.removeChild(element);
+      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`, `${this.survey.name}.json`);
     },
     async fetchData() {
       try {
@@ -351,7 +364,7 @@ export default {
         console.log('something went wrong:', e);
       }
       this.sessionId = new ObjectId().toString();
-      this.loading = false;
+      this.loading.fetch = false;
     },
     onReloadSurvey() {
       this.fetchData();
@@ -363,7 +376,7 @@ export default {
     this.survey._id = new ObjectId();
 
     if (this.editMode) {
-      this.loading = true;
+      this.loading.fetch = true;
       await this.fetchData();
     }
   },

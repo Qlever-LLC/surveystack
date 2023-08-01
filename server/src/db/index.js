@@ -41,6 +41,8 @@ const connectDatabase = async () => {
   await db.collection('farmos-instances').createIndex({ userId: 1 });
   await db.collection('farmos-instances').createIndex({ instanceName: 1 });
 
+  await db.collection('farmos-instance-notes').createIndex({ instanceName: 1 }, { unique: true });
+
   await db.collection(COLL_GROUPS_HYLO_MAPPINGS).createIndex({ groupId: 1 }, { unique: true });
   // await db.collection(COLL_GROUPS_HYLO_MAPPINGS).dropIndex({ hyloGroupId: 1 });
 
@@ -70,6 +72,10 @@ const connectDatabase = async () => {
   await migrateGroups_VXtoV2();
   await migrateLibraryIds();
   await migrateResourceLibraryIds();
+  await migrateSurveyPrintOptions_VXtoV5();
+  await migrateSurveyControlPrintLayout_VXtoV6();
+  await migrateSurveyOntologyOptions_VXtoV7();
+  await migrateSurveyControlPrintLayout_VXtoV9();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -260,6 +266,311 @@ const migrateResourceLibraryIds = async () => {
   if (modifiedCount > 0) {
     console.log('Migrated resource.library to objectId of this many surveys', modifiedCount);
   }
+};
+
+const migrateSurveyPrintOptions_VXtoV5 = async () => {
+  let modifiedCount = 0;
+
+  // Insert print options if doesn't have one
+  let res = await db.collection('surveys').updateMany(
+    {
+      'meta.specVersion': { $lte: 4 },
+      options: { $eq: null },
+      'meta.printOptions': { $eq: null },
+    },
+    [
+      {
+        $set: {
+          'meta.specVersion': 5,
+          'meta.printOptions': {
+            showInstruction: true,
+            showUnanswered: false,
+          },
+        },
+      },
+    ]
+  );
+  modifiedCount += res.modifiedCount;
+
+  // Move `survey.options` to `survey.meta.printOptions`
+  res = await db.collection('surveys').updateMany(
+    {
+      'meta.specVersion': { $lte: 4 },
+      options: { $ne: null },
+    },
+    [
+      {
+        $set: {
+          'meta.specVersion': 5,
+          'meta.printOptions': '$options',
+        },
+      },
+      {
+        $unset: 'options',
+      },
+    ]
+  );
+  modifiedCount += res.modifiedCount;
+
+  if (modifiedCount > 0) {
+    console.log(
+      'Migrated `survey.options` to `survey.meta.printOptions` for many surveys:',
+      modifiedCount
+    );
+  }
+};
+
+const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({ 'meta.specVersion': { $lte: 5 } })
+    .toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    let modifiedControlsCount = 0;
+    for (const revision of survey.revisions) {
+      for (const control of revision.controls) {
+        modifiedControlsCount += addControlPrintLayout(control);
+      }
+    }
+
+    if (modifiedControlsCount === 0) {
+      await db
+        .collection('surveys')
+        .findOneAndUpdate(
+          { _id: new ObjectId(survey._id) },
+          { $set: { 'meta.specVersion': 6 } },
+          { returnOriginal: false }
+        );
+
+      continue;
+    }
+
+    survey.meta.specVersion = 6;
+
+    await db
+      .collection('surveys')
+      .findOneAndUpdate(
+        { _id: new ObjectId(survey._id) },
+        { $set: survey },
+        { returnOriginal: false }
+      );
+
+    modifiedCount++;
+
+    console.log('Migrated `control.options.printLayout` to the survey:', survey.name);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated `control.options.printLayout` to many surveys:', modifiedCount);
+  }
+};
+
+const addControlPrintLayout = (control) => {
+  if (control.options.printLayout) {
+    return 0;
+  }
+
+  const printLayout = {};
+  if (control.type === 'matrix') {
+    printLayout.table = true;
+  } else if (control.type === 'file' || control.type === 'image') {
+    printLayout.preview = false;
+  } else if (/select/i.test(control.type) || control.type === 'ontology') {
+    printLayout.showAll = false;
+    printLayout.hideList = false;
+    printLayout.columns = 3;
+  }
+
+  if (Object.keys(printLayout).length > 0) {
+    control.options.printLayout = printLayout;
+    return 1;
+  }
+
+  if (Array.isArray(control.children)) {
+    let modifiedCount = 0;
+    for (const child of control.children) {
+      modifiedCount += addControlPrintLayout(child);
+    }
+    return modifiedCount;
+  }
+
+  return 0;
+};
+
+// https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
+const migrateSurveyOntologyOptions_VXtoV7 = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({ 'meta.specVersion': { $lte: 6 } })
+    .toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    let modifiedControlsCount = 0;
+    for (const revision of survey.revisions) {
+      for (const control of revision.controls) {
+        modifiedControlsCount += addOntologyAutocompleteOption(control);
+      }
+    }
+
+    if (modifiedControlsCount === 0) {
+      await db
+        .collection('surveys')
+        .findOneAndUpdate(
+          { _id: new ObjectId(survey._id) },
+          { $set: { 'meta.specVersion': 7 } },
+          { returnOriginal: false }
+        );
+
+      continue;
+    }
+
+    survey.meta.specVersion = 7;
+
+    await db
+      .collection('surveys')
+      .findOneAndUpdate(
+        { _id: new ObjectId(survey._id) },
+        { $set: survey },
+        { returnOriginal: false }
+      );
+
+    modifiedCount++;
+
+    console.log('Migrated dropdown options to the survey:', survey.name);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated dropdown options to many surveys:', modifiedCount);
+  }
+};
+
+const addOntologyAutocompleteOption = (control) => {
+  // Skip if already set
+  if (typeof control.options.allowAutocomplete === 'boolean') {
+    return 0;
+  }
+
+  // Add `options.allowAutocomplete if ontology
+  if (control.type === 'ontology') {
+    control.options.allowAutocomplete = control.options.allowCustomSelection || false;
+    return 1;
+  }
+
+  // 1. Add `autocomplete`, `custom` option if `dropdown`
+  // 2. Add `autocomplete` option, replace type with `dropdown` if `autocomplete`
+  if (control.type === 'matrix') {
+    let isModified = false;
+    for (const content of control.options.source.content) {
+      // Already set
+      if (typeof content.custom === 'boolean' && typeof content.autocomplete === 'boolean') {
+        continue;
+      }
+
+      if (content.type === 'dropdown') {
+        content.custom = false;
+        content.autocomplete = false;
+      } else if (content.type === 'autocomplete') {
+        content.type = 'dropdown';
+        content.autocomplete = true;
+      } else {
+        continue;
+      }
+
+      if (!isModified) {
+        isModified = true;
+      }
+    }
+
+    return isModified ? 1 : 0;
+  }
+
+  if (Array.isArray(control.children)) {
+    let modifiedCount = 0;
+    for (const child of control.children) {
+      modifiedCount += addOntologyAutocompleteOption(child);
+    }
+    return modifiedCount;
+  }
+
+  return 0;
+};
+
+// https://gitlab.com/our-sci/software/surveystack/-/issues/253
+const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({ 'meta.specVersion': { $lte: 8 } })
+    .toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    let modifiedControlsCount = 0;
+    for (const revision of survey.revisions) {
+      for (const control of revision.controls) {
+        modifiedControlsCount += changePrintLayoutShowAllOptionName(control);
+      }
+    }
+
+    if (modifiedControlsCount === 0) {
+      await db
+        .collection('surveys')
+        .findOneAndUpdate(
+          { _id: new ObjectId(survey._id) },
+          { $set: { 'meta.specVersion': 9 } },
+          { returnOriginal: false }
+        );
+
+      continue;
+    }
+
+    survey.meta.specVersion = 9;
+
+    await db
+      .collection('surveys')
+      .findOneAndUpdate(
+        { _id: new ObjectId(survey._id) },
+        { $set: survey },
+        { returnOriginal: false }
+      );
+
+    modifiedCount++;
+
+    console.log('Migrated print layout options of control to the survey:', survey.name);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated print layout options of control to many surveys:', modifiedCount);
+  }
+};
+
+/*
+ *   control.options.printLayout.hideList => (invert) control.options.printLayout.showAllOptionsPrintable
+ *   control.options.printLayout.showAll => control.options.printLayout.showAllOptions
+ */
+const changePrintLayoutShowAllOptionName = (control) => {
+  if (/select/i.test(control.type) || control.type === 'ontology') {
+    control.options.printLayout.showAllOptionsPrintable = !control.options.printLayout.hideList;
+    control.options.printLayout.showAllOptions = control.options.printLayout.showAll;
+    delete control.options.printLayout.hideList;
+    delete control.options.printLayout.showAll;
+    return 1;
+  }
+
+  if (Array.isArray(control.children)) {
+    let modifiedCount = 0;
+    for (const child of control.children) {
+      modifiedCount += changePrintLayoutShowAllOptionName(child);
+    }
+    return modifiedCount;
+  }
+
+  return 0;
 };
 
 export const getDb = () => db;

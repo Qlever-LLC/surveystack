@@ -22,6 +22,22 @@
       :items="mappings.aggregatorFarms"
     ></v-autocomplete>
 
+    <div class="d-flex flex-column mb-5" v-if="!!selectedInstance">
+      <h3>Notes</h3>
+      <textarea
+        readonly
+        rows="3"
+        style="border-style: dotted"
+        class="pa-1 w-100"
+        v-model="selectedInstanceNote"
+      ></textarea>
+    </div>
+
+    <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
+      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
+      <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
+    </div>
+
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
       <v-label>Tags for instance on FarmOS Aggregator</v-label>
       <div class="d-flex mt-4">
@@ -37,18 +53,19 @@
         <v-chip>{{ selectedInstance }}</v-chip>
       </h2>
 
-      <div class="v-flex my-2">
+      <div class="d-flex my-2 align-baseline">
         <v-autocomplete
           outlined
           primary
-          label="Select Group"
+          label="Map Group to Instance"
           v-model="selectedGroup"
           :item-text="(g) => `${g.name} (${g.path})`"
           item-value="_id"
           :items="groups"
+          class="mt-4 mr-4"
         ></v-autocomplete>
         <v-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
-          >Map Selected Aggregator Instance to Group in Surveystack</v-btn
+          >Map</v-btn
         >
       </div>
 
@@ -82,11 +99,32 @@
         User Mappings for
         <v-chip>{{ selectedInstance }}</v-chip>
       </h2>
+
+      <div class="d-flex my-2 justify-space-between align-baseline">
+        <v-autocomplete
+          class="mt-4"
+          outlined
+          primary
+          hint="Select User"
+          label="Map User to Instance"
+          v-model="selectedUser"
+          v-if="!loading && !!groups"
+          :item-text="(item) => `${item.name} (${item.email})`"
+          item-value="_id"
+          :items="users"
+        ></v-autocomplete>
+
+        <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
+
+        <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
+      </div>
+
+      <v-label class="vy-4">Current User Mappings</v-label>
       <v-simple-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
-              <th class="text-left">Instance Name</th>
+              <th class="text-left">User</th>
               <th class="text-left">Owner</th>
               <th class="text-left">Action</th>
             </tr>
@@ -97,29 +135,6 @@
               <td>{{ mapping.owner }}</td>
               <td>
                 <v-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)" dark>Unmap</v-btn>
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                <v-autocomplete
-                  class="mt-4"
-                  outlined
-                  primary
-                  hint="Select User"
-                  label="Map User to Instance"
-                  v-model="selectedUser"
-                  v-if="!loading && !!groups"
-                  :item-text="(item) => `${item.name} (${item.email})`"
-                  item-value="_id"
-                  :items="users"
-                ></v-autocomplete>
-              </td>
-              <td>
-                <v-checkbox v-model="owner" label="owner"></v-checkbox>
-              </td>
-              <td>
-                <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
               </td>
             </tr>
           </tbody>
@@ -192,6 +207,7 @@
               <th class="text-left">Instance Name</th>
               <th class="text-left">Tags</th>
               <th class="text-left">Action</th>
+              <th class="text-left">Notes</th>
             </tr>
           </thead>
           <tbody>
@@ -207,6 +223,9 @@
               <td>
                 <v-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</v-btn>
               </td>
+              <td>
+                <textarea v-if="farm.note" readonly rows="3" v-model="farm.note"></textarea>
+              </td>
             </tr>
           </tbody>
         </template>
@@ -219,9 +238,11 @@
 import _ from 'lodash';
 
 export default {
+  emits: ['addSuperAdminNote'],
   props: {
     groups: Array,
     mappings: Object,
+    notes: String,
     loading: Boolean,
     users: Array,
   },
@@ -233,6 +254,7 @@ export default {
       owner: false,
       error: null,
       success: null,
+      updatedNote: null,
     };
   },
   methods: {
@@ -248,8 +270,24 @@ export default {
         this.$vuetify.goTo(this.$refs['map-group']);
       });
     },
+    addSuperAdminNote() {
+      const updatedNote = this.updatedNote;
+      const selectedInstance = this.selectedInstance;
+      if (updatedNote) {
+        this.$emit('addSuperAdminNote', { updatedNote, selectedInstance });
+      }
+      this.updatedNote = null;
+    },
   },
   computed: {
+    selectedInstanceNote() {
+      let note = null;
+      const noteOfFarm = this.notes.find((el) => el.instanceName === this.selectedInstance);
+      if (noteOfFarm) {
+        note = noteOfFarm.note;
+      }
+      return note;
+    },
     selectedInstanceInfo() {
       return this.mappings.aggregatorFarms.find((e) => e.url === this.selectedInstance);
     },
@@ -303,9 +341,15 @@ export default {
       const mappings = [];
 
       for (const farm of farms) {
+        let note = null;
+        const noteOfFarm = this.notes.find((el) => el.instanceName === farm.url);
+        if (noteOfFarm) {
+          note = noteOfFarm.note;
+        }
         mappings.push({
           instanceName: farm.url,
           tags: farm.tags.split(' '),
+          note: note,
         });
       }
 

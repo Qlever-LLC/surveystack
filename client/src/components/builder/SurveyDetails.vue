@@ -51,7 +51,7 @@
         <publish-updated-library-dialog
           v-if="updateLibraryDialogIsVisible"
           v-model="updateLibraryDialogIsVisible"
-          :library-survey="value"
+          :library-survey="librarySurveyPublishedAndDraft"
           @ok="publishUpdateToLibrary"
           @cancel="updateLibraryDialogIsVisible = false"
         />
@@ -102,8 +102,7 @@
               <v-list-item-title>
                 <v-btn @click="editLibraryDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-library</v-icon>
-                  <div class="ml-1" v-if="!value.meta.isLibrary">add to library</div>
-                  <div class="ml-1" v-if="value.meta.isLibrary">edit library data</div>
+                  <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
@@ -111,7 +110,15 @@
               <v-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-layers-search</v-icon>
-                  <div class="ml-1">list library consumers</div>
+                  <div class="ml-1">List library consumers</div>
+                </v-btn>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>
+                <v-btn text @click="printSettingDialogIsVisible = true">
+                  <v-icon color="grey">mdi-printer-settings</v-icon>
+                  <div class="ml-1">Print settings</div>
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
@@ -138,6 +145,7 @@
           :library-survey="value"
           @cancel="libraryConsumersDialogIsVisible = false"
         />
+        <print-settings-dialog v-model="printSettingDialogIsVisible" :survey="survey" />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
@@ -176,7 +184,8 @@
                 <v-btn
                   v-if="!isNew"
                   :dark="enableUpdate"
-                  :disabled="!enableUpdate"
+                  :disabled="!enableUpdate || isSaving"
+                  :loading="isUpdating"
                   @click="$emit('update')"
                   color="primary"
                   class="my-1 mr-1"
@@ -218,7 +227,8 @@
                   :dark="enableSaveDraft"
                   @click="$emit('saveDraft')"
                   color="primary"
-                  :disabled="!enableSaveDraft"
+                  :disabled="!enableSaveDraft || isUpdating"
+                  :loading="isSaving"
                   class="my-1 mr-1"
                 >
                   <v-icon class="mr-1">mdi-content-save</v-icon>
@@ -253,7 +263,9 @@ import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
+import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
+import api from '@/services/api.service';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -269,7 +281,9 @@ export default {
       editLibraryDialogIsVisible: false,
       updateLibraryDialogIsVisible: false,
       libraryConsumersDialogIsVisible: false,
+      printSettingDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
+      librarySurveyPublishedAndDraft: null,
       availableSubmissions,
     };
   },
@@ -284,6 +298,8 @@ export default {
     'survey',
     'value',
     'isNew',
+    'isSaving',
+    'isUpdating',
     'dirty',
     'enableUpdate',
     'enableSaveDraft',
@@ -311,6 +327,7 @@ export default {
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,
+    PrintSettingsDialog,
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
@@ -319,8 +336,12 @@ export default {
     async getGroupNameById(id) {
       return await getGroupNameById(id);
     },
-    publish() {
+    async publish() {
       if (this.value.meta.isLibrary) {
+        //add published revision to the survey as published and draft versions are needed to show diffs
+        const { data } = await api.get(`/surveys/${this.value._id}?version=latest`);
+        this.librarySurveyPublishedAndDraft = this.value;
+        this.librarySurveyPublishedAndDraft.revisions.unshift(data.revisions.pop());
         //show update library dialog, ask for release notes
         this.updateLibraryDialogIsVisible = true;
       } else {

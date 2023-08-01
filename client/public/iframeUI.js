@@ -1,4 +1,10 @@
-import { marked } from 'https://cdn.jsdelivr.net/npm/marked@4.0.0/lib/marked.esm.js';
+export const ui = {
+  card,
+  message,
+  text,
+  markdown,
+  md,
+};
 
 export function card(content, { header, meta, footer } = {}) {
   const node = document.createElement('div');
@@ -73,6 +79,8 @@ export function text(content) {
 
 export function markdown(content) {
   const node = document.createElement('div');
+  // marked function is provided at runtime as js text copied into the iframe html
+  // eslint-disable-next-line no-undef
   node.innerHTML = marked(content);
   return node;
 }

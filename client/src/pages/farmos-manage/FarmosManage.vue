@@ -24,6 +24,7 @@
           :is="item.component"
           :groups="groups"
           :mappings="mappings"
+          :notes="notes"
           :users="users"
           :loading="loading"
           :viewModel="item.viewModel || {}"
@@ -31,6 +32,7 @@
           @create-instance="createInstance"
           @create-plan="createPlan"
           @delete-plan="deletePlan"
+          @addSuperAdminNote="addSuperAdminNote"
         ></v-component>
       </v-tab-item>
     </v-tabs-items>
@@ -46,14 +48,17 @@ import Groups from './Groups.vue';
 import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
+import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
   data() {
     return {
       mappings: null,
+      notes: null,
       groups: null,
       users: null,
       tab: null,
+      timeoutID: null,
       successMessage: null,
       errorMessage: null,
       loading: false,
@@ -103,7 +108,7 @@ export default {
           },
         },
         {
-          name: 'Plans',
+          name: 'Create Plans',
           id: 'plans',
           component: Plans,
           viewModel: {
@@ -120,6 +125,7 @@ export default {
   methods: {
     async reload() {
       this.loading = true;
+      const { data: notes } = await api.get('/farmos/notes/all');
       const { data: mappings } = await api.get('/farmos/all');
       const { data: groups } = await api.get('/groups?populate=0&prefix=/');
       const { data: users } = await api.get('/users');
@@ -128,6 +134,7 @@ export default {
       console.log('mappings', mappings);
 
       this.loading = false;
+      this.notes = notes;
       this.mappings = mappings;
       this.groups = groups;
       this.users = users;
@@ -144,7 +151,6 @@ export default {
       console.dir(users);
     },
     async mapGroup(group, instanceName) {
-      this.error(null);
       try {
         this.loading = true;
 
@@ -170,7 +176,6 @@ export default {
     },
     async unmapGroup(group, instanceName) {
       console.log('unmap group instanceName', instanceName);
-      this.error(null);
       try {
         this.loading = true;
 
@@ -190,7 +195,6 @@ export default {
       }
     },
     async mapUser(user, instanceName, owner) {
-      this.error(null);
       try {
         console.log('owner', owner);
         this.loading = true;
@@ -212,7 +216,6 @@ export default {
       }
     },
     async unmapUser(user, instanceName) {
-      this.error(null);
       try {
         this.loading = true;
 
@@ -232,7 +235,6 @@ export default {
       }
     },
     async unmapFarm(instanceName) {
-      this.error(null);
       try {
         this.loading = true;
         await api.post('/farmos/unmap-instance', {
@@ -394,14 +396,52 @@ export default {
       vm.loading = false;
       vm.count += 1;
     },
+    async addSuperAdminNote(arg) {
+      const { updatedNote: note, selectedInstance: instanceName } = arg;
+      try {
+        const timestamp = getCurrentDateAsString();
+        await api.post(`/farmos/group-manage/add-sa-notes`, {
+          note,
+          instanceName,
+          timestamp,
+        });
+        this.success('Succefully added notes');
+        //reload notes
+        this.loading = true;
+        const { data: notes } = await api.get('/farmos/notes/all');
+        this.notes = notes;
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
+      this.loading = false;
+    },
     success(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.successMessage = msg;
       this.errorMessage = null;
       window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.successMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
     error(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.errorMessage = msg;
       this.successMessage = null;
+      window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.errorMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
   },
 };

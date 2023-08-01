@@ -21,6 +21,7 @@ const mockSubmissions = () => {
           dateSubmitted: '2021-12-18T07:08:31.938Z',
           survey: {
             id: '61bb38d155512900019e1619',
+            name: 'Test Survey',
             version: 2,
           },
           revision: 1,
@@ -96,6 +97,7 @@ const mockSubmissions = () => {
           dateSubmitted: '2021-12-21T12:47:40.395Z',
           survey: {
             id: '61bb38d155512900019e1619',
+            name: 'Test Survey',
             version: 2,
           },
           revision: 1,

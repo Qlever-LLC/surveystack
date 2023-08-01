@@ -1048,6 +1048,10 @@ export function createSurvey({ creator = null, group = null, specVersion = SPEC_
       creator,
       group,
       specVersion,
+      printOptions: {
+        showInstruction: true,
+        showUnanswered: false,
+      },
     },
     resources: [],
     revisions: [
@@ -1079,15 +1083,3 @@ export const calcSurveySizeMB = (survey) => {
   const megaBytes = kiloBytes / 1024;
   return Math.round(megaBytes * 10) / 10;
 };
-
-export function cleanupAutocompleteMatrix(content) {
-  const isAutocomplete = content.type === 'autocomplete';
-  const custom = content.custom || false;
-  const autocomplete = isAutocomplete || custom || content.autocomplete || false;
-  return {
-    ...content,
-    type: isAutocomplete ? 'dropdown' : content.type,
-    custom,
-    autocomplete,
-  };
-}

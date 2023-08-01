@@ -3,16 +3,11 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
-
-let wakeLock = null;
+import { isOnline } from '@/utils/surveyStack';
 
 const requestWakeLock = async () => {
   try {
-    wakeLock = await navigator.wakeLock.request('screen');
-    wakeLock.addEventListener('release', () => {
-      // console.log('Wake Lock was released');
-    });
-    // console.log('Wake Lock is active');
+    await navigator.wakeLock.request('screen');
   } catch (e) {
     console.error(`${e.name}, ${e.message}`);
   }
@@ -56,6 +51,7 @@ export default {
       marker: null,
       ctrl: null,
       mapError: false,
+      offlineMode: false,
       location: null,
       gpsLocation: null,
       gpsTimer: 0,
@@ -76,9 +72,7 @@ export default {
         this.marker = null;
       }
 
-      this.marker = new mapboxgl.Marker()
-        .setLngLat([this.location.geometry.coordinates[0], this.location.geometry.coordinates[1]])
-        .addTo(this.map);
+      this.marker = new mapboxgl.Marker().setLngLat(this.location.geometry.coordinates).addTo(this.map);
     },
     retake() {
       this.changed(null);
@@ -87,7 +81,7 @@ export default {
         this.marker = null;
       }
       this.location = null;
-      this.ctrl.trigger();
+      this.startGpsTimer();
     },
     switchMapStyle() {
       const index = MAP_STYLES.indexOf(this.mapStyle);
@@ -96,6 +90,7 @@ export default {
       this.map.setStyle(`mapbox://styles/mapbox/${this.mapStyle}-v9`);
     },
     startGpsTimer() {
+      this.ctrl.trigger();
       this.stopGpsTimer();
       this.gpsTimer = setTimeout(() => {
         console.warn('No confirmation from the user permission');
@@ -139,7 +134,6 @@ export default {
       });
 
       this.ctrl.on('trackuserlocationstart', () => {
-        this.startGpsTimer();
         this.usingGPS = true;
       });
 
@@ -148,10 +142,17 @@ export default {
         this.gpsLocation = geoJsonFromPosition(position);
       });
 
+      this.ctrl.on('error', (e) => {
+        console.warn(e);
+        this.geolocationError = e;
+        this.usingGPS = false;
+        this.stopGpsTimer();
+      });
+
       this.map.addControl(this.ctrl);
 
       if (this.value) {
-        this.marker = new mapboxgl.Marker().setLngLat(this.value.geometry.coordinates[0]).addTo(this.map);
+        this.marker = new mapboxgl.Marker().setLngLat(this.value.geometry.coordinates).addTo(this.map);
 
         this.map.jumpTo({
           center: this.value.geometry.coordinates,
@@ -160,7 +161,7 @@ export default {
 
       this.map.on('load', () => {
         if (!this.value) {
-          this.ctrl.trigger();
+          this.startGpsTimer();
         }
         this.map.resize();
       });
@@ -169,11 +170,23 @@ export default {
         console.log(err);
         this.mapError = true;
         this.usingGPS = true;
+        if (!isOnline()) {
+          this.loadCurrentPositionOffline();
+        }
       });
 
       this.map.on('drag', () => {
         this.usingGPS = false;
       });
+    },
+    loadCurrentPositionOffline() {
+      if (navigator.geolocation) {
+        this.offlineMode = true;
+        navigator.geolocation.getCurrentPosition((position) => {
+          this.gpsLocation = geoJsonFromPosition(position);
+          this.changed(this.gpsLocation);
+        });
+      }
     },
   },
   computed: {
@@ -192,7 +205,7 @@ export default {
       };
     },
     disablePick() {
-      return !this.gpsLocation || this.mapError;
+      return this.geolocationError && this.mapError;
     },
   },
   watch: {
@@ -219,7 +232,7 @@ export default {
   mounted() {
     this.startMap();
 
-    if (wakeLock in navigator) {
+    if (navigator.wakeLock) {
       requestWakeLock();
     }
 

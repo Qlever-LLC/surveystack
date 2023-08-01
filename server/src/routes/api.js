@@ -17,7 +17,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
-import { isToggleOn, unleashProxyApp } from '../services/featureToggle.service';
+import { unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -35,6 +35,8 @@ import {
   assertHasIds,
   validateBulkReassignRequestBody,
   checkFeatureToggledOn,
+  assertIsAtLeastOnceOwner,
+  assertIsOwnerOfInstance,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -114,11 +116,22 @@ router.post(
   ],
   catchErrors(submissionController.bulkReassignSubmissions)
 );
+router.post(
+  '/submissions/:id/send-email',
+  [assertAuthenticated, assertEntityExists({ collection: 'submissions' })],
+  catchErrors(submissionController.sendPdfLink)
+);
 router.get(
   '/submissions/:id',
   [assertEntityExists({ collection: 'submissions' })],
   catchErrors(submissionController.getSubmission)
 );
+router.get(
+  '/submissions/:id/pdf',
+  [assertEntityExists({ collection: 'submissions' })],
+  catchErrors(submissionController.getSubmissionPdf)
+);
+router.post('/submissions/pdf', catchErrors(submissionController.postSubmissionPdf));
 router.post(
   '/submissions',
   [assertSubmissionRights],
@@ -147,6 +160,7 @@ router.post(
 );
 
 /** Surveys */
+router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
 router.get(
@@ -157,6 +171,7 @@ router.get(
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/pinned', catchErrors(surveyController.getPinned));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
+router.get('/surveys/:id/pdf', catchErrors(surveyController.getSurveyPdf));
 router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
 router.post(
   '/surveys',
@@ -190,6 +205,13 @@ router.delete(
 );
 
 /** Users */
+router.get('/owner/:userId', catchErrors(userController.isUserOwner));
+router.get(
+  '/ownership/:userId',
+  [assertAuthenticated, assertIsAtLeastOnceOwner],
+  catchErrors(userController.getOwnership)
+);
+
 router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));
@@ -238,9 +260,9 @@ router.put(
 );
 router.delete(
   '/memberships/:id',
-  catchErrors(membershipController.deleteMembership, async (membership) => {
+  catchErrors(membershipController.deleteMembership, async (membership, origin) => {
     try {
-      await farmosController.removeMembershipHook(membership);
+      await farmosController.removeMembershipHook(membership, origin);
     } catch (error) {
       // log the error, but don't escalate as it is not critical
       console.log(error);
@@ -260,6 +282,67 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 /** farmos */
 router.get('/farmos/farms', catchErrors(handleDelegates(farmosController.getFarmOSInstances)));
 router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAssets)));
+
+router.post(
+  '/farmos/available-add-user-to-instance',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.availableAddUserToInstance)
+);
+router.post(
+  '/farmos/add-user-to-instance',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.addUserToInstance)
+);
+router.post(
+  '/farmos/available-update-ownership',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.availableUpdateOwnership)
+);
+router.post(
+  '/farmos/update-ownership',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.updateOwnership)
+);
+router.post(
+  '/farmos/available-remove-instance-from-user',
+  assertAuthenticated,
+  catchErrors(farmosController.availableRemoveInstanceFromUser)
+);
+router.post(
+  '/farmos/remove-instance-from-user',
+  assertAuthenticated,
+  catchErrors(farmosController.removeInstanceFromUser)
+);
+router.post(
+  '/farmos/available-delete-instance-from-user',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.availableDeleteInstance)
+);
+router.post(
+  '/farmos/delete-instance-from-user',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.deleteInstance)
+);
+router.post(
+  '/farmos/available-remove-instance-from-group',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.availableRemoveInstanceFromGroup)
+);
+router.post(
+  '/farmos/remove-instance-from-group',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.removeInstanceFromGroup)
+);
+router.post(
+  '/farmos/available-remove-instance-from-other-user',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.availableRemoveInstanceFromOtherUser)
+);
+router.post(
+  '/farmos/remove-instance-from-other-user',
+  [assertAuthenticated, assertIsOwnerOfInstance],
+  catchErrors(farmosController.removeInstanceFromOtherUser)
+);
 
 // TODO update test connection
 // router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
@@ -316,6 +399,24 @@ router.post(
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
 );
 
+router.get(
+  '/farmos/notes/all',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminGetAllNotes)
+);
+
+router.post(
+  '/farmos/group-manage/add-notes',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.addNotes)
+);
+
+router.post(
+  '/farmos/group-manage/add-sa-notes',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.addSuperAdminNotes)
+);
+
 router.post(
   '/farmos/group-manage/:groupId/updatePlans',
   [assertIsSuperAdmin],
@@ -350,6 +451,12 @@ router.post(
   '/farmos/group-manage/:groupId/mapUser',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.mapUser)
+);
+
+router.post(
+  '/farmos/group-manage/get-owners-from-instances',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getOwnersFromInstances)
 );
 
 router.post(

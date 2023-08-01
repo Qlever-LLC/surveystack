@@ -3,12 +3,14 @@ import slugify from '@/utils/slugify';
 import api from '@/services/api.service';
 import axios from 'axios';
 import { linearControls } from '@/utils/submissions';
+import downloadExternal from './downloadExternal';
 
 export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
   IMAGE: 'IMAGE',
   SURVEY_REFERENCE: 'SURVEY_REFERENCE',
   FILE: 'FILE',
+  SCRIPT_REFERENCE: 'SCRIPT_REFERENCE',
 };
 
 export const resourceLocations = {
@@ -76,13 +78,7 @@ export function getLabelFromKey(resourceKey) {
 export async function openResourceInTab(store, resourceId) {
   let resource = await store.dispatch('resources/fetchResource', resourceId);
   let url = window.URL.createObjectURL(resource.fileData);
-  const element = document.createElement('a');
-  element.setAttribute('href', url);
-  element.setAttribute('download', `${resource.label}`);
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
+  downloadExternal(url, `${resource.label}`);
 }
 
 export async function getSignedDownloadUrl(resourceKey) {

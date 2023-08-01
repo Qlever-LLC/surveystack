@@ -5,6 +5,8 @@ import {
   createSurvey,
   getControlGenerator,
   getSubmissionDataGenerator,
+  createGroup,
+  createSuperAdmin,
 } from '../testUtils';
 import _ from 'lodash';
 import { db, getDb } from '../db';
@@ -16,6 +18,7 @@ const {
   cleanupSurvey,
   getSurveyAndCleanupInfo,
   deleteArchivedTestSubmissions,
+  getSurveyPdf,
 } = surveyController;
 
 /**
@@ -106,7 +109,105 @@ async function mockControlsAndSubmission(
   return { survey, submission, createSubmission };
 }
 
+describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
+  it("random user doesn't have access", async () => {
+    const group = await createGroup();
+    const user = await group.createUserMember();
+    const admin = await group.createAdminMember();
+    const res = await createRes({ user: user.user });
+
+    const libraryResult = await mockControlsAndSubmission({
+      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+    });
+    const librarySurvey = libraryResult.survey;
+    await expect(getSurveyAndCleanupInfo(librarySurvey._id, res)).rejects.toThrow(
+      `You are not authorized to update survey: ${librarySurvey._id}`
+    );
+  });
+  it('user who is the creator has access', async () => {
+    const group = await createGroup();
+    const user = await group.createUserMember();
+    const res = await createRes({ user: user.user });
+
+    const libraryResult = await mockControlsAndSubmission({
+      meta: { isLibrary: true, creator: user.user._id, group: { id: group._id } },
+    });
+    const librarySurvey = libraryResult.survey;
+    const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
+    expect(result.survey._id).toStrictEqual(librarySurvey._id);
+  });
+  it('group admin who does not belong to the group does not have access', async () => {
+    const group1 = await createGroup();
+    const admin1 = await group1.createAdminMember();
+    const group2 = await createGroup();
+    const admin2 = await group2.createAdminMember();
+    const res = await createRes({ user: admin2.user });
+
+    const libraryResult = await mockControlsAndSubmission({
+      meta: { isLibrary: true, creator: admin1.user._id, group: { id: group1._id } },
+    });
+    const librarySurvey = libraryResult.survey;
+    await expect(getSurveyAndCleanupInfo(librarySurvey._id, res)).rejects.toThrow(
+      `You are not authorized to update survey: ${librarySurvey._id}`
+    );
+  });
+  it('group admin group has access without being the creator', async () => {
+    const group = await createGroup();
+    const admin1 = await group.createAdminMember();
+    const admin2 = await group.createAdminMember();
+    const res = await createRes({ user: admin2.user });
+
+    const libraryResult = await mockControlsAndSubmission({
+      meta: { isLibrary: true, creator: admin1.user._id, group: { id: group._id } },
+    });
+    const librarySurvey = libraryResult.survey;
+    const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
+    expect(result.survey._id).toStrictEqual(librarySurvey._id);
+  });
+  it('super admin has access without being the creator', async () => {
+    const group = await createGroup();
+    const admin = await group.createAdminMember();
+    const superAdmin = await createSuperAdmin();
+    const res = await createRes({ user: superAdmin });
+
+    const libraryResult = await mockControlsAndSubmission({
+      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+    });
+    const librarySurvey = libraryResult.survey;
+    const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
+    expect(result.survey._id).toStrictEqual(librarySurvey._id);
+  });
+});
+
 describe('surveyController', () => {
+  let librarySurvey,
+    librarySurveySubmission,
+    consumerSurvey,
+    consumerSubmission,
+    createSubmission,
+    admin,
+    res;
+
+  beforeEach(async () => {
+    const group = await createGroup();
+    admin = await group.createAdminMember();
+    res = await createRes({ user: admin.user });
+
+    const libraryResult = await mockControlsAndSubmission({
+      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+    });
+    createSubmission = libraryResult.createSubmission;
+    librarySurvey = libraryResult.survey;
+    librarySurveySubmission = libraryResult.submission;
+    const consumerResult = await mockControlsAndSubmission(
+      undefined,
+      librarySurvey._id,
+      librarySurvey.lastedVersion
+    );
+    consumerSurvey = consumerResult.survey;
+    consumerSubmission = consumerResult.submission;
+  });
+
   describe('getSurvey', () => {
     let surveyStored;
     beforeEach(async () => {
@@ -168,6 +269,7 @@ describe('surveyController', () => {
       expect(returnedSurvey.revisions[0].version).toBe(4);
     });
   });
+
   describe('update', () => {
     let surveyStored, surveyToBeUpdated;
     beforeEach(async () => {
@@ -323,22 +425,22 @@ describe('surveyController', () => {
     });
     describe('getSurveyAndCleanupInfo', () => {
       it('returns the survey by the id passed', async () => {
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.survey._id).toStrictEqual(librarySurvey._id);
       });
       it('returns surveyVersions array of all available version strings', async () => {
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.surveyVersions.length).toBe(librarySurvey.revisions.length);
         expect(result.surveyVersions).toStrictEqual(
           librarySurvey.revisions.map((r) => String(r.version))
         );
       });
       it('returns versionsToKeep array of all versions strings not allowed to delete', async () => {
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.versionsToKeep).toStrictEqual(['2', '3']);
       });
       it('returns versionsToDelete array of all versions strings allowed to delete', async () => {
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.versionsToDelete).toStrictEqual(['1']);
       });
       it('returns versionsToDelete array of all versions excluding drafts', async () => {
@@ -352,19 +454,19 @@ describe('surveyController', () => {
             returnOriginal: false,
           }
         );
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.versionsToDelete).toStrictEqual(['1']);
       });
       it('returns submissionsVersionCounts object map with keys=version and value=count of submissions referencing that version', async () => {
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.submissionsVersionCounts).toStrictEqual({ 2: 1 });
       });
       it('returns libraryConsumersByVersion object map with keys=version and value=count of question set consumer surveys referencing that version', async () => {
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.libraryConsumersByVersion).toStrictEqual({ 3: 3 });
       });
       it('returns submissionsVersionCounts object map with keys=version and value=count of submissions referencing that version', async () => {
-        const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+        const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
         expect(result.submissionsVersionCounts).toStrictEqual({ 2: 1 });
       });
     });
@@ -466,6 +568,22 @@ describe('surveyController', () => {
         );
         expect(deleteCount).toBe(0);
       });
+    });
+  });
+
+  describe('getSurveyPdf', () => {
+    it('should return PDF base64 if success', async () => {
+      const { survey } = await createSurvey(['instructions', 'text', 'ontology']);
+      const req = createReq({ params: { id: survey._id } });
+      const res = await createRes({
+        user: { _id: survey.meta.creator, permissions: [] },
+      });
+      await getSurveyPdf(req, res);
+
+      expect(res.attachment).toHaveBeenCalledWith('Mock Survey Name - SurveyStack.pdf');
+      expect(res.send).toHaveBeenCalledWith(
+        expect.stringContaining('data:application/pdf;base64,')
+      );
     });
   });
 });
