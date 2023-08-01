@@ -51,7 +51,7 @@
         <publish-updated-library-dialog
           v-if="updateLibraryDialogIsVisible"
           v-model="updateLibraryDialogIsVisible"
-          :library-survey="value"
+          :library-survey="librarySurveyPublishedAndDraft"
           @ok="publishUpdateToLibrary"
           @cancel="updateLibraryDialogIsVisible = false"
         />
@@ -265,6 +265,7 @@ import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpda
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
+import api from '@/services/api.service';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -282,6 +283,7 @@ export default {
       libraryConsumersDialogIsVisible: false,
       printSettingDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
+      librarySurveyPublishedAndDraft: null,
       availableSubmissions,
     };
   },
@@ -334,8 +336,12 @@ export default {
     async getGroupNameById(id) {
       return await getGroupNameById(id);
     },
-    publish() {
+    async publish() {
       if (this.value.meta.isLibrary) {
+        //add published revision to the survey as published and draft versions are needed to show diffs
+        const { data } = await api.get(`/surveys/${this.value._id}?version=latest`);
+        this.librarySurveyPublishedAndDraft = this.value;
+        this.librarySurveyPublishedAndDraft.revisions.unshift(data.revisions.pop());
         //show update library dialog, ask for release notes
         this.updateLibraryDialogIsVisible = true;
       } else {
