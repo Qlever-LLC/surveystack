@@ -79,7 +79,8 @@ module.exports = {
       // ...other Workbox options...
       clientsClaim: true,
       skipWaiting: true,
-      //navigateFallback: 'index.html',
+      navigateFallback: 'index.html',
+      navigateFallbackBlacklist: [/\/static\/.*$/], //rename this to navigateFallbackDenylist when migrating to vue3
       runtimeCaching: [
         {
           urlPattern: /\/api\/.*$/,
