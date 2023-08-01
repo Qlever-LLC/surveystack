@@ -51,7 +51,7 @@
         <publish-updated-library-dialog
           v-if="updateLibraryDialogIsVisible"
           v-model="updateLibraryDialogIsVisible"
-          :library-survey="value"
+          :library-survey="librarySurveyPublishedAndDraft"
           @ok="publishUpdateToLibrary"
           @cancel="updateLibraryDialogIsVisible = false"
         />
@@ -184,7 +184,8 @@
                 <v-btn
                   v-if="!isNew"
                   :dark="enableUpdate"
-                  :disabled="!enableUpdate"
+                  :disabled="!enableUpdate || isSaving"
+                  :loading="isUpdating"
                   @click="$emit('update')"
                   color="primary"
                   class="my-1 mr-1"
@@ -226,7 +227,8 @@
                   :dark="enableSaveDraft"
                   @click="$emit('saveDraft')"
                   color="primary"
-                  :disabled="!enableSaveDraft"
+                  :disabled="!enableSaveDraft || isUpdating"
+                  :loading="isSaving"
                   class="my-1 mr-1"
                 >
                   <v-icon class="mr-1">mdi-content-save</v-icon>
@@ -263,6 +265,7 @@ import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpda
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
+import api from '@/services/api.service';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -280,6 +283,7 @@ export default {
       libraryConsumersDialogIsVisible: false,
       printSettingDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
+      librarySurveyPublishedAndDraft: null,
       availableSubmissions,
     };
   },
@@ -294,6 +298,8 @@ export default {
     'survey',
     'value',
     'isNew',
+    'isSaving',
+    'isUpdating',
     'dirty',
     'enableUpdate',
     'enableSaveDraft',
@@ -330,8 +336,12 @@ export default {
     async getGroupNameById(id) {
       return await getGroupNameById(id);
     },
-    publish() {
+    async publish() {
       if (this.value.meta.isLibrary) {
+        //add published revision to the survey as published and draft versions are needed to show diffs
+        const { data } = await api.get(`/surveys/${this.value._id}?version=latest`);
+        this.librarySurveyPublishedAndDraft = this.value;
+        this.librarySurveyPublishedAndDraft.revisions.unshift(data.revisions.pop());
         //show update library dialog, ask for release notes
         this.updateLibraryDialogIsVisible = true;
       } else {

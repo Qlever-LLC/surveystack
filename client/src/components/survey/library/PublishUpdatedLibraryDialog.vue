@@ -24,7 +24,7 @@
         :version-name-remote-revision-new="`Version ${
           localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version
         }`"
-      ></survey-diff>
+      />
       <v-card-actions class="mr-3">
         <v-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>

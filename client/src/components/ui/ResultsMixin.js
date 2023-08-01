@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import { isOnline } from '@/utils/surveyStack';
 
 export default {
   data() {
@@ -16,12 +17,20 @@ export default {
       // debugger;
       if (error) {
         hasErrors = true;
-        this.resultItems.push({
-          title: 'Error',
-          body: (error.response && error.response.data && error.response.data.message) || error,
-          logs: error.response && error.response.data && error.response.data.logs,
-          error: true,
-        });
+        if (isOnline()) {
+          this.resultItems.push({
+            title: 'Error',
+            body: (error.response && error.response.data && error.response.data.message) || error,
+            logs: error.response && error.response.data && error.response.data.logs,
+            error: true,
+          });
+        } else {
+          this.resultItems.push({
+            title: 'Offline',
+            body: 'Cannot submit without internet connection. Go to MY SUBMISSIONS and then DRAFTS to submit completed surveys when you have an internet connection',
+            error: true,
+          });
+        }
         return;
       }
 

@@ -99,9 +99,73 @@ const sendLink = async ({
   });
 };
 
+/**
+ * Sends a email when a group admin removes/moves/adds an instance to/from a group.
+ */
+const sendHandleNotification = async ({
+  to,
+  subject,
+  link,
+  // text above the button in html format
+  actionDescriptionHtml,
+  // text before the link in text format
+  actionDescriptionText,
+  greeting = 'Hi there,',
+}) => {
+  // remove all html tags
+  const s = (text) => sanitizeHtml(text, { allowedTags: [] });
+
+  await transport.sendMail({
+    from: process.env.SMTP_DEFAULT_SENDER,
+    to,
+    subject,
+    // Note: Basic html email. We should probably use some templating engine if we decide to create more complicated emails
+    html: `
+      <table style="max-width: 600px; margin: 0 auto; font-size: 17px; font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;"width="100%;" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+              <td align="center">
+                <img style="width:80px;" src="cid:logo"/>
+              </td>
+          </tr>
+          <tr>
+              <td style="background-color: #f9f9f9; border-radius: 7px; padding: 32px">
+                <h3>${s(greeting)}</h3>
+                <table style="width:100%;margin-bottom:32px"><tbody>
+                <tr><td style="text-align:center">
+                  <h2>${s(actionDescriptionHtml)}</h2>
+                </td></tr>
+                <tr><td align="center" style="padding-top: 32px">
+                  <p style="padding-top:18px">
+                  <b>Unsure why you're receiving this email?</b><br>
+                  Please reach out to your group admin or info@our-sci.net if you have any questions. 
+                  You have control over your account. 
+                  <a href="${s(
+                    link
+                  )}" target="_blank">Click here</a> to manage or change your account.
+                  </p>
+                </td></tr>
+                </tbody></table>
+              </td>
+          </tr>
+      </table>`,
+    attachments: [
+      {
+        filename: 'logo.png',
+        path: `${__dirname}/assets/logo.png`,
+        cid: 'logo',
+      },
+    ],
+    text: `${greeting}
+
+    ${actionDescriptionText}
+    ${link}`,
+  });
+};
+
 export default {
   transport,
   send,
   sendLink,
+  sendHandleNotification,
   check,
 };
