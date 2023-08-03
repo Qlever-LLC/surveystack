@@ -130,16 +130,17 @@ export default {
   methods: {
     setProperty(value) {
       const path = `${this.path}.value`;
-      this.$store.dispatch('draft/setProperty', { path, value });
-
-      // adjust modified date
+      // adjust modified date of the control
       const modified = new Date().toISOString();
       this.$store.dispatch('draft/setProperty', {
         path: `${this.path}.meta.dateModified`,
         value: modified,
         calculate: false,
       });
+      // adjust modified date of the submission
       this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified, calculate: false });
+      // adjust value
+      this.$store.dispatch('draft/setProperty', { path, value });
     },
     setStatus({ type, message }) {
       this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.status`, value: type });
