@@ -21,7 +21,7 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import createMap from '@/external/instance/instance';
+import { MapInstanceManager } from '@farmos.org/farmos-map';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
@@ -45,7 +45,7 @@ export function addBaseLayer(map) {
  * @param {string|undefined|null} value: stringified geojson used to initialize drawing layer
  * @returns {ol.Layer} drawing layer created
  */
-export function addDrawingLayer(map, value) {
+export async function addDrawingLayer(map, value) {
   const opts = {
     title: 'features',
     ...(value && { geojson: JSON.stringify(value) }),
@@ -59,8 +59,8 @@ export function addDrawingLayer(map, value) {
     map.zoomToLayer(layer);
   }
 
-  map.addBehavior('edit', { layer });
-  map.addBehavior('measure', { layer });
+  await map.addBehavior('edit', { layer });
+  await map.addBehavior('measure', { layer });
   return layer;
 }
 
@@ -104,14 +104,12 @@ export default {
     }
   },
   methods: {
-    load() {
-      this.map = createMap({
-        target: this.mapId,
-        options: {},
-      });
+    async load() {
+      const instance = new MapInstanceManager();
+      this.map = instance.create(this.mapId, {});
 
       addBaseLayer(this.map);
-      addDrawingLayer(this.map, this.value);
+      await addDrawingLayer(this.map, this.value);
 
       const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
       this.map.edit.geoJSONOn('drawend', mapChangeHandler);

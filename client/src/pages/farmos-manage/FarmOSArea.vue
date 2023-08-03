@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import createMap from '@/external/instance/instance';
+import { MapInstanceManager } from '@farmos.org/farmos-map';
 
 export default {
   props: ['value', 'center'],
@@ -32,11 +32,9 @@ export default {
         wkt,
       });
     },
-    load() {
-      const map = createMap({
-        target: 'farmos-map',
-        options: {},
-      });
+    async load() {
+      const instance = new MapInstanceManager();
+      const map = instance.create('farmos-map', {});
       this.map = map;
 
       // Adding an XYZ layer.
@@ -67,8 +65,8 @@ export default {
         };
         layer = map.addLayer('vector', vopts);
       }
-      map.addBehavior('edit', { layer });
-      map.addBehavior('measure', { layer });
+      await map.addBehavior('edit', { layer });
+      await map.addBehavior('measure', { layer });
       this.layer = layer;
       map.zoomToLayer(layer);
 
