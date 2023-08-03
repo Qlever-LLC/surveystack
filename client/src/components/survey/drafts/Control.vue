@@ -65,7 +65,7 @@
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
           :forceMobile="forceMobile"
           :isInBuilder="isInBuilder"
-          @initialize="$store.dispatch('draft/initialize')"
+          @initialize="initialize(control.id)"
         />
       </div>
     </div>
@@ -153,6 +153,12 @@ export default {
     },
     getComponentName(control) {
       return `app-control-${control.type}`;
+    },
+    initialize(controlId) {
+      //get the control's node
+      const node = this.$store.getters['draft/nodeByControl'](controlId);
+      //force initialize
+      this.$store.dispatch('draft/initializeForced', node);
     },
   },
 };

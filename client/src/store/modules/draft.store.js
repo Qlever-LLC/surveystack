@@ -86,7 +86,7 @@ const getters = {
           .replace('[', '.')
           .replace(']', '')
       : null,
-
+  nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
   atStart: (state) => state.node === state.firstNode,
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
@@ -185,6 +185,9 @@ const actions = {
         console.warn('unable to persist submission to IDB');
       }
     }
+    if (state.node.model.type === 'page') {
+      dispatch('initialize', state.node);
+    }
     if (calculate) {
       dispatch('calculateRelevance');
     }
@@ -249,6 +252,8 @@ const actions = {
         }
       }
 
+      await dispatch('initialize', nextNode);
+
       const isInsidePage = nextNode
         .getPath()
         .slice(1)
@@ -256,16 +261,6 @@ const actions = {
         .find((parent) => parent.model.type === 'page');
       if (isInsidePage) {
         continue;
-      }
-
-      //initialize value if it has not been modified by the user yet
-      const nextNodePath = nextNode
-        .getPath()
-        .map((n) => n.model.name)
-        .join('.');
-      const field = get(state.submission, nextNodePath);
-      if (!field.meta.dateModified) {
-        await dispatch('initialize', nextNode);
       }
 
       commit('NEXT', nextNode);
@@ -400,14 +395,34 @@ const actions = {
       }
     });
   },
-  async initialize({ commit, state }, nextNode) {
-    //calculate nextNode if passed, or state.node
-    const [initialize] = await codeEvaluator.calculateInitialize([nextNode || state.node], state.submission, state.survey); // eslint-disable-line
-    if (initialize && initialize.result) {
-      commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
-      //also set dateModified to null which is required in case of the value being re-initialized manually
-      commit('SET_PROPERTY', { path: `${initialize.path}.meta.dateModified`, value: null });
-    }
+  async initializeForced({ commit, dispatch }, node) {
+    const path = node
+      .getPath()
+      .map((n) => n.model.name)
+      .join('.');
+    //first set dateModified to null which is required in case of the value being re-initialized manually
+    commit('SET_PROPERTY', {
+      path: `${path}.meta.dateModified`,
+      value: null,
+      calculate: true,
+      initialize: false,
+    });
+    await dispatch('initialize', node);
+  },
+  async initialize({ commit, state }, node) {
+    let nodes = surveyStackUtils.getAllNodes(node);
+    const calculations = await codeEvaluator.calculateInitialize(nodes, state.submission, state.survey); // eslint-disable-line
+    calculations.forEach((calculation) => {
+      const { result, path, skip } = calculation;
+      if (!skip && !!path) {
+        commit('SET_PROPERTY', {
+          path: `${path}.value`,
+          value: result,
+          calculate: true,
+          initialize: false,
+        });
+      }
+    });
   },
   async calculateApiCompose({ commit, state }) {
     // TODO: only calculate subset of nodes

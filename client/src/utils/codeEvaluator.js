@@ -58,6 +58,16 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
       };
     }
 
+    //do not initialize if dateModified is set (means user has set the value manually)
+    if (fname === 'initialize' && field.meta.dateModified) {
+      return {
+        path,
+        control,
+        field,
+        skip: true,
+      };
+    }
+
     const { code } = control.options[option];
     return {
       path,
