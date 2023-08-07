@@ -21,10 +21,11 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import { MapInstanceManager } from '@farmos.org/farmos-map';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
+import { MapInstanceManager } from '@farmos.org/farmos-map';
+import Geotrace from '@/third-party/farmOS-map/control/Geotrace/Geotrace';
 
 /**
  * Add base tile layer to map
@@ -36,6 +37,7 @@ export function addBaseLayer(map) {
     visible: true,
     base: true,
   };
+
   return map.addLayer('xyz', xyzOpts);
 }
 
@@ -61,6 +63,7 @@ export async function addDrawingLayer(map, value) {
 
   await map.addBehavior('edit', { layer });
   await map.addBehavior('measure', { layer });
+
   return layer;
 }
 
@@ -84,7 +87,7 @@ export default {
   },
   data() {
     return {
-      map: null,
+      mapInstance: null,
       mapId: `farmos-map-${Math.floor(Math.random() * 1e4)}`,
     };
   },
@@ -98,38 +101,26 @@ export default {
     this.load();
   },
   beforeDestroy() {
-    if (this.map) {
-      this.map.map.setTarget(null);
-      this.map = null;
+    if (this.mapInstance) {
+      this.mapInstance.map.setTarget(null);
+      this.mapInstance = null;
     }
   },
   methods: {
     async load() {
-      const instance = new MapInstanceManager();
-      this.map = instance.create(this.mapId, {});
+      this.mapInstance = new MapInstanceManager().create(this.mapId);
 
-      addBaseLayer(this.map);
-      await addDrawingLayer(this.map, this.value);
+      await addBaseLayer(this.mapInstance);
+      const layer = await addDrawingLayer(this.mapInstance, this.value);
+
+      const geotraceCtrl = new Geotrace({ layer });
+      this.mapInstance.map.addControl(geotraceCtrl);
 
       const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
-      this.map.edit.geoJSONOn('drawend', mapChangeHandler);
-      this.map.edit.geoJSONOn('modifyend', mapChangeHandler);
-      this.map.edit.geoJSONOn('translateend', mapChangeHandler);
-      this.map.edit.geoJSONOn('delete', mapChangeHandler);
+      this.mapInstance.edit.geoJSONOn('featurechange', mapChangeHandler);
 
       // If no features exist in value, run automatic behaviors
       if (!this.value) {
-        this.map.attachBehavior({
-          attach(instance) {
-            const controls = instance.map.getControls().getArray();
-            const geolocateControl = controls && controls.find((control) => control.constructor.name === 'Geolocate');
-            if (geolocateControl) {
-              // Trigger geolocation
-              geolocateControl.activate();
-            }
-          },
-        });
-
         // Autofocus geocoder for desktop
         if (window.innerWidth > 600) {
           document.querySelector('#gcd-button-control').click();

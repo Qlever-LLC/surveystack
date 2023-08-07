@@ -1,0 +1,64 @@
+.ol-overlaycontainer-stopevent.hidden > * {
+  display: none !important;
+}
+
+.ol-overlaycontainer-stopevent.hidden > .ol-geotrace.ol-control {
+  top: 0.5em;
+  display: block !important;
+}
+
+.ol-edit.ol-control {
+  top: 7.25em;
+}
+.ol-touch .ol-edit.ol-control {
+  top: 10.25em;
+}
+
+.ol-geotrace.ol-control {
+  top: 4.75em;
+  left: 0.5em;
+}
+
+.ol-touch .ol-geotrace.ol-control {
+  top: 6.75em;
+}
+
+.ol-geotrace.ol-control.active button {
+  background-color: #fc3;
+  background-color: rgba(255, 204, 51, 0.7);
+}
+
+.ol-geotrace.ol-control button svg {
+  pointer-events: none;
+}
+
+.geotrace-ctrls-container {
+  position: absolute;
+  bottom: 0.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.geotrace-ctrl {
+  border-radius: 99em;
+  overflow: hidden;
+}
+
+.geotrace-ctrl.ol-control {
+  position: relative;
+}
+
+.geotrace-ctrl.ol-control button {
+  width: auto;
+  height: auto;
+  padding: 0.5em;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+}
+
+.geotrace-ctrl svg {
+  display: block;
+}

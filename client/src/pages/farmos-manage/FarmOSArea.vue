@@ -33,8 +33,7 @@ export default {
       });
     },
     async load() {
-      const instance = new MapInstanceManager();
-      const map = instance.create('farmos-map', {});
+      const map = new MapInstanceManager().create('farmos-map', {});
       this.map = map;
 
       // Adding an XYZ layer.
