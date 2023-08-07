@@ -15,18 +15,18 @@
   },
   "scripts": {
     "prepare": "husky install; git config --local include.path ../.gitconfig",
-    "client:start": "FORCE_COLOR=1 lerna --scope surveystack-client run start --no-prefix --stream",
-    "client:build": "FORCE_COLOR=1 lerna --scope surveystack-client run build --no-prefix --stream",
-    "client:test": "FORCE_COLOR=1 lerna --scope surveystack-client run test --no-prefix --stream",
-    "client:test-watch": "FORCE_COLOR=1 lerna --scope surveystack-client run test-watch --no-prefix --stream",
-    "client:lint": "FORCE_COLOR=1 lerna --scope surveystack-client run lint --no-prefix --stream",
-    "server:start": "FORCE_COLOR=1 lerna --scope surveystack-server run start --no-prefix --stream",
-    "server:build": "FORCE_COLOR=1 lerna --scope surveystack-server run build --no-prefix --stream",
-    "build": "FORCE_COLOR=1 lerna run build --parallel --stream",
-    "server:test": "FORCE_COLOR=1 lerna --scope surveystack-server run test --no-prefix --stream",
-    "server:test-watch": "FORCE_COLOR=1 lerna --scope surveystack-server run test-watch --no-prefix --stream",
-    "server:lint": "FORCE_COLOR=1 lerna --scope surveystack-server run lint-all --no-prefix --stream",
-    "client:scaffold-partner": "FORCE_COLOR=1 lerna --scope surveystack-client run scaffold-partner --no-prefix --stream",
-    "client:chromatic" : "FORCE_COLOR=1 lerna --scope surveystack-client run chromatic --no-prefix --stream"
+    "client:start": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run start --no-prefix --stream",
+    "client:build": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run build --no-prefix --stream",
+    "client:test": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run test --no-prefix --stream",
+    "client:test-watch": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run test-watch --no-prefix --stream",
+    "client:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run lint --no-prefix --stream",
+    "server:start": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run start --no-prefix --stream",
+    "server:build": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run build --no-prefix --stream",
+    "build": "cross-env FORCE_COLOR=1 lerna run build --parallel --stream",
+    "server:test": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run test --no-prefix --stream",
+    "server:test-watch": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run test-watch --no-prefix --stream",
+    "server:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run lint-all --no-prefix --stream",
+    "client:scaffold-partner": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run scaffold-partner --no-prefix --stream",
+    "client:chromatic" : "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run chromatic --no-prefix --stream"
   }
 }
