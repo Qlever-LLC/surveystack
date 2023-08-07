@@ -19,6 +19,7 @@ workflow:
       - node_modules/
       - client/node_modules/
       - server/node_modules/
+      - .yarn
 
 .pull-cache-only:
   extends: .cache-policy
@@ -294,7 +295,7 @@ lerna bootstrap:
   extends: .cache-policy
   stage: install
   script:
-    - yarn
+    - yarn --frozen-lockfile --cache-folder .yarn
     - yarn lerna bootstrap
 
 lint client:
