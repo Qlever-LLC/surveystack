@@ -7,7 +7,7 @@ import Geolocation from 'ol/Geolocation';
 import LineString from 'ol/geom/LineString';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import Draw, { DrawEvent } from 'ol/interaction/Draw';
+import { DrawEvent } from 'ol/interaction/Draw';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import { inAndOut } from 'ol/easing';
@@ -198,13 +198,7 @@ class Geotrace extends Control {
       });
 
     // Turn on geo tracking.
-    this.geolocation.setTracking(true);
-
-    // The geolocation sampling period mean in ms
-    this.deltaMean = 500;
-
-    // When the heading, position or accuracy changes, update the features.
-    this.geolocation.on('change', this.updateFeatures.bind(this));
+    this.setTracking(true);
 
     // Add live controls
     if (!this.stateElements) {
@@ -234,7 +228,7 @@ class Geotrace extends Control {
     this.element.parentElement.classList.remove('hidden');
 
     // Turn off geo tracking.
-    this.geolocation.setTracking(false);
+    this.setTracking(false);
 
     // Clear features
     this.history.setCoordinates([], 'XYZM');
@@ -294,8 +288,9 @@ class Geotrace extends Control {
       this.marker.element.firstElementChild.innerHTML = SVG_MARKER;
     }
 
-    // Trigger `postrender` to draw features smoothly
-    // Note: at least one coordinate should be in the this.trace to make `postrender` working
+    // Trigger `postrender` to draw features smoothly.
+    // Note: at least one coordinate should be in the this.trace to make `postrender` working.
+    // If not, OL will optimize the empty layer, so, nothing will happened.
     if (this.trace.getCoordinates().length === 0) {
       this.updateView();
     }
@@ -427,7 +422,7 @@ class Geotrace extends Control {
    */
   actionStop() {
     // Turn off geo tracking.
-    this.geolocation.setTracking(false);
+    this.setTracking(false);
 
     // Hide marker
     this.marker.setPosition();
@@ -453,7 +448,7 @@ class Geotrace extends Control {
     this.traceFeature.setStyle(styles.inactive);
 
     // Turn on geo tracking.
-    this.geolocation.setTracking(true);
+    this.setTracking(true);
 
     // Reset zoom
     this.getMap().getView().setZoom(18);
@@ -488,6 +483,31 @@ class Geotrace extends Control {
 
     // Deactivate tracking
     this.deactivate();
+  }
+
+  /**
+   * Start geolocation tracking
+   * @private
+   */
+  setTracking(track) {
+    if (track) {
+      // The geolocation sampling period mean in ms
+      this.deltaMean = 500;
+
+      // Turn on geo tracking.
+      this.geolocation.setTracking(true);
+
+      // Register event listener
+      this.trackingKey = this.geolocation.on('change', this.updateFeatures.bind(this));
+    } else {
+      // Turn off geo tracking.
+      this.geolocation.setTracking(false);
+
+      if (this.trackingKey)
+        // Unregister event listener
+        unByKey(this.trackingKey);
+      this.trackingKey = null;
+    }
   }
 }
 
