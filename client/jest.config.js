@@ -1,4 +1,4 @@
-const esModules = ['ol', 'monaco-editor'].join('|');
+const esModules = ['ol', 'monaco-editor', '@farmos.org'].join('|');
 
 module.exports = {
   preset: '@vue/cli-plugin-unit-jest',

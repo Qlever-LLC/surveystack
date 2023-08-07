@@ -101,10 +101,8 @@ export default {
     this.load();
   },
   beforeDestroy() {
-    if (this.mapInstance) {
-      this.mapInstance.map.setTarget(null);
-      this.mapInstance = null;
-    }
+    new MapInstanceManager().destroy(this.mapId);
+    this.mapInstance = null;
   },
   methods: {
     async load() {
