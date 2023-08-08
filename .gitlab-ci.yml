@@ -273,6 +273,8 @@ build client:
       - client/dist/
   stage: build
   script:
+    - yarn
+    - yarn lerna bootstrap
     - yarn client:build
   variables:
     VUE_APP_COMMIT_SHA: $CI_COMMIT_SHA
@@ -286,6 +288,8 @@ build server:
       - server/dist/
   stage: build
   script:
+    - yarn
+    - yarn lerna bootstrap
     - yarn server:build
   needs:
     - lerna bootstrap
@@ -301,6 +305,8 @@ lint client:
   extends: .pull-cache-only
   stage: lint
   script:
+    - yarn
+    - yarn lerna bootstrap
     - yarn client:lint
   needs:
     - lerna bootstrap
@@ -309,6 +315,8 @@ lint server:
   extends: .pull-cache-only
   stage: lint
   script:
+    - yarn
+    - yarn lerna bootstrap
     - yarn server:lint
   needs:
     - lerna bootstrap
@@ -317,6 +325,8 @@ test client:
   extends: .pull-cache-only
   stage: test
   script:
+    - yarn
+    - yarn lerna bootstrap
     - yarn client:test
   needs:
     - lerna bootstrap
@@ -325,6 +335,8 @@ test server:
   extends: .pull-cache-only
   stage: test
   script:
+    - yarn
+    - yarn lerna bootstrap
     - yarn server:test
   needs:
     - lerna bootstrap
