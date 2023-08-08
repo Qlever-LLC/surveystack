@@ -19,7 +19,7 @@
   top: 0.5em;
 }
 
- /* deep selector is required to pierce component boundary for scoped styles 
+/* deep selector is required to pierce component boundary for scoped styles 
 but jest doesn't understand the deep selector (>>>)
  */
 .hide-polygon >>> .ol-edit-polygon,
@@ -35,4 +35,13 @@ but jest doesn't understand the deep selector (>>>)
 .hide-modify .ol-edit-modify,
 .hide-move .ol-edit-move {
   display: none;
+}
+
+.fields-table td input {
+  width: 100%;
+  height: 100%;
+}
+
+.fields-table td input:focus {
+  outline: none;
 }

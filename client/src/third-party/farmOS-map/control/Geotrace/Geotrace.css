@@ -62,3 +62,45 @@
 .geotrace-ctrl svg {
   display: block;
 }
+
+.custom-popup {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.custom-popup > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 50%;
+  width: 400px;
+  max-width: 90%;
+  padding: 1em;
+  border: 1px solid #ccc;
+  border-radius: 0.5em;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  background-color: white;
+}
+
+.custom-popup > div > p {
+  font-size: 0.875em;
+  margin-bottom: 1em;
+}
+
+.custom-popup > div > button {
+  align-self: flex-end;
+  background-color: var(--farmos-map-accent-color);
+  color: white;
+  padding: 0.25em 1em;
+  border-radius: 1em;
+  transition: background-color 300ms;
+}
+
+.custom-popup > div > button:hover {
+  background-color: #20a020;
+}

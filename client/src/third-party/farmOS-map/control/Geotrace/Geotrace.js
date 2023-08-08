@@ -32,6 +32,8 @@ const STATE_READY = 'STATE_READY';
 const STATE_PROGRESS = 'STATE_PROGRESS';
 const STATE_DONE = 'STATE_DONE';
 
+const DEFAULT_ZOOM = 19;
+
 const styles = {
   active: new Style({
     stroke: new Stroke({
@@ -138,9 +140,6 @@ class Geotrace extends Control {
     // Add the "active" class.
     this.element.classList.add('active');
 
-    // Hide controls
-    this.element.parentElement.classList.add('hidden');
-
     // Get the map.
     const map = this.getMap();
 
@@ -197,18 +196,32 @@ class Geotrace extends Control {
         projection: map.getView().getProjection(),
       });
 
+    // Update the UI if support GPS
+    this.geolocation.once('change', () => {
+      // Hide controls
+      this.element.parentElement.classList.add('hidden');
+
+      // Add live controls
+      if (!this.stateElements) {
+        const viewPort = map.getViewport();
+        this.stateElements = document.createElement('div');
+        this.stateElements.className = 'geotrace-ctrls-container';
+        viewPort.appendChild(this.stateElements);
+      }
+
+      this.changeState(STATE_READY);
+    });
+
+    // Otherwise, do nth and emit error
+    this.geolocation.once('error', () => {
+      this.showError(
+        'Geotrace feature is available only on devices with GPS tracking. If this device has GPS tracking, please enable it to use this feature.'
+      );
+      this.deactivate();
+    });
+
     // Turn on geo tracking.
     this.setTracking(true);
-
-    // Add live controls
-    if (!this.stateElements) {
-      const viewPort = map.getViewport();
-      this.stateElements = document.createElement('div');
-      this.stateElements.className = 'geotrace-ctrls-container';
-      viewPort.appendChild(this.stateElements);
-    }
-
-    this.changeState(STATE_READY);
   }
 
   /**
@@ -222,7 +235,9 @@ class Geotrace extends Control {
     this.element.classList.remove('active');
 
     // Remove live controls
-    this.stateElements.replaceChildren([]);
+    if (this.stateElements) {
+      this.stateElements.replaceChildren([]);
+    }
 
     // Restore controls
     this.element.parentElement.classList.remove('hidden');
@@ -333,7 +348,7 @@ class Geotrace extends Control {
       this.trace.setCoordinates([coords], 'XYZM');
 
       this.getMap().getView().setCenter(coords);
-      this.getMap().getView().setZoom(18);
+      this.getMap().getView().setZoom(DEFAULT_ZOOM);
     }
   }
 
@@ -451,7 +466,7 @@ class Geotrace extends Control {
     this.setTracking(true);
 
     // Reset zoom
-    this.getMap().getView().setZoom(18);
+    this.getMap().getView().setZoom(DEFAULT_ZOOM);
 
     this.changeState(STATE_READY);
   }
@@ -503,11 +518,35 @@ class Geotrace extends Control {
       // Turn off geo tracking.
       this.geolocation.setTracking(false);
 
-      if (this.trackingKey)
-        // Unregister event listener
+      // Unregister event listener
+      if (this.trackingKey) {
         unByKey(this.trackingKey);
-      this.trackingKey = null;
+        this.trackingKey = null;
+      }
     }
+  }
+
+  /**
+   * Show error popup
+   * @private
+   */
+  showError(error) {
+    const popupContainer = document.createElement('div');
+    popupContainer.className = 'custom-popup';
+
+    const popup = document.createElement('div');
+    popupContainer.appendChild(popup);
+
+    const paragraph = document.createElement('p');
+    paragraph.innerHTML = error;
+    popup.appendChild(paragraph);
+
+    const button = document.createElement('button');
+    button.innerHTML = 'Okay';
+    button.addEventListener('click', () => popupContainer.remove());
+    popup.appendChild(button);
+
+    this.getMap().getOverlayContainerStopEvent().appendChild(popupContainer);
   }
 }
 

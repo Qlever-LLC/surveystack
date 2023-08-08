@@ -15,6 +15,38 @@
       }"
       role="application"
     />
+    <!-- <app-dialog v-model="isOpen.addFarm" width="300" @cancel="isOpen.addFarm = false" @confirm="isOpen.addFarm = false">
+      <template #title>Add Farm Name</template>
+
+      <v-text-field v-model="farmName" />
+    </app-dialog> -->
+
+    <div class="fields-table mt-6 d-none">
+      <v-btn class="ml-auto" color="primary" @click="handleAddField">Add field</v-btn>
+      <v-simple-table class="mt-2" height="300" fixed-header dense>
+        <thead>
+          <tr>
+            <th class="text-left">Visible</th>
+            <th class="text-left">Preview</th>
+            <th class="text-left">Name</th>
+            <th class="text-left">Type</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(field, i) in fields" :key="i">
+            <td><v-switch v-model="fields[i].visible" class="my-3 pt-0" hide-details></v-switch></td>
+            <td><img v-if="field.preview" height="48" :src="field.preview" /></td>
+            <td><input v-model="fields[i].name" placeholder="Enter field name ..." /></td>
+            <td><input v-model="fields[i].type" placeholder="Enter field type ..." /></td>
+            <td align="right">
+              <v-btn icon outlined small><v-icon>mdi-delete</v-icon></v-btn>
+            </td>
+          </tr>
+        </tbody>
+      </v-simple-table>
+    </div>
+
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -87,8 +119,9 @@ export default {
   },
   data() {
     return {
-      mapInstance: null,
       mapId: `farmos-map-${Math.floor(Math.random() * 1e4)}`,
+      mapInstance: null,
+      fields: [],
     };
   },
   computed: {
@@ -125,6 +158,15 @@ export default {
           document.querySelector('#gcd-input-query').focus();
         }
       }
+    },
+    handleAddField() {
+      this.fields.push({
+        visible: true,
+        preview: null,
+        name: '',
+        type: '',
+        geojson: null,
+      });
     },
   },
 };
