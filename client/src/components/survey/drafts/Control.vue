@@ -136,9 +136,15 @@ export default {
         path: `${this.path}.meta.dateModified`,
         value: modified,
         calculate: false,
+        initialize: false,
       });
       // adjust modified date of the submission
-      this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified, calculate: false });
+      this.$store.dispatch('draft/setProperty', {
+        path: 'meta.dateModified',
+        value: modified,
+        calculate: false,
+        initialize: false,
+      });
       // adjust value
       this.$store.dispatch('draft/setProperty', { path, value });
     },

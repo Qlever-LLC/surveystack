@@ -176,7 +176,7 @@ const actions = {
     await dispatch('calculateRelevance');
     await dispatch('next');
   },
-  setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
+  setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
       try {
@@ -185,7 +185,7 @@ const actions = {
         console.warn('unable to persist submission to IDB');
       }
     }
-    if (state.node.model.type === 'page') {
+    if (initialize && state.node.model.type === 'page') {
       dispatch('initialize', state.node);
     }
     if (calculate) {
@@ -395,34 +395,34 @@ const actions = {
       }
     });
   },
-  async initializeForced({ commit, dispatch }, node) {
+  async initialize({ state, dispatch }, node) {
+    let nodes = surveyStackUtils.getAllNodes(node);
+    const calculations = await codeEvaluator.calculateInitialize(nodes, state.submission, state.survey); // eslint-disable-line
+    for (const calculation of calculations) {
+      const { result, path, skip } = calculation;
+      if (!skip && !!path) {
+        await dispatch('setProperty', {
+          path: `${path}.value`,
+          value: result,
+          calculate: true,
+          initialize: false, //prevent infinity loop
+        });
+      }
+    }
+  },
+  async initializeForced({ commit, state, dispatch }, node) {
     const path = node
       .getPath()
       .map((n) => n.model.name)
       .join('.');
     //first set dateModified to null which is required in case of the value being re-initialized manually
-    commit('SET_PROPERTY', {
+    await dispatch('setProperty', {
       path: `${path}.meta.dateModified`,
       value: null,
-      calculate: true,
-      initialize: false,
+      calculate: false,
+      initialize: false, //prevent infinity loop
     });
     await dispatch('initialize', node);
-  },
-  async initialize({ commit, state }, node) {
-    let nodes = surveyStackUtils.getAllNodes(node);
-    const calculations = await codeEvaluator.calculateInitialize(nodes, state.submission, state.survey); // eslint-disable-line
-    calculations.forEach((calculation) => {
-      const { result, path, skip } = calculation;
-      if (!skip && !!path) {
-        commit('SET_PROPERTY', {
-          path: `${path}.value`,
-          value: result,
-          calculate: true,
-          initialize: false,
-        });
-      }
-    });
   },
   async calculateApiCompose({ commit, state }) {
     // TODO: only calculate subset of nodes
