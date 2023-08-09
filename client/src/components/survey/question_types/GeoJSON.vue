@@ -56,7 +56,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
-import { MapInstanceManager } from '@farmos.org/farmos-map';
+import { MapInstanceManager } from '@our-sci/farmos-map';
 import Geotrace from '@/third-party/farmOS-map/control/Geotrace/Geotrace';
 
 /**

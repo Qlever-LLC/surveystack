@@ -16,10 +16,10 @@
   },
   "license": "GPL-3.0-only",
   "dependencies": {
-    "@farmos.org/farmos-map": "^2.2.1",
     "@mapbox/mapbox-gl-geocoder": "^4.7.0",
     "@mapbox/togeojson": "^0.16.0",
     "@mdi/font": "^6.4.95",
+    "@our-sci/farmos-map": "^2.2.2",
     "@sentry/integrations": "^6.17.2",
     "@sentry/tracing": "^6.17.2",
     "@sentry/vue": "^6.17.2",

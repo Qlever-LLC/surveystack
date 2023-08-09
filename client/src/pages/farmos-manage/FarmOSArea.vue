@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { MapInstanceManager } from '@farmos.org/farmos-map';
+import { MapInstanceManager } from '@our-sci/farmos-map';
 
 export default {
   props: ['value', 'center'],
