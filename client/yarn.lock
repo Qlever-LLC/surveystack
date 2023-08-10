@@ -2625,10 +2625,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@our-sci/farmos-map@^2.2.2":
-  version "2.2.2"
-  resolved "https://gitlab.com/api/v4/projects/48349961/packages/npm/@our-sci/farmos-map/-/@our-sci/farmos-map-2.2.2.tgz#b4103baf9f1e3e7e0209d697461eaa1f56746691"
-  integrity sha1-tBA7r58ePn4CCdaXRh6qH1Z0ZpE=
+"@our-sci/farmos-map@^2.2.7":
+  version "2.2.7"
+  resolved "https://gitlab.com/api/v4/projects/48349961/packages/npm/@our-sci/farmos-map/-/@our-sci/farmos-map-2.2.7.tgz#f49b252d9f997222ee103640da7d379f37d365e2"
+  integrity sha1-9JslLZ+ZciLuEDZA2n03nzfTZeI=
   dependencies:
     "@kirtandesai/ol-geocoder" "^5.0.6"
     bootstrap-icons "^1.10.5"
