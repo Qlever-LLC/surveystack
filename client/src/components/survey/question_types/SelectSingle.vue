@@ -3,7 +3,7 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
     <div class="py-2">
-      <v-radio-group
+      <a-radio-group
         :value="Array.isArray(value) ? value[0] : value"
         @change="onChange"
         v-if="sourceIsValid"
@@ -11,36 +11,38 @@
         data-test-id="radio-group"
         hide-details
       >
-        <a-radio
-          v-for="(item, index) in filteredSource"
-          :label="item.label"
-          :value="item.value"
-          :key="index"
-          color="focus"
-        />
-        <a-radio
-          :value="customSelection || 'other'"
-          v-if="control.options.allowCustomSelection"
-          class="mt-1"
-          @change="customSelection = customSelection || 'other'"
-          data-test-id="custom-input-radio"
-          color="focus"
-        >
-          <template v-slot:label>
-            <v-text-field
-              class="text-field-other"
-              :value="customSelection"
-              @input="handleCustomSelectionInput"
-              data-test-id="custom-input"
-              hide-details
-              outlined
-              dense
-              label="other"
-              color="focus"
-            />
-          </template>
-        </a-radio>
-      </v-radio-group>
+        <template>
+          <a-radio
+            v-for="(item, index) in filteredSource"
+            :label="item.label"
+            :value="item.value"
+            :key="index"
+            color="focus"
+          />
+          <a-radio
+            :value="customSelection || 'other'"
+            v-if="control.options.allowCustomSelection"
+            class="mt-1"
+            @change="customSelection = customSelection || 'other'"
+            data-test-id="custom-input-radio"
+            color="focus"
+          >
+            <template v-slot:label>
+              <v-text-field
+                class="text-field-other"
+                :value="customSelection"
+                @input="handleCustomSelectionInput"
+                data-test-id="custom-input"
+                hide-details
+                outlined
+                dense
+                label="other"
+                color="focus"
+              />
+            </template>
+          </a-radio>
+        </template>
+      </a-radio-group>
       <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     </div>
     <app-control-more-info :value="control.moreInfo" />
@@ -55,6 +57,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import ARadio from '@/components/ui/ARadio.vue';
+import ARadioGroup from '@/components/ui/ARadioGroup.vue';
 
 export function getNextValue(value) {
   const nextValue = getValueOrNull(value);
@@ -70,6 +73,7 @@ export default {
     appControlMoreInfo,
     appControlError,
     ARadio,
+    ARadioGroup,
   },
   data() {
     return {
@@ -79,6 +83,7 @@ export default {
   methods: {
     getValueOrNull,
     onChange(v) {
+      console.log('OnChange ', v);
       if (this.value !== v) {
         this.changed(getNextValue(v));
       }
