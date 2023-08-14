@@ -100,8 +100,8 @@
 
       <div class="text-left text--secondary">Unit System to use</div>
       <v-radio-group v-model="localViewModel.form.units" col>
-        <v-radio label="Metric" value="metric"></v-radio>
-        <v-radio label="US" value="us"></v-radio>
+        <a-radio label="Metric" value="metric" />
+        <a-radio label="US" value="us" />
       </v-radio-group>
 
       <v-autocomplete
@@ -224,6 +224,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
+import ARadio from '@/components/ui/ARadio.vue';
 
 import { timezones } from './timezones';
 
@@ -233,6 +234,7 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
+    ARadio,
   },
   data() {
     return {

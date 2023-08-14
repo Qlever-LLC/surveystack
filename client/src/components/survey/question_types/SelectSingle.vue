@@ -11,8 +11,14 @@
         data-test-id="radio-group"
         hide-details
       >
-        <v-radio v-for="item in filteredSource" :label="item.label" :value="item.value" :key="item.key" color="focus" />
-        <v-radio
+        <a-radio
+          v-for="(item, index) in filteredSource"
+          :label="item.label"
+          :value="item.value"
+          :key="index"
+          color="focus"
+        />
+        <a-radio
           :value="customSelection || 'other'"
           v-if="control.options.allowCustomSelection"
           class="mt-1"
@@ -33,7 +39,7 @@
               color="focus"
             />
           </template>
-        </v-radio>
+        </a-radio>
       </v-radio-group>
       <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     </div>
@@ -48,6 +54,7 @@ import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
+import ARadio from '@/components/ui/ARadio.vue';
 
 export function getNextValue(value) {
   const nextValue = getValueOrNull(value);
@@ -62,6 +69,7 @@ export default {
     appControlLabel,
     appControlMoreInfo,
     appControlError,
+    ARadio,
   },
   data() {
     return {

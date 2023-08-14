@@ -28,22 +28,22 @@
         </v-text-field>
 
         <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
-          <v-radio label="Send an invitation email" value="SEND_NOW">
+          <a-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Send an invitation email</div>
                 <div class="font-weight-regular caption">An email invitation will be sent right now</div>
               </div>
             </template>
-          </v-radio>
-          <v-radio label="Do not send an invitation email at this moment" value="SEND_LATER">
+          </a-radio>
+          <a-radio label="Do not send an invitation email at this moment" value="SEND_LATER">
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Do not send an invitation email now</div>
                 <div class="font-weight-regular caption">You can send an email invitation later on</div>
               </div>
             </template>
-          </v-radio>
+          </a-radio>
         </v-radio-group>
 
         <div class="d-flex mt-2 justify-end">
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import ARadio from '@/components/ui/ARadio.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { BtnDropdown, ARadio },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',
