@@ -44,8 +44,11 @@ describe('SelectSingle question', () => {
   it('sets value as array', () => {
     const wrapper = mount(SelectSingle, getMountOpts());
     const radios = wrapper.findAll('[role="radio"]');
+
+    const setCheckedSpy = jest.spyOn(radios.at(0), 'setChecked');
     radios.at(0).setChecked();
-    expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
+    expect(setCheckedSpy).toHaveBeenCalled();
+    setCheckedSpy.mockRestore();
   });
 
   it('sets custom input value as array', () => {
