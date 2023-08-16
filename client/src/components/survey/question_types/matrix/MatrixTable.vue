@@ -19,6 +19,7 @@
       </div>
       <div v-if="$scopedSlots['row-actions']" class="mt-header-left-spacer" />
     </div>
+    <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <div ref="body" class="mt-body pb-1" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div
         class="mt-row"
@@ -56,7 +57,7 @@
       </div>
     </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
-      <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
+      <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }" :disabled="loading">
         <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
       </v-btn>
     </div>
@@ -107,6 +108,10 @@ export default {
     addRowLabel: {
       type: String,
       default: 'Add row',
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
     // how much sooner the bottom has to start floating to avoid being coverd by the footer
     floatingFooterSize: {

@@ -28,16 +28,19 @@ describe('Matrix question', () => {
           },
         ],
         rows: range(numRows).map((ri) => ({ [field]: { value: valuesInRows[ri] } })),
+        resourcesMap: {
+          [`res_${colIdx}`]: options,
+        },
       };
 
       if (mapComponent) {
         component = mapComponent(component);
       }
 
-      return Matrix.methods.getDropdownItems.call(component, field, valuesInRows[rowIdx]);
+      return Matrix.methods.getDropdownItems.call(component, field);
     };
 
-    const item = (value, label = null) => ({ value, label: label === null ? value : label });
+    const item = (value, label = '') => ({ value, label: label || value });
 
     it('selects the correct resource', () => {
       const options = [item('value_1', 'label_1'), item('value_2', 'label_2')];
@@ -55,7 +58,7 @@ describe('Matrix question', () => {
     it('return empty array for unknown resource', () => {
       const options = [item('value_1', 'label_1'), item('value_2', 'label_2')];
       // remove resources from the component
-      const mapComponent = (component) => ({ ...component, resources: [] });
+      const mapComponent = (component) => ({ ...component, resources: [], resourcesMap: {} });
       const items = run({ options, mapComponent });
       expect(items).toMatchObject([]);
     });

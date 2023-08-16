@@ -91,7 +91,7 @@ export default defineComponent({
       const { id, path } = props.resource.content;
       const key = id + path;
 
-      // Skip fetching if dialog is closed or already fetchced items
+      // Skip fetching if dialog is closed or already fetched items
       if (!props.value || params.value === key) {
         return;
       }

@@ -153,13 +153,7 @@ export default {
       });
 
       this.paths = paths;
-    },
-  },
-  watch: {
-    surveyId() {
-      if (!this.loading) {
-        this.path = '';
-      }
+      this.path = '';
     },
   },
   async mounted() {

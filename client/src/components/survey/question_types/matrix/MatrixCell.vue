@@ -295,8 +295,7 @@ export default {
       }
     },
     items() {
-      const arrayValue = Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
-      return this.getDropdownItems(this.header.value, arrayValue);
+      return this.getDropdownItems(this.header.value);
     },
     getDateLabel() {
       const date = parseISO(this.value);

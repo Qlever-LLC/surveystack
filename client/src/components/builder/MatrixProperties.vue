@@ -24,14 +24,15 @@
       @change="setResource"
       @delete="removeResource"
       @close-dialog="open = false"
-      @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-      @set-control-required="(val) => $emit('set-control-required')"
+      @set-survey-resources="$emit('set-survey-resources', $event)"
+      @set-control-required="$emit('set-control-required')"
     />
   </v-dialog>
 </template>
 
 <script>
 import MatrixEditor from '@/components/builder/MatrixEditor.vue';
+import { removeResource, setResource } from '@/utils/resources';
 
 export default {
   components: {
@@ -60,12 +61,6 @@ export default {
     };
   },
   computed: {
-    resource() {
-      return this.resources.find((resource) => resource.id === this.value);
-    },
-    filteredResources() {
-      return this.resources.filter((resource) => resource.type === 'MATRIX');
-    },
     getLabel() {
       return this.value && Array.isArray(this.value.content)
         ? this.value.content
@@ -77,18 +72,10 @@ export default {
   },
   methods: {
     removeResource(id) {
-      const index = this.resources.findIndex((r) => r.id === id);
-      const newResources = [...this.resources.slice(0, index), ...this.resources.slice(index + 1)];
-      this.$emit('set-survey-resources', newResources);
-      this.$emit('set-control-source', null);
+      this.$emit('set-survey-resources', removeResource(this.resource, id));
     },
     setResource(resource) {
-      const index = this.resources.findIndex((r) => r.id === resource.id);
-      const newResources = [...this.resources.slice(0, index), resource, ...this.resources.slice(index + 1)];
-      this.$emit('set-survey-resources', newResources);
-    },
-    selectResourceHandler(id) {
-      this.$emit('set-control-source', id);
+      this.$emit('set-survey-resources', setResource(this.resources, resource));
     },
   },
 };
