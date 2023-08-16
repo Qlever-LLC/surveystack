@@ -99,10 +99,10 @@
       />
 
       <div class="text-left text--secondary">Unit System to use</div>
-      <v-radio-group v-model="localViewModel.form.units" col>
+      <a-radio-group v-model="localViewModel.form.units">
         <a-radio label="Metric" value="metric" />
         <a-radio label="US" value="us" />
-      </v-radio-group>
+      </a-radio-group>
 
       <v-autocomplete
         label="Owner of the FarmOS Instance"
@@ -225,6 +225,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 import ARadio from '@/components/ui/ARadio.vue';
+import ARadioGroup from '@/components/ui/ARadioGroup.vue';
 
 import { timezones } from './timezones';
 
@@ -235,6 +236,7 @@ export default {
     appFieldCreator,
     appFieldList,
     ARadio,
+    ARadioGroup,
   },
   data() {
     return {

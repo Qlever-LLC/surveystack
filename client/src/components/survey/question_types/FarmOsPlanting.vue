@@ -27,9 +27,9 @@
                 :true-value="hashItem(item)"
                 color="focus"
               />
-              <v-radio-group v-else :value="active">
+              <a-radio-group v-else :value="active">
                 <a-radio :value="true" color="focus" />
-              </v-radio-group>
+              </a-radio-group>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title v-html="item.label" />
@@ -46,6 +46,7 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 import ARadio from '@/components/ui/ARadio.vue';
+import ARadioGroup from '@/components/ui/ARadioGroup.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
@@ -156,6 +157,7 @@ export default {
   mixins: [baseQuestionComponent, farmosBase()],
   components: {
     ARadio,
+    ARadioGroup,
   },
   data() {
     return {

@@ -3,9 +3,9 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
     <div class="py-2">
-      <a-radio-group
+      <v-radio-group
         :value="Array.isArray(value) ? value[0] : value"
-        @change="onChange"
+        @input="onChange"
         v-if="sourceIsValid"
         class="mt-0"
         data-test-id="radio-group"
@@ -42,7 +42,7 @@
             </template>
           </a-radio>
         </template>
-      </a-radio-group>
+      </v-radio-group>
       <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     </div>
     <app-control-more-info :value="control.moreInfo" />
@@ -83,7 +83,6 @@ export default {
   methods: {
     getValueOrNull,
     onChange(v) {
-      console.log('OnChange ', v);
       if (this.value !== v) {
         this.changed(getNextValue(v));
       }

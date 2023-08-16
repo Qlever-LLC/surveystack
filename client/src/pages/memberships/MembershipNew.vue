@@ -27,7 +27,7 @@
           </template>
         </v-text-field>
 
-        <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
+        <a-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
           <a-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
               <div>
@@ -44,7 +44,7 @@
               </div>
             </template>
           </a-radio>
-        </v-radio-group>
+        </a-radio-group>
 
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
@@ -113,6 +113,7 @@ import EmailValidator from 'email-validator';
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
 import ARadio from '@/components/ui/ARadio.vue';
+import ARadioGroup from '@/components/ui/ARadioGroup.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -129,7 +130,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown, ARadio },
+  components: { BtnDropdown, ARadio, ARadioGroup },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

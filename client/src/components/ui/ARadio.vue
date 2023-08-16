@@ -11,9 +11,9 @@
 <script>
 export default {
   props: {
-    label: { default: undefined },
-    value: { default: undefined },
-    color: { default: undefined },
+    label: { type: String, required: false },
+    value: { type: undefined, required: true },
+    color: { type: String, required: false },
   },
 };
 </script>

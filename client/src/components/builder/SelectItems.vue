@@ -32,10 +32,10 @@
           />
           <v-checkbox v-if="custom" v-model="selected" label="other" value="other" class="mt-2" hide-details />
         </div>
-        <v-radio-group v-else :value="selected ? selected[0] : null" @change="selected = [$event]">
+        <a-radio-group v-else :value="selected ? selected[0] : null" @input="selected = [$event]">
           <a-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
           <a-radio v-if="custom" label="other" value="other" />
-        </v-radio-group>
+        </a-radio-group>
       </v-card-text>
 
       <v-divider></v-divider>
@@ -51,6 +51,7 @@
 
 <script>
 import ARadio from '@/components/ui/ARadio.vue';
+import ARadioGroup from '@/components/ui/ARadioGroup.vue';
 
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
@@ -59,6 +60,7 @@ function getArrayValue(source) {
 export default {
   components: {
     ARadio,
+    ARadioGroup,
   },
   props: {
     value: { type: [String, Array] },
