@@ -397,6 +397,7 @@ const actions = {
   },
   async initialize({ state, dispatch }, node) {
     let nodes = surveyStackUtils.getAllNodes(node);
+    //TODO maybe better loop over nodes here to make calculations based on results before. Case: page as first control including two initalized controls: second init does not take result uf first init into account
     const calculations = await codeEvaluator.calculateInitialize(nodes, state.submission, state.survey); // eslint-disable-line
     for (const calculation of calculations) {
       const { result, path, skip } = calculation;
