@@ -13,7 +13,7 @@
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>
-      <v-list flat>
+      <a-list flat>
         <v-list-item link :to="{ name: 'auth-profile' }">
           <v-list-item-icon>
             <v-icon>mdi-account-circle</v-icon>
@@ -36,7 +36,7 @@
           </v-list-item-icon>
           <v-list-item-title> Sign Out </v-list-item-title>
         </v-list-item>
-      </v-list>
+      </a-list>
 
       <!-- </v-card-text> -->
       <!-- </v-card> -->
@@ -52,9 +52,11 @@
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
 import api from '@/services/api.service';
+import AList from '@/components/ui/AList.vue';
 
 export default {
   components: {
+    AList,
     ActiveGroupSelectorList,
   },
   data() {

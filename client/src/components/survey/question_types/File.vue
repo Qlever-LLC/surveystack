@@ -70,7 +70,7 @@
     </div>
 
     <v-expand-transition>
-      <v-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
+      <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
         <v-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
@@ -112,7 +112,7 @@
             </v-btn>
           </v-list-item-action>
         </v-list-item>
-      </v-list>
+      </a-list>
     </v-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -125,6 +125,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 import { getLabelFromKey } from '@/utils/resources';
+import AList from '@/components/ui/AList.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -132,6 +133,7 @@ const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //5
 export default {
   mixins: [baseQuestionComponent],
   components: {
+    AList,
     appControlLabel,
     appControlMoreInfo,
     appControlHint,

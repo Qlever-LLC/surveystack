@@ -1,6 +1,6 @@
 <template>
   <v-sheet outlined>
-    <v-list subheader>
+    <a-list subheader>
       <v-subheader>Fields added to Farmos Instance</v-subheader>
 
       <v-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
@@ -18,12 +18,15 @@
           </v-btn>
         </v-list-item-action>
       </v-list-item>
-    </v-list>
+    </a-list>
   </v-sheet>
 </template>
 
 <script>
+import AList from '@/components/ui/AList.vue';
+
 export default {
+  components: { AList },
   props: ['value'],
   methods: {
     remove(e) {

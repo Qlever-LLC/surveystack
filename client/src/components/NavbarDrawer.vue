@@ -5,7 +5,7 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
-    <v-list class="mt-0 pt-0">
+    <a-list class="mt-0 pt-0">
       <template v-for="(item, i) in items">
         <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
         <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
@@ -36,7 +36,7 @@
               <v-subheader>DOCUMENTATION</v-subheader>
             </v-expansion-panel-header>
             <v-expansion-panel-content class="pa-0 ma-0 no-padding">
-              <v-list class="pa-0 ma-0">
+              <a-list class="pa-0 ma-0">
                 <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
                   <v-list-item-icon>
                     <v-icon>mdi-notebook</v-icon>
@@ -62,12 +62,12 @@
                     <v-list-item-title>About</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-              </v-list>
+              </a-list>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
       </v-list-item>
-    </v-list>
+    </a-list>
 
     <template v-slot:append>
       <div dark class="grey--text">
@@ -81,7 +81,10 @@
 </template>
 
 <script>
+import AList from '@/components/ui/AList.vue';
+
 export default {
+  components: { AList },
   props: {
     value: {
       type: Boolean,

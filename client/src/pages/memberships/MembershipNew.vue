@@ -60,7 +60,7 @@
             top
             left
           >
-            <v-list class="pa-0 mx-auto" max-width="280">
+            <a-list class="pa-0 mx-auto" max-width="280">
               <v-list-item-group v-model="invitationMethod">
                 <v-list-item two-line :value="INVITATION_METHODS.INVITE">
                   <v-list-item-content>
@@ -83,7 +83,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list-item-group>
-            </v-list>
+            </a-list>
           </btn-dropdown>
         </div>
       </v-form>
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import AList from '@/components/ui/AList.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { AList, BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

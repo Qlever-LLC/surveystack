@@ -1,5 +1,5 @@
 <template>
-  <v-list two-line>
+  <a-list two-line>
     <v-list-item-group v-model="selected" single active-class="pink--text">
       <template v-for="(question, index) in questions">
         <v-list-item :key="question.number">
@@ -24,10 +24,13 @@
         <v-divider v-if="index < questions.length - 1" :key="'div_' + question.number"></v-divider>
       </template>
     </v-list-item-group>
-  </v-list>
+  </a-list>
 </template>
 <script>
+import AList from '@/components/ui/AList.vue';
+
 export default {
+  components: { AList },
   data: () => ({
     selected: [],
   }),

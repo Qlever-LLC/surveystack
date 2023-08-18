@@ -37,7 +37,7 @@
           top
           left
         >
-          <v-list class="pa-0 mx-auto" max-width="260">
+          <a-list class="pa-0 mx-auto" max-width="260">
             <v-list-item @click="startDraft(entity)">
               <v-list-item-content>
                 <v-list-item-title>Start survey</v-list-item-title>
@@ -54,7 +54,7 @@
                 </v-list-item-content>
               </v-list-item-content>
             </v-list-item>
-          </v-list>
+          </a-list>
         </btn-dropdown>
 
         <div class="my-3 d-flex justify-center">
@@ -90,6 +90,7 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AList from '@/components/ui/AList.vue';
 
 export default {
   props: {
@@ -100,6 +101,7 @@ export default {
     },
   },
   components: {
+    AList,
     BtnDropdown,
     MemberSelector,
   },
