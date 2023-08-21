@@ -70,7 +70,7 @@
     </div>
 
     <v-expand-transition>
-      <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
+      <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0">
         <v-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"

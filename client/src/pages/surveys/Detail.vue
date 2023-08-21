@@ -37,7 +37,7 @@
           top
           left
         >
-          <a-list class="pa-0 mx-auto" max-width="260">
+          <a-list max-width="260">
             <v-list-item @click="startDraft(entity)">
               <v-list-item-content>
                 <v-list-item-title>Start survey</v-list-item-title>

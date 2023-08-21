@@ -5,7 +5,7 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
-    <a-list class="mt-0 pt-0">
+    <a-list>
       <template v-for="(item, i) in items">
         <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
         <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
