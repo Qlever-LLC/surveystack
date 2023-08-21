@@ -89,18 +89,24 @@ describe('draft store', () => {
       });
     });
     describe('initialize', () => {
-      const runTestWithControls = async (controls) => {
+      const runTestWithControls = async (controls, nodeNameToBeModified = undefined, force = false) => {
         const state = createStateWithControls(controls);
         const nextNode = state.root.first(({ model }) => model.id === EXPECTED_NEXT_CONTROL_ID);
 
+        if (nodeNameToBeModified) {
+          state.submission.data[nodeNameToBeModified].meta.dateModified = 'dummy-modification-date';
+        }
         const dispatch = jest.fn();
         const path = nextNode
           .getPath()
           .map((n) => nextNode.model.name)
           .join('.');
-        const value = 'foo';
-        await actions.initialize({ state, dispatch }, nextNode);
-        return { dispatch, path };
+        if (force) {
+          await actions.initializeForced({ state, dispatch }, nextNode);
+        } else {
+          await actions.initialize({ state, dispatch }, nextNode);
+        }
+        return { dispatch, path, state };
       };
       it("initializes the value of the passed node if the user didn't modify the value manually", async () => {
         const expectedValue = 'foo bar';
@@ -132,13 +138,71 @@ describe('draft store', () => {
           initialize: false,
         });
       });
-      it.todo(
-        "updates the value of the passed node and its child nodes if they have an initialize expression enabled and the user didn't set the value manually"
-      );
-    });
-    describe('initializeForced', () => {
-      it.todo('removes dateModified');
-      it.todo('updates the value of the passed node, even if the user has set the value manually before');
+      it('does not initialize the value of the passed node if the user did modify the value manually', async () => {
+        const expectedValue = 'foo bar';
+        const control1 = createControl({
+          type: 'text',
+          name: 'text_1',
+          id: INITIAL_CURRENT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: '',
+            },
+          },
+        });
+        const control2 = createControl({
+          type: 'text',
+          name: 'text_2',
+          id: EXPECTED_NEXT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: "function initialize(submission, survey, parent) {return 'foo bar';}",
+            },
+          },
+        });
+        const { dispatch, path } = await runTestWithControls([control1, control2], 'text_2');
+        expect(dispatch).not.toHaveBeenCalledWith('setProperty', {
+          path: 'data.' + control2.name + '.value',
+          value: expectedValue,
+          calculate: true,
+          initialize: false,
+        });
+      });
+      it('if forced, does initialize the value of the passed node even if the user did modify the value manually', async () => {
+        const expectedValue = 'foo bar';
+        const control1 = createControl({
+          type: 'text',
+          name: 'text_1',
+          id: INITIAL_CURRENT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: '',
+            },
+          },
+        });
+        const control2 = createControl({
+          type: 'text',
+          name: 'text_2',
+          id: EXPECTED_NEXT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: "function initialize(submission, survey, parent) {return 'foo bar';}",
+            },
+          },
+        });
+        const { dispatch, path, state } = await runTestWithControls([control1, control2], 'text_2', true);
+        expect(dispatch).toHaveBeenNthCalledWith(1, 'setProperty', {
+          path: 'data.' + control2.name + '.meta.dateModified',
+          value: null,
+          calculate: false,
+          initialize: false,
+        });
+        expect(dispatch).toHaveBeenNthCalledWith(2, 'initialize', expect.objectContaining({ model: control2 }));
+      });
     });
     describe('next', () => {
       const runTestWithControls = async (controls) => {
