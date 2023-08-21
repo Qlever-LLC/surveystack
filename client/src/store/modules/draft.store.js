@@ -397,17 +397,21 @@ const actions = {
   },
   async initialize({ state, dispatch }, node) {
     let nodes = surveyStackUtils.getAllNodes(node);
-    //TODO maybe better loop over nodes here to make calculations based on results before. Case: page as first control including two initalized controls: second init does not take result uf first init into account
-    const calculations = await codeEvaluator.calculateInitialize(nodes, state.submission, state.survey); // eslint-disable-line
-    for (const calculation of calculations) {
-      const { result, path, skip } = calculation;
-      if (!skip && !!path) {
-        await dispatch('setProperty', {
-          path: `${path}.value`,
-          value: result,
-          calculate: true,
-          initialize: false, //prevent infinity loop
-        });
+    // Loop over nodes here to force calculations being based on results before instead of making them base on the initial state.
+    // Example: Page as first control including two initalized controls: initializing the second control needs to take the result of the initialized first control into account
+    for (const node of nodes) {
+      const calculations = await codeEvaluator.calculateInitialize([node], state.submission, state.survey); // eslint-disable-line
+      // Loop over calculations, though we do not expect to iterate more than once
+      for (const calculation of calculations) {
+        const { result, path, skip } = calculation;
+        if (!skip && !!path) {
+          await dispatch('setProperty', {
+            path: `${path}.value`,
+            value: result,
+            calculate: true,
+            initialize: false, //prevent infinity loop
+          });
+        }
       }
     }
   },
