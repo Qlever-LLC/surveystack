@@ -7,7 +7,7 @@
 <script>
 export default {
   props: {
-    color: { type: Boolean, required: false },
+    color: { type: String, required: false },
     left: { type: Boolean, required: false }, //v3: start
     right: { type: Boolean, required: false }, //v3: end
     size: { type: [String, Number], required: false }, //number in pixels or one of x-small, small, default, large, and x-large

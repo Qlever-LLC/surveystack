@@ -2,7 +2,7 @@
   <v-container v-if="hasFeedback">
     <v-spacer />
     <div class="d-flex justify-end">
-      <v-btn text @click="clearAllFeedback"> <v-icon left>mdi-close</v-icon>{{ clearAllText }} </v-btn>
+      <v-btn text @click="clearAllFeedback"> <a-icon left>mdi-close</a-icon>{{ clearAllText }} </v-btn>
     </div>
     <v-alert v-for="(feedback, idx) in items" :key="idx" border="left" :type="feedback.type" elevation="2">
       {{ feedback.message }}
@@ -11,7 +11,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   data() {
     return {};
   },
