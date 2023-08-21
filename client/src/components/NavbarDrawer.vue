@@ -2,7 +2,7 @@
   <v-navigation-drawer :value="value" app>
     <div class="d-flex justify-end mt-3 mr-3">
       <v-btn large icon @click="$emit('input', !value)">
-        <v-icon>mdi-close</v-icon>
+        <a-icon>mdi-close</a-icon>
       </v-btn>
     </div>
     <v-list class="mt-0 pt-0">
@@ -11,7 +11,7 @@
         <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
         <v-list-item v-else :key="i" :to="item.to">
           <v-list-item-icon v-if="item.icon" :class="item.class">
-            <v-icon>{{ item.icon }}</v-icon>
+            <a-icon>{{ item.icon }}</a-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
@@ -39,7 +39,7 @@
               <v-list class="pa-0 ma-0">
                 <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
                   <v-list-item-icon>
-                    <v-icon>mdi-notebook</v-icon>
+                    <a-icon>mdi-notebook</a-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>{{ doc.label }}</v-list-item-title>
@@ -48,7 +48,7 @@
 
                 <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
                   <v-list-item-icon>
-                    <v-icon>mdi-help-circle-outline</v-icon>
+                    <a-icon>mdi-help-circle-outline</a-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>SurveyStack Help</v-list-item-title>
@@ -56,7 +56,7 @@
                 </v-list-item>
                 <v-list-item href="https://www.surveystack.io" target="_blank">
                   <v-list-item-icon>
-                    <v-icon>mdi-information-outline</v-icon>
+                    <a-icon>mdi-information-outline</a-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>About</v-list-item-title>
@@ -81,7 +81,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: {
     value: {
       type: Boolean,

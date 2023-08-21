@@ -13,7 +13,7 @@
             "
             :disabled="disabled"
           >
-            <v-icon left>mdi-plus</v-icon>Add Row
+            <a-icon left>mdi-plus</a-icon>Add Row
           </v-btn>
         </div>
         <div class="d-flex align-center">
@@ -29,7 +29,7 @@
           <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
               <v-btn icon v-on="on" class="ml-2" :disabled="disabled">
-                <v-icon>mdi-delete</v-icon>
+                <a-icon>mdi-delete</a-icon>
                 <!-- Delete List -->
               </v-btn>
             </template>
@@ -75,7 +75,7 @@
         <v-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
           <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
-            <v-icon>mdi-delete</v-icon>
+            <a-icon>mdi-delete</a-icon>
           </v-btn>
         </div>
       </div>
@@ -101,12 +101,12 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
-            <v-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</v-icon>
-            <v-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</v-icon>
-            <v-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</v-icon>
-            <v-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled">
+            <a-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</a-icon>
+            <a-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</a-icon>
+            <a-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</a-icon>
+            <a-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled">
               mdi-trash-can-outline
-            </v-icon>
+            </a-icon>
           </div>
         </template>
       </v-data-table>
@@ -135,10 +135,11 @@
 </template>
 
 <script>
-import { uniqWith, isEqual } from 'lodash';
+import { isEqual, uniqWith } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
     },
   },
   components: {
+    AIcon,
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
   },

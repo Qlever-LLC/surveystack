@@ -6,7 +6,7 @@
     <v-card class="pa-4 mb-4">
       <div class="d-flex">
         <v-btn class="ml-auto" color="error" outlined @click="dialogRemoval = true">
-          <v-icon left>mdi-trash-can-outline</v-icon> Delete
+          <a-icon left>mdi-trash-can-outline</a-icon> Delete
         </v-btn>
       </div>
       <v-form class="mt-3" @keydown.enter.prevent="submit">
@@ -36,7 +36,7 @@
     </v-card>
 
     <v-card class="my-3 pa-2" v-if="resendEnabled">
-      <v-card-title> <v-icon left>mdi-account-clock</v-icon>Pending </v-card-title>
+      <v-card-title> <a-icon left>mdi-account-clock</a-icon>Pending </v-card-title>
       <v-card-subtitle>Membership has not been claimed</v-card-subtitle>
       <v-card-text>
         You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by
@@ -44,14 +44,14 @@
       </v-card-text>
       <v-card-actions class="d-flex justify-space-between align-center">
         <div>
-          <v-btn color="primary" @click="resend"> <v-icon left>mdi-email-send-outline</v-icon> Resend </v-btn>
+          <v-btn color="primary" @click="resend"> <a-icon left>mdi-email-send-outline</a-icon> Resend </v-btn>
           <span class="ml-1 caption text--secondary">{{
             entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'
           }}</span>
         </div>
         <div>
           <v-btn @click="dialogInvitationLink = true" color="primary">
-            <v-icon left>mdi-eye-outline</v-icon>View
+            <a-icon left>mdi-eye-outline</a-icon>View
           </v-btn>
         </div>
       </v-card-actions>
@@ -101,6 +101,7 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const availableRoles = [
   {
@@ -126,6 +127,7 @@ const availableStatus = [
 
 export default {
   components: {
+    AIcon,
     appDialog,
   },
   data() {

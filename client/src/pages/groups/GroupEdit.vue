@@ -35,7 +35,7 @@
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
         <v-chip v-if="isPremium" class="ml-2" color="success">
-          <v-icon small left> mdi-octagram </v-icon>Premium
+          <a-icon size="small" left> mdi-octagram </a-icon>Premium
         </v-chip>
       </h1>
       <v-btn
@@ -45,7 +45,7 @@
         :to="`/call-for-submissions?group=${entity._id}`"
         color="secondary"
       >
-        <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
+        <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
       </v-btn>
     </div>
     <v-card :loading="isLoadingGroup" class="mb-4">
@@ -146,7 +146,7 @@
                   :userName="entity.user.name"
                   @updated="loadHyloGroup"
                 />
-                <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
+                <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
               </v-row>
             </v-list-item-action>
           </template>
@@ -202,6 +202,7 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const integrations = [
   {
@@ -218,6 +219,7 @@ const integrations = [
 
 export default {
   components: {
+    AIcon,
     appPinnedSurveys,
     appDocLinks,
     appBasicList,

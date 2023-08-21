@@ -12,7 +12,7 @@
       <v-spacer />
       <offline-indicator />
       <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
-        <v-icon size="22">mdi-help-circle-outline</v-icon>
+        <a-icon size="22">mdi-help-circle-outline</a-icon>
       </v-btn>
       <navbar-user-menu />
     </v-app-bar>
@@ -23,11 +23,12 @@
 <script>
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
-import { isOnline } from '@/utils/surveyStack';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
+    AIcon,
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,

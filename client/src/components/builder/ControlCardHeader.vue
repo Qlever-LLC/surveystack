@@ -2,7 +2,7 @@
   <v-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" :style="{ minWidth: '0px' }">
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon :color="iconColor" large class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</v-icon>
+        <a-icon :color="iconColor" size="large" class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</a-icon>
       </template>
       <span>{{ typeName }}</span>
     </v-tooltip>
@@ -21,8 +21,10 @@
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
+  components: { AIcon },
   props: {
     index: { type: String, required: true },
     title: { type: String, required: true },

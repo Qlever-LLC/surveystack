@@ -22,7 +22,7 @@
           </v-list-item-content>
           <v-list-item-action @click="remove(i)">
             <v-btn icon small>
-              <v-icon>mdi-trash-can-outline</v-icon>
+              <a-icon>mdi-trash-can-outline</a-icon>
             </v-btn>
           </v-list-item-action>
         </v-list-item>
@@ -32,7 +32,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: {
     queryList: {
       type: Array,

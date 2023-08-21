@@ -15,7 +15,7 @@
         <slot name="toolbar-actions"></slot>
 
         <v-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
-          <v-icon>mdi-format-list-numbered</v-icon>
+          <a-icon>mdi-format-list-numbered</a-icon>
         </v-btn>
       </div>
     </v-toolbar>
@@ -23,7 +23,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
 };
 </script>

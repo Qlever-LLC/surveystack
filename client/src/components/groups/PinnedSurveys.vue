@@ -30,7 +30,7 @@
             </div>
             <div class="d-flex">
               <v-btn icon @click.stop="() => showDeleteModal(idx)">
-                <v-icon color="grey lighten-1">mdi-delete</v-icon>
+                <a-icon color="grey lighten-1">mdi-delete</a-icon>
               </v-btn>
             </div>
           </div>
@@ -88,10 +88,12 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
+    AIcon,
     draggable,
   },
   data() {

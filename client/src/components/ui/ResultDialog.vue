@@ -37,11 +37,11 @@
                           <v-expansion-panel-header>
                             <template v-slot:actions v-if="!item.data"><v-spacer></v-spacer> </template>
                             <div class="mr-4 flex-grow-0">
-                              <v-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </v-icon>
-                              <v-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </v-icon>
-                              <v-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </v-icon>
-                              <v-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </v-icon>
-                              <v-icon v-else color="primary"> $expand </v-icon>
+                              <a-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </a-icon>
+                              <a-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </a-icon>
+                              <a-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </a-icon>
+                              <a-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </a-icon>
+                              <a-icon v-else color="primary"> $expand </a-icon>
                             </div>
                             {{ item.message }}
                           </v-expansion-panel-header>
@@ -83,8 +83,10 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
+  components: { AIcon },
   props: {
     value: {
       required: true,

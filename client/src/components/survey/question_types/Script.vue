@@ -32,7 +32,7 @@
           href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
           outlined
         >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          <a-icon left class="mr-4" size="x-large">mdi-android</a-icon>
           Download APK
         </v-btn>
       </template>
@@ -52,7 +52,7 @@
           outlined
           @click="showAndroidInstallDialog = true"
         >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          <a-icon left class="mr-4" size="x-large">mdi-android</a-icon>
           Install Android App
         </v-btn>
       </div>
@@ -64,7 +64,7 @@
         <v-chip dark> {{ meta && meta.status }}</v-chip>
         <br />
         <v-chip dark class="mt-1">
-          <v-icon small left>mdi-message-bulleted</v-icon>
+          <a-icon size="small" left>mdi-message-bulleted</a-icon>
           {{ meta && meta.statusMessage }}</v-chip
         >
       </p>
@@ -73,7 +73,7 @@
       <v-progress-circular indeterminate color="primary" class="ma-5" />
     </div>
     <div v-else-if="loadingSourceFailed" class="text-center">
-      <v-icon color="red">mdi-close-thick</v-icon>
+      <a-icon color="red">mdi-close-thick</a-icon>
       There was an error loading the script.
     </div>
     <app-control-more-info :value="control.moreInfo" />
@@ -87,10 +87,12 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
+    AIcon,
     appDialog,
   },
   props: {

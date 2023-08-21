@@ -27,7 +27,7 @@
             </div>
             <div class="d-flex">
               <v-btn icon @click.stop="() => showDeleteModal(idx)">
-                <v-icon color="grey lighten-1">mdi-delete</v-icon>
+                <a-icon color="grey lighten-1">mdi-delete</a-icon>
               </v-btn>
             </div>
           </div>
@@ -94,10 +94,12 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
+    AIcon,
     draggable,
   },
   data() {

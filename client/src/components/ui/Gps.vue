@@ -3,7 +3,7 @@
     <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
         <v-btn v-bind="attrs" v-on="on" class="button">
-          <v-icon>mdi-dots-vertical</v-icon>
+          <a-icon>mdi-dots-vertical</a-icon>
         </v-btn>
       </template>
       <div class="menu">
@@ -19,7 +19,7 @@
             <span v-if="location.properties.accuracy"> acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }} </span>
           </samp>
         </div>
-        <v-btn @click="clipboard" outlined class="mt-1"> <v-icon left>mdi-content-copy</v-icon>Copy </v-btn>
+        <v-btn @click="clipboard" outlined class="mt-1"> <a-icon left>mdi-content-copy</a-icon>Copy </v-btn>
       </div>
     </v-menu>
     <!-- TODO: fix copied snack notification -->
@@ -31,7 +31,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   data() {
     return {
       snackbar: false,

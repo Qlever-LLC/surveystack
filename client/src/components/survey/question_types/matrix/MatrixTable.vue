@@ -57,14 +57,15 @@
     </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
       <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
-        <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
+        <a-icon left>mdi-plus</a-icon>{{ addRowLabel }}
       </v-btn>
     </div>
   </div>
 </template>
 
 <script>
-import { sum, debounce } from 'lodash';
+import { debounce, sum } from 'lodash';
+import AIcon from '@/components/ui/AIcon.vue';
 
 function defaultColumnWidth(type) {
   switch (type) {
@@ -77,6 +78,7 @@ function defaultColumnWidth(type) {
   }
 }
 export default {
+  components: { AIcon },
   props: {
     headers: {
       type: Array,

@@ -15,7 +15,7 @@
           </v-list-item-content>
           <v-list-item-icon>
             <v-btn v-if="false" :to="`/users/${e._id}/edit`" text>
-              <v-icon>mdi-pencil</v-icon>
+              <a-icon>mdi-pencil</a-icon>
             </v-btn>
           </v-list-item-icon>
         </v-list-item>
@@ -27,8 +27,10 @@
 
 <script>
 import api from '@/services/api.service';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
+  components: { AIcon },
   data() {
     return {
       entities: [],

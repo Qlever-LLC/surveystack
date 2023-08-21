@@ -5,7 +5,7 @@
 
       <v-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
         <v-list-item-avatar>
-          <v-icon class="primary lighten-1" dark> mdi-map </v-icon>
+          <a-icon class="primary lighten-1" dark> mdi-map </a-icon>
         </v-list-item-avatar>
 
         <v-list-item-content>
@@ -14,7 +14,7 @@
 
         <v-list-item-action>
           <v-btn icon>
-            <v-icon color="grey lighten-1" @click="remove(field)">mdi-delete</v-icon>
+            <a-icon color="grey lighten-1" @click="remove(field)">mdi-delete</a-icon>
           </v-btn>
         </v-list-item-action>
       </v-list-item>
@@ -23,7 +23,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: ['value'],
   methods: {
     remove(e) {

@@ -22,9 +22,9 @@
       <v-col cols="auto" class="pa-0 align-self-center">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
+            <a-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
               mdi-information-outline
-            </v-icon>
+            </a-icon>
           </template>
           <p>
             <b>Major:</b><br />
@@ -46,8 +46,11 @@
   </v-container>
 </template>
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
   name: 'library-change-type-selector',
+  components: { AIcon },
   props: ['value', 'disabled', 'label'],
   data() {
     return {

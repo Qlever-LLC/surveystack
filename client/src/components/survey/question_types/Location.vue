@@ -11,7 +11,7 @@
       </app-gps>
 
       <v-btn class="layer-switch" @click="switchMapStyle">
-        <v-icon>mdi-layers-outline</v-icon>
+        <a-icon>mdi-layers-outline</a-icon>
       </v-btn>
 
       <div style="background-color: #000" :id="`map-question-${index}`" class="map-question" v-if="!mapError">

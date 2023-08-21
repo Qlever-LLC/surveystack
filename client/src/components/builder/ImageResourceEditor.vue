@@ -5,7 +5,7 @@
       <v-spacer />
 
       <v-btn icon @click="closeDialog">
-        <v-icon>mdi-close</v-icon>
+        <a-icon>mdi-close</a-icon>
       </v-btn>
     </v-card-title>
     <v-card-text>
@@ -51,9 +51,11 @@
 </template>
 
 <script>
-import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
+import { nameHasValidCharacters, nameHasValidLength, nameIsUnique } from '@/utils/resources';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
+  components: { AIcon },
   data() {
     return {};
   },

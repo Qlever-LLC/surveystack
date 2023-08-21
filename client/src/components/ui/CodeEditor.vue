@@ -32,14 +32,14 @@
         </v-dialog>
 
         <v-spacer></v-spacer>
-        <v-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</v-icon>
+        <a-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</a-icon>
         <v-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
-          <v-icon left>mdi-code-braces</v-icon>Examples
+          <a-icon left>mdi-code-braces</a-icon>Examples
         </v-btn>
         <v-btn class="mr-2" outlined color="white" v-if="runnable" @click="$emit('run', model.getValue())">
-          <v-icon left>mdi-play</v-icon> Run
+          <a-icon left>mdi-play</a-icon> Run
         </v-btn>
-        <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
+        <a-icon @click="$emit('close')">mdi-close-circle-outline</a-icon>
       </v-card-title>
       <div class="error red text--white pa-2" v-if="error">{{ error }}</div>
       <div class="editor-height" :id="'monaco-editor-' + _uid"></div>
@@ -71,6 +71,7 @@
 <script>
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
+import AIcon from '@/components/ui/AIcon.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -101,6 +102,7 @@ function log(message){};
 
 export default {
   components: {
+    AIcon,
     appCodeView,
   },
   data() {

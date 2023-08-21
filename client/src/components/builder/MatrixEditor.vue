@@ -16,7 +16,7 @@
         <div class="d-flex justify-space-between align-center">
           <div class="grey--text text--darken-2">Matrix Column Editor</div>
           <div class="d-flex align-center ml-auto mr-2">
-            <v-btn color="primary" @click="addColumn"> <v-icon left>mdi-plus</v-icon>Add Column </v-btn>
+            <v-btn color="primary" @click="addColumn"> <a-icon left>mdi-plus</a-icon>Add Column </v-btn>
           </div>
           <div class="d-flex align-center"></div>
         </div>
@@ -48,7 +48,7 @@
                     v-on="on"
                   >
                     <v-divider vertical class="lock-line-decor" />
-                    <v-icon class="my-1">mdi-arrow-horizontal-lock</v-icon>
+                    <a-icon class="my-1">mdi-arrow-horizontal-lock</a-icon>
                     <v-divider vertical class="lock-line-decor" />
                   </v-card>
                 </template>
@@ -59,7 +59,7 @@
                 <v-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
                   <div class="draggable-handle d-flex pa-2">
                     <v-btn icon small @click="moveItemLeft(i)" :disabled="i === 0" tabindex="-1">
-                      <v-icon>mdi-arrow-left</v-icon>
+                      <a-icon>mdi-arrow-left</a-icon>
                     </v-btn>
                     <v-btn
                       icon
@@ -69,11 +69,11 @@
                       :disabled="i === columns.length - 1"
                       tabindex="-1"
                     >
-                      <v-icon>mdi-arrow-right</v-icon>
+                      <a-icon>mdi-arrow-right</a-icon>
                     </v-btn>
                     <v-spacer />
                     <v-btn icon @click="deleteColumn(i)" tabindex="-1" small>
-                      <v-icon>mdi-trash-can-outline</v-icon>
+                      <a-icon>mdi-trash-can-outline</a-icon>
                     </v-btn>
                   </div>
                   <v-card-text>
@@ -105,10 +105,10 @@
                           :color="!item.resource ? 'primary' : ''"
                           class="ml-auto"
                         >
-                          <v-icon>mdi-plus</v-icon>
+                          <a-icon>mdi-plus</a-icon>
                         </v-btn>
                         <v-btn @click="openOntologyEditor(item.resource)" small :disabled="!item.resource" icon>
-                          <v-icon>mdi-pencil</v-icon>
+                          <a-icon>mdi-pencil</a-icon>
                         </v-btn>
                       </div>
                       <checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
@@ -240,7 +240,7 @@
             </div>
 
             <v-btn slot="footer" @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
-              <v-icon dark>mdi-plus</v-icon>
+              <a-icon dark>mdi-plus</a-icon>
             </v-btn>
           </draggable>
         </div>
@@ -262,6 +262,7 @@ import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -285,6 +286,7 @@ const createOptions = (src) => {
 
 export default {
   components: {
+    AIcon,
     AppOntologyListEditor,
     Draggable,
     Ontology,

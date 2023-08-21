@@ -5,19 +5,19 @@
         <v-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
-          <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
+          <a-icon class="ml-2">mdi-cloud-upload-outline</a-icon>
         </v-btn>
       </v-row>
       <v-row class="d-flex flex-grow-1">
         <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
           <v-tab href="#drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
-              <v-icon class="mr-2">mdi-file-document-edit</v-icon>Drafts
+              <a-icon class="mr-2">mdi-file-document-edit</a-icon>Drafts
             </span>
           </v-tab>
           <v-tab href="#sent" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
-              <v-icon class="mr-2">mdi-email-check</v-icon>Sent
+              <a-icon class="mr-2">mdi-email-check</a-icon>Sent
             </span>
           </v-tab>
         </v-tabs>
@@ -56,7 +56,7 @@
                             @click="() => handleSubmitClick(item._id)"
                             v-on="on"
                           >
-                            <v-icon> mdi-cloud-upload-outline </v-icon>
+                            <a-icon> mdi-cloud-upload-outline </a-icon>
                           </v-btn>
                         </template>
                         <span>Upload Submission</span>
@@ -153,12 +153,14 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   mixins: [ResultMixin],
   components: {
+    AIcon,
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,

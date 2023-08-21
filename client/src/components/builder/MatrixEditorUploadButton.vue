@@ -3,7 +3,7 @@
     <v-input>
       <label for="select-items-file-input" class="cursor-pointer">
         <v-btn class="pointer-events-none" color="primary">
-          <v-icon left>mdi-upload</v-icon>
+          <a-icon left>mdi-upload</a-icon>
           Import CSV
         </v-btn>
       </label>
@@ -22,8 +22,10 @@
 <script>
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
+  components: { AIcon },
   methods: {
     async handleFileChange({
       target: {

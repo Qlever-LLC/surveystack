@@ -44,6 +44,7 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
+
 export default {
   components: { ActiveGroupSelector },
   props: {

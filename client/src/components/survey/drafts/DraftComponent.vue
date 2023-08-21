@@ -54,7 +54,7 @@
             overflowing = false;
           "
         >
-          <v-icon>mdi-arrow-down</v-icon>
+          <a-icon>mdi-arrow-down</a-icon>
         </v-btn>
       </v-fab-transition>
       <app-control class="pb-1" :path="path" :control="control" :forceMobile="forceMobile" :isInBuilder="builder" />
@@ -83,20 +83,20 @@
       <div class="text-body-1 my-4 text-center">
         Click on the
         <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
-          <v-icon>mdi-plus</v-icon>
+          <a-icon>mdi-plus</a-icon>
         </v-btn>
         to add questions to your survey
       </div>
       <div class="text-body-1 my-4 text-center">
         <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events: none">
-          <v-icon class="mr-1">mdi-content-save</v-icon>
+          <a-icon class="mr-1">mdi-content-save</a-icon>
           Save
         </v-btn>
         to create a draft
       </div>
       <div class="text-body-1 my-4 text-center">
         <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events: none">
-          <v-icon class="mr-1">mdi-cloud-upload</v-icon>
+          <a-icon class="mr-1">mdi-cloud-upload</a-icon>
           Publish
         </v-btn>
         to allow users to submit to your survey
@@ -124,9 +124,11 @@ import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 import { queueAction } from '@/utils/surveyStack';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
+    AIcon,
     appControl,
     appDraftFooter,
     appDraftOverview,

@@ -138,26 +138,28 @@
         </v-list-item>
       </template>
     </v-combobox>
-    <v-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading </v-banner>
+    <v-banner v-else-if="isLoading"> <a-icon class="mr-2 mdi-spin">mdi-loading</a-icon>Loading </v-banner>
     <v-banner v-else color="red lighten-2" dark>
-      <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Survey Definition
+      <a-icon class="mr-2">mdi-alert</a-icon>Invalid select options, please update Survey Definition
     </v-banner>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
 
 <script>
-import { isNil, sortBy, uniq, without } from 'lodash';
+import { isNil, uniq, without } from 'lodash';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
+    AIcon,
     appControlLabel,
     appControlMoreInfo,
   },

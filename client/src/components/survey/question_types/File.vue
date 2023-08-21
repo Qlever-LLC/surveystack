@@ -40,7 +40,7 @@
         @click.stop="showFileChooser"
       >
         <div class="col-12 pb-0">
-          <v-icon color="primary" x-large>mdi-cloud-upload-outline</v-icon>
+          <a-icon color="primary" size="x-large">mdi-cloud-upload-outline</a-icon>
         </div>
         <div class="col-12 font-weight-bold">
           {{ $vuetify.breakpoint.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
@@ -62,7 +62,7 @@
               @click.stop="captureImage"
             >
               take a picture
-              <v-icon right> mdi-camera-outline</v-icon>
+              <a-icon right> mdi-camera-outline</a-icon>
             </v-btn>
           </div>
         </div>
@@ -77,10 +77,12 @@
           class="file-list-item my-2"
         >
           <v-list-item-avatar>
-            <v-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" large>mdi-image</v-icon>
-            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</v-icon>
-            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</v-icon>
-            <v-icon v-else large>mdi-file-outline</v-icon>
+            <a-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" size="large">mdi-image</a-icon>
+            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" size="large"
+              >mdi-file-document-outline</a-icon
+            >
+            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" size="large">mdi-file-document-outline</a-icon>
+            <a-icon v-else large>mdi-file-outline</a-icon>
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title
@@ -98,17 +100,17 @@
           </v-list-item-content>
           <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
             <v-btn icon @click="editResourceName(fileResourceKey, index)">
-              <v-icon color="grey lighten-1">mdi-pencil</v-icon>
+              <a-icon color="grey lighten-1">mdi-pencil</a-icon>
             </v-btn>
           </v-list-item-action>
           <v-list-item-action v-if="editIndex === index">
             <v-btn icon @click="commitResourceName(fileResourceKey, index)">
-              <v-icon color="success">mdi-check</v-icon>
+              <a-icon color="success">mdi-check</a-icon>
             </v-btn>
           </v-list-item-action>
           <v-list-item-action>
             <v-btn icon @click="remove(index)">
-              <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
+              <a-icon color="grey lighten-1">mdi-close-circle</a-icon>
             </v-btn>
           </v-list-item-action>
         </v-list-item>
@@ -125,6 +127,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 import { getLabelFromKey } from '@/utils/resources';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -132,6 +135,7 @@ const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //5
 export default {
   mixins: [baseQuestionComponent],
   components: {
+    AIcon,
     appControlLabel,
     appControlMoreInfo,
     appControlHint,

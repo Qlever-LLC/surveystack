@@ -1,5 +1,6 @@
 import {
   changeRecursive,
+  descendantHasPage,
   findControlById,
   findParentByChildId,
   getPosition,
@@ -9,7 +10,6 @@ import {
   prepareToAddFromLibrary,
   removeControl,
   replaceControl,
-  descendantHasPage,
 } from './surveys';
 import { resourceTypes } from '@/utils/resources';
 

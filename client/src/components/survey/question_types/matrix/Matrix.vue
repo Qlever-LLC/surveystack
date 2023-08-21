@@ -26,10 +26,10 @@
         <v-card>
           <v-card-title>
             <v-btn @click="duplicateRow(editedIndex)" text color="primary">
-              <v-icon left>mdi-content-copy</v-icon>Duplicate
+              <a-icon left>mdi-content-copy</a-icon>Duplicate
             </v-btn>
             <v-spacer />
-            <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
+            <v-btn text @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </v-btn>
           </v-card-title>
           <v-card-text>
             <v-form autocomplete="off" @submit.prevent="">
@@ -53,10 +53,10 @@
           </v-card-text>
           <v-card-actions class="d-flex justify-space-between">
             <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
-              <v-icon left>mdi-trash-can-outline</v-icon>Delete
+              <a-icon left>mdi-trash-can-outline</a-icon>Delete
             </v-btn>
             <v-btn text @click="showEditItemDialog = false" class="ma-2">
-              Close <v-icon right>mdi-close</v-icon>
+              Close <a-icon right>mdi-close</a-icon>
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -106,10 +106,10 @@
         <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
           <div class="d-flex">
             <v-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
-              <v-icon>mdi-trash-can-outline</v-icon>
+              <a-icon>mdi-trash-can-outline</a-icon>
             </v-btn>
             <v-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
-              <v-icon>mdi-content-copy</v-icon>
+              <a-icon>mdi-content-copy</a-icon>
             </v-btn>
           </div>
         </div>
@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import { cloneDeep, isNil, sortBy, uniq, without } from 'lodash';
+import { cloneDeep, isNil, uniq, without } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/matrix/MatrixCell.vue';
 import appMatrixTable from '@/components/survey/question_types/matrix/MatrixTable.vue';
@@ -133,6 +133,7 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import AIcon from '@/components/ui/AIcon.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -242,6 +243,7 @@ const transform = (assets) => {
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
   components: {
+    AIcon,
     appDialog,
     appMatrixCell,
     appMatrixTable,

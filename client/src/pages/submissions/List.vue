@@ -50,7 +50,7 @@
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
           <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
-            <v-icon left>mdi-note-text-outline</v-icon>
+            <a-icon left>mdi-note-text-outline</a-icon>
             View Survey
           </v-btn>
           <v-btn
@@ -60,7 +60,7 @@
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
             @click="startDraft(surveyEntity)"
           >
-            <v-icon left>mdi-plus</v-icon>
+            <a-icon left>mdi-plus</a-icon>
             New submission
           </v-btn>
         </div>
@@ -117,7 +117,7 @@
                 v-model="apiDownloadExpandAllMatrices"
               /> </v-col
             ><v-col md="2" sm="6">
-              <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
+              <v-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </v-btn>
             </v-col></v-row
           >
 
@@ -226,6 +226,7 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const defaultPageSize = 10;
 
@@ -257,6 +258,7 @@ const apiDownloadExpandAllMatricesOptions = [
 
 export default {
   components: {
+    AIcon,
     appSubmissionsFilterBasic,
     appSubmissionsFilterAdvanced,
     appSubmissionsTree,

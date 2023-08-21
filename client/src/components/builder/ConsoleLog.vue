@@ -2,14 +2,17 @@
   <v-card dark background-color="dark-blue" class="mt-4">
     <v-card-title color="blue-grey"
       >Console Log<v-spacer></v-spacer>
-      <v-icon @click="$emit('clear')">mdi-delete</v-icon>
+      <a-icon @click="$emit('clear')">mdi-delete</a-icon>
     </v-card-title>
 
     <textarea class="console-container" readonly :value="log"> </textarea>
   </v-card>
 </template>
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: {
     log: {
       required: false,

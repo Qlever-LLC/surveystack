@@ -2,14 +2,17 @@
   <div>
     <v-breadcrumbs :items="links">
       <template v-slot:divider>
-        <v-icon>mdi-chevron-right</v-icon>
+        <a-icon>mdi-chevron-right</a-icon>
       </template>
     </v-breadcrumbs>
   </div>
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: {
     path: {
       type: String,

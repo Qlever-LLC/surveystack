@@ -2,11 +2,11 @@
   <v-container v-if="entity && show" class="survey-detail">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
       <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
-        <v-icon>mdi-pencil</v-icon>
+        <a-icon>mdi-pencil</a-icon>
         <span class="ml-2">Edit</span>
       </v-btn>
       <v-btn class="mx-2" :to="`/submissions?survey=${entity._id}`">
-        <v-icon>mdi-table</v-icon>
+        <a-icon>mdi-table</a-icon>
         <span class="ml-2">Results</span>
       </v-btn>
     </div>
@@ -90,6 +90,7 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   props: {
@@ -100,6 +101,7 @@ export default {
     },
   },
   components: {
+    AIcon,
     BtnDropdown,
     MemberSelector,
   },

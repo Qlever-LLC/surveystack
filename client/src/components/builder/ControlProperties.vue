@@ -283,7 +283,7 @@
         <v-spacer></v-spacer>
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
-          <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
+          <a-icon @click.stop="showAdvanced = false">mdi-close</a-icon>
         </div>
 
         <div>
@@ -292,7 +292,7 @@
             v-model="relevance.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
-          <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
+          <a-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
         <div>
@@ -301,9 +301,9 @@
             v-model="calculate.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
             mdi-open-in-new
-          </v-icon>
+          </a-icon>
         </div>
 
         <div>
@@ -312,9 +312,9 @@
             v-model="constraint.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
             mdi-open-in-new
-          </v-icon>
+          </a-icon>
         </div>
 
         <div>
@@ -323,9 +323,9 @@
             v-model="apiCompose.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')" size="20">
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')" size="20">
             mdi-open-in-new
-          </v-icon>
+          </a-icon>
         </div>
       </div>
 
@@ -338,7 +338,7 @@
           <v-spacer></v-spacer>
           <div>
             <v-card-title class="px-0 py-0">Print Layout</v-card-title>
-            <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
+            <a-icon @click.stop="showLayout = false">mdi-close</a-icon>
           </div>
 
           <div v-if="isMatrix">
@@ -404,7 +404,7 @@
               <template #append-outer>
                 <v-tooltip max-width="400" transition="slide-x-transition" right>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+                    <a-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</a-icon>
                   </template>
                   Set the number of items in a row
                 </v-tooltip>
@@ -419,7 +419,7 @@
   </div>
 </template>
 <script>
-import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
+import { findParentByChildId, getAdvancedCodeTemplate } from '@/utils/surveys';
 import { nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 import SelectItems from '@/components/builder/SelectItems.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
@@ -433,9 +433,11 @@ import Checkbox from '@/components/ui/Checkbox.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
+    AIcon,
     SelectItems,
     SelectItemsEditor,
     OntologyProperties,

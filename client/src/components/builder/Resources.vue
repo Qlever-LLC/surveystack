@@ -33,7 +33,7 @@
       <v-menu offset-y left>
         <template v-slot:activator="{ on }">
           <v-btn color="primary" v-on="on">
-            <v-icon left>mdi-plus</v-icon>
+            <a-icon left>mdi-plus</a-icon>
             Add resource
           </v-btn>
         </template>
@@ -41,7 +41,7 @@
           <v-list-item class="d-flex align-center">
             <v-list-item-title>
               <v-btn text @click="createOntology">
-                <v-icon color="grey">mdi-plus</v-icon>
+                <a-icon color="grey">mdi-plus</a-icon>
                 <div class="ml-1">Create Ontology</div>
               </v-btn>
             </v-list-item-title>
@@ -51,7 +51,7 @@
               <v-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
                   <v-btn class="pointer-events-none" text>
-                    <v-icon color="grey">mdi-upload</v-icon>
+                    <a-icon color="grey">mdi-upload</a-icon>
                     <div class="ml-1">Add File Resource</div>
                   </v-btn>
                 </label>
@@ -86,10 +86,10 @@
             </v-list-item-subtitle>
             <v-list-item-subtitle v-else> {{ resource.name }}</v-list-item-subtitle>
           </v-list-item-content>
-          <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
+          <a-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</a-icon>
           <v-list-item-action v-if="resource.type === resourceTypes.FILE">
             <v-btn icon>
-              <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
+              <a-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </a-icon>
             </v-btn>
           </v-list-item-action>
         </v-list-item>
@@ -108,9 +108,11 @@ import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
+    AIcon,
     appOntologyListEditor,
   },
   props: {

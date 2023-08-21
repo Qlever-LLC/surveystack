@@ -15,7 +15,7 @@
         <div class="mb-5 d-flex align-center">
           <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
           <span v-if="selectedSurvey" class="mx-2">{{ selectedSurvey.name }}</span>
-          <v-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</v-icon>
+          <a-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</a-icon>
         </div>
 
         <v-text-field v-model="subject" label="Subject" filled />
@@ -87,6 +87,7 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -100,6 +101,7 @@ All the best
 
 export default {
   components: {
+    AIcon,
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,

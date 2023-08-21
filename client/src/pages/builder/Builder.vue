@@ -91,7 +91,7 @@
   >
     <v-card max-width="500">
       <v-card-title>
-        <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
+        <a-icon class="mr-2 error--text">mdi-close-octagon</a-icon>
         Unsupported browser
       </v-card-title>
       <!-- <v-alert type="error">
@@ -117,11 +117,13 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
   components: {
+    AIcon,
     VersionsDialog,
     SurveyBuilder,
     appDialog,

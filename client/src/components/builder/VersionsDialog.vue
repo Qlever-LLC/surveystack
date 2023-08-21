@@ -36,12 +36,12 @@
               </span>
             </div>
             <div class="col-1 py-0">
-              <v-icon
+              <a-icon
                 @click="toggleCompare(revision.version)"
                 class="mt-1"
                 title="Compare version"
                 :color="compareRevisions.includes(revision.version) ? 'primary' : ''"
-                >mdi-compare-horizontal</v-icon
+                >mdi-compare-horizontal</a-icon
               >
             </div>
             <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { AIcon, SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

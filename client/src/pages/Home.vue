@@ -31,7 +31,7 @@
                 title="Everyone can submit"
                 icon
               >
-                <v-icon>mdi-earth</v-icon>
+                <a-icon>mdi-earth</a-icon>
               </v-btn>
               <v-btn
                 v-if="entity.meta.submissions === 'user'"
@@ -39,7 +39,7 @@
                 title="Only signed-in users can submit"
                 icon
               >
-                <v-icon>mdi-account</v-icon>
+                <a-icon>mdi-account</a-icon>
               </v-btn>
               <v-btn
                 v-if="entity.meta.submissions === 'group'"
@@ -47,7 +47,7 @@
                 title="Everyone group members can submit"
                 icon
               >
-                <v-icon>mdi-account-group</v-icon>
+                <a-icon>mdi-account-group</a-icon>
               </v-btn>
             </v-list-item-icon>
             <v-list-item-content>
@@ -81,7 +81,7 @@
                     title="Everyone can submit"
                     icon
                   >
-                    <v-icon>mdi-earth</v-icon>
+                    <a-icon>mdi-earth</a-icon>
                   </v-btn>
                   <v-btn
                     v-if="entity.meta.submissions === 'user'"
@@ -89,7 +89,7 @@
                     title="Only signed-in users can submit"
                     icon
                   >
-                    <v-icon>mdi-account</v-icon>
+                    <a-icon>mdi-account</a-icon>
                   </v-btn>
                   <v-btn
                     v-if="entity.meta.submissions === 'group'"
@@ -97,7 +97,7 @@
                     title="Everyone group members can submit"
                     icon
                   >
-                    <v-icon>mdi-account-group</v-icon>
+                    <a-icon>mdi-account-group</a-icon>
                   </v-btn>
                 </div>
                 <div>
@@ -118,7 +118,7 @@
     <v-row>
       <v-col align="center">
         <v-btn x-large text :to="`/surveys/browse`">
-          <v-icon left>mdi-text-box-search-outline</v-icon>Browse All Surveys
+          <a-icon left>mdi-text-box-search-outline</a-icon>Browse All Surveys
         </v-btn>
       </v-col>
     </v-row>
@@ -134,9 +134,11 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
+    AIcon,
     AuthSelector,
     AppBasicList,
   },

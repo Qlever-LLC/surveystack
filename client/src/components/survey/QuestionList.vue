@@ -14,9 +14,9 @@
 
             <v-list-item-action>
               <v-list-item-action-text v-text="question.control.type"></v-list-item-action-text>
-              <v-icon v-if="!active" color="grey lighten-1"> mdi-star-outline </v-icon>
+              <a-icon v-if="!active" color="grey lighten-1"> mdi-star-outline </a-icon>
 
-              <v-icon v-else color="yellow"> mdi-star </v-icon>
+              <a-icon v-else color="yellow"> mdi-star </a-icon>
             </v-list-item-action>
           </template>
         </v-list-item>
@@ -27,7 +27,10 @@
   </v-list>
 </template>
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   data: () => ({
     selected: [],
   }),

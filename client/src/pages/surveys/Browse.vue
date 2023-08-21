@@ -16,7 +16,7 @@
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
             <v-list-item :to="`/surveys/${e._id}`">
               <v-list-item-icon>
-                <v-icon v-if="e.pinned">mdi-pin</v-icon>
+                <a-icon v-if="e.pinned">mdi-pin</a-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <div>
@@ -45,14 +45,14 @@
           <div v-for="(e, i) in surveys.content" :key="e._id">
             <v-list-item :to="`/surveys/${e._id}`">
               <v-list-item-icon>
-                <v-icon v-if="e.pinned">mdi-pin</v-icon>
+                <a-icon v-if="e.pinned">mdi-pin</a-icon>
                 <v-btn
                   v-if="e.meta.submissions === 'public' || !e.meta.submissions"
                   :to="`/surveys/${e._id}`"
                   title="Everyone can submit"
                   icon
                 >
-                  <v-icon>mdi-earth</v-icon>
+                  <a-icon>mdi-earth</a-icon>
                 </v-btn>
                 <v-btn
                   v-if="e.meta.submissions === 'user'"
@@ -60,7 +60,7 @@
                   title="Only signed-in users can submit"
                   icon
                 >
-                  <v-icon>mdi-account</v-icon>
+                  <a-icon>mdi-account</a-icon>
                 </v-btn>
                 <v-btn
                   v-if="e.meta.submissions === 'group'"
@@ -68,7 +68,7 @@
                   title="Everyone group members can submit"
                   icon
                 >
-                  <v-icon>mdi-account-group</v-icon>
+                  <a-icon>mdi-account-group</a-icon>
                 </v-btn>
               </v-list-item-icon>
               <v-list-item-content>
@@ -105,10 +105,12 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  components: { AIcon },
   data() {
     return {
       selectedGroupIds: [],

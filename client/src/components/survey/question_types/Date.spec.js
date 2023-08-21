@@ -1,4 +1,4 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import Date from '@/components/survey/question_types/Date.vue';
@@ -26,7 +26,7 @@ import Date from '@/components/survey/question_types/Date.vue';
 //   },
 //   value: null,
 // };
-import { createControlInstance, availableControls } from '@/utils/surveyConfig';
+import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 
 const dateControl = createControlInstance(availableControls.find((c) => c.type === 'date'));
 

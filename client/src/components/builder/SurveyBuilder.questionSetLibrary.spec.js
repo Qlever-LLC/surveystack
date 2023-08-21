@@ -1,4 +1,9 @@
-import { createApiGetMock, makeControl, optionsWithControls, saveDraft } from '@/components/builder/SurveyBuilder.spec';
+import {
+  createApiGetMock,
+  makeControl,
+  optionsWithControls,
+  saveDraft
+} from '@/components/builder/SurveyBuilder.spec';
 import { findByText, fireEvent, render, screen, within } from '@testing-library/vue';
 import SurveyBuilder from './SurveyBuilder.vue';
 import { createSurvey } from '@/utils/surveys';

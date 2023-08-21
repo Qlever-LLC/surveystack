@@ -17,7 +17,7 @@
         class="ml-2 mt-3"
         v-if="resource"
       >
-        <v-icon>mdi-pencil</v-icon>
+        <a-icon>mdi-pencil</a-icon>
       </v-btn>
     </div>
     <v-textarea
@@ -45,13 +45,14 @@
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import ImageResourceEditor from '@/components/builder/ImageResourceEditor.vue';
 import {
-  removeResource,
-  setResource,
-  createResource,
-  resourceTypes,
-  resourceLocations,
   appendResource,
+  createResource,
+  removeResource,
+  resourceLocations,
+  resourceTypes,
+  setResource,
 } from '@/utils/resources';
+import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   data() {
@@ -61,6 +62,7 @@ export default {
     };
   },
   components: {
+    AIcon,
     ResourceSelector,
     ImageResourceEditor,
   },

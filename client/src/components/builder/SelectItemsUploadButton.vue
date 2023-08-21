@@ -3,7 +3,7 @@
     <v-input>
       <label for="select-items-file-input" class="cursor-pointer">
         <v-btn class="pointer-events-none" color="primary" :disabled="disabled">
-          <v-icon left>mdi-upload</v-icon>
+          <a-icon left>mdi-upload</a-icon>
           Add CSV
         </v-btn>
       </label>
@@ -22,6 +22,7 @@
 <script>
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
+import AIcon from '@/components/ui/AIcon.vue';
 
 const columns = ['label', 'value', 'tags'];
 function columnIsValid(name) {
@@ -29,6 +30,7 @@ function columnIsValid(name) {
 }
 
 export default {
+  components: { AIcon },
   props: {
     disabled: {
       type: Boolean,

@@ -14,7 +14,7 @@
           color="focus"
         >
           <v-list-item-icon>
-            <v-icon>mdi-account-group</v-icon>
+            <a-icon>mdi-account-group</a-icon>
           </v-list-item-icon>
           <v-list-item-title>
             {{ item.text }}
@@ -26,7 +26,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: {
     value: {
       type: [String, Object],
