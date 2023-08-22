@@ -32,7 +32,7 @@
             <v-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <template v-for="(item, i) in activeTabPageContent">
-                  <v-list-item :key="i">
+                  <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
                         <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
@@ -62,7 +62,7 @@
                         <span>Upload Submission</span>
                       </v-tooltip>
                     </v-list-item-action>
-                  </v-list-item>
+                  </a-list-item>
                 </template>
 
                 <v-spacer class="flex-grow-1" />
@@ -80,7 +80,7 @@
 
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <template v-for="(item, i) in tab.content">
-                  <v-list-item :key="i">
+                  <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
                         <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
@@ -95,7 +95,7 @@
                         </v-list-item-subtitle>
                       </v-card>
                     </v-list-item-content>
-                  </v-list-item>
+                  </a-list-item>
                 </template>
                 <v-pagination
                   v-model="remotePage"
@@ -153,12 +153,14 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import AListItem from '@/components/ui/AListItem.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   mixins: [ResultMixin],
   components: {
+    AListItem,
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,

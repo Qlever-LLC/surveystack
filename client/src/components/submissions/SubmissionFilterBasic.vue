@@ -12,7 +12,7 @@
 
     <v-card outlined v-if="filters.length > 0">
       <v-list dense>
-        <v-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
+        <a-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
           <v-list-item-content>
             <div>
               <span class="font-weight-medium mr-1">{{ filter.field }}</span>
@@ -25,14 +25,17 @@
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
           </v-list-item-action>
-        </v-list-item>
+        </a-list-item>
       </v-list>
     </v-card>
   </div>
 </template>
 
 <script>
+import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
+  components: { AListItem },
   props: {
     queryList: {
       type: Array,

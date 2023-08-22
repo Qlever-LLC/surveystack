@@ -11,12 +11,12 @@
             <v-progress-circular :size="50" color="primary" indeterminate />
           </v-container>
           <template v-if="libraryConsumers !== null">
-            <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+            <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
                 <small class="grey--text">{{ c._id }}</small>
                 <v-list-item-title>{{ c.name }}</v-list-item-title>
               </v-list-item-content>
-            </v-list-item>
+            </a-list-item>
           </template>
         </v-list>
       </v-card-text>
@@ -31,10 +31,11 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {},
+  components: { AListItem },
   props: {
     value: {
       type: Boolean,

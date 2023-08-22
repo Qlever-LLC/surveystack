@@ -62,7 +62,7 @@
           >
             <v-list class="pa-0 mx-auto" max-width="280">
               <v-list-item-group v-model="invitationMethod">
-                <v-list-item two-line :value="INVITATION_METHODS.INVITE">
+                <a-list-item two-line :value="INVITATION_METHODS.INVITE">
                   <v-list-item-content>
                     <v-list-item-title>Invite Member</v-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
@@ -70,9 +70,9 @@
                       the email.
                     </v-list-item-content>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
 
-                <v-list-item three-line :value="INVITATION_METHODS.ADD">
+                <a-list-item three-line :value="INVITATION_METHODS.ADD">
                   <v-list-item-content>
                     <v-list-item-title>Add Member</v-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
@@ -81,7 +81,7 @@
                       them to check their email.
                     </v-list-item-content>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
               </v-list-item-group>
             </v-list>
           </btn-dropdown>
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import AListItem from '@/components/ui/AListItem.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { AListItem, BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

@@ -9,12 +9,12 @@
     </div>
     <v-card>
       <div v-for="e in entities" :key="e._id">
-        <v-list-item :to="`/${collection}/${e._id}`">
+        <a-list-item :to="`/${collection}/${e._id}`">
           <v-list-item-content>
             <v-list-item-title>{{ e.name }}</v-list-item-title>
             <v-list-item-subtitle>{{ e._id }}</v-list-item-subtitle>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
         <v-divider />
       </div>
     </v-card>
@@ -22,7 +22,10 @@
 </template>
 
 <script>
+import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
+  components: { AListItem },
   props: {
     collection: {
       type: String,

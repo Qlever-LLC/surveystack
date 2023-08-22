@@ -9,7 +9,7 @@
       <template v-for="(item, i) in items">
         <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
         <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
-        <v-list-item v-else :key="i" :to="item.to">
+        <a-list-item v-else :key="i" :to="item.to">
           <v-list-item-icon v-if="item.icon" :class="item.class">
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
@@ -24,12 +24,12 @@
               >
             </v-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
       </template>
 
       <v-divider dark class="my-1" />
 
-      <v-list-item class="pa-0">
+      <a-list-item class="pa-0">
         <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
           <v-expansion-panel>
             <v-expansion-panel-header class="pa-0 ma-0">
@@ -37,36 +37,36 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content class="pa-0 ma-0 no-padding">
               <v-list class="pa-0 ma-0">
-                <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
+                <a-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
                   <v-list-item-icon>
                     <v-icon>mdi-notebook</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>{{ doc.label }}</v-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
 
-                <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
+                <a-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
                   <v-list-item-icon>
                     <v-icon>mdi-help-circle-outline</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>SurveyStack Help</v-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
-                <v-list-item href="https://www.surveystack.io" target="_blank">
+                </a-list-item>
+                <a-list-item href="https://www.surveystack.io" target="_blank">
                   <v-list-item-icon>
                     <v-icon>mdi-information-outline</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>About</v-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
               </v-list>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
-      </v-list-item>
+      </a-list-item>
     </v-list>
 
     <template v-slot:append>
@@ -81,7 +81,10 @@
 </template>
 
 <script>
+import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
+  components: { AListItem },
   props: {
     value: {
       type: Boolean,

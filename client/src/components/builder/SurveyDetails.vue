@@ -62,7 +62,7 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-item class="d-flex align-center">
+            <a-list-item class="d-flex align-center">
               <v-list-item-title>
                 <v-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
@@ -81,7 +81,7 @@
                   />
                 </v-input>
               </v-list-item-title>
-            </v-list-item>
+            </a-list-item>
             <v-list-item>
               <v-list-item-title>
                 <v-btn @click="$emit('export-survey')" text>
@@ -106,30 +106,30 @@
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
-            <v-list-item v-if="value.meta.isLibrary">
+            <a-list-item v-if="value.meta.isLibrary">
               <v-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-layers-search</v-icon>
                   <div class="ml-1">List library consumers</div>
                 </v-btn>
               </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
+            </a-list-item>
+            <a-list-item>
               <v-list-item-title>
                 <v-btn text @click="printSettingDialogIsVisible = true">
                   <v-icon color="grey">mdi-printer-settings</v-icon>
                   <div class="ml-1">Print settings</div>
                 </v-btn>
               </v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="!isNew">
+            </a-list-item>
+            <a-list-item v-if="!isNew">
               <v-list-item-title>
                 <v-btn text @click="$emit('delete')">
                   <v-icon color="grey">mdi-delete</v-icon>
                   <div class="ml-1">Delete</div>
                 </v-btn>
               </v-list-item-title>
-            </v-list-item>
+            </a-list-item>
           </v-list>
         </v-menu>
         <edit-library-dialog
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AListItem from '@/components/ui/AListItem.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -324,6 +325,7 @@ export default {
     },
   },
   components: {
+    AListItem,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,

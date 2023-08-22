@@ -38,15 +38,15 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item class="d-flex align-center">
+          <a-list-item class="d-flex align-center">
             <v-list-item-title>
               <v-btn text @click="createOntology">
                 <v-icon color="grey">mdi-plus</v-icon>
                 <div class="ml-1">Create Ontology</div>
               </v-btn>
             </v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
+          </a-list-item>
+          <a-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
               <v-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
@@ -64,7 +64,7 @@
                 />
               </v-input>
             </v-list-item-title>
-          </v-list-item>
+          </a-list-item>
         </v-list>
       </v-menu>
     </div>
@@ -94,11 +94,11 @@
           </v-list-item-action>
         </v-list-item>
       </template>
-      <v-list-item v-else>
+      <a-list-item v-else>
         <v-list-item-content>
           <v-list-item-title class="text--secondary">No resources found</v-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </a-list-item>
     </v-list>
   </div>
 </template>
@@ -108,9 +108,11 @@ import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
   components: {
+    AListItem,
     appOntologyListEditor,
   },
   props: {

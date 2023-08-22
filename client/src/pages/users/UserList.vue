@@ -8,7 +8,7 @@
 
     <v-card>
       <div v-for="e in entities" :key="e._id">
-        <v-list-item :to="`/users/${e._id}`">
+        <a-list-item :to="`/users/${e._id}`">
           <v-list-item-content>
             <v-list-item-title>{{ e.email }}</v-list-item-title>
             <v-list-item-subtitle>{{ e.name }}</v-list-item-subtitle>
@@ -18,7 +18,7 @@
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </v-list-item-icon>
-        </v-list-item>
+        </a-list-item>
         <v-divider />
       </div>
     </v-card>
@@ -27,8 +27,10 @@
 
 <script>
 import api from '@/services/api.service';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
+  components: { AListItem },
   data() {
     return {
       entities: [],

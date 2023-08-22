@@ -2,7 +2,7 @@
   <v-list two-line>
     <v-list-item-group v-model="selected" single active-class="pink--text">
       <template v-for="(question, index) in questions">
-        <v-list-item :key="question.number">
+        <a-list-item :key="question.number">
           <template v-slot:default="{ active }">
             <v-list-item-content>
               <v-list-item-title v-text="question.control.title"></v-list-item-title>
@@ -19,7 +19,7 @@
               <v-icon v-else color="yellow"> mdi-star </v-icon>
             </v-list-item-action>
           </template>
-        </v-list-item>
+        </a-list-item>
 
         <v-divider v-if="index < questions.length - 1" :key="'div_' + question.number"></v-divider>
       </template>
@@ -27,7 +27,10 @@
   </v-list>
 </template>
 <script>
+import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
+  components: { AListItem },
   data: () => ({
     selected: [],
   }),

@@ -19,14 +19,14 @@
         }"
       >
         <div v-for="(entity, idx) in filteredEntities" :key="idx">
-          <v-list-item two-line :to="link(entity)">
+          <a-list-item two-line :to="link(entity)">
             <slot name="entity" v-bind:entity="entity">
               <v-list-item-content>
                 <v-list-item-title>Title #{{ idx }}</v-list-item-title>
                 <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
               </v-list-item-content>
             </slot>
-          </v-list-item>
+          </a-list-item>
           <v-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
         </div>
       </v-list>
@@ -37,7 +37,10 @@
 </template>
 
 <script>
+import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
+  components: { AListItem },
   props: {
     loading: {
       type: Boolean,

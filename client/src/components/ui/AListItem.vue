@@ -28,7 +28,7 @@ export default {
     to: { type: [String, Object], required: false },
     target: { type: String, required: false },
     value: { type: undefined, required: false },
-    //click
+    color: { type: String, required: false },
   },
 };
 </script>

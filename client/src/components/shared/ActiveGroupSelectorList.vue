@@ -4,9 +4,9 @@
       <v-list-item-title v-if="activeGroup">{{ activeGroupName }}</v-list-item-title>
       <v-list-item-title v-else>No Group selected</v-list-item-title>
     </template>
-    <v-list-item flat class="pt-0" color="focus">
+    <a-list-item flat class="pt-0" color="focus">
       <v-list-item-group :value="activeItem" color="primary" mandatory>
-        <v-list-item
+        <a-list-item
           v-for="(item, i) in groupItems"
           :key="item.text"
           @click="() => handleInput(item.value)"
@@ -19,14 +19,17 @@
           <v-list-item-title>
             {{ item.text }}
           </v-list-item-title>
-        </v-list-item>
+        </a-list-item>
       </v-list-item-group>
-    </v-list-item>
+    </a-list-item>
   </v-list-group>
 </template>
 
 <script>
+import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
+  components: { AListItem },
   props: {
     value: {
       type: [String, Object],

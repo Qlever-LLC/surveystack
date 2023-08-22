@@ -2,7 +2,7 @@
   <div class="image-resource-picker">
     Image resource picker
     <v-list>
-      <v-list-item v-for="image in value" :key="image.src">
+      <a-list-item v-for="image in value" :key="image.src">
         <v-list-item-avatar>
           <v-icon>mdi-image</v-icon>
         </v-list-item-avatar>
@@ -12,14 +12,17 @@
         <v-list-item-action>
           <v-icon>mdi-delete</v-icon>
         </v-list-item-action>
-      </v-list-item>
+      </a-list-item>
     </v-list>
     <v-btn class="ml-auto mr-0 d-block mb-3" @click="handleAddImage"> +&nbsp; Add Image </v-btn>
   </div>
 </template>
 
 <script>
+import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
+  components: { AListItem },
   data() {
     return {
       activeImage: null,
