@@ -10,6 +10,7 @@
       :to="to"
       :target="target"
       :value="value"
+      v-on="hasClickListener ? { click: (v) => $emit('click', v) } : {}"
     >
       <slot />
     </v-list-item>
@@ -29,6 +30,14 @@ export default {
     target: { type: String, required: false },
     value: { type: undefined, required: false },
     color: { type: String, required: false },
+  },
+  emits: ['click'],
+  computed: {
+    hasClickListener() {
+      // we should only register the @click handler on v-list-item if we need to
+      // otherwise v-list-item would show hover effects even if our consumer does not want it to be clickable
+      return this.$listeners && this.$listeners.click;
+    },
   },
 };
 </script>
