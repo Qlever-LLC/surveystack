@@ -131,17 +131,4 @@ export default {
 };
 </script>
 
-<style scoped>
->>> .v-list-item {
-  min-height: initial;
-  padding: 0px;
-}
-
->>> .v-list-item__content {
-  padding: 0px;
-}
-
->>> .v-list-item__action {
-  margin: 4px 8px 4px 0px !important;
-}
-</style>
+<style scoped></style>
