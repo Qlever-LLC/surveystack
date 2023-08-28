@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-radio :label="label" :value="value" :color="color">
+    <v-radio :label="label" :value="value" :color="color" @change="$emit('change', $event)">
       <template v-slot:label>
         <slot name="label" />
       </template>
