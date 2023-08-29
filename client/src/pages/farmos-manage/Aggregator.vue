@@ -34,7 +34,7 @@
     </div>
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
-      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
+      <a-text-field v-model.trim="updatedNote" label="Note" hide-details />
       <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
     </div>
 
@@ -236,6 +236,7 @@
 
 <script>
 import _ from 'lodash';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   emits: ['addSuperAdminNote'],
@@ -245,6 +246,9 @@ export default {
     notes: String,
     loading: Boolean,
     users: Array,
+  },
+  components: {
+    ATextField,
   },
   data() {
     return {

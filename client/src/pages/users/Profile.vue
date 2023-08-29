@@ -124,6 +124,7 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import ATextField from '@/components/ui/ATextField.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -139,6 +140,7 @@ export default {
   components: {
     appFeedback,
     ActiveGroupSelector,
+    ATextField,
   },
   data() {
     return {

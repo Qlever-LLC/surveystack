@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title> Add Survey To Library </v-card-title>
       <v-card-text>
-        <v-text-field :value="localLibrarySurvey.name" label="Title" readonly />
+        <a-text-field :value="localLibrarySurvey.name" label="Title" readonly />
         <h3>Description</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryDescription" class="mb-4" />
         <h3>Applications</h3>
@@ -34,10 +34,11 @@
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor },
+  components: { LibraryChangeTypeSelector, TipTapEditor, ATextField },
   props: {
     value: {
       type: Boolean,

@@ -8,7 +8,11 @@
 </template>
 
 <script>
+import ATextField from '@/components/ui/ATextField.vue';
 export default {
+  components: {
+    ATextField,
+  },
   data() {
     return {
       message: '',

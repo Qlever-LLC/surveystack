@@ -8,7 +8,7 @@
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
         <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
-        <v-text-field
+        <a-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
           v-model="archiveReasonOther"
@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import ATextField from '@/components/ui/ATextField.vue';
 export default {
   props: {
     persistent: Boolean,
@@ -43,6 +44,9 @@ export default {
       type: String,
       default: 'TEST_DATA',
     },
+  },
+  components: {
+    ATextField,
   },
   data() {
     return {

@@ -4,7 +4,7 @@
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
       <v-form>
-        <v-text-field
+        <a-text-field
           label="E-Mail"
           type="text"
           class="form-control"
@@ -14,7 +14,7 @@
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
-        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
+        <a-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
 
         <v-text-field
           label="Password"
@@ -47,6 +47,7 @@
 
 <script>
 import api from '@/services/api.service';
+import ATextField from '@/components/ui/ATextField.vue';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
@@ -57,6 +58,9 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
+  components: {
+    ATextField,
+  },
   data() {
     return {
       status: '',

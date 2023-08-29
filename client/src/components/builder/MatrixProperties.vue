@@ -32,10 +32,12 @@
 
 <script>
 import MatrixEditor from '@/components/builder/MatrixEditor.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     MatrixEditor,
+    ATextField,
   },
   props: {
     value: {

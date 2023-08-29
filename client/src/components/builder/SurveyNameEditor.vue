@@ -1,6 +1,6 @@
 <template>
   <!-- v-if="state.isEditing" -->
-  <v-text-field
+  <a-text-field
     :value="value"
     @input="$emit('input', $event)"
     @blur="setIsEditing(false)"
@@ -23,8 +23,12 @@
 
 <script>
 import { reactive } from '@vue/composition-api';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
+  components: {
+    ATextField,
+  },
   props: {
     value: String,
   },

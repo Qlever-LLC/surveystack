@@ -49,8 +49,13 @@
 </template>
 
 <script>
+import ATextField from '@/components/ui/ATextField.vue';
+
 export default {
   props: ['viewModel', 'loading'],
+  components: {
+    ATextField,
+  },
   data() {
     return {
       planName: '',

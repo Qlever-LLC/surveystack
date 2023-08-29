@@ -10,7 +10,7 @@
       </slot>
     </v-card-title>
     <v-card-text>
-      <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
+      <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <v-list
         v-if="entities.length > 0"
         :style="{
@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import ATextField from '@/components/ui/ATextField.vue';
 export default {
   props: {
     loading: {
@@ -77,6 +78,9 @@ export default {
     filter: {
       type: Function,
     },
+  },
+  components: {
+    ATextField,
   },
   computed: {
     filteredEntities() {

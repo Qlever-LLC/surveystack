@@ -22,7 +22,7 @@
       </div>
     </template>
     <template v-else-if="initialized && !membership">
-      <v-text-field v-model="code" label="Invitation"></v-text-field>
+      <a-text-field v-model="code" label="Invitation" />
       <div class="d-flex justify-end">
         <v-btn class="primary" @click="fetchData">Try code</v-btn>
       </div>
@@ -35,8 +35,12 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
+  components: {
+    ATextField,
+  },
   data() {
     return {
       initialized: false,

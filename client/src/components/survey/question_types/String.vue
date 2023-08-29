@@ -34,11 +34,13 @@ import { isIos } from '@/utils/compatibility';
 import appQrScanner from '@/components/ui/QrScanner.vue';
 
 import { getValueOrNull } from '@/utils/surveyStack';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
     appQrScanner,
+    ATextField,
   },
   methods: {
     submit() {

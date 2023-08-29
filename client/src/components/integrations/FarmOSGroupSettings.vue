@@ -14,7 +14,7 @@
       <v-card-title>Super Admin</v-card-title>
       <v-card-text>
         <div class="d-flex flex-grow-1">
-          <v-text-field
+          <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
             outlined
             v-model="seats"
@@ -95,7 +95,7 @@
     </div>
 
     <div class="search">
-      <v-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search"></v-text-field>
+      <v-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search" />
     </div>
     <FarmOSGroupTable
       :members="filteredMembers"
@@ -109,10 +109,12 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
+    ATextField,
   },
   props: {
     groupInfos: {

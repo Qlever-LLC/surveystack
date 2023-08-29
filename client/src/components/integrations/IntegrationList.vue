@@ -7,7 +7,7 @@
         <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
       </v-card-title>
       <v-card-text>
-        <v-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
+        <a-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
         <template v-if="entities && entities.length > 0">
           <v-list-item
             v-for="integration in integrations"
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import ATextField from '@/components/ui/ATextField.vue';
 export default {
   props: {
     entities: {
@@ -44,6 +45,9 @@ export default {
       type: String,
       required: true,
     },
+  },
+  components: {
+    ATextField,
   },
   computed: {
     integrations() {

@@ -12,13 +12,13 @@
       <v-form class="mt-3" @keydown.enter.prevent="submit">
         <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
 
-        <v-text-field v-model="entity.group" label="Group" disabled />
+        <a-text-field v-model="entity.group" label="Group" disabled />
 
-        <v-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
+        <a-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
 
-        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
+        <a-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
 
-        <v-text-field
+        <a-text-field
           v-if="entity.meta.status === 'pending'"
           class="mt-3"
           v-model="entity.meta.invitationName"
@@ -101,6 +101,7 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const availableRoles = [
   {
@@ -127,6 +128,7 @@ const availableStatus = [
 export default {
   components: {
     appDialog,
+    ATextField,
   },
   data() {
     return {

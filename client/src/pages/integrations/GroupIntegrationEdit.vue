@@ -6,7 +6,7 @@
       <h1>{{ editMode ? 'Edit Group Integration' : 'Create Group Integration' }}</h1>
 
       <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
+        <a-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
 
         <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
 
@@ -32,6 +32,7 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFeedback from '@/components/ui/Feedback.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -56,6 +57,7 @@ export default {
   components: {
     appJsonEditor,
     appFeedback,
+    ATextField,
   },
   data() {
     return {

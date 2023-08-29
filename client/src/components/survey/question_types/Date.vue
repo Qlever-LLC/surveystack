@@ -61,10 +61,12 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   props: { centered: { type: Boolean, default: true } },
+  components: { ATextField },
   data() {
     return {
       datePickerIsVisible: false,

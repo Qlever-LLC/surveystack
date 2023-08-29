@@ -5,7 +5,7 @@
         <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
         <h1 class="heading--text" v-else>Welcome Back!</h1>
         <v-form>
-          <v-text-field
+          <a-text-field
             label="E-Mail"
             type="text"
             class="form-control"
@@ -108,6 +108,7 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -132,6 +133,9 @@ export default {
       type: Boolean,
       default: true,
     },
+  },
+  components: {
+    ATextField,
   },
   data() {
     return {

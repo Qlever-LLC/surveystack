@@ -34,7 +34,7 @@
         </div>
         <draggable v-else :list="items" class="draggable">
           <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.label"
               @input="(value) => onInput(index, 'label', value)"
@@ -42,7 +42,7 @@
               :hide-details="false"
               dense
             />
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.value"
               @input="(value) => onInput(index, 'value', value)"
@@ -68,10 +68,12 @@
 
 <script>
 import draggable from 'vuedraggable';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     draggable,
+    ATextField,
   },
   props: {
     value: {

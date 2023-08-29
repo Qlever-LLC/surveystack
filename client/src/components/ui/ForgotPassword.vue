@@ -5,7 +5,7 @@
       <p>Enter your email address and we will send you a link for setting a new password.</p>
 
       <v-form @submit.prevent="submit">
-        <v-text-field v-model="email" label="Email" />
+        <a-text-field v-model="email" label="Email" />
         <div class="d-flex justify-end">
           <v-btn type="submit" color="primary" class="px-8">Submit</v-btn>
         </div>
@@ -23,8 +23,12 @@
 
 <script>
 import api from '@/services/api.service';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
+  components: {
+    ATextField,
+  },
   data() {
     return {
       status: { type: '' },

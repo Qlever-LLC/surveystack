@@ -37,7 +37,7 @@
         <v-card-title> </v-card-title>
         <v-card-text class="flex-grow-1">
           <div class="px-5 py-2">
-            <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+            <a-text-field v-model="search" label="Search" prepend-icon="mdi-magnify" />
             <div class="d-flex justify-end mb-4">
               <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
             </div>
@@ -105,10 +105,14 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  components: {
+    ATextField,
+  },
   data() {
     return {
       selectedGroupIds: [],

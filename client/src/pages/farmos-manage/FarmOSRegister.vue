@@ -57,7 +57,7 @@
         </v-col>
       </v-row>
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.email"
         label="E-Mail Address of Primary User"
         placeholder="Farmer's E-Mail"
@@ -65,7 +65,7 @@
         :rules="emailRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.fullName"
         label="Full Name of the Farmer"
         placeholder="Farmer's Name"
@@ -73,7 +73,7 @@
         :rules="nameRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmName"
         label="Name of the Farm"
         placeholder="Farm Name"
@@ -81,7 +81,7 @@
         :rules="nameRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmAddress"
         label="Farm Address / Location"
         placeholder="123 Fake Street, Exampletown, NY"
@@ -224,6 +224,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 import { timezones } from './timezones';
 
@@ -233,6 +234,7 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
+    ATextField,
   },
   data() {
     return {

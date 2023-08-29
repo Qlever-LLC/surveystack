@@ -168,7 +168,7 @@
     </v-card-title>
     <v-card-text>
       <div class="mt-4">
-        <v-text-field
+        <a-text-field
           :value="surveyGroupName"
           label="Group"
           readonly
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -331,6 +332,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    ATextField,
   },
   methods: {
     async getGroupNameById(id) {

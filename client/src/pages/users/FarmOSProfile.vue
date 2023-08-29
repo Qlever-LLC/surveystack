@@ -35,7 +35,7 @@
         <div class="my-8">
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
-            <v-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details></v-text-field>
+            <a-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details />
             <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
           </div>
           <v-alert
@@ -81,7 +81,7 @@
         <div class="my-8">
           <p>To whom do you wish to transfer the ownership of this farm?</p>
           <div class="d-flex mb-4">
-            <v-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details></v-text-field>
+            <a-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details />
           </div>
           <v-alert
             v-if="errorDialogMessage"
@@ -408,10 +408,12 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appDialog,
+    ATextField,
   },
   data() {
     return {

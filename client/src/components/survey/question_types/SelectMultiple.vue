@@ -26,7 +26,7 @@
           :disabled="!customValue"
           color="focus"
         />
-        <v-text-field
+        <a-text-field
           label="other"
           v-model="customValue"
           outlined
@@ -45,11 +45,15 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import ATextField from '@/components/ui/ATextField.vue';
 
 import { getValueOrNull } from '@/utils/surveyStack';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    ATextField,
+  },
   data() {
     return {
       customSelection: 'other',

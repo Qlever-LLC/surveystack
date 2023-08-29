@@ -9,7 +9,7 @@
       </v-btn>
     </v-card-title>
 
-    <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+    <a-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
       <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
     </div>
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    ATextField,
   },
   props: ['survey', 'libraryId'],
   data() {

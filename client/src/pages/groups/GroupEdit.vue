@@ -51,7 +51,7 @@
     <v-card :loading="isLoadingGroup" class="mb-4">
       <v-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
-          <v-text-field
+          <a-text-field
             label="Name"
             placeholder="Enter group name"
             id="group-name"
@@ -202,6 +202,7 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const integrations = [
   {
@@ -225,6 +226,7 @@ export default {
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
+    ATextField,
   },
   data() {
     return {

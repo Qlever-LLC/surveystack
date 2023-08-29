@@ -1,5 +1,5 @@
 <template>
-  <v-text-field
+  <a-text-field
     v-if="header.type === 'text'"
     :value="value"
     @input="onInput"
@@ -24,7 +24,7 @@
       <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
     </div>
   </div>
-  <v-text-field
+  <a-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
     @input="onFarmOsInput"
@@ -33,7 +33,7 @@
     autocomplete="off"
     :disabled="disabled"
   />
-  <v-text-field
+  <a-text-field
     v-else-if="header.type === 'number'"
     :value="value"
     @input="onNumberInput"
@@ -210,7 +210,7 @@
     </v-menu>
   </div>
 
-  <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
+  <a-text-field v-else value="unknown cell type" outlined hide-details disabled />
 </template>
 
 <script>
@@ -222,11 +222,13 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appQrScanner,
     MatrixCellSelectionLabel,
+    ATextField,
   },
   props: {
     header: {

@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" clearable />
+    <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" clearable />
     <app-entity-list :entities="entities" collection="scripts" />
   </v-container>
 </template>
@@ -8,10 +8,12 @@
 <script>
 import api from '@/services/api.service';
 import appEntityList from '@/components/ui/EntityList.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appEntityList,
+    ATextField,
   },
   data() {
     return {

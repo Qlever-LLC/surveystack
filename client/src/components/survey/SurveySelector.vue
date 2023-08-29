@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>Search surveys</v-card-title>
       <v-card-text>
-        <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
+        <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
         <v-list>
           <v-list-item
             v-for="searchResult in searchResults"
@@ -33,6 +33,7 @@
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   props: {
@@ -44,6 +45,9 @@ export default {
       type: Boolean,
       required: true,
     },
+  },
+  components: {
+    ATextField,
   },
   data() {
     return {

@@ -18,7 +18,7 @@
           <v-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</v-icon>
         </div>
 
-        <v-text-field v-model="subject" label="Subject" filled />
+        <a-text-field v-model="subject" label="Subject" filled />
         <v-textarea rows="10" v-model="body" label="Message" filled hide-details />
         <div v-if="showMissingMagicLinkWarning" class="mt-2 error--text">
           Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
@@ -87,6 +87,7 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -103,6 +104,7 @@ export default {
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,
+    ATextField,
   },
   data() {
     return {
