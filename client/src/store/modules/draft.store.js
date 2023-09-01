@@ -65,6 +65,7 @@ const createInitialState = () => ({
   firstNode: null,
   showOverview: false,
   showConfirmSubmission: false,
+  enableNext: true,
   errors: null,
   persist: false,
   farmOsCache: {}, // Cache for farmos resources, should be reset when survey starts
@@ -77,6 +78,7 @@ const getters = {
   submission: (state) => state.submission,
   property: (state) => (path, fallback) => get(state.submission, path, fallback),
   control: (state) => state.node && state.node.model, // current survey control
+  enableNext: (state) => state.enableNext,
   path: (state) =>
     state.node
       ? state.node
@@ -188,6 +190,9 @@ const actions = {
     if (calculate) {
       dispatch('calculateRelevance');
     }
+  },
+  setNextEnable({ commit }, enable) {
+    commit('SET_NEXT_ENABLE', enable);
   },
   async next({ commit, state, dispatch }) {
     dispatch('calculateApiCompose');
@@ -468,6 +473,9 @@ const mutations = {
     }
 
     Vue.set(parent, childKey, value);
+  },
+  SET_NEXT_ENABLE(state, enable) {
+    state.enableNext = enable;
   },
   NEXT(state, node) {
     // console.log('next', node, state);

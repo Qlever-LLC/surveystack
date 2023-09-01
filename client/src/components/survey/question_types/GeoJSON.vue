@@ -145,6 +145,9 @@ export default {
 
       const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
       this.mapInstance.edit.geoJSONOn('featurechange', mapChangeHandler);
+      this.mapInstance.edit.controlActivateOn('geotrace', (active) => {
+        this.$store.dispatch('draft/setNextEnable', !active);
+      });
 
       // If no features exist in value, run automatic behaviors
       if (!this.value) {
