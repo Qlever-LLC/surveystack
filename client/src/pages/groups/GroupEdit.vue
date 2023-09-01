@@ -58,7 +58,7 @@
             autocomplete="off"
             v-model="entity.name"
           />
-          <v-text-field
+          <a-text-field
             label="Slug"
             placeholder="Enter group slug or use suggested"
             id="group-slug"

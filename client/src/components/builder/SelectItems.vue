@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" width="500" @click:outside="cancel">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         ref="anchorRef"
         label="Default value"
         :value="getLabel"
@@ -50,6 +50,8 @@
 </template>
 
 <script>
+import ATextField from '@/components/ui/ATextField.vue';
+
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
@@ -60,6 +62,9 @@ export default {
     items: { type: Array, default: () => [] },
     custom: { type: Boolean },
     multiple: { type: Boolean },
+  },
+  components: {
+    ATextField,
   },
   data() {
     return {

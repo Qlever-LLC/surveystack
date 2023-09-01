@@ -1,37 +1,37 @@
 <template>
-  <div>
-    <v-text-field
-      :autocomplete="autocomplete"
-      :data-test-id="dataTestId"
-      :id="id"
-      @blur="$emit('blur', $event)"
-      @input="$emit('input', $event)"
-      @change="$emit('change', $event)"
-      :append-icon="appendIcon"
-      :autofocus="autofocus"
-      :clearable="clearable"
-      :color="color"
-      :dense="dense"
-      :disabled="disabled"
-      :error-messages="errorMessages"
-      :filled="filled"
-      :hide-details="hideDetails"
-      :hint="hint"
-      :label="label"
-      :loading="loading"
-      :outlined="outlined"
-      :persistent-hint="persistentHint"
-      :placeholder="placeholder"
-      :prepend-icon="prependIcon"
-      :readonly="readonly"
-      :rules="rules"
-      :single-line="singleLine"
-      :solo="solo"
-      :type="type"
-      :validate-on-blur="validateOnBlur"
-      :value="value"
-    />
-  </div>
+  <v-text-field
+    v-on="$listeners"
+    v-bind="$attrs"
+    :autocomplete="autocomplete"
+    :data-test-id="dataTestId"
+    :id="id"
+    :primary="primary"
+    :required="required"
+    :append-icon="appendIcon"
+    :autofocus="autofocus"
+    :clear-icon="clearIcon"
+    :clearable="clearable"
+    :color="color"
+    :dense="dense"
+    :disabled="disabled"
+    :error-messages="errorMessages"
+    :filled="filled"
+    :hide-details="hideDetails"
+    :hint="hint"
+    :label="label"
+    :loading="loading"
+    :outlined="outlined"
+    :persistent-hint="persistentHint"
+    :placeholder="placeholder"
+    :prepend-icon="prependIcon"
+    :readonly="readonly"
+    :rules="rules"
+    :single-line="singleLine"
+    :solo="solo"
+    :type="type"
+    :validate-on-blur="validateOnBlur"
+    :value="value"
+  />
 </template>
 
 <script>
@@ -41,9 +41,12 @@ export default {
     autocomplete: { type: String, required: false },
     dataTestId: { type: String, required: false },
     id: { type: String, required: false },
+    primary: { type: Boolean, required: false },
+    required: { type: Boolean, required: false },
     //vuetify props
     appendIcon: { type: String, required: false },
     autofocus: { type: Boolean, required: false },
+    clearIcon: { type: String, required: false },
     clearable: { type: Boolean, required: false },
     color: { type: String, required: false },
     dense: { type: Boolean, required: false },

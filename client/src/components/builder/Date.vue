@@ -11,7 +11,7 @@
   />
   <v-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         v-on="on"
         v-bind="attrs"
         label="Default value"
@@ -47,12 +47,16 @@ import endOfWeek from 'date-fns/endOfWeek';
 import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   props: {
     value: { type: String },
     type: { type: String },
     dense: { type: Boolean, default: false },
+  },
+  components: {
+    ATextField,
   },
   data() {
     return {

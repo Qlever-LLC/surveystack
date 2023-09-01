@@ -16,7 +16,7 @@
 
         <a-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
 
-        <v-text-field
+        <a-text-field
           label="Password"
           :type="passwordInputType"
           class="form-control"

@@ -16,7 +16,7 @@
           <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
             We'll send you an email to sign you in - no password needed! <b>Click send</b> then <b>check your email</b>.
           </div>
-          <v-text-field
+          <a-text-field
             v-if="usePassword"
             label="Password"
             :type="passwordInputType"

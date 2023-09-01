@@ -95,7 +95,7 @@
     </div>
 
     <div class="search">
-      <v-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search" />
+      <a-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search" />
     </div>
     <FarmOSGroupTable
       :members="filteredMembers"

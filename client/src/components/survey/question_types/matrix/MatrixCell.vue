@@ -10,7 +10,7 @@
   />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
-      <v-text-field
+      <a-text-field
         ref="text-qrcode"
         :value="value"
         @input="onInput"
@@ -184,7 +184,7 @@
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-text-field
+        <a-text-field
           :value="getDateLabel"
           @click="setActivePickerMonth"
           hide-details

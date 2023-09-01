@@ -29,7 +29,7 @@
           min-width="290px"
         >
           <template v-slot:activator="{ on }">
-            <v-text-field
+            <a-text-field
               :value="dateFormatted"
               @input="datePickerIsVisible = false"
               @change="updateDateInput"
