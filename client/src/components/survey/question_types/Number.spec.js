@@ -1,6 +1,7 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
-import Number from './Number.vue';
+import Number from '@/components/survey/question_types/Number.vue';
+import ATextField from '@/components/ui/ATextField.vue';
 
 const vuetify = new Vuetify();
 
@@ -33,9 +34,9 @@ function getMountOpts(opts = {}) {
 describe('Number question', () => {
   describe('rendering', () => {
     const rendersValue = (value) => {
-      const wrapper = shallowMount(Number, getMountOpts({ value }));
+      const wrapper = mount(Number, getMountOpts({ value }));
       const input = wrapper.find('[data-test-id="input"]');
-      expect(input.vm.value).toBe(value);
+      expect(input.element.value).toBe(value.toString());
     };
 
     test('displays integer value', () => rendersValue(5));

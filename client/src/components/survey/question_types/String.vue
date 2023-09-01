@@ -3,11 +3,11 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <div style="display: flex">
       <div style="flex: 1">
-        <v-text-field
+        <a-text-field
           outlined
           :label="control.hint"
-          v-bind:value="value"
-          v-on:input="onInput"
+          :value="value"
+          @input="onInput"
           @keyup.enter.prevent="submit"
           ref="textField"
           class="full-width"

@@ -90,7 +90,7 @@
               v-text="getLabelFromKey(fileResourceKey)"
             ></v-list-item-title>
             <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
-              <v-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
+              <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
             </v-list-item-title>
             <v-list-item-subtitle v-if="showUploadProgressIndex === index"
               ><v-progress-linear indeterminate class="mb-0"

@@ -289,7 +289,7 @@
                 v-if="linkMenuIsActive"
                 @submit.prevent="setLinkUrl(commands.link, linkUrl)"
               >
-                <v-text-field
+                <a-text-field
                   class="menububble__input ml-4"
                   dense
                   v-model="linkUrl"
@@ -351,12 +351,14 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
+import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,
+    ATextField,
   },
   props: {
     value: {

@@ -1,12 +1,12 @@
 <template>
   <div>
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
-    <v-text-field
+    <a-text-field
       outlined
       type="number"
       :label="control.hint"
-      v-bind:value="value"
-      v-on:input="onInput"
+      :value="value"
+      @input="onInput"
       @keyup.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"
