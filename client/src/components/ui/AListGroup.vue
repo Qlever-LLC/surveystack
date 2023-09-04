@@ -1,9 +1,7 @@
 <template>
-  <div>
-    <v-list-group :prepend-icon="prependIcon" :value="value" :color="color">
-      <slot />
-    </v-list-group>
-  </div>
+  <v-list-group :prepend-icon="prependIcon" :value="value" :color="color">
+    <slot name="activator" />
+  </v-list-group>
 </template>
 
 <script>
