@@ -7,6 +7,7 @@
     :id="id"
     :primary="primary"
     :required="required"
+    :tabindex="tabindex"
     :append-icon="appendIcon"
     :autofocus="autofocus"
     :clear-icon="clearIcon"
@@ -28,10 +29,18 @@
     :rules="rules"
     :single-line="singleLine"
     :solo="solo"
+    :suffix="suffix"
     :type="type"
     :validate-on-blur="validateOnBlur"
     :value="value"
-  />
+  >
+    <template v-slot:append-outer>
+      <slot name="append-outer" />
+    </template>
+    <template v-slot:label>
+      <slot name="label" />
+    </template>
+  </v-text-field>
 </template>
 
 <script>
@@ -43,6 +52,7 @@ export default {
     id: { type: String, required: false },
     primary: { type: Boolean, required: false },
     required: { type: Boolean, required: false },
+    tabindex: { type: String, required: false },
     //vuetify props
     appendIcon: { type: String, required: false },
     autofocus: { type: Boolean, required: false },
@@ -65,6 +75,7 @@ export default {
     rules: { type: Array, required: false },
     singleLine: { type: Boolean, required: false },
     solo: { type: Boolean, required: false },
+    suffix: { type: String, required: false },
     type: { type: String, required: false },
     validateOnBlur: { type: Boolean, required: false },
     value: { type: undefined, required: false },

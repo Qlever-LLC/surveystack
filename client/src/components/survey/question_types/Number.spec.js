@@ -1,7 +1,6 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import Number from '@/components/survey/question_types/Number.vue';
-import ATextField from '@/components/ui/ATextField.vue';
 
 const vuetify = new Vuetify();
 

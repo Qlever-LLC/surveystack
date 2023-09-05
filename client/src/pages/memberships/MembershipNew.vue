@@ -16,7 +16,7 @@
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
-        <v-text-field
+        <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationName"
           outlined
@@ -25,7 +25,7 @@
           <template v-slot:label>
             <div>Name <small>(optional)</small></div>
           </template>
-        </v-text-field>
+        </a-text-field>
 
         <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
           <v-radio label="Send an invitation email" value="SEND_NOW">

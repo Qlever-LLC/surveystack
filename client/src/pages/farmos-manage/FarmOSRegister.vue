@@ -26,7 +26,7 @@
 
       <v-row class="align-baseline">
         <v-col>
-          <v-text-field
+          <a-text-field
             :disabled="!localViewModel.form.plan"
             v-model.trim="localViewModel.form.instanceName"
             label="Instance URL"
@@ -44,7 +44,7 @@
                 >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
               >
             </template>
-          </v-text-field>
+          </a-text-field>
         </v-col>
 
         <v-col>
