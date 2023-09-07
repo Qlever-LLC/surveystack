@@ -18,5 +18,6 @@ export default {
     disabled: { type: Boolean, required: false },
     hideDetails: { type: [Boolean, String], required: false },
   },
+  emits: ['input'],
 };
 </script>

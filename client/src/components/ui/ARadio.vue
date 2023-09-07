@@ -13,5 +13,6 @@ export default {
     value: { type: undefined, required: true },
     color: { type: String, required: false },
   },
+  emits: ['change'],
 };
 </script>
