@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <v-radio :label="label" :value="value" :color="color" @change="$emit('change', $event)" class="mb-2">
-      <template v-slot:label>
-        <slot name="label" />
-      </template>
-    </v-radio>
-  </div>
+  <v-radio :label="label" :value="value" :color="color" @change="$emit('change', $event)">
+    <template v-slot:label>
+      <slot name="label" />
+    </template>
+  </v-radio>
 </template>
 
 <script>

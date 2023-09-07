@@ -1,18 +1,13 @@
 <template>
-  <div>
-    <v-radio-group
-      class="mt-0 pt-0"
-      :value="value"
-      @change="$emit('input', $event)"
-      :name="name"
-      :disabled="disabled"
-      :hide-details="hideDetails"
-    >
-      <template>
-        <slot />
-      </template>
-    </v-radio-group>
-  </div>
+  <v-radio-group
+    :value="value"
+    @change="$emit('input', $event)"
+    :name="name"
+    :disabled="disabled"
+    :hide-details="hideDetails"
+  >
+    <slot />
+  </v-radio-group>
 </template>
 
 <script>

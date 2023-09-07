@@ -9,7 +9,7 @@
         v-if="sourceIsValid"
         class="mt-0"
         data-test-id="radio-group"
-        :hideDetails="true"
+        hide-details
       >
         <template>
           <a-radio
