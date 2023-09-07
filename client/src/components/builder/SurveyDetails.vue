@@ -382,19 +382,4 @@ export default {
 .cursor-pointer {
   cursor: pointer;
 }
-
-.survey-group-name-input >>> .v-input__slot ::before {
-  border: none;
-}
-
-.survey-group-name-input
-  >>> .theme--light.v-text-field.v-input--is-disabled
-  > .v-input__control
-  > .v-input__slot:before {
-  border: none;
-}
-
-.survey-group-name-input >>> .v-input__control >>> .v-input__slot ::before {
-  border: none;
-}
 </style>

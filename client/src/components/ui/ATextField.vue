@@ -3,6 +3,7 @@
     v-on="$listeners"
     v-bind="$attrs"
     :autocomplete="autocomplete"
+    :class="{ noBorder: disabled }"
     :data-test-id="dataTestId"
     :id="id"
     :primary="primary"
@@ -82,3 +83,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.noBorder >>> .v-input__slot::before {
+  border: none !important;
+}
+</style>
