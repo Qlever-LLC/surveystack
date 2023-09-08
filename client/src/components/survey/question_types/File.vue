@@ -8,7 +8,7 @@
       :redacted="redacted"
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
-      :is-modified="meta && meta.dateModified"
+      :is-modified="meta && !!meta.dateModified"
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
