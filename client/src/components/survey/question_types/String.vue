@@ -5,7 +5,7 @@
       :redacted="redacted"
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled && value"
-      :is-modified="!!meta.dateModified"
+      :is-modified="meta && meta.dateModified"
       @initialize="initialize"
     />
     <div style="display: flex">

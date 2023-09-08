@@ -83,7 +83,7 @@
       :redacted="redacted"
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
-      :is-modified="!!meta.dateModified"
+      :is-modified="meta && meta.dateModified"
       initializeTooltip="Reset rows"
       @initialize="initializeConfirm"
     />
