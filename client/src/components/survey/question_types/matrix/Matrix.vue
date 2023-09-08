@@ -382,7 +382,11 @@ export default {
       this.$emit('changed', this.rows);
     },
     initializeConfirm() {
-      this.showConfirmInitializeDialog = true;
+      if (this.meta && !!this.meta.dateModified) {
+        this.showConfirmInitializeDialog = true;
+      } else {
+        this.initialize();
+      }
     },
   },
   async created() {
