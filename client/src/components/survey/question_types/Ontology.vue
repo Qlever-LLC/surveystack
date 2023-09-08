@@ -5,6 +5,7 @@
       :redacted="redacted"
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="!!meta.dateModified"
       @initialize="initialize"
     />
     <v-select

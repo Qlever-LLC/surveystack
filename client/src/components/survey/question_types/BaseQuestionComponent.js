@@ -2,6 +2,7 @@ export default {
   props: {
     control: { type: Object, required: true },
     value: { required: true },
+    meta: { type: Object, required: false },
     index: { required: true },
     autoFocus: { type: Boolean, default: true },
     relevant: { type: Boolean, default: true },

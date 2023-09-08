@@ -2,10 +2,10 @@
   <v-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left">
     <template v-slot:activator="{ on, attrs }">
       <v-btn icon v-bind="attrs" v-on="on">
-        <v-icon color="grey lighten-1" @click.stop="$emit('initialize')"> mdi-refresh </v-icon>
+        <v-icon :color="highlight ? 'blue' : 'grey lighten-1'" @click.stop="$emit('initialize')"> mdi-refresh </v-icon>
       </v-btn>
     </template>
-    <span>Initialize value</span>
+    <span>{{ tooltip }}</span>
   </v-tooltip>
 </template>
 
@@ -23,6 +23,14 @@ export default {
     },
     left: {
       type: Boolean,
+    },
+    highlight: {
+      type: Boolean,
+      default: false,
+    },
+    tooltip: {
+      type: String,
+      default: 'Initialize value',
     },
   },
   computed: {

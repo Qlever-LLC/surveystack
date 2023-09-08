@@ -62,12 +62,13 @@
         </v-card>
       </div>
     </v-dialog>
-
     <app-control-label
       :value="control.label"
       :redacted="redacted"
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="!!meta.dateModified"
+      initializeTooltip="Reset rows"
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
