@@ -1,9 +1,7 @@
 <template>
-  <div>
-    <v-list :flat="flat" :dense="dense" :two-line="twoLine" :subheader="subheader" :max-width="maxWidth">
-      <slot />
-    </v-list>
-  </div>
+  <v-list :flat="flat" :dense="dense" :two-line="twoLine" :subheader="subheader" :max-width="maxWidth">
+    <slot />
+  </v-list>
 </template>
 
 <script>
