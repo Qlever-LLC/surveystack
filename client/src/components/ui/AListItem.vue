@@ -1,20 +1,18 @@
 <template>
-  <div>
-    <v-list-item
-      :flat="flat"
-      :dense="dense"
-      :link="link"
-      :two-line="twoLine"
-      :three-line="threeLine"
-      :href="href"
-      :to="to"
-      :target="target"
-      :value="value"
-      v-on="hasClickListener ? { click: (v) => $emit('click', v) } : {}"
-    >
-      <slot />
-    </v-list-item>
-  </div>
+  <v-list-item
+    :flat="flat"
+    :dense="dense"
+    :link="link"
+    :two-line="twoLine"
+    :three-line="threeLine"
+    :href="href"
+    :to="to"
+    :target="target"
+    :value="value"
+    v-on="hasClickListener ? { click: (v) => $emit('click', v) } : {}"
+  >
+    <slot />
+  </v-list-item>
 </template>
 
 <script>
