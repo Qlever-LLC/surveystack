@@ -3,7 +3,7 @@ import TreeModel from 'tree-model';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 import api from '@/services/api.service';
 import Vue from 'vue';
 
@@ -86,7 +86,7 @@ const getters = {
           .replace('[', '.')
           .replace(']', '')
       : null,
-
+  nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
   atStart: (state) => state.node === state.firstNode,
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
@@ -176,7 +176,7 @@ const actions = {
     await dispatch('calculateRelevance');
     await dispatch('next');
   },
-  setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
+  setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
       try {
@@ -184,6 +184,9 @@ const actions = {
       } catch (err) {
         console.warn('unable to persist submission to IDB');
       }
+    }
+    if (initialize && state.node.model.type === 'page') {
+      dispatch('initialize', state.node);
     }
     if (calculate) {
       dispatch('calculateRelevance');
@@ -248,6 +251,8 @@ const actions = {
           continue;
         }
       }
+
+      await dispatch('initialize', nextNode);
 
       const isInsidePage = nextNode
         .getPath()
@@ -389,6 +394,40 @@ const actions = {
         // commit('SET_PROPERTY', { path: `${path}.meta.computedRelevance`, value: result }); // TODO: set computedRelevance as well?
       }
     });
+  },
+  async initialize({ state, dispatch }, node) {
+    let nodes = surveyStackUtils.getAllNodes(node);
+    // Loop over nodes here to force calculations being based on results before instead of making them base on the initial state.
+    // Example: Page as first control including two initalized controls: initializing the second control needs to take the result of the initialized first control into account
+    for (const node of nodes) {
+      const calculations = await codeEvaluator.calculateInitialize([node], state.submission, state.survey); // eslint-disable-line
+      // Loop over calculations, though we do not expect to iterate more than once
+      for (const calculation of calculations) {
+        const { result, path, skip } = calculation;
+        if (!skip && !!path) {
+          await dispatch('setProperty', {
+            path: `${path}.value`,
+            value: result,
+            calculate: true,
+            initialize: false, //prevent infinity loop
+          });
+        }
+      }
+    }
+  },
+  async initializeForced({ commit, state, dispatch }, node) {
+    const path = node
+      .getPath()
+      .map((n) => n.model.name)
+      .join('.');
+    //first set dateModified to null which is required in case of the value being re-initialized manually
+    await dispatch('setProperty', {
+      path: `${path}.meta.dateModified`,
+      value: null,
+      calculate: false,
+      initialize: false, //prevent infinity loop
+    });
+    await dispatch('initialize', node);
   },
   async calculateApiCompose({ commit, state }) {
     // TODO: only calculate subset of nodes
