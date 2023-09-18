@@ -119,9 +119,16 @@ const getOwnership = async (req, res) => {
   const groupIds = groupsMapped.map((el) => el.groupId);
   const groupsAffected = await db
     .collection('groups')
-    .find({
-      _id: { $in: groupIds.map((id) => new ObjectId(id)) },
-    })
+    .find(
+      {
+        _id: { $in: groupIds.map((id) => new ObjectId(id)) },
+      },
+      {
+        projection: {
+          name: 1,
+        },
+      }
+    )
     .toArray();
 
   for (const inst of instancesWhereOwner) {
@@ -148,9 +155,16 @@ const getOwnership = async (req, res) => {
   const userIds = usersMapped.map((el) => el.userId);
   const usersAffected = await db
     .collection('users')
-    .find({
-      _id: { $in: userIds.map((id) => new ObjectId(id)) },
-    })
+    .find(
+      {
+        _id: { $in: userIds.map((id) => new ObjectId(id)) },
+      },
+      {
+        projection: {
+          email: 1,
+        },
+      }
+    )
     .toArray();
 
   for (const inst of instancesWhereOwner) {
