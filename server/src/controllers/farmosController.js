@@ -1102,12 +1102,9 @@ export const mapUser = async (req, res) => {
     await mapFarmOSInstanceToUser(userId, instanceName, true, origin);
   }
 
-  const group = await db.collection('groups').findOne(
-    {
-      _id: asMongoId(groupId),
-    },
-    { name: 1 }
-  );
+  const group = await db.collection('groups').findOne({
+    _id: asMongoId(groupId),
+  });
   const resStatus = `Successfully added instance to ${group.name}, instance owner will be notified`;
   return res.send({
     status: resStatus,
@@ -1144,17 +1141,11 @@ export const getOwnersFromInstances = async (req, res) => {
     .toArray();
   const ownerUsers = await db
     .collection('users')
-    .find(
-      {
-        _id: {
-          $in: instancesObj.filter((i) => i.owner).map((i) => new ObjectId(i.userId)),
-        },
+    .find({
+      _id: {
+        $in: instancesObj.filter((i) => i.owner).map((i) => new ObjectId(i.userId)),
       },
-      {
-        email: 1,
-        name: 1,
-      }
-    )
+    })
     .toArray();
 
   const mergedData = extractOwnerUsersMappedInst(instancesObj, ownerUsers);

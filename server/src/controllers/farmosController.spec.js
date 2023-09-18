@@ -1119,17 +1119,11 @@ describe('farmos-controller', () => {
       .toArray();
     const ownerUsers = await db
       .collection('users')
-      .find(
-        {
-          _id: {
-            $in: instancesObj.filter((i) => i.owner).map((i) => new ObjectId(i.userId)),
-          },
+      .find({
+        _id: {
+          $in: instancesObj.filter((i) => i.owner).map((i) => new ObjectId(i.userId)),
         },
-        {
-          email: 1,
-          name: 1,
-        }
-      )
+      })
       .toArray();
 
     const mergedData = extractOwnerUsersMappedInst(instancesObj, ownerUsers);
