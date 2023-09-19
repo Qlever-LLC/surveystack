@@ -176,7 +176,7 @@ const actions = {
     await dispatch('calculateRelevance');
     await dispatch('next');
   },
-  setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
+  async setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
       try {
@@ -185,11 +185,11 @@ const actions = {
         console.warn('unable to persist submission to IDB');
       }
     }
-    if (initialize && state.node.model.type === 'page') {
-      dispatch('initialize', state.node);
-    }
     if (calculate) {
-      dispatch('calculateRelevance');
+      await dispatch('calculateRelevance');
+    }
+    if (initialize && state.node.model.type === 'page') {
+      await dispatch('initialize', state.node);
     }
   },
   async next({ commit, state, dispatch }) {
