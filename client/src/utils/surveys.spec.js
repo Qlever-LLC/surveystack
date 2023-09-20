@@ -202,6 +202,10 @@ function mockLibrarySurvey() {
                 enabled: false,
                 code: '',
               },
+              initialize: {
+                enabled: false,
+                code: '',
+              },
               constraint: {
                 enabled: false,
                 code: '',
@@ -228,6 +232,10 @@ function mockLibrarySurvey() {
               required: false,
               redacted: false,
               relevance: {
+                enabled: false,
+                code: '',
+              },
+              initialize: {
                 enabled: false,
                 code: '',
               },
@@ -266,6 +274,10 @@ function mockLibrarySurvey() {
                     enabled: false,
                     code: '',
                   },
+                  initialize: {
+                    enabled: false,
+                    code: '',
+                  },
                   constraint: {
                     enabled: false,
                     code: '',
@@ -297,6 +309,10 @@ function mockLibrarySurvey() {
                     enabled: false,
                     code: '',
                   },
+                  initialize: {
+                    enabled: false,
+                    code: '',
+                  },
                   constraint: {
                     enabled: false,
                     code: '',
@@ -323,6 +339,10 @@ function mockLibrarySurvey() {
               required: false,
               redacted: false,
               relevance: {
+                enabled: false,
+                code: '',
+              },
+              initialize: {
                 enabled: false,
                 code: '',
               },

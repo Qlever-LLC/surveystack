@@ -69,6 +69,10 @@ function mockControl() {
         enabled: false,
         code: '',
       },
+      initialize: {
+        enabled: false,
+        code: '',
+      },
       constraint: {
         enabled: false,
         code: '',
@@ -130,6 +134,10 @@ function mockSurvey() {
               required: false,
               redacted: false,
               relevance: {
+                enabled: false,
+                code: '',
+              },
+              initialize: {
                 enabled: false,
                 code: '',
               },

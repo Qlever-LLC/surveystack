@@ -148,22 +148,22 @@ describe('add control', () => {
         propValue: { enabled: true, code: expect.any(String) },
         openAdvanced: true,
       },
-      {
+      /*{ TODO not implemented yet - decide to implement or remove
         inputLabel: 'Calculate Expression',
         type: 'number',
         value: true,
         propPath: 'options.calculate',
         propValue: { enabled: true, code: expect.any(String) },
         openAdvanced: true,
-      },
-      {
+      },*/
+      /*{ TODO not implemented yet - decide to implement or remove
         inputLabel: 'Constraint Expression',
         type: 'number',
         value: true,
         propPath: 'options.constraint',
         propValue: { enabled: true, code: expect.any(String) },
         openAdvanced: true,
-      },
+      },*/
       {
         inputLabel: 'Api Compose Expression',
         type: 'number',

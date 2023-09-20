@@ -120,6 +120,8 @@ describe('surveyDiff', () => {
         'options.redacted',
         'options.relevance.enabled',
         'options.relevance.code',
+        'options.initialize.enabled',
+        'options.initialize.code',
         'options.constraint.enabled',
         'options.constraint.code',
         'options.calculate.enabled',

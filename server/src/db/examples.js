@@ -25,6 +25,10 @@ export const exampleSurveys = [
                 enabled: false,
                 code: '',
               },
+              initialize: {
+                enabled: false,
+                code: '',
+              },
               constraint: {
                 enabled: false,
                 code: '',
@@ -58,6 +62,10 @@ export const exampleSurveys = [
                     enabled: false,
                     code: '',
                   },
+                  initialize: {
+                    enabled: false,
+                    code: '',
+                  },
                   constraint: {
                     enabled: false,
                     code: '',
@@ -86,6 +94,10 @@ export const exampleSurveys = [
                     enabled: false,
                     code: '',
                   },
+                  initialize: {
+                    enabled: false,
+                    code: '',
+                  },
                   constraint: {
                     enabled: false,
                     code: '',
@@ -108,6 +120,10 @@ export const exampleSurveys = [
               required: false,
               redacted: false,
               relevance: {
+                enabled: false,
+                code: '',
+              },
+              initialize: {
                 enabled: false,
                 code: '',
               },

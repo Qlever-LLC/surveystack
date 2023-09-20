@@ -276,14 +276,21 @@
       </template>
 
       <!-- Advanced properties -->
-      <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
-        Advanced
+      <v-btn
+        v-if="!showAdvanced && !hasExpressionEnabled"
+        color="grey darken-1"
+        class="align-self-end"
+        @click="showAdvanced = true"
+        small
+        text
+      >
+        advanced
       </v-btn>
       <div v-else class="extra-options">
         <v-spacer></v-spacer>
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
-          <a-icon @click.stop="showAdvanced = false">mdi-close</a-icon>
+          <a-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</a-icon>
         </div>
 
         <div>
@@ -295,7 +302,19 @@
           <a-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
-        <div>
+        <div v-if="isText || isNumber || isDate || isMatrix || isOntology || isSelect">
+          <checkbox
+            label="Initialize Expression"
+            v-model="initialize.enabled"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          />
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-initialize')" size="20">
+            mdi-open-in-new
+          </a-icon>
+        </div>
+
+        <!-- TODO not implemented yet - decide to implement or remove-->
+        <!--div>
           <checkbox
             label="Calculate Expression"
             v-model="calculate.enabled"
@@ -307,6 +326,9 @@
         </div>
 
         <div>
+          </v-icon>
+        </div-->
+        <!--div>
           <checkbox
             label="Constraint Expression"
             v-model="constraint.enabled"
@@ -315,7 +337,7 @@
           <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
             mdi-open-in-new
           </a-icon>
-        </div>
+        </div-->
 
         <div>
           <checkbox
@@ -452,6 +474,7 @@ export default {
     control: {
       required: false,
     },
+    initialize: {},
     calculate: {},
     relevance: {},
     constraint: {},
@@ -569,6 +592,15 @@ export default {
       return (
         this.control.options.required ||
         !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
+      );
+    },
+    hasExpressionEnabled() {
+      return (
+        (this.initialize && this.initialize.enabled) ||
+        (this.calculate && this.calculate.enabled) ||
+        (this.relevance && this.relevance.enabled) ||
+        (this.constraint && this.constraint.enabled) ||
+        (this.apiCompose && this.apiCompose.enabled)
       );
     },
     hasLayoutOptions() {

@@ -13,6 +13,22 @@
       Do you want to delete this row?
     </app-dialog>
 
+    <app-dialog
+      v-model="showConfirmInitializeDialog"
+      v-bind="dialogProps"
+      @confirm="
+        showConfirmInitializeDialog = false;
+        initialize();
+      "
+      @cancel="showConfirmInitializeDialog = false"
+      title="Confirm Reset"
+      labelConfirm="RESET"
+      :maxWidth="400"
+    >
+      Do you want to reset this spreadsheet based on the previous answers in your survey? You will have to re-enter any
+      custom information you have entered.
+    </app-dialog>
+
     <v-dialog
       v-model="showEditItemDialog"
       v-bind="dialogProps"
@@ -62,8 +78,15 @@
         </v-card>
       </div>
     </v-dialog>
-
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      initializeTooltip="Reset rows"
+      @initialize="initializeConfirm"
+    />
     <app-control-hint :value="control.hint" />
 
     <app-matrix-table
@@ -260,6 +283,7 @@ export default {
       editedIndex: -1,
       editedItem: null,
       isFarmOsLoading: false,
+      showConfirmInitializeDialog: false,
     };
   },
   computed: {
@@ -359,6 +383,13 @@ export default {
       this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
     },
+    initializeConfirm() {
+      if (this.meta && !!this.meta.dateModified) {
+        this.showConfirmInitializeDialog = true;
+      } else {
+        this.initialize();
+      }
+    },
   },
   async created() {
     this.isFarmOsLoading = true;
@@ -375,6 +406,11 @@ export default {
     }
 
     this.isFarmOsLoading = false;
+  },
+  watch: {
+    value() {
+      this.rows = this.value || [];
+    },
   },
 };
 </script>

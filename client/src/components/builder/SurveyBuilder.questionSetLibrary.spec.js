@@ -416,6 +416,10 @@ function createConsumerSurvey() {
                 enabled: false,
                 code: '',
               },
+              initialize: {
+                enabled: false,
+                code: '',
+              },
               constraint: {
                 enabled: false,
                 code: '',
@@ -455,11 +459,15 @@ function createConsumerSurvey() {
                         enabled: false,
                         code: '',
                       },
-                      constraint: {
+                      initialize: {
                         enabled: false,
                         code: '',
                       },
                       calculate: {
+                        enabled: false,
+                        code: '',
+                      },
+                      constraint: {
                         enabled: false,
                         code: '',
                       },
@@ -483,6 +491,10 @@ function createConsumerSurvey() {
                       required: false,
                       redacted: false,
                       relevance: {
+                        enabled: false,
+                        code: '',
+                      },
+                      initialize: {
                         enabled: false,
                         code: '',
                       },
@@ -515,6 +527,10 @@ function createConsumerSurvey() {
                     enabled: false,
                     code: '',
                   },
+                  initialize: {
+                    enabled: false,
+                    code: '',
+                  },
                   constraint: {
                     enabled: false,
                     code: '',
@@ -539,6 +555,10 @@ function createConsumerSurvey() {
               required: false,
               redacted: false,
               relevance: {
+                enabled: false,
+                code: '',
+              },
+              initialize: {
                 enabled: false,
                 code: '',
               },
@@ -632,6 +652,10 @@ function createQSL() {
                 enabled: false,
                 code: '',
               },
+              initialize: {
+                enabled: false,
+                code: '',
+              },
               constraint: {
                 enabled: false,
                 code: '',
@@ -658,6 +682,10 @@ function createQSL() {
               required: false,
               redacted: false,
               relevance: {
+                enabled: false,
+                code: '',
+              },
+              initialize: {
                 enabled: false,
                 code: '',
               },
