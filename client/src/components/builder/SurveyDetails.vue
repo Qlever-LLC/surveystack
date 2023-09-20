@@ -158,7 +158,7 @@
             elevation="0"
             class="mb-1"
           >
-            <a-icon size="x-small" color="warning">mdi-alert</a-icon>try to clean up
+            <a-icon x-small color="warning">mdi-alert</a-icon>try to clean up
           </v-btn>
         </div>
         <div class="text-left">

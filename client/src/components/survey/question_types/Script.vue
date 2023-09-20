@@ -32,7 +32,7 @@
           href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
           outlined
         >
-          <a-icon left class="mr-4" size="x-large">mdi-android</a-icon>
+          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Download APK
         </v-btn>
       </template>
@@ -52,7 +52,7 @@
           outlined
           @click="showAndroidInstallDialog = true"
         >
-          <a-icon left class="mr-4" size="x-large">mdi-android</a-icon>
+          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Install Android App
         </v-btn>
       </div>
@@ -64,7 +64,7 @@
         <v-chip dark> {{ meta && meta.status }}</v-chip>
         <br />
         <v-chip dark class="mt-1">
-          <a-icon size="small" left>mdi-message-bulleted</a-icon>
+          <a-icon small left>mdi-message-bulleted</a-icon>
           {{ meta && meta.statusMessage }}</v-chip
         >
       </p>

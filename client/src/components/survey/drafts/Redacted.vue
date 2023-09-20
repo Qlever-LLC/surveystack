@@ -1,7 +1,7 @@
 <template>
   <v-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left">
     <template v-slot:activator="{ on, attrs }">
-      <a-icon size="small" color="primary lighten-1" v-bind="attrs" v-on="on" class="ml-1">mdi-eye-off</a-icon>
+      <a-icon small color="primary lighten-1" v-bind="attrs" v-on="on" class="ml-1">mdi-eye-off</a-icon>
     </template>
     <span>Private</span>
   </v-tooltip>

@@ -14,7 +14,7 @@
           </v-btn>
         </div>
         <v-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
-          <a-icon size="small">mdi-pencil</a-icon>
+          <a-icon small>mdi-pencil</a-icon>
         </v-btn>
         <div v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})

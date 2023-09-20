@@ -35,7 +35,7 @@
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
         <v-chip v-if="isPremium" class="ml-2" color="success">
-          <a-icon size="small" left> mdi-octagram </a-icon>Premium
+          <a-icon small left> mdi-octagram </a-icon>Premium
         </v-chip>
       </h1>
       <v-btn

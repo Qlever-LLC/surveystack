@@ -40,7 +40,7 @@
                 style="margin-top: -8px"
                 v-if="viewModel.form.instanceNameValid === true || viewModel.form.instanceNameValid === false"
                 :color="viewModel.form.instanceNameValid === true ? 'green' : 'red'"
-                size="large"
+                large
                 >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</a-icon
               >
             </template>

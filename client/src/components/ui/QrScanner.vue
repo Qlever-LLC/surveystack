@@ -9,7 +9,7 @@
       color="primary"
       @click="isScannerOpen = true"
     >
-      <a-icon :size="!!small ? 'small' : 'x-large'">mdi-qrcode-scan</a-icon>
+      <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
     </v-btn>
 
     <v-dialog v-model="isScannerOpen" fullscreen>
@@ -46,8 +46,7 @@
 import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from '@vue/composition-api';
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
-import qrScannerWorkerSource
-  from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
 import AIcon from '@/components/ui/AIcon.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));

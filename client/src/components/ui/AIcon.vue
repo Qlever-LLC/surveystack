@@ -1,5 +1,15 @@
 <template>
-  <v-icon :color="color" :size="size" :left="left">
+  <v-icon
+    :color="color"
+    :left="left"
+    :right="right"
+    :small="small"
+    :x-small="xSmall"
+    :large="large"
+    :x-large="xLarge"
+    :size="size"
+    v-on="$listeners"
+  >
     <slot />
   </v-icon>
 </template>
@@ -10,7 +20,11 @@ export default {
     color: { type: String, required: false },
     left: { type: Boolean, required: false }, //v3: start
     right: { type: Boolean, required: false }, //v3: end
-    size: { type: [String, Number], required: false }, //number in pixels or one of x-small, small, default, large, and x-large
+    small: { type: Boolean, required: false }, //v3: remove
+    xSmall: { type: Boolean, required: false }, //v3: remove
+    large: { type: Boolean, required: false }, //v3: remove
+    xLarge: { type: Boolean, required: false }, //v3: remove
+    size: { type: [String, Number], required: false }, //vuetify2: custom font size. TODO vuetify3: number in pixels or one of x-small, small, default, large, and x-large
     dark: { type: Boolean, required: false },
     disabled: { type: Boolean, required: false }, //v3: replace by v-btn
   },

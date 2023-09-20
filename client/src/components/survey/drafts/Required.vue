@@ -1,7 +1,7 @@
 <template>
   <v-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left">
     <template v-slot:activator="{ on, attrs }">
-      <a-icon size="small" color="red darken-2" v-bind="attrs" v-on="on" class="ml-1">mdi-asterisk</a-icon>
+      <a-icon small color="red darken-2" v-bind="attrs" v-on="on" class="ml-1">mdi-asterisk</a-icon>
     </template>
     <span>Required</span>
   </v-tooltip>

@@ -77,11 +77,9 @@
           class="file-list-item my-2"
         >
           <v-list-item-avatar>
-            <a-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" size="large">mdi-image</a-icon>
-            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" size="large"
-              >mdi-file-document-outline</a-icon
-            >
-            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" size="large">mdi-file-document-outline</a-icon>
+            <a-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" large>mdi-image</a-icon>
+            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</a-icon>
+            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</a-icon>
             <a-icon v-else large>mdi-file-outline</a-icon>
           </v-list-item-avatar>
           <v-list-item-content>
