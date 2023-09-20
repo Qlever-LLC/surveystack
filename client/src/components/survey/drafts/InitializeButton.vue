@@ -2,7 +2,7 @@
   <v-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left">
     <template v-slot:activator="{ on, attrs }">
       <v-btn icon v-bind="attrs" v-on="on">
-        <v-icon :color="highlight ? 'blue' : 'grey lighten-1'" @click.stop="$emit('initialize')"> mdi-refresh </v-icon>
+        <a-icon :color="highlight ? 'blue' : 'grey lighten-1'" @click.stop="$emit('initialize')"> mdi-refresh </a-icon>
       </v-btn>
     </template>
     <span>{{ tooltip }}</span>
@@ -10,7 +10,10 @@
 </template>
 
 <script>
+import AIcon from '@/components/ui/AIcon.vue';
+
 export default {
+  components: { AIcon },
   props: {
     top: {
       type: Boolean,

@@ -47,7 +47,7 @@
         @click.stop="showFileChooser"
       >
         <div class="col-12 pb-0">
-          <a-icon color="primary" size="x-large">mdi-cloud-upload-outline</a-icon>
+          <a-icon color="primary" x-large>mdi-cloud-upload-outline</a-icon>
         </div>
         <div class="col-12 font-weight-bold">
           {{ $vuetify.breakpoint.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
