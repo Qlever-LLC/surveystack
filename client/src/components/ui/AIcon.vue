@@ -8,7 +8,10 @@
     :large="large"
     :x-large="xLarge"
     :size="size"
+    :dark="dark"
+    :disabled="disabled"
     v-on="$listeners"
+    v-bind="$attrs"
   >
     <slot />
   </v-icon>
