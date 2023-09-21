@@ -270,15 +270,21 @@ export default {
           }
         }
 
+        if (this.header.type === 'dropdown') {
+          const arrayValue = Array.isArray(value) ? value : value ? [value] : [];
+          return this.header.multiple ? arrayValue : arrayValue[0] || value;
+        }
+
         return value;
       },
       set(value) {
+        let newValue = value;
         if (this.header.type == 'farmos_planting' || this.header.type == 'farmos_field') {
           if (value && !Array.isArray(value)) {
-            value = [value];
+            newValue = [value];
           }
         }
-        this.item[this.header.value].value = value;
+        this.item[this.header.value].value = newValue;
       },
     },
     localValue() {
@@ -372,9 +378,11 @@ export default {
             item.value.location.some((loc) => loc.id === field.location.id)
         )
       );
-      const noneExist = assetsToSelect.filter(
-        (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
-      );
+      const noneExist = assetsToSelect
+        .filter(
+          (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
+        )
+        .map((asset) => asset.value);
       assets.push(...noneExist);
 
       if (!Array.isArray(hashesArg)) {

@@ -2,6 +2,14 @@
   <div class="d-flex align-center control-label-wrapper" :class="className">
     <div class="control-label" v-if="value">{{ value }}</div>
     <v-spacer />
+    <initialize-button
+      v-if="initializable"
+      bottom
+      @initialize="$emit('initialize')"
+      :highlight="isModified"
+      :tooltip="initializeTooltip"
+    />
+    <app-redacted v-if="redacted" bottom />
     <app-redacted v-if="redacted" bottom />
     <app-required v-if="required" bottom />
   </div>
@@ -10,10 +18,12 @@
 <script>
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
+import InitializeButton from '@/components/survey/drafts/InitializeButton';
 
 export default {
-  props: ['value', 'required', 'redacted'],
+  props: ['value', 'required', 'redacted', 'initializable', 'isModified', 'initializeTooltip'],
   components: {
+    InitializeButton,
     appRequired,
     appRedacted,
   },
