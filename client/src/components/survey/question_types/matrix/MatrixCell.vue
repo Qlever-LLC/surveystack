@@ -43,7 +43,7 @@
     :disabled="disabled"
     :rules="[isValidNumber]"
   />
-  <v-select
+  <a-select
     v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
     :placeholder="header.multiple ? 'Select answers' : 'Select answer'"
     :value="value"
@@ -55,11 +55,12 @@
     :disabled="disabled"
     hide-details
     outlined
+    selectionSlot
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
-  </v-select>
+  </a-select>
   <v-autocomplete
     v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
     ref="dropdownRef"
@@ -222,11 +223,13 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
+import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   components: {
     appQrScanner,
     MatrixCellSelectionLabel,
+    ASelect,
   },
   props: {
     header: {

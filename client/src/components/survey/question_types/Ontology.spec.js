@@ -80,14 +80,14 @@ describe('Ontology question', () => {
   describe('Ontology List source', () => {
     it('sets value as an array in single selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts());
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       dropDown.vm.$emit('change', 'dog');
       expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
     });
 
     it('sets autocomplete input from value in single selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts({ value: ['dog'] }));
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       expect(dropDown.vm.value).toBe('dog');
     });
 
@@ -112,7 +112,7 @@ describe('Ontology question', () => {
 
     it('sets value as an array in multiple selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts({ hasMultipleSelections: true }));
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       dropDown.vm.$emit('change', ['cat', 'dog']);
       expect(wrapper.emitted().changed[0][0]).toEqual(['cat', 'dog']);
     });
@@ -125,7 +125,7 @@ describe('Ontology question', () => {
           value: ['cat', 'dog'],
         })
       );
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       expect(dropDown.vm.value).toEqual(['cat', 'dog']);
     });
 

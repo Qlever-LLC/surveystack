@@ -45,7 +45,7 @@
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />
-      <v-select
+      <a-select
         v-if="isDate"
         :items="dateTypes"
         label="Type"
@@ -86,7 +86,7 @@
         @set-control-required="control.options.required = true"
         class="mt-3"
       />
-      <v-select
+      <a-select
         v-if="this.control.type === 'file'"
         label="Restrict uploaded file types (.csv, .pdf, etc.)"
         v-model="control.options.source.types"
@@ -376,13 +376,16 @@
               />
             </div>
 
-            <v-select
+            <a-select
               label="Answer layout"
               v-model="control.options.printLayout.columns"
               :items="[1, 2, 3, 4, 5]"
               color="focus"
               :menu-props="{ contentClass: 'layout-select' }"
               hide-details
+              selectionSlot
+              itemSlot
+              appendOuterSlot
             >
               <template v-slot:selection="{ item, index }">
                 {{ item === 1 ? '1 column' : `${item} columns` }}
@@ -409,7 +412,7 @@
                   Set the number of items in a row
                 </v-tooltip>
               </template>
-            </v-select>
+            </a-select>
           </template>
         </div>
       </template>
@@ -430,6 +433,7 @@ import InstructionsImageSplitEditor from '@/components/builder/InstructionsImage
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
@@ -445,6 +449,7 @@ export default {
     Ontology,
     Date,
     Checkbox,
+    ASelect,
   },
   props: {
     control: {

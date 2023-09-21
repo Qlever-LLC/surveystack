@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>FarmOS Farm picker</h3>
-    <v-select
+    <a-select
       class="mt-2"
       :items="aggregators"
       v-model="selectedAggregator"
@@ -9,9 +9,9 @@
       outlined
       :hint="`Found ${aggregators.length} aggregators`"
       persistent-hint
-    ></v-select>
+    />
 
-    <v-select
+    <a-select
       class="mt-2"
       :items="farms"
       v-model="selectedFarm"
@@ -19,11 +19,13 @@
       outlined
       :hint="`Found ${farms.length} farms`"
       persistent-hint
-    ></v-select>
+    />
   </div>
 </template>
 
 <script>
+import ASelect from '@/components/ui/ASelect.vue';
+
 export default {
   props: {
     aggregators: {
@@ -33,6 +35,9 @@ export default {
       type: Object,
       default: () => {},
     },
+  },
+  components: {
+    ASelect,
   },
   data() {
     return {

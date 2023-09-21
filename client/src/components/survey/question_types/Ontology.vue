@@ -1,7 +1,7 @@
 <template>
   <div class="ontology question">
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
-    <v-select
+    <a-select
       v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
       :label="control.hint"
       :placeholder="getPlaceholder"
@@ -20,8 +20,10 @@
       outlined
       class="full-width dropdown"
       data-test-id="dropdown"
+      :selectionSlot="!!control.options.hasMultipleSelections"
+      :itemSlot="!!control.options.hasMultipleSelections"
     >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:selection="data">
         <v-chip
           v-bind="data.attrs"
           :input-value="data.selected"
@@ -32,7 +34,7 @@
           {{ data.item.label }}
         </v-chip>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:item="data">
         <v-list-item-content>
           <v-list-item-title>
             {{ data.item.label }}
@@ -42,7 +44,7 @@
           </v-list-item-title>
         </v-list-item-content>
       </template>
-    </v-select>
+    </a-select>
     <v-autocomplete
       v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
       ref="dropdownRef"
@@ -154,12 +156,14 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
     appControlLabel,
     appControlMoreInfo,
+    ASelect,
   },
   data() {
     return {

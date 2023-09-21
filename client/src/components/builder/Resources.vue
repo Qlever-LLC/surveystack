@@ -68,7 +68,7 @@
         </v-list>
       </v-menu>
     </div>
-    <v-select :items="availableFilters" v-model="filter" label="Filter" />
+    <a-select :items="availableFilters" v-model="filter" label="Filter" />
     <v-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
@@ -106,12 +106,14 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
 
 export default {
   components: {
     appOntologyListEditor,
+    ASelect,
   },
   props: {
     resources: {

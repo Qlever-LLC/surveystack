@@ -7,7 +7,7 @@
       <v-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
-        <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
+        <a-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
         <v-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import ASelect from '@/components/ui/ASelect.vue';
+
 export default {
   props: {
     persistent: Boolean,
@@ -43,6 +45,9 @@ export default {
       type: String,
       default: 'TEST_DATA',
     },
+  },
+  components: {
+    ASelect,
   },
   data() {
     return {

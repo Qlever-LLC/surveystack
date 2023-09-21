@@ -99,31 +99,28 @@
         <v-card-text>
           <v-row>
             <v-col md="2" sm="6">
-              <v-select
-                label="Format"
-                dense
-                :items="apiDownloadFormats"
-                hide-details
-                v-model="apiDownloadFormat"
-              /> </v-col
-            ><v-col md="2" sm="6">
-              <v-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" /></v-col
-            ><v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
-              <v-select
+              <a-select label="Format" dense :items="apiDownloadFormats" hide-details v-model="apiDownloadFormat" />
+            </v-col>
+            <v-col md="2" sm="6">
+              <a-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
+            </v-col>
+            <v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
+              <a-select
                 label="Matrix answers"
                 dense
                 :items="apiDownloadExpandAllMatricesOptions"
                 hide-details
                 v-model="apiDownloadExpandAllMatrices"
-              /> </v-col
-            ><v-col md="2" sm="6">
+              />
+            </v-col>
+            <v-col md="2" sm="6">
               <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
-            </v-col></v-row
-          >
+            </v-col>
+          </v-row>
 
           <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
             <v-col sm="2">
-              <v-select
+              <a-select
                 label="Page Size"
                 dense
                 :items="pageSizes"
@@ -183,7 +180,7 @@
 
       <v-row class="my-2">
         <v-col cols="1">
-          <v-select
+          <a-select
             style="max-width: 5rem; display: inline-block"
             label="Page Size"
             dense
@@ -223,6 +220,7 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -264,6 +262,7 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
+    ASelect,
   },
   data() {
     return {

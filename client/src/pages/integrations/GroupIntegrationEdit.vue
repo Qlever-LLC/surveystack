@@ -8,7 +8,7 @@
       <v-form class="mt-3" @keydown.enter.prevent="submit">
         <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
 
-        <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
+        <a-select :items="integrationTypes" v-model="entity.type" label="Type" outlined />
 
         <app-json-editor v-model="entity.data" />
         <div class="d-flex ma-2">
@@ -32,6 +32,7 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFeedback from '@/components/ui/Feedback.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -56,6 +57,7 @@ export default {
   components: {
     appJsonEditor,
     appFeedback,
+    ASelect,
   },
   data() {
     return {

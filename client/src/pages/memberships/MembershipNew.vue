@@ -4,7 +4,7 @@
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
       <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined />
 
         <v-text-field
           class="mt-3"
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import ASelect from '@/components/ui/ASelect.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { BtnDropdown, ASelect },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-autocomplete :items="fieldItems" label="Field" v-model="selectedField" hide-details />
-    <v-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
+    <a-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
     <v-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
 
     <div class="d-flex justify-end">
@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import ASelect from '@/components/ui/ASelect.vue';
+
 export default {
   props: {
     queryList: {
@@ -42,6 +44,9 @@ export default {
       type: Array,
       required: true,
     },
+  },
+  components: {
+    ASelect,
   },
   data() {
     return {

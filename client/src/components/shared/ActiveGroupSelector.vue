@@ -1,6 +1,6 @@
 <template>
   <div class="survey-group-selector">
-    <v-select
+    <a-select
       :value="value"
       @input="handleInput"
       :items="groupItems"
@@ -10,15 +10,18 @@
       :outlined="outlined"
       hide-details
       color="focus"
+      itemSlot
     >
       <template v-slot:item="{ item }">
         <span :class="item.className" :style="item.style">{{ item.text }}</span>
       </template>
-    </v-select>
+    </a-select>
   </div>
 </template>
 
 <script>
+import ASelect from '@/components/ui/ASelect.vue';
+
 function getGroupLevel(group) {
   return group.dir.match(/\//g).length;
 }
@@ -61,6 +64,9 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  components: {
+    ASelect,
   },
   computed: {
     groups() {

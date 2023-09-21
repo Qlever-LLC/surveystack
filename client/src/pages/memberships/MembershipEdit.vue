@@ -10,7 +10,7 @@
         </v-btn>
       </div>
       <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
+        <a-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
 
         <v-text-field v-model="entity.group" label="Group" disabled />
 
@@ -26,7 +26,7 @@
           hint="Default name for newly registered users"
         />
 
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" />
 
         <div class="d-flex mt-2">
           <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
@@ -101,6 +101,7 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 
 const availableRoles = [
   {
@@ -127,6 +128,7 @@ const availableStatus = [
 export default {
   components: {
     appDialog,
+    ASelect,
   },
   data() {
     return {

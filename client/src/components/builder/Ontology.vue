@@ -1,5 +1,5 @@
 <template>
-  <v-select
+  <a-select
     v-if="!customAnswer && !autocomplete"
     label="Default value"
     :value="getValue"
@@ -17,8 +17,9 @@
     hide-details
     class="full-width dropdown"
     data-test-id="dropdown"
+    :itemSlot="multiple"
   >
-    <template v-slot:item="data" v-if="multiple">
+    <template v-slot:item="data">
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
@@ -28,7 +29,7 @@
         </v-list-item-title>
       </v-list-item-content>
     </template>
-  </v-select>
+  </a-select>
   <v-autocomplete
     v-else-if="!customAnswer && autocomplete"
     ref="dropdownRef"
@@ -116,6 +117,7 @@ import { isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   props: {
@@ -127,6 +129,9 @@ export default {
     outlined: { type: Boolean, default: false },
     source: { type: String },
     resources: { default: () => [] },
+  },
+  components: {
+    ASelect,
   },
   data() {
     return {

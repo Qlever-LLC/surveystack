@@ -8,7 +8,7 @@
         </b></v-col
       >
       <v-col v-else cols="auto" class="pa-0">
-        <v-select
+        <a-select
           outlined
           dense
           hide-details
@@ -46,9 +46,14 @@
   </v-container>
 </template>
 <script>
+import ASelect from '@/components/ui/ASelect.vue';
+
 export default {
   name: 'library-change-type-selector',
   props: ['value', 'disabled', 'label'],
+  components: {
+    ASelect,
+  },
   data() {
     return {
       content: this.value,
