@@ -31,17 +31,10 @@
           </v-btn-toggle>
 
           <template v-if="viewMode === 0">
-            <label for="fileRef" class="ml-auto mr-2">
-              <v-btn dense>
-                <v-icon class="mr-1">mdi-upload</v-icon>
-                Add Image
-              </v-btn>
-            </label>
-            <v-btn color="primary" dense :disabled="resourceOpen" @click="openResource">
+            <v-btn class="ml-auto" color="primary" dense :disabled="resourceOpen" @click="openResource">
               <v-icon class="mr-1">mdi-plus</v-icon>
-              Add Resource
+              Add Image
             </v-btn>
-            <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
           </template>
         </div>
 
@@ -67,25 +60,54 @@
             </div>
           </div>
 
-          <v-list
+          <div
+            class="ressourceBloc"
             v-if="resourceOpen"
-            class="resource-panel"
             :class="{
               'd-none': viewMode !== 0,
             }"
-            dense
           >
-            <v-subheader>
-              Survey Resources
-              <v-btn class="ml-auto" icon @click="resourceOpen = false"><v-icon>mdi-close</v-icon></v-btn>
-            </v-subheader>
+            <div class="toolbar">
+              <label for="fileRef">
+                <v-btn dense class="mb-1">
+                  <v-icon class="mr-1">mdi-upload</v-icon>
+                  Import Local Image
+                </v-btn>
+              </label>
+              <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
+            </div>
+            <v-list class="resource-panel" dense>
+              <v-subheader>
+                Survey Resources
+                <v-btn class="ml-auto" icon @click="resourceOpen = false"><v-icon>mdi-close</v-icon></v-btn>
+              </v-subheader>
 
-            <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
-              <v-list-item-content>
-                <v-list-item-title>{{ item.label }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+              <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
+                <v-list-item-content>
+                  <v-list-item-title>{{ item.label }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+            <div class="d-flex align-end">
+              <v-text-field
+                label="Image URL"
+                hide-details
+                clearable
+                class="mr-2"
+                v-model="imageUrl"
+                @click:clear="onClearImageUrl"
+              />
+              <v-btn dense @click="importImageFromUrl">import</v-btn>
+            </div>
+            <div
+              :class="{
+                'd-none': UrlErrorState === 0,
+              }"
+              style="color: red"
+            >
+              Unable to import this image
+            </div>
+          </div>
         </div>
       </v-card-text>
 
@@ -122,6 +144,8 @@ export default {
       markdown: '',
       caretPosition: 0,
       viewMode: 0,
+      imageUrl: '',
+      UrlErrorState: 0,
     };
   },
   computed: {
@@ -233,8 +257,33 @@ export default {
       if (!file) {
         return;
       }
-
       await this.createFileResource(file);
+    },
+    onClearImageUrl() {
+      this.UrlErrorState = 0;
+    },
+    secureUrl(url) {
+      const indexInterrogation = url.indexOf('?');
+      if (indexInterrogation !== -1) {
+        return url.slice(0, indexInterrogation);
+      } else {
+        return url;
+      }
+    },
+    async importImageFromUrl() {
+      const imageUrl = this.secureUrl(this.imageUrl);
+
+      const fileExtension = imageUrl.split('.').pop().toLowerCase();
+
+      try {
+        await fetch(imageUrl).then(async (response) => {
+          const blob = await response.blob();
+          const file = new File([blob], imageUrl, { type: `image/${fileExtension}` });
+          await this.createFileResource(file);
+        });
+      } catch (error) {
+        this.UrlErrorState = 1;
+      }
     },
     close() {
       this.open = false;
@@ -298,7 +347,7 @@ export default {
 }
 
 >>> .editor .v-textarea.resource textarea {
-  min-height: 300px;
+  min-height: 400px;
 }
 
 >>> .editor textarea {
@@ -320,9 +369,13 @@ export default {
   transition: none;
 }
 
->>> .resource-panel {
+.ressourceBloc {
   width: 300px;
   margin-left: 12px;
+  text-align: center;
+}
+
+>>> .resource-panel {
   min-height: 300px;
   border: 1px solid #ddd;
   padding: 0px;
