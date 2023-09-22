@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import uuidv4 from 'uuid/v4';
+import assert from 'assert';
 
 import { db } from '../db';
 
@@ -28,7 +29,7 @@ const createDefaultAdmin = async () => {
   const authProviders = [];
 
   try {
-    const created = await db.collection('users').insertOne({
+    const user = {
       _id,
       email,
       name,
@@ -36,11 +37,13 @@ const createDefaultAdmin = async () => {
       password,
       permissions,
       authProviders,
-    });
-    console.log('Created admin', created.ops[0]);
+    };
+    const insertResult = await db.collection('users').insertOne(user);
+    assert.strictEqual(insertResult?.acknowledged, true);
+    console.log('Created default super admin.');
   } catch (error) {
     console.log(error);
-    console.log('Could not create default super admin');
+    console.log('Could not create default super admin.');
   }
 };
 

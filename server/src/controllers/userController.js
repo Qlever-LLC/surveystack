@@ -198,7 +198,7 @@ const getOwnership = async (req, res) => {
 const createUser = async (req, res) => {
   const entity = req.body;
 
-  const { email, name, password, memberships } = entity;
+  const { email, name, password } = entity;
   if (password.trim() === '') {
     throw boom.badRequest('Password must not be empty');
   }
@@ -206,6 +206,7 @@ const createUser = async (req, res) => {
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
   const user = {
+    _id: new ObjectId(entity._id),
     email,
     name,
     token,
@@ -214,11 +215,10 @@ const createUser = async (req, res) => {
     authProviders: [],
   };
 
-  // TODO: only allow admins of group to create memberships
   try {
-    let r = await db.collection(col).insertOne({ ...user, _id: new ObjectId(entity._id) });
-    assert.equal(1, r.insertedCount);
-    return res.send(r.ops[0]);
+    const insertResult = await db.collection(col).insertOne(user);
+    assert.equal(insertResult?.acknowledged, true);
+    return res.send(user);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       return res.status(409).send({ message: `User with _id already exists: ${entity._id}` });
@@ -271,7 +271,7 @@ const updateUser = async (req, res) => {
       .findOneAndUpdate(
         { _id: new ObjectId(id) },
         { $set: updatedUser },
-        { returnOriginal: false }
+        { returnDocument: 'after' }
       );
     return res.send(updated);
   } catch (err) {
@@ -289,8 +289,8 @@ const deleteUser = async (req, res) => {
         message: `No entity with _id exists: ${id}`,
       });
     }
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
+    const deleteResult = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    assert.equal(1, deleteResult.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });

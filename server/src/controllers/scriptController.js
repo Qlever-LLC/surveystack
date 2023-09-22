@@ -79,9 +79,9 @@ const createScript = async (req, res) => {
   entity.meta.creator = res.locals.auth.user._id;
 
   try {
-    let r = await db.collection(col).insertOne(entity);
-    assert.equal(1, r.insertedCount);
-    return res.send(r);
+    const insertResult = await db.collection(col).insertOne(entity);
+    assert.equal(insertResult?.acknowledged, true);
+    return res.send({ _id: insertResult.insertedId, ...entity });
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       throw boom.conflict(`Entity with _id already exists: ${entity._id}`);
@@ -103,7 +103,7 @@ const updateScript = async (req, res) => {
       { _id: new ObjectId(id) },
       { $set: entity },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
     return res.send(updated);
@@ -116,8 +116,8 @@ const updateScript = async (req, res) => {
 const deleteScript = async (req, res) => {
   const { id } = req.params;
   try {
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
+    const deleteResult = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    assert.equal(1, deleteResult.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });

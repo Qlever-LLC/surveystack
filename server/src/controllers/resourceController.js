@@ -50,8 +50,8 @@ const getUploadURL = async (req, res) => {
       resource.contentLength
     );
     // add resource entry to our db
-    let r = await addResource(resource, res.locals.auth.user, LOCATION_S3);
-    assert.equal(1, r.insertedCount);
+    const insertResult = await addResource(resource, res.locals.auth.user, LOCATION_S3);
+    assert.equal(insertResult?.acknowledged, true);
     return res.send({ signedUrl });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
@@ -67,7 +67,7 @@ const addResource = async (resource, user, location) => {
     dateCreated: new Date(),
     dateModified: null,
   };
-  return await db.collection(col).insertOne(resource);
+  return db.collection(col).insertOne(resource);
 };
 
 const commitResource = async (req, res) => {
@@ -83,7 +83,7 @@ const commitResource = async (req, res) => {
 
   try {
     // set resource to committed state
-    let r = await db.collection(col).updateOne(
+    const updateResult = await db.collection(col).updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
@@ -92,7 +92,7 @@ const commitResource = async (req, res) => {
         },
       }
     );
-    assert.equal(1, r.modifiedCount);
+    assert.equal(1, updateResult.modifiedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
@@ -116,8 +116,8 @@ const deleteResource = async (req, res) => {
     assert.equal(204, deleteResult.$metadata.httpStatusCode);
 
     //delete resource in surveystack
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(resource._id) });
-    assert.equal(1, r.deletedCount);
+    const result = await db.collection(col).deleteOne({ _id: new ObjectId(resource._id) });
+    assert.equal(1, result.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
