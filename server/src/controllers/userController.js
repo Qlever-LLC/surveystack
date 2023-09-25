@@ -124,7 +124,9 @@ const getOwnership = async (req, res) => {
         _id: { $in: groupIds.map((id) => new ObjectId(id)) },
       },
       {
-        name: 1,
+        projection: {
+          name: 1,
+        },
       }
     )
     .toArray();
@@ -158,7 +160,9 @@ const getOwnership = async (req, res) => {
         _id: { $in: userIds.map((id) => new ObjectId(id)) },
       },
       {
-        email: 1,
+        projection: {
+          email: 1,
+        },
       }
     )
     .toArray();

@@ -1126,8 +1126,10 @@ describe('farmos-controller', () => {
           },
         },
         {
-          email: 1,
-          name: 1,
+          projection: {
+            email: 1,
+            name: 1,
+          },
         }
       )
       .toArray();
