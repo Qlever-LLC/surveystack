@@ -29,25 +29,15 @@
             <v-btn>Edit</v-btn>
             <v-btn>Preview</v-btn>
           </v-btn-toggle>
-
-          <template v-if="viewMode === 0">
-            <v-btn class="ml-auto" color="primary" dense :disabled="resourceOpen" @click="openResource">
-              <v-icon class="mr-1">mdi-plus</v-icon>
-              Add Image
-            </v-btn>
-          </template>
         </div>
 
         <div class="d-flex align-stretch">
           <div class="editor">
-            <div v-if="viewMode === 0 && resourceOpen" class="alignHCenter">
-              <b>Upload an image file, pick one from your survey resources, or add one with a URL</b>
-            </div>
             <v-textarea
               v-if="viewMode === 0"
               ref="editorRef"
               v-model="markdown"
-              :class="{ resource: resourceOpen }"
+              class="resource"
               :readonly="showAttach"
               auto-grow
               hide-details
@@ -64,26 +54,20 @@
           </div>
 
           <div
-            class="ressourceBloc alignHCenter d-flex flex-column justify-space-around"
-            v-if="viewMode === 0 && resourceOpen"
+            class="ressourceBloc d-flex flex-column"
+            v-if="viewMode === 0"
             :class="{
               'd-none': viewMode !== 0,
             }"
           >
-            <div class="toolbar">
+            <div class="toolbar mb-3" style="font-weight: 600; font-size: 1rem">
               <label for="fileRef">
-                <v-btn dense class="mb-1">
-                  <v-icon class="mr-1">mdi-upload</v-icon>
-                  Import Local Image
-                </v-btn>
+                <a> + Upload new image </a>
               </label>
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
-            <v-list class="resource-panel" dense>
-              <v-subheader>
-                Survey Resources
-                <v-btn class="ml-auto" icon @click="resourceOpen = false"><v-icon>mdi-close</v-icon></v-btn>
-              </v-subheader>
+            <v-list class="resource-panel">
+              <v-subheader class="px-2 py-0">Clic to insert </v-subheader>
 
               <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
                 <v-list-item-content>
@@ -91,25 +75,6 @@
                 </v-list-item-content>
               </v-list-item>
             </v-list>
-            <div class="d-flex align-end">
-              <v-text-field
-                label="Image URL"
-                hide-details
-                clearable
-                class="mr-2"
-                v-model="imageUrl"
-                @click:clear="onClearImageUrl"
-              />
-              <v-btn dense @click="importImageFromUrl">insert</v-btn>
-            </div>
-            <div
-              :class="{
-                'd-none': UrlErrorState === 0,
-              }"
-              style="color: red"
-            >
-              Unable to download this image
-            </div>
           </div>
         </div>
       </v-card-text>
@@ -141,19 +106,16 @@ export default {
   data() {
     return {
       open: false,
-      resourceOpen: false,
       showAttach: false,
       isLoading: false,
       markdown: '',
       caretPosition: 0,
       viewMode: 0,
-      imageUrl: '',
-      UrlErrorState: 0,
     };
   },
   computed: {
     getDialogWidth() {
-      return this.resourceOpen ? 1050 : 750;
+      return 1050;
     },
     getText() {
       const text = this.value || '';
@@ -213,12 +175,6 @@ export default {
 
       this.isLoading = false;
     },
-    openResource() {
-      this.resourceOpen = true;
-      this.$nextTick(() => {
-        this.$refs.editorRef.focus();
-      });
-    },
     updateCaretPosition() {
       const el = this.$refs.editorRef;
       this.caretPosition =
@@ -262,9 +218,17 @@ export default {
       }
       await this.createFileResource(file);
     },
-    onClearImageUrl() {
-      this.UrlErrorState = 0;
-    },
+
+    /*<v-text-field
+      label="Image URL"
+      hide-details
+      clearable
+      class="mr-2"
+      v-model="imageUrl"
+      @click:clear="onClearImageUrl"
+    />
+    <v-btn dense @click="importImageFromUrl">insert</v-btn>
+
     secureUrl(url) {
       const indexInterrogation = url.indexOf('?');
       if (indexInterrogation !== -1) {
@@ -287,7 +251,7 @@ export default {
       } catch (error) {
         this.UrlErrorState = 1;
       }
-    },
+    },*/
     close() {
       this.open = false;
       this.$refs.anchorRef.blur();
@@ -302,8 +266,6 @@ export default {
       if (!val) {
         return;
       }
-
-      this.resourceOpen = false;
       this.isLoading = false;
       this.viewMode = 0;
       this.markdown = this.value || '';
@@ -372,16 +334,16 @@ export default {
   transition: none;
 }
 
-.alignHCenter {
-  text-align: center;
-}
 .ressourceBloc {
-  width: 300px;
+  text-align: center;
+  width: 250px;
   margin-left: 12px;
 }
 
 >>> .resource-panel {
+  height: 100%;
   min-height: 300px;
+  max-height: 465px;
   border: 1px solid #ddd;
   padding: 0px;
   overflow-y: auto;
