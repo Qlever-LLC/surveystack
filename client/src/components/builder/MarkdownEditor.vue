@@ -40,6 +40,9 @@
 
         <div class="d-flex align-stretch">
           <div class="editor">
+            <div v-if="viewMode === 0 && resourceOpen" class="alignHCenter">
+              <b>Upload an image file, pick one from your survey resources, or add one with a URL</b>
+            </div>
             <v-textarea
               v-if="viewMode === 0"
               ref="editorRef"
@@ -61,8 +64,8 @@
           </div>
 
           <div
-            class="ressourceBloc"
-            v-if="resourceOpen"
+            class="ressourceBloc alignHCenter d-flex flex-column justify-space-around"
+            v-if="viewMode === 0 && resourceOpen"
             :class="{
               'd-none': viewMode !== 0,
             }"
@@ -97,7 +100,7 @@
                 v-model="imageUrl"
                 @click:clear="onClearImageUrl"
               />
-              <v-btn dense @click="importImageFromUrl">import</v-btn>
+              <v-btn dense @click="importImageFromUrl">insert</v-btn>
             </div>
             <div
               :class="{
@@ -105,7 +108,7 @@
               }"
               style="color: red"
             >
-              Unable to import this image
+              Unable to download this image
             </div>
           </div>
         </div>
@@ -369,10 +372,12 @@ export default {
   transition: none;
 }
 
+.alignHCenter {
+  text-align: center;
+}
 .ressourceBloc {
   width: 300px;
   margin-left: 12px;
-  text-align: center;
 }
 
 >>> .resource-panel {
