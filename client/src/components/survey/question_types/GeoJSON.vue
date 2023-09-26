@@ -2,6 +2,20 @@
   <div>
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
+    <v-snackbar top light v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1">
+      Keep this window open while tracing your area or field. If you switch applications you may lose the area you have
+      traced.
+      <v-btn
+        v-bind="$attrs"
+        @click="keepOpenNotificationIsVisible = false"
+        rounded
+        depressed
+        color="primary"
+        class="d-block ml-auto"
+      >
+        Dismiss
+      </v-btn>
+    </v-snackbar>
     <div
       :id="mapId"
       :class="{
@@ -93,7 +107,8 @@ export async function addDrawingLayer(map, value) {
   }
 
   await map.addBehavior('edit', { layer });
-  await map.addBehavior('measure', { layer });
+  // TODO: fix or get rid of
+  // await map.addBehavior('measure', { layer });
 
   return layer;
 }
@@ -121,6 +136,7 @@ export default {
       mapId: `farmos-map-${Math.floor(Math.random() * 1e4)}`,
       mapInstance: null,
       fields: [],
+      keepOpenNotificationIsVisible: false,
     };
   },
   computed: {
@@ -146,6 +162,7 @@ export default {
       const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
       this.mapInstance.edit.geoJSONOn('featurechange', mapChangeHandler);
       this.mapInstance.edit.controlActivateOn('geotrace', (active) => {
+        this.keepOpenNotificationIsVisible = active;
         this.$store.dispatch('draft/setNextEnable', !active);
       });
 
