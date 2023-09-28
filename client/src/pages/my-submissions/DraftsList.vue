@@ -1,7 +1,5 @@
 <template>
   <div :class="{ 'mb-16': showFooter }">
-    <draft-filter class="mb-6"></draft-filter>
-
     <div v-if="isLoading && drafts.length === 0" class="d-flex justify-center my-8">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
     </div>
@@ -28,12 +26,10 @@
 import { computed, defineComponent } from '@vue/composition-api';
 import DraftCard from '@/components/my-submissions/Card.vue';
 import DraftFooter from '@/components/my-submissions/DraftFooter.vue';
-import DraftFilter from '@/components/my-submissions/DraftFilter.vue';
 
 export default defineComponent({
   components: {
     DraftCard,
-    DraftFilter,
     DraftFooter,
   },
   setup(props, { root }) {

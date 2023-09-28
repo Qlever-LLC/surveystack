@@ -2,7 +2,10 @@
   <v-dialog v-model="isOpen" :persistent="isLoading" max-width="400">
     <v-card class="d-flex flex-column">
       <v-card-title> Delete Submission </v-card-title>
-      <v-card-text class="pt-0"> This action cannot be undone. Are you sure you want to delete? </v-card-text>
+      <v-card-text class="pt-0">
+        This will delete the selected submission completely from your phone and the cloud. An organization you are part
+        of may need this data. Are you sure?
+      </v-card-text>
       <v-spacer></v-spacer>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -42,7 +45,7 @@ export default defineComponent({
     const handleDelete = async () => {
       isLoading.value = true;
       error.value = '';
-      const success = await root.$store.dispatch('mySubmissions/deleteSubmission', [props.submission._id]);
+      const success = await root.$store.dispatch('mySubmissions/deleteSubmissions', [props.submission._id]);
       isLoading.value = false;
 
       if (success) {

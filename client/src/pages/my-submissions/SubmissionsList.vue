@@ -1,7 +1,5 @@
 <template>
   <div :class="{ 'mb-16': showFooter }">
-    <submission-filter class="mb-6"></submission-filter>
-
     <div v-if="isLoading && submissions.length === 0" class="d-flex justify-center my-8">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
     </div>
@@ -25,13 +23,13 @@
 <script>
 import { computed, defineComponent } from '@vue/composition-api';
 import SubmissionCard from '@/components/my-submissions/Card.vue';
-import SubmissionFilter from '@/components/my-submissions/SubmissionFilter.vue';
 import SubmissionFooter from '@/components/my-submissions/SubmissionFooter.vue';
+import DraftCard from '@/components/my-submissions/Card.vue';
 
 export default defineComponent({
   components: {
+    DraftCard,
     SubmissionCard,
-    SubmissionFilter,
     SubmissionFooter,
   },
   setup(props, { root }) {

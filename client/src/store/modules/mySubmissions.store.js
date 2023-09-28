@@ -14,10 +14,10 @@ const createInitialState = () => ({
   totalPage: 1,
   filter: {
     surveyIds: [],
-    hideArchived: true,
-    resubmitter: true,
-    proxyUserId: true,
-    creator: true,
+    submitted: true,
+    resubmitted: true,
+    proxied: true,
+    archived: false,
   },
 });
 
@@ -34,13 +34,14 @@ const getters = {
   filter: (state) => state.filter,
   filterType: (state) => {
     const indexes = [];
-    if (state.filter.creator) indexes.push(0);
-    if (state.filter.proxyUserId) indexes.push(1);
-    if (state.filter.resubmitter) indexes.push(2);
+    if (state.filter.submitted) indexes.push('submitted');
+    if (state.filter.resubmitted) indexes.push('resubmitted');
+    if (state.filter.proxied) indexes.push('proxied');
+    if (state.filter.archived) indexes.push('archived');
     return indexes;
   },
   isSelected: (state) => (id) => state.selectedIds.includes(id),
-  selected: (state) => state.submissions.filter((item) => state.selectedIds.includes(item._id)),
+  selected: (state) => state.submissions.filter((item) => state.selectedIds.includes(item._id)), //TODO REMOVE?
 };
 
 const mutations = {
@@ -138,17 +139,17 @@ const actions = {
     state.filter.surveyIds.forEach((id) => {
       params.append('surveyIds[]', id);
     });
-    if (state.filter.resubmitter) {
-      params.append('resubmitter', '1');
+    if (state.filter.submitted) {
+      params.append('submitted', '1');
     }
-    if (state.filter.proxyUserId) {
-      params.append('proxyUserId', '1');
+    if (state.filter.resubmitted) {
+      params.append('resubmitted', '1');
     }
-    if (state.filter.creator) {
-      params.append('creator', '1');
+    if (state.filter.proxied) {
+      params.append('proxied', '1');
     }
-    if (state.filter.hideArchived) {
-      params.append('hideArchived', '1');
+    if (state.filter.archived) {
+      params.append('archived', '1');
     }
 
     try {
@@ -250,17 +251,17 @@ const actions = {
     commit('SET_SURVEYS', []);
 
     const params = new URLSearchParams();
-    if (state.filter.resubmitter) {
-      params.append('resubmitter', '1');
+    if (state.filter.submitted) {
+      params.append('submitted', '1');
     }
-    if (state.filter.proxyUserId) {
-      params.append('proxyUserId', '1');
+    if (state.filter.resubmitted) {
+      params.append('resubmitted', '1');
     }
-    if (state.filter.creator) {
-      params.append('creator', '1');
+    if (state.filter.proxied) {
+      params.append('proxied', '1');
     }
-    if (state.filter.hideArchived) {
-      params.append('hideArchived', '1');
+    if (state.filter.archived) {
+      params.append('archived', '1');
     }
 
     try {

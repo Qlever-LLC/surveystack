@@ -9,7 +9,10 @@
     <v-card class="d-flex flex-column">
       <v-card-title> Delete Submissions </v-card-title>
 
-      <v-card-text class="pt-0"> This action cannot be undone. Are you sure you want to delete? </v-card-text>
+      <v-card-text class="pt-0">
+        This will delete the selected submissions completely from your phone and the cloud. An organization you are part
+        of may need this data. Are you sure?
+      </v-card-text>
 
       <v-spacer></v-spacer>
 

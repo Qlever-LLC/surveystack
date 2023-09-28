@@ -1,8 +1,13 @@
 <template>
   <div>
-    <v-breadcrumbs :items="links">
+    <v-breadcrumbs :items="links" :class="noPadding ? 'pa-0' : ''">
       <template v-slot:divider>
         <v-icon>mdi-chevron-right</v-icon>
+      </template>
+      <template v-slot:item="{ item }">
+        <v-breadcrumbs-item :to="item.to" :exact="item.exact" :disabled="disabled">
+          {{ item.text }}
+        </v-breadcrumbs-item>
       </template>
     </v-breadcrumbs>
   </div>
@@ -15,9 +20,17 @@ export default {
       type: String,
       default: '/',
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
     disabledSuffix: {
       type: String,
       default: null,
+    },
+    noPadding: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

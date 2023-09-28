@@ -20,8 +20,8 @@ const createInitialState = () => ({
   selectedIds: [],
   filter: {
     surveyIds: [],
-    local: true,
-    remote: true,
+    draft: true,
+    readyToSubmit: true,
   },
 });
 
@@ -34,31 +34,29 @@ const getters = {
   totalPage: (state, getters) => (state.isLoading ? 1 : Math.ceil(getters.drafts.length / PER_PAGE)),
   readyToSubmit: (state) => state.drafts.filter((item) => item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT')),
   surveys: (state) => state.surveys,
-  drafts: (state, getters) => {
+  drafts: (state) => {
     let drafts = state.drafts;
     if (state.filter.surveyIds.length > 0) {
       drafts = drafts.filter((item) => state.filter.surveyIds.includes(item.meta.survey.id));
     }
-    if (!state.filter.local) {
-      drafts = drafts.filter((item) => getters.isRemote(item._id));
+    if (!state.filter.draft) {
+      drafts = drafts.filter((item) => item.meta.status.length > 0); //drafts do not have a status, so only keep those with a status
     }
-    if (!state.filter.remote) {
-      drafts = drafts.filter((item) => getters.isLocal(item._id));
+    if (!state.filter.readyToSubmit) {
+      drafts = drafts.filter((item) => !item.meta.status.some((s) => s.type === 'READY_TO_SUBMIT'));
     }
-
     return drafts.slice(state.page - 1, state.page - 1 + PER_PAGE);
   },
   filter: (state) => state.filter,
   filterType: (state) => {
     const indexes = [];
-    if (state.filter.local) indexes.push(0);
-    if (state.filter.remote) indexes.push(1);
+    if (state.filter.draft) indexes.push('draft');
+    if (state.filter.readyToSubmit) indexes.push('readyToSubmit');
     return indexes;
   },
-  isLocal: (state) => (id) => state.localDrafts.some((item) => item._id === id),
-  isRemote: (state) => (id) => state.remoteDrafts.some((item) => item._id === id),
+  isLocal: (state) => (id) => state.localDrafts.some((item) => item._id === id), //TODO change ot isLocallyChanged or locallyModified or offlineChanged or...
   isSelected: (state) => (id) => state.selectedIds.includes(id),
-  selected: (state, getters) => getters.drafts.filter((item) => state.selectedIds.includes(item._id)),
+  selected: (state, getters) => getters.drafts.filter((item) => state.selectedIds.includes(item._id)), //TODO REMOVE?
 };
 
 const mutations = {
@@ -136,20 +134,10 @@ const actions = {
     commit('CLEAR_SELECTION');
   },
 
-  async fetchLocalDrafts({ commit, rootGetters }) {
+  async fetchLocalDrafts({ commit }) {
     try {
       let localDrafts = await db.getAllSubmissions();
-
-      const user = rootGetters['auth/user']._id;
-      localDrafts = localDrafts
-        ? localDrafts.filter(
-            (item) => item.meta.resubmitter === user || item.meta.proxyUserId === user || item.meta.creator === user
-          )
-        : [];
-
       commit('SET_LOCAL_DRAFTS', localDrafts);
-
-      return localDrafts;
     } catch (e) {
       console.warn('Failed to get all submissions from the IDB', e);
       commit('SET_LOCAL_DRAFTS', []);
@@ -291,13 +279,18 @@ const actions = {
    * - Delete remote drafts
    * - After fetch all drafts
    */
+  //TODO see this, conflict resolution seems to be implemented already somehow
   async refreshDrafts({ state, commit, dispatch }) {
     const drafts = [];
     const localIdsToDelete = [];
     const remoteIdsToDelete = [];
-    const newDrafts = [...state.remoteDrafts.map((item) => ({ ...item, remote: true })), ...state.localDrafts].sort(
-      sortByModifiedDate
-    );
+    const newDrafts = [
+      ...state.remoteDrafts.map((item) => ({
+        ...item,
+        remote: true,
+      })),
+      ...state.localDrafts,
+    ].sort(sortByModifiedDate);
     newDrafts.forEach((item) => {
       // Existing draft win - means we might have duplicated draft in both server and local.
       // So, we should remove others to ensure the source of truth.
@@ -486,22 +479,28 @@ const actions = {
     commit('SET_FETCHING_SURVEYS', true);
     commit('SET_SURVEYS', []);
 
+    const remoteAndLocalDrafts = state.localDrafts.concat(state.remoteDrafts);
     let surveyIds = [];
-    if (state.filter.local) {
+    if (state.filter.draft) {
       surveyIds.push(
-        ...state.localDrafts.map((item) => item.meta.survey.id).filter((item) => typeof item === 'string')
+        ...remoteAndLocalDrafts
+          .filter((item) => !item.meta.status || item.meta.status.every((i) => i.type !== 'READY_TO_SUBMIT'))
+          .map((item) => item.meta.survey.id)
       );
     }
-    if (state.filter.remote) {
+    if (state.filter.readyToSubmit) {
       surveyIds.push(
-        ...state.remoteDrafts.map((item) => item.meta.survey.id).filter((item) => typeof item === 'string')
+        ...remoteAndLocalDrafts
+          .filter((item) => !item.meta.status || item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT'))
+          .map((item) => item.meta.survey.id)
       );
     }
     surveyIds = [...new Set(surveyIds)];
     if (surveyIds.length > 0) {
       const params = new URLSearchParams();
       surveyIds.forEach((id) => {
-        params.append('ids[]', id);
+        if (typeof id === 'string') params.append('ids[]', id);
+        else console.error('id is not a string:' + id); //TODO prevent this
       });
 
       try {

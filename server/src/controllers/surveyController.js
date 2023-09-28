@@ -104,18 +104,12 @@ const buildPipelineForGetSurveysForMySubmissions = (req, res) => {
                   },
                   {
                     $or: [
-                      ...(queryParam(req.query.resubmitter)
-                        ? [{ $eq: ['$meta.resubmitter', user] }]
-                        : []),
-                      ...(queryParam(req.query.proxyUserId)
-                        ? [{ $eq: ['$meta.proxyUserId', user] }]
-                        : []),
-                      ...(queryParam(req.query.creator) ? [{ $eq: ['$meta.creator', user] }] : []),
+                      { $eq: ['$meta.resubmitter', user] },
+                      { $eq: ['$meta.proxyUserId', user] },
+                      { $eq: ['$meta.creator', user] },
                     ],
                   },
-                  ...(queryParam(req.query.hideArchived)
-                    ? [{ $ne: ['$meta.archived', true] }]
-                    : []),
+                  ...(!queryParam(req.query.archived) ? [{ $ne: ['$meta.archived', true] }] : []),
                 ],
               },
             },
@@ -149,19 +143,8 @@ const buildPipelineForGetSurveysForMySubmissions = (req, res) => {
  * @returns             array,          // Surveys { ID, name }
  */
 const getSurveysForMySubmissions = async (req, res) => {
-  if (
-    !queryParam(req.query.resubmitter) &&
-    !queryParam(req.query.proxyUserId) &&
-    !queryParam(req.query.creator)
-  ) {
-    throw boom.badRequest(
-      "Bad query parameter, at least one flag should be set among the 'resubmitter', 'proxyUserId', 'creator'"
-    );
-  }
-
   const pipeline = buildPipelineForGetSurveysForMySubmissions(req, res);
   const surveys = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
-
   return res.send(surveys);
 };
 

@@ -1,113 +1,53 @@
 <template>
-  <div class="wrapper background flex flex-column">
-    <v-card class="d-flex align-center px-sm-6 space-x-4">
-      <v-tabs v-model="tab" :height="72" :grow="!readyToSubmitShowOnTabs">
-        <v-tab>
-          <div class="d-flex flex-column flex-sm-row align-center">
-            <v-icon class="mr-2">mdi-file-document-edit</v-icon>
-            My Drafts
-          </div>
-        </v-tab>
-        <v-tab>
-          <div class="d-flex flex-column flex-sm-row align-center">
-            <v-icon class="mr-2">mdi-email-check</v-icon>
-            My Submissions
-          </div>
-        </v-tab>
-      </v-tabs>
-
-      <v-spacer v-if="readyToSubmitShow && readyToSubmitShowOnTabs" />
-
-      <draft-submit-bulk
-        v-if="readyToSubmitShow && readyToSubmitShowOnTabs"
-        v-slot="{ on, attrs }"
-        :drafts="readyToSubmit"
-      >
-        <v-btn v-bind="attrs" color="primary" v-on="on">
-          <v-icon class="mr-2">mdi-cloud-upload-outline</v-icon>
-          Submit Completed ({{ readyToSubmit.length }})
-        </v-btn>
-      </draft-submit-bulk>
-    </v-card>
-
-    <v-container class="flex-grow-1">
-      <draft-submit-bulk
-        v-if="readyToSubmitShow && !readyToSubmitShowOnTabs"
-        class="d-flex justify-end"
-        v-slot="{ on, attrs }"
-        :drafts="readyToSubmit"
-      >
-        <v-btn v-bind="attrs" color="primary" v-on="on">
-          <v-icon class="mr-2">mdi-cloud-upload-outline</v-icon>
-          Submit Completed ({{ readyToSubmit.length }})
-        </v-btn>
-      </draft-submit-bulk>
-
-      <v-tabs-items v-model="tab" class="background mt-4">
-        <v-tab-item>
-          <drafts-list></drafts-list>
-        </v-tab-item>
-        <v-tab-item>
-          <submissions-list></submissions-list>
-        </v-tab-item>
-      </v-tabs-items>
+  <div class="wrapper">
+    <v-container>
+      <my-submissions-filter />
+      <drafts-list />
+      <submissions-list />
     </v-container>
   </div>
 </template>
 
 <script>
-import { computed, defineComponent, watch } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 import DraftsList from './DraftsList.vue';
 import SubmissionsList from './SubmissionsList.vue';
 import DraftSubmitBulk from '@/components/my-submissions/actions/DraftSubmitBulk.vue';
+import MySubmissionsFilter from '@/components/my-submissions/Filter.vue';
 
 export default defineComponent({
   components: {
+    MySubmissionsFilter,
     DraftsList,
     SubmissionsList,
     DraftSubmitBulk,
   },
   setup(props, { root }) {
-    const tab = computed({
-      get() {
-        return root.$store.getters['mySubmissions/isDraftTab'] ? 0 : 1;
-      },
-      set(val) {
-        root.$store.dispatch('mySubmissions/setIsDraftTab', val === 0);
-      },
-    });
-    const readyToSubmit = computed(() => root.$store.getters['myDrafts/readyToSubmit']);
-    const readyToSubmitShow = computed(() => tab.value === 0 && readyToSubmit.value.length > 0);
-    const readyToSubmitShowOnTabs = computed(() => !root.$vuetify.breakpoint.smAndDown);
+    //TDOO set page title - when setting the title /subtitle like this, it shows up on other page. either set volatile somehow, or set it in the other pages manually too
+    /*root.$store.dispatch('appui/setTitle', 'My Submissions');
+    root.$store.dispatch('appui/setSubtitle', 'Drafts and submitted surveys');*/
 
-    // Refetch data
-    watch(tab, (val, val1) => {
-      // skip first loading - means previous tab is `undefined`
-      if (typeof val1 === 'undefined') {
-        return;
-      }
+    //load data
+    loadData();
 
-      if (val === 0) {
-        root.$store.dispatch('myDrafts/fetchDrafts');
-        root.$store.dispatch('myDrafts/fetchSurveys');
-      } else {
-        root.$store.dispatch('mySubmissions/fetchSubmissions');
-        root.$store.dispatch('mySubmissions/fetchSurveys');
-      }
-    });
-
-    return {
-      tab,
-      readyToSubmit,
-      readyToSubmitShow,
-      readyToSubmitShowOnTabs,
-    };
+    async function loadData() {
+      await root.$store.dispatch('myDrafts/fetchDrafts');
+      await root.$store.dispatch('myDrafts/fetchSurveys'); //TODO needs to be called after fetchDrafts - better integrate fetchSurveys in to fetchDrafts
+      await root.$store.dispatch('mySubmissions/fetchSubmissions');
+      await root.$store.dispatch('mySubmissions/fetchSurveys'); //needs to be called after fetchSubmissions - better integrate fetchSurveys in to fetchSubmissions
+    }
+    return {};
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .wrapper {
+  background-color: var(--v-background-base);
+  width: 100%;
+  height: 100%;
+}
+/*.wrapper {
   min-height: 100%;
 
   .header {
@@ -118,7 +58,7 @@ export default defineComponent({
     position: relative;
     max-width: 1280px;
   }
-}
+}*/
 
 .space-x-4 > * + * {
   margin-left: 16px;

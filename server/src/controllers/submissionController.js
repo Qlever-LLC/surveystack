@@ -611,10 +611,7 @@ const getSubmissionsCsv = async (req, res) => {
  * Fetch all my submissions (creator, proxyUserId, resubmitter)
  *
  * @param {
- *   resubmitter:        boolean,         // Submissions which is resubmitted by me
- *   proxyUserId:        boolean,         // Submissions which is submitted by me as a proxy
- *   creator:            boolean,         // Submissions which is submitted by me
- *   hideArchived:       boolean,         // Exclude archived submissions
+ *   archived:           boolean,         // include archived submissions
  *   surveyIds:          array,           // Filter by surveys
  *   skip:               number,          // Pagination
  *   limit:              number,          // Pagination
@@ -638,14 +635,38 @@ const getMySubmissions = async (req, res) => {
 
   let match = {};
 
+  // Hide all which were NOT resubmitted,proxied,archived
+  if (!queryParam(req.query.submitted)) {
+    match = {
+      ...match,
+      $or: [
+        { 'meta.resubmitter': { $ne: null } },
+        { 'meta.proxyUserId': { $ne: null } },
+        { 'meta.archived': { $eq: true } },
+      ],
+    };
+  }
+  // Hide resubmitted
+  if (!queryParam(req.query.resubmitted)) {
+    match = {
+      ...match,
+      'meta.resubmitter': null,
+    };
+  }
+  // Hide proxied
+  if (!queryParam(req.query.proxied)) {
+    match = {
+      ...match,
+      'meta.proxyUserId': null,
+    };
+  }
   // Hide archived
-  if (queryParam(req.query.hideArchived)) {
+  if (!queryParam(req.query.archived)) {
     match = {
       ...match,
       'meta.archived': { $ne: true },
     };
   }
-
   // Filter by survey
   if (Array.isArray(req.query.surveyIds) && req.query.surveyIds.length > 0) {
     match = {
@@ -662,11 +683,7 @@ const getMySubmissions = async (req, res) => {
     },
     {
       $match: {
-        $or: [
-          ...(queryParam(req.query.resubmitter) ? [{ 'meta.resubmitter': user }] : []),
-          ...(queryParam(req.query.proxyUserId) ? [{ 'meta.proxyUserId': user }] : []),
-          ...(queryParam(req.query.creator) ? [{ 'meta.creator': user }] : []),
-        ],
+        $or: [{ 'meta.resubmitter': user }, { 'meta.proxyUserId': user }, { 'meta.creator': user }],
         ...match,
       },
     },

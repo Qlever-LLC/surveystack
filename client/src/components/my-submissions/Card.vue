@@ -10,12 +10,16 @@
     <div class="top d-flex flex-column flex-sm-row align-sm-center">
       <div v-if="!isArchived" class="status-bar" :class="classes.bar"></div>
       <div class="d-flex flex-column align-start">
-        <v-chip :color="chipColor" :input-value="true" label small @click.stop>
-          {{ submission._id }}
-        </v-chip>
+        <app-group-breadcrumbs :path="submission.meta.group.path" disabled no-padding />
+        <!--app-group-breadcrumbs
+          :path="submission.meta.group.path"
+          :disabled-suffix="submission._id"
+          disabled
+          no-padding
+        /-->
         <div class="mt-2 d-flex align-center text-h6" :class="classes.surveyName">
           <v-icon v-if="!survey" class="mr-1" small>mdi-alert-outline</v-icon>
-          {{ survey ? survey.name : 'No survey found' }}
+          {{ survey ? survey.name : 'Survey not found' }}
         </div>
       </div>
 
@@ -55,10 +59,10 @@
           </template>
           <v-list>
             <v-list-item v-if="draft && local && survey" @click="handleUploadDraft">
-              <v-list-item-title>Upload</v-list-item-title>
+              <v-list-item-title>Move to Cloud</v-list-item-title>
             </v-list-item>
             <v-list-item v-if="draft && !local && survey" @click="handleDownloadDraft">
-              <v-list-item-title>Download</v-list-item-title>
+              <v-list-item-title>Move to Local (available offline)</v-list-item-title>
             </v-list-item>
             <v-list-item @click="handleExportJSON()">
               <v-list-item-title>Export as JSON</v-list-item-title>
@@ -91,23 +95,20 @@
     <div class="bottom d-flex flex-column flex-md-row align-md-center">
       <div class="d-flex align-center">
         <template v-if="draft">
-          <v-chip v-if="local" color="light-blue lighten-4" small @click.stop="setFilerLocal"> Local </v-chip>
-          <v-chip v-else color="light-blue lighten-4" small @click.stop="setFilerServer"> Server </v-chip>
-          <v-chip v-if="isCreator" color="light-blue lighten-4" small :input-value="true"> Creator </v-chip>
-          <v-chip v-if="isProxy" color="lime lighten-2" small :input-value="true"> Proxy </v-chip>
-          <v-chip v-if="isResubmitter" color="light-green lighten-3" small :input-value="true"> Resubmitter </v-chip>
+          <v-chip v-if="!isReadyToSubmit" color="yellow lighten-3" small> Draft </v-chip>
+          <v-chip v-else color="light-green lighten-3" small> Ready to submit </v-chip>
+          <v-chip v-if="local" color="light-blue lighten-4" small> Local </v-chip>
+          <v-chip v-else color="light-blue lighten-4" small> Server </v-chip>
         </template>
         <template v-else>
-          <v-chip v-if="isCreator" color="light-blue lighten-4" small @click.stop="setFilerCreator"> Creator </v-chip>
-          <v-chip v-if="isProxy" color="lime lighten-2" small @click.stop="setFilerProxy"> Proxy </v-chip>
-          <v-chip v-if="isResubmitter" color="light-green lighten-3" small @click.stop="setFilerResubmitter">
-            Resubmitter
-          </v-chip>
+          <v-chip v-if="!isResubmitted" color="light-green lighten-3" small> Submitted </v-chip>
+          <v-chip v-if="isResubmitted" color="light-green lighten-1" small> Resubmitted </v-chip>
+          <v-chip v-if="isProxied" color="teal lighten-2" small> Proxied </v-chip>
+          <v-chip v-if="isArchived" color="orange darken-1" small> Archived </v-chip>
         </template>
-        <v-chip v-if="isAdmin" color="teal lighten-4" small :input-value="true"> Admin </v-chip>
       </div>
 
-      <v-spacer></v-spacer>
+      <v-spacer />
 
       <div class="d-flex flex-column flex-sm-row align-sm-center">
         <span v-if="dateSubmitted" class="text-caption">
@@ -119,6 +120,8 @@
           <span class="blue-grey--text">Modified:</span>
           {{ dateModified }}
         </span>
+        <span class="text-caption"> <span class="blue-grey--text">ID:</span> {{ submission._id }} </span>
+        <span class="text-caption"> Survey: {{ submission.meta.survey.id }} </span>
       </div>
     </div>
 
@@ -169,9 +172,11 @@ import ResultDialog from '@/components/ui/ResultDialog.vue';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { parse as parseDisposition } from 'content-disposition';
+import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 
 export default {
   components: {
+    appGroupBreadcrumbs,
     DraftDelete,
     DraftContinue,
     DraftSubmit,
@@ -221,12 +226,8 @@ export default {
         ? props.submission.meta.submitAsUser._id === userId.value
         : props.submission.meta.creator === userId.value
     );
-    const isProxy = computed(
-      () =>
-        props.submission.meta.proxyUserId === userId.value ||
-        (props.submission.meta.submitAsUser ? props.submission.meta.creator === userId.value : false)
-    );
-    const isResubmitter = computed(() => props.submission.meta.resubmitter === userId.value);
+    const isProxied = computed(() => !!props.submission.meta.proxyUserId || !!props.submission.meta.submitAsUser);
+    const isResubmitted = computed(() => !!props.submission.meta.resubmitter);
     const isArchived = computed(() => !!props.submission.meta.archived);
     const isReadyToSubmit = computed(() =>
       props.submission.meta.status.some((item) => item.type === 'READY_TO_SUBMIT')
@@ -249,14 +250,14 @@ export default {
       const bar = [];
       if (props.draft || isCreator.value) {
         bar.push('light-blue darken-3');
-      } else if (isProxy.value) {
+      } else if (isProxied.value) {
         bar.push('lime darken-1');
       }
 
       const surveyName = [];
       if (!survey.value || isArchived.value) {
         surveyName.push('blue-grey--text font-weight-light');
-      } else if (isProxy.value) {
+      } else if (isProxied.value) {
         surveyName.push('lime--text text--darken-2 font-weight-medium');
       } else if (isCreator.value) {
         surveyName.push('blue--text text--darken-3 font-weight-medium');
@@ -391,8 +392,8 @@ export default {
     return {
       isOpen,
       isCreator,
-      isProxy,
-      isResubmitter,
+      isProxied,
+      isResubmitted,
       isArchived,
       isReadyToSubmit,
       isAdmin,
