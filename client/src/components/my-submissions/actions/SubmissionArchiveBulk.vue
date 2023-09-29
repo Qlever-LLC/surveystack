@@ -40,7 +40,7 @@ export default defineComponent({
       isOpen.value = false;
       isLoading.value = true;
       const ids = props.submissions.map((item) => item._id);
-      const success = root.$store.dispatch('mySubmissions/archiveSubmissions', { ids, reason });
+      const success = root.$store.dispatch('submissions/archiveSubmissions', { ids, reason });
       isLoading.value = false;
 
       if (!success) {

@@ -505,7 +505,7 @@ export default {
       this.selectedSubmissions = submissions;
     },
     startDraft(survey) {
-      this.$store.dispatch('myDrafts/startDraft', { survey });
+      this.$store.dispatch('submissions/startDraft', { survey });
     },
     async resubmit(submission) {
       this.$router.push(`/submissions/drafts/${submission._id}`);

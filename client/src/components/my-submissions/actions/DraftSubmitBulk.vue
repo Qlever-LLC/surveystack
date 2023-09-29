@@ -62,7 +62,7 @@ export default defineComponent({
     const handleSubmitDrafts = async () => {
       isOpen.value = false;
       isLoading.value = true;
-      resultItems.value = await root.$store.dispatch('myDrafts/submitDrafts', props.drafts);
+      resultItems.value = await root.$store.dispatch('submissions/submitDrafts', props.drafts);
       isLoading.value = false;
       showResult.value = true;
     };

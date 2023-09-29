@@ -2,7 +2,6 @@
   <div class="wrapper">
     <v-container>
       <my-submissions-filter />
-      <drafts-list />
       <submissions-list />
     </v-container>
   </div>
@@ -10,17 +9,13 @@
 
 <script>
 import { defineComponent } from '@vue/composition-api';
-import DraftsList from './DraftsList.vue';
 import SubmissionsList from './SubmissionsList.vue';
-import DraftSubmitBulk from '@/components/my-submissions/actions/DraftSubmitBulk.vue';
 import MySubmissionsFilter from '@/components/my-submissions/Filter.vue';
 
 export default defineComponent({
   components: {
     MySubmissionsFilter,
-    DraftsList,
     SubmissionsList,
-    DraftSubmitBulk,
   },
   setup(props, { root }) {
     //TDOO set page title - when setting the title /subtitle like this, it shows up on other page. either set volatile somehow, or set it in the other pages manually too
@@ -31,10 +26,10 @@ export default defineComponent({
     loadData();
 
     async function loadData() {
-      await root.$store.dispatch('myDrafts/fetchDrafts');
-      await root.$store.dispatch('myDrafts/fetchSurveys'); //TODO needs to be called after fetchDrafts - better integrate fetchSurveys in to fetchDrafts
-      await root.$store.dispatch('mySubmissions/fetchSubmissions');
-      await root.$store.dispatch('mySubmissions/fetchSurveys'); //needs to be called after fetchSubmissions - better integrate fetchSurveys in to fetchSubmissions
+      await root.$store.dispatch('submissions/fetchDrafts');
+      await root.$store.dispatch('submissions/fetchDraftSurveys'); //TODO needs to be called after fetchDrafts - better integrate fetchSurveys in to fetchDrafts
+      await root.$store.dispatch('submissions/fetchSubmissions');
+      await root.$store.dispatch('submissions/fetchSubmissionSurveys'); //needs to be called after fetchSubmissions - better integrate fetchSurveys in to fetchSubmissions
     }
     return {};
   },

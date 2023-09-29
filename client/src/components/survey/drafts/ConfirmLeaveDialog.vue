@@ -50,9 +50,9 @@ export default defineComponent({
 
       // Save to server
       if (action.value === 'server') {
-        await root.$store.dispatch('myDrafts/saveRemoteDrafts', [props.submission]);
+        await root.$store.dispatch('submissions/saveRemoteDrafts', [props.submission]);
       } else if (action.value === 'discard') {
-        await root.$store.dispatch('myDrafts/deleteDrafts', [props.submission._id]);
+        await root.$store.dispatch('submissions/deleteDrafts', [props.submission._id]);
       }
 
       isLoading.value = false;

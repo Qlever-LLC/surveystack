@@ -148,7 +148,7 @@ export default {
         this.isSubmitted = true;
 
         // Delete draft after submit
-        await this.$store.dispatch('myDrafts/deleteDrafts', [payload._id]);
+        await this.$store.dispatch('submissions/deleteDrafts', [payload._id]);
         message = {
           type: 'SUBMISSION_SUBMIT_SUCCESS',
           payload: { submissionId: this.submission._id },
@@ -172,7 +172,7 @@ export default {
     this.loading = true;
     const { id } = this.$route.params;
 
-    this.submission = await this.$store.dispatch('myDrafts/getDraft', id);
+    this.submission = await this.$store.dispatch('submissions/getDraft', id);
     if (!this.submission) {
       console.log('Error: submission not found');
       this.hasError = true;

@@ -22,7 +22,7 @@ export default defineComponent({
   setup(props, { root }) {
     const handleClick = async () => {
       // Create a new local draft from the submission
-      await root.$store.dispatch('myDrafts/saveLocalDrafts', [props.submission]);
+      await root.$store.dispatch('submissions/saveLocalDrafts', [props.submission]);
 
       root.$router.push(`/submissions/drafts/${props.submission._id}`);
     };

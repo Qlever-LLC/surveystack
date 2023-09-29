@@ -224,7 +224,7 @@ export default {
         this.result({ response });
 
         // Delete draft after submit
-        await this.$store.dispatch('myDrafts/deleteDrafts', [payload._id]);
+        await this.$store.dispatch('submissions/deleteDrafts', [payload._id]);
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;

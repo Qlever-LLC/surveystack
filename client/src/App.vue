@@ -46,9 +46,8 @@ export default {
       }
     },
     async fetchMySubmissions() {
-      //TODO check if it really makes sens to load all this when starting the app.
-      await this.$store.dispatch('myDrafts/fetchSurveys');
-      await this.$store.dispatch('myDrafts/fetchDrafts');
+      await this.$store.dispatch('submissions/fetchDraftSurveys');
+      await this.$store.dispatch('submissions/fetchDrafts');
     },
   },
 };

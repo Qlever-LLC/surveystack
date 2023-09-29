@@ -50,7 +50,7 @@ export default defineComponent({
     ExportPdfBulk,
   },
   setup(props, { root }) {
-    const selected = computed(() => root.$store.getters['mySubmissions/selected']);
+    const selected = computed(() => root.$store.getters['submissions/selected']);
     const isLoading = ref(false);
     const isOpen = computed(() => selected.value.length > 0);
     const memberships = computed(() => root.$store.getters['memberships/memberships']);
@@ -83,7 +83,7 @@ export default defineComponent({
     );
 
     const handleClear = () => {
-      root.$store.dispatch('mySubmissions/clearSelection');
+      root.$store.dispatch('submissions/clearSelection');
     };
 
     return {

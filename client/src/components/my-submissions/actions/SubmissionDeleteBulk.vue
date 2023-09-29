@@ -45,7 +45,7 @@ export default defineComponent({
       isOpen.value = false;
       isLoading.value = true;
       const ids = props.submissions.map((item) => item._id);
-      const success = await root.$store.dispatch('mySubmissions/deleteSubmissions', ids);
+      const success = await root.$store.dispatch('submissions/deleteSubmissions', ids);
       isLoading.value = false;
 
       if (!success) {

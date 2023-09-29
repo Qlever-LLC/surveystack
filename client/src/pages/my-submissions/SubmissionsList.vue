@@ -1,18 +1,20 @@
 <template>
   <div :class="{ 'mb-16': showFooter }">
-    <div v-if="isLoading && submissions.length === 0" class="d-flex justify-center my-8">
+    <div v-if="isLoading && submissionsAndDrafts.length === 0" class="d-flex justify-center my-8">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
     </div>
-    <p v-else-if="submissions.length === 0" class="my-8 text-center">No matching submissions found.</p>
+    <p v-else-if="submissionsAndDrafts.length === 0" class="my-8 text-center">No matching submissions found.</p>
     <template v-else>
       <submission-card
-        v-for="submission in submissions"
+        v-for="submission in submissionsAndDrafts"
         :key="submission._id"
         :submission="submission"
+        :draft="isDraft(submission._id)"
+        :local="isLocal(submission._id)"
         :surveys="surveys"
         :selected="isSelected(submission._id)"
         @change-select="handleSelect(submission, $event)"
-      ></submission-card>
+      />
       <v-pagination v-model="page" :length="totalPage" class="mt-4"></v-pagination>
     </template>
 
@@ -33,36 +35,39 @@ export default defineComponent({
     SubmissionFooter,
   },
   setup(props, { root }) {
-    const showFooter = computed(() => root.$store.getters['mySubmissions/selected'].length > 0);
-    const isLoading = computed(() => root.$store.getters['mySubmissions/isLoading']);
-    const submissions = computed(() => root.$store.getters['mySubmissions/submissions']);
-    const surveys = computed(() => root.$store.getters['mySubmissions/surveys']);
-    const totalPage = computed(() => root.$store.getters['mySubmissions/totalPage']);
+    const showFooter = computed(() => root.$store.getters['submissions/selected'].length > 0);
+    const isLoading = computed(() => root.$store.getters['submissions/isLoading']);
+    const surveys = computed(() => root.$store.getters['submissions/surveys']);
+    const submissionsAndDrafts = computed(() => root.$store.getters['submissions/submissionsAndDrafts']);
+    const totalPage = computed(() => root.$store.getters['submissions/totalPage']);
     const page = computed({
       get() {
-        return root.$store.getters['mySubmissions/page'];
+        return root.$store.getters['submissions/page'];
       },
       set(val) {
-        root.$store.dispatch('mySubmissions/setPage', val);
+        root.$store.dispatch('submissions/setPage', val);
       },
     });
-
-    const isSelected = root.$store.getters['mySubmissions/isSelected'];
+    const isDraft = root.$store.getters['submissions/isDraft'];
+    const isLocal = root.$store.getters['submissions/isLocal'];
+    const isSelected = root.$store.getters['submissions/isSelected'];
     const handleSelect = (submission, selected) => {
       if (selected) {
-        root.$store.dispatch('mySubmissions/selectSubmission', submission);
+        root.$store.dispatch('submissions/selectSubmission', submission);
       } else {
-        root.$store.dispatch('mySubmissions/deselectSubmission', submission);
+        root.$store.dispatch('submissions/deselectSubmission', submission);
       }
     };
 
     return {
       showFooter,
       isLoading,
-      submissions,
       surveys,
+      submissionsAndDrafts,
       page,
       totalPage,
+      isDraft,
+      isLocal,
       isSelected,
       handleSelect,
     };

@@ -117,12 +117,12 @@ export default {
   },
   methods: {
     startDraft(survey) {
-      this.$store.dispatch('myDrafts/startDraft', { survey });
+      this.$store.dispatch('submissions/startDraft', { survey });
     },
     startDraftAs(survey, selectedMember) {
       this.showSelectMember = false;
       if (selectedMember.user) {
-        this.$store.dispatch('myDrafts/startDraft', { survey, submitAsUser: selectedMember.user });
+        this.$store.dispatch('submissions/startDraft', { survey, submitAsUser: selectedMember.user });
       }
     },
     async downloadPrintablePdf(survey) {

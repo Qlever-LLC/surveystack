@@ -44,7 +44,7 @@ export default defineComponent({
       isOpen.value = false;
       isLoading.value = true;
       const ids = props.drafts.map((item) => item._id);
-      const success = await root.$store.dispatch('myDrafts/deleteDrafts', ids);
+      const success = await root.$store.dispatch('submissions/deleteDrafts', ids);
       isLoading.value = false;
 
       if (!success) {

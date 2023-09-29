@@ -45,7 +45,7 @@ export default defineComponent({
     const handleDelete = async () => {
       isLoading.value = true;
       error.value = '';
-      const success = await root.$store.dispatch('myDrafts/deleteDrafts', [props.submission._id]);
+      const success = await root.$store.dispatch('submissions/deleteDrafts', [props.submission._id]);
       isLoading.value = false;
 
       if (success) {

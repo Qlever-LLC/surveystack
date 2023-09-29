@@ -248,8 +248,8 @@ export default {
       }
 
       await this.$store.dispatch('surveys/fetchPinned');
-      await this.$store.dispatch('myDrafts/fetchDrafts');
-      await this.$store.dispatch('myDrafts/fetchSurveys');
+      await this.$store.dispatch('submissions/fetchDrafts');
+      await this.$store.dispatch('submissions/fetchDraftSurveys');
 
       if (this.$route.params.redirect) {
         this.$router.push(this.$route.params.redirect);

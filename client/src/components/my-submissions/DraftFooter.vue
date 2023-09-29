@@ -44,7 +44,7 @@ export default defineComponent({
     ExportPdfBulk,
   },
   setup(props, { root }) {
-    const selected = computed(() => root.$store.getters['myDrafts/selected']);
+    const selected = computed(() => root.$store.getters['submissions/selected']);
     const isLoading = ref(false);
     const isOpen = computed(() => selected.value.length > 0);
     const draftsToSubmit = computed(() =>
@@ -52,7 +52,7 @@ export default defineComponent({
     );
 
     const handleClear = () => {
-      root.$store.dispatch('myDrafts/clearSelection');
+      root.$store.dispatch('submissions/clearSelection');
     };
 
     return {

@@ -270,15 +270,15 @@ export default {
     });
 
     const handleDownloadDraft = () => {
-      root.$store.dispatch('myDrafts/saveLocalDrafts', [props.submission]);
+      root.$store.dispatch('submissions/saveLocalDrafts', [props.submission]);
     };
 
     const handleUploadDraft = () => {
-      root.$store.dispatch('myDrafts/saveRemoteDrafts', [props.submission]);
+      root.$store.dispatch('submissions/saveRemoteDrafts', [props.submission]);
     };
 
     const handleSubmitDraft = async () => {
-      resultItems.value = await root.$store.dispatch('myDrafts/submitDrafts', [props.submission]);
+      resultItems.value = await root.$store.dispatch('submissions/submitDrafts', [props.submission]);
     };
 
     const handleSetGroup = (id) => {
@@ -290,14 +290,14 @@ export default {
     };
 
     const handleArchiveSubmission = async (reason) => {
-      await root.$store.dispatch('mySubmissions/archiveSubmissions', {
+      await root.$store.dispatch('submissions/archiveSubmissions', {
         ids: [props.submission._id],
         reason,
       });
     };
 
     const handleRestoreSubmission = () => {
-      root.$store.dispatch('mySubmissions/restoreSubmissions', [props.submission._id]);
+      root.$store.dispatch('submissions/restoreSubmissions', [props.submission._id]);
     };
 
     const handleExportJSON = () => {
@@ -346,49 +346,6 @@ export default {
       }
     };
 
-    const setFilerLocal = () => {
-      root.$store.dispatch('myDrafts/setFilter', {
-        local: true,
-        remote: false,
-      });
-      root.$store.dispatch('myDrafts/fetchSurveys');
-    };
-
-    const setFilerServer = () => {
-      root.$store.dispatch('myDrafts/setFilter', {
-        local: false,
-        remote: true,
-      });
-      root.$store.dispatch('myDrafts/fetchSurveys');
-    };
-
-    const setFilerCreator = () => {
-      root.$store.dispatch('mySubmissions/setFilter', {
-        resubmitter: false,
-        proxyUserId: false,
-        creator: true,
-      });
-      root.$store.dispatch('mySubmissions/fetchSurveys');
-    };
-
-    const setFilerProxy = () => {
-      root.$store.dispatch('mySubmissions/setFilter', {
-        resubmitter: false,
-        proxyUserId: true,
-        creator: false,
-      });
-      root.$store.dispatch('mySubmissions/fetchSurveys');
-    };
-
-    const setFilerResubmitter = () => {
-      root.$store.dispatch('mySubmissions/setFilter', {
-        resubmitter: true,
-        proxyUserId: false,
-        creator: false,
-      });
-      root.$store.dispatch('mySubmissions/fetchSurveys');
-    };
-
     return {
       isOpen,
       isCreator,
@@ -411,11 +368,6 @@ export default {
       handleRestoreSubmission,
       handleExportJSON,
       handleExportPDF,
-      setFilerLocal,
-      setFilerServer,
-      setFilerCreator,
-      setFilerProxy,
-      setFilerResubmitter,
     };
   },
 };

@@ -1,8 +1,8 @@
-import * as db from '@/store/db';
 import api from '@/services/api.service';
-import { createSubmissionFromSurvey, parseSubmitResponse } from '@/utils/submissions';
-import { uploadFileResources } from '@/utils/resources';
 import { get, isEqual } from 'lodash';
+import * as db from '@/store/db';
+import { uploadFileResources } from '@/utils/resources';
+import { createSubmissionFromSurvey, parseSubmitResponse } from '@/utils/submissions';
 import router from '@/router';
 
 const PER_PAGE = 10;
@@ -11,17 +11,24 @@ const sortByModifiedDate = (a, b) => new Date(b.meta.dateModified).valueOf() - n
 
 const createInitialState = () => ({
   isFetchingSurveys: false,
-  surveys: [],
   isLoading: false,
-  page: 1,
-  localDrafts: [],
-  remoteDrafts: [],
-  drafts: [],
+  draftSurveys: [], //TODO re-unite surveys
+  submissionSurveys: [], //TODO re-unite surveys
+  submissions: [], //contains submitted surveys
+  localDrafts: [], //TODO return these as part of submissions, but with a meta.status 'LOCAL_DRAFT'
+  remoteDrafts: [], //TODO return these as part of submissions, but with a meta.status 'DRAFT' or 'READY_TO_SUBMIT'
+  drafts: [], //contains localDrafts and remoteDrafts
   selectedIds: [],
+  page: 1,
+  totalPage: 1,
   filter: {
     surveyIds: [],
     draft: true,
     readyToSubmit: true,
+    submitted: true,
+    resubmitted: true,
+    proxied: true,
+    archived: false,
   },
 });
 
@@ -30,12 +37,11 @@ const initialState = createInitialState();
 const getters = {
   isFetchingSurveys: (state) => state.isFetchingSurveys,
   isLoading: (state) => state.isLoading,
-  page: (state) => state.page,
-  totalPage: (state, getters) => (state.isLoading ? 1 : Math.ceil(getters.drafts.length / PER_PAGE)),
-  readyToSubmit: (state) => state.drafts.filter((item) => item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT')),
-  surveys: (state) => state.surveys,
-  drafts: (state) => {
+  surveys: (state) => state.draftSurveys.concat(state.submissionSurveys), //TODO sort by name, or better load them together from one endpoint
+  submissionSurveys: (state) => state.submissionSurveys,
+  submissionsAndDrafts: (state) => {
     let drafts = state.drafts;
+    //TODO refactor these filters to be params for the fetch, but make sure they still work for offline situations as well
     if (state.filter.surveyIds.length > 0) {
       drafts = drafts.filter((item) => state.filter.surveyIds.includes(item.meta.survey.id));
     }
@@ -45,18 +51,34 @@ const getters = {
     if (!state.filter.readyToSubmit) {
       drafts = drafts.filter((item) => !item.meta.status.some((s) => s.type === 'READY_TO_SUBMIT'));
     }
-    return drafts.slice(state.page - 1, state.page - 1 + PER_PAGE);
+    //TODO this leads to the first page being (potentially way) longer than PER_PAGE. To improve this, it needs further calculations (especially offset/limit in fetchSubmissions)
+    if (state.page === 1) {
+      //include all drafts on the first page
+      return drafts.concat(state.submissions);
+    } else {
+      //from the second page, only show submissions
+      return state.submissions;
+    }
   },
+  draftSurveys: (state) => state.draftSurveys,
+  readyToSubmit: (state) => state.drafts.filter((item) => item.meta.status.some((i) => i.type === 'READY_TO_SUBMIT')),
+  page: (state) => state.page,
+  totalPage: (state) => state.totalPage,
   filter: (state) => state.filter,
   filterType: (state) => {
     const indexes = [];
     if (state.filter.draft) indexes.push('draft');
     if (state.filter.readyToSubmit) indexes.push('readyToSubmit');
+    if (state.filter.submitted) indexes.push('submitted');
+    if (state.filter.resubmitted) indexes.push('resubmitted');
+    if (state.filter.proxied) indexes.push('proxied');
+    if (state.filter.archived) indexes.push('archived');
     return indexes;
   },
-  isLocal: (state) => (id) => state.localDrafts.some((item) => item._id === id), //TODO change ot isLocallyChanged or locallyModified or offlineChanged or...
+  isLocal: (state) => (id) => state.localDrafts.some((item) => item._id === id), //TODO change to isLocallyChanged or locallyModified or offlineChanged or...
+  isDraft: (state) => (id) => state.drafts.some((item) => item._id === id),
   isSelected: (state) => (id) => state.selectedIds.includes(id),
-  selected: (state, getters) => getters.drafts.filter((item) => state.selectedIds.includes(item._id)), //TODO REMOVE?
+  selected: (state) => state.submissions.filter((item) => state.selectedIds.includes(item._id)), //TODO REMOVE?
 };
 
 const mutations = {
@@ -69,14 +91,14 @@ const mutations = {
   SET_LOADING: (state, loading) => {
     state.isLoading = loading;
   },
-  SET_SURVEYS: (state, surveys) => {
-    state.surveys = surveys;
+  SET_DRAFT_SURVEYS: (state, surveys) => {
+    state.draftSurveys = surveys;
   },
-  SET_PAGE: (state, page) => {
-    state.page = page;
+  SET_SUBMISSION_SURVEYS: (state, surveys) => {
+    state.submissionSurveys = surveys;
   },
-  SET_FILTER: (state, filter) => {
-    state.filter = { ...state.filter, ...filter };
+  SET_SUBMISSIONS: (state, submissions) => {
+    state.submissions = submissions;
   },
   SET_LOCAL_DRAFTS: (state, localDrafts) => {
     state.localDrafts = localDrafts;
@@ -87,11 +109,20 @@ const mutations = {
   SET_DRAFTS: (state, drafts) => {
     state.drafts = drafts;
   },
-  SELECT_DRAFT: (state, draft) => {
-    state.selectedIds = [...new Set([...state.selectedIds, draft._id])];
+  SET_PAGE: (state, page) => {
+    state.page = page;
   },
-  DESELECT_DRAFT: (state, draft) => {
-    state.selectedIds = state.selectedIds.filter((id) => id !== draft._id);
+  SET_TOTAL_PAGE: (state, totalPage) => {
+    state.totalPage = totalPage;
+  },
+  SET_FILTER: (state, filter) => {
+    state.filter = { ...state.filter, ...filter };
+  },
+  SELECT_SUBMISSION: (state, submission) => {
+    state.selectedIds = [...new Set([...state.selectedIds, submission._id])];
+  },
+  DESELECT_SUBMISSION: (state, submission) => {
+    state.selectedIds = state.selectedIds.filter((id) => id !== submission._id);
   },
   SET_SELECTION: (state, selection) => {
     state.selectedIds = selection;
@@ -106,6 +137,23 @@ const actions = {
     commit('RESET');
   },
 
+  async setPage({ commit, dispatch }, page) {
+    commit('SET_PAGE', page);
+    await dispatch('fetchSubmissions');
+  },
+
+  selectSubmission({ commit }, submission) {
+    commit('SELECT_SUBMISSION', submission);
+  },
+
+  deselectSubmission({ commit }, submission) {
+    commit('DESELECT_SUBMISSION', submission);
+  },
+
+  clearSelection({ commit }) {
+    commit('CLEAR_SELECTION');
+  },
+
   async setFilter({ state, commit, dispatch }, filter) {
     // Not changed
     const newFilter = { ...state.filter, ...filter };
@@ -115,23 +163,158 @@ const actions = {
 
     commit('SET_FILTER', filter);
     commit('SET_PAGE', 1);
-    await dispatch('fetchDrafts');
+    await dispatch('fetchSubmissions');
   },
 
-  setPage({ commit }, page) {
-    commit('SET_PAGE', page);
+  /*
+   * Load submissions
+   * - Filter is changed
+   * - Page is changed
+   */
+  async fetchSubmissions({ state, commit, getters }) {
+    commit('SET_LOADING', true);
+
+    //TODO take drafts into account for pagination. Currently, drafts are just added before the submissions on the first page, making the first page (possible way) longer than PER_PAGE
+    const params = new URLSearchParams();
+    params.append('skip', (state.page - 1) * PER_PAGE);
+    params.append('limit', PER_PAGE);
+
+    state.filter.surveyIds.forEach((id) => {
+      params.append('surveyIds[]', id);
+    });
+    if (state.filter.submitted) {
+      params.append('submitted', '1');
+    }
+    if (state.filter.resubmitted) {
+      params.append('resubmitted', '1');
+    }
+    if (state.filter.proxied) {
+      params.append('proxied', '1');
+    }
+    if (state.filter.archived) {
+      params.append('archived', '1');
+    }
+
+    try {
+      const { data } = await api.get(`/submissions/my-submissions?${params}`);
+      commit('SET_SUBMISSIONS', data.content);
+      commit('SET_TOTAL_PAGE', Math.ceil(data.pagination.total / PER_PAGE));
+      const ids = data.content.map((item) => item._id);
+      commit(
+        'SET_SELECTION',
+        state.selectedIds.filter((id) => ids.includes(id))
+      );
+    } catch (e) {
+      console.warn('Failed to fetch my submissions', params.toString());
+    }
+
+    commit('SET_LOADING', false);
   },
 
-  selectDraft({ commit }, draft) {
-    commit('SELECT_DRAFT', draft);
+  /*
+   * Archives multiple submissions
+   * - Bulk archive from the selection
+   * - Archive from the item card
+   */
+  async archiveSubmissions({ dispatch }, { ids, reason }) {
+    if (ids.length === 0) {
+      return true;
+    }
+
+    let success = true;
+    try {
+      // Bulk archive
+      await api.post(`/submissions/bulk-archive?set=true&reason=${reason}`, { ids });
+      await dispatch('fetchSubmissions');
+    } catch (e) {
+      console.warn('Failed to archive submissions', ...ids, e);
+      success = false;
+    }
+
+    return success;
   },
 
-  deselectDraft({ commit }, draft) {
-    commit('DESELECT_DRAFT', draft);
+  /*
+   * Restore multiple submissions
+   * - Bulk restore from the selection
+   * - Restore from the item card
+   */
+  async restoreSubmissions({ dispatch }, ids) {
+    if (ids.length === 0) {
+      return true;
+    }
+
+    let success = true;
+    try {
+      // Bulk restore
+      await api.post('/submissions/bulk-archive?set=false', { ids });
+      await dispatch('fetchSubmissions');
+    } catch (e) {
+      console.warn('Failed to restore submissions', ...ids, e);
+      success = false;
+    }
+
+    return success;
   },
 
-  clearSelection({ commit }) {
-    commit('CLEAR_SELECTION');
+  /*
+   * Delete multiple submissions.
+   * - Bulk delete from the selection
+   * - Delete from the item card
+   */
+  async deleteSubmissions({ dispatch }, ids) {
+    if (ids.length === 0) {
+      return true;
+    }
+
+    let success = true;
+    try {
+      // Bulk delete
+      await api.post('/submissions/bulk-delete', { ids });
+      await dispatch('fetchSubmissions');
+    } catch (e) {
+      console.warn('Failed to delete submissions', ...ids);
+      success = false;
+    }
+
+    return success;
+  },
+
+  /*
+   * Fetch surveys of my submissions
+   * - Switching tab
+   * - Change filter
+   */
+  async fetchSubmissionSurveys({ commit, state }) {
+    if (state.isFetchingSurveys) {
+      return;
+    }
+
+    commit('SET_FETCHING_SURVEYS', true);
+    commit('SET_SUBMISSION_SURVEYS', []);
+
+    const params = new URLSearchParams();
+    if (state.filter.submitted) {
+      params.append('submitted', '1');
+    }
+    if (state.filter.resubmitted) {
+      params.append('resubmitted', '1');
+    }
+    if (state.filter.proxied) {
+      params.append('proxied', '1');
+    }
+    if (state.filter.archived) {
+      params.append('archived', '1');
+    }
+
+    try {
+      const { data } = await api.get(`/surveys/my-submissions?${params}`);
+      commit('SET_SUBMISSION_SURVEYS', data);
+    } catch (e) {
+      console.warn('Failed to fetch surveys of my submissions', state.filter, e);
+    }
+
+    commit('SET_FETCHING_SURVEYS', false);
   },
 
   async fetchLocalDrafts({ commit }) {
@@ -206,7 +389,6 @@ const actions = {
     try {
       const { data } = await api.get('/drafts/my-drafts');
       commit('SET_REMOTE_DRAFTS', data);
-
       return data;
     } catch (e) {
       console.warn('Failed to fetch drafts with filter', e);
@@ -454,7 +636,7 @@ const actions = {
 
     // Save to IDB
     await dispatch('saveLocalDrafts', [submission]);
-    await dispatch('fetchSurveys');
+    await dispatch('fetchDraftSurveys');
 
     router.push({
       name: 'submissions-drafts-detail',
@@ -471,13 +653,13 @@ const actions = {
    * - Switching tab
    * - Change filter
    */
-  async fetchSurveys({ commit, state }) {
+  async fetchDraftSurveys({ commit, state }) {
     if (state.isFetchingSurveys) {
       return;
     }
 
     commit('SET_FETCHING_SURVEYS', true);
-    commit('SET_SURVEYS', []);
+    commit('SET_DRAFT_SURVEYS', []);
 
     const remoteAndLocalDrafts = state.localDrafts.concat(state.remoteDrafts);
     let surveyIds = [];
@@ -500,17 +682,17 @@ const actions = {
       const params = new URLSearchParams();
       surveyIds.forEach((id) => {
         if (typeof id === 'string') params.append('ids[]', id);
-        else console.error('id is not a string:' + id); //TODO prevent this
+        else console.error('id is not a string:' + id); //TODO prevent root cause for id's not being strings. They look like this example: e\u0012¨¼,Q\u0000\u0001ñ¢g
       });
 
       try {
         const { data } = await api.get(`/surveys/my-drafts?${params}`);
-        commit('SET_SURVEYS', data);
+        commit('SET_DRAFT_SURVEYS', data);
       } catch (e) {
         console.warn('Failed to fetch surveys of my submissions', state.filter, e);
       }
     } else {
-      commit('SET_SURVEYS', []);
+      commit('SET_DRAFT_SURVEYS', []);
       commit('SET_FILTER', { surveyIds: [] });
     }
 

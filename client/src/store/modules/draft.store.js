@@ -194,7 +194,7 @@ const actions = {
   },
   async next({ commit, state, dispatch }) {
     // Save current step into the IDB
-    dispatch('myDrafts/saveLocalDrafts', [state.submission], { root: true });
+    dispatch('submissions/saveLocalDrafts', [state.submission], { root: true });
 
     dispatch('calculateApiCompose');
 

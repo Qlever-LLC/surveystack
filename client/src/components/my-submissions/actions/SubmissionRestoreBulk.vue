@@ -31,7 +31,7 @@ export default defineComponent({
       isOpen.value = false;
       isLoading.value = true;
       const ids = props.submissions.map((item) => item._id);
-      const success = await root.$store.dispatch('mySubmissions/restoreSubmissions', ids);
+      const success = await root.$store.dispatch('submissions/restoreSubmissions', ids);
       isLoading.value = false;
 
       if (!success) {
