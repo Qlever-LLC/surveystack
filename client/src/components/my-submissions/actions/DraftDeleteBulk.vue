@@ -3,7 +3,7 @@
     <template v-slot:activator="{ on, attrs }">
       <slot :attrs="attrs" :on="on">
         <v-btn v-bind="attrs" color="red lighten-2" dark :disabled="disabled" :loading="isLoading" v-on="on">
-          Delete ({{ drafts.length }})
+          Delete draft ({{ drafts.length }})
         </v-btn>
       </slot>
     </template>

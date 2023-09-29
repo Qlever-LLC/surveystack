@@ -4,26 +4,13 @@
       <span class="flex-grow-1">Selected: {{ selected.length }}</span>
 
       <div class="buttons d-flex align-center">
-        <submission-archive-bulk
-          :submissions="unArchived"
-          :disabled="isLoading"
-          @loading-change="isLoading = $event"
-        ></submission-archive-bulk>
-        <submission-restore-bulk
-          :submissions="archived"
-          :disabled="isLoading"
-          @loading-change="isLoading = $event"
-        ></submission-restore-bulk>
-        <submission-delete-bulk
-          :submissions="archived"
-          :disabled="isLoading"
-          @loading-change="isLoading = $event"
-        ></submission-delete-bulk>
-        <export-json-bulk :submissions="selected" :disabled="isLoading" /><export-pdf-bulk
-          :submissions="selected"
-          :disabled="isLoading"
-          @loading-change="isLoading = $event"
-        ></export-pdf-bulk>
+        <draft-submit-bulk :drafts="draftsToSubmit" :disabled="isLoading" @loading-change="isLoading = $event" />
+        <draft-delete-bulk :drafts="selected" :disabled="isLoading" @loading-change="isLoading = $event" />
+        <submission-archive-bulk :submissions="unArchived" :disabled="isLoading" @loading-change="isLoading = $event" />
+        <submission-restore-bulk :submissions="archived" :disabled="isLoading" @loading-change="isLoading = $event" />
+        <submission-delete-bulk :submissions="archived" :disabled="isLoading" @loading-change="isLoading = $event" />
+        <export-json-bulk :submissions="selected" :disabled="isLoading" />
+        <export-pdf-bulk :submissions="selected" :disabled="isLoading" @loading-change="isLoading = $event" />
       </div>
 
       <div class="flex-grow-1 text-end">
@@ -40,9 +27,13 @@ import SubmissionDeleteBulk from './actions/SubmissionDeleteBulk.vue';
 import SubmissionRestoreBulk from './actions/SubmissionRestoreBulk.vue';
 import ExportJsonBulk from './actions/ExportJsonBulk.vue';
 import ExportPdfBulk from './actions/ExportPdfBulk.vue';
+import DraftSubmitBulk from '@/components/my-submissions/actions/DraftSubmitBulk.vue';
+import DraftDeleteBulk from '@/components/my-submissions/actions/DraftDeleteBulk.vue';
 
 export default defineComponent({
   components: {
+    DraftDeleteBulk,
+    DraftSubmitBulk,
     SubmissionArchiveBulk,
     SubmissionDeleteBulk,
     SubmissionRestoreBulk,
@@ -50,15 +41,22 @@ export default defineComponent({
     ExportPdfBulk,
   },
   setup(props, { root }) {
+    const draftsToSubmit = computed(() =>
+      selected.value.filter((item) => item.meta.status.some((item) => item.type === 'READY_TO_SUBMIT'))
+    );
     const selected = computed(() => root.$store.getters['submissions/selected']);
     const isLoading = ref(false);
     const isOpen = computed(() => selected.value.length > 0);
     const memberships = computed(() => root.$store.getters['memberships/memberships']);
     const userId = computed(() => root.$store.getters['auth/user']._id);
 
+    const isDraft = root.$store.getters['submissions/isDraft'];
+
     const unArchived = computed(() =>
       selected.value.filter(
         (item) =>
+          // not a draft
+          !isDraft(item._id) &&
           // not archived
           !item.meta.archived &&
           // admin or creator
@@ -87,10 +85,12 @@ export default defineComponent({
     };
 
     return {
+      draftsToSubmit,
       selected,
       userId,
       isLoading,
       isOpen,
+      isDraft,
       unArchived,
       archived,
       handleClear,

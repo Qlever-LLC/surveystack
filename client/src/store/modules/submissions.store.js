@@ -78,7 +78,7 @@ const getters = {
   isLocal: (state) => (id) => state.localDrafts.some((item) => item._id === id), //TODO change to isLocallyChanged or locallyModified or offlineChanged or...
   isDraft: (state) => (id) => state.drafts.some((item) => item._id === id),
   isSelected: (state) => (id) => state.selectedIds.includes(id),
-  selected: (state) => state.submissions.filter((item) => state.selectedIds.includes(item._id)), //TODO REMOVE?
+  selected: (state, getters) => getters.submissionsAndDrafts.filter((item) => state.selectedIds.includes(item._id)), //TODO REMOVE?
 };
 
 const mutations = {
