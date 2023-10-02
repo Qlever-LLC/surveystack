@@ -248,7 +248,6 @@ export default {
       members: [],
       integratedHyloGroup: null,
       learnMoreDialog: false,
-      integrations,
       isLoadingMembers: false,
       isLoadingGroup: false,
       isLoadingHyloGroup: false,
@@ -380,9 +379,6 @@ export default {
       }
     }
 
-    // TODO is it okay to remove this?
-    // this.entity._id = new ObjectId().toString();
-
     if (this.editMode) {
       this.isLoadingGroup = true;
       try {
@@ -391,9 +387,6 @@ export default {
         this.entity = { ...this.entity, ...data };
 
         await Promise.all([this.loadMembers(), this.loadHyloGroup()]);
-
-        // const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
-        // this.integrations = integrations;
       } catch (e) {
         console.log('something went wrong:', e);
       } finally {

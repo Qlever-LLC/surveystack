@@ -533,57 +533,6 @@ router.get(
 
 router.get('/hylo/group', [], catchErrors(hyloController.getGroupBySlug));
 
-/** Integrations - Group */
-router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
-
-router.get('/group-integrations/:id', catchErrors(groupIntegrationController.getIntegration));
-
-router.post(
-  '/group-integrations',
-  [assertNameNotEmpty],
-  catchErrors(groupIntegrationController.createIntegration)
-);
-
-router.put(
-  '/group-integrations/:id',
-  [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations.groups' })],
-  catchErrors(groupIntegrationController.updateIntegration)
-);
-router.delete(
-  '/group-integrations/:id',
-  [assertAuthenticated, assertEntityExists({ collection: 'integrations.groups' })],
-  catchErrors(groupIntegrationController.deleteIntegration)
-);
-
-/** Integrations - Membership */
-router.get(
-  '/membership-integrations',
-  catchErrors(membershipIntegrationController.getIntegrations)
-);
-router.get(
-  '/membership-integrations/:id',
-  catchErrors(membershipIntegrationController.getIntegration)
-);
-router.post(
-  '/membership-integrations',
-  [assertNameNotEmpty],
-  catchErrors(membershipIntegrationController.createIntegration)
-);
-router.put(
-  '/membership-integrations/:id',
-  [
-    assertNameNotEmpty,
-    assertIdsMatch,
-    assertEntityExists({ collection: 'integrations.memberships' }),
-  ],
-  catchErrors(membershipIntegrationController.updateIntegration)
-);
-router.delete(
-  '/membership-integrations/:id',
-  [assertAuthenticated, assertEntityExists({ collection: 'integrations.memberships' })],
-  catchErrors(membershipIntegrationController.deleteIntegration)
-);
-
 // Call for submissions (CFS)
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
