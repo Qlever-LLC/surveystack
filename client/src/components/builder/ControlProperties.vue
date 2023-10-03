@@ -24,12 +24,13 @@
       />
       <v-text-field
         v-if="isNumber"
-        type="number"
         v-model="control.defaultValue"
-        @blur="handleDefaultValueTrim"
+        @blur="handleDefaultValueTrimNumber"
         label="Default value"
         hide-details="auto"
         :rules="[isValidNumber]"
+        clearable
+        @click:clear="setToNull"
       />
       <instructions-editor
         v-if="isInstructions"
@@ -670,8 +671,24 @@ export default {
       }
       return true;
     },
+    handleDefaultValueTrimNumber() {
+      const val = this.control.defaultValue;
+      if (val === '0') {
+        //the number 0 is to be considered separately because Number(0) is also equal to false
+        const value = String(Number(this.control.defaultValue));
+        this.control.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      } else if (Number(val)) {
+        const value = Number(this.control.defaultValue);
+        this.control.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      } else {
+        this.control.defaultValue = null;
+      }
+    },
     isValidNumber(val) {
-      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+      return isNaN(Number(val)) ? 'Please enter a number' : true;
+    },
+    setToNull(e) {
+      e.target.value = null;
     },
     getScriptParams() {
       return (

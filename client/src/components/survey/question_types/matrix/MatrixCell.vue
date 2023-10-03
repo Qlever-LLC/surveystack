@@ -37,11 +37,12 @@
     v-else-if="header.type === 'number'"
     :value="value"
     @input="onNumberInput"
-    type="number"
     outlined
     hide-details="auto"
     :disabled="disabled"
     :rules="[isValidNumber]"
+    clearable
+    @click:clear="setToNull"
   />
   <v-select
     v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
@@ -308,7 +309,10 @@ export default {
   },
   methods: {
     isValidNumber(val) {
-      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+      return isNaN(Number(val)) ? 'Please enter a number' : true;
+    },
+    setToNull() {
+      this.value = null;
     },
     onInput(value) {
       this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
@@ -330,8 +334,16 @@ export default {
       }
     },
     onNumberInput(value) {
-      const numValue = Number(value);
-      this.value = isNaN(numValue) ? null : numValue;
+      if (value === '' || value === null || value === undefined) {
+        this.value = null;
+      } else {
+        const numValue = Number(value);
+        if (numValue || value === '0') {
+          // possibility to write 1e2 => 100
+          // while keeping security: 95.5h675 => show error and store 95.5
+          this.value = numValue;
+        }
+      }
       this.$emit('changed');
     },
     onDropDownInput(value) {
