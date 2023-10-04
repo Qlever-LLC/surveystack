@@ -309,7 +309,7 @@ export default {
   },
   methods: {
     isValidNumber(val) {
-      return isNaN(Number(val)) ? 'Please enter a number' : true;
+      return isNaN(Number(val)) || (this.header.required && val === null) ? 'Please enter a number' : true;
     },
     setToNull() {
       this.value = null;
