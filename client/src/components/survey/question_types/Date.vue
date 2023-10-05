@@ -11,23 +11,11 @@
     <app-control-hint :value="control.hint" />
     <v-row>
       <div :class="{ 'mx-auto': centered }">
-        <v-date-picker
-          v-if="control.options.subtype !== 'date-year'"
-          :value="dateForPicker"
-          @input="updateDatePicker"
-          :type="datePickerType"
-          reactive
-          no-title
-          :range="control.options.subtype === 'date-week-month-year'"
-          class="mt-5"
-          color="focus"
-        />
         <!--
           use text field with menu for year picker because year picker's
           UI placeholder year is the same as when year is selected
          -->
         <v-menu
-          v-else
           v-model="datePickerIsVisible"
           :close-on-content-click="false"
           transition="scale-transition"
@@ -39,24 +27,36 @@
             <v-text-field
               :value="dateFormatted"
               @input="datePickerIsVisible = false"
-              @change="updateDateInput"
-              label="Year"
+              :label="getLabel()"
               persistent-hint
               prepend-icon="mdi-calendar"
               v-on="on"
               readonly
               outlined
               color="focus"
+              clearable
+              @click:clear="setToNull"
             />
           </template>
           <v-date-picker
+            v-if="control.options.subtype !== 'date-year'"
             :value="dateForPicker"
             @input="updateDatePicker"
             :type="datePickerType"
-            ref="picker"
             reactive
             no-title
             color="focus"
+            :range="control.options.subtype === 'date-week-month-year'"
+          />
+          <v-date-picker
+            v-else
+            :value="dateForPicker"
+            @input="updateDatePicker"
+            :type="datePickerType"
+            reactive
+            no-title
+            color="focus"
+            ref="picker"
           />
         </v-menu>
       </div>
@@ -71,15 +71,16 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
-  props: { centered: { type: Boolean, default: true } },
+  props: { centered: { type: Boolean, default: true }, value: { type: String } },
   data() {
     return {
       datePickerIsVisible: false,
+      localValue: this.value,
     };
   },
   computed: {
     dateFormatted() {
-      return this.value ? this.formatDate(new Date(this.value).toISOString().substring(0, 10)) : null;
+      return this.localValue ? this.formatDate(new Date(this.value).toISOString().substring(0, 10)) : null;
     },
     dateForPicker() {
       let substrLength;
@@ -144,14 +145,23 @@ export default {
   // },
   watch: {
     datePickerIsVisible(val) {
-      if (val) {
-        setTimeout(() => {
-          this.$refs.picker.activePicker = 'YEAR';
-        });
+      if (this.control.options.subtype === 'date-year') {
+        if (val) {
+          setTimeout(() => {
+            this.$refs.picker.activePicker = 'YEAR';
+          });
+        }
       }
     },
   },
   methods: {
+    getLabel() {
+      return this.control.options.subtype === 'date-year' ? 'Year' : 'Date';
+    },
+    setToNull() {
+      this.localValue = null;
+      this.updateDatePicker(null);
+    },
     handlePickerInput(ev) {
       console.log('picker', ev);
     },
@@ -166,33 +176,33 @@ export default {
     },
     updateDate(date) {
       const newDate = new Date(date).toISOString();
-      this.dateFormatted = newDate;
-    },
-    updateDateInput(date) {
-      const newDate = new Date(date).toISOString();
-      this.changed(newDate);
+      this.localValue = newDate;
     },
     updateDatePicker(date) {
-      this.datePickerIsVisible = false;
-      console.log('update date picker', date);
+      this.localValue = date;
+      if (date === null) {
+        this.changed(null);
+      } else {
+        this.datePickerIsVisible = false;
 
-      const newDate =
-        this.control.options.subtype === 'date-year'
-          ? new Date(date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (match, g1) => [g1, '01', '01'].join('-'))) // set month and date to 1
-          : new Date(date);
-      console.log('new Date', newDate, newDate.toISOString());
-      if (this.control.options.subtype === 'date-year') {
-        this.$refs.picker.activePicker = 'YEAR';
-      } else if (this.control.options.subtype === 'date-week-month-year') {
-        // const offset = newDate.getDay() === 0 ? -1 : 0;
-        const offset = -1;
-        console.log(newDate.toISOString().substring(0, 10), newDate.getDay(), offset);
-        newDate.setDate(newDate.getDate() - newDate.getDay() + offset);
-        // newDate.setDate(newDate.getDate() - newDate.getDay() - 1);
+        const newDate =
+          this.control.options.subtype === 'date-year'
+            ? new Date(date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (match, g1) => [g1, '01', '01'].join('-'))) // set month and date to 1
+            : new Date(date);
+        console.log('new Date', newDate, newDate.toISOString());
+        if (this.control.options.subtype === 'date-year') {
+          this.$refs.picker.activePicker = 'YEAR';
+        } else if (this.control.options.subtype === 'date-week-month-year') {
+          // const offset = newDate.getDay() === 0 ? -1 : 0;
+          const offset = -1;
+          console.log('date-week-month-year', newDate.toISOString().substring(0, 10), newDate.getDay(), offset);
+          newDate.setDate(newDate.getDate() - newDate.getDay() + offset);
+          // newDate.setDate(newDate.getDate() - newDate.getDay() - 1);
+        }
+        // this.changed(newDate.toISOString(true));
+        console.log(newDate, 'as iso', newDate.toISOString());
+        this.changed(newDate.toISOString());
       }
-      // this.changed(newDate.toISOString(true));
-      console.log(newDate, 'as iso', newDate.toISOString());
-      this.changed(newDate.toISOString());
     },
     formatDate(date) {
       if (!date) return null;

@@ -78,12 +78,12 @@ export default {
           return;
         }
         const pickedDate = Array.isArray(date) ? date[0] : date;
+        let localDate = new Date(pickedDate);
         let target = parse(pickedDate, this.formatter, new Date());
         if (!isValid(target)) {
           this.$emit('input', null);
           return;
         }
-
         if (this.type === 'date') {
           target = startOfDay(target);
         } else if (this.type === 'date-month-year') {
@@ -93,6 +93,7 @@ export default {
         } else if (this.type === 'date-week-month-year') {
           target = startOfWeek(target);
         }
+        target.setHours(localDate.getHours());
         this.$emit('input', target.toISOString());
       },
     },

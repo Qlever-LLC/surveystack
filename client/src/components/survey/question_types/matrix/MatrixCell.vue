@@ -196,6 +196,8 @@
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
+          clearable
+          @click:clear="setToNull"
         />
       </template>
       <v-date-picker
@@ -320,7 +322,9 @@ export default {
     },
     onDateInput(value) {
       const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
-      const date = parse(value, 'yyyy-MM-dd', new Date());
+      const localDate = new Date(value);
+      let date = parse(value, 'yyyy-MM-dd', new Date());
+      date.setHours(localDate.getHours());
       if (!isValidFormat || !isValid(date)) {
         return;
       }
