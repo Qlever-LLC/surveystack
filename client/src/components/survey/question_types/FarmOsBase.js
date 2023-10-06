@@ -52,15 +52,18 @@ const base = () => ({
       try {
         const assets = await this.$store.dispatch('draft/getFarmOsResource', 'assets');
 
-        this.farms = assets.map((f) => ({
-          label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
-          value: {
-            farmName: f.instanceName,
-            url: f.instanceName,
-            name: f.name.trim(),
-            id: f.id,
-          },
-        }));
+        this.farms = assets
+          .map((f) => ({
+            label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+            value: {
+              archived: f.archived !== null,
+              farmName: f.instanceName,
+              url: f.instanceName,
+              name: f.name.trim(),
+              id: f.id,
+            },
+          }))
+          .filter((a) => a.value.archived == false);
       } catch (e) {
         console.log('something went wrong:', e);
         // TODO show error
@@ -117,30 +120,32 @@ const base = () => ({
           this.$store.dispatch('draft/getFarmOsResource', 'plant'),
         ]);
 
-        this.assets = plantAssets.map((asset) => {
-          const location = asset.location
-            ? asset.location.map(({ id }) => {
-                const match = locationAssets.find((l) => l.id === id);
+        this.assets = plantAssets
+          .map((asset) => {
+            const location = asset.location
+              ? asset.location.map(({ id }) => {
+                  const match = locationAssets.find((l) => l.id === id);
 
-                return {
-                  id,
-                  name: match ? match.name : '(No Area Associated)',
-                };
-              })
-            : [];
+                  return {
+                    id,
+                    name: match ? match.name : '(No Area Associated)',
+                  };
+                })
+              : [];
 
-          return {
-            label: `<span class="blue-chip mr-4">${asset.instanceName}</span> ${asset.name} `,
-            value: {
-              farmName: asset.instanceName,
-              url: asset.instanceName,
-              name: asset.name.trim(),
-              id: asset.id,
-              archived: asset.archived !== null,
-              location,
-            },
-          };
-        });
+            return {
+              label: `<span class="blue-chip mr-4">${asset.instanceName}</span> ${asset.name} `,
+              value: {
+                farmName: asset.instanceName,
+                url: asset.instanceName,
+                name: asset.name.trim(),
+                id: asset.id,
+                archived: asset.archived !== null,
+                location,
+              },
+            };
+          })
+          .filter((a) => a.value.archived == false);
       } catch (e) {
         console.log('something went wrong:', e);
         // TODO show error
