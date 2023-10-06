@@ -35,7 +35,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     const r = await axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(
         farmurl
-      )}/api/asset/${bundle}?&fields[asset--${bundle}]=id,name,archived,location`,
+      )}/api/asset/${bundle}?&fields[asset--${bundle}]=id,name,status,location`,
       {
         ...opts,
       }
