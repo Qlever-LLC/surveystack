@@ -194,7 +194,10 @@ export default {
           this.$refs.picker.activePicker = 'YEAR';
         } else if (this.control.options.subtype === 'date-week-month-year') {
           // const offset = newDate.getDay() === 0 ? -1 : 0;
-          const offset = -1;
+          let offset = -1;
+          if (newDate.getTimezoneOffset() < 0) {
+            offset = 0;
+          }
           console.log('date-week-month-year', newDate.toISOString().substring(0, 10), newDate.getDay(), offset);
           newDate.setDate(newDate.getDate() - newDate.getDay() + offset);
           // newDate.setDate(newDate.getDate() - newDate.getDay() - 1);

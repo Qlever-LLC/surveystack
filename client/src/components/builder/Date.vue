@@ -78,23 +78,35 @@ export default {
           return;
         }
         const pickedDate = Array.isArray(date) ? date[0] : date;
-        let localDate = new Date(pickedDate);
-        let target = parse(pickedDate, this.formatter, new Date());
+        let target = new Date(pickedDate);
+
         if (!isValid(target)) {
           this.$emit('input', null);
           return;
         }
+        // + 1 day due to GMT
+        target.setDate(target.getDate() + 1);
+
         if (this.type === 'date') {
           target = startOfDay(target);
         } else if (this.type === 'date-month-year') {
           target = startOfMonth(target);
+          if (target.getTimezoneOffset() < 0) {
+            target.setDate(target.getDate() + 1);
+          }
         } else if (this.type === 'date-year') {
           target = startOfYear(target);
         } else if (this.type === 'date-week-month-year') {
           target = startOfWeek(target);
+          if (target.getTimezoneOffset() < 0) {
+            target.setDate(target.getDate() + 1);
+          }
         }
-        target.setHours(localDate.getHours());
-        this.$emit('input', target.toISOString());
+
+        // remove 'Z'
+        const result = target.toISOString().slice(0, -1);
+
+        this.$emit('input', result);
       },
     },
     year: {
@@ -103,7 +115,7 @@ export default {
       },
       set(year) {
         if (typeof year === 'number') {
-          this.$emit('input', new Date(year, 0).toISOString());
+          this.$emit('input', new Date(year, 1, 0).toISOString());
         } else {
           this.$emit('input', null);
         }

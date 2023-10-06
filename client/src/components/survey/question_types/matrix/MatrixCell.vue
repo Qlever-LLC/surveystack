@@ -322,13 +322,13 @@ export default {
     },
     onDateInput(value) {
       const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
-      const localDate = new Date(value);
-      let date = parse(value, 'yyyy-MM-dd', new Date());
-      date.setHours(localDate.getHours());
+      let date = new Date(value);
+
       if (!isValidFormat || !isValid(date)) {
         return;
       }
-      this.value = date.toISOString();
+      // remove 'Z'
+      this.value = date.toISOString().slice(0, -1);
       this.$emit('changed');
     },
     onFarmOsInput(value) {
