@@ -26,7 +26,7 @@
 
     <v-divider class="my-4"></v-divider>
 
-    <v-simple-table v-if="!loading">
+    <a-table v-if="!loading">
       <template v-slot:default>
         <thead>
           <tr>
@@ -96,12 +96,15 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
   </v-container>
 </template>
 
 <script>
+import ATable from '@/components/ui/ATable.vue';
+
 export default {
+  components: { ATable },
   props: {
     groups: Array,
     mappings: Object,

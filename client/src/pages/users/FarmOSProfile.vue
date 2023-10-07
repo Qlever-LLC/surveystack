@@ -233,7 +233,7 @@
         <h2>FarmOS Integrations</h2>
       </div>
 
-      <v-simple-table class="mt-8">
+      <a-table class="mt-8">
         <template v-slot>
           <thead>
             <tr>
@@ -392,7 +392,7 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
 
       <div style="margin-top: 100px !important">
         <p><b>If you have questions or need support reach out to your group admin or email info@our-sci.net.</b></p>
@@ -408,9 +408,11 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import ATable from '@/components/ui/ATable.vue';
 
 export default {
   components: {
+    ATable,
     appDialog,
   },
   data() {

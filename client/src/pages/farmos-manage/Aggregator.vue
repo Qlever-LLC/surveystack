@@ -71,7 +71,7 @@
 
       <v-label class="vy-4">Current Group Mappings</v-label>
 
-      <v-simple-table v-if="mappedGroups.length > 0">
+      <a-table v-if="mappedGroups.length > 0">
         <template v-slot:default>
           <thead>
             <tr>
@@ -88,7 +88,7 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
       <v-alert v-else class="mt-4" mode="fade" text type="warning"
         >No Group Mappings exist for {{ selectedInstance }}</v-alert
       >
@@ -120,7 +120,7 @@
       </div>
 
       <v-label class="vy-4">Current User Mappings</v-label>
-      <v-simple-table v-if="!loading">
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -139,13 +139,13 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </template>
 
     <div v-if="farmsNotInAggregator.length > 0 && !loading">
       <h2>Farms in Surveystack which are not present on FarmOS Aggregator</h2>
       <p class="grey--text text--darken-2">These instances have likely been removed from the aggregator.</p>
-      <v-simple-table v-if="!loading">
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -192,7 +192,7 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </div>
 
     <div v-if="farmsNotInSurvestack.length > 0 && !loading">
@@ -200,7 +200,7 @@
       <p class="grey--text text--darken-2">
         These instances are likely self hosted or have not been added to a payment plan of a group.
       </p>
-      <v-simple-table v-if="!loading">
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -229,15 +229,17 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </div>
   </v-container>
 </template>
 
 <script>
 import _ from 'lodash';
+import ATable from '@/components/ui/ATable.vue';
 
 export default {
+  components: { ATable },
   emits: ['addSuperAdminNote'],
   props: {
     groups: Array,
