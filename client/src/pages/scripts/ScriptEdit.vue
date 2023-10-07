@@ -4,7 +4,14 @@
     <span class="text--secondary">{{ this.entity._id }}</span>
     <v-form class="mt-3" @keydown.enter.prevent="submit">
       <v-text-field v-model="entity.name" label="Name" outlined hide-details />
-      <active-group-selector class="my-4" label="Group" v-model="entity.meta.group" outlined returnObject />
+      <active-group-selector
+        class="my-4"
+        label="Group"
+        v-model="entity.meta.group"
+        outlined
+        returnObject
+        adminGroupsOnly
+      />
       <code-editor
         title=""
         class="code-editor"
