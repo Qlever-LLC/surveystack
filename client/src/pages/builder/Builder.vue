@@ -250,17 +250,13 @@ export default {
         tmp.latestVersion = tmp.revisions[tmp.revisions.length - 1].version;
       }
 
-      const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/surveys/${tmp._id}` : '/surveys';
       console.log('submitting survey', tmp);
 
       try {
-        await api.customRequest({
-          method,
-          url,
-          data: tmp,
-        });
-        if (!this.editMode) {
+        if (this.editMode) {
+          await api.put(`/surveys/${tmp._id}`, tmp);
+        } else {
+          await api.post('/surveys', tmp);
           this.editMode = true;
           this.$router.push(`/surveys/${tmp._id}/edit`);
         }

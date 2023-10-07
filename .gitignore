@@ -4,3 +4,4 @@ lerna-debug.log
 client/build-storybook.log
 client/public/static
 review-2*
+.DS_Store

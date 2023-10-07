@@ -20,8 +20,8 @@ export const createUser = async (overrides = {}) => {
     name: `User Number${fakeId}`,
   };
   const user = createUserDoc({ ...defaults, ...overrides });
-  const result = await getDb().collection('users').insertOne(user);
-  return result.ops[0];
+  const insertResult = await getDb().collection('users').insertOne(user);
+  return { _id: insertResult.insertedId, ...user };
 };
 
 export const createGroup = async (_overrides = {}) => {
@@ -44,13 +44,14 @@ export const createGroup = async (_overrides = {}) => {
     ...overrides,
   };
 
-  const result = await getDb().collection('groups').insertOne(doc);
+  const insertResult = await getDb().collection('groups').insertOne(doc);
+  const group = { _id: insertResult.insertedId, ...doc };
 
   const createUserMember = async ({ userOverrides, membershipOverrides } = {}) => {
     const user = await createUser(userOverrides);
     const membership = await createMembership({
       user,
-      group: result.insertedId,
+      group: group._id,
       role: 'user',
       ...membershipOverrides,
     });
@@ -72,7 +73,7 @@ export const createGroup = async (_overrides = {}) => {
     });
   };
 
-  return { ...result.ops[0], createUserMember, createAdminMember, createSubGroup };
+  return { ...group, createUserMember, createAdminMember, createSubGroup };
 };
 
 export const asMongoId = (source) =>
@@ -95,19 +96,18 @@ export const createMembership = async (_overrides = {}) => {
     },
     ...overrides,
   };
-  const result = await getDb().collection('memberships').insertOne(doc);
+  const insertResult = await getDb().collection('memberships').insertOne(doc);
 
-  return result.ops[0];
+  return { _id: insertResult.insertedId, ...doc };
 };
 
-export const deleteMemberships = async (groupId, userId) => {
-  return await getDb()
+export const deleteMemberships = (groupId, userId) =>
+  getDb()
     .collection('memberships')
     .deleteMany({
       group: asMongoId(groupId),
       user: asMongoId(userId),
     });
-};
 
 /**
  * membershipId must be ObjectId
@@ -120,7 +120,7 @@ export const setRole = async (membershipId, role) => {
     { _id: membershipId },
     { $set: { role } },
     {
-      returnOriginal: false,
+      returnDocument: 'after',
     }
   );
 };
@@ -249,10 +249,8 @@ export const createSurvey = async (control = '', overrides = {}) => {
     surveyDoc.latestVersion = 2;
   }
 
-  const {
-    ops: [survey],
-    insertedId,
-  } = await getDb().collection('surveys').insertOne(surveyDoc);
+  const insertResult = await getDb().collection('surveys').insertOne(surveyDoc);
+  const survey = { _id: insertResult.insertedId, ...surveyDoc };
 
   const createSubmission = async (_overrides = {}) => {
     let data = {};
@@ -293,7 +291,7 @@ export const createSurvey = async (control = '', overrides = {}) => {
         dateModified: now,
         dateSubmitted: now,
         survey: {
-          id: insertedId,
+          id: survey._id,
           name: survey.name,
           version: 2,
         },
@@ -314,9 +312,8 @@ export const createSurvey = async (control = '', overrides = {}) => {
       ..._overrides,
     };
 
-    const {
-      ops: [submission],
-    } = await getDb().collection('submissions').insertOne(submissionDoc);
+    const insertResult = await getDb().collection('submissions').insertOne(submissionDoc);
+    const submission = { _id: insertResult.insertedId, ...submissionDoc };
 
     submission.meta.dateCreated = submission.meta.dateCreated.toISOString();
     submission.meta.dateModified = submission.meta.dateModified.toISOString();

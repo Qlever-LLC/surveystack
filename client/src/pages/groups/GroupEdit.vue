@@ -288,16 +288,13 @@ export default {
         return;
       }
 
-      const data = this.entity;
-      const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/groups/${this.entity._id}` : '/groups';
-
       try {
-        await api.customRequest({
-          method,
-          url,
-          data,
-        });
+        if (this.editMode) {
+          await api.put(`/groups/${this.entity._id}`, this.entity);
+        } else {
+          await api.post('/groups', this.entity);
+        }
+
         this.$router.push(`/g${this.entity.dir}${this.entity.slug}/`);
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
