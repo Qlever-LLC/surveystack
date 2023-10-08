@@ -1,10 +1,12 @@
 <template>
   <v-checkbox
-    v-model="checked"
-    class="align-center align-self-start"
-    v-bind="$attrs"
-    color="grey darken-1"
-    hide-details
+    :model-value="value"
+    @change="$emit('change', $event)"
+    :color="color"
+    :dense="dense"
+    :disabled="disabled"
+    :hide-details="hideDetails"
+    :label="label"
   >
     <template slot="append" v-if="helperText || $slots['helper-text']">
       <v-tooltip max-width="400" transition="slide-x-transition" right>
@@ -24,18 +26,28 @@ export default {
     value: {
       type: Boolean,
     },
+    hideDetails: {
+      type: Boolean,
+      default: true, //yes, we usually wwant to hide details as there's not validation
+    },
+    label: {
+      type: String,
+      default: undefined,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    dense: {
+      type: Boolean,
+      default: false,
+    },
+    color: {
+      type: String,
+      required: false,
+    },
     helperText: {
       type: String,
-    },
-  },
-  computed: {
-    checked: {
-      get() {
-        return this.value || false;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
     },
   },
 };

@@ -111,29 +111,37 @@
                           <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                       </div>
-                      <a-checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
                       <a-checkbox
-                        class="mt-0 ml-2"
+                        v-model="item.multiple"
+                        label="Multi-select"
+                        hide-details
+                        dense
+                        color="grey darken-1"
+                        class="mt-0 ml-2 align-center align-self-start"
+                      />
+                      <a-checkbox
                         v-model="item.custom"
-                        :checked="item.custom"
-                        @input="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
+                        @change="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
                         label="Allow custom answer"
                         hide-details
                         dense
+                        color="grey darken-1"
+                        class="mt-0 ml-2 align-center align-self-start"
                       >
                         <template slot="helper-text">
                           Allows the user to input answers that do not exist within the provided items. This will also
                           require <strong>Autocomplete</strong> is on
                         </template>
-                      </checkbox>
+                      </a-checkbox>
                       <a-checkbox
-                        class="mt-0 ml-2"
                         v-model="item.autocomplete"
                         label="Autocomplete"
                         :disabled="Boolean(item.custom)"
                         helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
                         hide-details
                         dense
+                        color="grey darken-1"
+                        class="mt-0 ml-2 align-center align-self-start"
                       />
                     </div>
 
@@ -195,33 +203,38 @@
                       label="Required"
                       helper-text="Make this a required field"
                       hide-details
-                      class="mt-4"
+                      class="mt-4 align-center align-self-start"
+                      color="grey darken-1"
                     />
                     <a-checkbox
                       v-model="item.redacted"
                       label="Private"
                       helper-text="Visible to submitter and admins only"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
+                      color="grey darken-1"
                     />
                     <a-checkbox
                       v-if="allowSetAllowHide"
                       v-model="item.allowHide"
                       label="Allow hide"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
                       helper-text="Allow users of this question set to hide this column"
+                      color="grey darken-1"
                     />
                     <a-checkbox
                       v-if="!allowSetAllowHide && item.allowHide"
                       v-model="item.hidden"
                       label="Hidden"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
                       helper-text="Submitters can not see this column. This option is intentionally allowed by the question set designer"
+                      color="grey darken-1"
                     />
                     <a-checkbox
                       v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
                       v-model="item.multiple"
                       label="Multi-select"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
+                      color="grey darken-1"
                     />
 
                     <h4 class="mt-6 mb-4">Display Options</h4>
