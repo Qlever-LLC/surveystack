@@ -419,7 +419,7 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  if (typeof owner == undefined) {
+  if (typeof owner === 'undefined') {
     throw boom.badData('owner attribute missing');
   }
   const { origin } = req.headers;
