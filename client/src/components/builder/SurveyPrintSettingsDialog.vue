@@ -5,14 +5,14 @@
 
       <v-card-text>
         <div class="d-flex">
-          <checkbox
+          <a-checkbox
             v-model="survey.meta.printOptions.showInstruction"
             label="Show Instructions"
             helper-text="Display instructions questions on PDFs of completed submissions."
           />
         </div>
         <div class="d-flex">
-          <checkbox
+          <a-checkbox
             v-model="survey.meta.printOptions.showUnanswered"
             label="Show Unanswered"
             helper-text='Display unanswered questions on PDFs of completed submissions. Unanswered questions will show "No answer" in the PDF.'
@@ -29,11 +29,11 @@
 </template>
 
 <script>
-import Checkbox from '@/components/ui/Checkbox.vue';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   name: 'survey-print-settings-dialog',
-  components: { Checkbox },
+  components: { ACheckbox },
   props: {
     value: {
       type: Boolean,

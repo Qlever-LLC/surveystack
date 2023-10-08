@@ -111,8 +111,8 @@
                           <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                       </div>
-                      <checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
-                      <checkbox
+                      <a-checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
+                      <a-checkbox
                         class="mt-0 ml-2"
                         v-model="item.custom"
                         :checked="item.custom"
@@ -126,7 +126,7 @@
                           require <strong>Autocomplete</strong> is on
                         </template>
                       </checkbox>
-                      <checkbox
+                      <a-checkbox
                         class="mt-0 ml-2"
                         v-model="item.autocomplete"
                         label="Autocomplete"
@@ -185,7 +185,7 @@
                       />
                     </div>
 
-                    <checkbox
+                    <a-checkbox
                       v-model="item.required"
                       @change="
                         (v) => {
@@ -197,27 +197,27 @@
                       hide-details
                       class="mt-4"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-model="item.redacted"
                       label="Private"
                       helper-text="Visible to submitter and admins only"
                       class="mt-2"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-if="allowSetAllowHide"
                       v-model="item.allowHide"
                       label="Allow hide"
                       class="mt-2"
                       helper-text="Allow users of this question set to hide this column"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-if="!allowSetAllowHide && item.allowHide"
                       v-model="item.hidden"
                       label="Hidden"
                       class="mt-2"
                       helper-text="Submitters can not see this column. This option is intentionally allowed by the question set designer"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
                       v-model="item.multiple"
                       label="Multi-select"
@@ -259,7 +259,7 @@ import Draggable from 'vuedraggable';
 import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/ui/Checkbox.vue';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 
@@ -289,7 +289,7 @@ export default {
     Draggable,
     Ontology,
     Date,
-    Checkbox,
+    ACheckbox,
   },
   props: {
     value: {
