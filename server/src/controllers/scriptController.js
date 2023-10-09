@@ -115,7 +115,8 @@ const updateScript = async (req, res) => {
     return res.status(401).send();
   }
 
-  if (entity.meta.group?.id !== res.locals.existing.meta.group?.id) {
+  const isUpdatingGroup = entity.meta.group?.id !== res.locals.existing.meta.group?.id;
+  if (isUpdatingGroup) {
     const hasAdminRoleForNewGroup = await rolesService.hasAdminRoleForRequest(
       res,
       entity.meta.group?.id
