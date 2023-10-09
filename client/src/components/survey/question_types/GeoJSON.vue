@@ -1,6 +1,13 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <app-control-hint :value="control.hint" />
     <v-snackbar top light v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1">
       Keep this window open while tracing your area or field. If you switch applications you may lose the area you have

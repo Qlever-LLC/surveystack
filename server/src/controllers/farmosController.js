@@ -1106,7 +1106,7 @@ export const mapUser = async (req, res) => {
     {
       _id: asMongoId(groupId),
     },
-    { name: 1 }
+    { projection: { name: 1 } }
   );
   const resStatus = `Successfully added instance to ${group.name}, instance owner will be notified`;
   return res.send({
@@ -1151,8 +1151,10 @@ export const getOwnersFromInstances = async (req, res) => {
         },
       },
       {
-        email: 1,
-        name: 1,
+        projection: {
+          email: 1,
+          name: 1,
+        },
       }
     )
     .toArray();

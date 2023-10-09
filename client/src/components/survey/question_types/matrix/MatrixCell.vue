@@ -378,9 +378,11 @@ export default {
             item.value.location.some((loc) => loc.id === field.location.id)
         )
       );
-      const noneExist = assetsToSelect.filter(
-        (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
-      );
+      const noneExist = assetsToSelect
+        .filter(
+          (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
+        )
+        .map((asset) => asset.value);
       assets.push(...noneExist);
 
       if (!Array.isArray(hashesArg)) {

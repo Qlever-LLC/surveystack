@@ -25,6 +25,17 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
       };
     }
 
+    // if control option is not existing, skip calc for this node
+    if (!control.options[option]) {
+      return {
+        path,
+        control,
+        field,
+        skip: true,
+      };
+    }
+
+    // if control option is disabled, skip calc for this node
     if (!control.options[option].enabled) {
       return {
         path,
@@ -44,6 +55,16 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
         field,
         skip: true,
         clear: true,
+      };
+    }
+
+    //do not initialize if dateModified is set (means user has set the value manually)
+    if (fname === 'initialize' && field.meta.dateModified) {
+      return {
+        path,
+        control,
+        field,
+        skip: true,
       };
     }
 
@@ -99,6 +120,17 @@ export const calculateRelevance = async (nodes, submission, survey) => {
     survey,
     option: 'relevance',
     fname: 'relevance',
+  });
+  return calculations;
+};
+
+export const calculateInitialize = async (nodes, submission, survey) => {
+  const calculations = await calculateField({
+    nodes,
+    submission,
+    survey,
+    option: 'initialize',
+    fname: 'initialize',
   });
   return calculations;
 };

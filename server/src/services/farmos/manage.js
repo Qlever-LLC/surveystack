@@ -446,7 +446,11 @@ export const addFarmToSurveystackGroupAndSendNotification = async (
   groupId,
   origin
 ) => {
-  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
+  try {
+    await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
+  } catch (error) {
+    console.log(error);
+  }
   return await addFarmToSurveystackGroup(instanceName, groupId);
 };
 

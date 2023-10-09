@@ -48,7 +48,7 @@
         <component
           :is="getComponentName(control)"
           :control="control"
-          :value="$store.getters['draft/property'](path) ? $store.getters['draft/property'](path).value : null"
+          :value="value"
           :index="path"
           :key="path"
           :resources="survey.resources"
@@ -65,6 +65,7 @@
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
           :forceMobile="forceMobile"
           :isInBuilder="isInBuilder"
+          @initialize="initialize(control.id)"
         />
       </div>
     </div>
@@ -121,20 +122,31 @@ export default {
     meta() {
       return this.$store.getters['draft/property'](`${this.path}.meta`);
     },
+    value() {
+      const property = this.$store.getters['draft/property'](this.path);
+      return property ? property.value : null;
+    },
   },
   methods: {
     setProperty(value) {
       const path = `${this.path}.value`;
-      this.$store.dispatch('draft/setProperty', { path, value });
-
-      // adjust modified date
+      // adjust modified date of the control
       const modified = new Date().toISOString();
       this.$store.dispatch('draft/setProperty', {
         path: `${this.path}.meta.dateModified`,
         value: modified,
         calculate: false,
+        initialize: false,
       });
-      this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified, calculate: false });
+      // adjust modified date of the submission
+      this.$store.dispatch('draft/setProperty', {
+        path: 'meta.dateModified',
+        value: modified,
+        calculate: false,
+        initialize: false,
+      });
+      // adjust value
+      this.$store.dispatch('draft/setProperty', { path, value });
     },
     setStatus({ type, message }) {
       this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.status`, value: type });
@@ -148,6 +160,12 @@ export default {
     },
     getComponentName(control) {
       return `app-control-${control.type}`;
+    },
+    initialize(controlId) {
+      //get the control's node
+      const node = this.$store.getters['draft/nodeByControl'](controlId);
+      //force initialize
+      this.$store.dispatch('draft/initializeForced', node);
     },
   },
 };
