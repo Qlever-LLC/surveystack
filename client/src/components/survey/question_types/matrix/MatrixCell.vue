@@ -56,6 +56,7 @@
     :disabled="disabled"
     hide-details
     outlined
+    clearable
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />

@@ -27,6 +27,7 @@
       outlined
       class="full-width dropdown"
       data-test-id="dropdown"
+      clearable
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
