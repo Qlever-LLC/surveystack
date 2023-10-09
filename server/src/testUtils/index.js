@@ -9,8 +9,11 @@ const { getDb } = jest.requireActual('../db');
 const { createUserDoc } = jest.requireActual('../services/auth.service');
 const { getRoles } = jest.requireActual('../services/roles.service');
 
-export const createSuperAdmin = async () => {
-  return await createUser({ permissions: ['super-admin'] });
+export const createSuperAdmin = async (overrides = {}) => {
+  return await createUser({
+    permissions: ['super-admin'],
+    ...overrides,
+  });
 };
 
 export const createUser = async (overrides = {}) => {
@@ -123,6 +126,24 @@ export const setRole = async (membershipId, role) => {
       returnDocument: 'after',
     }
   );
+};
+
+export const createScript = async ({ group }) => {
+  const script = {
+    name: 'script name',
+    content: 'script content',
+    meta: {
+      creator: null,
+      dateCreated: new Date().toISOString(),
+      dateModified: new Date().toISOString(),
+      group,
+      revision: 1,
+      specVersion: 2,
+    },
+    _id: new ObjectId(),
+  };
+  await getDb().collection('scripts').insertOne(script);
+  return script;
 };
 
 /**
