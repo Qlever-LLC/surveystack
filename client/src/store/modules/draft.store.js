@@ -122,15 +122,6 @@ const getters = {
       the user can proceed with the survey without filling in the matrix.
       But if a row is added, then a value must be placed in the required column
     */
-      // state.node.model.type === 'matrix'
-      // state.node.model.name => 'matrix_1' UNIQUE
-      // state.node.model.options.source.content => Array
-      //        -> content[i].required === true
-      //        -> content[i].value => 'description'
-      // i = column
-      // state.submission.data."matrix_1".value => Array
-      //        -> value[j]."description".value !== null || value.trim() !== ''
-      // j = row of answer
       const matrixName = state.node.model.name;
       //detect required columns
       let requiredColumnNames = [];
