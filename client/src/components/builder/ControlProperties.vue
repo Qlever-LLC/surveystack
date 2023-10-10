@@ -151,7 +151,7 @@
         color="grey darken-1"
         label="Allow custom answer"
         v-model="control.options.allowCustomSelection"
-        @change="
+        @input="
           () => {
             control.options.allowAutocomplete = true;
             control.defaultValue = null;

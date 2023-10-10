@@ -121,7 +121,7 @@
                       />
                       <a-checkbox
                         v-model="item.custom"
-                        @change="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
+                        @input="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
                         label="Allow custom answer"
                         hide-details
                         dense
@@ -195,7 +195,7 @@
 
                     <a-checkbox
                       v-model="item.required"
-                      @change="
+                      @input="
                         (v) => {
                           v && $emit('set-control-required');
                         }

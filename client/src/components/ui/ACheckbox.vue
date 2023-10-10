@@ -1,7 +1,8 @@
 <template>
   <v-checkbox
-    :model-value="value"
-    @change="$emit('change', $event)"
+    :input-value="value"
+    :value="selectedValue"
+    @change="change"
     :color="color"
     :dense="dense"
     :disabled="disabled"
@@ -24,7 +25,13 @@
 export default {
   props: {
     value: {
-      type: Boolean,
+      //set by v-model
+      type: undefined, //typically a boolean or an array (then combined with the value prop
+      default: false,
+    },
+    selectedValue: {
+      type: undefined,
+      default: undefined,
     },
     hideDetails: {
       type: Boolean,
@@ -48,6 +55,12 @@ export default {
     },
     helperText: {
       type: String,
+    },
+  },
+  methods: {
+    change(value) {
+      this.$emit('input', value);
+      //this.$emit('change', value);
     },
   },
 };
