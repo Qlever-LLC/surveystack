@@ -5,7 +5,7 @@
       This will clear all surveys and all submissions. And furthermore create an example survey with corresponding
       submissions.
     </p>
-    <v-checkbox label="Activate" v-model="activate" />
+    <a-checkbox label="Activate" v-model="activate" />
 
     <v-btn color="primary" @click="submit" :disabled="!activate">{{ activate ? 'CONFIRM!' : 'Activate first' }}</v-btn>
 
@@ -19,9 +19,11 @@
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import appFeedback from '@/components/ui/Feedback.vue';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   components: {
+    ACheckbox,
     appFeedback,
   },
   data() {

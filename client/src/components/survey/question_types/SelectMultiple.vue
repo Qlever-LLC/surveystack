@@ -13,10 +13,10 @@
     <div v-if="sourceIsValid" class="py-2">
       <div class="select-multiple-source">
         <div v-for="item in selections" :key="item.value">
-          <v-checkbox
+          <a-checkbox
             v-model="item.selected"
             :label="item.label"
-            @change="onChange"
+            @input="onChange"
             hide-details
             class="my-1"
             color="focus"
@@ -25,9 +25,9 @@
       </div>
 
       <div v-if="control.options.allowCustomSelection" class="select-multiple-custom mt-3 d-flex align-center">
-        <v-checkbox
+        <a-checkbox
           v-model="customSelected"
-          @change="onChange"
+          @input="onChange"
           hide-details
           class="mt-0"
           :disabled="!customValue"
@@ -54,8 +54,10 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 
 import { getValueOrNull } from '@/utils/surveyStack';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
+  components: { ACheckbox },
   mixins: [baseQuestionComponent],
   data() {
     return {

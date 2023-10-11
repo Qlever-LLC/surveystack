@@ -45,9 +45,9 @@
               >
             </div>
             <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
-              <v-checkbox
+              <a-checkbox
                 v-model="selectedVersionsToDelete"
-                :value="String(revision.version)"
+                :selected-item="String(revision.version)"
                 hide-details
                 title="Delete version"
                 class="mt-0"
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { ACheckbox, SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

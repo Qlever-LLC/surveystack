@@ -53,7 +53,7 @@
             </td>
             <td></td>
             <td>
-              <v-checkbox v-model="owner" label="owner"></v-checkbox>
+              <a-checkbox v-model="owner" label="owner" />
             </td>
             <td>
               <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
@@ -101,7 +101,10 @@
 </template>
 
 <script>
+import ACheckbox from '@/components/ui/ACheckbox.vue';
+
 export default {
+  components: { ACheckbox },
   props: {
     groups: Array,
     mappings: Object,

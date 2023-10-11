@@ -64,7 +64,7 @@
             You are about to send an E-mail to {{ selectedMembers.length }}
             {{ selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
           </p>
-          <v-checkbox label="Also send a copy to myself" v-model="copy" />
+          <a-checkbox label="Also send a copy to myself" v-model="copy" />
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
           <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
@@ -87,6 +87,7 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -100,6 +101,7 @@ All the best
 
 export default {
   components: {
+    ACheckbox,
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,

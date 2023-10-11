@@ -1,15 +1,21 @@
 <template>
   <v-checkbox
     :input-value="value"
-    :value="selectedValue"
+    :value="selectedItem"
     @change="change"
+    @click="click"
+    :true-value="trueValue"
+    :indeterminate="indeterminate"
     :color="color"
     :dense="dense"
     :disabled="disabled"
     :hide-details="hideDetails"
     :label="label"
+    :rules="rules"
+    :hint="hint"
+    :persistent-hint="persistentHint"
   >
-    <template slot="append" v-if="helperText || $slots['helper-text']">
+    <template v-slot:append v-if="helperText || $slots['helper-text']">
       <v-tooltip max-width="400" transition="slide-x-transition" right>
         <template v-slot:activator="{ on, attrs }">
           <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
@@ -29,13 +35,33 @@ export default {
       type: undefined, //typically a boolean or an array (then combined with the value prop
       default: false,
     },
-    selectedValue: {
+    selectedItem: {
       type: undefined,
       default: undefined,
     },
+    trueValue: {
+      type: undefined,
+      required: false,
+    },
+    indeterminate: {
+      type: Boolean,
+      required: false,
+    },
+    rules: {
+      type: undefined,
+      required: false,
+    },
+    hint: {
+      type: undefined,
+      required: false,
+    },
+    persistentHint: {
+      type: Boolean,
+      required: false,
+    },
     hideDetails: {
       type: Boolean,
-      default: true, //yes, we usually wwant to hide details as there's not validation
+      default: true, //yes, we usually want to hide details as there's no validation
     },
     label: {
       type: String,
@@ -60,7 +86,9 @@ export default {
   methods: {
     change(value) {
       this.$emit('input', value);
-      //this.$emit('change', value);
+    },
+    click(value) {
+      this.$emit('click', value);
     },
   },
 };

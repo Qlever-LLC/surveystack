@@ -52,34 +52,34 @@
             <v-tooltip bottom :disabled="canAddCoffeeShop">
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
-                  <v-checkbox
+                  <a-checkbox
                     class="ma-0 pa-0"
                     label="Add this group to the Coffee Shop"
                     v-model="groupInfos.groupHasCoffeeShopAccess"
                     :ripple="false"
                     :disabled="!canAddCoffeeShop"
                     hide-details
-                    @change="$emit('addGrpCoffeeShop', $event)"
+                    @input="$emit('addGrpCoffeeShop', $event)"
                   />
                 </div>
               </template>
               <span>Talk to your parent group administrator to enable this option</span>
             </v-tooltip>
-            <v-checkbox
+            <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               hide-details
               :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-              @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
+              @input="$emit('allowSbGrpsJoinCoffeeShop', $event)"
               :label="`Allow subgroups to join the Coffee Shop`"
             />
-            <v-checkbox
+            <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
-              @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
+              @input="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
             />
           </v-container>
@@ -109,9 +109,11 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   components: {
+    ACheckbox,
     FarmOSGroupTable,
   },
   props: {

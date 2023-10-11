@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div class="d-flex justify-end">
-      <v-checkbox v-model="showArchived" label="View archived" dense hide-details />
+      <a-checkbox v-model="showArchived" label="View archived" dense hide-details />
     </div>
     <app-basic-list
       editable
@@ -24,9 +24,11 @@
 <script>
 import api from '@/services/api.service';
 import appBasicList from '@/components/ui/BasicList.vue';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   components: {
+    ACheckbox,
     appBasicList,
   },
   data() {

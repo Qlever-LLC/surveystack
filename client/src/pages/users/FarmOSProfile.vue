@@ -36,7 +36,7 @@
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
             <v-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details></v-text-field>
-            <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
+            <a-checkbox v-model="userIsOwner" label="this user will be an owner too" />
           </div>
           <v-alert
             v-if="errorDialogMessage"
@@ -408,9 +408,11 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   components: {
+    ACheckbox,
     appDialog,
   },
   data() {

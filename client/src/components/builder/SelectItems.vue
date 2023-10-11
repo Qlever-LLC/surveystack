@@ -21,16 +21,16 @@
 
       <v-card-text class="dialog-content">
         <div v-if="multiple" class="checkbox-group">
-          <v-checkbox
+          <a-checkbox
             v-for="(item, index) in items"
             :key="index"
             v-model="selected"
             :label="item.label"
-            :value="item.value"
+            :selected-item="item.value"
             class="mt-2"
             hide-details
           />
-          <v-checkbox v-if="custom" v-model="selected" label="other" value="other" class="mt-2" hide-details />
+          <a-checkbox v-if="custom" v-model="selected" label="other" selected-item="other" class="mt-2" hide-details />
         </div>
         <v-radio-group v-else :value="selected ? selected[0] : null" @change="selected = [$event]">
           <v-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
@@ -50,11 +50,14 @@
 </template>
 
 <script>
+import ACheckbox from '@/components/ui/ACheckbox.vue';
+
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
+  components: { ACheckbox },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

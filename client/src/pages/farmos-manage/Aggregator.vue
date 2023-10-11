@@ -114,7 +114,7 @@
           :items="users"
         ></v-autocomplete>
 
-        <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
+        <a-checkbox v-model="owner" label="owner" class="mx-6" />
 
         <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
       </div>
@@ -236,8 +236,10 @@
 
 <script>
 import _ from 'lodash';
+import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
+  components: { ACheckbox },
   emits: ['addSuperAdminNote'],
   props: {
     groups: Array,
