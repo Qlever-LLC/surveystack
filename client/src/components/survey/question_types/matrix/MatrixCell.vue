@@ -185,11 +185,11 @@
     >
       <template v-slot:activator="{ on, attrs }">
         <a-text-field
-          :value="getDateLabel"
-          @click="setActivePickerMonth"
-          hide-details
-          v-bind="attrs"
           v-on="on"
+          v-bind="attrs"
+          @click="setActivePickerMonth"
+          :value="getDateLabel"
+          hide-details
           outlined
           autocomplete="off"
           :disabled="disabled"

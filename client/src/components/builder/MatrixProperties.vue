@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
+  <v-dialog v-model="open" @click:outside="$refs.anchorRef.$children[0].blur()">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         v-on="on"

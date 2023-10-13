@@ -7,7 +7,7 @@
       :label="control.hint"
       :value="value"
       @input="onInput"
-      @keyup.enter.prevent="submit"
+      @keyup.native.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"
       hide-details="auto"
@@ -44,12 +44,12 @@ export default {
     tryAutofocus() {
       if (
         typeof document === 'undefined' ||
-        !this.$refs.textField.$refs.input ||
+        !this.$refs.textField.$children[0].$refs.input ||
         document.activeElement === this.$refs.input
       ) {
         return false;
       }
-      this.$refs.textField.$refs.input.focus({ preventScroll: true });
+      this.$refs.textField.$children[0].$refs.input.focus({ preventScroll: true });
 
       return true;
     },

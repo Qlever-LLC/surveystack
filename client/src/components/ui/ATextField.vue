@@ -1,7 +1,13 @@
 <template>
   <v-text-field
-    v-on="$listeners"
-    v-bind="$attrs"
+    @blur="$emit('blur')"
+    @click="$emit('click', $event)"
+    @click:append="$emit('click:append', $event)"
+    @change="$emit('change', $event)"
+    @focusout="$emit('focusout')"
+    @input="$emit('input', $event)"
+    @keydown.esc="$emit('keydown.esc')"
+    @keyup.enter="$emit('keyup.enter')"
     :autocomplete="autocomplete"
     :class="{ noBorder: disabled }"
     :data-test-id="dataTestId"
@@ -46,6 +52,8 @@
 
 <script>
 export default {
+  // click event listened to by slot:activator
+  emits: ['blur', 'click', 'click:append', 'change', 'focusout', 'input', 'keydown.esc', 'keyup.enter'],
   props: {
     //non vuetify props
     autocomplete: { type: String, required: false },

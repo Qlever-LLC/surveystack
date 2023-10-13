@@ -14,9 +14,10 @@
       <a-text-field
         v-on="on"
         v-bind="attrs"
+        @input="onChange"
+        @blur="$emit('blur')"
         label="Default value"
         :value="formattedDate"
-        @input="onChange"
         :class="$vnode.data.staticClass"
         :dense="dense"
         readonly
@@ -50,6 +51,7 @@ import getWeekOfMonth from 'date-fns/getWeekOfMonth';
 import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
+  emits: ['blur', 'input'],
   props: {
     value: { type: String },
     type: { type: String },

@@ -2,17 +2,17 @@
   <v-dialog v-model="open" width="500" @click:outside="cancel">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
+        v-on="on"
+        v-bind="attrs"
+        @input="onChange"
         ref="anchorRef"
         label="Default value"
         :value="getLabel"
-        @input="onChange"
         :class="$vnode.data.staticClass"
         clearable
         hide-details
         readonly
         :disabled="getDisabled"
-        v-on="on"
-        v-bind="attrs"
       />
     </template>
 
@@ -98,7 +98,7 @@ export default {
     },
     close() {
       this.open = false;
-      this.$refs.anchorRef.blur();
+      this.$refs.anchorRef.$children[0].blur();
     },
     cancel() {
       this.selected = getArrayValue(this.value);

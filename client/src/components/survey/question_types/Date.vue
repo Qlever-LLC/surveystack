@@ -30,13 +30,13 @@
         >
           <template v-slot:activator="{ on }">
             <a-text-field
-              :value="dateFormatted"
-              @input="datePickerIsVisible = false"
+              v-on="on"
               @change="updateDateInput"
+              @input="datePickerIsVisible = false"
+              :value="dateFormatted"
               label="Year"
               persistent-hint
               prepend-icon="mdi-calendar"
-              v-on="on"
               readonly
               outlined
               color="focus"

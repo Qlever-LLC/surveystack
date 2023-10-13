@@ -295,7 +295,7 @@
                   v-model="linkUrl"
                   placeholder="https://"
                   ref="linkInput"
-                  @keydown.esc="hideLinkMenu"
+                  @keydown.native.esc="hideLinkMenu"
                 />
                 <v-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
                   <v-icon>mdi-check</v-icon>
@@ -456,7 +456,7 @@ export default {
       this.linkUrl = attrs.href;
       this.linkMenuIsActive = true;
       this.$nextTick(() => {
-        this.$refs.linkInput.focus();
+        this.$refs.linkInput.$children[0].focus();
       });
     },
     hideLinkMenu() {

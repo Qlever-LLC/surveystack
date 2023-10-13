@@ -44,7 +44,7 @@ describe('Number question', () => {
   });
 
   describe('input validating', () => {
-    const wrapper = shallowMount(Number, getMountOpts());
+    const wrapper = mount(Number, getMountOpts());
     const errorMsg = 'Please enter a number';
     [
       ['', errorMsg],

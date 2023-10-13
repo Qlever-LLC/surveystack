@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
+  <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.$children[0].blur()">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         v-on="on"
@@ -119,7 +119,7 @@ export default {
     },
     close() {
       this.open = false;
-      this.$refs.anchorRef.blur();
+      this.$refs.anchorRef.$children[0].blur();
     },
     save() {
       this.$emit('set-control-source', this.validItems);
