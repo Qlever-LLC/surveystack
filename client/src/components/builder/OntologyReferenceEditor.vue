@@ -35,17 +35,17 @@
     <v-spacer />
     <v-card-actions>
       <v-spacer />
-      <v-btn text @click="closeHandler"> Close </v-btn>
+      <a-btn text @click="closeHandler"> Close </a-btn>
       <v-tooltip top :disabled="!!path">
         <template v-slot:activator="{ on }">
           <div v-on="on">
-            <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
+            <a-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </a-btn>
           </div>
         </template>
         <span>No Submitted Surveys Available</span>
       </v-tooltip>
-      <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
-      <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
+      <a-btn text color="error" @click="deleteResource"> Delete </a-btn>
+      <a-btn text color="primary" @click="updateAndClose"> Save </a-btn>
     </v-card-actions>
 
     <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />
@@ -56,6 +56,7 @@
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -66,7 +67,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: { ABtn, OntologyReferencePreview },
   props: {
     resource: {
       type: Object,

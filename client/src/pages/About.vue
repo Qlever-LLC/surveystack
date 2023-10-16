@@ -6,7 +6,7 @@
         <p><strong>Note:</strong> This is a work in progress</p>
 
         <div class="text-center ma-8" v-if="showInstall">
-          <v-btn @click="install" large color="primary">Install</v-btn>
+          <a-btn @click="install" large color="primary">Install</a-btn>
         </div>
 
         <p class="subheading font-weight-regular">
@@ -19,3 +19,10 @@
     </v-layout>
   </div>
 </template>
+<script>
+import ABtn from '@/components/ui/ABtn.vue';
+
+export default {
+  components: { ABtn },
+};
+</script>

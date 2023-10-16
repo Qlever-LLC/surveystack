@@ -2,7 +2,7 @@
   <v-container v-if="hasFeedback">
     <v-spacer />
     <div class="d-flex justify-end">
-      <v-btn text @click="clearAllFeedback"> <v-icon left>mdi-close</v-icon>{{ clearAllText }} </v-btn>
+      <a-btn text @click="clearAllFeedback"> <v-icon left>mdi-close</v-icon>{{ clearAllText }} </a-btn>
     </div>
     <v-alert v-for="(feedback, idx) in items" :key="idx" border="left" :type="feedback.type" elevation="2">
       {{ feedback.message }}
@@ -11,7 +11,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   data() {
     return {};
   },

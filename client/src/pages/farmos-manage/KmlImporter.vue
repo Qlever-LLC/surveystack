@@ -23,7 +23,7 @@
         ></v-autocomplete>
       </v-row>
       <v-row class="text-center">
-        <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
+        <v-col><a-btn @click="$emit('change')" color="primary">Import</a-btn></v-col>
       </v-row>
     </template>
   </v-sheet>
@@ -33,9 +33,11 @@ import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
 import appTooltip from '@/components/ui/Tooltip.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     appTooltip,
   },
   props: ['value'],

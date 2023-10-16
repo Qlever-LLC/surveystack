@@ -81,7 +81,7 @@
 
     <v-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
-      <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
+      <a-btn color="grey" text @click="showSnackbar = false">Close</a-btn>
     </v-snackbar>
   </div>
   <div
@@ -117,11 +117,13 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
   components: {
+    ABtn,
     VersionsDialog,
     SurveyBuilder,
     appDialog,

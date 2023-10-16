@@ -2,7 +2,7 @@
   <v-container v-if="entity">
     <div class="d-flex justify-end">
       <router-link :to="{ name: 'scripts-edit', params: { id: entity._id } }">
-        <v-btn color="primary"> <v-icon left>mdi-pencil</v-icon> Edit </v-btn>
+        <a-btn color="primary"> <v-icon left>mdi-pencil</v-icon> Edit </a-btn>
       </router-link>
     </div>
     <h1>{{ entity.name }}</h1>
@@ -15,12 +15,14 @@
 <script>
 import api from '@/services/api.service';
 import codeEditor from '@/components/ui/CodeEditor.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
 export default {
   components: {
+    ABtn,
     codeEditor,
   },
   data() {

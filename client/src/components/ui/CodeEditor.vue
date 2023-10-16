@@ -26,19 +26,19 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
+              <a-btn color="green darken-1" text @click="dialog = false"> Close </a-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <v-spacer></v-spacer>
         <v-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</v-icon>
-        <v-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
+        <a-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
           <v-icon left>mdi-code-braces</v-icon>Examples
-        </v-btn>
-        <v-btn class="mr-2" outlined color="white" v-if="runnable" @click="$emit('run', model.getValue())">
+        </a-btn>
+        <a-btn class="mr-2" outlined color="white" v-if="runnable" @click="$emit('run', model.getValue())">
           <v-icon left>mdi-play</v-icon> Run
-        </v-btn>
+        </a-btn>
         <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
       </v-card-title>
       <div class="error red text--white pa-2" v-if="error">{{ error }}</div>
@@ -71,6 +71,7 @@
 <script>
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -101,6 +102,7 @@ function log(message){};
 
 export default {
   components: {
+    ABtn,
     appCodeView,
   },
   data() {

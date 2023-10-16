@@ -13,9 +13,9 @@
         </v-list-item-content>
 
         <v-list-item-action>
-          <v-btn icon>
+          <a-btn icon>
             <v-icon color="grey lighten-1" @click="remove(field)">mdi-delete</v-icon>
-          </v-btn>
+          </a-btn>
         </v-list-item-action>
       </v-list-item>
     </v-list>
@@ -23,7 +23,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: ['value'],
   methods: {
     remove(e) {

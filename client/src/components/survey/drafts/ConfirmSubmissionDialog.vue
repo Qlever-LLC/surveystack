@@ -9,13 +9,13 @@
         <strong v-else>no group</strong>
         <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
           <active-group-selector label="Group" class="d-inline-block" :value="groupId" @input="setGroup" />
-          <v-btn icon @click="handleCloseGroupEditor">
+          <a-btn icon @click="handleCloseGroupEditor">
             <v-icon>mdi-close</v-icon>
-          </v-btn>
+          </a-btn>
         </div>
-        <v-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
+        <a-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
           <v-icon small>mdi-pencil</v-icon>
-        </v-btn>
+        </a-btn>
         <div v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
         </div>
@@ -29,8 +29,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
-        <v-btn text color="primary" @click.stop="handleConfirm"> Submit </v-btn>
+        <a-btn text @click.stop="handleAbort"> Cancel </a-btn>
+        <a-btn text color="primary" @click.stop="handleConfirm"> Submit </a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -39,6 +39,7 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   data() {
@@ -75,6 +76,7 @@ export default {
     },
   },
   components: {
+    ABtn,
     ActiveGroupSelector,
   },
   created() {

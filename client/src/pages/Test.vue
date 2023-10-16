@@ -3,12 +3,15 @@
     <h2>Hi</h2>
     Add Feedback to store
     <v-text-field v-model="message" @keyup.enter="addFeedback(message)" placeholder="Feedback..." />
-    <v-btn @click="addFeedback(message)">ADD</v-btn>
+    <a-btn @click="addFeedback(message)">ADD</a-btn>
   </div>
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   data() {
     return {
       message: '',

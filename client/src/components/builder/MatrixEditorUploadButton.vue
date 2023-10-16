@@ -2,10 +2,10 @@
   <div>
     <v-input>
       <label for="select-items-file-input" class="cursor-pointer">
-        <v-btn class="pointer-events-none" color="primary">
+        <a-btn class="pointer-events-none" color="primary">
           <v-icon left>mdi-upload</v-icon>
           Import CSV
-        </v-btn>
+        </a-btn>
       </label>
       <input
         type="file"
@@ -22,8 +22,10 @@
 <script>
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   methods: {
     async handleFileChange({
       target: {

@@ -49,11 +49,11 @@
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
-          <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
+          <a-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
             <v-icon left>mdi-note-text-outline</v-icon>
             View Survey
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             outlined
             color="secondary"
             class="ml-2"
@@ -62,7 +62,7 @@
           >
             <v-icon left>mdi-plus</v-icon>
             New submission
-          </v-btn>
+          </a-btn>
         </div>
       </div>
       <v-expansion-panels class="mb-6">
@@ -117,7 +117,7 @@
                 v-model="apiDownloadExpandAllMatrices"
               /> </v-col
             ><v-col md="2" sm="6">
-              <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
+              <a-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </a-btn>
             </v-col></v-row
           >
 
@@ -226,6 +226,7 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const defaultPageSize = 10;
 
@@ -257,6 +258,7 @@ const apiDownloadExpandAllMatricesOptions = [
 
 export default {
   components: {
+    ABtn,
     appSubmissionsFilterBasic,
     appSubmissionsFilterAdvanced,
     appSubmissionsTree,

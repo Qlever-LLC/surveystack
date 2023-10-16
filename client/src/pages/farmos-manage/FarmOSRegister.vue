@@ -48,11 +48,11 @@
         </v-col>
 
         <v-col>
-          <v-btn
+          <a-btn
             @click="$emit('check-url', localViewModel)"
             color="primary"
             :disabled="!localViewModel.form.plan || localViewModel.loading"
-            >Check URL</v-btn
+            >Check URL</a-btn
           >
         </v-col>
       </v-row>
@@ -140,7 +140,7 @@
           </div>
         </template>
         <template v-slot:prepend-item>
-          <v-btn
+          <a-btn
             color="primary"
             class="ma-4"
             outlined
@@ -149,13 +149,13 @@
             target="_blank"
           >
             <v-icon left>mdi-account-plus</v-icon>Invite Member to Organization
-          </v-btn>
+          </a-btn>
           <v-divider />
         </template>
         <template v-slot:append-outer>
-          <v-btn fab color="primary" style="margin-top: -16px">
+          <a-btn fab color="primary" style="margin-top: -16px">
             <v-icon>mdi-refresh</v-icon>
-          </v-btn>
+          </a-btn>
         </template>
       </v-autocomplete> -->
 
@@ -166,7 +166,7 @@
         v-model="localViewModel.form.fields"
       ></app-field-list>
 
-      <v-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</v-btn>
+      <a-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</a-btn>
 
       <app-field-creator
         v-show="importFields"
@@ -202,8 +202,8 @@
         <a href="https://farmier.com/privacy" target="blank">Privacy Policy</a>.
       </div>
 
-      <v-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
-        >Register FarmOS Instance</v-btn
+      <a-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
+        >Register FarmOS Instance</a-btn
       >
     </v-form>
     <app-dialog
@@ -226,10 +226,12 @@ import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 
 import { timezones } from './timezones';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   props: ['viewModel'],
   components: {
+    ABtn,
     appDialog,
     appFieldCreator,
     appFieldList,

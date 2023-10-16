@@ -33,7 +33,7 @@
           <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
             Already have an account?
           </a>
-          <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </v-btn>
+          <a-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </a-btn>
         </div>
       </v-form>
       <v-alert class="mt-4" outlined v-if="membership" type="info"
@@ -49,6 +49,7 @@
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -57,6 +58,7 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
+  components: { ABtn },
   data() {
     return {
       status: '',

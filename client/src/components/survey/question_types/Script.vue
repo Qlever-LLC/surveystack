@@ -26,7 +26,7 @@
         </v-alert>
 
         <br />
-        <v-btn
+        <a-btn
           x-large
           color="green"
           href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
@@ -34,7 +34,7 @@
         >
           <v-icon left class="mr-4" x-large>mdi-android</v-icon>
           Download APK
-        </v-btn>
+        </a-btn>
       </template>
     </app-dialog>
 
@@ -44,7 +44,7 @@
       <iframe src="" frameborder="0" ref="iframe" sandbox="allow-scripts allow-same-origin allow-popups" />
 
       <div class="android-button-container" v-if="!this.value">
-        <v-btn
+        <a-btn
           v-if="control.options.isNativeScript"
           class=""
           x-large
@@ -54,12 +54,12 @@
         >
           <v-icon left class="mr-4" x-large>mdi-android</v-icon>
           Install Android App
-        </v-btn>
+        </a-btn>
       </div>
 
-      <v-btn @click="requestRunScript" class="full center-button mt-4" depressed large color="primary">
+      <a-btn @click="requestRunScript" class="full center-button mt-4" depressed large color="primary">
         {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
-      </v-btn>
+      </a-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">
         <v-chip dark> {{ meta && meta.status }}</v-chip>
         <br />
@@ -87,10 +87,12 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
+    ABtn,
     appDialog,
   },
   props: {

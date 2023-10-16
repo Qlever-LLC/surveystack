@@ -1,11 +1,14 @@
 <template>
-  <v-btn @click.stop="copyText" icon class="button">
+  <a-btn @click.stop="copyText" icon class="button">
     <v-icon>mdi-content-copy</v-icon>
-  </v-btn>
+  </a-btn>
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     value: {
       type: String,

@@ -47,7 +47,7 @@
         </v-radio-group>
 
         <div class="d-flex mt-2 justify-end">
-          <v-btn text @click="cancel">Cancel</v-btn>
+          <a-btn text @click="cancel">Cancel</a-btn>
 
           <btn-dropdown
             :label="invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'"
@@ -97,8 +97,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
+          <a-btn text @click.stop="dialogCreateUser = false"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import ABtn from '@/components/ui/ABtn.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { ABtn, BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

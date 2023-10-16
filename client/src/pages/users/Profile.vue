@@ -28,7 +28,7 @@
                 <div class="text-h6">{{ email }}</div>
                 <v-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
+                    <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
                   </template>
                   <v-card>
                     <v-card-title class="text-h5"> Change Email </v-card-title>
@@ -39,9 +39,9 @@
                     </v-card-text>
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
+                      <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
-                      </v-btn>
+                      </a-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog></v-row
@@ -71,7 +71,7 @@
             />
 
             <div class="d-flex mt-2 justify-end">
-              <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</v-btn>
+              <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</a-btn>
             </div>
           </v-form></v-card-text
         >
@@ -82,8 +82,8 @@
         <p class="mt-1 mb-5 grey--text text-body-2">These are your group memberships. You can select one to leave.</p>
         <div class="d-flex align-center">
           <active-group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
-          <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
-            >Leave</v-btn
+          <a-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
+            >Leave</a-btn
           >
         </div>
       </div>
@@ -103,8 +103,8 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
-            <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
+            <a-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </a-btn>
+            <a-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </a-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -124,6 +124,7 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -137,6 +138,7 @@ function findParentAdminGroup(memberships, activeMembership) {
 
 export default {
   components: {
+    ABtn,
     appFeedback,
     ActiveGroupSelector,
   },

@@ -9,9 +9,9 @@
       max-height="calc(100% - 100px)"
     >
       <template v-slot:activator="{ on }">
-        <v-btn text v-on="on" @click="checkIsOwner">
+        <a-btn text v-on="on" @click="checkIsOwner">
           <v-icon>mdi-account</v-icon>
-        </v-btn>
+        </a-btn>
       </template>
       <v-list flat>
         <v-list-item link :to="{ name: 'auth-profile' }">
@@ -42,19 +42,21 @@
       <!-- </v-card> -->
     </v-menu>
 
-    <v-btn v-else :to="{ name: 'auth-login' }" text>
+    <a-btn v-else :to="{ name: 'auth-login' }" text>
       <v-icon>mdi-login-variant</v-icon>
       <span class="ml-2">Login</span>
-    </v-btn>
+    </a-btn>
   </div>
 </template>
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     ActiveGroupSelectorList,
   },
   data() {

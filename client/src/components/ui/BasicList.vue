@@ -6,7 +6,7 @@
       </slot>
       <v-spacer />
       <slot name="actions" v-if="editable">
-        <v-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</v-btn>
+        <a-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</a-btn>
       </slot>
     </v-card-title>
     <v-card-text>
@@ -37,7 +37,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     loading: {
       type: Boolean,

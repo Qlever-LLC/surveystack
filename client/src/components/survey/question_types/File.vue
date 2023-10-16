@@ -62,7 +62,7 @@
         >
           <div class="col-12 pa-0 caption">--- or ----</div>
           <div class="col-12">
-            <v-btn
+            <a-btn
               for="captureImage"
               class="text-center align-center justify-center"
               color="default"
@@ -70,7 +70,7 @@
             >
               take a picture
               <v-icon right> mdi-camera-outline</v-icon>
-            </v-btn>
+            </a-btn>
           </div>
         </div>
       </div>
@@ -104,19 +104,19 @@
             /></v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
-            <v-btn icon @click="editResourceName(fileResourceKey, index)">
+            <a-btn icon @click="editResourceName(fileResourceKey, index)">
               <v-icon color="grey lighten-1">mdi-pencil</v-icon>
-            </v-btn>
+            </a-btn>
           </v-list-item-action>
           <v-list-item-action v-if="editIndex === index">
-            <v-btn icon @click="commitResourceName(fileResourceKey, index)">
+            <a-btn icon @click="commitResourceName(fileResourceKey, index)">
               <v-icon color="success">mdi-check</v-icon>
-            </v-btn>
+            </a-btn>
           </v-list-item-action>
           <v-list-item-action>
-            <v-btn icon @click="remove(index)">
+            <a-btn icon @click="remove(index)">
               <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
-            </v-btn>
+            </a-btn>
           </v-list-item-action>
         </v-list-item>
       </v-list>
@@ -132,6 +132,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 import { getLabelFromKey } from '@/utils/resources';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -139,6 +140,7 @@ const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //5
 export default {
   mixins: [baseQuestionComponent],
   components: {
+    ABtn,
     appControlLabel,
     appControlMoreInfo,
     appControlHint,

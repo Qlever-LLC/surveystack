@@ -4,7 +4,7 @@
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">Ontology List Editor</div>
         <div class="d-flex align-center ml-auto mr-2">
-          <v-btn
+          <a-btn
             color="primary"
             style="margin-top: 2px"
             @click="
@@ -14,7 +14,7 @@
             :disabled="disabled"
           >
             <v-icon left>mdi-plus</v-icon>Add Row
-          </v-btn>
+          </a-btn>
         </div>
         <div class="d-flex align-center">
           <v-tooltip bottom>
@@ -28,10 +28,10 @@
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
           <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
-              <v-btn icon v-on="on" class="ml-2" :disabled="disabled">
+              <a-btn icon v-on="on" class="ml-2" :disabled="disabled">
                 <v-icon>mdi-delete</v-icon>
                 <!-- Delete List -->
-              </v-btn>
+              </a-btn>
             </template>
             <v-card>
               <v-card-title>Delete List</v-card-title>
@@ -40,8 +40,8 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn text color="red" @click="deleteResult">Delete</v-btn>
-                <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
+                <a-btn text color="red" @click="deleteResult">Delete</a-btn>
+                <a-btn text @click="closeDeleteDialog">Cancel</a-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -74,9 +74,9 @@
 
         <v-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
-          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
+          <a-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
             <v-icon>mdi-delete</v-icon>
-          </v-btn>
+          </a-btn>
         </div>
       </div>
 
@@ -113,7 +113,7 @@
     </v-card-text>
     <v-spacer />
     <v-card-actions class="d-flex justify-end mr-3 align-start">
-      <v-btn text class="ml-4" @click="close">Close</v-btn>
+      <a-btn text class="ml-4" @click="close">Close</a-btn>
     </v-card-actions>
 
     <v-dialog v-model="editItemDialogIsVisible" max-width="350">
@@ -126,8 +126,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
-          <v-btn text color="primary" @click="saveItem">Save</v-btn>
+          <a-btn text @click="editItemDialogIsVisible = false">Cancel</a-btn>
+          <a-btn text color="primary" @click="saveItem">Save</a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -139,6 +139,7 @@ import { uniqWith, isEqual } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
     },
   },
   components: {
+    ABtn,
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
   },

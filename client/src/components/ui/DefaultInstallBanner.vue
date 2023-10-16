@@ -1,22 +1,25 @@
 <template>
   <v-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
-    <v-btn @click="handleClose" icon class="close-button">
+    <a-btn @click="handleClose" icon class="close-button">
       <v-icon>mdi-close</v-icon>
-    </v-btn>
+    </a-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center pt-2">
-        <v-btn outlined @click="install" large>
+        <a-btn outlined @click="install" large>
           <v-icon class="ml-n2 mr-1" small>mdi-plus</v-icon>
           Add to Homescreen
-        </v-btn>
+        </a-btn>
       </div>
     </div>
   </v-snackbar>
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   data() {
     return {
       showDefaultInstall: false,

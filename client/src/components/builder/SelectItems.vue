@@ -42,19 +42,22 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="cancel">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <a-btn text @click="cancel">Cancel</a-btn>
+        <a-btn color="primary" @click="save">Save</a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
+  components: { ABtn },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

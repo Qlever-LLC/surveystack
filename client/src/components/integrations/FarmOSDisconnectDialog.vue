@@ -18,7 +18,7 @@
           open-on-clear
         >
           <template slot="prepend-item">
-            <v-btn
+            <a-btn
               :disabled="loading"
               :loading="loading"
               @click="updateGroups"
@@ -26,12 +26,12 @@
               class="button--autocomplete"
             >
               Update Groups
-            </v-btn>
+            </a-btn>
           </template>
         </v-autocomplete>
         <div class="d-flex justify-space-around">
-          <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
-          <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
+          <a-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</a-btn>
+          <a-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </a-btn>
         </div>
       </v-card-text>
     </v-card>
@@ -40,8 +40,10 @@
 
 <script>
 import './css/button.css';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   emits: ['updateGroups', 'cancelUpdate'],
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {

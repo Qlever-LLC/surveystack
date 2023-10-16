@@ -20,7 +20,7 @@
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-        <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </v-btn>
+        <a-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </a-btn>
       </v-card-title>
 
       <v-card-text class="dialog-content">
@@ -59,8 +59,8 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="close">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <a-btn text @click="close">Cancel</a-btn>
+        <a-btn color="primary" @click="save">Save</a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -68,9 +68,11 @@
 
 <script>
 import draggable from 'vuedraggable';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     draggable,
   },
   props: {

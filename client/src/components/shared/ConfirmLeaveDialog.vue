@@ -9,10 +9,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
-        <v-btn text color="primary" @click.stop="handleConfirm">
+        <a-btn text @click.stop="handleAbort"> Cancel </a-btn>
+        <a-btn text color="primary" @click.stop="handleConfirm">
           {{ confirmText }}
-        </v-btn>
+        </a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -20,8 +20,10 @@
 
 <script>
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   data() {
     return {
       isVisible: false,

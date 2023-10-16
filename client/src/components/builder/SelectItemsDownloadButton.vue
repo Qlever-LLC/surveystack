@@ -1,15 +1,17 @@
 <template>
-  <v-btn outlined color="primary" @click="download" style="margin-bottom: 1px">
+  <a-btn outlined color="primary" @click="download" style="margin-bottom: 1px">
     <v-icon left>mdi-download</v-icon>
     Export CSV
-  </v-btn>
+  </a-btn>
 </template>
 
 <script>
 import { createResourceCsv } from '@/services/csv.service';
 import downloadExternal from '@/utils/downloadExternal';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   props: {
     resourceName: {
       type: String,

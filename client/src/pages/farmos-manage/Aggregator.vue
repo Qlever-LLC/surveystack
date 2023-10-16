@@ -35,7 +35,7 @@
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
       <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
-      <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
+      <a-btn color="primary" @click="addSuperAdminNote">update note</a-btn>
     </div>
 
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
@@ -64,8 +64,8 @@
           :items="groups"
           class="mt-4 mr-4"
         ></v-autocomplete>
-        <v-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
-          >Map</v-btn
+        <a-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
+          >Map</a-btn
         >
       </div>
 
@@ -83,7 +83,7 @@
             <tr v-for="(group, idx) in mappedGroups" :key="`grp-${idx}`">
               <td>{{ group.name }}</td>
               <td>
-                <v-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)" dark>Unmap</v-btn>
+                <a-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)" dark>Unmap</a-btn>
               </td>
             </tr>
           </tbody>
@@ -116,7 +116,7 @@
 
         <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
 
-        <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
+        <a-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</a-btn>
       </div>
 
       <v-label class="vy-4">Current User Mappings</v-label>
@@ -134,7 +134,7 @@
               <td>{{ `${mapping.user.name} (${mapping.user.email})` }}</td>
               <td>{{ mapping.owner }}</td>
               <td>
-                <v-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)" dark>Unmap</v-btn>
+                <a-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)" dark>Unmap</a-btn>
               </td>
             </tr>
           </tbody>
@@ -185,8 +185,8 @@
                 </div>
               </td>
               <td>
-                <v-btn x-small color="red" @click="$emit('unmap-farm', farm.instanceName)" dark
-                  >Remove all Mappings</v-btn
+                <a-btn x-small color="red" @click="$emit('unmap-farm', farm.instanceName)" dark
+                  >Remove all Mappings</a-btn
                 >
               </td>
             </tr>
@@ -221,7 +221,7 @@
                 </div>
               </td>
               <td>
-                <v-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</v-btn>
+                <a-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</a-btn>
               </td>
               <td>
                 <textarea v-if="farm.note" readonly rows="3" v-model="farm.note"></textarea>
@@ -236,8 +236,10 @@
 
 <script>
 import _ from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   emits: ['addSuperAdminNote'],
   props: {
     groups: Array,

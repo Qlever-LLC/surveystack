@@ -203,26 +203,26 @@
           >
             <template v-slot:toolbar-actions>
               <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
-                <v-btn :value="false" dense>
+                <a-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
                   <v-icon right> mdi-monitor</v-icon>
-                </v-btn>
+                </a-btn>
 
-                <v-btn :value="true">
+                <a-btn :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
                   <v-icon right> mdi-cellphone</v-icon>
-                </v-btn>
+                </a-btn>
               </v-btn-toggle>
 
-              <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>
                 <v-icon right>mdi-code-tags</v-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">submission</span>
                 <v-icon right>mdi-code-tags</v-icon>
-              </v-btn>
+              </a-btn>
             </template>
           </app-draft-component>
         </div>
@@ -274,6 +274,7 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -308,6 +309,7 @@ const tabMap = ['relevance', 'initialize', 'calculate', 'constraint', 'apiCompos
 export default {
   mixins: [appMixin],
   components: {
+    ABtn,
     UpdateLibraryDialog,
     Splitpanes,
     Pane,

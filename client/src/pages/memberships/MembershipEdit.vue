@@ -5,9 +5,9 @@
 
     <v-card class="pa-4 mb-4">
       <div class="d-flex">
-        <v-btn class="ml-auto" color="error" outlined @click="dialogRemoval = true">
+        <a-btn class="ml-auto" color="error" outlined @click="dialogRemoval = true">
           <v-icon left>mdi-trash-can-outline</v-icon> Delete
-        </v-btn>
+        </a-btn>
       </div>
       <v-form class="mt-3" @keydown.enter.prevent="submit">
         <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
@@ -29,8 +29,8 @@
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
 
         <div class="d-flex mt-2">
-          <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit">Save</v-btn>
+          <a-btn class="ml-auto" text @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" @click="submit">Save</a-btn>
         </div>
       </v-form>
     </v-card>
@@ -44,15 +44,15 @@
       </v-card-text>
       <v-card-actions class="d-flex justify-space-between align-center">
         <div>
-          <v-btn color="primary" @click="resend"> <v-icon left>mdi-email-send-outline</v-icon> Resend </v-btn>
+          <a-btn color="primary" @click="resend"> <v-icon left>mdi-email-send-outline</v-icon> Resend </a-btn>
           <span class="ml-1 caption text--secondary">{{
             entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'
           }}</span>
         </div>
         <div>
-          <v-btn @click="dialogInvitationLink = true" color="primary">
+          <a-btn @click="dialogInvitationLink = true" color="primary">
             <v-icon left>mdi-eye-outline</v-icon>View
-          </v-btn>
+          </a-btn>
         </div>
       </v-card-actions>
     </v-card>
@@ -63,8 +63,8 @@
         <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogRemoval = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="remove"> Delete </v-btn>
+          <a-btn text @click.stop="dialogRemoval = false"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="remove"> Delete </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -77,7 +77,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
+          <a-btn text @click.stop="dialogSent = false"> OK </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -101,6 +101,7 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const availableRoles = [
   {
@@ -126,6 +127,7 @@ const availableStatus = [
 
 export default {
   components: {
+    ABtn,
     appDialog,
   },
   data() {

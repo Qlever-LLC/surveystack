@@ -4,9 +4,9 @@
       <app-group-breadcrumbs :path="entity.path" />
 
       <div v-if="editable">
-        <v-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
+        <a-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
           <v-icon left>mdi-cog</v-icon> Admin
-        </v-btn>
+        </a-btn>
       </div>
     </div>
 
@@ -72,10 +72,12 @@
 import api from '@/services/api.service';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'Group',
   components: {
+    ABtn,
     appGroupBreadcrumbs,
     appBasicList,
   },

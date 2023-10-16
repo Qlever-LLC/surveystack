@@ -1,8 +1,8 @@
 <template>
   <v-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
-    <v-btn @click="handleClose" icon class="close-button">
+    <a-btn @click="handleClose" icon class="close-button">
       <v-icon>mdi-close</v-icon>
-    </v-btn>
+    </a-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center">
@@ -16,7 +16,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     value: Boolean,
   },

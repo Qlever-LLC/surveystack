@@ -38,7 +38,7 @@
           <v-icon small left> mdi-octagram </v-icon>Premium
         </v-chip>
       </h1>
-      <v-btn
+      <a-btn
         v-if="editMode"
         :disabled="!entity._id"
         class="ma-2"
@@ -46,7 +46,7 @@
         color="secondary"
       >
         <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
-      </v-btn>
+      </a-btn>
     </div>
     <v-card :loading="isLoadingGroup" class="mb-4">
       <v-card-text>
@@ -85,15 +85,15 @@
               class="d-inline mt-0"
             />
             <div class="ml-auto ml-sm-6">
-              <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
+              <a-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
                 >Learn more...
-              </v-btn>
+              </a-btn>
             </div>
           </div>
           <v-checkbox label="Archived" v-model="entity.meta.archived" />
           <div class="d-flex justify-end pa-2">
-            <v-btn text @click="cancel">Cancel</v-btn>
-            <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
+            <a-btn text @click="cancel">Cancel</a-btn>
+            <a-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</a-btn>
           </div>
         </form>
       </v-card-text>
@@ -202,6 +202,7 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const integrations = [
   {
@@ -218,6 +219,7 @@ const integrations = [
 
 export default {
   components: {
+    ABtn,
     appPinnedSurveys,
     appDocLinks,
     appBasicList,

@@ -11,8 +11,8 @@
         </v-alert>
 
         <div class="d-flex justify-end">
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="join">Join {{ membership.group.name }}</v-btn>
+          <a-btn text @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" @click="join">Join {{ membership.group.name }}</a-btn>
         </div>
       </div>
       <div v-else>
@@ -24,7 +24,7 @@
     <template v-else-if="initialized && !membership">
       <v-text-field v-model="code" label="Invitation"></v-text-field>
       <div class="d-flex justify-end">
-        <v-btn class="primary" @click="fetchData">Try code</v-btn>
+        <a-btn class="primary" @click="fetchData">Try code</a-btn>
       </div>
     </template>
     <v-progress-circular v-else :size="50" color="primary" indeterminate></v-progress-circular>
@@ -35,8 +35,10 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   data() {
     return {
       initialized: false,

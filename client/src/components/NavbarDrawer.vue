@@ -1,9 +1,9 @@
 <template>
   <v-navigation-drawer :value="value" app>
     <div class="d-flex justify-end mt-3 mr-3">
-      <v-btn large icon @click="$emit('input', !value)">
+      <a-btn large icon @click="$emit('input', !value)">
         <v-icon>mdi-close</v-icon>
-      </v-btn>
+      </a-btn>
     </div>
     <v-list class="mt-0 pt-0">
       <template v-for="(item, i) in items">
@@ -81,7 +81,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     value: {
       type: Boolean,

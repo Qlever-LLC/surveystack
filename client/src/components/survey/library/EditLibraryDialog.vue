@@ -21,11 +21,11 @@
       </v-card-text>
       <v-card-actions class="mr-3">
         <v-spacer />
-        <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
+        <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span v-if="!librarySurvey.meta.isLibrary">Add to library</span>
           <span v-if="localLibrarySurvey.meta.isLibrary">Save</span>
-        </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
+        </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" text> Cancel </a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -34,10 +34,11 @@
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor },
+  components: { ABtn, LibraryChangeTypeSelector, TipTapEditor },
   props: {
     value: {
       type: Boolean,

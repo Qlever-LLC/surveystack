@@ -1,14 +1,14 @@
 <template>
   <v-container v-if="entity && show" class="survey-detail">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
-      <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
+      <a-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <v-icon>mdi-pencil</v-icon>
         <span class="ml-2">Edit</span>
-      </v-btn>
-      <v-btn class="mx-2" :to="`/submissions?survey=${entity._id}`">
+      </a-btn>
+      <a-btn class="mx-2" :to="`/submissions?survey=${entity._id}`">
         <v-icon>mdi-table</v-icon>
         <span class="ml-2">Results</span>
-      </v-btn>
+      </a-btn>
     </div>
 
     <h1 class="heading--text">{{ entity.name }}</h1>
@@ -58,9 +58,9 @@
         </btn-dropdown>
 
         <div class="my-3 d-flex justify-center">
-          <v-btn color="primary" text large :loading="download.loading" @click="downloadPrintablePdf(entity._id)">
+          <a-btn color="primary" text large :loading="download.loading" @click="downloadPrintablePdf(entity._id)">
             Print Blank Survey
-          </v-btn>
+          </a-btn>
         </div>
 
         <div class="text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
@@ -90,6 +90,7 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   props: {
@@ -100,6 +101,7 @@ export default {
     },
   },
   components: {
+    ABtn,
     BtnDropdown,
     MemberSelector,
   },

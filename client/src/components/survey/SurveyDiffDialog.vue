@@ -17,7 +17,7 @@
         :showNoChangesText="false"
       ></survey-diff>
       <v-card-actions class="mr-3">
-        <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
+        <a-btn @click="$emit('cancel')" color="primary" text> Cancel</a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -25,9 +25,10 @@
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { SurveyDiff },
+  components: { ABtn, SurveyDiff },
   props: {
     value: {
       required: true,

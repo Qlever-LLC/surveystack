@@ -80,7 +80,7 @@
       Selecting your Version of this question is not possible because the new
       {{ versionNameRemoteRevisionNew }} contains a required change.
       <template v-slot:action="{ attrs }">
-        <v-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </v-btn>
+        <a-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </a-btn>
       </template>
     </v-snackbar>
   </v-card>
@@ -89,10 +89,12 @@
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
+    ABtn,
     ControlCardHeader,
   },
   data() {

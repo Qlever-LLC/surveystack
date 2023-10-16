@@ -1,12 +1,14 @@
 <template>
-  <v-btn :class="classes" @click="onClick($event)" outlined>{{ label }}</v-btn>
+  <a-btn :class="classes" @click="onClick($event)" outlined>{{ label }}</a-btn>
 </template>
 
 <script>
 import '../css/button.css';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'custom-button',
+  components: { ABtn },
 
   props: {
     label: {

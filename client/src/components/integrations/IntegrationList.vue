@@ -4,7 +4,7 @@
       <v-card-title>
         {{ title }}
         <v-spacer />
-        <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
+        <a-btn color="primary" class="ml-4" :to="newRoute" text>New...</a-btn>
       </v-card-title>
       <v-card-text>
         <v-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
@@ -28,7 +28,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     entities: {
       type: Array,

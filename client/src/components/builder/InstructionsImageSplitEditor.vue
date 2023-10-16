@@ -9,7 +9,7 @@
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
-      <v-btn
+      <a-btn
         icon
         @click.stop="openDialog"
         :disabled="disabled"
@@ -18,7 +18,7 @@
         v-if="resource"
       >
         <v-icon>mdi-pencil</v-icon>
-      </v-btn>
+      </a-btn>
     </div>
     <v-textarea
       class="mt-3"
@@ -52,6 +52,7 @@ import {
   resourceLocations,
   appendResource,
 } from '@/utils/resources';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   data() {
@@ -61,6 +62,7 @@ export default {
     };
   },
   components: {
+    ABtn,
     ResourceSelector,
     ImageResourceEditor,
   },

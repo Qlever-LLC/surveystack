@@ -4,9 +4,9 @@
       <v-icon class="mr-1">mdi-library</v-icon>
       Question Library
       <v-spacer></v-spacer>
-      <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
+      <a-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <v-icon> mdi-close </v-icon>
-      </v-btn>
+      </a-btn>
     </v-card-title>
 
     <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
@@ -41,7 +41,7 @@
                 </v-chip>
               </v-col>
               <v-col align="right" md="auto">
-                <v-btn
+                <a-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="grey"
@@ -52,8 +52,8 @@
                   small
                 >
                   back
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="white"
@@ -64,7 +64,7 @@
                   small
                 >
                   add to survey
-                </v-btn>
+                </a-btn>
                 <!--TODO Resolve #48, then uncomment this
                 div>
                   <v-tooltip bottom>
@@ -130,11 +130,13 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
+    ABtn,
     graphicalView,
   },
   props: ['survey', 'libraryId'],

@@ -20,8 +20,8 @@
         @change="updateCode"
       />
       <div class="d-flex mt-2 justify-end">
-        <v-btn text @click="cancel">Cancel</v-btn>
-        <v-btn color="primary" @click="submit">Save</v-btn>
+        <a-btn text @click="cancel">Cancel</a-btn>
+        <a-btn color="primary" @click="submit">Save</a-btn>
       </div>
     </v-form>
   </v-container>
@@ -36,6 +36,7 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 
 import codeEditor from '@/components/ui/CodeEditor.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = () => import('@/components/ui/CodeEditor.vue');
@@ -131,6 +132,7 @@ export function render(props, state, setState) {
     };
   },
   components: {
+    ABtn,
     codeEditor,
     ActiveGroupSelector,
   },

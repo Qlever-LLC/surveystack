@@ -3,7 +3,7 @@
     <div class="full maxw-60 mx-auto">
       <div v-if="showSubmit" class="d-flex flex-row">
         <div class="half px-1">
-          <v-btn
+          <a-btn
             @click="$store.dispatch('draft/showOverview', false)"
             outlined
             depressed
@@ -12,28 +12,28 @@
             class="full"
           >
             Cancel
-          </v-btn>
+          </a-btn>
         </div>
 
         <div class="half px-1">
-          <v-btn :disabled="!enableSubmit" @click="$emit('submit')" depressed large color="primary" class="full">
+          <a-btn :disabled="!enableSubmit" @click="$emit('submit')" depressed large color="primary" class="full">
             Submit
             <span v-if="$store.getters['draft/submission'].meta.submitAsUser"
               >as {{ $store.getters['draft/submission'].meta.submitAsUser.name }} <br
             /></span>
-          </v-btn>
+          </a-btn>
         </div>
       </div>
       <div v-else class="d-flex flex-row">
         <div class="half px-1">
-          <v-btn v-show="showPrev" @click="$emit('prev')" outlined depressed large color="primary" class="full">
+          <a-btn v-show="showPrev" @click="$emit('prev')" outlined depressed large color="primary" class="full">
             Previous
-          </v-btn>
+          </a-btn>
         </div>
         <div class="half px-1">
-          <v-btn :disabled="!enableNext" @click="$emit('next')" depressed large color="primary" class="full">
+          <a-btn :disabled="!enableNext" @click="$emit('next')" depressed large color="primary" class="full">
             Next
-          </v-btn>
+          </a-btn>
         </div>
       </div>
     </div>
@@ -41,7 +41,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: ['showPrev', 'enableNext', 'enableSubmit', 'showSubmit', 'showNav'],
 };
 </script>

@@ -20,7 +20,7 @@
             @click:append="showPasswords = !showPasswords"
           />
           <div class="d-flex justify-end">
-            <v-btn type="submit" color="primary">Set password</v-btn>
+            <a-btn type="submit" color="primary">Set password</a-btn>
           </div>
         </v-form>
       </v-card>
@@ -45,9 +45,11 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     appFeedback,
   },
   data() {

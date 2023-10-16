@@ -5,9 +5,9 @@
     <v-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
 
     <div class="d-flex justify-end">
-      <v-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</v-btn>
-      <v-btn class="ma-2" outlined @click="reset">Reset</v-btn>
-      <v-btn class="ma-2" @click="add" color="primary">Apply</v-btn>
+      <a-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</a-btn>
+      <a-btn class="ma-2" outlined @click="reset">Reset</a-btn>
+      <a-btn class="ma-2" @click="add" color="primary">Apply</a-btn>
     </div>
 
     <v-card outlined v-if="filters.length > 0">
@@ -21,9 +21,9 @@
             </div>
           </v-list-item-content>
           <v-list-item-action @click="remove(i)">
-            <v-btn icon small>
+            <a-btn icon small>
               <v-icon>mdi-trash-can-outline</v-icon>
-            </v-btn>
+            </a-btn>
           </v-list-item-action>
         </v-list-item>
       </v-list>
@@ -32,7 +32,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     queryList: {
       type: Array,

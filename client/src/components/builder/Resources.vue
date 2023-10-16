@@ -32,28 +32,28 @@
     <div class="d-flex justify-end">
       <v-menu offset-y left>
         <template v-slot:activator="{ on }">
-          <v-btn color="primary" v-on="on">
+          <a-btn color="primary" v-on="on">
             <v-icon left>mdi-plus</v-icon>
             Add resource
-          </v-btn>
+          </a-btn>
         </template>
         <v-list>
           <v-list-item class="d-flex align-center">
             <v-list-item-title>
-              <v-btn text @click="createOntology">
+              <a-btn text @click="createOntology">
                 <v-icon color="grey">mdi-plus</v-icon>
                 <div class="ml-1">Create Ontology</div>
-              </v-btn>
+              </a-btn>
             </v-list-item-title>
           </v-list-item>
           <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
               <v-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
-                  <v-btn class="pointer-events-none" text>
+                  <a-btn class="pointer-events-none" text>
                     <v-icon color="grey">mdi-upload</v-icon>
                     <div class="ml-1">Add File Resource</div>
-                  </v-btn>
+                  </a-btn>
                 </label>
                 <input
                   type="file"
@@ -88,9 +88,9 @@
           </v-list-item-content>
           <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
           <v-list-item-action v-if="resource.type === resourceTypes.FILE">
-            <v-btn icon>
+            <a-btn icon>
               <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
-            </v-btn>
+            </a-btn>
           </v-list-item-action>
         </v-list-item>
       </template>
@@ -108,9 +108,11 @@ import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     appOntologyListEditor,
   },
   props: {

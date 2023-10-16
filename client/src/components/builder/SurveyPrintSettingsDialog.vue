@@ -22,7 +22,7 @@
 
       <v-card-actions class="mr-3">
         <v-spacer />
-        <v-btn @click="$emit('input', false)" color="primary" text> Close </v-btn>
+        <a-btn @click="$emit('input', false)" color="primary" text> Close </a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -30,10 +30,11 @@
 
 <script>
 import Checkbox from '@/components/ui/Checkbox.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'survey-print-settings-dialog',
-  components: { Checkbox },
+  components: { ABtn, Checkbox },
   props: {
     value: {
       type: Boolean,

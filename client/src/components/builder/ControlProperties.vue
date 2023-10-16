@@ -276,7 +276,7 @@
       </template>
 
       <!-- Advanced properties -->
-      <v-btn
+      <a-btn
         v-if="!showAdvanced && !hasExpressionEnabled"
         color="grey darken-1"
         class="align-self-end"
@@ -285,7 +285,7 @@
         text
       >
         advanced
-      </v-btn>
+      </a-btn>
       <div v-else class="extra-options">
         <v-spacer></v-spacer>
         <div>
@@ -349,9 +349,9 @@
 
       <!-- Print layout -->
       <template v-if="hasLayoutOptions">
-        <v-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
+        <a-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
           Print Layout
-        </v-btn>
+        </a-btn>
         <div v-else class="extra-options">
           <v-spacer></v-spacer>
           <div>
@@ -451,9 +451,11 @@ import Checkbox from '@/components/ui/Checkbox.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     SelectItems,
     SelectItemsEditor,
     OntologyProperties,

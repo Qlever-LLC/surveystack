@@ -24,19 +24,19 @@
         @discard-local-changes-changed="discardLocalChangesChanged"
       ></survey-diff>
       <v-card-actions class="mr-3">
-        <v-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
+        <a-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
           >Learn more...
-        </v-btn>
+        </a-btn>
         <v-spacer />
-        <v-btn
+        <a-btn
           @click="update"
           color="primary"
           text
           :disabled="libraryRootGroup.libraryVersion === toSurvey.latestVersion"
         >
           <span>update</span>
-        </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
+        </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" text> Cancel</a-btn>
       </v-card-actions>
     </v-card>
     <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
@@ -51,8 +51,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</v-btn>
-          <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
+          <a-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</a-btn>
+          <a-btn text color="red" @click.stop="updateConfirmed"> Update</a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -65,9 +65,10 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: { ABtn, SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
   props: {
     value: {
       required: true,

@@ -16,7 +16,7 @@
                   <template v-slot:activator="{ on, attrs }">
                     <v-card-actions>
                       <v-spacer />
-                      <v-btn text v-bind="attrs" v-on="on"> Logs </v-btn>
+                      <a-btn text v-bind="attrs" v-on="on"> Logs </a-btn>
                     </v-card-actions>
                   </template>
 
@@ -60,18 +60,18 @@
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
           <div v-if="survey && submission && isOnline()" class="mt-6 d-flex flex-column align-stretch">
-            <v-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
+            <a-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
               Download Submission
-            </v-btn>
-            <v-btn class="mt-3" color="primary" depressed dense :loading="emailing.loading" @click="emailMe">
+            </a-btn>
+            <a-btn class="mt-3" color="primary" depressed dense :loading="emailing.loading" @click="emailMe">
               Email Submission
-            </v-btn>
+            </a-btn>
           </div>
         </v-card-text>
 
         <v-card-actions>
           <v-spacer />
-          <v-btn text color="primary" @click="onClose"> Ok </v-btn>
+          <a-btn text color="primary" @click="onClose"> Ok </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -83,8 +83,10 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   props: {
     value: {
       required: true,

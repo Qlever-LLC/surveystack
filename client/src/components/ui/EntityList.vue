@@ -5,7 +5,7 @@
         <h1>Browse {{ collection | capitalize }}</h1>
       </slot>
 
-      <v-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</v-btn>
+      <a-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</a-btn>
     </div>
     <v-card>
       <div v-for="e in entities" :key="e._id">
@@ -22,7 +22,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     collection: {
       type: String,

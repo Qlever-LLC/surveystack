@@ -12,11 +12,11 @@
 
         <app-json-editor v-model="entity.data" />
         <div class="d-flex ma-2">
-          <v-btn color="error" outlined class="mr-auto" @click="deleteEntity">
+          <a-btn color="error" outlined class="mr-auto" @click="deleteEntity">
             <v-icon left>mdi-trash-can-outline</v-icon> Delete
-          </v-btn>
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit">Submit</v-btn>
+          </a-btn>
+          <a-btn text @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" @click="submit">Submit</a-btn>
         </div>
       </v-form>
     </v-card>
@@ -32,6 +32,7 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFeedback from '@/components/ui/Feedback.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -54,6 +55,7 @@ const integrationTypes = [
 
 export default {
   components: {
+    ABtn,
     appJsonEditor,
     appFeedback,
   },

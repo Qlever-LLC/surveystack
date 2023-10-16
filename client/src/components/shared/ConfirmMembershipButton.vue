@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="isVisible" width="300">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </v-btn>
+      <a-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </a-btn>
     </template>
 
     <v-card>
@@ -12,8 +12,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="isVisible = false"> Cancel </v-btn>
-        <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
+        <a-btn text @click="isVisible = false"> Cancel </a-btn>
+        <a-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -22,8 +22,10 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   data() {
     return {
       isVisible: false,

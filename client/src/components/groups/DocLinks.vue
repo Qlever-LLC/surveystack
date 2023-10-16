@@ -3,7 +3,7 @@
     <v-card-title
       >Documentation Links
       <v-spacer />
-      <v-btn color="primary" text @click="showAddDialog = true">New.. </v-btn>
+      <a-btn color="primary" text @click="showAddDialog = true">New.. </a-btn>
     </v-card-title>
     <v-card-subtitle>Custom links which appear in the side menu when logged into your group</v-card-subtitle>
     <draggable
@@ -26,9 +26,9 @@
               <a :href="el.link" target="_blank">{{ el.link }}</a>
             </div>
             <div class="d-flex">
-              <v-btn icon @click.stop="() => showDeleteModal(idx)">
+              <a-btn icon @click.stop="() => showDeleteModal(idx)">
                 <v-icon color="grey lighten-1">mdi-delete</v-icon>
-              </v-btn>
+              </a-btn>
             </div>
           </div>
         </v-card-text>
@@ -55,8 +55,8 @@
         <v-card-text class="mt-4"> Are you sure you want to remove this documentation link? </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+          <a-btn text @click.stop="cancelDeleteEntry"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -79,8 +79,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
-          <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
+          <a-btn text @click.stop="cancelAddEntry"> Cancel </a-btn>
+          <a-btn text color="primary" @click.stop="addEntry"> Submit </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -94,10 +94,12 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
+    ABtn,
     draggable,
   },
   data() {

@@ -74,7 +74,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer />
-        <v-btn
+        <a-btn
           v-if="compareRevisions.length > 0"
           :disabled="compareRevisions.length === 1"
           @click="surveyDiffDialogVisible = true"
@@ -83,8 +83,8 @@
         >
           Compare {{ compareRevisions[0] }}
           {{ compareRevisions.length === 2 ? 'with ' + compareRevisions[1] : '' }}
-        </v-btn>
-        <v-btn
+        </a-btn>
+        <a-btn
           @click="deleteVersions"
           :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
           :loading="deleteVersionsIsLoading"
@@ -92,8 +92,8 @@
           outlined
         >
           Delete {{ selectedVersionsToDelete.length }} versions
-        </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
+        </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" text> Close </a-btn>
       </v-card-actions>
     </v-card>
     <survey-diff-dialog
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { ABtn, SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

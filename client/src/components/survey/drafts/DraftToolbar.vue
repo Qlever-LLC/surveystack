@@ -14,16 +14,19 @@
 
         <slot name="toolbar-actions"></slot>
 
-        <v-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
+        <a-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
           <v-icon>mdi-format-list-numbered</v-icon>
-        </v-btn>
+        </a-btn>
       </div>
     </v-toolbar>
   </div>
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
 };
 </script>

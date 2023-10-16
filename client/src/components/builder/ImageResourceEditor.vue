@@ -4,9 +4,9 @@
       <div>Image Resource Editor</div>
       <v-spacer />
 
-      <v-btn icon @click="closeDialog">
+      <a-btn icon @click="closeDialog">
         <v-icon>mdi-close</v-icon>
-      </v-btn>
+      </a-btn>
     </v-card-title>
     <v-card-text>
       <v-form
@@ -44,16 +44,18 @@
       </v-form>
     </v-card-text>
     <v-card-actions class="d-flex justify-space-between px-6 pb-4">
-      <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>
-      <v-btn @click="updateResource" text color="primary"> Update </v-btn>
+      <a-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </a-btn>
+      <a-btn @click="updateResource" text color="primary"> Update </a-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   data() {
     return {};
   },

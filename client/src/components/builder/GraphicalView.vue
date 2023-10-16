@@ -48,16 +48,16 @@
           {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="mb-2 context-actions">
-          <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
+          <a-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
             <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             icon
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             @mousedown.stop="toggleLibrary(el.libraryId)"
           >
             <v-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</v-icon>
-          </v-btn>
+          </a-btn>
           <v-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
@@ -87,7 +87,7 @@
             </v-icon>
             Version {{ el.libraryVersion }}
           </v-chip>
-          <v-btn
+          <a-btn
             icon
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
             @click.stop="() => showDeleteModal(idx)"
@@ -95,8 +95,8 @@
             <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
               mdi-delete
             </v-icon>
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             text
             x-small
             v-if="el.options.hidden"
@@ -105,8 +105,8 @@
             style="margin-bottom: -8px"
           >
             unhide
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             text
             x-small
             v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
@@ -115,7 +115,7 @@
             class="mb-4"
           >
             hide
-          </v-btn>
+          </a-btn>
         </div>
       </div>
 
@@ -170,8 +170,8 @@
         <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+          <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -196,10 +196,12 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
+    ABtn,
     draggable,
     ControlCardHeader,
   },

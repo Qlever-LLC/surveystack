@@ -19,7 +19,7 @@
       <v-spacer />
 
       <v-card-actions class="mr-3 d-flex justify-end">
-        <v-btn text @click="open = false">Close</v-btn>
+        <a-btn text @click="open = false">Close</a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -30,9 +30,11 @@ import { computed, defineComponent, ref, watchEffect } from '@vue/composition-ap
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default defineComponent({
   components: {
+    ABtn,
     SelectItemsDownloadButton,
   },
   props: {

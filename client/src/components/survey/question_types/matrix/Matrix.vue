@@ -41,11 +41,11 @@
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
           <v-card-title>
-            <v-btn @click="duplicateRow(editedIndex)" text color="primary">
+            <a-btn @click="duplicateRow(editedIndex)" text color="primary">
               <v-icon left>mdi-content-copy</v-icon>Duplicate
-            </v-btn>
+            </a-btn>
             <v-spacer />
-            <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
+            <a-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </a-btn>
           </v-card-title>
           <v-card-text>
             <v-form autocomplete="off" @submit.prevent="">
@@ -68,12 +68,12 @@
             </v-form>
           </v-card-text>
           <v-card-actions class="d-flex justify-space-between">
-            <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
+            <a-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
               <v-icon left>mdi-trash-can-outline</v-icon>Delete
-            </v-btn>
-            <v-btn text @click="showEditItemDialog = false" class="ma-2">
+            </a-btn>
+            <a-btn text @click="showEditItemDialog = false" class="ma-2">
               Close <v-icon right>mdi-close</v-icon>
-            </v-btn>
+            </a-btn>
           </v-card-actions>
         </v-card>
       </div>
@@ -128,12 +128,12 @@
       <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
         <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
           <div class="d-flex">
-            <v-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
+            <a-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
               <v-icon>mdi-trash-can-outline</v-icon>
-            </v-btn>
-            <v-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
+            </a-btn>
+            <a-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
               <v-icon>mdi-content-copy</v-icon>
-            </v-btn>
+            </a-btn>
           </div>
         </div>
       </template>
@@ -156,6 +156,7 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import ABtn from '@/components/ui/ABtn.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -265,6 +266,7 @@ const transform = (assets) => {
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
   components: {
+    ABtn,
     appDialog,
     appMatrixCell,
     appMatrixTable,

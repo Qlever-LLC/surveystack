@@ -23,7 +23,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
+        <a-btn @click="$emit('cancel')" color="primary" text> Close </a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -31,10 +31,11 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {},
+  components: { ABtn },
   props: {
     value: {
       type: Boolean,

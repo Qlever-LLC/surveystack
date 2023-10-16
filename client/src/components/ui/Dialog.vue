@@ -9,15 +9,18 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</v-btn>
-        <v-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
+        <a-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</a-btn>
+        <a-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     modal: {
       type: Boolean,

@@ -13,7 +13,7 @@
       <v-card-text>
         <label>Survey</label>
         <div class="mb-5 d-flex align-center">
-          <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
+          <a-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</a-btn>
           <span v-if="selectedSurvey" class="mx-2">{{ selectedSurvey.name }}</span>
           <v-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</v-icon>
         </div>
@@ -25,8 +25,8 @@
         </div>
         <div class="d-flex justify-end align-center mt-3">
           <span v-if="!submittable" class="mr-2">Select a survey and at least one member below</span>
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</v-btn>
+          <a-btn text @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</a-btn>
         </div>
       </v-card-text>
     </v-card>
@@ -67,8 +67,8 @@
           <v-checkbox label="Also send a copy to myself" v-model="copy" />
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
-          <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
-          <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
+          <a-btn @click="showConfirmDialog = false" text>Cancel</a-btn>
+          <a-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -87,6 +87,7 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -100,6 +101,7 @@ All the best
 
 export default {
   components: {
+    ABtn,
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,

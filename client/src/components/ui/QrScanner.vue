@@ -1,6 +1,6 @@
 <template>
   <div class="qr-scanner">
-    <v-btn
+    <a-btn
       ref="scannerButton"
       aria-label="Open QR Scanner"
       :x-large="!small"
@@ -10,14 +10,14 @@
       @click="isScannerOpen = true"
     >
       <v-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</v-icon>
-    </v-btn>
+    </a-btn>
 
     <v-dialog v-model="isScannerOpen" fullscreen>
       <v-card>
         <v-toolbar dark color="primary">
-          <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
+          <a-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <v-icon>mdi-close</v-icon>
-          </v-btn>
+          </a-btn>
           <v-toolbar-title>QR Code Scanner</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
@@ -43,14 +43,16 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@vue/composition-api';
+import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from '@vue/composition-api';
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+import ABtn from '@/components/ui/ABtn.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
+  components: { ABtn },
   emits: ['codeDetected'],
   props: {
     small: {

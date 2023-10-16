@@ -7,7 +7,7 @@
       </v-card-title>
       <v-card-text class="d-flex justify-center">
         <div class="pa-8">
-          <v-btn class="center-text" color="primary" priominent x-large :to="newRoute">Manage FarmOS Farms</v-btn>
+          <a-btn class="center-text" color="primary" priominent x-large :to="newRoute">Manage FarmOS Farms</a-btn>
         </div>
       </v-card-text>
     </v-card>
@@ -15,7 +15,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: {
     entities: {
       type: Array,

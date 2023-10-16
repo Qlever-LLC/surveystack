@@ -19,7 +19,7 @@
         <v-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl"></v-text-field>
       </v-col>
       <v-col>
-        <v-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</v-btn>
+        <a-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</a-btn>
       </v-col>
     </v-row>
 
@@ -39,7 +39,7 @@
             <td>{{ plan.planName }}</td>
             <td>{{ plan.planUrl }}</td>
             <td>
-              <v-btn color="red" @click="$emit('delete-plan', plan._id)" dark>Delete</v-btn>
+              <a-btn color="red" @click="$emit('delete-plan', plan._id)" dark>Delete</a-btn>
             </td>
           </tr>
         </tbody>
@@ -49,7 +49,10 @@
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   props: ['viewModel', 'loading'],
   data() {
     return {

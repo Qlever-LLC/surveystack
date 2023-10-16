@@ -9,7 +9,7 @@
       <v-card-title v-if="editMode"
         >{{ currentEmail }} <v-spacer /><v-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
+            <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
           </template>
           <v-card>
             <v-card-title class="text-h5"> Change Email </v-card-title>
@@ -20,7 +20,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
+              <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </a-btn>
             </v-card-actions>
           </v-card>
         </v-dialog></v-card-title
@@ -54,8 +54,8 @@
           <v-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
 
           <div class="d-flex mt-2 justify-end">
-            <v-btn text @click="cancel">Cancel</v-btn>
-            <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</v-btn>
+            <a-btn text @click="cancel">Cancel</a-btn>
+            <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</a-btn>
           </div>
         </v-form></v-card-text
       >
@@ -74,9 +74,11 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     appFeedback,
   },
   data() {

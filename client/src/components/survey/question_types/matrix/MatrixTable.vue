@@ -56,15 +56,16 @@
       </div>
     </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
-      <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
+      <a-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
         <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
-      </v-btn>
+      </a-btn>
     </div>
   </div>
 </template>
 
 <script>
 import { sum, debounce } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 function defaultColumnWidth(type) {
   switch (type) {
@@ -77,6 +78,7 @@ function defaultColumnWidth(type) {
   }
 }
 export default {
+  components: { ABtn },
   props: {
     headers: {
       type: Array,

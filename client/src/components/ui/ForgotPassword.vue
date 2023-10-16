@@ -7,7 +7,7 @@
       <v-form @submit.prevent="submit">
         <v-text-field v-model="email" label="Email" />
         <div class="d-flex justify-end">
-          <v-btn type="submit" color="primary" class="px-8">Submit</v-btn>
+          <a-btn type="submit" color="primary" class="px-8">Submit</a-btn>
         </div>
       </v-form>
       <div class="text-center text-muted mt-5">
@@ -23,8 +23,10 @@
 
 <script>
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
+  components: { ABtn },
   data() {
     return {
       status: { type: '' },

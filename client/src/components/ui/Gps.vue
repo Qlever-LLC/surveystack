@@ -2,9 +2,9 @@
   <div>
     <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" v-on="on" class="button">
+        <a-btn v-bind="attrs" v-on="on" class="button">
           <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
+        </a-btn>
       </template>
       <div class="menu">
         <div>
@@ -19,19 +19,22 @@
             <span v-if="location.properties.accuracy"> acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }} </span>
           </samp>
         </div>
-        <v-btn @click="clipboard" outlined class="mt-1"> <v-icon left>mdi-content-copy</v-icon>Copy </v-btn>
+        <a-btn @click="clipboard" outlined class="mt-1"> <v-icon left>mdi-content-copy</v-icon>Copy </a-btn>
       </div>
     </v-menu>
     <!-- TODO: fix copied snack notification -->
     <v-snackbar v-model="snackbar">
       {{ snackbarText }}
-      <v-btn color="pink" text @click="snackbar = false"> Close </v-btn>
+      <a-btn color="pink" text @click="snackbar = false"> Close </a-btn>
     </v-snackbar>
   </div>
 </template>
 
 <script>
+import ABtn from '@/components/ui/ABtn.vue';
+
 export default {
+  components: { ABtn },
   data() {
     return {
       snackbar: false,

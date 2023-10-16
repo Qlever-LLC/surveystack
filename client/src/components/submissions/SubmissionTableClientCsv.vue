@@ -51,7 +51,7 @@
                     {{ `${selected.length} ${selected.length === 1 ? 'submission' : 'submissions'} selected` }}
                   </div>
                   <div class="ml-auto d-flex flex-column flex-sm-row">
-                    <v-btn
+                    <a-btn
                       v-if="selected[0]['meta.archived'] === 'true'"
                       :disabled="actionsAreDisabled"
                       color="error"
@@ -59,16 +59,16 @@
                       @click="$emit('showDeleteModal', $event)"
                     >
                       DELETE
-                    </v-btn>
-                    <v-btn
+                    </a-btn>
+                    <a-btn
                       v-if="selected[0]['meta.archived'] === 'true'"
                       :disabled="actionsAreDisabled"
                       text
                       @click="$emit('archiveSubmissions', $event)"
                     >
                       RESTORE
-                    </v-btn>
-                    <v-btn
+                    </a-btn>
+                    <a-btn
                       v-if="selected[0]['meta.archived'] !== 'true'"
                       :disabled="actionsAreDisabled"
                       color="error"
@@ -76,11 +76,11 @@
                       @click="$emit('showArchiveModal', $event)"
                     >
                       ARCHIVE
-                    </v-btn>
-                    <v-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
-                      >REASSIGN</v-btn
+                    </a-btn>
+                    <a-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
+                      >REASSIGN</a-btn
                     >
-                    <v-btn
+                    <a-btn
                       v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
                       :disabled="actionsAreDisabled"
                       text
@@ -88,7 +88,7 @@
                       @click="$emit('resubmit', $event)"
                     >
                       RESUBMIT
-                    </v-btn>
+                    </a-btn>
                   </div>
                 </div>
               </div>
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -272,6 +273,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 
 export default {
   components: {
+    ABtn,
     SubmissionTableCellModal,
   },
   props: {

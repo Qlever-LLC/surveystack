@@ -6,7 +6,7 @@
       </v-col>
       <v-col cols="12"> OR </v-col>
       <v-col cols="12">
-        <v-btn outlined color="primary" @click="draw">Draw new Field</v-btn>
+        <a-btn outlined color="primary" @click="draw">Draw new Field</a-btn>
       </v-col>
     </template>
 
@@ -21,11 +21,11 @@
       </v-col>
 
       <v-col cols="6">
-        <v-btn color="primary" @click="$emit('done')" :loading="loading">Add Field to FarmOS Instance</v-btn>
+        <a-btn color="primary" @click="$emit('done')" :loading="loading">Add Field to FarmOS Instance</a-btn>
       </v-col>
 
       <v-col cols="6">
-        <v-btn color="primary" outlined @click="$emit('cancel')" :loading="loading">Cancel</v-btn>
+        <a-btn color="primary" outlined @click="$emit('cancel')" :loading="loading">Cancel</a-btn>
       </v-col>
     </template>
 
@@ -36,6 +36,7 @@
 import appDialog from '@/components/ui/Dialog.vue';
 import appFarmArea from './FarmOSArea.vue';
 import appKmlImporter from './KmlImporter.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const states = {
   IDLE: 0,
@@ -47,6 +48,7 @@ Object.freeze(states);
 
 export default {
   components: {
+    ABtn,
     appDialog,
     appFarmArea,
     appKmlImporter,

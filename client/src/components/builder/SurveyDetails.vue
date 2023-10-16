@@ -6,9 +6,9 @@
         <v-spacer />
         <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <a-btn icon v-on="on">
               <v-icon>mdi-pencil</v-icon>
-            </v-btn>
+            </a-btn>
           </template>
           <v-card>
             <v-card-title> Edit Survey Details</v-card-title>
@@ -24,15 +24,15 @@
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
+              <a-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</a-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <a-btn icon v-on="on">
               <v-icon>mdi-dresser</v-icon>
-            </v-btn>
+            </a-btn>
           </template>
           <v-card>
             <v-card-title> Survey Resources</v-card-title>
@@ -44,7 +44,7 @@
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
+              <a-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</a-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -57,19 +57,19 @@
         />
         <v-menu offset-y left>
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <a-btn icon v-on="on">
               <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
+            </a-btn>
           </template>
           <v-list>
             <v-list-item class="d-flex align-center">
               <v-list-item-title>
                 <v-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
-                    <v-btn class="pointer-events-none" text>
+                    <a-btn class="pointer-events-none" text>
                       <v-icon color="grey">mdi-file-upload</v-icon>
                       <div class="ml-1">Import</div>
-                    </v-btn>
+                    </a-btn>
                   </label>
                   <input
                     type="file"
@@ -84,50 +84,50 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-btn @click="$emit('export-survey')" text>
+                <a-btn @click="$emit('export-survey')" text>
                   <v-icon color="grey">mdi-file-download</v-icon>
                   <div class="ml-1">Export</div>
-                </v-btn>
+                </a-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-btn @click="$emit('show-version-dialog')" text>
+                <a-btn @click="$emit('show-version-dialog')" text>
                   <v-icon color="grey">mdi-sitemap</v-icon>
                   <div class="ml-1">Manage Survey Versions</div>
-                </v-btn>
+                </a-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-btn @click="editLibraryDialogIsVisible = true" text>
+                <a-btn @click="editLibraryDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-library</v-icon>
                   <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
-                </v-btn>
+                </a-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item v-if="value.meta.isLibrary">
               <v-list-item-title>
-                <v-btn @click="libraryConsumersDialogIsVisible = true" text>
+                <a-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-layers-search</v-icon>
                   <div class="ml-1">List library consumers</div>
-                </v-btn>
+                </a-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-btn text @click="printSettingDialogIsVisible = true">
+                <a-btn text @click="printSettingDialogIsVisible = true">
                   <v-icon color="grey">mdi-printer-settings</v-icon>
                   <div class="ml-1">Print settings</div>
-                </v-btn>
+                </a-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item v-if="!isNew">
               <v-list-item-title>
-                <v-btn text @click="$emit('delete')">
+                <a-btn text @click="$emit('delete')">
                   <v-icon color="grey">mdi-delete</v-icon>
                   <div class="ml-1">Delete</div>
-                </v-btn>
+                </a-btn>
               </v-list-item-title>
             </v-list-item>
           </v-list>
@@ -150,7 +150,7 @@
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
           Size: {{ surveySize }} MB
-          <v-btn
+          <a-btn
             v-if="surveySize > 1"
             @click="$emit('show-version-dialog')"
             x-small
@@ -159,7 +159,7 @@
             class="mb-1"
           >
             <v-icon x-small color="warning">mdi-alert</v-icon>try to clean up
-          </v-btn>
+          </a-btn>
         </div>
         <div class="text-left">
           <v-chip dark small outlined color="grey"> Version {{ version }}</v-chip>
@@ -181,7 +181,7 @@
           <v-tooltip bottom v-if="!isNew">
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <v-btn
+                <a-btn
                   v-if="!isNew"
                   :dark="enableUpdate"
                   :disabled="!enableUpdate || isSaving"
@@ -192,7 +192,7 @@
                 >
                   <v-icon class="mr-1">mdi-update</v-icon>
                   Update
-                </v-btn>
+                </a-btn>
               </div>
             </template>
             <span
@@ -204,7 +204,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <v-btn
+                <a-btn
                   :dark="enablePublish"
                   class="my-1 mr-1"
                   @click="publish"
@@ -213,7 +213,7 @@
                 >
                   <v-icon class="mr-1">mdi-cloud-upload</v-icon>
                   Publish
-                </v-btn>
+                </a-btn>
               </div>
             </template>
 
@@ -223,7 +223,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <v-btn
+                <a-btn
                   :dark="enableSaveDraft"
                   @click="$emit('saveDraft')"
                   color="primary"
@@ -233,7 +233,7 @@
                 >
                   <v-icon class="mr-1">mdi-content-save</v-icon>
                   Save
-                </v-btn>
+                </a-btn>
               </div>
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -324,6 +325,7 @@ export default {
     },
   },
   components: {
+    ABtn,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,

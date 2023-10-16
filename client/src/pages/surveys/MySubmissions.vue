@@ -3,10 +3,10 @@
     <v-container>
       <v-row class="my-2">
         <v-spacer />
-        <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
+        <a-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
           <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
-        </v-btn>
+        </a-btn>
       </v-row>
       <v-row class="d-flex flex-grow-1">
         <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
@@ -50,14 +50,14 @@
                     <v-list-item-action>
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
-                          <v-btn
+                          <a-btn
                             v-if="readyToSubmitHas(item._id)"
                             icon
                             @click="() => handleSubmitClick(item._id)"
                             v-on="on"
                           >
                             <v-icon> mdi-cloud-upload-outline </v-icon>
-                          </v-btn>
+                          </a-btn>
                         </template>
                         <span>Upload Submission</span>
                       </v-tooltip>
@@ -153,12 +153,14 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   mixins: [ResultMixin],
   components: {
+    ABtn,
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,

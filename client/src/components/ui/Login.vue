@@ -47,13 +47,13 @@
                 >Forgot password?</a
               >
             </template>
-            <v-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
+            <a-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
               usePassword ? 'Login' : 'Send Link'
-            }}</v-btn>
+            }}</a-btn>
           </div>
         </v-form>
         <div class="text-center text-muted mt-5">
-          <v-btn
+          <a-btn
             text
             small
             color="primary"
@@ -64,7 +64,7 @@
             data-testid="toggle-method"
           >
             {{ usePassword ? 'email me a sign in link instead' : 'sign in with password instead' }}
-          </v-btn>
+          </a-btn>
         </div>
       </div>
       <template v-if="registrationEnabled">
@@ -75,10 +75,10 @@
         </div>
         <div class="d-flex justify-center pr-sm-5 pl-sm-10 py-6 d-flex flex-column align-center flex-wrap">
           <p class="white-space-nowrap">Don't have an account?</p>
-          <v-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link"> Register now </v-btn>
-          <v-btn v-else @click.stop="$emit('updateActive', 'register')" color="primary" class="px-8" role="button">
+          <a-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link"> Register now </a-btn>
+          <a-btn v-else @click.stop="$emit('updateActive', 'register')" color="primary" class="px-8" role="button">
             Register now
-          </v-btn>
+          </a-btn>
         </div>
       </template>
     </div>
@@ -100,7 +100,7 @@
       Follow the link we sent you at <span class="font-weight-medium">{{ entity.email }}</span> to finish logging in!
     </p>
     <div class="text-right text-muted mt-5">
-      <v-btn text small @click="signInLinkSent = false"> Back to login </v-btn>
+      <a-btn text small @click="signInLinkSent = false"> Back to login </a-btn>
     </div>
   </v-alert>
 </template>
@@ -108,6 +108,7 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -118,6 +119,7 @@ const DEFAULT_ENTITY = {
 const LS_DEFAULT_USE_PASSWORD = 'use-password-on-login-page-by-default';
 
 export default {
+  components: { ABtn },
   props: {
     initialEmail: {
       type: String,

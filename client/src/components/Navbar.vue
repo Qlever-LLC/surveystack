@@ -11,9 +11,9 @@
 
       <v-spacer />
       <offline-indicator />
-      <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
+      <a-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
         <v-icon size="22">mdi-help-circle-outline</v-icon>
-      </v-btn>
+      </a-btn>
       <navbar-user-menu />
     </v-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />
@@ -24,9 +24,11 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,

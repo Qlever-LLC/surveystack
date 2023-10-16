@@ -10,9 +10,9 @@
       :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
       outlined
     />
-    <v-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
+    <a-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
       <v-icon>mdi-pencil</v-icon>
-    </v-btn>
+    </a-btn>
 
     <v-dialog v-model="tableDialogIsVisible">
       <ontology-list-editor
@@ -43,9 +43,11 @@ import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
 import { createResource, resourceTypes, resourceLocations, setResource, removeResource } from '@/utils/resources';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
+    ABtn,
     OntologyListEditor,
     OntologyReferenceEditor,
     ResourceSelector,

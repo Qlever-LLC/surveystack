@@ -3,7 +3,7 @@
     <v-card-title
       >Pinned Surveys
       <v-spacer />
-      <v-btn color="primary" text @click="openSearchDialog">New..</v-btn>
+      <a-btn color="primary" text @click="openSearchDialog">New..</a-btn>
     </v-card-title>
     <draggable
       v-if="entities.length !== 0"
@@ -29,9 +29,9 @@
               </span>
             </div>
             <div class="d-flex">
-              <v-btn icon @click.stop="() => showDeleteModal(idx)">
+              <a-btn icon @click.stop="() => showDeleteModal(idx)">
                 <v-icon color="grey lighten-1">mdi-delete</v-icon>
-              </v-btn>
+              </a-btn>
             </div>
           </div>
         </v-card-text>
@@ -53,8 +53,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+          <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -88,10 +88,12 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
+    ABtn,
     draggable,
   },
   data() {

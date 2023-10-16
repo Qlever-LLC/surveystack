@@ -2,14 +2,14 @@
   <div class="control-adder">
     <v-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
-        <v-btn fab color="blue darken-2" dark data-testid="control-adder-open">
+        <a-btn fab color="blue darken-2" dark data-testid="control-adder-open">
           <v-icon v-if="fabIsOpen">mdi-close</v-icon>
           <v-icon v-else>mdi-plus</v-icon>
-        </v-btn>
+        </a-btn>
       </template>
       <template v-slot:default>
         <div class="button-grid">
-          <v-btn
+          <a-btn
             dark
             color="white"
             key="library"
@@ -20,8 +20,8 @@
             data-testid="add-control-library"
           >
             search question library
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             dark
             color="white"
             key="group"
@@ -35,8 +35,8 @@
               {{ group.icon }}
             </v-icon>
             Group
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             small
             dark
             color="indigo"
@@ -50,7 +50,7 @@
               {{ el.icon }}
             </v-icon>
             {{ el.name.replace('_', ' ') }}
-          </v-btn>
+          </a-btn>
         </div>
       </template>
     </v-speed-dial>
@@ -59,10 +59,12 @@
 
 <script>
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
+import ABtn from '@/components/ui/ABtn.vue';
 
 const group = availableControls.find((c) => c.type === 'group');
 
 export default {
+  components: { ABtn },
   data() {
     return {
       group,
