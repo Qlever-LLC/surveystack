@@ -28,7 +28,7 @@
           v-bind="data.attrs"
           :input-value="data.selected"
           close
-          @click="data.select"
+          @click="clickOnChip(data)"
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
@@ -174,6 +174,9 @@ export default {
     };
   },
   methods: {
+    clickOnChip(data) {
+      data.select;
+    },
     onChange(value) {
       this.comboboxSearch = null;
       if (this.$refs.dropdownRef && !this.control.options.hasMultipleSelections) {
