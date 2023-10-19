@@ -147,6 +147,7 @@
                     />
                     <v-text-field
                       v-if="item.type === 'number'"
+                      type="number"
                       v-model="item.defaultValue"
                       @blur="() => handleDefaultValueTrimNumber(i)"
                       label="Default value"

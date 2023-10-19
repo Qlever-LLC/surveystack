@@ -37,6 +37,7 @@
     v-else-if="header.type === 'number'"
     :value="value"
     @input="onNumberInput"
+    type="number"
     outlined
     hide-details="auto"
     :disabled="disabled"
@@ -345,7 +346,6 @@ export default {
         const numValue = Number(value);
         if (numValue || value === '0') {
           // possibility to write 1e2 => 100
-          // while keeping security: 95.5h675 => show error and store 95.5
           this.value = numValue;
         }
       }

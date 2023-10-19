@@ -10,6 +10,7 @@
     />
     <v-text-field
       outlined
+      type="number"
       :label="control.hint"
       v-bind:value="value"
       v-on:input="onInput"
@@ -70,7 +71,6 @@ export default {
           this.changed(value);
         } else if (numValue) {
           // possibility to write 1e2 => 100
-          // while keeping security: 95.5h675 => show error and store 95.5
           this.changed(numValue);
         }
       }

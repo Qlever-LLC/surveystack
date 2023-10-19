@@ -24,6 +24,7 @@
       />
       <v-text-field
         v-if="isNumber"
+        type="number"
         v-model="control.defaultValue"
         @blur="handleDefaultValueTrimNumber"
         label="Default value"
