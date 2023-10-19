@@ -289,6 +289,7 @@
                 v-if="linkMenuIsActive"
                 @submit.prevent="setLinkUrl(commands.link, linkUrl)"
               >
+                <!-- TODO in Vue3 remove .native -->
                 <a-text-field
                   class="menububble__input ml-4"
                   dense
@@ -456,7 +457,7 @@ export default {
       this.linkUrl = attrs.href;
       this.linkMenuIsActive = true;
       this.$nextTick(() => {
-        this.$refs.linkInput.$children[0].focus();
+        this.$refs.linkInput.focus();
       });
     },
     hideLinkMenu() {

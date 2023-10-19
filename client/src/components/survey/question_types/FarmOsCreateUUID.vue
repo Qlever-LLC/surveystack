@@ -3,6 +3,7 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <div style="display: flex">
       <div style="flex: 1">
+        <!-- TODO in Vue3 remove .native -->
         <a-text-field
           outlined
           :label="control.hint"
@@ -53,16 +54,16 @@ export default {
     tryAutofocus() {
       if (
         typeof document === 'undefined' ||
-        !this.$refs.textField.$children[0].$refs.input ||
+        !this.$refs.textField.refInput() ||
         document.activeElement === this.$refs.input
       ) {
         return false;
       }
 
-      this.$refs.textField.$children[0].$refs.input.focus({ preventScroll: true });
+      this.$refs.textField.refInput().focus({ preventScroll: true });
 
       // could we use this instead?
-      // this.$nextTick(() => this.$refs.textField.$children[0].$refs.input.focus());
+      // this.$nextTick(() => this.$refs.textField.refInput().focus());
 
       return true;
     },

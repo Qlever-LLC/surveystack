@@ -98,7 +98,7 @@ export default {
     },
     close() {
       this.open = false;
-      this.$refs.anchorRef.$children[0].blur();
+      this.$refs.anchorRef.blur();
     },
     cancel() {
       this.selected = getArrayValue(this.value);

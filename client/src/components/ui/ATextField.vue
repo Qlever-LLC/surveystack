@@ -1,5 +1,6 @@
 <template>
   <v-text-field
+    ref="refAnchor"
     @blur="$emit('blur')"
     @click="$emit('click', $event)"
     @click:append="$emit('click:append', $event)"
@@ -88,6 +89,17 @@ export default {
     type: { type: String, required: false },
     validateOnBlur: { type: Boolean, required: false },
     value: { type: undefined, required: false },
+  },
+  methods: {
+    blur() {
+      this.$refs.refAnchor.blur();
+    },
+    refInput() {
+      return this.$refs.refAnchor.$refs.input;
+    },
+    focus() {
+      this.$refs.refAnchor.focus();
+    },
   },
 };
 </script>

@@ -1,6 +1,7 @@
 <template>
   <div>
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <!-- TODO in Vue3 remove .native -->
     <a-text-field
       outlined
       type="number"
@@ -44,12 +45,12 @@ export default {
     tryAutofocus() {
       if (
         typeof document === 'undefined' ||
-        !this.$refs.textField.$children[0].$refs.input ||
+        !this.$refs.textField.refInput() ||
         document.activeElement === this.$refs.input
       ) {
         return false;
       }
-      this.$refs.textField.$children[0].$refs.input.focus({ preventScroll: true });
+      this.$refs.textField.refInput().focus({ preventScroll: true });
 
       return true;
     },
