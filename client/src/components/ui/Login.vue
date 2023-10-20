@@ -53,16 +53,7 @@
           </div>
         </v-form>
         <div class="text-center text-muted mt-5">
-          <a-btn
-            text
-            small
-            color="primary"
-            @click="
-              usePassword = !usePassword;
-              status = null;
-            "
-            data-testid="toggle-method"
-          >
+          <a-btn text small color="primary" @click="switchSignInMode" data-testid="toggle-method">
             {{ usePassword ? 'email me a sign in link instead' : 'sign in with password instead' }}
           </a-btn>
         </div>
@@ -196,6 +187,10 @@ export default {
     }
   },
   methods: {
+    switchSignInMode() {
+      this.usePassword = !this.usePassword;
+      this.status = null;
+    },
     async handleSubmitClick() {
       this.isSubmitting = true;
       try {
