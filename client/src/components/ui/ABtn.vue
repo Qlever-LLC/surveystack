@@ -22,7 +22,6 @@
     :to="to"
     v-on="$listeners"
     v-bind="$attrs"
-    @click="$emit('click', $event)"
   >
     <slot />
   </v-btn>
