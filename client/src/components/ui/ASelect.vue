@@ -54,7 +54,12 @@ export default {
       default: 'select',
       required: false,
     },
-    //named slot
+    /* Named slot set to true to render slot
+      Example: 
+      <a-select ... selectionSlot>
+        <template v-slot:selection="data">
+      </a-select>
+    */
     selectionSlot: { type: Boolean, required: false },
     itemSlot: { type: Boolean, required: false },
     appendOuterSlot: { type: Boolean, required: false },

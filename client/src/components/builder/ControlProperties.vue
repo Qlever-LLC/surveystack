@@ -387,7 +387,7 @@
               itemSlot
               appendOuterSlot
             >
-              <template v-slot:selection="{ item, index }">
+              <template v-slot:selection="{ item }">
                 {{ item === 1 ? '1 column' : `${item} columns` }}
               </template>
 
