@@ -94,9 +94,6 @@ export default {
     blur() {
       this.$refs.refAnchor.blur();
     },
-    refInput() {
-      return this.$refs.refAnchor.$refs.input;
-    },
     focus() {
       this.$refs.refAnchor.focus();
     },

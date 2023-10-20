@@ -43,16 +43,11 @@ export default {
       this.$emit('next');
     },
     tryAutofocus() {
-      if (
-        typeof document === 'undefined' ||
-        !this.$refs.textField.refInput() ||
-        document.activeElement === this.$refs.input
-      ) {
-        return false;
+      if (this.$refs.textField) {
+        this.$refs.textField.focus({ preventScroll: true });
+        return true;
       }
-      this.$refs.textField.refInput().focus({ preventScroll: true });
-
-      return true;
+      return false;
     },
     parseInputToNumber(v) {
       // TODO: implicitly parse as Integer or Float?

@@ -58,20 +58,13 @@ export default {
       }
     },
     tryAutofocus() {
-      if (
-        typeof document === 'undefined' ||
-        !this.$refs.textField.refInput() ||
-        document.activeElement === this.$refs.input
-      ) {
-        return false;
+      if (this.$refs.textField) {
+        this.$refs.textField.focus({ preventScroll: true });
+        return true;
       }
-
-      this.$refs.textField.refInput().focus({ preventScroll: true });
-
+      return false;
       // could we use this instead?
-      // this.$nextTick(() => this.$refs.textField.refInput().focus());
-
-      return true;
+      // this.$nextTick(() => this.$refs.textField.focus());
     },
   },
   mounted() {
