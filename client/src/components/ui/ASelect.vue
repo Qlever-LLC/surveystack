@@ -1,8 +1,10 @@
 <template>
   <v-select
     v-if="engineering === 'select'"
-    v-on="$listeners"
-    v-bind="$attrs"
+    @blur="$emit('blur')"
+    @change="$emit('change', $event)"
+    @focus="$emit('focus')"
+    @input="$emit('input', $event)"
     :data-test-id="dataTestId"
     :chips="chips"
     :clearable="clearable"
@@ -41,7 +43,7 @@
 
 <script>
 export default {
-  emits: ['input', 'change', 'focus', 'blur'],
+  emits: ['blur', 'change', 'focus', 'input'],
   props: {
     //choose btw select - autocomplete - combobox
     engineering: {
