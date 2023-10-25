@@ -4,7 +4,7 @@
       <div class="pl-sm-5 pr-sm-10 py-6">
         <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
         <h1 class="heading--text" v-else>Welcome Back!</h1>
-        <v-form>
+        <a-form>
           <v-text-field
             label="E-Mail"
             type="text"
@@ -51,7 +51,7 @@
               usePassword ? 'Login' : 'Send Link'
             }}</v-btn>
           </div>
-        </v-form>
+        </a-form>
         <div class="text-center text-muted mt-5">
           <v-btn
             text
@@ -108,6 +108,7 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AForm from '@/components/ui/AForm.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -118,6 +119,7 @@ const DEFAULT_ENTITY = {
 const LS_DEFAULT_USE_PASSWORD = 'use-password-on-login-page-by-default';
 
 export default {
+  components: { AForm },
   props: {
     initialEmail: {
       type: String,

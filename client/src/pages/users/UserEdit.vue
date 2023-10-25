@@ -25,8 +25,8 @@
           </v-card>
         </v-dialog></v-card-title
       >
-      <v-card-text
-        ><v-form>
+      <v-card-text>
+        <a-form>
           <v-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
           <v-text-field tabindex="2" v-model="entity.name" label="Name" />
           <v-text-field
@@ -57,8 +57,8 @@
             <v-btn text @click="cancel">Cancel</v-btn>
             <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</v-btn>
           </div>
-        </v-form></v-card-text
-      >
+        </a-form>
+      </v-card-text>
     </v-card>
     <!-- <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert> -->
     <transition name="fade">
@@ -74,9 +74,11 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
+import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: {
+    AForm,
     appFeedback,
   },
   data() {

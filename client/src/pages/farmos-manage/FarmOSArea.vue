@@ -1,16 +1,18 @@
 <template>
   <div style="width: 100%">
-    <v-form>
+    <a-form>
       <v-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
-    </v-form>
+    </a-form>
     <div id="farmos-map" style="width: 100%; height: 500px"></div>
   </div>
 </template>
 
 <script>
 import createMap from '@/external/instance/instance';
+import AForm from '@/components/ui/AForm.vue';
 
 export default {
+  components: { AForm },
   props: ['value', 'center'],
   data() {
     return {

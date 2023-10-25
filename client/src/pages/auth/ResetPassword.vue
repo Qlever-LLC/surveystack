@@ -4,7 +4,7 @@
       <v-card class="pa-5">
         <h1>New password</h1>
         <p>Set a new password for {{ this.email }}</p>
-        <v-form @submit.prevent="submit">
+        <a-form @submit.prevent="submit">
           <v-text-field
             v-model="newPassword"
             label="Password"
@@ -22,7 +22,7 @@
           <div class="d-flex justify-end">
             <v-btn type="submit" color="primary">Set password</v-btn>
           </div>
-        </v-form>
+        </a-form>
       </v-card>
       <transition name="fade">
         <app-feedback v-if="status" class="mt-5" @closed="status = {}" :type="status.type">{{
@@ -45,9 +45,11 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
+import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: {
+    AForm,
     appFeedback,
   },
   data() {

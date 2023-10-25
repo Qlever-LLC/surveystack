@@ -1,7 +1,7 @@
 <template>
   <div class="property-panel">
     <v-card-title class="pl-0">Properties</v-card-title>
-    <v-form v-if="control">
+    <a-form v-if="control">
       <!-- Default properties -->
       <v-text-field v-model="control.label" label="Label" hide-details />
       <v-text-field
@@ -433,7 +433,7 @@
       </template>
 
       <v-spacer></v-spacer>
-    </v-form>
+    </a-form>
   </div>
 </template>
 <script>
@@ -451,9 +451,11 @@ import Checkbox from '@/components/ui/Checkbox.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
+import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: {
+    AForm,
     SelectItems,
     SelectItemsEditor,
     OntologyProperties,

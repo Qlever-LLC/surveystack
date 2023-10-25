@@ -3,7 +3,7 @@
     <v-card class="pa-6 pa-sm-12">
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
-      <v-form>
+      <a-form>
         <v-text-field
           label="E-Mail"
           type="text"
@@ -35,7 +35,7 @@
           </a>
           <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </v-btn>
         </div>
-      </v-form>
+      </a-form>
       <v-alert class="mt-4" outlined v-if="membership" type="info"
         >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
       >
@@ -49,6 +49,7 @@
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import AForm from '@/components/ui/AForm.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -57,6 +58,7 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
+  components: { AForm },
   data() {
     return {
       status: '',

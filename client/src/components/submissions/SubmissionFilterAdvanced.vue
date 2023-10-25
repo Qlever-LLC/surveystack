@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-form class="d-flex flex-column">
+    <a-form class="d-flex flex-column">
       <v-textarea v-model="value.match" outlined label="Match" rows="3" />
       <v-row>
         <v-col>
@@ -42,12 +42,15 @@
           >Apply</v-btn
         >
       </div>
-    </v-form>
+    </a-form>
   </div>
 </template>
 
 <script>
+import AForm from '@/components/ui/AForm.vue';
+
 export default {
+  components: { AForm },
   props: {
     value: {
       type: Object,

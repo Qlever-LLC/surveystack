@@ -2,7 +2,7 @@
   <v-container>
     <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
     <span class="text--secondary">{{ this.entity._id }}</span>
-    <v-form class="mt-3" @keydown.enter.prevent="submit">
+    <a-form class="mt-3" @keydown.enter.prevent="submit">
       <v-text-field v-model="entity.name" label="Name" outlined hide-details />
       <active-group-selector
         class="my-4"
@@ -23,7 +23,7 @@
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="submit">Save</v-btn>
       </div>
-    </v-form>
+    </a-form>
   </v-container>
 </template>
 
@@ -36,6 +36,7 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 
 import codeEditor from '@/components/ui/CodeEditor.vue';
+import AForm from '@/components/ui/AForm.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = () => import('@/components/ui/CodeEditor.vue');
@@ -131,6 +132,7 @@ export function render(props, state, setState) {
     };
   },
   components: {
+    AForm,
     codeEditor,
     ActiveGroupSelector,
   },

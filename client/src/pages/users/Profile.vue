@@ -22,7 +22,7 @@
       <v-card outlined>
         <v-card-text> <div>User Details</div></v-card-text>
         <v-card-text>
-          <v-form>
+          <a-form>
             <v-card-text>
               <v-row>
                 <div class="text-h6">{{ email }}</div>
@@ -73,7 +73,7 @@
             <div class="d-flex mt-2 justify-end">
               <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</v-btn>
             </div>
-          </v-form></v-card-text
+          </a-form></v-card-text
         >
       </v-card>
 
@@ -124,6 +124,7 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import AForm from '@/components/ui/AForm.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -137,6 +138,7 @@ function findParentAdminGroup(memberships, activeMembership) {
 
 export default {
   components: {
+    AForm,
     appFeedback,
     ActiveGroupSelector,
   },
