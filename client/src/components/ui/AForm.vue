@@ -1,5 +1,6 @@
 <template>
   <v-form
+    ref="form"
     :model-value="value"
     :disabled="disabled"
     :lazy-validation="lazyValidation"
@@ -20,6 +21,18 @@ export default {
     lazyValidation: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     value: { type: Boolean, default: false },
+  },
+  setup() {
+    function validate() {
+      return this.$refs.form.validate();
+    }
+    function resetValidation() {
+      this.$refs.form.resetValidation();
+    }
+    return {
+      validate,
+      resetValidation,
+    };
   },
 };
 </script>
