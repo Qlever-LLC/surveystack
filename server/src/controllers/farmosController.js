@@ -288,7 +288,7 @@ export const getAssets = async (req, res) => {
           name: a.attributes.name,
           id: a.id,
           instanceName: instance.instanceName,
-          archived: a.attributes.archived,
+          archived: a.attributes.status == 'archived',
           location:
             a.relationships && a.relationships.location ? a.relationships.location.data : undefined,
         };
