@@ -24,7 +24,7 @@ export default {
   },
   setup() {
     function validate() {
-      return this.$refs.form.validate();
+      return this.$refs.form.validate(); //TODO in v3, validate() will return a Promise<FormValidationResult> instead of a boolean. Await the promise then check result.valid to determine form state.
     }
     function resetValidation() {
       this.$refs.form.resetValidation();
