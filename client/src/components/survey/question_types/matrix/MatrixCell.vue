@@ -311,7 +311,11 @@ export default {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     onInput(value) {
-      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      if (this.header.type === 'dropdown') {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : [value]);
+      } else {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      }
       this.$emit('changed');
     },
     onDateInput(value) {

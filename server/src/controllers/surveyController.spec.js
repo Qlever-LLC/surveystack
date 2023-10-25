@@ -9,7 +9,7 @@ import {
   createSuperAdmin,
 } from '../testUtils';
 import _ from 'lodash';
-import { db, getDb } from '../db';
+import { getDb } from '../db';
 
 const { ObjectId } = jest.requireActual('mongodb');
 const {
@@ -102,7 +102,7 @@ async function mockControlsAndSubmission(
     { _id: survey._id },
     { $set: survey },
     {
-      returnOriginal: false,
+      returnDocument: 'after',
     }
   );
 
@@ -451,7 +451,7 @@ describe('surveyController', () => {
           { _id: librarySurvey._id },
           { $set: librarySurvey },
           {
-            returnOriginal: false,
+            returnDocument: 'after',
           }
         );
         const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -522,7 +522,7 @@ describe('surveyController', () => {
           { _id: submissionToDel._id },
           { $set: submissionToDel },
           {
-            returnOriginal: false,
+            returnDocument: 'after',
           }
         );
 
@@ -540,7 +540,7 @@ describe('surveyController', () => {
           { _id: submissionToDel._id },
           { $set: submissionToDel },
           {
-            returnOriginal: false,
+            returnDocument: 'after',
           }
         );
 
@@ -558,7 +558,7 @@ describe('surveyController', () => {
           { _id: submissionToDel._id },
           { $set: submissionToDel },
           {
-            returnOriginal: false,
+            returnDocument: 'after',
           }
         );
 

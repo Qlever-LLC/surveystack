@@ -1,20 +1,11 @@
 import uuid from 'uuid';
-
-import {
-  createGroup,
-  createReq,
-  createRes,
-  createUser,
-  deleteMemberships,
-  setRole,
-} from '../../testUtils';
+import { createGroup, deleteMemberships } from '../../testUtils';
 import {
   mapFarmOSInstanceToUser,
   unmapFarmOSInstance,
   listFarmOSInstancesForUser,
   createFarmOSInstanceForUserAndGroup,
 } from './manage';
-
 import { createAsset } from './apiCompose';
 
 jest.mock('../../services/mail/mail.service');
