@@ -1,19 +1,21 @@
 <template>
   <v-container>
     <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
+        v-if="!!localViewModel.groups"
         outlined
         primary
         label="Select Group"
         v-model="localViewModel.form.groupId"
-        v-if="!!localViewModel.groups"
         :item-text="(g) => `${g.name} (${g.path})`"
         item-value="_id"
         :items="localViewModel.groups"
         :rules="[(v) => !!v || `select group`]"
-      ></v-autocomplete>
+      />
 
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         outlined
         primary
         label="Select Plan"
@@ -22,7 +24,7 @@
         :item-text="(p) => `${p.planName}, ${p.planUrl}`"
         item-value="_id"
         :rules="[(v) => !!v || `select plan`]"
-      ></v-autocomplete>
+      />
 
       <v-row class="align-baseline">
         <v-col>
@@ -89,7 +91,8 @@
         :rules="addressRules"
       />
 
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         label="Timezone"
         outlined
         :items="timezones"
@@ -104,7 +107,8 @@
         <v-radio label="US" value="us"></v-radio>
       </v-radio-group>
 
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         label="Owner of the FarmOS Instance"
         outlined
         :items="localViewModel.users"
@@ -115,7 +119,8 @@
         return-object
       />
 
-      <!-- <v-autocomplete
+      <!-- <a-select
+        engineering="autocomplete"
         label="Admins with Access to Farm"
         v-model="localViewModel.form.admins"
         :items="localViewModel.users"
@@ -128,6 +133,9 @@
         return-object
         :loading="localViewModel.loading"
         ref="members"
+        itemSlot
+        prependItemSlot
+        appendOuterSlot
       >
         <template v-slot:item="{ item }">
           <div v-if="item.userExists">
@@ -157,7 +165,7 @@
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </template>
-      </v-autocomplete> -->
+      </a-select> -->
 
       <v-divider class="my-4"></v-divider>
 
@@ -224,6 +232,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 
 import { timezones } from './timezones';
 
@@ -233,6 +242,7 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
+    ASelect,
   },
   data() {
     return {

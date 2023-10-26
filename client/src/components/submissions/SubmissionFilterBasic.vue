@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-autocomplete :items="fieldItems" label="Field" v-model="selectedField" hide-details />
+    <a-select engineering="autocomplete" :items="fieldItems" label="Field" v-model="selectedField" hide-details />
     <a-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
     <v-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
 

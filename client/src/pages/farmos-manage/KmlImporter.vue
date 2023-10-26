@@ -14,13 +14,14 @@
     </v-row>
     <template v-if="kml !== ''">
       <v-row>
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           v-model="field"
           :items="fields"
           outlined
           label="Select Field"
           @change="selected"
-        ></v-autocomplete>
+        />
       </v-row>
       <v-row class="text-center">
         <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
@@ -33,10 +34,12 @@ import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
 import appTooltip from '@/components/ui/Tooltip.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   components: {
     appTooltip,
+    ASelect,
   },
   props: ['value'],
   data() {

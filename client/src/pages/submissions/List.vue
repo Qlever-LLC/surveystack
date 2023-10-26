@@ -23,11 +23,13 @@
     >
       <template v-slot:title>Reassign Submission</template>
       <template>
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           :items="reassignment.groups"
           v-model="reassignment.group"
           label="Group"
           :filter="reassignGroupFilter"
+          itemSlot
         >
           <template v-slot:item="{ item }">
             <div class="d-flex flex-column py-1">
@@ -35,13 +37,14 @@
               <div class="text--secondary caption">{{ item.path }}</div>
             </div>
           </template>
-        </v-autocomplete>
-        <v-autocomplete
+        </a-select>
+        <a-select
+          engineering="autocomplete"
           :disabled="reassignment.group === null"
           :items="reassignment.users"
           v-model="reassignment.user"
           label="User"
-        ></v-autocomplete>
+        />
       </template>
     </app-dialog>
 

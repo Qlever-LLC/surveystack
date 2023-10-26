@@ -2,25 +2,28 @@
   <v-card>
     <v-card-title> Survey Reference Editor </v-card-title>
     <v-card-text>
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         label="Select Survey"
         outlined
         :items="surveys"
         v-model="surveyId"
-        @change="surveyChanged()"
+        @change="surveyChanged"
         :loading="loading"
         item-value="_id"
         item-text="name"
+        appendOuterSlot
       >
         <template slot="append-outer">
           <v-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
           </v-chip>
         </template>
-      </v-autocomplete>
+      </a-select>
 
       <template v-if="surveyId">
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           label="Select Path"
           outlined
           @change="updateResource"
@@ -56,6 +59,7 @@
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
+import ASelect from '@/components/ui/ASelect.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -66,7 +70,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: { OntologyReferencePreview, ASelect },
   props: {
     resource: {
       type: Object,
@@ -120,7 +124,7 @@ export default {
       this.updateResource();
       this.$emit('close-dialog');
     },
-    async surveyChanged(version) {
+    async surveyChanged({ version }) {
       const versionParam = version || 'latest';
       const { data } = await api.get(`/surveys/${this.surveyId}?version=${versionParam}`);
       if (!version) {
@@ -169,7 +173,7 @@ export default {
       this.surveyVersion = this.resource.content.version || '';
 
       if (this.surveyVersion) {
-        await this.surveyChanged(this.surveyVersion);
+        await this.surveyChanged({ version: this.surveyVersion });
       }
     }
 

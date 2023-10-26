@@ -98,24 +98,26 @@
         deletable-chips
         hide-details
       />
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         v-if="isScript"
+        @change="handleScriptSourceChange"
+        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
+        @focus="handleScriptSourceFocus"
         label="Script Source"
         v-model="scriptSourceId"
         :items="scriptSourceItems"
         item-text="name"
         item-value="_id"
         append-outer-icon="mdi-open-in-new"
-        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
-        @focus="handleScriptSourceFocus"
-        @change="handleScriptSourceChange"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         hide-details
+        selectionSlot
       >
         <template v-slot:selection="{ item }">
           <div>{{ item.name }}</div>
         </template>
-      </v-autocomplete>
+      </a-select>
       <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea

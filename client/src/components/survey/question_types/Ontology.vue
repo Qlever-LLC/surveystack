@@ -45,16 +45,16 @@
         </v-list-item-content>
       </template>
     </a-select>
-    <v-autocomplete
+    <a-select
+      engineering="autocomplete"
       v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
+      @blur="onBlur"
+      @change="onChange"
+      @focus="onFocus"
       ref="dropdownRef"
       :label="control.hint"
       :placeholder="getPlaceholder"
       :value="getValue"
-      @change="onChange"
-      @focus="onFocus"
-      @blur="onBlur"
-      :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
       item-value="value"
@@ -67,19 +67,21 @@
       hide-details
       class="full-width dropdown"
       data-test-id="autocomplete"
+      :selectionSlot="!!control.options.hasMultipleSelections"
+      :itemSlot="!!control.options.hasMultipleSelections"
     >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:selection="data">
         <v-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
-          @click="data.select"
+          @click="clickOnChip(data)"
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
         </v-chip>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:item="data">
         <v-list-item-content>
           <v-list-item-title>
             {{ data.item.label }}
@@ -89,7 +91,7 @@
           </v-list-item-title>
         </v-list-item-content>
       </template>
-    </v-autocomplete>
+    </a-select>
     <v-combobox
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
       ref="dropdownRef"
@@ -180,7 +182,7 @@ export default {
     onChange(value) {
       this.comboboxSearch = null;
       if (this.$refs.dropdownRef && !this.control.options.hasMultipleSelections) {
-        this.$refs.dropdownRef.isMenuActive = false;
+        this.$refs.dropdownRef.blur();
       }
       if (this.value !== value) {
         if (Array.isArray(value)) {

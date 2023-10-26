@@ -61,13 +61,13 @@
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </a-select>
-  <v-autocomplete
+  <a-select
+    engineering="autocomplete"
     v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
     ref="dropdownRef"
     placeholder="Type to search"
     :value="value"
     @input="onDropDownInput"
-    :search-input.sync="comboboxSearch"
     :items="items"
     item-text="label"
     item-value="value"
@@ -77,11 +77,12 @@
     :disabled="disabled"
     hide-details
     outlined
+    selectionSlot
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
-  </v-autocomplete>
+  </a-select>
   <v-combobox
     v-else-if="header.type === 'dropdown' && header.custom"
     ref="dropdownRef"
@@ -113,7 +114,8 @@
       </v-list-item>
     </template>
   </v-combobox>
-  <v-autocomplete
+  <a-select
+    engineering="autocomplete"
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
     :multiple="header.multiple"
@@ -126,9 +128,11 @@
     clearable
     outlined
     :disabled="disabled || loading"
+    selectionSlot
+    itemSlot
   >
     <template v-slot:selection="data" v-if="!!header.multiple">
-      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
+      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="clickOnChip(data)">
         <span v-html="data.item.label" />
       </v-chip>
     </template>
@@ -138,15 +142,16 @@
 
     <template v-slot:item="data" v-if="!!header.multiple">
       <v-list-item-content>
-        <v-list-item-title v-html="data.item.label" />
+        <v-list-item-title>{{ data.item.label }} </v-list-item-title>
       </v-list-item-content>
     </template>
     <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>
     </template>
-  </v-autocomplete>
+  </a-select>
 
-  <v-autocomplete
+  <a-select
+    engineering="autocomplete"
     v-else-if="header.type === 'farmos_planting'"
     :multiple="header.multiple"
     :value="value"
@@ -159,6 +164,8 @@
     clearable
     outlined
     :disabled="disabled || loading"
+    selectionSlot
+    itemSlot
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :html="item.label" :index="index" :value="value" />
@@ -166,13 +173,13 @@
 
     <template v-slot:item="data" v-if="!!header.multiple">
       <v-list-item-content>
-        <v-list-item-title v-html="data.item.label" />
+        <v-list-item-title>{{ data.item.label }} </v-list-item-title>
       </v-list-item-content>
     </template>
     <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>
     </template>
-  </v-autocomplete>
+  </a-select>
   <div v-else-if="header.type === 'date'">
     <v-menu
       :close-on-content-click="false"
@@ -310,6 +317,9 @@ export default {
     },
   },
   methods: {
+    clickOnChip(data) {
+      data.select;
+    },
     isValidNumber(val) {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
@@ -341,7 +351,7 @@ export default {
       this.onInput(value);
       this.comboboxSearch = null;
       if (this.$refs.dropdownRef && !this.header.multiple) {
-        this.$refs.dropdownRef.isMenuActive = false;
+        this.$refs.dropdownRef.blur();
       }
     },
     getDropdownLabel(value) {

@@ -13,16 +13,17 @@
       ></v-progress-circular>
     </div>
 
-    <v-autocomplete
+    <a-select
+      engineering="autocomplete"
+      v-if="!loading && !!groups"
       outlined
       primary
       label="Select User"
       v-model="selectedUser"
-      v-if="!loading && !!groups"
       :item-text="(item) => `${item.name} (${item.email})`"
       item-value="_id"
       :items="users"
-    ></v-autocomplete>
+    />
 
     <v-divider class="my-4"></v-divider>
 
@@ -39,17 +40,18 @@
         <tbody>
           <tr>
             <td>
-              <v-autocomplete
+              <a-select
+                engineering="autocomplete"
+                v-if="!loading && !!mappings"
                 class="mt-6"
                 outlined
                 primary
                 label="Select FarmOS Instance"
                 v-model="selectedInstance"
-                v-if="!loading && !!mappings"
                 item-value="instanceName"
                 item-text="instanceName"
                 :items="instances"
-              ></v-autocomplete>
+              />
             </td>
             <td></td>
             <td>
@@ -101,7 +103,11 @@
 </template>
 
 <script>
+import ASelect from '@/components/ui/ASelect.vue';
 export default {
+  components: {
+    ASelect,
+  },
   props: {
     groups: Array,
     mappings: Object,

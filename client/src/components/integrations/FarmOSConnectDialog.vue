@@ -6,7 +6,8 @@
         Select Farm from this Member's profile to include in this group.
 
         <br />
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           label="Select Farms"
           multiple
           chips
@@ -15,6 +16,8 @@
           :item-text="(i) => `${i.instanceName}`"
           class="mt-4"
           v-model="selectedFarms"
+          prependItemSlot
+          itemSlot
         >
           <template slot="prepend-item">
             <v-btn
@@ -39,7 +42,7 @@
               </v-list-item-subtitle>
             </v-list-item-content>
           </template>
-        </v-autocomplete>
+        </a-select>
         <v-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
           Connect selected Farms
         </v-btn>
@@ -65,9 +68,13 @@
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
+import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
+  components: {
+    ASelect,
+  },
   props: {
     value: Boolean,
     farmInstances: {

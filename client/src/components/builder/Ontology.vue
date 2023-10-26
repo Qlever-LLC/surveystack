@@ -30,13 +30,13 @@
       </v-list-item-content>
     </template>
   </a-select>
-  <v-autocomplete
+  <a-select
+    engineering="autocomplete"
     v-else-if="!customAnswer && autocomplete"
+    @change="onChange"
     ref="dropdownRef"
     label="Default value"
     :value="getValue"
-    @change="onChange"
-    :search-input.sync="comboboxSearch"
     :items="items"
     item-text="label"
     item-value="value"
@@ -50,8 +50,9 @@
     hide-details
     class="full-width dropdown"
     data-test-id="autocomplete"
+    :itemSlot="multiple"
   >
-    <template v-slot:item="data" v-if="multiple">
+    <template v-slot:item="data">
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
@@ -61,7 +62,7 @@
         </v-list-item-title>
       </v-list-item-content>
     </template>
-  </v-autocomplete>
+  </a-select>
   <v-combobox
     v-else-if="customAnswer"
     ref="dropdownRef"
@@ -145,7 +146,7 @@ export default {
       this.comboboxSearch = null;
       this.$emit('input', getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value));
       if (this.$refs.dropdownRef && !this.multiple) {
-        this.$refs.dropdownRef.isMenuActive = false;
+        this.$refs.dropdownRef.blur();
       }
     },
     remove(value) {

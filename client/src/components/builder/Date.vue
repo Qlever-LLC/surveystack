@@ -1,5 +1,6 @@
 <template>
-  <v-autocomplete
+  <a-select
+    engineering="autocomplete"
     v-if="type === 'date-year'"
     label="Default value"
     v-model="year"
@@ -48,7 +49,12 @@ import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
 
+import ASelect from '@/components/ui/ASelect.vue';
+
 export default {
+  components: {
+    ASelect,
+  },
   props: {
     value: { type: String },
     type: { type: String },
