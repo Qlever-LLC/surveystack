@@ -2,8 +2,8 @@
   <v-alert
     :border="border"
     :color="color"
-    :colored-border="coloredBorder"
-    :dismissible="dismissible"
+    :colored-border="borderColor"
+    :dismissible="closable"
     :elevation="elevation"
     :icon="icon"
     :mode="mode"
@@ -24,8 +24,9 @@
 export default {
   props: {
     border: { type: String, required: false },
-    coloredBorder: { type: Boolean, default: false },
-    dismissible: { type: Boolean, default: false },
+    color: { type: String, required: false },
+    borderColor: { type: Boolean, default: false },
+    closable: { type: Boolean, default: false },
     elevation: { type: [Number, String], required: false },
     icon: { type: [Boolean, String], required: false },
     mode: { type: String, required: false },
