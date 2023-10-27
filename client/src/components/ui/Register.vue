@@ -36,11 +36,11 @@
           <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </v-btn>
         </div>
       </v-form>
-      <v-alert class="mt-4" outlined v-if="membership" type="info"
-        >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
+      <a-alert class="mt-4" outlined v-if="membership" type="info"
+        >Your code is eligible to join <strong>{{ membership.group.name }}</strong></a-alert
       >
 
-      <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
+      <a-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</a-alert>
     </v-card>
   </v-container>
 </template>
@@ -49,6 +49,7 @@
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import AAlert from '@/components/ui/AAlert.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -57,6 +58,7 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
+  components: { AAlert },
   data() {
     return {
       status: '',

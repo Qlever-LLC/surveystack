@@ -21,9 +21,9 @@
           <v-toolbar-title>QR Code Scanner</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
-        <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
+        <a-alert v-if="hasCameraError" border="left" border-color type="error" elevation="2">
           No camera detected.
-        </v-alert>
+        </a-alert>
         <v-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />
@@ -47,10 +47,12 @@ import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@v
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+import AAlert from '@/components/ui/AAlert.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
+  components: { AAlert },
   emits: ['codeDetected'],
   props: {
     small: {

@@ -89,8 +89,8 @@
           </tbody>
         </template>
       </v-simple-table>
-      <v-alert v-else class="mt-4" mode="fade" text type="warning"
-        >No Group Mappings exist for {{ selectedInstance }}</v-alert
+      <a-alert v-else class="mt-4" mode="fade" text type="warning"
+        >No Group Mappings exist for {{ selectedInstance }}</a-alert
       >
 
       <v-divider class="my-8"></v-divider>
@@ -236,8 +236,10 @@
 
 <script>
 import _ from 'lodash';
+import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
+  components: { AAlert },
   emits: ['addSuperAdminNote'],
   props: {
     groups: Array,

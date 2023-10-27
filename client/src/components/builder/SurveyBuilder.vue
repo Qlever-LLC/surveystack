@@ -21,16 +21,16 @@
       @cancel="updateLibraryCancelled"
     />
 
-    <v-alert
+    <a-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
       text
       type="warning"
       color="orange"
       elevation="2"
-      dismissible
+      closable
     >
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
-    </v-alert>
+    </a-alert>
 
     <splitpanes class="pane-root" vertical>
       <pane class="pane pane-survey">
@@ -274,6 +274,7 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
+import AAlert from '@/components/ui/AAlert.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -308,6 +309,7 @@ const tabMap = ['relevance', 'initialize', 'calculate', 'constraint', 'apiCompos
 export default {
   mixins: [appMixin],
   components: {
+    AAlert,
     UpdateLibraryDialog,
     Splitpanes,
     Pane,

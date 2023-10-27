@@ -3,7 +3,7 @@
     <div class="d-flex justify-space-between align-center">
       <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-alert
+    <a-alert
       v-if="successMessage"
       class="mt-4"
       style="cursor: pointer"
@@ -11,11 +11,11 @@
       text
       type="success"
       @click="successMessage = null"
-      >{{ successMessage }}</v-alert
+      >{{ successMessage }}</a-alert
     >
-    <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+    <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
       errorMessage
-    }}</v-alert>
+    }}</a-alert>
 
     <app-dialog
       modal
@@ -146,12 +146,14 @@ import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemove
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
+import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
   props: {
     id: String,
   },
   components: {
+    AAlert,
     FarmOSGroupSettings,
     FarmOSConnectDialog,
     FarmOSCreateDialog,

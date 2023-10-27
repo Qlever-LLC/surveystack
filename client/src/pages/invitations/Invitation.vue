@@ -1,14 +1,14 @@
 <template>
   <v-container>
-    <v-alert v-if="errorMsg" class="mt-4" mode="fade" text type="error">{{ errorMsg }}</v-alert>
+    <a-alert v-if="errorMsg" class="mt-4" mode="fade" text type="error">{{ errorMsg }}</a-alert>
     <template v-if="initialized && membership">
       <h1>Invitation</h1>
       <p class="subtitle-2 text--secondary">{{ code }}</p>
       <div v-if="membership.meta.status === 'pending'">
-        <v-alert class="mt-4" outlined v-if="membership" type="info"
+        <a-alert class="mt-4" outlined v-if="membership" type="info"
           >This code allows you to join <strong>{{ membership.group.name }}</strong
           >!
-        </v-alert>
+        </a-alert>
 
         <div class="d-flex justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
@@ -16,9 +16,9 @@
         </div>
       </div>
       <div v-else>
-        <v-alert class="mt-4" outlined v-if="membership" type="error"
+        <a-alert class="mt-4" outlined v-if="membership" type="error"
           >This code has already been activated and is no longer valid...
-        </v-alert>
+        </a-alert>
       </div>
     </template>
     <template v-else-if="initialized && !membership">
@@ -35,8 +35,10 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
+import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
+  components: { AAlert },
   data() {
     return {
       initialized: false,

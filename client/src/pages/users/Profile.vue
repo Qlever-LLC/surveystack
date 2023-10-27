@@ -113,9 +113,9 @@
       <h1>Profile</h1>
       You are not logged in... <router-link to="/auth/login">Go to Login</router-link></template
     >
-    <v-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
+    <a-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
       status.message
-    }}</v-alert>
+    }}</a-alert>
   </v-container>
 </template>
 
@@ -124,6 +124,7 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import AAlert from '@/components/ui/AAlert.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -137,6 +138,7 @@ function findParentAdminGroup(memberships, activeMembership) {
 
 export default {
   components: {
+    AAlert,
     appFeedback,
     ActiveGroupSelector,
   },

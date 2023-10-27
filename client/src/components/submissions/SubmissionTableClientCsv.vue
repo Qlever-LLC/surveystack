@@ -196,9 +196,9 @@
       </v-card>
     </v-dialog>
 
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
+    </a-alert>
   </v-card>
 </template>
 <script>
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import AAlert from '@/components/ui/AAlert.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -272,6 +273,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 
 export default {
   components: {
+    AAlert,
     SubmissionTableCellModal,
   },
   props: {

@@ -21,9 +21,9 @@
           When installing you will be asked to allow installing applications from unknown sources.
         </p>
 
-        <v-alert outlined class="pa-4" type="success" color="blue">
+        <a-alert outlined class="pa-4" type="success" color="blue">
           If you have already installed the Android App once, you don't need install the App again.
-        </v-alert>
+        </a-alert>
 
         <br />
         <v-btn
@@ -87,10 +87,12 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
+import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
+    AAlert,
     appDialog,
   },
   props: {

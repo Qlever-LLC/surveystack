@@ -4,14 +4,17 @@
     <div class="d-flex justify-end">
       <v-btn text @click="clearAllFeedback"> <v-icon left>mdi-close</v-icon>{{ clearAllText }} </v-btn>
     </div>
-    <v-alert v-for="(feedback, idx) in items" :key="idx" border="left" :type="feedback.type" elevation="2">
+    <a-alert v-for="(feedback, idx) in items" :key="idx" border="left" :type="feedback.type" elevation="2">
       {{ feedback.message }}
-    </v-alert>
+    </a-alert>
   </v-container>
 </template>
 
 <script>
+import AAlert from '@/components/ui/AAlert.vue';
+
 export default {
+  components: { AAlert },
   data() {
     return {};
   },

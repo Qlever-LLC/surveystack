@@ -64,12 +64,12 @@
             <span v-else> none </span>
           </p>
         </div>
-        <v-alert v-if="deleteVersionsHasError" type="error" class="mt-1" dismissible>
+        <a-alert v-if="deleteVersionsHasError" type="error" class="mt-1" closable>
           An error occurred deleting survey versions.
-        </v-alert>
-        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" dismissible>
+        </a-alert>
+        <a-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" closable>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
-        </v-alert>
+        </a-alert>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { AAlert, SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,
