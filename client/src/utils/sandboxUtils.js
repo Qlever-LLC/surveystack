@@ -362,7 +362,7 @@ const unstable = {
     let surveyId = _surveyId ? _surveyId : submission.meta.survey.id;
     try {
       // search in archived surveys first
-      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"\$oid":"${submissionId}"}}&showArchived=true`;
+      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`;
       this.prettyLog('check submission in archived url', 'info');
       this.prettyLog(url);
       let response = await fetch(url);
@@ -370,7 +370,7 @@ const unstable = {
       result = JSON.parse(result);
       // if not present, search in non-archived surveys
       if (result.length === 0 || !result?.[0]?.data) {
-        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"\$oid":"${submissionId}"}}`;
+        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
         this.prettyLog('check submission in non archived url', 'info');
         this.prettyLog(url);
         response = await fetch(url);
