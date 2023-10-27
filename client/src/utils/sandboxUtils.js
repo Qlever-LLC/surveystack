@@ -585,6 +585,251 @@ const unstable = {
     if (labels.length === 0) labels.push(value);
     return labels;
   },
+
+  /**
+   * addMaterials
+   *
+   * Use with getQuantity to add additional materials for the quantity
+   * Creates the materials as entities in farmOS and assigns them to their associated Quantity
+   * @param {quantity} the quantity object you are adding materials to
+   * @param {materials} uuid for this quantity (required)
+   */
+  addMaterials(quantity, ...materials) {
+    // check to make sure this not empty or invalid
+    if (quantity?.entity?.type === 'quantity--material') {
+      this.prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
+      if (materials) {
+        if (!quantity.entity.relationships?.material_type) {
+          quantity.entity.relationships.material_type = {};
+          quantity.entity.relationships.material_type.data = [];
+        }
+        materials.forEach((material) => {
+          quantity.entity.relationships.material_type.data.push({
+            type: 'taxonomy_term--material_type',
+            name: material,
+          });
+          this.prettyLog(`Added: ${material}`, 'success');
+        });
+      }
+      return quantity;
+    } else {
+      this.prettyLog(
+        `${material} must be added to quantity--material.  Please change the quantity type and try again`,
+        'error'
+      );
+      return {};
+    }
+    // return whatever was passed otherwise
+  },
+
+  /**
+   * addQuantity
+   *
+   * add a quantity to a log
+   * @param {log} the log you want to update
+   * @param {quantities} type of quantity (one of the accepted farmOS types)
+   */
+  addQuantityToLog(log, ...quantities) {
+    this.prettyLog(`trying to add quantities to ${log.entity.type}`, 'info');
+    if (!log.entity.relationships?.quantity && quantities?.length > 0) {
+      log.entity.relationships.quantity = {};
+      log.entity.relationships.quantity.data = [];
+    }
+    quantities.forEach((quantity) => {
+      log.entity.relationships.quantity.data.push({
+        type: quantity.entity.type,
+        id: quantity.entity.id,
+      });
+      this.prettyLog(`Added: ${quantity.entity.type}, ${quantity.entity.id}`, 'success');
+    });
+    // prettyLog(log);
+    return log;
+  },
+
+  /**
+   * addRelationshipData
+   *
+   * Adds relationship data to an object (log, asset, etc.) without duplication of the objects
+   * @param {obj} object - The object (log, asset, etc.) to which the relationship data will be added
+   * @param {string} relationship - The relationship key in the object
+   * @param {string} type - The type of the relationship data to be added
+   * @param {field} field - The name of the field where the names are being added.  This should be either "name" (which the SurveyStack backend will convert to "id" in the backend) or "id" directly
+   * @param {...string} names - One or more relationship names to be added
+   * @returns {Object} - The updated object (log, asset, etc.)
+   */
+  addRelationshipData(obj, relationship, type, field, ...names) {
+    if (!obj.entity?.relationships) obj.entity.relationships = {}; // check that this exists, make exist is not
+    if (!obj.entity?.relationships?.[relationship]) obj.entity.relationships[relationship] = { data: [] }; // same
+    if (obj && relationship && type && names) {
+      names.forEach((name) => {
+        const isDuplicate = obj.entity.relationships[relationship].data.some((obj) => obj[field] === name);
+        if (!isDuplicate) {
+          obj.entity.relationships[relationship].data.push({
+            type: type,
+            [field]: name,
+          });
+          this.prettyLog(`Added ${type} ${name}`, 'success');
+        } else {
+          this.prettyLog(`'${name}' is a duplicate and was not added.`, 'info');
+        }
+      });
+    } else {
+      this.prettyLog(`Could not add relationship data, some required information was missing`, 'warning');
+    }
+    return obj;
+  },
+
+  /**
+   * Extracts a portion of the input date string for a more concise representation.
+   *
+   * This function takes a date string and returns a substring of it, starting from
+   * the third character and ending at the tenth character (inclusive).
+   *
+   * For instance, given the input "2023-10-05T12:45:00Z", the function will return "23-10-05".
+   *
+   * It is important to ensure that the input date string is in a consistent format
+   * to achieve the expected results.
+   *
+   * @param {string} date - The input date string to be transformed.
+   * @return {string} - Returns the extracted portion of the date string.
+   */
+  dateReadable(date) {
+    return date.slice(2, 10);
+  },
+
+  /** findUrl
+   * Find a URL to associate with this newly created asset!
+   * @submission {object} the submission object from the survey, needed to do full survey search for URLs
+   * @spreadsheet {object} the object containing all rows of the spreadsheet (matrix) question
+   * @row {object} the current row of the spreadsheet being searched
+   */
+  findUrl(submission, spreadsheet, row) {
+    let url = null;
+    // 1. find url in the current row (stop at the 1st one)
+    let value = row?.planting.value; // get this rows plantings
+    for (let i = 0; i < value.length; i++) {
+      if (value[i]?.url) {
+        url = value[i].url;
+        this.prettyLog(`found URL in this row: ${url}`, 'success');
+        break;
+      }
+    }
+    // 2a. get all URLs the user has entered in nearby rows (stop at the 1st one)
+    if (!url && Array.isArray(spreadsheet)) {
+      // if it's in an array (spreadsheet), otherwise skip this step
+      console.log('checking urls');
+      let urls = new Set([]);
+      spreadsheet.forEach((row) => {
+        row.planting.value.forEach((planting) => {
+          if (planting?.url) urls.add(planting.url);
+        });
+      });
+      urls = Array.from(urls);
+      this.prettyLog(`urls nearby: ${urls.join(' ')}`, 'info');
+      // 2b. find url in any nearby entries
+      if (!url && urls.length > 0) {
+        url = urls[0];
+        this.prettyLog(`found URL in nearby row ${url}`, 'success');
+      }
+    }
+    // 3. find a url somewhere in the submission (stop at the 1st one)
+    if (!url) {
+      let all = Object.flattenAll(submission);
+      let objectKeys = Object.keys(all);
+      for (let i = 0; i < objectKeys.length; i++) {
+        //    console.log(`${objectKeys[i]}: ${all[objectKeys[i]]} ${isValidURL(all[objectKeys[i]])}`)
+        if (
+          objectKeys[i].includes('url') &&
+          typeof all[objectKeys[i]] === 'string' &&
+          this.isValidURL(all[objectKeys[i]])
+        ) {
+          url = all[objectKeys[i]];
+          this.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
+          break;
+        }
+      }
+    }
+    if (!url) {
+      this.prettyLog(`no URL found.  Cannot generate apiCompose`, `warning`);
+    }
+    return url;
+  },
+
+  /**
+   * getQuantity
+   *
+   * Get a farmOS quantity field of a specific type, adding the minimum parameters
+   * @param {url} url for the farmOS instance of this quantity (required)
+   * @param {uuid} uuid for this quantity (required)
+   * @param {type} type of quantity (required, one of the accepted farmOS types)
+   * @param {value} value of the quantity
+   * @param {label} label for the quantity
+   * @param {units} units for te quantity
+   */
+  getQuantity(url, uuid, type, value = null, label = null, units = null) {
+    const quantity = {
+      type: 'farmos',
+      url: url,
+      time: Date.now(),
+      entity: {
+        type: type,
+        id: uuid,
+        attributes: {},
+        relationships: {},
+      },
+    };
+    if (value !== null && value !== '' && units)
+      quantity.entity.relationships.units = {
+        data: [
+          {
+            type: 'taxonomy_term--unit',
+            name: units,
+          },
+        ],
+      };
+    if (value !== null && value !== '') quantity.entity.attributes.value = { decimal: value }; // 0 is allowable
+    if (label) quantity.entity.attributes.label = label;
+    return quantity;
+  },
+
+  /**
+   * Checks if the given string is a valid URL format.
+   *
+   * This function verifies if a string follows a specific URL format:
+   * - It should not contain any whitespace characters.
+   * - It should not contain the ">" character more than once.
+   * - The URL must be in the format of 'domain.TLD', e.g., 'example.com'.
+   * - The domain can have alphabets, numbers, dots, and hyphens.
+   * - The top-level domain (TLD) should only contain alphabets and must be at least 2 characters long.
+   *
+   * Note: This function may not cover all valid URL formats, and its constraints
+   * are specific to the regex used. Use it based on the expected URL formats for your application.
+   *
+   * @param {string} string - The string to be checked.
+   * @return {boolean} - Returns `true` if the string matches the expected URL format, `false` otherwise.
+   */
+  isValidURL(string) {
+    if (typeof string === 'string') {
+      var res = string.match(/^(?!.*\s)(?!.*\>{1})([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/gi);
+    }
+    return res !== null;
+  },
+
+  /**
+   * Converts a string to a more readable format.
+   *
+   * This function performs two main transformations on the input string:
+   * 1. Replaces underscores ("_") with spaces, making variable-like names more human-readable.
+   * 2. Ensures that words separated by commas are spaced properly for readability.
+   *
+   * For instance, the string "apple,banana_grape" would be converted to "apple, banana grape".
+   *
+   * @param {string} name - The input string to be converted.
+   * @return {string} - Returns the transformed, more readable string.
+   */
+  readable(name) {
+    return `${name}`.split(/_/).join(' ').split(/,/).join(', ');
+  },
 };
 
 export const utils = {
