@@ -452,7 +452,7 @@ const unstable = {
    *                                Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
    */
   prettyLog(label, status = '') {
-    const logEnabled = typeof config !== 'undefined' ? config?.log : false;
+    const logEnabled = true; //typeof config !== 'undefined' ? config?.log : false;
 
     if (logEnabled) {
       const styles = {
@@ -614,7 +614,7 @@ const unstable = {
       return quantity;
     } else {
       this.prettyLog(
-        `${material} must be added to quantity--material.  Please change the quantity type and try again`,
+        'A material must be added to a "quantity--material" entity.  Please change the quantity "type" field and try again',
         'error'
       );
       return {};
