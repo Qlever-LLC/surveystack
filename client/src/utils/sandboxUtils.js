@@ -163,6 +163,7 @@ export function getCleanArray(chooseMult) {
   console.log(`clean ${chooseMult.value} to ${JSON.stringify(thisAnswer)}`);
   return thisAnswer;
 }
+
 /**
  * clean result (check existence, check string, check relevance) from single choice select answer
  * @param {chooseOne} single choice select answer root (not .value!)
@@ -251,6 +252,237 @@ async function parseArrayBuffer(file) {
   return result;
 }
 
+const unstable = {
+  /*
+   * Find a nested item inside a JSON object.
+   * Pass the object and the string referencing the location.
+   * Returns the object in that location.
+   *
+   * ### Example
+   * let submission = { this: { that: { theOther: 55} } }
+   * dig(submission, 'this.that.theOther'); // returns 55
+   * dig(submission, 'this.that[theOther]'); // returns 55 (this notation also works!)
+   * now imagine we are passed the full reference and want to use dig.  Let's use getRoot and removeRoot also -->
+   * refText = submission.this.that.theother;
+   * dig(getRoot(refText), removeRoot(refText)); // returns 55
+   * @param {object} the JSON object your looking in - this is usually 'submission' or 'parent'
+   * @param {string} the location in the object.
+   * robust, can accept null, undefined and will always pass back null
+   */
+  dig(object, path, defaultValue = null) {
+    const chunks = path.split(/\.|\[|\]/).filter((d) => d.length !== 0);
+    try {
+      const value = chunks.reduce((current, chunk) => current[chunk], object);
+      if (value !== undefined) {
+        return value;
+      } else {
+        return defaultValue;
+      }
+    } catch (e) {
+      return defaultValue;
+    }
+  },
+
+  /*
+   * Get and return a value, using previous functions
+   * robust, can accept null, undefined and will always pass back null
+   * @path {string} the string to get the value from.
+   * @submission {object} survey submission object
+   * @parent {object} survey parent object
+   */
+  get(path, submission, parent, defaultValue = null) {
+    try {
+      const obj = this.dig(this.getRoot(path, submission, parent), this.removeRoot(path));
+      return obj;
+    } catch (e) {
+      return defaultValue;
+    }
+  },
+
+  /**
+   * getCleanNumber
+   *
+   * Output a number or a "" if it's not relevant or not a number, you may also specify precision
+   * Helpfully also removes any annoying trailing zeroes if the value is more precise than precision specified
+   * @object {num} single choice select answer root (not .value!)
+   * @number {precision} desired precision of output (if not specificied, no precision applied)
+   */
+  getCleanNumber(num, sigFigs) {
+    //    prettyLog('in getCleanNumeber', 'success');
+    let val = utils.getClean(num);
+    // return "" if getClean returns "", removes this edge case from the if/then list
+    if (utils.getClean(num) === '') {
+      val = '';
+      // now Number() needs to return a valid number OR it needs to return 0 (which shows up as falsey but we want to pass it anyway since it's a numnber)
+    } else if (Number(utils.getClean(num)) || Number(utils.getClean(num)) === 0) {
+      if (sigFigs !== undefined) {
+        val = Number(Number(val).toFixed(sigFigs)); // converts to string w/ sig figs, then back to number which removes trailing zeros
+      } else {
+        val = Number(utils.getClean(num));
+      }
+    } else {
+      val = '';
+    }
+    // prettyLog(val);
+    // prettyLog('leaving getCleanNumeber', 'success');
+    return val;
+  },
+
+  /*
+   * identify object root as referencing parent or the submission
+   * return parent or submission objects
+   * robust, can accept null, undefined and will always pass back null
+   * @param {string} the location in the object.
+   * @param {object} the `submission` object for the survey.
+   * @param {object} the `parent` object for the survey.
+   */
+  getRoot(path, submission, parent, defaultValue = null) {
+    if (typeof path !== 'string') {
+      return defaultValue;
+    } else if (/^parent+/g.test(path)) {
+      return parent;
+    } else if (/^submission+/g.test(path)) {
+      return submission;
+    } else {
+      // if neither, assume parent.  add error checking here also
+      return parent;
+    }
+  },
+
+  /**
+   * getSubmission
+   *
+   * Allows you to get a previous submission to test against quickly
+   * Searches archived and non-archived, defaults to current survey ID but can specify another
+   * @param {submission} current submission object (submission)
+   * @param {submissionId} ID of the submission you want to test against
+   * @param {surveyId} (optional) ID of the survey you want to find the submission in
+   */
+  async getSubmission(submission, submissionId, _surveyId = undefined) {
+    let surveyId = _surveyId ? _surveyId : submission.meta.survey.id;
+    try {
+      // search in archived surveys first
+      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"\$oid":"${submissionId}"}}&showArchived=true`;
+      this.prettyLog('check submission in archived url', 'info');
+      this.prettyLog(url);
+      let response = await fetch(url);
+      let result = await response.text();
+      result = JSON.parse(result);
+      // if not present, search in non-archived surveys
+      if (result.length === 0 || !result?.[0]?.data) {
+        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"\$oid":"${submissionId}"}}`;
+        this.prettyLog('check submission in non archived url', 'info');
+        this.prettyLog(url);
+        response = await fetch(url);
+        result = await response.text();
+        result = JSON.parse(result);
+      }
+      if (result?.[0]?.data) {
+        submission = result[0]; // assign this so we can test against it
+        this.prettyLog(`found: submission id ${submissionId}`, 'success');
+        this.prettyLog(submission);
+      } else {
+        submission = {};
+        this.prettyLog(
+          `did not find the submission id ${submissionId}.  Try a different submission id or survey id`,
+          'warning'
+        );
+        console.table(result);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    return submission;
+  },
+
+  /**
+   * lookupFromResource
+   *
+   * look up a row of values from one or more resources lists, returns those values
+   * you may also specify which columns in the row you want to return.
+   * @object {survey} the survey you'll be using to lookup the resource list
+   * @array {resourceNames} the name of the resource list (slug name)
+   * @string {lookup} the thing you're looking up
+   * @string {lookupColumn} the column to search for the thing you're looking up
+   * @string {returnColumns} which columns to include if this finds the row you're looking for
+   */
+  lookupFromResource(survey, resourceNames, lookup, lookupColumn, ...returnColumns) {
+    let items;
+    let foundFlag = 0; // flag to stop looking if you find it
+    resourceNames.forEach((resourceName) => {
+      if (!foundFlag) {
+        const resource = survey.resources.find((object) => object.name === resourceName);
+        if (resource && lookup) {
+          items = resource.content.find((object) => object[lookupColumn] === lookup);
+          if (typeof items === 'object' && !Array.isArray(items)) {
+            this.prettyLog(`Found ${lookup} in ${resourceName}`, 'success');
+            foundFlag = 1;
+            if (returnColumns && returnColumns.length) {
+              let someItems = {};
+              returnColumns.forEach((column) => {
+                if (items?.[column]) {
+                  someItems[column] = items[column];
+                } else {
+                  this.prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
+                }
+              });
+              items = someItems;
+            }
+          } else {
+            this.prettyLog(`Did not find ${lookup} in ${resourceName}`, 'info');
+          }
+        } else {
+          if (!lookup) this.prettyLog(`Did not find Lookup field "${lookup}" in "${resourceName}" resource`, 'warning');
+          if (!resource) this.prettyLog(`Did not find "${resourceName}" resource`, 'warning');
+        }
+      }
+    });
+    // if it's empty, return null
+    return items && Object.keys(items).length > 0 ? items : null;
+  },
+
+  /**
+   * prettyLog
+   *
+   * Logs messages with optional colored backgrounds based on the status parameter.
+   * Logging is controlled by the config.log flag.
+   *
+   * @param {string} label - The message to log.
+   * @param {string} [status=''] - The status of the message, which determines the background color.
+   *                                Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
+   */
+  prettyLog(label, status = '') {
+    const logEnabled = typeof config !== 'undefined' ? config?.log : false;
+
+    if (logEnabled) {
+      const styles = {
+        success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
+        warning: 'background-color: #de9250; padding: 0.2rem 1.5rem;',
+        info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
+      };
+
+      const style = styles[status] || '';
+
+      console.log('%c' + label, style);
+    }
+  },
+
+  /*
+   * remove the survey root and return the text
+   * useful when using dig() function
+   * robust, can accept null, undefined and will always pass back null
+   * @param {string} the string you want the root removed from.
+   */
+  removeRoot(path, defaultValue = null) {
+    try {
+      path = path.replace(/(^submission\.|^submission|^parent\.|^parent)+/g, '');
+      return path;
+    } catch (e) {
+      return defaultValue;
+    }
+  },
+};
+
 export const utils = {
   match,
   checkIfAny,
@@ -262,4 +494,5 @@ export const utils = {
   getResource,
   parseText,
   parseArrayBuffer,
+  unstable,
 };
