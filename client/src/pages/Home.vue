@@ -2,14 +2,14 @@
   <v-container class="home" :fluid="true">
     <v-row>
       <v-col>
-        <v-img
+        <a-img
           v-if="isWhitelabel"
           :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
           class="my-3"
           contain
           height="128"
-        ></v-img>
-        <v-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128"></v-img>
+        />
+        <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
       </v-col>
     </v-row>
 
@@ -134,9 +134,11 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
+import AImg from '@/components/ui/AImg.vue';
 
 export default {
   components: {
+    AImg,
     AuthSelector,
     AppBasicList,
   },
