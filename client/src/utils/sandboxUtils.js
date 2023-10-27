@@ -362,7 +362,7 @@ const unstable = {
     let surveyId = _surveyId ? _surveyId : submission.meta.survey.id;
     try {
       // search in archived surveys first
-      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"\$oid":"${submissionId}"}}&showArchived=true`;
+      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`;
       this.prettyLog('check submission in archived url', 'info');
       this.prettyLog(url);
       let response = await fetch(url);
@@ -370,7 +370,7 @@ const unstable = {
       result = JSON.parse(result);
       // if not present, search in non-archived surveys
       if (result.length === 0 || !result?.[0]?.data) {
-        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"\$oid":"${submissionId}"}}`;
+        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
         this.prettyLog('check submission in non archived url', 'info');
         this.prettyLog(url);
         response = await fetch(url);
@@ -441,31 +441,28 @@ const unstable = {
     return items && Object.keys(items).length > 0 ? items : null;
   },
 
-  /**
+ /**
    * prettyLog
    *
    * Logs messages with optional colored backgrounds based on the status parameter.
    * Logging is controlled by the config.log flag.
    *
    * @param {string} label - The message to log.
-   * @param {string} [status=''] - The status of the message, which determines the background color.
-   *                                Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
+   * @param {string} [status=''] - The status of the message, which determines the background color. 
+   * @param {boolean} [show=true] - Optional parameter to print.  Use as switch to show all in a script / document 
+   * Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
    */
-  prettyLog(label, status = '') {
-    const logEnabled = typeof config !== 'undefined' ? config?.log : false;
-
-    if (logEnabled) {
+ prettyLog = (label, status = '', show = true) => {
+  if (show) {
       const styles = {
         success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
         warning: 'background-color: #de9250; padding: 0.2rem 1.5rem;',
         info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
       };
-
       const style = styles[status] || '';
-
-      console.log('%c' + label, style);
-    }
-  },
+      console.log('%c' + label, style);  
+  }
+},
 
   /*
    * remove the survey root and return the text
@@ -587,37 +584,31 @@ const unstable = {
   },
 
   /**
-   * addMaterials
-   *
-   * Use with getQuantity to add additional materials for the quantity
-   * Creates the materials as entities in farmOS and assigns them to their associated Quantity
-   * @param {quantity} the quantity object you are adding materials to
-   * @param {materials} uuid for this quantity (required)
-   */
+  * addMaterials
+  *
+  * Use with getQuantity to add additional materials for the quantity
+  * Creates the materials as entities in farmOS and assigns them to their associated Quantity
+  * @param {quantity} the quantity object you are adding materials to
+  * @param {materials} uuid for this quantity (required)
+  */
   addMaterials(quantity, ...materials) {
     // check to make sure this not empty or invalid
     if (quantity?.entity?.type === 'quantity--material') {
-      this.prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
+      prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
       if (materials) {
         if (!quantity.entity.relationships?.material_type) {
           quantity.entity.relationships.material_type = {};
           quantity.entity.relationships.material_type.data = [];
         }
         materials.forEach((material) => {
-          quantity.entity.relationships.material_type.data.push({
-            type: 'taxonomy_term--material_type',
-            name: material,
-          });
-          this.prettyLog(`Added: ${material}`, 'success');
-        });
+          quantity.entity.relationships.material_type.data.push({ type: "taxonomy_term--material_type", name: material });
+          prettyLog(`Added: ${material}`, 'success')
+        })
       }
-      return quantity;
+      return quantity
     } else {
-      this.prettyLog(
-        `${material} must be added to quantity--material.  Please change the quantity type and try again`,
-        'error'
-      );
-      return {};
+      prettyLog('A material must be added to a "quantity--material" entity.  Please change the quantity "type" field and try again', 'error')
+      return {}
     }
     // return whatever was passed otherwise
   },
@@ -810,7 +801,7 @@ const unstable = {
    */
   isValidURL(string) {
     if (typeof string === 'string') {
-      var res = string.match(/^(?!.*\s)(?!.*\>{1})([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/gi);
+      var res = string.match(/^(?!.*\s)(?!.*>{1})([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/gi);
     }
     return res !== null;
   },
