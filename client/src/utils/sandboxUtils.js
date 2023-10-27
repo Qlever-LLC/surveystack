@@ -481,6 +481,110 @@ const unstable = {
       return defaultValue;
     }
   },
+
+  /**
+   * this flatten works for objects, leaves any arrays untouched
+   * @data {object} data the object you pass
+   */
+  flatten(data) {
+    var result = {};
+    var seenObjects = new Set();
+
+    function recurse(cur, prop) {
+      if (Object(cur) !== cur) {
+        result[prop] = cur;
+      } else if (seenObjects.has(cur)) {
+        // Circular reference detected
+        result[prop] = '[Circular]';
+        return;
+      } else if (Array.isArray(cur)) {
+        seenObjects.add(cur);
+        result[prop] = cur;
+        seenObjects.delete(cur);
+      } else {
+        seenObjects.add(cur);
+        var isEmpty = true;
+        for (var p in cur) {
+          isEmpty = false;
+          recurse(cur[p], prop ? prop + '--' + p : p);
+        }
+        if (isEmpty && prop) result[prop] = {};
+        seenObjects.delete(cur);
+      }
+    }
+
+    recurse(data, '');
+    return result;
+  },
+  /**
+   * flatten works for objects AND arrays.  Uses Set() to handle circular references which can throw errors in browser (more in chrome than firefox)
+   * @data {object} data the object you pass
+   */
+  flattenAll(data) {
+    var result = {};
+    var seenObjects = new Set();
+
+    function recurse(cur, prop) {
+      if (Object(cur) !== cur) {
+        result[prop] = cur;
+      } else if (seenObjects.has(cur)) {
+        // Circular reference detected
+        result[prop] = '[Circular]';
+        return;
+      } else if (Array.isArray(cur)) {
+        seenObjects.add(cur);
+        for (var i = 0, l = cur.length; i < l; i++) recurse(cur[i], prop + '.' + i);
+        if (l == 0) result[prop] = [];
+        seenObjects.delete(cur);
+      } else {
+        seenObjects.add(cur);
+        var isEmpty = true;
+        for (var p in cur) {
+          isEmpty = false;
+          recurse(cur[p], prop ? prop + '.' + p : p);
+        }
+        if (isEmpty && prop) result[prop] = {};
+        seenObjects.delete(cur);
+      }
+    }
+
+    recurse(data, '');
+    return result;
+  },
+
+  /**
+   * apply this to a flattened version of the survey.resources survey.revisions (most recent revision only)
+   * enter a value, and it returns the label for that value
+   * if it has a value and the label is empty, it returns the value
+   * useful for user inputted answers and answers populated from past submissions
+   * WARNING! if the value isn't unique, this can't guarantee it's finding the correct one!
+   * @res {object} survey.resources
+   * @rev {object} survey.revisions[survey.revisions.length - 1] (only most recent revision)
+   * @value {object} the value you want to find the label for
+   */
+  getLabels(res, rev, value) {
+    let labels = [];
+    // first, look for the key in the survey itself
+    // applies if it's a checkbox or single select
+    Object.keys(rev).forEach((key) => {
+      if (rev[key] === value && key.slice(-6) === '.value') {
+        console.log(`${key} :: ${rev[key.slice(0, -6) + '.label']}`);
+        labels.push(rev[key.slice(0, -6) + '.label']);
+      }
+    });
+    // now look for the key in the resources section
+    // applies if it's a dropdown or resource referenced list
+    Object.keys(res).forEach((key) => {
+      if (res[key] === value && key.slice(-6) === '.value') {
+        // if the value matches AND key is .value
+        console.log(`${key} :: ${res[key.slice(0, -6) + '.label']}`);
+        labels.push(res[key.slice(0, -6) + '.label']);
+      }
+    });
+    // if no label is found, just return the value
+    if (labels.length === 0) labels.push(value);
+    return labels;
+  },
 };
 
 export const utils = {
