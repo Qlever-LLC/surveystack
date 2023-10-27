@@ -90,13 +90,7 @@
     noDataSlot
   >
     <template v-slot:selection="data" v-if="multiple">
-      <v-chip
-        v-bind="data.attrs"
-        :input-value="data.selected"
-        close
-        @click="clickOnChip(data)"
-        @click:close="remove(data.item)"
-      >
+      <v-chip :input-value="data.selected" close @click="clickOnChip(data)" @click:close="remove(data.item)">
         {{ getLabelForItemValue(data.item) }}
       </v-chip>
     </template>
@@ -156,7 +150,7 @@ export default {
       }
     },
     remove(value) {
-      this.$emit('input', getValueOrNull(this.value.filter((v) => v !== value)));
+      if (this.value) this.$emit('input', getValueOrNull(this.value.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);
