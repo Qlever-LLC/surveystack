@@ -12,7 +12,6 @@
         hide-details
       />
       <v-text-field v-model="control.hint" label="Hint" hide-details />
-      <!-- <v-text-field v-model="control.moreInfo" label="More info" hide-details /> -->
       <markdown-editor
         v-model="control.moreInfo"
         :resources="survey.resources"
