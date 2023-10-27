@@ -55,6 +55,7 @@
     :append-outer-icon="appendOuterIcon"
     :chips="chips"
     :clearable="clearable"
+    :color="color"
     :dark="dark"
     :deletable-chips="deletableChips"
     :dense="dense"
@@ -96,11 +97,48 @@
       <slot name="prepend-item" />
     </template>
   </v-autocomplete>
+
+  <v-combobox
+    v-else-if="engineering === 'combobox'"
+    ref="selectRef"
+    @blur="$emit('blur')"
+    @change="$emit('change', $event)"
+    @focus="$emit('focus', $event)"
+    @input="$emit('input', $event)"
+    @update:search-input="onSearchInputUpdate"
+    :data-test-id="dataTestId"
+    :delimiters="delimiters"
+    :chips="chips"
+    :clearable="clearable"
+    :color="color"
+    :dense="dense"
+    :hide-details="hideDetails"
+    :disabled="disabled"
+    :item-text="itemText"
+    :item-value="itemValue"
+    :items="items"
+    :label="label"
+    :menu-props="menuProps"
+    :multiple="multiple"
+    :outlined="outlined"
+    :placeholder="placeholder"
+    :return-object="returnObject"
+    :search-input="internalSearch"
+    :value="value"
+  >
+    <template v-if="selectionSlot" v-slot:selection="{ item, index }">
+      <slot name="selection" :item="item" :index="index" />
+    </template>
+
+    <template v-if="noDataSlot" v-slot:no-data>
+      <slot name="no-data" />
+    </template>
+  </v-combobox>
 </template>
 
 <script>
 export default {
-  emits: ['blur', 'change', 'click:append-outer', 'focus', 'input', 'keyup.enter'],
+  emits: ['blur', 'change', 'click:append-outer', 'focus', 'input', 'keyup.enter', 'update:search-input'],
   props: {
     //choose btw select - autocomplete - combobox
     engineering: {
@@ -121,6 +159,7 @@ export default {
     itemSlot: { type: Boolean, required: false },
     appendOuterSlot: { type: Boolean, required: false },
     prependItemSlot: { type: Boolean, required: false },
+    noDataSlot: { type: Boolean, required: false },
     //non vuetify props
     dataTestId: { type: String, required: false },
     delimiters: { type: Array, required: false },
@@ -153,14 +192,24 @@ export default {
     returnObject: { type: Boolean, required: false },
     rounded: { type: Boolean, required: false },
     rules: { type: Array, required: false },
+    searchInput: { type: String, required: false },
     singleLine: { type: Boolean, required: false },
     smallChips: { type: Boolean, required: false },
     solo: { type: Boolean, required: false },
     value: { type: undefined, required: false },
   },
+  data() {
+    return {
+      internalSearch: this.searchInput,
+    };
+  },
   methods: {
     blur() {
       this.$refs.selectRef.blur();
+    },
+    onSearchInputUpdate(newVal) {
+      this.internalSearch = newVal;
+      this.$emit('update:search-input', newVal);
     },
   },
 };

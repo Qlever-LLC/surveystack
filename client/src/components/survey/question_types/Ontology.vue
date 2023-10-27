@@ -92,7 +92,8 @@
         </v-list-item-content>
       </template>
     </a-select>
-    <v-combobox
+    <a-select
+      engineering="combobox"
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
       ref="dropdownRef"
       :label="control.hint"
@@ -115,13 +116,15 @@
       hide-details
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
+      selectionSlot
+      noDataSlot
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
-          @click="data.select"
+          @click="clickOnChip(data)"
           @click:close="removeValue(data.item)"
         >
           {{ getLabelForItemValue(data.item) }}
@@ -141,7 +144,7 @@
           </v-list-item-content>
         </v-list-item>
       </template>
-    </v-combobox>
+    </a-select>
     <v-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading </v-banner>
     <v-banner v-else color="red lighten-2" dark>
       <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Survey Definition
@@ -267,16 +270,6 @@ export default {
         }
       }
       return undefined;
-    },
-  },
-  watch: {
-    comboboxSearch(newVal) {
-      const match = newVal
-        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
-        : undefined;
-      if (!match && this.$refs.dropdownRef) {
-        this.$refs.dropdownRef.setMenuIndex(-1);
-      }
     },
   },
   async mounted() {

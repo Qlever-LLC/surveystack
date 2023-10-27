@@ -63,7 +63,8 @@
       </v-list-item-content>
     </template>
   </a-select>
-  <v-combobox
+  <a-select
+    engineering="combobox"
     v-else-if="customAnswer"
     ref="dropdownRef"
     label="Default value"
@@ -85,13 +86,15 @@
     hide-details
     class="full-width custom-ontology dropdown"
     data-test-id="combobox"
+    selectionSlot
+    noDataSlot
   >
     <template v-slot:selection="data" v-if="multiple">
       <v-chip
         v-bind="data.attrs"
         :input-value="data.selected"
         close
-        @click="data.select"
+        @click="clickOnChip(data)"
         @click:close="remove(data.item)"
       >
         {{ getLabelForItemValue(data.item) }}
@@ -110,7 +113,7 @@
         </v-list-item-content>
       </v-list-item>
     </template>
-  </v-combobox>
+  </a-select>
 </template>
 
 <script>
@@ -142,6 +145,9 @@ export default {
     };
   },
   methods: {
+    clickOnChip(data) {
+      data.select;
+    },
     onChange(value) {
       this.comboboxSearch = null;
       this.$emit('input', getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value));
@@ -203,16 +209,6 @@ export default {
         defaultProps.closeOnContentClick = false;
       }
       return defaultProps;
-    },
-  },
-  watch: {
-    comboboxSearch(newVal) {
-      const match = newVal
-        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
-        : undefined;
-      if (!match && this.$refs.dropdownRef) {
-        this.$refs.dropdownRef.setMenuIndex(-1);
-      }
     },
   },
   async mounted() {

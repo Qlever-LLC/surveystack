@@ -92,21 +92,21 @@ describe('Ontology question', () => {
     });
 
     it('sets value as an array in single selection, custom mode', () => {
-      const wrapper = shallowMount(Ontology, getMountOpts({ allowCustomSelection: true }));
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const wrapper = mount(Ontology, getMountOpts({ allowCustomSelection: true }));
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
       dropDown.vm.$emit('change', 'dog');
       expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
     });
 
     it('sets autocomplete input from value in single selection, custom mode', () => {
-      const wrapper = shallowMount(
+      const wrapper = mount(
         Ontology,
         getMountOpts({
           value: ['custom'],
           allowCustomSelection: true,
         })
       );
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
       expect(dropDown.vm.value).toBe('custom');
     });
 
@@ -141,20 +141,20 @@ describe('Ontology question', () => {
     });
 
     it('sets value as an array in multiple selection, custom mode', () => {
-      const wrapper = shallowMount(
+      const wrapper = mount(
         Ontology,
         getMountOpts({
           hasMultipleSelections: true,
           allowCustomSelection: true,
         })
       );
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
       dropDown.vm.$emit('change', ['custom', 'dog']);
       expect(wrapper.emitted().changed[0][0]).toEqual(['custom', 'dog']);
     });
 
     it('sets autocomplete value from value in multiple selection, custom mode', () => {
-      const wrapper = shallowMount(
+      const wrapper = mount(
         Ontology,
         getMountOpts({
           hasMultipleSelections: true,
@@ -162,7 +162,7 @@ describe('Ontology question', () => {
           value: ['custom', 'dog'],
         })
       );
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
       expect(dropDown.vm.value).toEqual(['custom', 'dog']);
     });
 

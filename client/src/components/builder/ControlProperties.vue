@@ -130,7 +130,8 @@
         class="pt-3"
         hide-details
       />
-      <v-combobox
+      <a-select
+        engineering="combobox"
         v-if="isFarmOsUuid"
         label="FarmOS Type"
         v-model="control.options.farmOsType"

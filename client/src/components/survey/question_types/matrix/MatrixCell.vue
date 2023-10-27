@@ -83,7 +83,8 @@
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </a-select>
-  <v-combobox
+  <a-select
+    engineering="combobox"
     v-else-if="header.type === 'dropdown' && header.custom"
     ref="dropdownRef"
     placeholder="Type to search or add custom answer"
@@ -99,6 +100,8 @@
     :disabled="disabled"
     hide-details
     outlined
+    selectionSlot
+    noDataSlot
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
@@ -113,7 +116,7 @@
         </v-list-item-content>
       </v-list-item>
     </template>
-  </v-combobox>
+  </a-select>
   <a-select
     engineering="autocomplete"
     v-else-if="header.type === 'farmos_field'"
@@ -401,16 +404,6 @@ export default {
       }
 
       return assets;
-    },
-  },
-  watch: {
-    comboboxSearch(newVal) {
-      const match = newVal
-        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
-        : undefined;
-      if (!match && this.$refs.dropdownRef) {
-        this.$refs.dropdownRef.setMenuIndex(-1);
-      }
     },
   },
 };
