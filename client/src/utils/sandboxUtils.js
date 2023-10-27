@@ -449,20 +449,17 @@ const unstable = {
    *
    * @param {string} label - The message to log.
    * @param {string} [status=''] - The status of the message, which determines the background color.
-   *                                Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
+   * @param {boolean} [show=true] - Optional parameter to print.  Use as switch to show all in a script / document
+   * Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
    */
-  prettyLog(label, status = '') {
-    const logEnabled = true; //typeof config !== 'undefined' ? config?.log : false;
-
-    if (logEnabled) {
+  prettyLog(label, status = '', show = true) {
+    if (show) {
       const styles = {
         success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
         warning: 'background-color: #de9250; padding: 0.2rem 1.5rem;',
         info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
       };
-
       const style = styles[status] || '';
-
       console.log('%c' + label, style);
     }
   },
@@ -810,7 +807,7 @@ const unstable = {
    */
   isValidURL(string) {
     if (typeof string === 'string') {
-      var res = string.match(/^(?!.*\s)(?!.*\>{1})([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/gi);
+      var res = string.match(/^(?!.*\s)(?!.*>{1})([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/gi);
     }
     return res !== null;
   },
