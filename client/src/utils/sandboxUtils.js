@@ -369,7 +369,7 @@ const unstable = {
       let result = await response.text();
       result = JSON.parse(result);
       // if not present, search in non-archived surveys
-      if (result.length === 0 || !result?.[0]?.data) {
+      if (result.length === 0 || !result[0] || !result[0].data) {
         url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
         this.prettyLog('check submission in non archived url', 'info');
         this.prettyLog(url);
@@ -377,7 +377,7 @@ const unstable = {
         result = await response.text();
         result = JSON.parse(result);
       }
-      if (result?.[0]?.data) {
+      if (result && result[0] && result[0].data) {
         submission = result[0]; // assign this so we can test against it
         this.prettyLog(`found: submission id ${submissionId}`, 'success');
         this.prettyLog(submission);
@@ -420,7 +420,7 @@ const unstable = {
             if (returnColumns && returnColumns.length) {
               let someItems = {};
               returnColumns.forEach((column) => {
-                if (items?.[column]) {
+                if (items && items[column]) {
                   someItems[column] = items[column];
                 } else {
                   this.prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
@@ -655,8 +655,14 @@ const unstable = {
    * @returns {Object} - The updated object (log, asset, etc.)
    */
   addRelationshipData(obj, relationship, type, field, ...names) {
-    if (!obj.entity?.relationships) obj.entity.relationships = {}; // check that this exists, make exist is not
-    if (!obj.entity?.relationships?.[relationship]) obj.entity.relationships[relationship] = { data: [] }; // same
+    if (obj.entity) {
+      if (!obj.entity.relationships) {
+        obj.entity.relationships = {};
+      }
+      if (!obj.entity.relationships[relationship]) {
+        obj.entity.relationships[relationship] = { data: [] };
+      }
+    }
     if (obj && relationship && type && names) {
       names.forEach((name) => {
         const isDuplicate = obj.entity.relationships[relationship].data.some((obj) => obj[field] === name);
