@@ -593,10 +593,10 @@ const unstable = {
    */
   addMaterials(quantity, ...materials) {
     // check to make sure this not empty or invalid
-    if (quantity?.entity?.type === 'quantity--material') {
+    if (quantity && quantity.entity && quantity.entity.type === 'quantity--material') {
       this.prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
       if (materials) {
-        if (!quantity.entity.relationships?.material_type) {
+        if (!quantity.entity.relationships || !quantity.entity.relationships.material_type) {
           quantity.entity.relationships.material_type = {};
           quantity.entity.relationships.material_type.data = [];
         }
@@ -628,7 +628,7 @@ const unstable = {
    */
   addQuantityToLog(log, ...quantities) {
     this.prettyLog(`trying to add quantities to ${log.entity.type}`, 'info');
-    if (!log.entity.relationships?.quantity && quantities?.length > 0) {
+    if ((!log.entity.relationships || !log.entity.relationships.quantity) && quantities && quantities.length > 0) {
       log.entity.relationships.quantity = {};
       log.entity.relationships.quantity.data = [];
     }
@@ -709,9 +709,9 @@ const unstable = {
   findUrl(submission, spreadsheet, row) {
     let url = null;
     // 1. find url in the current row (stop at the 1st one)
-    let value = row?.planting.value; // get this rows plantings
+    let value = row ? row.planting.value : undefined; // get this rows plantings
     for (let i = 0; i < value.length; i++) {
-      if (value[i]?.url) {
+      if (value[i] && value[i].url) {
         url = value[i].url;
         this.prettyLog(`found URL in this row: ${url}`, 'success');
         break;
@@ -724,7 +724,7 @@ const unstable = {
       let urls = new Set([]);
       spreadsheet.forEach((row) => {
         row.planting.value.forEach((planting) => {
-          if (planting?.url) urls.add(planting.url);
+          if (planting && planting.url) urls.add(planting.url);
         });
       });
       urls = Array.from(urls);
