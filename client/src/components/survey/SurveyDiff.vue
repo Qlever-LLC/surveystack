@@ -20,13 +20,13 @@
         </v-tooltip>
 
         <v-spacer />
-        <v-switch
+        <a-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"
           @click.native.stop=""
           v-model="showChangesOnly"
           label="changes only"
-        ></v-switch>
+        />
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <survey-diff-card-tree
@@ -45,10 +45,12 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
+import ASwitch from '@/components/ui/ASwitch.vue';
 
 export default {
   name: 'survey-diff',
   components: {
+    ASwitch,
     SurveyDiffCardTree,
   },
   props: {

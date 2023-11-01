@@ -20,7 +20,7 @@
                 <v-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
               </v-col>
               <v-col :cols="2">
-                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
+                <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
               </v-col>
             </v-row>
           </v-toolbar>
@@ -42,8 +42,10 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
+import ASwitch from '@/components/ui/ASwitch.vue';
 
 export default {
+  components: { ASwitch },
   data() {
     return {
       excludeMeta: true,
