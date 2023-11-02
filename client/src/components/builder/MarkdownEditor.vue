@@ -67,7 +67,7 @@
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
             <v-list class="resource-panel">
-              <v-subheader class="px-2 py-0">Clic to insert </v-subheader>
+              <v-subheader class="px-2 py-0">Click to insert </v-subheader>
 
               <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
                 <v-list-item-content>
