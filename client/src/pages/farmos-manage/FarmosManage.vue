@@ -12,8 +12,8 @@
       <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
     </v-tabs>
 
-    <v-tabs-items v-model="tab">
-      <v-tab-item v-for="item in items" :key="item.name">
+    <a-window v-model="tab">
+      <a-window-item v-for="item in items" :key="item.name">
         <v-component
           @map-group="mapGroup"
           @unmap-group="unmapGroup"
@@ -34,8 +34,8 @@
           @delete-plan="deletePlan"
           @addSuperAdminNote="addSuperAdminNote"
         ></v-component>
-      </v-tab-item>
-    </v-tabs-items>
+      </a-window-item>
+    </a-window>
 
     <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</v-alert>
   </v-container>
@@ -49,8 +49,11 @@ import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
+import AWindow from '@/components/ui/AWindow.vue';
+import AWindowItem from '@/components/ui/AWindowItem.vue';
 
 export default {
+  components: { AWindowItem, AWindow },
   data() {
     return {
       mappings: null,

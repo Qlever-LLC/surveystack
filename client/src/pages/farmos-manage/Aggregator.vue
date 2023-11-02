@@ -242,7 +242,7 @@ export default {
   props: {
     groups: Array,
     mappings: Object,
-    notes: String,
+    notes: Array,
     loading: Boolean,
     users: Array,
   },
