@@ -94,6 +94,12 @@ describe('Ontology question', () => {
     it('sets value as an array in single selection, custom mode', () => {
       const wrapper = mount(Ontology, getMountOpts({ allowCustomSelection: true }));
       const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
+
+      //mock this.$refs.dropdownRef.blur();
+      const blurMock = jest.fn();
+      const dropdownRef = { blur: blurMock };
+      wrapper.vm.$refs.dropdownRef = dropdownRef;
+
       dropDown.vm.$emit('change', 'dog');
       expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
     });

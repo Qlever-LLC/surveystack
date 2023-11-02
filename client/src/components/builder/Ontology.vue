@@ -69,6 +69,7 @@
     ref="dropdownRef"
     label="Default value"
     :value="getValue"
+    @input="setValue"
     @change="onChange"
     :search-input.sync="comboboxSearch"
     :items="items"
@@ -136,6 +137,7 @@ export default {
       isLoading: false,
       comboboxSearch: null,
       submissionItems: [],
+      values: this.value,
     };
   },
   methods: {
@@ -150,19 +152,25 @@ export default {
       }
     },
     remove(value) {
-      if (this.value) this.$emit('input', getValueOrNull(this.value.filter((v) => v !== value)));
+      this.setValue(getValueOrNull(this.values.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);
       return (item && item.label) || value;
     },
+    setValue(value) {
+      this.values = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      if (this.multiple) {
+        this.$emit('input', this.values);
+      }
+    },
   },
   computed: {
     getArrayValue() {
-      return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      return Array.isArray(this.values) ? this.values : this.values ? [this.values] : [];
     },
     getValue() {
-      return this.multiple ? this.getArrayValue : this.getArrayValue[0] || this.value;
+      return this.multiple ? this.getArrayValue : this.getArrayValue[0] || this.values;
     },
     resource() {
       return this.resources.find((r) => r.id === this.source);

@@ -102,9 +102,9 @@
     v-else-if="engineering === 'combobox'"
     ref="selectRef"
     @blur="$emit('blur')"
-    @change="$emit('change', $event)"
+    @change="onChange"
     @focus="$emit('focus', $event)"
-    @input="$emit('input', $event)"
+    @input="onInput"
     @update:search-input="onSearchInputUpdate"
     :data-test-id="dataTestId"
     :delimiters="delimiters"
@@ -137,6 +137,8 @@
 </template>
 
 <script>
+// import { ref } from '@vue/composition-api';
+
 export default {
   emits: ['blur', 'change', 'click:append-outer', 'focus', 'input', 'keyup.enter', 'update:search-input'],
   props: {
@@ -198,6 +200,44 @@ export default {
     solo: { type: Boolean, required: false },
     value: { type: undefined, required: false },
   },
+
+  //TODO Vue3 Composition API causes error in several Unit Tests
+
+  // setup(props, { emit }) {
+  //   const selectRef = ref(null);
+  //   const internalSearch = ref(props.searchInput);
+  //   const multiple = ref(props.multiple);
+
+  //   function blur() {
+  //     selectRef.value.blur();
+  //   }
+
+  //   function onSearchInputUpdate(newVal) {
+  //     internalSearch.value = newVal;
+  //     emit('update:search-input', newVal);
+  //   }
+
+  //   function onChange(val) {
+  //     if (multiple.value || internalSearch.value !== null) {
+  //       emit('change', val);
+  //     }
+  //     internalSearch.value = null;
+  //   }
+  //   function onInput(val) {
+  //     if (multiple.value || internalSearch.value !== null) {
+  //       emit('input', val);
+  //     }
+  //   }
+
+  //   return {
+  //     selectRef,
+  //     internalSearch,
+  //     blur,
+  //     onSearchInputUpdate,
+  //     onChange,
+  //     onInput,
+  //   };
+  // },
   data() {
     return {
       internalSearch: this.searchInput,
@@ -210,6 +250,17 @@ export default {
     onSearchInputUpdate(newVal) {
       this.internalSearch = newVal;
       this.$emit('update:search-input', newVal);
+    },
+    onChange(val) {
+      if (this.multiple || this.internalSearch) {
+        this.$emit('change', val);
+      }
+      this.internalSearch = null;
+    },
+    onInput(val) {
+      if (this.multiple || this.internalSearch) {
+        this.$emit('input', val);
+      }
     },
   },
 };
