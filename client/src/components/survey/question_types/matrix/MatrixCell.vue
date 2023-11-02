@@ -56,6 +56,8 @@
     hide-details
     outlined
     selectionSlot
+    cssFlexNoWrap
+    cssOneLineSpan
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
@@ -78,6 +80,8 @@
     hide-details
     outlined
     selectionSlot
+    cssFlexNoWrap
+    cssOneLineSpan
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
@@ -102,6 +106,8 @@
     outlined
     selectionSlot
     noDataSlot
+    cssFlexNoWrap
+    cssOneLineSpan
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
@@ -133,6 +139,8 @@
     :disabled="disabled || loading"
     selectionSlot
     itemSlot
+    cssFlexNoWrap
+    cssOneLineSpan
   >
     <template v-slot:selection="data" v-if="!!header.multiple">
       <v-chip v-bind="data.attrs" :input-value="data.selected" @click="clickOnChip(data)">
@@ -169,6 +177,8 @@
     :disabled="disabled || loading"
     selectionSlot
     itemSlot
+    cssFlexNoWrap
+    cssOneLineSpan
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :html="item.label" :index="index" :value="value" />
@@ -410,16 +420,6 @@ export default {
 </script>
 
 <style scoped>
->>> .v-select__selections {
-  flex-wrap: nowrap;
-}
-
->>> .v-select__selections span {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 >>> .blue-chip,
 >>> .orange-chip,
 >>> .green-chip {

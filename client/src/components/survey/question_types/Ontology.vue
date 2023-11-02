@@ -22,6 +22,7 @@
       data-test-id="dropdown"
       :selectionSlot="!!control.options.hasMultipleSelections"
       :itemSlot="!!control.options.hasMultipleSelections"
+      cssMinHeight56px
     >
       <template v-slot:selection="data">
         <v-chip
@@ -69,6 +70,7 @@
       data-test-id="autocomplete"
       :selectionSlot="!!control.options.hasMultipleSelections"
       :itemSlot="!!control.options.hasMultipleSelections"
+      cssMinHeight56px
     >
       <template v-slot:selection="data">
         <v-chip
@@ -118,6 +120,7 @@
       data-test-id="combobox"
       selectionSlot
       noDataSlot
+      cssMinHeight56px
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -293,9 +296,5 @@ export default {
 
 .dropdown >>> .v-list-item.v-list-item--active {
   color: var(--v-focus-base) !important;
-}
-
-.dropdown >>> .v-select__selections {
-  min-height: 56px !important;
 }
 </style>

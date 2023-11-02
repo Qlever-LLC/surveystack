@@ -19,6 +19,7 @@
       color="focus"
       selectionSlot
       itemSlot
+      cssFlexWrap
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -73,10 +74,6 @@ export default {
 </script>
 
 <style scoped>
->>> .v-select__selections {
-  flex-wrap: wrap !important;
-}
-
 div >>> .blue-chip,
 div >>> .orange-chip,
 div >>> .green-chip {

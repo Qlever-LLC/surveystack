@@ -5,6 +5,13 @@
     @change="$emit('change', $event)"
     @focus="$emit('focus')"
     @input="$emit('input', $event)"
+    :class="{
+      minHeightAuto: cssMinHeightAuto,
+      minHeight56px: cssMinHeight56px,
+      flexWrap: cssFlexWrap,
+      flexNoWrap: cssFlexNoWrap,
+      oneLineSpan: cssOneLineSpan,
+    }"
     :data-test-id="dataTestId"
     :chips="chips"
     :clearable="clearable"
@@ -49,6 +56,13 @@
     @focus="$emit('focus', $event)"
     @input="$emit('input', $event)"
     @keyup.enter="$emit('keyup.enter')"
+    :class="{
+      minHeightAuto: cssMinHeightAuto,
+      minHeight56px: cssMinHeight56px,
+      flexWrap: cssFlexWrap,
+      flexNoWrap: cssFlexNoWrap,
+      oneLineSpan: cssOneLineSpan,
+    }"
     :data-test-id="dataTestId"
     :delimiters="delimiters"
     :primary="primary"
@@ -106,6 +120,13 @@
     @focus="$emit('focus', $event)"
     @input="onInput"
     @update:search-input="onSearchInputUpdate"
+    :class="{
+      minHeightAuto: cssMinHeightAuto,
+      minHeight56px: cssMinHeight56px,
+      flexWrap: cssFlexWrap,
+      flexNoWrap: cssFlexNoWrap,
+      oneLineSpan: cssOneLineSpan,
+    }"
     :data-test-id="dataTestId"
     :delimiters="delimiters"
     :chips="chips"
@@ -163,6 +184,11 @@ export default {
     prependItemSlot: { type: Boolean, required: false },
     noDataSlot: { type: Boolean, required: false },
     //non vuetify props
+    cssMinHeightAuto: { type: Boolean, required: false },
+    cssMinHeight56px: { type: Boolean, required: false },
+    cssFlexWrap: { type: Boolean, required: false },
+    cssFlexNoWrap: { type: Boolean, required: false },
+    cssOneLineSpan: { type: Boolean, required: false },
     dataTestId: { type: String, required: false },
     delimiters: { type: Array, required: false },
     primary: { type: Boolean, required: false },
@@ -269,5 +295,23 @@ export default {
 <style>
 .v-select .v-select__selections > input:not(:first-child) {
   margin-left: 4px;
+}
+
+.minHeightAuto .v-select__selections {
+  min-height: auto !important;
+}
+.minHeight56px .v-select__selections {
+  min-height: 56px !important;
+}
+.flexWrap .v-select__selections {
+  flex-wrap: wrap !important;
+}
+.flexNoWrap .v-select__selections {
+  flex-wrap: nowrap;
+}
+.oneLineSpan .v-select__selections span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 </style>
