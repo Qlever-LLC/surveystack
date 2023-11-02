@@ -122,7 +122,9 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
     let v = null;
     if (flattenedInstance) {
       const keys = Object.keys(flattenedInstance).filter((o) => o.startsWith(`${flatName}.value`));
-      if (keys.length === 1) {
+      // regex to detect an array with only 1 element that should continue to be treated as an array
+      let regex = /value\.\d+$/;
+      if (keys.length === 1 && !regex.test(keys[0])) {
         // eslint-disable-next-line prefer-destructuring
         v = flattenedInstance[keys[0]];
       } else {
@@ -135,7 +137,6 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
           inner[updatedKey] = flattenedInstance[k];
         }
         v = unflatten(inner);
-        // console.log('unflattened');
       }
     }
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
@@ -158,7 +159,6 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
 
   const c = Object.assign({}, ...objects);
   submission.data = unflatten(c, { safe: true });
-
   return submission;
 };
 

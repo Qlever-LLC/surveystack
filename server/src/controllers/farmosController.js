@@ -288,7 +288,7 @@ export const getAssets = async (req, res) => {
           name: a.attributes.name,
           id: a.id,
           instanceName: instance.instanceName,
-          archived: a.attributes.archived,
+          archived: a.attributes.status == 'archived',
           location:
             a.relationships && a.relationships.location ? a.relationships.location.data : undefined,
         };
@@ -419,7 +419,7 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  if (typeof owner == undefined) {
+  if (typeof owner === 'undefined') {
     throw boom.badData('owner attribute missing');
   }
   const { origin } = req.headers;
