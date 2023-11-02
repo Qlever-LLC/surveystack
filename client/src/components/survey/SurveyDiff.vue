@@ -3,9 +3,9 @@
     <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </v-card-text>
-  <v-expansion-panels v-else flat multiple v-model="mainPanelState">
-    <v-expansion-panel>
-      <v-expansion-panel-header v-if="showHeader" class="pt-0">
+  <a-expansion-panels v-else flat multiple v-model="mainPanelState">
+    <a-expansion-panel>
+      <a-expansion-panel-title v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
         <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
@@ -27,8 +27,8 @@
           v-model="showChangesOnly"
           label="changes only"
         ></v-switch>
-      </v-expansion-panel-header>
-      <v-expansion-panel-content>
+      </a-expansion-panel-title>
+      <a-expansion-panel-text>
         <survey-diff-card-tree
           :diffInfoTree="showChangesOnly ? diffInfoTreeWithoutUnchangeds : diffInfoTree"
           :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
@@ -36,19 +36,27 @@
           :version-name-remote-revision-new="versionNameRemoteRevisionNew"
           @discard-changed="discardChanged"
         />
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
+      </a-expansion-panel-text>
+    </a-expansion-panel>
+  </a-expansion-panels>
 </template>
 
 <script>
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
+import AExpansionPanelTitle from '@/components/ui/AExpansionPanelTitle.vue';
+import AExpansionPanelText from '@/components/ui/AExpansionPanelText.vue';
+import AExpansionPanel from '@/components/ui/AExpansionPanel.vue';
+import AExpansionPanels from '@/components/ui/AExpansionPanels.vue';
 
 export default {
   name: 'survey-diff',
   components: {
+    AExpansionPanels,
+    AExpansionPanel,
+    AExpansionPanelText,
+    AExpansionPanelTitle,
     SurveyDiffCardTree,
   },
   props: {
