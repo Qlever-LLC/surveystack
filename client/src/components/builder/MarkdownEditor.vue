@@ -80,7 +80,7 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
@@ -90,12 +90,16 @@
 
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
+import ASpacer from '@/components/ui/ASpacer.vue';
 import MarkdownIt from 'markdown-it';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     value: { type: String },
     label: { type: String },

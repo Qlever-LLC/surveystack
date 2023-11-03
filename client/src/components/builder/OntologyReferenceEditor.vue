@@ -32,9 +32,9 @@
         />
       </template>
     </v-card-text>
-    <v-spacer />
+    <a-spacer />
     <v-card-actions>
-      <v-spacer />
+      <a-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
       <v-tooltip top :disabled="!!path">
         <template v-slot:activator="{ on }">
@@ -56,6 +56,7 @@
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -66,7 +67,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: { OntologyReferencePreview, ASpacer },
   props: {
     resource: {
       type: Object,

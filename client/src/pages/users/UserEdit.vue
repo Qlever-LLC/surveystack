@@ -7,7 +7,7 @@
     </div>
     <v-card class="pa-4 mb-4 mt-2">
       <v-card-title v-if="editMode"
-        >{{ currentEmail }} <v-spacer /><v-dialog v-model="isEmailDialogOpen">
+        >{{ currentEmail }} <a-spacer /><v-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
             <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
           </template>
@@ -19,7 +19,7 @@
               not work properly until you have re-mapped or updated them. Are you sure?
             </v-card-text>
             <v-card-actions>
-              <v-spacer></v-spacer>
+              <a-spacer />
               <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
             </v-card-actions>
           </v-card>
@@ -74,10 +74,12 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   components: {
     appFeedback,
+    ASpacer,
   },
   data() {
     return {

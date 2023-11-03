@@ -27,7 +27,7 @@
         <v-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
           >Learn more...
         </v-btn>
-        <v-spacer />
+        <a-spacer />
         <v-btn
           @click="update"
           color="primary"
@@ -50,7 +50,7 @@
           >
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</v-btn>
           <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
         </v-card-actions>
@@ -65,9 +65,10 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ASpacer },
   props: {
     value: {
       required: true,

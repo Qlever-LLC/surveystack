@@ -26,7 +26,7 @@
             <v-card-text>
               <v-row>
                 <div class="text-h6">{{ email }}</div>
-                <v-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
+                <a-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
                   </template>
@@ -38,7 +38,7 @@
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
                     </v-card-text>
                     <v-card-actions>
-                      <v-spacer></v-spacer>
+                      <a-spacer />
                       <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
                       </v-btn>
@@ -102,7 +102,7 @@
             >?
           </v-card-text>
           <v-card-actions>
-            <v-spacer />
+            <a-spacer />
             <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
             <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
           </v-card-actions>
@@ -124,6 +124,7 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -139,6 +140,7 @@ export default {
   components: {
     appFeedback,
     ActiveGroupSelector,
+    ASpacer,
   },
   data() {
     return {

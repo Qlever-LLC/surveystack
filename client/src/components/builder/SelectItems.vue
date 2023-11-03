@@ -41,7 +41,7 @@
       <v-divider></v-divider>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
@@ -50,11 +50,16 @@
 </template>
 
 <script>
+import ASpacer from '@/components/ui/ASpacer.vue';
+
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

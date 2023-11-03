@@ -2,7 +2,7 @@
   <div class="background wrapper">
     <v-container>
       <v-row class="my-2">
-        <v-spacer />
+        <a-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
           <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
@@ -65,7 +65,7 @@
                   </v-list-item>
                 </template>
 
-                <v-spacer class="flex-grow-1" />
+                <a-spacer class="flex-grow-1" />
                 <v-card-actions>
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    ASpacer,
   },
   watch: {
     activeSubmissionId(id) {

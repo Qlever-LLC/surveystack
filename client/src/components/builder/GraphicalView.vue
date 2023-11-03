@@ -169,7 +169,7 @@
         <v-card-title> Delete Question </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
@@ -196,12 +196,14 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
     ControlCardHeader,
+    ASpacer,
   },
   data() {
     return {

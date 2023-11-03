@@ -1,7 +1,7 @@
 <template>
   <v-card dark background-color="dark-blue" class="mt-4">
     <v-card-title color="blue-grey"
-      >Console Log<v-spacer></v-spacer>
+      >Console Log<a-spacer />
       <v-icon @click="$emit('clear')">mdi-delete</v-icon>
     </v-card-title>
 
@@ -9,7 +9,11 @@
   </v-card>
 </template>
 <script>
+import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     log: {
       required: false,

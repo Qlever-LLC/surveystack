@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>
         Farm Hub Onboarding
-        <v-spacer />
+        <a-spacer />
       </v-card-title>
       <v-card-text class="d-flex justify-center">
         <div class="pa-8">
@@ -15,7 +15,11 @@
 </template>
 
 <script>
+import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     entities: {
       type: Array,

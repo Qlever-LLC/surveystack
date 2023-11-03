@@ -11,7 +11,7 @@
         instructions. You'll be able to send "Call for Submission" links to this user.
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn text @click="isVisible = false"> Cancel </v-btn>
         <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
       </v-card-actions>
@@ -22,8 +22,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
+  components: {
+    ASpacer,
+  },
   data() {
     return {
       isVisible: false,

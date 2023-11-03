@@ -2,7 +2,7 @@
   <v-card class="image-resource-editor p-relative">
     <v-card-title class="d-flex">
       <div>Image Resource Editor</div>
-      <v-spacer />
+      <a-spacer />
 
       <v-btn icon @click="closeDialog">
         <v-icon>mdi-close</v-icon>
@@ -52,8 +52,12 @@
 
 <script>
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
+  components: {
+    ASpacer,
+  },
   data() {
     return {};
   },

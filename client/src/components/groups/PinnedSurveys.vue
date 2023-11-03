@@ -2,7 +2,7 @@
   <v-card class="pb-2">
     <v-card-title
       >Pinned Surveys
-      <v-spacer />
+      <a-spacer />
       <v-btn color="primary" text @click="openSearchDialog">New..</v-btn>
     </v-card-title>
     <draggable
@@ -52,7 +52,7 @@
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
@@ -88,11 +88,13 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
+    ASpacer,
   },
   data() {
     return {

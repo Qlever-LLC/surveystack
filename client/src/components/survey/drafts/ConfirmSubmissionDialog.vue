@@ -28,7 +28,7 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
         <v-btn text color="primary" @click.stop="handleConfirm"> Submit </v-btn>
       </v-card-actions>
@@ -39,6 +39,7 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   data() {
@@ -76,6 +77,7 @@ export default {
   },
   components: {
     ActiveGroupSelector,
+    ASpacer,
   },
   created() {
     if (this.groupId) {

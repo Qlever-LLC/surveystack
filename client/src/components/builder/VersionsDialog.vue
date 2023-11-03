@@ -73,7 +73,7 @@
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn
           v-if="compareRevisions.length > 0"
           :disabled="compareRevisions.length === 1"
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { SurveyDiffDialog, ASpacer },
   props: {
     value: {
       type: Boolean,

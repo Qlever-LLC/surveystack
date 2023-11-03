@@ -15,7 +15,7 @@
           :chip-color="diffInfo.color"
           class="ml-3 align-self-center"
         />
-        <v-spacer />
+        <a-spacer />
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
         </v-icon>
@@ -89,11 +89,13 @@
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
     ControlCardHeader,
+    ASpacer,
   },
   data() {
     return {

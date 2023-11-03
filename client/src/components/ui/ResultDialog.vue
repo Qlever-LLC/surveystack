@@ -15,7 +15,7 @@
                 <v-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
                     <v-card-actions>
-                      <v-spacer />
+                      <a-spacer />
                       <v-btn text v-bind="attrs" v-on="on"> Logs </v-btn>
                     </v-card-actions>
                   </template>
@@ -23,7 +23,7 @@
                   <v-card>
                     <v-card-title>
                       Handler logs
-                      <v-spacer></v-spacer>
+                      <a-spacer />
                       <copy-to-clipboard :value="JSON.stringify(item.logs, null, 2)" />
                     </v-card-title>
 
@@ -35,7 +35,7 @@
                           :readonly="!item.data"
                         >
                           <v-expansion-panel-header>
-                            <template v-slot:actions v-if="!item.data"><v-spacer></v-spacer> </template>
+                            <template v-slot:actions v-if="!item.data"><a-spacer /> </template>
                             <div class="mr-4 flex-grow-0">
                               <v-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </v-icon>
                               <v-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </v-icon>
@@ -70,7 +70,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
         </v-card-actions>
       </v-card>
@@ -83,8 +83,12 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     value: {
       required: true,

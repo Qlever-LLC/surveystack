@@ -19,7 +19,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>QR Code Scanner</v-toolbar-title>
-          <v-spacer></v-spacer>
+          <a-spacer />
         </v-toolbar>
         <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
           No camera detected.
@@ -47,11 +47,15 @@ import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@v
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
   emits: ['codeDetected'],
+  components: {
+    ASpacer,
+  },
   props: {
     small: {
       type: Boolean,

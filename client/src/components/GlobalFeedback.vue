@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="hasFeedback">
-    <v-spacer />
+    <a-spacer />
     <div class="d-flex justify-end">
       <v-btn text @click="clearAllFeedback"> <v-icon left>mdi-close</v-icon>{{ clearAllText }} </v-btn>
     </div>
@@ -11,7 +11,11 @@
 </template>
 
 <script>
+import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
+  components: {
+    ASpacer,
+  },
   data() {
     return {};
   },

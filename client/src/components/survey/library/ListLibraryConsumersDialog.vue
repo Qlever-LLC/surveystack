@@ -22,7 +22,7 @@
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
@@ -31,10 +31,11 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {},
+  components: { ASpacer },
   props: {
     value: {
       type: Boolean,

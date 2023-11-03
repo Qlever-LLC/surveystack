@@ -10,7 +10,7 @@
           </div>
         </v-toolbar-title>
 
-        <v-spacer />
+        <a-spacer />
 
         <slot name="toolbar-actions"></slot>
 
@@ -23,7 +23,11 @@
 </template>
 
 <script>
+import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
+  components: {
+    ASpacer,
+  },
   props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
 };
 </script>

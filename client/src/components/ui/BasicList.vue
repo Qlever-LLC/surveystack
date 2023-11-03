@@ -4,7 +4,7 @@
       <slot name="title">
         {{ title }}
       </slot>
-      <v-spacer />
+      <a-spacer />
       <slot name="actions" v-if="editable">
         <v-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</v-btn>
       </slot>
@@ -37,7 +37,11 @@
 </template>
 
 <script>
+import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     loading: {
       type: Boolean,

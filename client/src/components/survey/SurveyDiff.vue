@@ -19,7 +19,7 @@
           <span>{{ tooltip }}</span>
         </v-tooltip>
 
-        <v-spacer />
+        <a-spacer />
         <v-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"
@@ -45,11 +45,13 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'survey-diff',
   components: {
     SurveyDiffCardTree,
+    ASpacer,
   },
   props: {
     controlsLocalRevision: Array,

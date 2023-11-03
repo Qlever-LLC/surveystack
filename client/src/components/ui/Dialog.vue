@@ -8,7 +8,7 @@
         <slot name="default">Default slot content</slot>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</v-btn>
         <v-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
       </v-card-actions>
@@ -17,7 +17,11 @@
 </template>
 
 <script>
+import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     modal: {
       type: Boolean,

@@ -3,7 +3,7 @@
     <v-card>
       <v-card-text v-if="isLoading">
         <v-card-title> Hylo Integraton </v-card-title>
-        <v-spacer />
+        <a-spacer />
         <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
       </v-card-text>
       <template v-else-if="integratedHyloGroup">
@@ -15,7 +15,7 @@
           <v-app-bar flat color="rgba(0, 0, 0, 0)">
             <v-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </v-toolbar-title>
 
-            <v-spacer></v-spacer>
+            <a-spacer />
             <v-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
@@ -23,7 +23,7 @@
               <v-card>
                 <v-card-title class="text-h5"> Are you sure? </v-card-title>
                 <v-card-actions>
-                  <v-spacer></v-spacer>
+                  <a-spacer />
                   <v-btn
                     color="green darken-1"
                     text
@@ -36,7 +36,7 @@
               </v-card>
             </v-dialog>
           </v-app-bar>
-          <v-spacer />
+          <a-spacer />
           <!-- <v-col cols="4" sm="2" md="1"> -->
           <!-- <v-avatar size="36px" class="mr-4">
               <img alt="Avatar" :src="integratedHyloGroup.avatarUrl" />
@@ -67,7 +67,7 @@
 
       <template v-else>
         <v-card-title> Hylo Integraton </v-card-title>
-        <v-spacer />
+        <a-spacer />
         <v-card-subtitle>This group is not integrated with Hylo yet</v-card-subtitle>
 
         <v-card-text>
@@ -122,7 +122,7 @@
               </v-card-text>
 
               <v-card-actions>
-                <v-spacer></v-spacer>
+                <a-spacer />
                 <v-btn text @click="integrateDialog = false"> close </v-btn>
               </v-card-actions>
             </v-card>
@@ -136,8 +136,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
+  components: {
+    ASpacer,
+  },
   props: {
     groupId: String,
   },

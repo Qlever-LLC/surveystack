@@ -3,7 +3,7 @@
     <v-card-title class="pl-0">
       <v-icon class="mr-1">mdi-library</v-icon>
       Question Library
-      <v-spacer></v-spacer>
+      <a-spacer />
       <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <v-icon> mdi-close </v-icon>
       </v-btn>
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    ASpacer,
   },
   props: ['survey', 'libraryId'],
   data() {

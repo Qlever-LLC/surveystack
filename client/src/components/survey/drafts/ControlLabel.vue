@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex align-center control-label-wrapper" :class="className">
     <div class="control-label" v-if="value">{{ value }}</div>
-    <v-spacer />
+    <a-spacer />
     <initialize-button
       v-if="initializable"
       bottom
@@ -18,6 +18,7 @@
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import InitializeButton from '@/components/survey/drafts/InitializeButton';
+import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   props: ['value', 'required', 'redacted', 'initializable', 'isModified', 'initializeTooltip'],
@@ -25,6 +26,7 @@ export default {
     InitializeButton,
     appRequired,
     appRedacted,
+    ASpacer,
   },
   computed: {
     className() {
