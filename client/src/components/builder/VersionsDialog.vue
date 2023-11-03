@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>Survey Versions</v-card-title>
       <v-card-text style="max-height: 500px">
-        <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
+        <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import ASkeletonLoader from '@/components/ui/ASkeletonLoader.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { SurveyDiffDialog, ASkeletonLoader },
   props: {
     value: {
       type: Boolean,

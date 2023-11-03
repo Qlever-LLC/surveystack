@@ -4,7 +4,7 @@
       <v-card-text v-if="isLoading">
         <v-card-title> Hylo Integraton </v-card-title>
         <v-spacer />
-        <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
+        <a-skeleton-loader type="list-item-avatar, card-heading" />
       </v-card-text>
       <template v-else-if="integratedHyloGroup">
         <v-img
@@ -136,11 +136,13 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ASkeletonLoader from '@/components/ui/ASkeletonLoader.vue';
 
 export default {
   props: {
     groupId: String,
   },
+  components: { ASkeletonLoader },
   data() {
     return {
       integratedHyloGroup: null,
