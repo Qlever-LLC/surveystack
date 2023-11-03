@@ -548,6 +548,45 @@ const unstable = {
     recurse(data, '');
     return result;
   },
+  /**
+  * unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
+  * @data {object} data - the flattened object you pass.
+  * 
+  * Caveats:
+  * 1. Assumes no property keys in the original data contain periods (`.`).
+  * 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
+  * 3. Does not recreate circular structures from the "[Circular]" marker.
+  */
+  unflattenAll(data) {
+    var result = {};
+
+    for (var key in data) {
+      var keys = key.split('.');
+      var last = keys.pop();
+      var nested = result;
+
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var nextKey = keys[i + 1];
+
+        if (nextKey !== undefined && /^\d+$/.test(nextKey)) {
+          nested[k] = nested[k] || [];
+        } else {
+          nested[k] = nested[k] || {};
+        }
+        nested = nested[k];
+      }
+
+      if (/^\d+$/.test(last)) {
+        var index = parseInt(last, 10);
+        nested[index] = data[key];
+      } else {
+        nested[last] = data[key];
+      }
+    }
+
+    return result[""] || result;
+  },
 
   /**
    * apply this to a flattened version of the survey.resources survey.revisions (most recent revision only)
