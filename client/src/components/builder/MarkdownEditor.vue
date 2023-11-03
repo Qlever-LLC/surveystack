@@ -67,7 +67,7 @@
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
             <v-list class="resource-panel">
-              <v-subheader class="px-2 py-0">Clic to insert </v-subheader>
+              <a-list-subheader class="px-2 py-0" cssSticky>Clic to insert </a-list-subheader>
 
               <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
                 <v-list-item-content>
@@ -91,6 +91,7 @@
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 import MarkdownIt from 'markdown-it';
+import AListSubheader from '@/components/ui/AListSubheader.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
@@ -102,6 +103,9 @@ export default {
     placeholder: { type: String },
     disabled: { type: Boolean },
     resources: { type: Array, default: () => [] },
+  },
+  components: {
+    AListSubheader,
   },
   data() {
     return {
@@ -351,15 +355,5 @@ export default {
 
 >>> .resource-panel > * {
   border-bottom: 1px solid #eee;
-}
-
->>> .resource-panel .v-subheader {
-  position: sticky;
-  top: 0;
-  background: white;
-  border-bottom: 2px solid #ddd;
-  font-weight: 600;
-  font-size: 1rem;
-  z-index: 1;
 }
 </style>

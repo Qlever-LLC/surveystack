@@ -8,7 +8,7 @@
     <v-list class="mt-0 pt-0">
       <template v-for="(item, i) in items">
         <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
-        <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
+        <a-list-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</a-list-subheader>
         <v-list-item v-else :key="i" :to="item.to">
           <v-list-item-icon v-if="item.icon" :class="item.class">
             <v-icon>{{ item.icon }}</v-icon>
@@ -33,7 +33,7 @@
         <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
           <v-expansion-panel>
             <v-expansion-panel-header class="pa-0 ma-0">
-              <v-subheader>DOCUMENTATION</v-subheader>
+              <a-list-subheader>DOCUMENTATION</a-list-subheader>
             </v-expansion-panel-header>
             <v-expansion-panel-content class="pa-0 ma-0 no-padding">
               <v-list class="pa-0 ma-0">
@@ -81,12 +81,16 @@
 </template>
 
 <script>
+import AListSubheader from '@/components/ui/AListSubheader.vue';
 export default {
   props: {
     value: {
       type: Boolean,
       required: true,
     },
+  },
+  components: {
+    AListSubheader,
   },
   data() {
     let groupsLink = { name: 'groups-list' };

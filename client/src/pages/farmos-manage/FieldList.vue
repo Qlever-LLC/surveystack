@@ -1,7 +1,7 @@
 <template>
   <v-sheet outlined>
     <v-list subheader>
-      <v-subheader>Fields added to Farmos Instance</v-subheader>
+      <a-list-subheader>Fields added to Farmos Instance</a-list-subheader>
 
       <v-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
         <v-list-item-avatar>
@@ -23,8 +23,12 @@
 </template>
 
 <script>
+import AListSubheader from '@/components/ui/AListSubheader.vue';
 export default {
   props: ['value'],
+  components: {
+    AListSubheader,
+  },
   methods: {
     remove(e) {
       const arr = this.value.filter((v) => v !== e);
