@@ -26,7 +26,7 @@
           use text field with menu for year picker because year picker's
           UI placeholder year is the same as when year is selected
          -->
-        <v-menu
+        <a-menu
           v-else
           v-model="datePickerIsVisible"
           :close-on-content-click="false"
@@ -58,7 +58,7 @@
             no-title
             color="focus"
           />
-        </v-menu>
+        </a-menu>
       </div>
     </v-row>
 
@@ -68,8 +68,10 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import AMenu from '@/components/ui/AMenu.vue';
 
 export default {
+  components: { AMenu },
   mixins: [baseQuestionComponent],
   props: { centered: { type: Boolean, default: true } },
   data() {

@@ -55,7 +55,7 @@
           @ok="publishUpdateToLibrary"
           @cancel="updateLibraryDialogIsVisible = false"
         />
-        <v-menu offset-y left>
+        <a-menu offset-y left>
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
               <v-icon>mdi-dots-vertical</v-icon>
@@ -131,7 +131,7 @@
               </v-list-item-title>
             </v-list-item>
           </v-list>
-        </v-menu>
+        </a-menu>
         <edit-library-dialog
           v-if="editLibraryDialogIsVisible"
           v-model="editLibraryDialogIsVisible"
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AMenu from '@/components/ui/AMenu.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -324,6 +325,7 @@ export default {
     },
   },
   components: {
+    AMenu,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,

@@ -9,7 +9,7 @@
     clearable
     hide-details
   />
-  <v-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+  <a-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         v-on="on"
@@ -33,7 +33,7 @@
       no-title
       scrollable
     />
-  </v-menu>
+  </a-menu>
 </template>
 
 <script>
@@ -47,8 +47,10 @@ import endOfWeek from 'date-fns/endOfWeek';
 import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
+import AMenu from '@/components/ui/AMenu.vue';
 
 export default {
+  components: { AMenu },
   props: {
     value: { type: String },
     type: { type: String },

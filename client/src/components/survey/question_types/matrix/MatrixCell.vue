@@ -173,7 +173,7 @@
     </template>
   </v-autocomplete>
   <div v-else-if="header.type === 'date'">
-    <v-menu
+    <a-menu
       :close-on-content-click="false"
       v-model="menus[`${index}_${header.value}`]"
       transition="scale-transition"
@@ -207,7 +207,7 @@
         "
         no-title
       />
-    </v-menu>
+    </a-menu>
   </div>
 
   <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
@@ -222,9 +222,11 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
+import AMenu from '@/components/ui/AMenu.vue';
 
 export default {
   components: {
+    AMenu,
     appQrScanner,
     MatrixCellSelectionLabel,
   },

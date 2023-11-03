@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-menu offset-y>
+    <a-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
         <v-btn v-bind="attrs" v-on="on" class="button">
           <v-icon>mdi-dots-vertical</v-icon>
@@ -21,7 +21,7 @@
         </div>
         <v-btn @click="clipboard" outlined class="mt-1"> <v-icon left>mdi-content-copy</v-icon>Copy </v-btn>
       </div>
-    </v-menu>
+    </a-menu>
     <!-- TODO: fix copied snack notification -->
     <v-snackbar v-model="snackbar">
       {{ snackbarText }}
@@ -31,7 +31,10 @@
 </template>
 
 <script>
+import AMenu from '@/components/ui/AMenu.vue';
+
 export default {
+  components: { AMenu },
   data() {
     return {
       snackbar: false,

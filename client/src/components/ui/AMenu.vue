@@ -1,34 +1,37 @@
 <template>
   <v-menu
-    :disabled="disabled"
     :attach="attach"
+    :close-on-content-click="closeOnContentClick"
+    :disabled="disabled"
+    :left="left"
     :max-height="maxHeight"
     :max-width="maxWidth"
     :min-width="minWidth"
-    :transition="transition"
-    :close-on-content-click="closeOnContentClick"
-    :left="left"
     :offset-y="offsetY"
+    :transition="transition"
     :value="value"
     v-bind="$attrs"
-    @change="$emit('input', $event)"
+    @input="$emit('input', $event)"
   >
-    <slot />
+    <template v-slot:activator="{ on, attrs }">
+      <slot name="activator" :on="on" :attrs="attrs"></slot>
+    </template>
+    <slot></slot>
   </v-menu>
 </template>
 
 <script>
 export default {
   props: {
-    attach: {},
-    maxHeight: {},
-    maxWidth: {},
-    minWidth: {},
-    closeOnContentClick: {},
-    left: {},
-    transition: {},
+    attach: { type: undefined, default: false },
+    closeOnContentClick: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
+    left: { type: Boolean, default: false },
+    maxHeight: { type: [Number, String], default: 'auto' },
+    maxWidth: { type: [Number, String], default: 'auto' },
+    minWidth: { type: [Number, String], required: false },
     offsetY: { type: Boolean, default: false },
+    transition: { type: String, default: 'v-menu-transition' },
     value: { type: undefined, required: false },
   },
   emits: ['input'],

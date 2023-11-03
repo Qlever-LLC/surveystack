@@ -30,7 +30,7 @@
       {{ openResourceError }}
     </v-alert>
     <div class="d-flex justify-end">
-      <v-menu offset-y left>
+      <a-menu offset-y left>
         <template v-slot:activator="{ on }">
           <v-btn color="primary" v-on="on">
             <v-icon left>mdi-plus</v-icon>
@@ -66,7 +66,7 @@
             </v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu>
+      </a-menu>
     </div>
     <v-select :items="availableFilters" v-model="filter" label="Filter" />
     <v-text-field v-model="search" label="Search" autocomplete="off" />
@@ -108,9 +108,11 @@ import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
+import AMenu from '@/components/ui/AMenu.vue';
 
 export default {
   components: {
+    AMenu,
     appOntologyListEditor,
   },
   props: {
