@@ -33,14 +33,10 @@
         'hide-circle': !control.options.geoJSON.showCircle,
         'hide-move': !hasSomeDrawControl,
         'hide-modify': !hasSomeDrawControl,
+        'hide-geotrace': !control.options.geoJSON.showGeoTrace,
       }"
       role="application"
     />
-    <!-- <app-dialog v-model="isOpen.addFarm" width="300" @cancel="isOpen.addFarm = false" @confirm="isOpen.addFarm = false">
-      <template #title>Add Farm Name</template>
-
-      <v-text-field v-model="farmName" />
-    </app-dialog> -->
 
     <div class="fields-table mt-6 d-none">
       <v-btn class="ml-auto" color="primary" @click="handleAddField">Add field</v-btn>
@@ -148,8 +144,8 @@ export default {
   },
   computed: {
     hasSomeDrawControl() {
-      const { showPolygon, showLine, showCircle, showPoint } = this.control.options.geoJSON;
-      return showPolygon || showLine || showCircle || showPoint;
+      const { showPolygon, showLine, showCircle, showPoint, showGeoTrace } = this.control.options.geoJSON;
+      return showPolygon || showLine || showCircle || showPoint || showGeoTrace;
     },
   },
   mounted() {

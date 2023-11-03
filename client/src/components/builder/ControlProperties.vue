@@ -533,6 +533,10 @@ export default {
           key: 'showCircle',
           text: 'Show circle control',
         },
+        {
+          key: 'showGeoTrace',
+          text: 'Show geotrace control',
+        },
       ],
     };
   },
