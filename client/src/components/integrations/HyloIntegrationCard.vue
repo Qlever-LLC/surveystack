@@ -37,16 +37,11 @@
             </v-dialog>
           </v-app-bar>
           <v-spacer />
-          <!-- <v-col cols="4" sm="2" md="1"> -->
-          <!-- <v-avatar size="36px" class="mr-4">
-              <img alt="Avatar" :src="integratedHyloGroup.avatarUrl" />
-            </v-avatar> -->
-          <!-- </v-col> -->
 
           <v-card-title class="white--text mt-8">
-            <v-avatar size="56">
+            <a-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
-            </v-avatar>
+            </a-avatar>
             <v-col class="ml-3"
               ><p class="text-h5 mb-1">{{ integratedHyloGroup.name }}</p>
 
@@ -136,10 +131,14 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AAvatar from '@/components/ui/AAvatar.vue';
 
 export default {
   props: {
     groupId: String,
+  },
+  components: {
+    AAvatar,
   },
   data() {
     return {
