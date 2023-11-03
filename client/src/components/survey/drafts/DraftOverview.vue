@@ -1,11 +1,11 @@
 <template>
   <v-container class="wrapper">
-    <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
+    <a-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
         <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
       </li>
-    </v-banner>
+    </a-banner>
     <v-card>
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle class="grey--text mt-n5">
@@ -120,6 +120,7 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
+import ABanner from '@/components/ui/ABanner.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -146,6 +147,9 @@ function iconify(value, control, relevant) {
 }
 
 export default {
+  components: {
+    ABanner,
+  },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {
