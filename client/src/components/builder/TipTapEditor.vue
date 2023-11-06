@@ -2,7 +2,7 @@
   <v-card outlined class="tiptap-editor">
     <v-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-        <v-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" class="pa-0 editor-toolbar">
+        <a-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
           <v-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
             <div>
               <v-btn
@@ -185,9 +185,9 @@
                 <v-icon>mdi-minus</v-icon>
               </v-btn> -->
           </v-toolbar-items>
-        </v-toolbar>
+        </a-toolbar>
         <!--
-          <v-toolbar dense class="pa-0">
+          <a-toolbar dense class="pa-0">
             <v-toolbar-items class="pa-0">
 
 
@@ -267,7 +267,7 @@
                 </v-btn>
               </span>
             </v-toolbar-items>
-          </v-toolbar> -->
+          </a-toolbar> -->
       </editor-menu-bar>
     </v-card-title>
     <v-card-text class="pa-0">
@@ -351,12 +351,14 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
+import AToolbar from '@/components/ui/AToolbar.vue';
 
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,
+    AToolbar,
   },
   props: {
     value: {
@@ -546,14 +548,5 @@ export default {
   border: none;
   background: transparent;
   color: var(--color-white);
-}
-
-.tiptap-editor >>> .editor-toolbar .v-toolbar__items {
-  width: 100%;
-}
-.tiptap-editor >>> .editor-toolbar .v-toolbar__content {
-  padding-left: 4px;
-  padding-right: 4px;
-  width: 100%;
 }
 </style>

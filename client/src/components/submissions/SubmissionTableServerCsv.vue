@@ -11,7 +11,7 @@
         :mobile-breakpoint="0"
       >
         <template v-slot:top>
-          <v-toolbar flat>
+          <a-toolbar flat>
             <v-row>
               <v-col>
                 <v-toolbar-title>Simple CSV</v-toolbar-title>
@@ -23,7 +23,7 @@
                 <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
               </v-col>
             </v-row>
-          </v-toolbar>
+          </a-toolbar>
         </template>
         <template v-slot:header="{ props: { headers } }">
           <thead>
@@ -42,8 +42,12 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
+import AToolbar from '@/components/ui/AToolbar.vue';
 
 export default {
+  components: {
+    AToolbar,
+  },
   data() {
     return {
       excludeMeta: true,

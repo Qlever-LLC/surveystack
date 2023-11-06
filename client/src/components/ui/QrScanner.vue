@@ -14,13 +14,13 @@
 
     <v-dialog v-model="isScannerOpen" fullscreen>
       <v-card>
-        <v-toolbar dark color="primary">
+        <a-toolbar dark color="primary">
           <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>QR Code Scanner</v-toolbar-title>
           <v-spacer></v-spacer>
-        </v-toolbar>
+        </a-toolbar>
         <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
           No camera detected.
         </v-alert>
@@ -47,11 +47,15 @@ import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@v
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+import AToolbar from '@/components/ui/AToolbar.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
   emits: ['codeDetected'],
+  components: {
+    AToolbar,
+  },
   props: {
     small: {
       type: Boolean,

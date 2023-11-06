@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar color="grey lighten-4" flat tile>
+    <a-toolbar color="grey lighten-4" flat tile>
       <div class="flex-grow-1 d-flex flex-row justify-space-between maxw-60 mx-auto">
         <v-toolbar-title id="draft-toolbar">
           <div class="infos grey--text text--darken-2">
@@ -18,12 +18,16 @@
           <v-icon>mdi-format-list-numbered</v-icon>
         </v-btn>
       </div>
-    </v-toolbar>
+    </a-toolbar>
   </div>
 </template>
 
 <script>
+import AToolbar from '@/components/ui/AToolbar.vue';
 export default {
+  components: {
+    AToolbar,
+  },
   props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
 };
 </script>

@@ -22,7 +22,7 @@
       hide-default-footer
     >
       <template v-slot:top>
-        <v-toolbar flat class="my-5">
+        <a-toolbar flat class="my-5" cssBackgroundCream>
           <v-row>
             <v-col>
               <div class="d-flex justify-space-between align-center">
@@ -94,7 +94,7 @@
               </div>
             </v-col>
           </v-row>
-        </v-toolbar>
+        </a-toolbar>
       </template>
 
       <template v-slot:header.data-table-select="{ props }">
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import AToolbar from '@/components/ui/AToolbar.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -273,6 +274,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 export default {
   components: {
     SubmissionTableCellModal,
+    AToolbar,
   },
   props: {
     actionsAreDisabled: {
@@ -544,9 +546,6 @@ export default {
 </script>
 
 <style scoped>
->>> .v-toolbar__content {
-  background: #f5f5f5 !important;
-}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;
