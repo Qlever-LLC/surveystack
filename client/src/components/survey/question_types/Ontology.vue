@@ -1,6 +1,13 @@
 <template>
   <div class="ontology question">
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <v-select
       v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
       :label="control.hint"
@@ -147,7 +154,7 @@
 </template>
 
 <script>
-import { isNil, sortBy, uniq, without } from 'lodash';
+import { isNil, uniq, without } from 'lodash';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';

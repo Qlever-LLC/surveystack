@@ -138,23 +138,14 @@ const actions = {
     }
   },
   async fetchResource({ commit, getters, dispatch }, resourceId) {
-    try {
-      let resource = getters['getResource'](resourceId);
-      if (!resource) {
-        // fetch resource
-        ({ data: resource } = await api.get(`/resources/${resourceId}`));
-        // get download url
-        const url = getPublicDownloadUrl(resource.key);
-        // download data
-        const { data: binaryResult } = await axios.get(url, {
-          responseType: 'arraybuffer',
-          validateStatus: false,
-        });
-        resource.fileData = new Blob([binaryResult], { type: resource.contentType });
-        db.persistResource(resource);
-        commit('ADD_RESOURCE', resource);
-      }
+    let resource = getters['getResource'](resourceId);
+    if (resource) {
       return resource;
+    }
+
+    try {
+      // fetch resource
+      ({ data: resource } = await api.get(`/resources/${resourceId}`));
     } catch (error) {
       dispatch('feedback/add', `Could not fetch resource ${resourceId}. This problem is reported automatically.`, {
         root: true,
@@ -162,6 +153,26 @@ const actions = {
       console.error(error);
       throw error;
     }
+
+    // Some remote URL doesn't work since CORS error, so ignore download file error
+    // We can still use download url without raw file data and actually it works on browser.
+    try {
+      // get download url
+      const url = getPublicDownloadUrl(resource.key);
+      // download data
+      const { data: binaryResult } = await axios.get(url, {
+        responseType: 'arraybuffer',
+        validateStatus: false,
+      });
+      resource.fileData = new Blob([binaryResult], { type: resource.contentType });
+    } catch (error) {
+      console.error('Could not fetch the remote file data', error);
+    }
+
+    db.persistResource(resource);
+    commit('ADD_RESOURCE', resource);
+
+    return resource;
   },
   async fetchScriptResource({ commit, getters, dispatch }, resource) {
     try {

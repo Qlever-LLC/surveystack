@@ -86,12 +86,12 @@ export async function getSignedDownloadUrl(resourceKey) {
   return url;
 }
 
-export function getPublicDownloadUrl(resourceKey) {
+export function getPublicDownloadUrl(resourceKey, escape = false) {
   const s3BaseUrl =
     window.location.origin.indexOf('app.surveystack.io') > -1
       ? 'https://surveystack.s3.amazonaws.com/'
       : 'https://surveystack-test.s3.amazonaws.com/';
-  return s3BaseUrl + resourceKey;
+  return s3BaseUrl + (escape ? encodeURI(resourceKey) : resourceKey);
 }
 
 export async function uploadFileResource(store, resourceKey, clearCacheAfterUpload) {

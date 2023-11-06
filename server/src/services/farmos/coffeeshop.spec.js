@@ -4,7 +4,7 @@ import {
   removeGroupFromCoffeeShop,
   validateGroup,
 } from './coffeeshop';
-import { createGroup, createReq, createRes, createUser } from '../../testUtils';
+import { createGroup } from '../../testUtils';
 
 const init = async () => {
   const group = await createGroup();
@@ -35,8 +35,8 @@ describe('coffeeShop', () => {
   it('validateAdd', async () => {
     const { group } = await init();
 
-    const res = await addGroupToCoffeeShop(group._id + '');
-    expect(res.result.ok).toEqual(1);
+    const insertResult = await addGroupToCoffeeShop(group._id + '');
+    expect(insertResult?.acknowledged).toBe(true);
 
     await expect(addGroupToCoffeeShop(group._id + '')).rejects.toThrow(
       'group already added to coffeeshop'
@@ -50,11 +50,11 @@ describe('coffeeShop', () => {
       `group has coffeeshop disabled: ${group._id}`
     );
 
-    const res = await addGroupToCoffeeShop(group._id + '');
-    expect(res.result.ok).toEqual(1);
+    const insertResult = await addGroupToCoffeeShop(group._id + '');
+    expect(insertResult?.acknowledged).toBe(true);
 
-    const rem = await removeGroupFromCoffeeShop(group._id + '');
-    expect(rem.result.ok).toEqual(1);
+    const deleteResult = await removeGroupFromCoffeeShop(group._id + '');
+    expect(deleteResult?.acknowledged).toBe(true);
   });
 
   it('validateIsEnabled', async () => {

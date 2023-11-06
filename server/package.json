@@ -32,7 +32,8 @@
     "mongodb-memory-server": "^8.0.4",
     "nodemon": "^1.19.3",
     "prettier": "^2.5.1",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "supertest": "^6.3.3"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.44.0",
@@ -41,6 +42,7 @@
     "@babel/runtime": "^7.14.6",
     "@elastic/elasticsearch": "^7.16.0",
     "@hapi/boom": "^8.0.1",
+    "@marsup/joi-objectid": "^1.0.0",
     "@unleash/proxy": "^0.5.0",
     "assert": "^2.0.0",
     "axios": "^0.19.2",
@@ -60,13 +62,12 @@
     "html-to-pdfmake": "^2.4.16",
     "isemail": "^3.2.0",
     "joi": "^17.6.0",
-    "joi-objectid": "^4.0.2",
     "js-base64": "^3.7.2",
     "jsdom": "^21.1.1",
     "json-stringify-safe": "^5.0.1",
     "lodash": "^4.17.15",
     "markdown-it": "^13.0.1",
-    "mongodb": "^3.7.3",
+    "mongodb": "^4.4.0",
     "nodemailer": "^6.4.3",
     "papaparse": "^5.1.1",
     "pdfmake": "^0.2.7",
