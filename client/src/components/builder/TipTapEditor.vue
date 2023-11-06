@@ -3,7 +3,7 @@
     <v-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
         <a-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
-          <v-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
+          <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
             <div>
               <v-btn
                 icon
@@ -184,11 +184,11 @@
               >
                 <v-icon>mdi-minus</v-icon>
               </v-btn> -->
-          </v-toolbar-items>
+          </a-toolbar-items>
         </a-toolbar>
         <!--
           <a-toolbar dense class="pa-0">
-            <v-toolbar-items class="pa-0">
+            <a-toolbar-items class="pa-0">
 
 
               <v-btn
@@ -266,7 +266,7 @@
                   <v-icon>mdi-combine_cells</v-icon>
                 </v-btn>
               </span>
-            </v-toolbar-items>
+            </a-toolbar-items>
           </a-toolbar> -->
       </editor-menu-bar>
     </v-card-title>
@@ -352,6 +352,7 @@ import {
 
 import CustomLink from '@/utils/TipTapCustomLink';
 import AToolbar from '@/components/ui/AToolbar.vue';
+import AToolbarItems from '@/components/ui/AToolbarItems.vue';
 
 export default {
   components: {
@@ -359,6 +360,7 @@ export default {
     EditorMenuBar,
     EditorMenuBubble,
     AToolbar,
+    AToolbarItems,
   },
   props: {
     value: {
