@@ -26,7 +26,7 @@
       class="autocomplete"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
+        <a-chip
           close
           v-bind="data.attrs"
           :input-value="data.selected"
@@ -36,7 +36,7 @@
           <template v-slot:default>
             <span v-html="data.item.label" />
           </template>
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:selection="{ item }" v-else>
         <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
@@ -58,9 +58,13 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
+  components: {
+    AChip,
+  },
   async created() {
     await this.fetchFarms();
   },

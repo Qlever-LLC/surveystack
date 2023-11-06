@@ -36,9 +36,9 @@
                 <div>
                   <small class="grey--text">{{ c._id }}</small>
                 </div>
-                <v-chip dark small outlined color="grey" class="font-weight-medium mt-1">
+                <a-chip dark small outlined color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
-                </v-chip>
+                </a-chip>
               </v-col>
               <v-col align="right" md="auto">
                 <v-btn
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import AChip from '@/components/ui/AChip.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    AChip,
   },
   props: ['survey', 'libraryId'],
   data() {

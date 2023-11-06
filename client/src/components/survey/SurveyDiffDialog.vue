@@ -3,9 +3,9 @@
     <v-card>
       <v-card-title>
         Compare
-        <v-chip dark small color="green" class="mx-2"> Version {{ revisionA.version }} </v-chip>
+        <a-chip dark small color="green" class="mx-2"> Version {{ revisionA.version }} </a-chip>
         to
-        <v-chip dark small color="green" class="mx-2"> Version {{ revisionB.version }} </v-chip>
+        <a-chip dark small color="green" class="mx-2"> Version {{ revisionB.version }} </a-chip>
       </v-card-title>
       <survey-diff
         :controls-remote-revision-old="revisionA.controls"
@@ -25,9 +25,10 @@
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
-  components: { SurveyDiff },
+  components: { SurveyDiff, AChip },
   props: {
     value: {
       required: true,

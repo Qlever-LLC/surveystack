@@ -105,9 +105,9 @@
             </v-card-text>
           </v-card>
 
-          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
+          <a-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
-          </v-chip>
+          </a-chip>
         </v-timeline-item>
       </template>
     </v-timeline>
@@ -120,6 +120,7 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
+import AChip from '@/components/ui/AChip.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -146,6 +147,9 @@ function iconify(value, control, relevant) {
 }
 
 export default {
+  components: {
+    AChip,
+  },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {

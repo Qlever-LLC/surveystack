@@ -1,14 +1,18 @@
 <template>
-  <v-chip class="px-4 mx-1" small :color="color">
+  <a-chip class="px-4 mx-1" small :color="color">
     <span class="font-weight-bold white--text">
       <v-icon x-small left>{{ icon }}</v-icon>
       <slot>???</slot>
     </span>
-  </v-chip>
+  </a-chip>
 </template>
 
 <script>
+import AChip from '@/components/ui/AChip.vue';
 export default {
+  components: {
+    AChip,
+  },
   props: {
     icon: {
       type: String,

@@ -3,9 +3,9 @@
     <v-card>
       <v-card-title>
         Publish
-        <v-chip dark small color="green" class="mx-2">
+        <a-chip dark small color="green" class="mx-2">
           Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
-        </v-chip>
+        </a-chip>
         to Library
       </v-card-title>
       <v-card-text class="mt-5">
@@ -40,10 +40,11 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import SurveyDiff from '@/components/survey/SurveyDiff';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, AChip },
   props: {
     value: {
       type: Boolean,

@@ -162,7 +162,7 @@
           </v-btn>
         </div>
         <div class="text-left">
-          <v-chip dark small outlined color="grey"> Version {{ version }}</v-chip>
+          <a-chip dark small outlined color="grey"> Version {{ version }}</a-chip>
         </div>
       </div>
     </v-card-title>
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AChip from '@/components/ui/AChip.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -331,6 +332,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    AChip,
   },
   methods: {
     async getGroupNameById(id) {

@@ -61,12 +61,12 @@
         {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
       </v-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">
-        <v-chip dark> {{ meta && meta.status }}</v-chip>
+        <a-chip dark> {{ meta && meta.status }}</a-chip>
         <br />
-        <v-chip dark class="mt-1">
+        <a-chip dark class="mt-1">
           <v-icon small left>mdi-message-bulleted</v-icon>
-          {{ meta && meta.statusMessage }}</v-chip
-        >
+          {{ meta && meta.statusMessage }}
+        </a-chip>
       </p>
     </div>
     <div v-else-if="isLoading" class="d-flex align-center justify-center">
@@ -87,11 +87,13 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
     appDialog,
+    AChip,
   },
   props: {
     submission: {

@@ -20,7 +20,7 @@
           </div>
         </td>
         <td v-if="Array.isArray(item.grpAccess) && item.grpAccess.length" class="box">
-          <v-chip
+          <a-chip
             v-for="(group, id) in item.grpAccess"
             :key="id"
             class="ma-2"
@@ -30,7 +30,7 @@
             label
           >
             {{ group.value }}
-          </v-chip>
+          </a-chip>
         </td>
         <td v-else class="box">
           <p>
@@ -38,7 +38,7 @@
           </p>
         </td>
         <td v-if="Object.entries(item.othAccess) && Object.entries(item.othAccess).length" class="box">
-          <v-chip
+          <a-chip
             v-for="(other, id) in item.othAccess"
             :key="id"
             class="ma-2"
@@ -48,7 +48,7 @@
             label
           >
             {{ other.value }}
-          </v-chip>
+          </a-chip>
         </td>
         <td v-else class="box">
           <p>
@@ -63,9 +63,10 @@
 <script>
 import {} from '@vue/composition-api';
 import MyButton from './common/Button.vue';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
-  components: { MyButton },
+  components: { MyButton, AChip },
   props: {
     headers: {
       type: Array,

@@ -78,7 +78,7 @@
             <td>{{ instance.instanceName }}</td>
             <td>
               <div>
-                <v-chip
+                <a-chip
                   small
                   class="ma-1"
                   dark
@@ -87,11 +87,11 @@
                   :key="`instance-${idx}-user-${uidx}`"
                 >
                   {{ userMapping.user }}
-                </v-chip>
+                </a-chip>
               </div>
 
               <div>
-                <v-chip
+                <a-chip
                   class="ma-1"
                   small
                   dark
@@ -100,7 +100,7 @@
                   :key="`instance-${idx}-group-${gidx}`"
                 >
                   {{ groupMapping.group }}
-                </v-chip>
+                </a-chip>
               </div>
             </td>
             <td>
@@ -114,7 +114,11 @@
 </template>
 
 <script>
+import AChip from '@/components/ui/AChip.vue';
 export default {
+  components: {
+    AChip,
+  },
   props: {
     groups: Array,
     users: Array,

@@ -29,7 +29,7 @@
       data-test-id="dropdown"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
+        <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
@@ -37,15 +37,15 @@
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
         <v-list-item-content>
           <v-list-item-title>
             {{ data.item.label }}
-            <v-chip v-if="data.item.count" small class="ma-2">
+            <a-chip v-if="data.item.count" small class="ma-2">
               {{ data.item.count }}
-            </v-chip>
+            </a-chip>
           </v-list-item-title>
         </v-list-item-content>
       </template>
@@ -74,7 +74,7 @@
       data-test-id="autocomplete"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
+        <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
@@ -82,15 +82,15 @@
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
         <v-list-item-content>
           <v-list-item-title>
             {{ data.item.label }}
-            <v-chip v-if="data.item.count" small class="ma-2">
+            <a-chip v-if="data.item.count" small class="ma-2">
               {{ data.item.count }}
-            </v-chip>
+            </a-chip>
           </v-list-item-title>
         </v-list-item-content>
       </template>
@@ -120,7 +120,7 @@
       data-test-id="combobox"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
+        <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
@@ -128,7 +128,7 @@
           @click:close="removeValue(data.item)"
         >
           {{ getLabelForItemValue(data.item) }}
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:selection="data" v-else>
         {{ getLabelForItemValue(data.item) }}
@@ -161,12 +161,14 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
     appControlLabel,
     appControlMoreInfo,
+    AChip,
   },
   data() {
     return {

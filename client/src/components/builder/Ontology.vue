@@ -22,9 +22,9 @@
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
-          <v-chip v-if="data.item.count" small class="ma-2">
+          <a-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
-          </v-chip>
+          </a-chip>
         </v-list-item-title>
       </v-list-item-content>
     </template>
@@ -54,9 +54,9 @@
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
-          <v-chip v-if="data.item.count" small class="ma-2">
+          <a-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
-          </v-chip>
+          </a-chip>
         </v-list-item-title>
       </v-list-item-content>
     </template>
@@ -85,7 +85,7 @@
     data-test-id="combobox"
   >
     <template v-slot:selection="data" v-if="multiple">
-      <v-chip
+      <a-chip
         v-bind="data.attrs"
         :input-value="data.selected"
         close
@@ -93,7 +93,7 @@
         @click:close="remove(data.item)"
       >
         {{ getLabelForItemValue(data.item) }}
-      </v-chip>
+      </a-chip>
     </template>
     <template v-slot:selection="data" v-else>
       {{ getLabelForItemValue(data.item) }}
@@ -116,8 +116,12 @@ import { isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
+  components: {
+    AChip,
+  },
   props: {
     value: { required: true },
     multiple: { type: Boolean, default: false },

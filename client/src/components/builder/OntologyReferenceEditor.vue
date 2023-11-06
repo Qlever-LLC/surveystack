@@ -13,9 +13,9 @@
         item-text="name"
       >
         <template slot="append-outer">
-          <v-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
+          <a-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
-          </v-chip>
+          </a-chip>
         </template>
       </v-autocomplete>
 
@@ -56,6 +56,7 @@
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
+import AChip from '@/components/ui/AChip.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -66,7 +67,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: { OntologyReferencePreview, AChip },
   props: {
     resource: {
       type: Object,

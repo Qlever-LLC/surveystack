@@ -127,9 +127,9 @@
     :disabled="disabled || loading"
   >
     <template v-slot:selection="data" v-if="!!header.multiple">
-      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
+      <a-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
         <span v-html="data.item.label" />
-      </v-chip>
+      </a-chip>
     </template>
     <template v-slot:selection="{ item }" v-else>
       <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
@@ -222,11 +222,13 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
   components: {
     appQrScanner,
     MatrixCellSelectionLabel,
+    AChip,
   },
   props: {
     header: {

@@ -132,7 +132,7 @@
         <template v-slot:item="{ item }">
           <div v-if="item.userExists">
             {{ item.name }}
-            <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
+            <a-chip color="grey--darken-2" dark>{{ item.email }}</a-chip>
           </div>
           <div v-else>
             <v-icon left>mdi-account-clock</v-icon>
@@ -224,6 +224,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
+import AChip from '@/components/ui/AChip.vue';
 
 import { timezones } from './timezones';
 
@@ -233,6 +234,7 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
+    AChip,
   },
   data() {
     return {

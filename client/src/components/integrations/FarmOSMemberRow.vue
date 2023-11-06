@@ -21,7 +21,7 @@
           <div class="group-chip mx-1" v-if="idx < 3 || more.includes(`${user.id}-${instance.name}`)">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-chip small v-on="on"> {{ group.name }}</v-chip>
+                <a-chip small v-on="on"> {{ group.name }}</a-chip>
               </template>
               <span>{{ group.path }}</span>
             </v-tooltip>
@@ -48,7 +48,11 @@
 </template>
 
 <script>
+import AChip from '@/components/ui/AChip.vue';
 export default {
+  components: {
+    AChip,
+  },
   data() {
     return {
       more: [],

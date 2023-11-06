@@ -8,7 +8,7 @@
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
             <div class="col-10 mt-1 py-0">
-              <v-chip
+              <a-chip
                 dark
                 small
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
@@ -22,8 +22,8 @@
                     : revision.version === survey.latestVersion
                     ? ' (published) '
                     : '')
-                }}</v-chip
-              >
+                }}
+              </a-chip>
               <span class="ml-2"
                 >{{ getSubmissionCount(revision.version) || 'no' }} submission{{
                   getSubmissionCount(revision.version) > 1 ? 's' : ''
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import AChip from '@/components/ui/AChip.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { SurveyDiffDialog, AChip },
   props: {
     value: {
       type: Boolean,
