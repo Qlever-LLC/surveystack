@@ -16,6 +16,7 @@ export default {
   props: {
     //non vuetify props
     cssFullWidth: { type: Boolean, required: false },
+    cssBackgroundCream: { type: Boolean, required: false },
     //vuetify props
     color: { type: String, required: false },
     dark: { type: Boolean, required: false },
@@ -30,13 +31,13 @@ export default {
 .fullWidth >>> .v-toolbar__items {
   width: 100%;
 }
-.fullWidth .v-toolbar__content {
-  padding-left: 4px;
+.fullWidth >>> .v-toolbar__content {
+  padding-left: 40px;
   padding-right: 4px;
   width: 100%;
 }
 
-.backgroundCream .v-toolbar__content {
+.backgroundCream >>> .v-toolbar__content {
   background: #f5f5f5 !important;
 }
 </style>
