@@ -30,7 +30,7 @@
     </v-card>
     <a-timeline v-if="controlDisplays" dense>
       <template v-for="(display, idx) in controlDisplays">
-        <v-timeline-item
+        <a-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :key="idx"
           :icon="display.icon"
@@ -108,7 +108,7 @@
           <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
           </v-chip>
-        </v-timeline-item>
+        </a-timeline-item>
       </template>
     </a-timeline>
   </v-container>
@@ -121,6 +121,7 @@ import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
 import ATimeline from '@/components/ui/ATimeline.vue';
+import ATimelineItem from '@/components/ui/ATimelineItem.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -149,6 +150,7 @@ function iconify(value, control, relevant) {
 export default {
   components: {
     ATimeline,
+    ATimelineItem,
   },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
