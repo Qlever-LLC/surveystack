@@ -49,7 +49,7 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-tooltip bottom :disabled="canAddCoffeeShop">
+            <a-tooltip bottom :disabled="canAddCoffeeShop">
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
                   <v-checkbox
@@ -64,7 +64,7 @@
                 </div>
               </template>
               <span>Talk to your parent group administrator to enable this option</span>
-            </v-tooltip>
+            </a-tooltip>
             <v-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
@@ -109,10 +109,12 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
+    ATooltip,
   },
   props: {
     groupInfos: {

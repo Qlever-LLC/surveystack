@@ -101,12 +101,12 @@
       @addRow="add"
     >
       <template v-slot:header-cell="{ header }">
-        <v-tooltip top>
+        <a-tooltip top>
           <template v-slot:activator="{ on }">
             <span class="flex-grow-1 text-truncate" v-on="on">{{ header.label }}</span>
           </template>
           <span>{{ header.type }}: {{ header.label }}</span>
-        </v-tooltip>
+        </a-tooltip>
         <app-redacted v-if="header.redacted" />
         <app-required v-if="header.required" />
       </template>
@@ -156,6 +156,7 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -270,6 +271,7 @@ export default {
     appMatrixTable,
     appRequired,
     appRedacted,
+    ATooltip,
   },
   data() {
     return {

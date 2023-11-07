@@ -178,7 +178,7 @@
           class="mb-2 survey-group-name-input"
         />
         <div class="d-flex flex-wrap justify-end align-center">
-          <v-tooltip bottom v-if="!isNew">
+          <a-tooltip bottom v-if="!isNew">
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
@@ -200,8 +200,8 @@
               <br />
               Updating is only possible <em>only</em> when changing Labels of a Question.</span
             >
-          </v-tooltip>
-          <v-tooltip bottom>
+          </a-tooltip>
+          <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
@@ -218,9 +218,9 @@
             </template>
 
             <span>Publish current version of Survey to users</span>
-          </v-tooltip>
+          </a-tooltip>
 
-          <v-tooltip bottom>
+          <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
@@ -237,11 +237,11 @@
               </div>
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
-          </v-tooltip>
+          </a-tooltip>
         </div>
       </div>
 
-      <v-tooltip bottom v-if="validationErrors.length > 0">
+      <a-tooltip bottom v-if="validationErrors.length > 0">
         <template v-slot:activator="{ on }">
           <v-alert type="error" colored-border border="left" class="mt-2" elevation="2" v-on="on">
             Survey contains errors
@@ -250,7 +250,7 @@
         <div v-for="error in validationErrors" :key="error">
           {{ error }}
         </div>
-      </v-tooltip>
+      </a-tooltip>
     </v-card-text>
   </v-card>
 </template>
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -331,6 +332,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    ATooltip,
   },
   methods: {
     async getGroupNameById(id) {

@@ -48,7 +48,7 @@
                       </v-card>
                     </v-list-item-content>
                     <v-list-item-action>
-                      <v-tooltip bottom>
+                      <a-tooltip bottom>
                         <template v-slot:activator="{ on }">
                           <v-btn
                             v-if="readyToSubmitHas(item._id)"
@@ -60,7 +60,7 @@
                           </v-btn>
                         </template>
                         <span>Upload Submission</span>
-                      </v-tooltip>
+                      </a-tooltip>
                     </v-list-item-action>
                   </v-list-item>
                 </template>
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    ATooltip,
   },
   watch: {
     activeSubmissionId(id) {

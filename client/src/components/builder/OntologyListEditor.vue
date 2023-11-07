@@ -17,14 +17,14 @@
           </v-btn>
         </div>
         <div class="d-flex align-center">
-          <v-tooltip bottom>
+          <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled" />
               </div>
             </template>
             CSV must have column headers 'label', 'value', and optionally 'tags'
-          </v-tooltip>
+          </a-tooltip>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
           <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
@@ -139,6 +139,7 @@ import { uniqWith, isEqual } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 export default {
   props: {
@@ -161,6 +162,7 @@ export default {
   components: {
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
+    ATooltip,
   },
   data() {
     return {

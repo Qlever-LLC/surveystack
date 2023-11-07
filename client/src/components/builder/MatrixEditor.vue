@@ -37,7 +37,7 @@
           >
             <div class="draggable-column" v-for="(item, i) in columns" :key="i">
               <!-- vertical bar indicating which columns are locked to the left -->
-              <v-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
+              <a-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
                 <template v-slot:activator="{ on, attrs }">
                   <v-card
                     width="26px"
@@ -53,7 +53,7 @@
                   </v-card>
                 </template>
                 <span>Columns to the left of this line will always be visible</span>
-              </v-tooltip>
+              </a-tooltip>
 
               <div v-else>
                 <v-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
@@ -262,6 +262,7 @@ import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -290,6 +291,7 @@ export default {
     Ontology,
     Date,
     Checkbox,
+    ATooltip,
   },
   props: {
     value: {

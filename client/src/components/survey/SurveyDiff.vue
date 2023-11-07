@@ -8,7 +8,7 @@
       <v-expansion-panel-header v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
-        <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
+        <a-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
           <template v-slot:activator="{ on, attrs }">
             <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on"
               ><v-badge overlap bordered left :color="color" :content="count.toString()">
@@ -17,7 +17,7 @@
             >
           </template>
           <span>{{ tooltip }}</span>
-        </v-tooltip>
+        </a-tooltip>
 
         <v-spacer />
         <v-switch
@@ -45,11 +45,13 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 export default {
   name: 'survey-diff',
   components: {
     SurveyDiffCardTree,
+    ATooltip,
   },
   props: {
     controlsLocalRevision: Array,

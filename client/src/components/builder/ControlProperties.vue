@@ -429,12 +429,12 @@
               </template>
 
               <template #append-outer>
-                <v-tooltip max-width="400" transition="slide-x-transition" right>
+                <a-tooltip max-width="400" transition="slide-x-transition" right>
                   <template v-slot:activator="{ on, attrs }">
                     <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
                   </template>
                   Set the number of items in a row
-                </v-tooltip>
+                </a-tooltip>
               </template>
             </v-select>
           </template>
@@ -461,6 +461,7 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
+import ATooltip from '@/components/ui/ATooltip.vue';
 
 export default {
   components: {
@@ -474,6 +475,7 @@ export default {
     Date,
     Checkbox,
     MarkdownEditor,
+    ATooltip,
   },
   props: {
     control: {
