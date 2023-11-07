@@ -31,19 +31,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/*  .fullWidth >>> .v-toolbar__items {
-   width: 100%;
- }
- .fullWidth >>> .v-toolbar__content {
-   padding-left: 40px;
-   padding-right: 4px;
-   width: 100%;
- }
-
- .backgroundCream >>> .v-toolbar__content {
-   background: #f5f5f5 !important;
- }
- */
-</style>
