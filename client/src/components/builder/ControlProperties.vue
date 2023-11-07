@@ -127,7 +127,7 @@
       </v-autocomplete>
       <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
-      <v-textarea
+      <a-textarea
         v-if="isScript"
         v-model="scriptParams"
         @input="handleScriptParamsChange"
@@ -461,6 +461,7 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
+import ATextarea from '@/components/ui/ATextarea.vue';
 
 export default {
   components: {
@@ -474,6 +475,7 @@ export default {
     Date,
     Checkbox,
     MarkdownEditor,
+    ATextarea,
   },
   props: {
     control: {

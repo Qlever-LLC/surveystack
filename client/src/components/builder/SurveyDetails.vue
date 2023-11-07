@@ -20,7 +20,7 @@
                 label="Allow Submissions for..."
                 :items="availableSubmissions"
               />
-              <v-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
+              <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import ATextarea from '@/components/ui/ATextarea.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -331,6 +332,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    ATextarea,
   },
   methods: {
     async getGroupNameById(id) {

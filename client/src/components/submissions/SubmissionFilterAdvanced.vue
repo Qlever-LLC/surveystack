@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-form class="d-flex flex-column">
-      <v-textarea v-model="value.match" outlined label="Match" rows="3" />
+      <a-textarea v-model="value.match" outlined label="Match" rows="3" />
       <v-row>
         <v-col>
           <v-text-field v-model="value.sort" label="Sort" dense />
@@ -47,7 +47,11 @@
 </template>
 
 <script>
+import ATextarea from '@/components/ui/ATextarea.vue';
 export default {
+  components: {
+    ATextarea,
+  },
   props: {
     value: {
       type: Object,

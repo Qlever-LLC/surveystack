@@ -33,7 +33,7 @@
 
         <div class="d-flex align-stretch">
           <div class="editor">
-            <v-textarea
+            <a-textarea
               v-if="viewMode === 0"
               ref="editorRef"
               v-model="markdown"
@@ -45,7 +45,7 @@
               @dragover.prevent="showAttach = true"
               @dragleave.prevent="showAttach = false"
               @drop.prevent="onDrop"
-            ></v-textarea>
+            />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
               <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
@@ -91,11 +91,15 @@
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 import MarkdownIt from 'markdown-it';
+import ATextarea from '@/components/ui/ATextarea.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
+  components: {
+    ATextarea,
+  },
   props: {
     value: { type: String },
     label: { type: String },
@@ -178,7 +182,7 @@ export default {
     updateCaretPosition() {
       const el = this.$refs.editorRef;
       this.caretPosition =
-        el && el.$refs.input.selectionStart ? el.$refs.input.selectionStart : Math.max(this.markdown.length - 1, 0);
+        el && el.inputSelectionStart() ? el.inputSelectionStart() : Math.max(this.markdown.length - 1, 0);
     },
     onAddResource(resId) {
       // Load resource

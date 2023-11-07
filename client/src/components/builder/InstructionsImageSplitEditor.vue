@@ -20,7 +20,7 @@
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
     </div>
-    <v-textarea
+    <a-textarea
       class="mt-3"
       label="Instructions Body (Markdown)"
       :value="value.body"
@@ -52,6 +52,7 @@ import {
   resourceLocations,
   appendResource,
 } from '@/utils/resources';
+import ATextarea from '@/components/ui/ATextarea.vue';
 
 export default {
   data() {
@@ -63,6 +64,7 @@ export default {
   components: {
     ResourceSelector,
     ImageResourceEditor,
+    ATextarea,
   },
   props: {
     value: {
