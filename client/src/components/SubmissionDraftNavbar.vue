@@ -3,7 +3,7 @@
     <navbar-drawer v-model="drawerIsVisible" />
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column flex-grow-1">
+      <a-toolbar-title class="flex-column flex-grow-1">
         <draft-toolbar
           :groupPath="groupPath"
           :required="control && control.options && control.options.required"
@@ -12,7 +12,7 @@
           :questionNumber="$store.getters['draft/questionNumber']"
           @showOverviewClicked="showOverview = !showOverview"
         />
-      </v-toolbar-title>
+      </a-toolbar-title>
 
       <navbar-user-menu />
     </v-app-bar>
@@ -23,6 +23,7 @@
 import DraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
+import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 
 import { queueAction } from '@/utils/surveyStack';
 
@@ -31,6 +32,7 @@ export default {
     DraftToolbar,
     NavbarDrawer,
     NavbarUserMenu,
+    AToolbarTitle,
   },
   computed: {
     drawerIsVisible: {

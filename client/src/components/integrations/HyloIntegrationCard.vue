@@ -13,7 +13,7 @@
           :src="integratedHyloGroup.bannerUrl"
         >
           <v-app-bar flat color="rgba(0, 0, 0, 0)">
-            <v-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </v-toolbar-title>
+            <a-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </a-toolbar-title>
 
             <v-spacer></v-spacer>
             <v-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
@@ -136,8 +136,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 
 export default {
+  components: {
+    AToolbarTitle,
+  },
   props: {
     groupId: String,
   },

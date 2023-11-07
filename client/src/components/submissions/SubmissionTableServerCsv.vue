@@ -14,7 +14,7 @@
           <a-toolbar flat>
             <v-row>
               <v-col>
-                <v-toolbar-title>Simple CSV</v-toolbar-title>
+                <a-toolbar-title>Simple CSV</a-toolbar-title>
               </v-col>
               <v-col>
                 <v-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
@@ -43,10 +43,12 @@
 import papa from 'papaparse';
 import api from '@/services/api.service';
 import AToolbar from '@/components/ui/AToolbar.vue';
+import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 
 export default {
   components: {
     AToolbar,
+    AToolbarTitle,
   },
   data() {
     return {

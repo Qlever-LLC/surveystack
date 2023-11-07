@@ -2,12 +2,12 @@
   <nav class="app-navbar">
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column">
+      <a-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
         </div>
         <div class="app-bar-subtitle subtitle py-0 my-0" v-html="appSubtitle" />
-      </v-toolbar-title>
+      </a-toolbar-title>
 
       <v-spacer />
       <offline-indicator />
@@ -24,12 +24,14 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
+import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 
 export default {
   components: {
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,
+    AToolbarTitle,
   },
   computed: {
     drawerIsVisible: {

@@ -18,7 +18,7 @@
           <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>QR Code Scanner</v-toolbar-title>
+          <a-toolbar-title>QR Code Scanner</a-toolbar-title>
           <v-spacer></v-spacer>
         </a-toolbar>
         <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
@@ -48,6 +48,7 @@ import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
 import AToolbar from '@/components/ui/AToolbar.vue';
+import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
@@ -55,6 +56,7 @@ export default defineComponent({
   emits: ['codeDetected'],
   components: {
     AToolbar,
+    AToolbarTitle,
   },
   props: {
     small: {
