@@ -28,7 +28,7 @@
         <br />
       </v-card-text>
     </v-card>
-    <v-timeline v-if="controlDisplays" dense class="width: 100%">
+    <a-timeline v-if="controlDisplays" dense>
       <template v-for="(display, idx) in controlDisplays">
         <v-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
@@ -110,7 +110,7 @@
           </v-chip>
         </v-timeline-item>
       </template>
-    </v-timeline>
+    </a-timeline>
   </v-container>
 </template>
 
@@ -120,6 +120,7 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
+import ATimeline from '@/components/ui/ATimeline.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -146,6 +147,9 @@ function iconify(value, control, relevant) {
 }
 
 export default {
+  components: {
+    ATimeline,
+  },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {
