@@ -146,7 +146,7 @@
     </v-container>
 
     <v-container>
-      <v-tabs v-model="tab">
+      <a-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
         </v-tab>
@@ -179,7 +179,7 @@
             <app-submissions-code :submissions="submissions" />
           </v-tab-item>
         </v-tabs-items>
-      </v-tabs>
+      </a-tabs>
 
       <v-row class="my-2">
         <v-col cols="1">
@@ -223,6 +223,7 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import ATabs from '@/components/ui/ATabs.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -264,6 +265,7 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
+    ATabs,
   },
   data() {
     return {

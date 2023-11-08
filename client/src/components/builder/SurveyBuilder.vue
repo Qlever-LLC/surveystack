@@ -138,7 +138,7 @@
         <splitpanes horizontal class="code-resizer">
           <pane size="80">
             <div style="height: 100%">
-              <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
+              <a-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
                 <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
                 <v-tab :disabled="!control.options.initialize.enabled"> Initialize</v-tab>
                 <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
@@ -147,7 +147,7 @@
                   API Compose
                 </v-tab>
                 <v-tab v-if="control.type === 'script'"> Script</v-tab>
-              </v-tabs>
+              </a-tabs>
 
               <code-editor
                 v-if="selectedTab !== null"
@@ -274,6 +274,7 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
+import ATabs from '@/components/ui/ATabs.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -322,6 +323,7 @@ export default {
     appCodeView,
     // ConfirmLeaveDialog,
     appExamplesView,
+    ATabs,
   },
   props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {

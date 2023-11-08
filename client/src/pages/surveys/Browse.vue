@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <v-container>
-      <v-tabs v-model="activeTab" fixed-tabs>
+      <a-tabs v-model="activeTab" fixed-tabs>
         <v-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
           <span v-if="tab.name === 'active-group'" class="text-no-wrap">
             {{ activeGroupName }}
@@ -10,7 +10,7 @@
             {{ tab.label }}
           </span>
         </v-tab>
-      </v-tabs>
+      </a-tabs>
       <v-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
         <v-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
@@ -105,10 +105,14 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
+import ATabs from '@/components/ui/ATabs.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  components: {
+    ATabs,
+  },
   data() {
     return {
       selectedGroupIds: [],
