@@ -14,7 +14,7 @@
             <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
                 <small class="grey--text">{{ c._id }}</small>
-                <v-list-item-title>{{ c.name }}</v-list-item-title>
+                <a-list-item-title>{{ c.name }}</a-list-item-title>
               </v-list-item-content>
             </a-list-item>
           </template>
@@ -32,10 +32,11 @@
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: { AListItem },
+  components: { AListItemTitle, AListItem },
   props: {
     value: {
       type: Boolean,

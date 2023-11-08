@@ -21,8 +21,8 @@
         >
           <v-list-item-content>
             <span class="text--secondary caption">{{ membership.group.path }}</span>
-            <v-list-item-title>{{ membership.group.name }}</v-list-item-title>
-            <v-list-item-subtitle class="text--secondary">{{ membership.role }}</v-list-item-subtitle>
+            <a-list-item-title>{{ membership.group.name }}</a-list-item-title>
+            <a-list-item-subtitle class="text--secondary">{{ membership.role }}</a-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -32,8 +32,11 @@
 
 <script>
 import api from '@/services/api.service';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
+  components: { AListItemSubtitle, AListItemTitle },
   data() {
     return {
       user: {

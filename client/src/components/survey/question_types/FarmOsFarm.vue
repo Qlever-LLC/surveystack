@@ -44,7 +44,7 @@
 
       <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
         <v-list-item-content>
-          <v-list-item-title v-html="data.item.label" />
+          <a-list-item-title v-html="data.item.label" />
         </v-list-item-content>
       </template>
       <template v-slot:item="{ item }" v-else>
@@ -58,8 +58,10 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
+  components: { AListItemTitle },
   mixins: [baseQuestionComponent, farmosBase()],
   async created() {
     await this.fetchFarms();

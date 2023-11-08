@@ -1,8 +1,8 @@
 <template>
   <v-list-group prepend-icon="mdi-account-check" :value="true" color="focus">
     <template v-slot:activator>
-      <v-list-item-title v-if="activeGroup">{{ activeGroupName }}</v-list-item-title>
-      <v-list-item-title v-else>No Group selected</v-list-item-title>
+      <a-list-item-title v-if="activeGroup">{{ activeGroupName }}</a-list-item-title>
+      <a-list-item-title v-else>No Group selected</a-list-item-title>
     </template>
     <a-list-item flat class="pt-0" color="focus">
       <v-list-item-group :value="activeItem" color="primary" mandatory>
@@ -13,12 +13,12 @@
           :value="i"
           color="focus"
         >
-          <v-list-item-icon>
+          <a-list-item-icon>
             <v-icon>mdi-account-group</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>
+          </a-list-item-icon>
+          <a-list-item-title>
             {{ item.text }}
-          </v-list-item-title>
+          </a-list-item-title>
         </a-list-item>
       </v-list-item-group>
     </a-list-item>
@@ -27,9 +27,11 @@
 
 <script>
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemIcon from '@/components/ui/AListItemIcon.vue';
 
 export default {
-  components: { AListItem },
+  components: { AListItemIcon, AListItemTitle, AListItem },
   props: {
     value: {
       type: [String, Object],

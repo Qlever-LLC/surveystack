@@ -9,9 +9,9 @@
         <v-list-item-content>
           {{ image.name }}
         </v-list-item-content>
-        <v-list-item-action>
+        <a-list-item-action>
           <v-icon>mdi-delete</v-icon>
-        </v-list-item-action>
+        </a-list-item-action>
       </a-list-item>
     </v-list>
     <v-btn class="ml-auto mr-0 d-block mb-3" @click="handleAddImage"> +&nbsp; Add Image </v-btn>
@@ -20,9 +20,10 @@
 
 <script>
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemAction from '@/components/ui/AListItemAction.vue';
 
 export default {
-  components: { AListItem },
+  components: { AListItemAction, AListItem },
   data() {
     return {
       activeImage: null,

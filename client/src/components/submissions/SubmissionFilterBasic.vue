@@ -20,11 +20,11 @@
               <span class="font-weight-boldmr-1">{{ filter.value }}</span>
             </div>
           </v-list-item-content>
-          <v-list-item-action @click="remove(i)">
+          <a-list-item-action @click="remove(i)">
             <v-btn icon small>
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
-          </v-list-item-action>
+          </a-list-item-action>
         </a-list-item>
       </v-list>
     </v-card>
@@ -33,9 +33,10 @@
 
 <script>
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemAction from '@/components/ui/AListItemAction.vue';
 
 export default {
-  components: { AListItem },
+  components: { AListItemAction, AListItem },
   props: {
     queryList: {
       type: Array,

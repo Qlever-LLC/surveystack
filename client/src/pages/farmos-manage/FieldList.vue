@@ -9,14 +9,14 @@
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title v-text="field.name"></v-list-item-title>
+          <a-list-item-title v-text="field.name"></a-list-item-title>
         </v-list-item-content>
 
-        <v-list-item-action>
+        <a-list-item-action>
           <v-btn icon>
             <v-icon color="grey lighten-1" @click="remove(field)">mdi-delete</v-icon>
           </v-btn>
-        </v-list-item-action>
+        </a-list-item-action>
       </a-list-item>
     </v-list>
   </v-sheet>
@@ -24,9 +24,11 @@
 
 <script>
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemAction from '@/components/ui/AListItemAction.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
-  components: { AListItem },
+  components: { AListItemTitle, AListItemAction, AListItem },
   props: ['value'],
   methods: {
     remove(e) {

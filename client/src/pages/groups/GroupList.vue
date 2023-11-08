@@ -13,8 +13,8 @@
     >
       <template v-slot:entity="{ entity }">
         <v-list-item-content>
-          <v-list-item-title>{{ entity.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ entity.path }}</v-list-item-subtitle>
+          <a-list-item-title>{{ entity.name }}</a-list-item-title>
+          <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
         </v-list-item-content>
       </template>
     </app-basic-list>
@@ -24,9 +24,13 @@
 <script>
 import api from '@/services/api.service';
 import appBasicList from '@/components/ui/BasicList.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   components: {
+    AListItemSubtitle,
+    AListItemTitle,
     appBasicList,
   },
   data() {

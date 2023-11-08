@@ -10,14 +10,14 @@
       <div v-for="e in entities" :key="e._id">
         <a-list-item :to="`/users/${e._id}`">
           <v-list-item-content>
-            <v-list-item-title>{{ e.email }}</v-list-item-title>
-            <v-list-item-subtitle>{{ e.name }}</v-list-item-subtitle>
+            <a-list-item-title>{{ e.email }}</a-list-item-title>
+            <a-list-item-subtitle>{{ e.name }}</a-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-icon>
+          <a-list-item-icon>
             <v-btn v-if="false" :to="`/users/${e._id}/edit`" text>
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-          </v-list-item-icon>
+          </a-list-item-icon>
         </a-list-item>
         <v-divider />
       </div>
@@ -28,9 +28,12 @@
 <script>
 import api from '@/services/api.service';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemIcon from '@/components/ui/AListItemIcon.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
-  components: { AListItem },
+  components: { AListItemSubtitle, AListItemIcon, AListItemTitle, AListItem },
   data() {
     return {
       entities: [],

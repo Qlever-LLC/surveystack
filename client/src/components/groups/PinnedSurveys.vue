@@ -67,10 +67,10 @@
           <v-list>
             <a-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
               <v-list-item-content>
-                <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
-                <v-list-item-subtitle v-if="searchResult.meta">
+                <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
+                <a-list-item-subtitle v-if="searchResult.meta">
                   last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}
-                </v-list-item-subtitle>
+                </a-list-item-subtitle>
               </v-list-item-content>
             </a-list-item>
           </v-list>
@@ -89,10 +89,14 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
+    AListItemSubtitle,
+    AListItemTitle,
     AListItem,
     draggable,
   },

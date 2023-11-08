@@ -40,7 +40,7 @@
           <v-list class="pa-0 mx-auto" max-width="260">
             <a-list-item @click="startDraft(entity)">
               <v-list-item-content>
-                <v-list-item-title>Start survey</v-list-item-title>
+                <a-list-item-title>Start survey</a-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
                   Start a survey as the user you are signed in with
                 </v-list-item-content>
@@ -48,7 +48,7 @@
             </a-list-item>
             <a-list-item @click="showSelectMember = true">
               <v-list-item-content>
-                <v-list-item-title>Start survey as a member</v-list-item-title>
+                <a-list-item-title>Start survey as a member</a-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
                   Select the member for whom you want to start the survey
                 </v-list-item-content>
@@ -91,6 +91,7 @@ import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
   props: {
@@ -101,6 +102,7 @@ export default {
     },
   },
   components: {
+    AListItemTitle,
     AListItem,
     BtnDropdown,
     MemberSelector,

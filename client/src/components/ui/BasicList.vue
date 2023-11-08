@@ -22,8 +22,8 @@
           <a-list-item two-line :to="link(entity)">
             <slot name="entity" v-bind:entity="entity">
               <v-list-item-content>
-                <v-list-item-title>Title #{{ idx }}</v-list-item-title>
-                <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
+                <a-list-item-title>Title #{{ idx }}</a-list-item-title>
+                <a-list-item-subtitle>Subtitle</a-list-item-subtitle>
               </v-list-item-content>
             </slot>
           </a-list-item>
@@ -38,9 +38,11 @@
 
 <script>
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
-  components: { AListItem },
+  components: { AListItemSubtitle, AListItemTitle, AListItem },
   props: {
     loading: {
       type: Boolean,

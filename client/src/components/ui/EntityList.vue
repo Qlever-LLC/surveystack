@@ -11,8 +11,8 @@
       <div v-for="e in entities" :key="e._id">
         <a-list-item :to="`/${collection}/${e._id}`">
           <v-list-item-content>
-            <v-list-item-title>{{ e.name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ e._id }}</v-list-item-subtitle>
+            <a-list-item-title>{{ e.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ e._id }}</a-list-item-subtitle>
           </v-list-item-content>
         </a-list-item>
         <v-divider />
@@ -23,9 +23,11 @@
 
 <script>
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
-  components: { AListItem },
+  components: { AListItemSubtitle, AListItemTitle, AListItem },
   props: {
     collection: {
       type: String,

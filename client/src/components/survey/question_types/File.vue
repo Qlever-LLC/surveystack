@@ -90,34 +90,34 @@
             <v-icon v-else large>mdi-file-outline</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title
+            <a-list-item-title
               v-if="editIndex !== index"
               :data-test-id="'file_' + index"
               class="text-wrap font-bold"
               v-text="getLabelFromKey(fileResourceKey)"
-            ></v-list-item-title>
-            <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
+            ></a-list-item-title>
+            <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
               <v-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
-            </v-list-item-title>
-            <v-list-item-subtitle v-if="showUploadProgressIndex === index"
+            </a-list-item-title>
+            <a-list-item-subtitle v-if="showUploadProgressIndex === index"
               ><v-progress-linear indeterminate class="mb-0"
-            /></v-list-item-subtitle>
+            /></a-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
+          <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
             <v-btn icon @click="editResourceName(fileResourceKey, index)">
               <v-icon color="grey lighten-1">mdi-pencil</v-icon>
             </v-btn>
-          </v-list-item-action>
-          <v-list-item-action v-if="editIndex === index">
+          </a-list-item-action>
+          <a-list-item-action v-if="editIndex === index">
             <v-btn icon @click="commitResourceName(fileResourceKey, index)">
               <v-icon color="success">mdi-check</v-icon>
             </v-btn>
-          </v-list-item-action>
-          <v-list-item-action>
+          </a-list-item-action>
+          <a-list-item-action>
             <v-btn icon @click="remove(index)">
               <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
             </v-btn>
-          </v-list-item-action>
+          </a-list-item-action>
         </v-list-item>
       </v-list>
     </v-expand-transition>
@@ -132,6 +132,9 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 import { getLabelFromKey } from '@/utils/resources';
+import AListItemAction from '@/components/ui/AListItemAction.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -139,6 +142,9 @@ const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //5
 export default {
   mixins: [baseQuestionComponent],
   components: {
+    AListItemSubtitle,
+    AListItemTitle,
+    AListItemAction,
     appControlLabel,
     appControlMoreInfo,
     appControlHint,

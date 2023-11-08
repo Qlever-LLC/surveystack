@@ -20,12 +20,12 @@
   >
     <template v-slot:item="data" v-if="multiple">
       <v-list-item-content>
-        <v-list-item-title>
+        <a-list-item-title>
           {{ data.item.label }}
           <v-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
           </v-chip>
-        </v-list-item-title>
+        </a-list-item-title>
       </v-list-item-content>
     </template>
   </v-select>
@@ -52,12 +52,12 @@
   >
     <template v-slot:item="data" v-if="multiple">
       <v-list-item-content>
-        <v-list-item-title>
+        <a-list-item-title>
           {{ data.item.label }}
           <v-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
           </v-chip>
-        </v-list-item-title>
+        </a-list-item-title>
       </v-list-item-content>
     </template>
   </v-autocomplete>
@@ -101,10 +101,10 @@
     <template v-slot:no-data>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>
+          <a-list-item-title>
             No values matching "<strong>{{ comboboxSearch }}</strong
             >". Press <kbd>enter</kbd> <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
-          </v-list-item-title>
+          </a-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </template>
@@ -116,8 +116,10 @@ import { isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
+  components: { AListItemTitle },
   props: {
     value: { required: true },
     multiple: { type: Boolean, default: false },

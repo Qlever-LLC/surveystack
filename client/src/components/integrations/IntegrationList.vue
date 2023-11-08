@@ -16,8 +16,8 @@
             :to="`/${integrationType}-integrations/${integration._id}/edit`"
           >
             <v-list-item-content>
-              <v-list-item-title>{{ integration.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ integration.type }}</v-list-item-subtitle>
+              <a-list-item-title>{{ integration.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ integration.type }}</a-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </template>
@@ -28,7 +28,11 @@
 </template>
 
 <script>
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
+
 export default {
+  components: { AListItemSubtitle, AListItemTitle },
   props: {
     entities: {
       type: Array,

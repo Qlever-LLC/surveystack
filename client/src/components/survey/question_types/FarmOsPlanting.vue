@@ -27,7 +27,7 @@
           :disabled="!control.options.hasMultipleSelections && item.value.isField"
         >
           <template v-slot:default="{ active }">
-            <v-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
+            <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
               <v-checkbox
                 v-if="control.options.hasMultipleSelections"
                 :input-value="active"
@@ -37,9 +37,9 @@
               <v-radio-group v-else :value="active">
                 <v-radio :value="true" color="focus" />
               </v-radio-group>
-            </v-list-item-action>
+            </a-list-item-action>
             <v-list-item-content>
-              <v-list-item-title v-html="item.label" />
+              <a-list-item-title v-html="item.label" />
             </v-list-item-content>
           </template>
         </v-list-item>
@@ -52,6 +52,8 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
+import AListItemAction from '@/components/ui/AListItemAction.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
@@ -159,6 +161,7 @@ const transform = (assets) => {
 };
 
 export default {
+  components: { AListItemTitle, AListItemAction },
   mixins: [baseQuestionComponent, farmosBase()],
   data() {
     return {

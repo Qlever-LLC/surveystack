@@ -104,10 +104,10 @@
     <template v-slot:no-data>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>
+          <a-list-item-title>
             No values matching "<strong>{{ comboboxSearch }}</strong
             >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
-          </v-list-item-title>
+          </a-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </template>
@@ -137,7 +137,7 @@
 
     <template v-slot:item="data" v-if="!!header.multiple">
       <v-list-item-content>
-        <v-list-item-title v-html="data.item.label" />
+        <a-list-item-title v-html="data.item.label" />
       </v-list-item-content>
     </template>
     <template v-slot:item="{ item }" v-else>
@@ -165,7 +165,7 @@
 
     <template v-slot:item="data" v-if="!!header.multiple">
       <v-list-item-content>
-        <v-list-item-title v-html="data.item.label" />
+        <a-list-item-title v-html="data.item.label" />
       </v-list-item-content>
     </template>
     <template v-slot:item="{ item }" v-else>
@@ -222,9 +222,11 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
   components: {
+    AListItemTitle,
     appQrScanner,
     MatrixCellSelectionLabel,
   },

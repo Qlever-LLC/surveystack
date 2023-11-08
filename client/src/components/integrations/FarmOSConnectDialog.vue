@@ -30,13 +30,13 @@
 
           <template v-slot:item="{ item }">
             <v-list-item-content style="width: min-content">
-              <v-list-item-title>{{ item.instanceName }}</v-list-item-title>
-              <v-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
-                >owner(s):</v-list-item-subtitle
+              <a-list-item-title>{{ item.instanceName }}</a-list-item-title>
+              <a-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
+                >owner(s):</a-list-item-subtitle
               >
-              <v-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
+              <a-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
                 {{ owner.name }}({{ owner.email }})
-              </v-list-item-subtitle>
+              </a-list-item-subtitle>
             </v-list-item-content>
           </template>
         </v-autocomplete>
@@ -65,8 +65,11 @@
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
+  components: { AListItemSubtitle, AListItemTitle },
   emits: ['connect', 'addExisting', 'create'],
   props: {
     value: Boolean,

@@ -15,15 +15,15 @@
         <v-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
             <a-list-item :to="`/surveys/${e._id}`">
-              <v-list-item-icon>
+              <a-list-item-icon>
                 <v-icon v-if="e.pinned">mdi-pin</v-icon>
-              </v-list-item-icon>
+              </a-list-item-icon>
               <v-list-item-content>
                 <div>
-                  <v-list-item-title>{{ e.name }}</v-list-item-title>
-                  <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
+                  <a-list-item-title>{{ e.name }}</a-list-item-title>
+                  <a-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
                     {{ getGroupName(e.meta.group.id) }}
-                  </v-list-item-subtitle>
+                  </a-list-item-subtitle>
                   <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
                 </div>
               </v-list-item-content>
@@ -44,7 +44,7 @@
           </div>
           <div v-for="(e, i) in surveys.content" :key="e._id">
             <a-list-item :to="`/surveys/${e._id}`">
-              <v-list-item-icon>
+              <a-list-item-icon>
                 <v-icon v-if="e.pinned">mdi-pin</v-icon>
                 <v-btn
                   v-if="e.meta.submissions === 'public' || !e.meta.submissions"
@@ -70,13 +70,13 @@
                 >
                   <v-icon>mdi-account-group</v-icon>
                 </v-btn>
-              </v-list-item-icon>
+              </a-list-item-icon>
               <v-list-item-content>
                 <div>
-                  <v-list-item-title>{{ e.name }}</v-list-item-title>
-                  <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
+                  <a-list-item-title>{{ e.name }}</a-list-item-title>
+                  <a-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                     {{ getGroupName(e.meta.group.id) }}
-                  </v-list-item-subtitle>
+                  </a-list-item-subtitle>
                   <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
                   <br />
                   <small v-if="e.createdAgo" class="grey--text">created {{ e.createdAgo }} ago</small>
@@ -106,11 +106,14 @@ import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemIcon from '@/components/ui/AListItemIcon.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
-  components: { AListItem },
+  components: { AListItemSubtitle, AListItemIcon, AListItemTitle, AListItem },
   data() {
     return {
       selectedGroupIds: [],

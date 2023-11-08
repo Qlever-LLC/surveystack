@@ -35,19 +35,19 @@
                   <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
-                        </v-list-item-title>
-                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-title>
+                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
-                        </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-subtitle>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </v-list-item-subtitle>
+                        </a-list-item-subtitle>
                       </v-card>
                     </v-list-item-content>
-                    <v-list-item-action>
+                    <a-list-item-action>
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                           <v-btn
@@ -61,7 +61,7 @@
                         </template>
                         <span>Upload Submission</span>
                       </v-tooltip>
-                    </v-list-item-action>
+                    </a-list-item-action>
                   </a-list-item>
                 </template>
 
@@ -83,16 +83,16 @@
                   <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
-                        </v-list-item-title>
-                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-title>
+                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
-                        </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-subtitle>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </v-list-item-subtitle>
+                        </a-list-item-subtitle>
                       </v-card>
                     </v-list-item-content>
                   </a-list-item>
@@ -154,12 +154,18 @@ import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemAction from '@/components/ui/AListItemAction.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   mixins: [ResultMixin],
   components: {
+    AListItemSubtitle,
+    AListItemTitle,
+    AListItemAction,
     AListItem,
     ConfirmSubmissionDialog,
     SubmittingDialog,

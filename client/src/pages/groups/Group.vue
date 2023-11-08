@@ -34,8 +34,8 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.path }}</v-list-item-subtitle>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>
@@ -52,8 +52,8 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity._id }}</v-list-item-subtitle>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity._id }}</a-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>
@@ -72,10 +72,14 @@
 import api from '@/services/api.service';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   name: 'Group',
   components: {
+    AListItemSubtitle,
+    AListItemTitle,
     appGroupBreadcrumbs,
     appBasicList,
   },

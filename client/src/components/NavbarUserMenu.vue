@@ -15,26 +15,26 @@
       </template>
       <v-list flat>
         <a-list-item link :to="{ name: 'auth-profile' }">
-          <v-list-item-icon>
+          <a-list-item-icon>
             <v-icon>mdi-account-circle</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Profile </v-list-item-title>
+          </a-list-item-icon>
+          <a-list-item-title> Profile </a-list-item-title>
         </a-list-item>
         <a-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
-          <v-list-item-icon>
+          <a-list-item-icon>
             <v-icon>mdi-leaf-circle-outline</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> FarmOS Profile </v-list-item-title>
+          </a-list-item-icon>
+          <a-list-item-title> FarmOS Profile </a-list-item-title>
         </a-list-item>
         <v-divider />
         <v-subheader>Active Group</v-subheader>
         <active-group-selector-list v-model="activeGroup" />
         <v-divider />
         <a-list-item link @click="logout" class="mt-2">
-          <v-list-item-icon>
+          <a-list-item-icon>
             <v-icon>mdi-logout-variant</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Sign Out </v-list-item-title>
+          </a-list-item-icon>
+          <a-list-item-title> Sign Out </a-list-item-title>
         </a-list-item>
       </v-list>
 
@@ -53,9 +53,13 @@
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
 import api from '@/services/api.service';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItemIcon from '@/components/ui/AListItemIcon.vue';
 
 export default {
   components: {
+    AListItemIcon,
+    AListItemTitle,
     AListItem,
     ActiveGroupSelectorList,
   },

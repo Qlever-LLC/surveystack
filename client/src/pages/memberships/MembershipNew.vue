@@ -64,7 +64,7 @@
               <v-list-item-group v-model="invitationMethod">
                 <a-list-item two-line :value="INVITATION_METHODS.INVITE">
                   <v-list-item-content>
-                    <v-list-item-title>Invite Member</v-list-item-title>
+                    <a-list-item-title>Invite Member</a-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
                       Send them an email to agree to join your group. They only join once they click the "Join" link in
                       the email.
@@ -74,7 +74,7 @@
 
                 <a-list-item three-line :value="INVITATION_METHODS.ADD">
                   <v-list-item-content>
-                    <v-list-item-title>Add Member</v-list-item-title>
+                    <a-list-item-title>Add Member</a-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
                       The member joins immediately. An email is still sent informing them they are joined. This is
                       useful when using "Call for Submissions" to send this member survey requests without waiting for
@@ -113,6 +113,7 @@ import EmailValidator from 'email-validator';
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
 import AListItem from '@/components/ui/AListItem.vue';
+import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -129,7 +130,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { AListItem, BtnDropdown },
+  components: { AListItemTitle, AListItem, BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',
