@@ -8,7 +8,7 @@
       <v-list-item-group :value="activeItem" color="primary" mandatory>
         <a-list-item
           v-for="(item, i) in groupItems"
-          :key="item.text"
+          :key="item.value"
           @click="() => handleInput(item.value)"
           :value="i"
           color="focus"
