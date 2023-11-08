@@ -10,16 +10,16 @@
       </v-row>
       <v-row class="d-flex flex-grow-1">
         <a-tabs v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
-          <v-tab href="#drafts" class="background">
+          <a-tab href="#drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
               <v-icon class="mr-2">mdi-file-document-edit</v-icon>Drafts
             </span>
-          </v-tab>
-          <v-tab href="#sent" class="background">
+          </a-tab>
+          <a-tab href="#sent" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
               <v-icon class="mr-2">mdi-email-check</v-icon>Sent
             </span>
-          </v-tab>
+          </a-tab>
         </a-tabs>
         <v-tabs-items v-model="activeTab" class="flex-grow-1" v-if="!isLoading">
           <v-tab-item
@@ -154,6 +154,7 @@ import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import ATabs from '@/components/ui/ATabs.vue';
+import ATab from '@/components/ui/ATab.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -164,6 +165,7 @@ export default {
     SubmittingDialog,
     ResultDialog,
     ATabs,
+    ATab,
   },
   watch: {
     activeSubmissionId(id) {

@@ -9,7 +9,7 @@
     }}</v-alert>
 
     <a-tabs v-model="tab" background-color="transparent" color="basil" grow>
-      <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
+      <a-tab v-for="item in items" :key="item.name">{{ item.name }}</a-tab>
     </a-tabs>
 
     <v-tabs-items v-model="tab">
@@ -50,10 +50,12 @@ import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 import ATabs from '@/components/ui/ATabs.vue';
+import ATab from '@/components/ui/ATab.vue';
 
 export default {
   components: {
     ATabs,
+    ATab,
   },
   data() {
     return {

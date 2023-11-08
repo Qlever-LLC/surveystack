@@ -139,14 +139,14 @@
           <pane size="80">
             <div style="height: 100%">
               <a-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
-                <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
-                <v-tab :disabled="!control.options.initialize.enabled"> Initialize</v-tab>
-                <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
-                <v-tab :disabled="!control.options.constraint.enabled"> Constraint</v-tab>
-                <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
+                <a-tab :disabled="!control.options.relevance.enabled"> Relevance</a-tab>
+                <a-tab :disabled="!control.options.initialize.enabled"> Initialize</a-tab>
+                <a-tab :disabled="!control.options.calculate.enabled"> Calculate</a-tab>
+                <a-tab :disabled="!control.options.constraint.enabled"> Constraint</a-tab>
+                <a-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
-                </v-tab>
-                <v-tab v-if="control.type === 'script'"> Script</v-tab>
+                </a-tab>
+                <a-tab v-if="control.type === 'script'"> Script</a-tab>
               </a-tabs>
 
               <code-editor
@@ -275,6 +275,7 @@ import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
 import ATabs from '@/components/ui/ATabs.vue';
+import ATab from '@/components/ui/ATab.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -324,6 +325,7 @@ export default {
     // ConfirmLeaveDialog,
     appExamplesView,
     ATabs,
+    ATab,
   },
   props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {
