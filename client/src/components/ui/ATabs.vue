@@ -1,7 +1,6 @@
 <template>
   <v-tabs
-    @change="$emit('change', $event)"
-    @input="$emit('input', $event)"
+    @change="handleCustomChange"
     :background-color="backgroundColor"
     :centered="centered"
     :color="color"
@@ -28,6 +27,13 @@ export default {
     grow: { type: Boolean, required: false },
     iconsAndText: { type: Boolean, required: false },
     value: { type: undefined, required: false },
+  },
+  methods: {
+    handleCustomChange(event) {
+      // @change emits input for v-model case
+      this.$emit('input', event);
+      this.$emit('change', event);
+    },
   },
 };
 </script>
