@@ -28,7 +28,7 @@
     </app-dialog>
 
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="entity.path" />
+      <a-breadcrumbs :path="entity.path" />
     </div>
 
     <div class="d-flex justify-space-between">
@@ -196,7 +196,7 @@ import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+import ABreadcrumbs from '@/components/ui/ABreadcrumbs.vue';
 import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
 import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
@@ -222,7 +222,7 @@ export default {
     appDocLinks,
     appBasicList,
     appDialog,
-    appGroupBreadcrumbs,
+    ABreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
   },

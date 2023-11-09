@@ -1,7 +1,7 @@
 <template>
   <v-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="entity.path" />
+      <a-breadcrumbs :path="entity.path" />
 
       <div v-if="editable">
         <v-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
@@ -70,13 +70,13 @@
 
 <script>
 import api from '@/services/api.service';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+import ABreadcrumbs from '@/components/ui/ABreadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   name: 'Group',
   components: {
-    appGroupBreadcrumbs,
+    ABreadcrumbs,
     appBasicList,
   },
   data() {
