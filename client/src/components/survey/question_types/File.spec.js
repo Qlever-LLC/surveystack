@@ -50,7 +50,9 @@ describe('File question', () => {
       const wrapper = mount(FileComp, getMountOpts({ value }));
       value.forEach((key, index) => {
         const input = wrapper.find('[data-test-id="file_' + index + '"]');
-        expect(input.vnode.data.domProps.textContent).toContain(key.substring(key.lastIndexOf('/') + 1, key.length));
+        expect(input.vnode.parent.data.domProps.textContent).toContain(
+          key.substring(key.lastIndexOf('/') + 1, key.length)
+        );
       });
     };
 
