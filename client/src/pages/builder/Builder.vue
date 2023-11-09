@@ -79,10 +79,10 @@
       @reload-survey="onReloadSurvey"
     />
 
-    <v-snackbar v-model="showSnackbar" :timeout="4000">
+    <a-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
       <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
-    </v-snackbar>
+    </a-snackbar>
   </div>
   <div
     v-else
@@ -117,6 +117,7 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import ASnackbar from '@/components/ui/ASnackbar.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -126,6 +127,7 @@ export default {
     SurveyBuilder,
     appDialog,
     resultDialog,
+    ASnackbar,
   },
   mixins: [resultMixin],
   data() {

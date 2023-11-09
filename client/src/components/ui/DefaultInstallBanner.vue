@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
+  <a-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" fixed bottom>
     <v-btn @click="handleClose" icon class="close-button">
       <v-icon>mdi-close</v-icon>
     </v-btn>
@@ -12,11 +12,15 @@
         </v-btn>
       </div>
     </div>
-  </v-snackbar>
+  </a-snackbar>
 </template>
 
 <script>
+import ASnackbar from '@/components/ui/ASnackbar.vue';
 export default {
+  components: {
+    ASnackbar,
+  },
   data() {
     return {
       showDefaultInstall: false,
