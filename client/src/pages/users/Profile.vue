@@ -24,7 +24,7 @@
         <v-card-text>
           <v-form>
             <v-card-text>
-              <v-row>
+              <a-row>
                 <div class="text-h6">{{ email }}</div>
                 <v-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
@@ -44,9 +44,9 @@
                       </v-btn>
                     </v-card-actions>
                   </v-card>
-                </v-dialog></v-row
-              ></v-card-text
-            >
+                </v-dialog>
+              </a-row>
+            </v-card-text>
             <v-text-field tabindex="2" v-model="name" label="Name" />
             <v-text-field
               tabindex="3"
@@ -124,6 +124,7 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import ARow from '@/components/ui/ARow.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -139,6 +140,7 @@ export default {
   components: {
     appFeedback,
     ActiveGroupSelector,
+    ARow,
   },
   data() {
     return {

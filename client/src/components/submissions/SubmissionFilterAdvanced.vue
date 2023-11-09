@@ -2,7 +2,7 @@
   <div>
     <v-form class="d-flex flex-column">
       <v-textarea v-model="value.match" outlined label="Match" rows="3" />
-      <v-row>
+      <a-row>
         <v-col>
           <v-text-field v-model="value.sort" label="Sort" dense />
         </v-col>
@@ -15,25 +15,25 @@
         <v-col cols="2">
           <v-text-field v-model.number="value.limit" label="Limit" dense />
         </v-col>
-      </v-row>
+      </a-row>
 
-      <v-row dense>
+      <a-row dense>
         <v-col>
           <v-checkbox label="Show irrelevant fields" v-model="value.showIrrelevant" class="my-0" hide-details />
         </v-col>
-      </v-row>
+      </a-row>
 
-      <v-row dense>
+      <a-row dense>
         <v-col>
           <v-checkbox label="Show data meta (CSV)" v-model="value.showCsvDataMeta" class="my-0" hide-details />
         </v-col>
-      </v-row>
+      </a-row>
 
-      <v-row v-if="showRolesDebug">
+      <a-row v-if="showRolesDebug">
         <v-col cols="6">
           <v-text-field v-model.number="value.roles" label="Roles (Debug)" dense />
         </v-col>
-      </v-row>
+      </a-row>
 
       <div class="d-flex justify-end">
         <v-btn class="ma-2" @click="$emit('show-advanced', false)" text>Basic</v-btn>
@@ -47,7 +47,11 @@
 </template>
 
 <script>
+import ARow from '@/components/ui/ARow.vue';
 export default {
+  components: {
+    ARow,
+  },
   props: {
     value: {
       type: Object,

@@ -99,9 +99,9 @@
                     {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
                   </v-btn>
                 </v-col>
-                <v-row align="center" class="my-5">
+                <a-row align="center" class="my-5">
                   <v-divider></v-divider><span class="mx-2">or</span><v-divider></v-divider
-                ></v-row>
+                ></a-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 
@@ -136,8 +136,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ARow from '@/components/ui/ARow.vue';
 
 export default {
+  components: {
+    ARow,
+  },
   props: {
     groupId: String,
   },

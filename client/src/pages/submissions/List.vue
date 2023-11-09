@@ -97,7 +97,7 @@
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
         </v-card-text>
         <v-card-text>
-          <v-row>
+          <a-row>
             <v-col md="2" sm="6">
               <v-select
                 label="Format"
@@ -118,10 +118,10 @@
               /> </v-col
             ><v-col md="2" sm="6">
               <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
-            </v-col></v-row
+            </v-col></a-row
           >
 
-          <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
+          <a-row class="mt-5" v-if="apiDownloadRange === 'page'">
             <v-col sm="2">
               <v-select
                 label="Page Size"
@@ -140,7 +140,7 @@
                 {{ submissions.pagination.total }} total
               </div>
             </v-col>
-          </v-row>
+          </a-row>
         </v-card-text>
       </v-card>
     </v-container>
@@ -181,7 +181,7 @@
         </v-tabs-items>
       </v-tabs>
 
-      <v-row class="my-2">
+      <a-row class="my-2">
         <v-col cols="1">
           <v-select
             style="max-width: 5rem; display: inline-block"
@@ -201,7 +201,7 @@
             {{ submissions.pagination.total }} total
           </div>
         </v-col>
-      </v-row>
+      </a-row>
     </v-container>
   </div>
 </template>
@@ -223,6 +223,7 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import ARow from '@/components/ui/ARow.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -264,6 +265,7 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
+    ARow,
   },
   data() {
     return {

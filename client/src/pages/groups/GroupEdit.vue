@@ -99,7 +99,7 @@
       </v-card-text>
     </v-card>
 
-    <v-row>
+    <a-row>
       <v-col cols="12" lg="12">
         <app-basic-list
           maxHeight="500px"
@@ -131,7 +131,7 @@
               <v-list-item-subtitle>{{ entity.user.email }}</v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
-              <v-row style="gap: 12px">
+              <a-row cssGap12px>
                 <app-confirm-membership-button
                   v-if="entity.meta && entity.meta.status === 'pending'"
                   :membershipId="entity._id"
@@ -147,14 +147,14 @@
                   @updated="loadHyloGroup"
                 />
                 <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
-              </v-row>
+              </a-row>
             </v-list-item-action>
           </template>
         </app-basic-list>
       </v-col>
-    </v-row>
+    </a-row>
 
-    <v-row>
+    <a-row>
       <v-col cols="12" lg="12">
         <app-basic-list
           class="mb-4"
@@ -171,9 +171,9 @@
           </template>
         </app-basic-list>
       </v-col>
-    </v-row>
+    </a-row>
 
-    <v-row>
+    <a-row>
       <v-col cols="12" lg="12">
         <app-pinned-surveys
           class="mb-4"
@@ -184,7 +184,7 @@
         >
         </app-pinned-surveys>
       </v-col>
-    </v-row>
+    </a-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
   </v-container>
@@ -202,6 +202,7 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+import ARow from '@/components/ui/ARow.vue';
 
 const integrations = [
   {
@@ -225,6 +226,7 @@ export default {
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
+    ARow,
   },
   data() {
     return {

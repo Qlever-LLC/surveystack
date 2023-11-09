@@ -4,7 +4,7 @@
     :data-testid="`diff-card-${diffInfo.indexPath}-${diffInfo.changeType}`"
   >
     <button @click="isOpen = !isOpen" :disabled="!haveChangeDetails">
-      <v-row>
+      <a-row>
         <control-card-header
           :index="diffInfo.indexPath"
           :title="diffInfo.label"
@@ -19,7 +19,7 @@
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
         </v-icon>
-      </v-row>
+      </a-row>
     </button>
     <v-simple-table v-if="isOpen" fixed-header dense class="mb-4">
       <template v-slot:default>
@@ -89,11 +89,13 @@
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
+import ARow from '@/components/ui/ARow.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
     ControlCardHeader,
+    ARow,
   },
   data() {
     return {

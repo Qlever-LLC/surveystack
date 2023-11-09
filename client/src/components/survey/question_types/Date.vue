@@ -9,7 +9,7 @@
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
-    <v-row>
+    <a-row>
       <div :class="{ 'mx-auto': centered }">
         <v-date-picker
           v-if="control.options.subtype !== 'date-year'"
@@ -60,7 +60,7 @@
           />
         </v-menu>
       </div>
-    </v-row>
+    </a-row>
 
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -68,9 +68,13 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import ARow from '@/components/ui/ARow.vue';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    ARow,
+  },
   props: { centered: { type: Boolean, default: true } },
   data() {
     return {

@@ -23,7 +23,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat class="my-5">
-          <v-row>
+          <a-row>
             <v-col>
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
@@ -93,7 +93,7 @@
                 </div>
               </div>
             </v-col>
-          </v-row>
+          </a-row>
         </v-toolbar>
       </template>
 
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import ARow from '@/components/ui/ARow.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -273,6 +274,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 export default {
   components: {
     SubmissionTableCellModal,
+    ARow,
   },
   props: {
     actionsAreDisabled: {

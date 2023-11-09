@@ -1,7 +1,7 @@
 <template>
   <v-card style="height: 90vh" color="grey darken-3">
     <v-container>
-      <v-row dark>
+      <a-row>
         <v-spacer></v-spacer>
         <v-autocomplete
           style="max-width: 800px"
@@ -16,7 +16,7 @@
         >
         </v-autocomplete>
         <v-btn outlined class="ma-2" dark color="white" text @click="close"> Close </v-btn>
-      </v-row>
+      </a-row>
       <div style="width: 100%; height: 80vh">
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>
       </div>
@@ -26,6 +26,7 @@
 
 <script>
 import appCodeView from '@/components/builder/CodeView.vue';
+import ARow from '@/components/ui/ARow.vue';
 
 const reg = /.*\/(.*?)$/;
 
@@ -40,6 +41,7 @@ const examples = req.keys().map((key) => ({
 export default {
   components: {
     appCodeView,
+    ARow,
   },
   props: ['category'],
   data() {

@@ -17,7 +17,7 @@
       <v-progress-circular :size="50" color="primary" indeterminate />
     </v-container>
     <v-container fluid class="pa-0" v-else>
-      <v-row dense>
+      <a-row dense>
         <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
             @click="toggleCard(c._id)"
@@ -25,7 +25,7 @@
             class="control-item mb-2"
             elevation="7"
           >
-            <v-row style="min-height: 96px">
+            <a-row cssMinHeight96px>
               <v-col :style="{ minWidth: '0px' }">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
@@ -89,8 +89,8 @@
                   </v-tooltip>
                 </div>
               </v-col>
-            </v-row>
-            <v-row v-if="selectedSurvey && selectedSurvey._id === c._id">
+            </a-row>
+            <a-row v-if="selectedSurvey && selectedSurvey._id === c._id">
               <v-col>
                 <h4>Description</h4>
                 <small v-html="selectedSurvey.meta.libraryDescription"></small>
@@ -114,10 +114,10 @@
                   :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
                 />
               </v-col>
-            </v-row>
+            </a-row>
           </v-card>
         </v-col>
-      </v-row>
+      </a-row>
     </v-container>
     <v-pagination
       v-if="surveys.content.length > 0 && !selectedSurvey"
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import ARow from '@/components/ui/ARow.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    ARow,
   },
   props: ['survey', 'libraryId'],
   data() {

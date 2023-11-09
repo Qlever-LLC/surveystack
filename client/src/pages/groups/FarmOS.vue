@@ -110,12 +110,12 @@
     <div class="d-flex justify-space-between align-center">
       <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-row v-if="loading">
+    <a-row v-if="loading">
       <v-col>
         <v-progress-linear indeterminate class="mb-0" />
       </v-col>
-    </v-row>
-    <v-row v-else>
+    </a-row>
+    <a-row v-else>
       <v-col lg="4" class="mx-auto">
         <v-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
@@ -131,7 +131,7 @@
           >
         </v-card>
       </v-col>
-    </v-row>
+    </a-row>
   </v-container>
 </template>
 
@@ -146,6 +146,7 @@ import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemove
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
+import ARow from '@/components/ui/ARow.vue';
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
     FarmOSRemoveNoteDialog,
     appDialog,
     appGroupBreadcrumbs,
+    ARow,
   },
   computed: {
     superAdmin() {

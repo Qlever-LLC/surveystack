@@ -1,14 +1,14 @@
 <template>
   <div class="background wrapper">
     <v-container>
-      <v-row class="my-2">
+      <a-row class="my-2">
         <v-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
           <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
         </v-btn>
-      </v-row>
-      <v-row class="d-flex flex-grow-1">
+      </a-row>
+      <a-row class="d-flex flex-grow-1">
         <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
           <v-tab href="#drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
@@ -71,11 +71,11 @@
                 </v-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
-                <v-row align="center" justify="center">
+                <a-row align="center" justify="center">
                   <v-col>
                     <v-alert color="primary" class="black-text" text>No Drafts</v-alert>
                   </v-col>
-                </v-row>
+                </a-row>
               </div>
 
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
@@ -105,11 +105,11 @@
                 />
               </template>
               <div v-else>
-                <v-row align="center" justify="center">
+                <a-row align="center" justify="center">
                   <v-col>
                     <v-alert color="primary" class="black-text" text>No Submissions</v-alert>
                   </v-col>
-                </v-row>
+                </a-row>
               </div>
             </v-card>
           </v-tab-item>
@@ -119,7 +119,7 @@
             <v-progress-circular :size="50" color="primary" indeterminate />
           </v-card-text>
         </v-card>
-      </v-row>
+      </a-row>
       <confirm-submission-dialog
         ref="confirm-submission-dialog"
         v-if="confirmSubmissionIsVisible"
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import ARow from '@/components/ui/ARow.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    ARow,
   },
   watch: {
     activeSubmissionId(id) {

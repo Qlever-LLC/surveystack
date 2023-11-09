@@ -12,7 +12,7 @@
       >
         <template v-slot:top>
           <v-toolbar flat>
-            <v-row>
+            <a-row>
               <v-col>
                 <v-toolbar-title>Simple CSV</v-toolbar-title>
               </v-col>
@@ -22,7 +22,7 @@
               <v-col :cols="2">
                 <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
               </v-col>
-            </v-row>
+            </a-row>
           </v-toolbar>
         </template>
         <template v-slot:header="{ props: { headers } }">
@@ -42,8 +42,12 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
+import ARow from '@/components/ui/ARow.vue';
 
 export default {
+  components: {
+    ARow,
+  },
   data() {
     return {
       excludeMeta: true,

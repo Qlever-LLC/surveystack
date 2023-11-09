@@ -11,7 +11,7 @@
       ></v-progress-circular>
     </div>
 
-    <v-row class="align-baseline">
+    <a-row class="align-baseline">
       <v-col>
         <v-text-field outlined primary label="New Plan Name" v-model.trim="planName"></v-text-field>
       </v-col>
@@ -21,7 +21,7 @@
       <v-col>
         <v-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</v-btn>
       </v-col>
-    </v-row>
+    </a-row>
 
     <v-divider class="my-4"></v-divider>
 
@@ -49,7 +49,11 @@
 </template>
 
 <script>
+import ARow from '@/components/ui/ARow.vue';
 export default {
+  components: {
+    ARow,
+  },
   props: ['viewModel', 'loading'],
   data() {
     return {

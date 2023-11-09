@@ -104,7 +104,7 @@
     </v-sheet>
   </div>
   <v-alert v-else border="left" prominent text type="error">
-    <v-row align="center">
+    <a-row align="center">
       <v-col class="grow">
         This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
         editor.
@@ -112,7 +112,7 @@
       <v-col class="shrink">
         <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
       </v-col>
-    </v-row>
+    </a-row>
   </v-alert>
 </template>
 
@@ -122,6 +122,7 @@ import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
+import ARow from '@/components/ui/ARow.vue';
 
 import { queueAction } from '@/utils/surveyStack';
 
@@ -132,6 +133,7 @@ export default {
     appDraftOverview,
     appDraftToolbar,
     appConfirmSubmissionDialog,
+    ARow,
   },
   props: {
     survey: { type: Object },
