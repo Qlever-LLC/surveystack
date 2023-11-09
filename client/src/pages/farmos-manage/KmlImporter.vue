@@ -1,5 +1,5 @@
 <template>
-  <v-sheet outlined class="pa-8">
+  <a-sheet outlined class="pa-8">
     <div class="display-1">
       KML Importer
       <app-tooltip
@@ -26,17 +26,19 @@
         <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
       </v-row>
     </template>
-  </v-sheet>
+  </a-sheet>
 </template>
 <script>
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
 import appTooltip from '@/components/ui/Tooltip.vue';
+import ASheet from '@/components/ui/ASheet.vue';
 
 export default {
   components: {
     appTooltip,
+    ASheet,
   },
   props: ['value'],
   data() {

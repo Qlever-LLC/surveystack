@@ -1,5 +1,5 @@
 <template>
-  <v-sheet outlined>
+  <a-sheet outlined>
     <v-list subheader>
       <v-subheader>Fields added to Farmos Instance</v-subheader>
 
@@ -19,11 +19,15 @@
         </v-list-item-action>
       </v-list-item>
     </v-list>
-  </v-sheet>
+  </a-sheet>
 </template>
 
 <script>
+import ASheet from '@/components/ui/ASheet.vue';
 export default {
+  components: {
+    ASheet,
+  },
   props: ['value'],
   methods: {
     remove(e) {

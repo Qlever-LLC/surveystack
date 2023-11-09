@@ -79,7 +79,7 @@
     />
   </div>
   <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
-    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
+    <a-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
       <div class="text-body-1 my-4 text-center">
         Click on the
         <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
@@ -101,7 +101,7 @@
         </v-btn>
         to allow users to submit to your survey
       </div>
-    </v-sheet>
+    </a-sheet>
   </div>
   <v-alert v-else border="left" prominent text type="error">
     <v-row align="center">
@@ -122,6 +122,7 @@ import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
+import ASheet from '@/components/ui/ASheet.vue';
 
 import { queueAction } from '@/utils/surveyStack';
 
@@ -132,6 +133,7 @@ export default {
     appDraftOverview,
     appDraftToolbar,
     appConfirmSubmissionDialog,
+    ASheet,
   },
   props: {
     survey: { type: Object },
