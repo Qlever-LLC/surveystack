@@ -2,7 +2,7 @@
   <nav class="app-navbar">
     <navbar-drawer v-model="drawerIsVisible" />
     <a-app-bar app clipped-left color="appbar" absolute>
-      <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
+      <a-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <v-toolbar-title class="flex-column flex-grow-1">
         <draft-toolbar
           :groupPath="groupPath"
@@ -24,6 +24,7 @@ import DraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import AAppBar from '@/components/ui/AAppBar.vue';
+import AAppBarNavIcon from '@/components/ui/AAppBarNavIcon.vue';
 
 import { queueAction } from '@/utils/surveyStack';
 
@@ -33,6 +34,7 @@ export default {
     NavbarDrawer,
     NavbarUserMenu,
     AAppBar,
+    AAppBarNavIcon,
   },
   computed: {
     drawerIsVisible: {
