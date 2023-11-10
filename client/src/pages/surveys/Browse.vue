@@ -88,7 +88,7 @@
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </v-card-text>
         <v-card-actions>
-          <v-pagination
+          <a-pagination
             v-if="surveys.content.length > 0"
             v-model="page"
             :length="activeTabPaginationLength"
@@ -105,10 +105,14 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
+import APagination from '@/components/ui/APagination.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  components: {
+    APagination,
+  },
   data() {
     return {
       selectedGroupIds: [],

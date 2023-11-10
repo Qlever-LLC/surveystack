@@ -67,7 +67,7 @@
 
                 <v-spacer class="flex-grow-1" />
                 <v-card-actions>
-                  <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
+                  <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
@@ -97,7 +97,7 @@
                     </v-list-item-content>
                   </v-list-item>
                 </template>
-                <v-pagination
+                <a-pagination
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import APagination from '@/components/ui/APagination.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    APagination,
   },
   watch: {
     activeSubmissionId(id) {
