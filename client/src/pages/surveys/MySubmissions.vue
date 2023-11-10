@@ -29,12 +29,12 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
           >
             <!-- -->
-            <v-card class="d-flex flex-column justify-space-between background">
+            <a-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <template v-for="(item, i) in activeTabPageContent">
                   <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <v-card :elevation="3" class="py-3 px-4">
+                      <a-card :elevation="3" class="py-3 px-4">
                         <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
                         </v-list-item-title>
@@ -45,7 +45,7 @@
                         <v-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
-                      </v-card>
+                      </a-card>
                     </v-list-item-content>
                     <v-list-item-action>
                       <v-tooltip bottom>
@@ -82,7 +82,7 @@
                 <template v-for="(item, i) in tab.content">
                   <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <v-card :elevation="3" class="py-3 px-4">
+                      <a-card :elevation="3" class="py-3 px-4">
                         <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
                         </v-list-item-title>
@@ -93,7 +93,7 @@
                         <v-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
-                      </v-card>
+                      </a-card>
                     </v-list-item-content>
                   </v-list-item>
                 </template>
@@ -111,14 +111,14 @@
                   </v-col>
                 </v-row>
               </div>
-            </v-card>
+            </a-card>
           </v-tab-item>
         </v-tabs-items>
-        <v-card v-else>
+        <a-card v-else>
           <v-card-text class="d-flex align-center justify-center">
             <v-progress-circular :size="50" color="primary" indeterminate />
           </v-card-text>
-        </v-card>
+        </a-card>
       </v-row>
       <confirm-submission-dialog
         ref="confirm-submission-dialog"
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import ACard from '@/components/ui/ACard.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    ACard,
   },
   watch: {
     activeSubmissionId(id) {

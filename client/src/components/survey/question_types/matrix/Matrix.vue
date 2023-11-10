@@ -39,7 +39,7 @@
       max-width="800px"
     >
       <div style="background: #1867c0; padding: 4px 0px">
-        <v-card>
+        <a-card>
           <v-card-title>
             <v-btn @click="duplicateRow(editedIndex)" text color="primary">
               <v-icon left>mdi-content-copy</v-icon>Duplicate
@@ -75,7 +75,7 @@
               Close <v-icon right>mdi-close</v-icon>
             </v-btn>
           </v-card-actions>
-        </v-card>
+        </a-card>
       </div>
     </v-dialog>
     <app-control-label
@@ -156,6 +156,7 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import ACard from '@/components/ui/ACard.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -270,6 +271,7 @@ export default {
     appMatrixTable,
     appRequired,
     appRedacted,
+    ACard,
   },
   data() {
     return {

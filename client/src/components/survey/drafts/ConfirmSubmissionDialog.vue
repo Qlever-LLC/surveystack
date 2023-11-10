@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
-    <v-card>
+    <a-card>
       <v-card-title> Confirm Submission </v-card-title>
       <v-card-text v-if="!groupChangeAllowed"> Submit Survey </v-card-text>
       <v-card-text v-else>
@@ -32,13 +32,14 @@
         <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
         <v-btn text color="primary" @click.stop="handleConfirm"> Submit </v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   data() {
@@ -76,6 +77,7 @@ export default {
   },
   components: {
     ActiveGroupSelector,
+    ACard,
   },
   created() {
     if (this.groupId) {

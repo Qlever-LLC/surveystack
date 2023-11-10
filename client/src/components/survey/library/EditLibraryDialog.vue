@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
-    <v-card>
+    <a-card>
       <v-card-title> Add Survey To Library </v-card-title>
       <v-card-text>
         <v-text-field :value="localLibrarySurvey.name" label="Title" readonly />
@@ -27,17 +27,18 @@
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 <script>
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor },
+  components: { LibraryChangeTypeSelector, TipTapEditor, ACard },
   props: {
     value: {
       type: Boolean,

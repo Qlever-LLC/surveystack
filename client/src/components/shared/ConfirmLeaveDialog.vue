@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="isVisible" persistent width="300">
-    <v-card>
+    <a-card>
       <v-card-title>
         {{ title }}
       </v-card-title>
@@ -14,14 +14,18 @@
           {{ confirmText }}
         </v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
+  components: {
+    ACard,
+  },
   data() {
     return {
       isVisible: false,

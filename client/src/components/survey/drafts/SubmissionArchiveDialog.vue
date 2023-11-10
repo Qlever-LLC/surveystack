@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="persistent">
-    <v-card>
+    <a-card>
       <v-card-title class="headline">
         <slot name="title">{{ title }}</slot>
       </v-card-title>
@@ -20,12 +20,16 @@
         <v-btn text @click="$emit('cancel')">Cancel</v-btn>
         <v-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 export default {
+  components: {
+    ACard,
+  },
   props: {
     persistent: Boolean,
     value: Boolean,

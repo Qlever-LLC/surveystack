@@ -45,12 +45,12 @@
     </app-dialog>
 
     <v-dialog v-model="submitting" hide-overlay persistent width="300">
-      <v-card>
+      <a-card>
         <v-card-text class="pa-4">
           <span>Submitting Builder</span>
           <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
         </v-card-text>
-      </v-card>
+      </a-card>
     </v-dialog>
 
     <result-dialog
@@ -89,7 +89,7 @@
     class="d-flex justify-center align-center overlay-bg"
     style="background: rgba(0, 0, 0, 0.45); height: 100%"
   >
-    <v-card max-width="500">
+    <a-card max-width="500">
       <v-card-title>
         <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
         Unsupported browser
@@ -101,7 +101,7 @@
         Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
         browser.
       </v-card-text>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
@@ -117,6 +117,7 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import ACard from '@/components/ui/ACard.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -126,6 +127,7 @@ export default {
     SurveyBuilder,
     appDialog,
     resultDialog,
+    ACard,
   },
   mixins: [resultMixin],
   data() {

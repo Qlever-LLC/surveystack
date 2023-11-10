@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card class="pa-6 pa-sm-12">
+    <a-card class="pa-6 pa-sm-12">
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
       <v-form>
@@ -41,7 +41,7 @@
       >
 
       <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
-    </v-card>
+    </a-card>
   </v-container>
 </template>
 
@@ -49,6 +49,7 @@
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import ACard from '@/components/ui/ACard.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -57,6 +58,9 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
+  components: {
+    ACard,
+  },
   data() {
     return {
       status: '',

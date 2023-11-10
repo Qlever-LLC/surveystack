@@ -48,7 +48,7 @@
         <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
       </v-btn>
     </div>
-    <v-card :loading="isLoadingGroup" class="mb-4">
+    <a-card :loading="isLoadingGroup" class="mb-4">
       <v-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
           <v-text-field
@@ -97,7 +97,7 @@
           </div>
         </form>
       </v-card-text>
-    </v-card>
+    </a-card>
 
     <v-row>
       <v-col cols="12" lg="12">
@@ -202,6 +202,7 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+import ACard from '@/components/ui/ACard.vue';
 
 const integrations = [
   {
@@ -225,6 +226,7 @@ export default {
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
+    ACard,
   },
   data() {
     return {

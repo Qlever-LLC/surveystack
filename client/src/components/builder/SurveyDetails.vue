@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <a-card>
     <v-card-title class="d-block pb-0">
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
@@ -10,7 +10,7 @@
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </template>
-          <v-card>
+          <a-card>
             <v-card-title> Edit Survey Details</v-card-title>
             <v-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
@@ -26,7 +26,7 @@
               <v-spacer />
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
-          </v-card>
+          </a-card>
         </v-dialog>
         <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
@@ -34,7 +34,7 @@
               <v-icon>mdi-dresser</v-icon>
             </v-btn>
           </template>
-          <v-card>
+          <a-card>
             <v-card-title> Survey Resources</v-card-title>
             <v-card-text>
               <app-resources
@@ -46,7 +46,7 @@
               <v-spacer />
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
-          </v-card>
+          </a-card>
         </v-dialog>
         <publish-updated-library-dialog
           v-if="updateLibraryDialogIsVisible"
@@ -252,7 +252,7 @@
         </div>
       </v-tooltip>
     </v-card-text>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import ACard from '@/components/ui/ACard.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -331,6 +332,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    ACard,
   },
   methods: {
     async getGroupNameById(id) {

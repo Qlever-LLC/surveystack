@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
-    <v-card>
+    <a-card>
       <v-card-title>Survey Versions</v-card-title>
       <v-card-text style="max-height: 500px">
         <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
@@ -95,7 +95,7 @@
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
     <survey-diff-dialog
       v-if="surveyDiffDialogVisible"
       :value="surveyDiffDialogVisible"
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { SurveyDiffDialog, ACard },
   props: {
     value: {
       type: Boolean,

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card>
+    <a-card>
       <v-card-text v-if="isLoading">
         <v-card-title> Hylo Integraton </v-card-title>
         <v-spacer />
@@ -20,7 +20,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
               </template>
-              <v-card>
+              <a-card>
                 <v-card-title class="text-h5"> Are you sure? </v-card-title>
                 <v-card-actions>
                   <v-spacer></v-spacer>
@@ -33,7 +33,7 @@
                     Yes, remove Hylo integration
                   </v-btn>
                 </v-card-actions>
-              </v-card>
+              </a-card>
             </v-dialog>
           </v-app-bar>
           <v-spacer />
@@ -76,7 +76,7 @@
               <v-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </v-btn>
             </template>
 
-            <v-card>
+            <a-card>
               <v-card-title>Integrate group with Hylo</v-card-title>
 
               <v-card-text>
@@ -125,19 +125,23 @@
                 <v-spacer></v-spacer>
                 <v-btn text @click="integrateDialog = false"> close </v-btn>
               </v-card-actions>
-            </v-card>
+            </a-card>
           </v-dialog>
         </v-card-text>
       </template>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
+  components: {
+    ACard,
+  },
   props: {
     groupId: String,
   },

@@ -11,7 +11,7 @@
           </span>
         </v-tab>
       </v-tabs>
-      <v-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
+      <a-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
         <v-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
             <v-list-item :to="`/surveys/${e._id}`">
@@ -31,9 +31,9 @@
             <v-divider v-if="i < pinnedSurveys.length - 1" />
           </div>
         </v-card-text>
-      </v-card>
+      </a-card>
 
-      <v-card min-height="60vh" class="d-flex flex-column">
+      <a-card min-height="60vh" class="d-flex flex-column">
         <v-card-title> </v-card-title>
         <v-card-text class="flex-grow-1">
           <div class="px-5 py-2">
@@ -95,7 +95,7 @@
             @input="() => getDataForTab(activeTab)"
           />
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-container>
   </div>
 </template>
@@ -105,10 +105,14 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
+import ACard from '@/components/ui/ACard.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  components: {
+    ACard,
+  },
   data() {
     return {
       selectedGroupIds: [],

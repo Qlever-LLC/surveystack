@@ -2,7 +2,7 @@
   <v-container>
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
-    <v-card class="pa-4 mb-4">
+    <a-card class="pa-4 mb-4">
       <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
@@ -87,10 +87,10 @@
           </btn-dropdown>
         </div>
       </v-form>
-    </v-card>
+    </a-card>
 
     <v-dialog v-model="dialogCreateUser" max-width="500">
-      <v-card class="">
+      <a-card>
         <v-card-title> User does not exist yet </v-card-title>
         <v-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
@@ -100,7 +100,7 @@
           <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-dialog>
   </v-container>
 </template>
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import ACard from '@/components/ui/ACard.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { BtnDropdown, ACard },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card>
+    <a-card>
       <v-card-title>
         {{ title }}
         <v-spacer />
@@ -18,12 +18,16 @@
         </template>
         <div v-else class="grey--text">No {{ title }} yet</div>
       </v-card-text>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 export default {
+  components: {
+    ACard,
+  },
   props: {
     entities: {
       type: Array,

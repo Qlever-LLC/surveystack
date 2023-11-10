@@ -4,7 +4,7 @@
       <v-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </v-btn>
     </template>
 
-    <v-card>
+    <a-card>
       <v-card-title> Confirm Membership </v-card-title>
       <v-card-text>
         This will immediately activate the membership of the user "{{ email }}". They will receive an email with login
@@ -15,15 +15,19 @@
         <v-btn text @click="isVisible = false"> Cancel </v-btn>
         <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
+  components: {
+    ACard,
+  },
   data() {
     return {
       isVisible: false,

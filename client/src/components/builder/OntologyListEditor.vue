@@ -1,5 +1,5 @@
 <template>
-  <v-card min-height="70vh" class="d-flex flex-column">
+  <a-card min-height="70vh" class="d-flex flex-column">
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">Ontology List Editor</div>
@@ -33,7 +33,7 @@
                 <!-- Delete List -->
               </v-btn>
             </template>
-            <v-card>
+            <a-card>
               <v-card-title>Delete List</v-card-title>
               <v-card-text>
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
@@ -43,7 +43,7 @@
                 <v-btn text color="red" @click="deleteResult">Delete</v-btn>
                 <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </v-card-actions>
-            </v-card>
+            </a-card>
           </v-dialog>
         </div>
       </div>
@@ -117,7 +117,7 @@
     </v-card-actions>
 
     <v-dialog v-model="editItemDialogIsVisible" max-width="350">
-      <v-card>
+      <a-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
           <v-text-field v-model="editedItem.label" label="Label" />
@@ -129,9 +129,9 @@
           <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
           <v-btn text color="primary" @click="saveItem">Save</v-btn>
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-dialog>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
@@ -139,6 +139,7 @@ import { uniqWith, isEqual } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   props: {
@@ -161,6 +162,7 @@ export default {
   components: {
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
+    ACard,
   },
   data() {
     return {

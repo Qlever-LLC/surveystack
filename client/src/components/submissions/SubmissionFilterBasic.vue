@@ -10,7 +10,7 @@
       <v-btn class="ma-2" @click="add" color="primary">Apply</v-btn>
     </div>
 
-    <v-card outlined v-if="filters.length > 0">
+    <a-card outlined v-if="filters.length > 0">
       <v-list dense>
         <v-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
           <v-list-item-content>
@@ -27,12 +27,16 @@
           </v-list-item-action>
         </v-list-item>
       </v-list>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 export default {
+  components: {
+    ACard,
+  },
   props: {
     queryList: {
       type: Array,

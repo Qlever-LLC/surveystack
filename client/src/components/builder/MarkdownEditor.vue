@@ -18,7 +18,7 @@
       />
     </template>
 
-    <v-card>
+    <a-card>
       <v-card-title class="grey--text text--darken-2">
         <slot name="title"></slot>
       </v-card-title>
@@ -84,18 +84,22 @@
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 import MarkdownIt from 'markdown-it';
+import ACard from '@/components/ui/ACard.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
+  components: {
+    ACard,
+  },
   props: {
     value: { type: String },
     label: { type: String },

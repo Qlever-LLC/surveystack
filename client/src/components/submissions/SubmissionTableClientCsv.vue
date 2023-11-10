@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <a-card>
     <v-data-table
       ref="table"
       v-model="tableSelected"
@@ -188,18 +188,18 @@
     />
 
     <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
-      <v-card>
+      <a-card>
         <v-card-text class="pa-4">
           <span>Downloading file resource</span>
           <v-progress-linear indeterminate class="mb-0" />
         </v-card-text>
-      </v-card>
+      </a-card>
     </v-dialog>
 
     <v-alert v-if="openResourceError" type="warning" dismissible>
       {{ openResourceError }}
     </v-alert>
-  </v-card>
+  </a-card>
 </template>
 <script>
 import papa from 'papaparse';
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import ACard from '@/components/ui/ACard.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -273,6 +274,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 export default {
   components: {
     SubmissionTableCellModal,
+    ACard,
   },
   props: {
     actionsAreDisabled: {

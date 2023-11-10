@@ -1,5 +1,5 @@
 <template>
-  <v-card class="image-resource-editor p-relative">
+  <a-card class="image-resource-editor p-relative">
     <v-card-title class="d-flex">
       <div>Image Resource Editor</div>
       <v-spacer />
@@ -47,13 +47,17 @@
       <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>
       <v-btn @click="updateResource" text color="primary"> Update </v-btn>
     </v-card-actions>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
+  components: {
+    ACard,
+  },
   data() {
     return {};
   },

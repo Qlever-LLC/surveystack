@@ -9,7 +9,7 @@
       @search="searchSurveys"
       @selected="selectSurvey"
     />
-    <v-card class="my-2">
+    <a-card class="my-2">
       <v-card-text>
         <label>Survey</label>
         <div class="mb-5 d-flex align-center">
@@ -29,8 +29,8 @@
           <v-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</v-btn>
         </div>
       </v-card-text>
-    </v-card>
-    <v-card>
+    </a-card>
+    <a-card>
       <v-card-title>Select members</v-card-title>
       <v-card-subtitle>{{ selectedMembers.length }} selected</v-card-subtitle>
       <v-card-text>
@@ -54,10 +54,10 @@
           </template>
         </v-data-table>
       </v-card-text>
-    </v-card>
+    </a-card>
 
     <v-dialog v-model="showConfirmDialog" max-width="500">
-      <v-card>
+      <a-card>
         <v-card-title class="headline">Confirmation</v-card-title>
         <v-card-text>
           <p class="body-1">
@@ -70,7 +70,7 @@
           <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
           <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-dialog>
     <result-dialog
       v-model="showSubmitResult"
@@ -87,6 +87,7 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ACard from '@/components/ui/ACard.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -103,6 +104,7 @@ export default {
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,
+    ACard,
   },
   data() {
     return {

@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
-    <v-card class="pa-4">
+    <a-card class="pa-4">
       <v-card-title class="headline"> Connect Existing Farm </v-card-title>
       <v-card-text>
         Select Farm from this Member's profile to include in this group.
@@ -58,16 +58,20 @@
       <v-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
         or add existing farmOS instance (currently in development)
       </v-card-text>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
+  components: {
+    ACard,
+  },
   props: {
     value: Boolean,
     farmInstances: {

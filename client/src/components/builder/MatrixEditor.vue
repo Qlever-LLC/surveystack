@@ -11,7 +11,7 @@
       />
     </v-dialog>
 
-    <v-card class="d-flex flex-column">
+    <a-card class="d-flex flex-column">
       <v-card-title class="d-block">
         <div class="d-flex justify-space-between align-center">
           <div class="grey--text text--darken-2">Matrix Column Editor</div>
@@ -39,7 +39,7 @@
               <!-- vertical bar indicating which columns are locked to the left -->
               <v-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-card
+                  <a-card
                     width="26px"
                     height="100%"
                     class="draggable-handle mx-1 py-3 d-flex flex-column justify-space-around align-center"
@@ -50,13 +50,13 @@
                     <v-divider vertical class="lock-line-decor" />
                     <v-icon class="my-1">mdi-arrow-horizontal-lock</v-icon>
                     <v-divider vertical class="lock-line-decor" />
-                  </v-card>
+                  </a-card>
                 </template>
                 <span>Columns to the left of this line will always be visible</span>
               </v-tooltip>
 
               <div v-else>
-                <v-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
+                <a-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
                   <div class="draggable-handle d-flex pa-2">
                     <v-btn icon small @click="moveItemLeft(i)" :disabled="i === 0" tabindex="-1">
                       <v-icon>mdi-arrow-left</v-icon>
@@ -235,7 +235,7 @@
                       persistent-hint
                     />
                   </v-card-text>
-                </v-card>
+                </a-card>
               </div>
             </div>
 
@@ -249,7 +249,7 @@
       <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
         <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
@@ -262,6 +262,7 @@ import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
+import ACard from '@/components/ui/ACard.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -290,6 +291,7 @@ export default {
     Ontology,
     Date,
     Checkbox,
+    ACard,
   },
   props: {
     value: {

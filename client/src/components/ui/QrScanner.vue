@@ -13,7 +13,7 @@
     </v-btn>
 
     <v-dialog v-model="isScannerOpen" fullscreen>
-      <v-card>
+      <a-card>
         <v-toolbar dark color="primary">
           <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <v-icon>mdi-close</v-icon>
@@ -37,7 +37,7 @@
             <div v-if="!isLoading" class="scan-region-outline" />
           </div>
         </v-container>
-      </v-card>
+      </a-card>
     </v-dialog>
   </div>
 </template>
@@ -47,11 +47,15 @@ import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@v
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+import ACard from '@/components/ui/ACard.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
   emits: ['codeDetected'],
+  components: {
+    ACard,
+  },
   props: {
     small: {
       type: Boolean,

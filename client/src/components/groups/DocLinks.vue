@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pb-2">
+  <a-card class="pb-2">
     <v-card-title
       >Documentation Links
       <v-spacer />
@@ -17,7 +17,7 @@
       @start="drag = true"
       @end="drag = false"
     >
-      <v-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" outlined>
+      <a-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" outlined>
         <v-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -32,18 +32,18 @@
             </div>
           </div>
         </v-card-text>
-      </v-card>
+      </a-card>
     </draggable>
-    <v-card class="ma-2" outlined elevation="1" v-else>
+    <a-card class="ma-2" outlined elevation="1" v-else>
       <v-card-text>
         <span class="title text--secondary">No documentation links yet</span><br />
         <span class="font-weight-light grey--text text--darken-2"
           >You can add documentation links from the menu in the top right</span
         >
       </v-card-text>
-    </v-card>
+    </a-card>
     <v-dialog v-model="deleteModalIsVisible" max-width="290">
-      <v-card>
+      <a-card>
         <v-card-title> Remove Documentation </v-card-title>
         <v-card-text class="mt-4">
           <v-checkbox
@@ -58,11 +58,11 @@
           <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-dialog>
 
     <v-dialog v-model="showAddDialog" max-width="500">
-      <v-card>
+      <a-card>
         <v-card-title>Add documentation link</v-card-title>
         <v-card-text>
           <v-form v-model="newIsValid" ref="form">
@@ -82,23 +82,25 @@
           <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
           <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-dialog>
 
     <slot name="footer">
       <div></div>
     </slot>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
+    ACard,
   },
   data() {
     return {

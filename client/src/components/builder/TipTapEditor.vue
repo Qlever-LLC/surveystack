@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="tiptap-editor">
+  <a-card outlined class="tiptap-editor">
     <v-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
         <v-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" class="pa-0 editor-toolbar">
@@ -282,7 +282,7 @@
           :class="{ 'is-active': menu.isActive }"
           :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
         >
-          <v-card class="pa-0">
+          <a-card class="pa-0">
             <v-card-text class="pa-0">
               <form
                 class="menububble__form"
@@ -317,12 +317,12 @@
                 </v-btn>
               </template>
             </v-card-text>
-          </v-card>
+          </a-card>
         </div>
       </editor-menu-bubble>
       <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%" />
     </v-card-text>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
@@ -351,12 +351,14 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,
+    ACard,
   },
   props: {
     value: {

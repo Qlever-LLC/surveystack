@@ -89,7 +89,7 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
-      <v-card class="my-5 px-2">
+      <a-card class="my-5 px-2">
         <v-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>
         </v-card-title>
@@ -142,7 +142,7 @@
             </v-col>
           </v-row>
         </v-card-text>
-      </v-card>
+      </a-card>
     </v-container>
 
     <v-container>
@@ -223,6 +223,7 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import ACard from '@/components/ui/ACard.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -264,6 +265,7 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
+    ACard,
   },
   data() {
     return {

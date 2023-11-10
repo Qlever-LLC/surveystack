@@ -17,7 +17,7 @@
       />
     </template>
 
-    <v-card>
+    <a-card>
       <v-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
         <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </v-btn>
@@ -62,16 +62,18 @@
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import draggable from 'vuedraggable';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   components: {
     draggable,
+    ACard,
   },
   props: {
     value: {

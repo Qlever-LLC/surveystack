@@ -95,7 +95,7 @@
       </pane>
 
       <pane class="pane pane-controls" v-if="control">
-        <v-card class="px-4 pb-3 m-2 mb-3">
+        <a-card class="px-4 pb-3 m-2 mb-3">
           <!-- <v-card-title class="pl-0">Details</v-card-title> -->
           <control-properties
             v-if="control"
@@ -118,7 +118,7 @@
             @set-script-editor-is-visible="setScriptIsVisible"
             data-testid="control-properties"
           />
-        </v-card>
+        </a-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
         <code-editor
@@ -228,9 +228,9 @@
         </div>
 
         <v-overlay :value="enableSaveDraft">
-          <v-card>
+          <a-card>
             <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
-          </v-card>
+          </a-card>
         </v-overlay>
       </pane>
 
@@ -274,6 +274,7 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
+import ACard from '@/components/ui/ACard.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -322,6 +323,7 @@ export default {
     appCodeView,
     // ConfirmLeaveDialog,
     appExamplesView,
+    ACard,
   },
   props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {

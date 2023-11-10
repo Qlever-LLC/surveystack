@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
-    <v-card>
+    <a-card>
       <v-card-title>
         Publish
         <v-chip dark small color="green" class="mx-2">
@@ -32,7 +32,7 @@
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 <script>
@@ -40,10 +40,11 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import SurveyDiff from '@/components/survey/SurveyDiff';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ACard },
   props: {
     value: {
       type: Boolean,

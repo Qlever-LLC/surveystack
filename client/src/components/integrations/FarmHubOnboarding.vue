@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card>
+    <a-card>
       <v-card-title>
         Farm Hub Onboarding
         <v-spacer />
@@ -10,12 +10,16 @@
           <v-btn class="center-text" color="primary" priominent x-large :to="newRoute">Manage FarmOS Farms</v-btn>
         </div>
       </v-card-text>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 export default {
+  components: {
+    ACard,
+  },
   props: {
     entities: {
       type: Array,

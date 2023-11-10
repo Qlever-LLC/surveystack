@@ -1,5 +1,5 @@
 <template>
-  <v-card
+  <a-card
     class="control-item d-flex flex-column"
     :data-testid="`diff-card-${diffInfo.indexPath}-${diffInfo.changeType}`"
   >
@@ -83,17 +83,19 @@
         <v-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </v-btn>
       </template>
     </v-snackbar>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
     ControlCardHeader,
+    ACard,
   },
   data() {
     return {

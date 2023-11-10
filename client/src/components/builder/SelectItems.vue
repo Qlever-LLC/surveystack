@@ -16,7 +16,7 @@
       />
     </template>
 
-    <v-card>
+    <a-card>
       <v-card-title class="grey--text text--darken-2"> Default value </v-card-title>
 
       <v-card-text class="dialog-content">
@@ -45,16 +45,20 @@
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
+  components: {
+    ACard,
+  },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

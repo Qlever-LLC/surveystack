@@ -6,7 +6,7 @@
         <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
       </li>
     </v-banner>
-    <v-card>
+    <a-card>
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle class="grey--text mt-n5">
         {{ submission._id }}
@@ -27,7 +27,7 @@
         Last modified: {{ modified }}
         <br />
       </v-card-text>
-    </v-card>
+    </a-card>
     <v-timeline v-if="controlDisplays" dense class="width: 100%">
       <template v-for="(display, idx) in controlDisplays">
         <v-timeline-item
@@ -37,7 +37,7 @@
           :color="display.color"
           :hide-dot="display.hidden"
         >
-          <v-card
+          <a-card
             v-if="display.relevant || !display.hidden"
             @click="$emit('goto', display.path)"
             :color="display.background"
@@ -103,7 +103,7 @@
                 <div v-if="display.modifiedHumanized">{{ display.modifiedHumanized }} ago</div>
               </div>
             </v-card-text>
-          </v-card>
+          </a-card>
 
           <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
@@ -120,6 +120,7 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
+import ACard from '@/components/ui/ACard.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -146,6 +147,9 @@ function iconify(value, control, relevant) {
 }
 
 export default {
+  components: {
+    ACard,
+  },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {

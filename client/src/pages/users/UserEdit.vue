@@ -5,13 +5,13 @@
       ... with role <span class="font-weight-bold">{{ $route.query.role }}</span> @
       <span class="font-weight-bold">{{ groupEntity.name }}</span>
     </div>
-    <v-card class="pa-4 mb-4 mt-2">
+    <a-card class="pa-4 mb-4 mt-2">
       <v-card-title v-if="editMode"
         >{{ currentEmail }} <v-spacer /><v-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
             <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
           </template>
-          <v-card>
+          <a-card>
             <v-card-title class="text-h5"> Change Email </v-card-title>
             <v-card-text>
               <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
@@ -22,7 +22,7 @@
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
             </v-card-actions>
-          </v-card>
+          </a-card>
         </v-dialog></v-card-title
       >
       <v-card-text
@@ -59,7 +59,7 @@
           </div>
         </v-form></v-card-text
       >
-    </v-card>
+    </a-card>
     <!-- <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert> -->
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
@@ -74,6 +74,7 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   components: {

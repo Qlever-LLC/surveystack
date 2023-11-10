@@ -1,5 +1,5 @@
 <template>
-  <v-card style="height: 90vh" color="grey darken-3">
+  <a-card cssHeight90vh color="grey darken-3">
     <v-container>
       <v-row dark>
         <v-spacer></v-spacer>
@@ -21,11 +21,12 @@
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>
       </div>
     </v-container>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
 import appCodeView from '@/components/builder/CodeView.vue';
+import ACard from '@/components/ui/ACard.vue';
 
 const reg = /.*\/(.*?)$/;
 
@@ -40,6 +41,7 @@ const examples = req.keys().map((key) => ({
 export default {
   components: {
     appCodeView,
+    ACard,
   },
   props: ['category'],
   data() {

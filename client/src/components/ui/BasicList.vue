@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading">
+  <a-card :loading="loading">
     <v-card-title class="heading--text">
       <slot name="title">
         {{ title }}
@@ -33,11 +33,15 @@
 
       <div v-else class="grey--text">No {{ title }} yet</div>
     </v-card-text>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 export default {
+  components: {
+    ACard,
+  },
   props: {
     loading: {
       type: Boolean,

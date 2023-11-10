@@ -19,7 +19,7 @@
         >.
       </p>
 
-      <v-card outlined>
+      <a-card outlined>
         <v-card-text> <div>User Details</div></v-card-text>
         <v-card-text>
           <v-form>
@@ -30,7 +30,7 @@
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
                   </template>
-                  <v-card>
+                  <a-card>
                     <v-card-title class="text-h5"> Change Email </v-card-title>
                     <v-card-text>
                       <v-text-field tabindex="1" v-model="email" label="E-Mail" />
@@ -43,7 +43,7 @@
                         Update email
                       </v-btn>
                     </v-card-actions>
-                  </v-card>
+                  </a-card>
                 </v-dialog></v-row
               ></v-card-text
             >
@@ -75,7 +75,7 @@
             </div>
           </v-form></v-card-text
         >
-      </v-card>
+      </a-card>
 
       <div class="mt-8 mb-4">
         <h3>Group Memberships</h3>
@@ -89,7 +89,7 @@
       </div>
 
       <v-dialog v-model="isLeaveDialogOpen" max-width="290">
-        <v-card>
+        <a-card>
           <v-card-title> Leave Group </v-card-title>
           <v-card-text v-if="parentAdminGroup" class="mt-4">
             To leave <strong>{{ activeGroup.name }}</strong
@@ -106,7 +106,7 @@
             <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
             <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
           </v-card-actions>
-        </v-card>
+        </a-card>
       </v-dialog>
     </template>
     <template v-else>
@@ -124,6 +124,7 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import ACard from '@/components/ui/ACard.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -139,6 +140,7 @@ export default {
   components: {
     appFeedback,
     ActiveGroupSelector,
+    ACard,
   },
   data() {
     return {

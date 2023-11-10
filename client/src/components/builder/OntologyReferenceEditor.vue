@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <a-card>
     <v-card-title> Survey Reference Editor </v-card-title>
     <v-card-text>
       <v-autocomplete
@@ -49,13 +49,14 @@
     </v-card-actions>
 
     <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />
-  </v-card>
+  </a-card>
 </template>
 
 <script>
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
+import ACard from '@/components/ui/ACard.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -66,7 +67,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: { OntologyReferencePreview, ACard },
   props: {
     resource: {
       type: Object,

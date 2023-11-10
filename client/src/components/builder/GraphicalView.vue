@@ -17,7 +17,8 @@
     draggable=".draggable-item"
     :group="draggableGroup"
   >
-    <v-card
+    <!-- TODO in Vue3 remove .native -->
+    <a-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
       :class="[
@@ -27,7 +28,7 @@
         { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
       ]"
       :key="el.id || el._id"
-      @mousedown.stop.left="$emit('control-selected', el)"
+      @mousedown.native.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
       :data-control-contains-page="descendantHasPage(el)"
@@ -162,10 +163,10 @@
         :data-control-contains-page="descendantHasPage(el)"
         :index="createIndex(index, idx + 1)"
       />
-    </v-card>
+    </a-card>
 
     <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
-      <v-card class="">
+      <a-card>
         <v-card-title> Delete Question </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
         <v-card-actions>
@@ -173,11 +174,11 @@
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-dialog>
   </draggable>
   <div v-else>
-    <v-card class="text--secondary">
+    <a-card class="text--secondary">
       <v-card-title>Empty survey</v-card-title>
       <v-card-text v-if="!readOnly">
         <div class="text--primary">
@@ -185,7 +186,7 @@
           below.
         </div>
       </v-card-text>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
@@ -196,12 +197,14 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
     ControlCardHeader,
+    ACard,
   },
   data() {
     return {

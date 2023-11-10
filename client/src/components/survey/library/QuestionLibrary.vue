@@ -19,7 +19,7 @@
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
         <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
-          <v-card
+          <a-card
             @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
             class="control-item mb-2"
@@ -115,7 +115,7 @@
                 />
               </v-col>
             </v-row>
-          </v-card>
+          </a-card>
         </v-col>
       </v-row>
     </v-container>
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import ACard from '@/components/ui/ACard.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    ACard,
   },
   props: ['survey', 'libraryId'],
   data() {

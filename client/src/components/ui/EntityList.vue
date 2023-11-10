@@ -7,7 +7,7 @@
 
       <v-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</v-btn>
     </div>
-    <v-card>
+    <a-card>
       <div v-for="e in entities" :key="e._id">
         <v-list-item :to="`/${collection}/${e._id}`">
           <v-list-item-content>
@@ -17,12 +17,16 @@
         </v-list-item>
         <v-divider />
       </div>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 export default {
+  components: {
+    ACard,
+  },
   props: {
     collection: {
       type: String,

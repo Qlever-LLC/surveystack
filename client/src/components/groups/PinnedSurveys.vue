@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pb-2">
+  <a-card class="pb-2">
     <v-card-title
       >Pinned Surveys
       <v-spacer />
@@ -16,7 +16,7 @@
       @start="drag = true"
       @end="drag = false"
     >
-      <v-card v-for="(el, idx) in entities" :key="`${idx}-survey-${el._id}`" class="ma-2 mx-6" elevation="1" outlined>
+      <a-card v-for="(el, idx) in entities" :key="`${idx}-survey-${el._id}`" class="ma-2 mx-6" elevation="1" outlined>
         <v-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -35,18 +35,18 @@
             </div>
           </div>
         </v-card-text>
-      </v-card>
+      </a-card>
     </draggable>
-    <v-card class="ma-2" outlined elevation="1" v-else>
+    <a-card class="ma-2" outlined elevation="1" v-else>
       <v-card-text>
         <span class="title text--secondary">No pinned surveys yet</span><br />
         <span class="font-weight-light grey--text text--darken-2"
           >You can add surveys from the menu in the top right</span
         >
       </v-card-text>
-    </v-card>
+    </a-card>
     <v-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
-      <v-card>
+      <a-card>
         <v-card-title> Remove Pinned Survey </v-card-title>
         <v-card-text class="mt-4">
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
@@ -56,11 +56,11 @@
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
-      </v-card>
+      </a-card>
     </v-dialog>
 
     <v-dialog v-model="showSearchDialog" max-width="500">
-      <v-card>
+      <a-card>
         <v-card-title>Search surveys</v-card-title>
         <v-card-text>
           <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
@@ -75,12 +75,12 @@
             </v-list-item>
           </v-list>
         </v-card-text>
-      </v-card>
+      </a-card>
     </v-dialog>
     <slot name="footer">
       <div></div>
     </slot>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
@@ -88,11 +88,13 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
+    ACard,
   },
   data() {
     return {

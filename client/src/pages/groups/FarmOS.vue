@@ -117,19 +117,19 @@
     </v-row>
     <v-row v-else>
       <v-col lg="4" class="mx-auto">
-        <v-card class="pa-8 text-center" v-if="superAdmin">
+        <a-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
             Contact Our-Sci</v-btn
           >
-        </v-card>
-        <v-card class="pa-8 text-center" v-else>
+        </a-card>
+        <a-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
             >Contact Our-Sci</v-btn
           >
-        </v-card>
+        </a-card>
       </v-col>
     </v-row>
   </v-container>
@@ -146,6 +146,7 @@ import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemove
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
     FarmOSRemoveNoteDialog,
     appDialog,
     appGroupBreadcrumbs,
+    ACard,
   },
   computed: {
     superAdmin() {

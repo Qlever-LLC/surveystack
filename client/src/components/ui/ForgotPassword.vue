@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card class="pa-6 pa-sm-12">
+    <a-card class="pa-6 pa-sm-12">
       <h1>Forgot Password?</h1>
       <p>Enter your email address and we will send you a link for setting a new password.</p>
 
@@ -17,14 +17,18 @@
         >
       </div>
       <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert>
-    </v-card>
+    </a-card>
   </v-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
+  components: {
+    ACard,
+  },
   data() {
     return {
       status: { type: '' },

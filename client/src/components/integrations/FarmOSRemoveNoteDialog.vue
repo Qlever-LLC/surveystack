@@ -1,6 +1,6 @@
 <template>
   <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
-    <v-card class="pa-4">
+    <a-card class="pa-4">
       <v-card-title class="headline"> Why is this instance being removed? </v-card-title>
       <v-card-text>
         <v-checkbox
@@ -22,13 +22,17 @@
           <v-btn :disabled="btnDisabled" :loading="loading" @click="addNote" color="primary">Submit</v-btn>
         </div>
       </v-card-text>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
+import ACard from '@/components/ui/ACard.vue';
 export default {
   emits: ['addNote', 'cancelNote'],
+  components: {
+    ACard,
+  },
   props: ['loading', 'value'],
   data() {
     return {

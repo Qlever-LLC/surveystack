@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <v-container class="maxw-40">
-      <v-card class="pa-5">
+      <a-card class="pa-5">
         <h1>New password</h1>
         <p>Set a new password for {{ this.email }}</p>
         <v-form @submit.prevent="submit">
@@ -23,7 +23,7 @@
             <v-btn type="submit" color="primary">Set password</v-btn>
           </div>
         </v-form>
-      </v-card>
+      </a-card>
       <transition name="fade">
         <app-feedback v-if="status" class="mt-5" @closed="status = {}" :type="status.type">{{
           status.message
@@ -45,10 +45,12 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
   components: {
     appFeedback,
+    ACard,
   },
   data() {
     return {

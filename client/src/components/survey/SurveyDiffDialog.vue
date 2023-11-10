@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
-    <v-card>
+    <a-card>
       <v-card-title>
         Compare
         <v-chip dark small color="green" class="mx-2"> Version {{ revisionA.version }} </v-chip>
@@ -19,15 +19,16 @@
       <v-card-actions class="mr-3">
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
-  components: { SurveyDiff },
+  components: { SurveyDiff, ACard },
   props: {
     value: {
       required: true,

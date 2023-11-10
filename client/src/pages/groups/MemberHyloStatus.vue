@@ -14,7 +14,7 @@
     <template v-slot:activator="{ on, attrs }">
       <v-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</v-btn>
     </template>
-    <v-card>
+    <a-card>
       <v-card-title> Confirm Invitation </v-card-title>
       <v-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </v-card-text>
       <v-card-actions>
@@ -22,15 +22,19 @@
         <v-btn text @click="isConfirming = false"> Cancel </v-btn>
         <v-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </v-btn>
       </v-card-actions>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
+  components: {
+    ACard,
+  },
   data() {
     return {
       isConfirming: false,

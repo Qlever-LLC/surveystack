@@ -1,6 +1,6 @@
 <template>
   <v-dialog max-width="500" v-model="dialog">
-    <v-card>
+    <a-card>
       <v-card-title>Search surveys</v-card-title>
       <v-card-text>
         <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
@@ -25,7 +25,7 @@
           </v-list-item>
         </v-list>
       </v-card-text>
-    </v-card>
+    </a-card>
   </v-dialog>
 </template>
 
@@ -33,8 +33,12 @@
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import ACard from '@/components/ui/ACard.vue';
 
 export default {
+  components: {
+    ACard,
+  },
   props: {
     searchResults: {
       type: Array,
