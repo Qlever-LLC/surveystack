@@ -2,10 +2,10 @@
   <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
     <router-view name="navbar" />
     <div id="app-menu"></div>
-    <v-main>
+    <a-main>
       <app-global-feedback />
       <router-view />
-    </v-main>
+    </a-main>
     <install-banner />
   </v-app>
 </template>
@@ -16,12 +16,14 @@ import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
+import AMain from '@/components/ui/AMain.vue';
 
 export default {
   name: 'App',
   components: {
     appGlobalFeedback,
     InstallBanner,
+    AMain,
   },
   created() {
     domainHandler.install(this);
