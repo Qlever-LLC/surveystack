@@ -227,11 +227,11 @@
           </app-draft-component>
         </div>
 
-        <v-overlay :value="enableSaveDraft">
+        <a-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
           </v-card>
-        </v-overlay>
+        </a-overlay>
       </pane>
 
       <!-- Padding pane - DO NOT DELETE -->
@@ -274,6 +274,7 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
+import AOverlay from '@/components/ui/AOverlay.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -322,6 +323,7 @@ export default {
     appCodeView,
     // ConfirmLeaveDialog,
     appExamplesView,
+    AOverlay,
   },
   props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {
