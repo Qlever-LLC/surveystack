@@ -79,6 +79,7 @@ import ACard from '@/components/ui/ACard.vue';
 export default {
   components: {
     appFeedback,
+    ACard,
   },
   data() {
     return {
