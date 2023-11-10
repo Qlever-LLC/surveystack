@@ -84,6 +84,7 @@ describe('question set library', () => {
     // render the component
     const options = optionsWithControls();
     render(SurveyBuilder, options);
+    const surveyDetails = screen.getByTestId('survey-details');
 
     // add a qsl to the survey like a user would
     await fireEvent.click(screen.getByTestId('control-adder-open'));
@@ -95,7 +96,7 @@ describe('question set library', () => {
     fireEvent.click(addBtn);
 
     // save draft and get the value from vuex
-    const savedRevision = await saveDraft(options.store);
+    const savedRevision = await saveDraft(options.store, surveyDetails);
 
     expect(savedRevision).toMatchObject({
       version: options.props.survey.latestVersion + 1,
