@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
+  <a-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
     <router-view name="navbar" />
     <div id="app-menu"></div>
     <v-main>
@@ -7,7 +7,7 @@
       <router-view />
     </v-main>
     <install-banner />
-  </v-app>
+  </a-app>
 </template>
 
 <script>
@@ -16,12 +16,14 @@ import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
+import AApp from '@/components/ui/AApp.vue';
 
 export default {
   name: 'App',
   components: {
     appGlobalFeedback,
     InstallBanner,
+    AApp,
   },
   created() {
     domainHandler.install(this);
