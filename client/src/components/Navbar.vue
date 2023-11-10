@@ -1,6 +1,6 @@
 <template>
   <nav class="app-navbar">
-    <v-app-bar app clipped-left color="appbar" absolute>
+    <a-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <v-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
@@ -15,7 +15,7 @@
         <v-icon size="22">mdi-help-circle-outline</v-icon>
       </v-btn>
       <navbar-user-menu />
-    </v-app-bar>
+    </a-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />
   </nav>
 </template>
@@ -24,12 +24,14 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
+import AAppBar from '@/components/ui/AAppBar.vue';
 
 export default {
   components: {
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,
+    AAppBar,
   },
   computed: {
     drawerIsVisible: {

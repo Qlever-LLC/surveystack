@@ -12,7 +12,7 @@
           height="250"
           :src="integratedHyloGroup.bannerUrl"
         >
-          <v-app-bar flat color="rgba(0, 0, 0, 0)">
+          <a-app-bar flat color="rgba(0, 0, 0, 0)">
             <v-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </v-toolbar-title>
 
             <v-spacer></v-spacer>
@@ -35,7 +35,7 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-          </v-app-bar>
+          </a-app-bar>
           <v-spacer />
           <!-- <v-col cols="4" sm="2" md="1"> -->
           <!-- <v-avatar size="36px" class="mr-4">
@@ -136,8 +136,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AAppBar from '@/components/ui/AAppBar.vue';
 
 export default {
+  components: {
+    AAppBar,
+  },
   props: {
     groupId: String,
   },
