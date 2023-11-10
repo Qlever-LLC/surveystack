@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer :value="value" app>
+  <a-navigation-drawer :value="value" app>
     <div class="d-flex justify-end mt-3 mr-3">
       <v-btn large icon @click="$emit('input', !value)">
         <v-icon>mdi-close</v-icon>
@@ -77,11 +77,15 @@
         </p>
       </div>
     </template>
-  </v-navigation-drawer>
+  </a-navigation-drawer>
 </template>
 
 <script>
+import ANavigationDrawer from '@/components/ui/ANavigationDrawer.vue';
 export default {
+  components: {
+    ANavigationDrawer,
+  },
   props: {
     value: {
       type: Boolean,
