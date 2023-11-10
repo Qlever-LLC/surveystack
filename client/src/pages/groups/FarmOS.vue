@@ -112,7 +112,7 @@
     </div>
     <v-row v-if="loading">
       <v-col>
-        <v-progress-linear indeterminate class="mb-0" />
+        <a-progress-linear indeterminate class="mb-0" />
       </v-col>
     </v-row>
     <v-row v-else>
@@ -146,6 +146,7 @@ import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemove
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
+import AProgressLinear from '@/components/ui/AProgressLinear.vue';
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
     FarmOSRemoveNoteDialog,
     appDialog,
     appGroupBreadcrumbs,
+    AProgressLinear,
   },
   computed: {
     superAdmin() {

@@ -100,7 +100,7 @@
               <v-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
             </v-list-item-title>
             <v-list-item-subtitle v-if="showUploadProgressIndex === index"
-              ><v-progress-linear indeterminate class="mb-0"
+              ><a-progress-linear indeterminate class="mb-0"
             /></v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
@@ -132,6 +132,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 import { getLabelFromKey } from '@/utils/resources';
+import AProgressLinear from '@/components/ui/AProgressLinear.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -142,6 +143,7 @@ export default {
     appControlLabel,
     appControlMoreInfo,
     appControlHint,
+    AProgressLinear,
   },
   data() {
     return {

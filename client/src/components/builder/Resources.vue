@@ -14,7 +14,7 @@
       <v-card>
         <v-card-text class="pa-4">
           <span>Uploading file resource</span>
-          <v-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -22,7 +22,7 @@
       <v-card>
         <v-card-text class="pa-4">
           <span>Downloading file resource</span>
-          <v-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -108,10 +108,12 @@ import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
+import AProgressLinear from '@/components/ui/AProgressLinear.vue';
 
 export default {
   components: {
     appOntologyListEditor,
+    AProgressLinear,
   },
   props: {
     resources: {

@@ -191,7 +191,7 @@
       <v-card>
         <v-card-text class="pa-4">
           <span>Downloading file resource</span>
-          <v-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import AProgressLinear from '@/components/ui/AProgressLinear.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -273,6 +274,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 export default {
   components: {
     SubmissionTableCellModal,
+    AProgressLinear,
   },
   props: {
     actionsAreDisabled: {

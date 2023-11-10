@@ -48,7 +48,7 @@
       <v-card>
         <v-card-text class="pa-4">
           <span>Submitting Builder</span>
-          <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
+          <a-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -118,6 +118,7 @@ import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import AProgressCircular from '@/components/ui/AProgressCircular.vue';
+import AProgressLinear from '@/components/ui/AProgressLinear.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -128,6 +129,7 @@ export default {
     appDialog,
     resultDialog,
     AProgressCircular,
+    AProgressLinear,
   },
   mixins: [resultMixin],
   data() {
