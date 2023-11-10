@@ -5,12 +5,7 @@
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Users</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
     <v-autocomplete
@@ -101,7 +96,11 @@
 </template>
 
 <script>
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 export default {
+  components: {
+    AProgressCircular,
+  },
   props: {
     groups: Array,
     mappings: Object,

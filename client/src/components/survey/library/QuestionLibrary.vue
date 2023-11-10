@@ -14,7 +14,7 @@
       <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
     </div>
     <v-container v-if="loading" class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    AProgressCircular,
   },
   props: ['survey', 'libraryId'],
   data() {

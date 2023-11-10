@@ -17,7 +17,7 @@
       @show-version-dialog="versionsDialogIsVisible = true"
     />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </div>
     <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
@@ -117,6 +117,7 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -126,6 +127,7 @@ export default {
     SurveyBuilder,
     appDialog,
     resultDialog,
+    AProgressCircular,
   },
   mixins: [resultMixin],
   data() {

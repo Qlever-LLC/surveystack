@@ -70,7 +70,7 @@
       </p>
     </div>
     <div v-else-if="isLoading" class="d-flex align-center justify-center">
-      <v-progress-circular indeterminate color="primary" class="ma-5" />
+      <a-progress-circular indeterminate color="primary" class="ma-5" />
     </div>
     <div v-else-if="loadingSourceFailed" class="text-center">
       <v-icon color="red">mdi-close-thick</v-icon>
@@ -87,11 +87,13 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
     appDialog,
+    AProgressCircular,
   },
   props: {
     submission: {

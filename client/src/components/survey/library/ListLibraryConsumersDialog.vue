@@ -8,7 +8,7 @@
       <v-card-text>
         <v-list dense style="max-height: 500px" class="overflow-y-auto">
           <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
-            <v-progress-circular :size="50" color="primary" indeterminate />
+            <a-progress-circular :size="50" color="primary" indeterminate />
           </v-container>
           <template v-if="libraryConsumers !== null">
             <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
@@ -31,10 +31,11 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {},
+  components: { AProgressCircular },
   props: {
     value: {
       type: Boolean,

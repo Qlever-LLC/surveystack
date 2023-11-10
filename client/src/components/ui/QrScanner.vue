@@ -27,13 +27,7 @@
         <v-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />
-            <v-progress-circular
-              v-if="isLoading"
-              indeterminate
-              :width="7"
-              :size="80"
-              color="primary"
-            ></v-progress-circular>
+            <a-progress-circular v-if="isLoading" indeterminate :width="7" :size="80" color="primary" />
             <div v-if="!isLoading" class="scan-region-outline" />
           </div>
         </v-container>
@@ -47,11 +41,15 @@ import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@v
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
   emits: ['codeDetected'],
+  components: {
+    AProgressCircular,
+  },
   props: {
     small: {
       type: Boolean,

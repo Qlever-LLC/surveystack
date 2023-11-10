@@ -8,7 +8,7 @@
       @submit="submit"
     />
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </div>
     <div v-else-if="hasError" class="text-center mt-8">
       Error Loading Draft Submission or Survey. Click <a @click="$router.back()">here</a> to go back to Survey.
@@ -78,6 +78,7 @@ import { getApiComposeErrors } from '@/utils/draft';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -87,6 +88,7 @@ export default {
     ConfirmLeaveDialog,
     SubmittingDialog,
     appSubmissionArchiveDialog,
+    AProgressCircular,
   },
   data() {
     return {

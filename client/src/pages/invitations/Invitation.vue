@@ -27,7 +27,7 @@
         <v-btn class="primary" @click="fetchData">Try code</v-btn>
       </div>
     </template>
-    <v-progress-circular v-else :size="50" color="primary" indeterminate></v-progress-circular>
+    <a-progress-circular v-else :size="50" color="primary" indeterminate />
   </v-container>
 </template>
 
@@ -35,8 +35,12 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
+  components: {
+    AProgressCircular,
+  },
   data() {
     return {
       initialized: false,

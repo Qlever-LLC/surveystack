@@ -141,7 +141,7 @@
     <app-control-more-info :value="control.moreInfo" />
 
     <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
-      <v-progress-circular indeterminate color="primary" size="24" />
+      <a-progress-circular indeterminate color="primary" size="24" />
       <div class="ml-2 text--secondary">Loading farmOS data</div>
     </div>
   </div>
@@ -156,6 +156,7 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -270,6 +271,7 @@ export default {
     appMatrixTable,
     appRequired,
     appRedacted,
+    AProgressCircular,
   },
   data() {
     return {

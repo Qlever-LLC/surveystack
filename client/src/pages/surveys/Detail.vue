@@ -77,7 +77,7 @@
   </v-container>
   <v-container fill-height v-else>
     <v-layout column justify-center align-center>
-      <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </v-layout>
   </v-container>
 </template>
@@ -90,6 +90,7 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   props: {
@@ -102,6 +103,7 @@ export default {
   components: {
     BtnDropdown,
     MemberSelector,
+    AProgressCircular,
   },
   data() {
     return {

@@ -10,7 +10,7 @@
     />
     <app-control-hint :value="control.hint" />
 
-    <v-progress-circular v-if="loading" indeterminate color="secondary" class="my-8"> </v-progress-circular>
+    <a-progress-circular v-if="loading" indeterminate color="secondary" class="my-8" />
 
     <v-list style="overflow: auto">
       <v-list-item-group
@@ -52,6 +52,7 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
@@ -160,6 +161,9 @@ const transform = (assets) => {
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
+  components: {
+    AProgressCircular,
+  },
   data() {
     return {
       transformed: [],

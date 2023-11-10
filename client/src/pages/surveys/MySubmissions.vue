@@ -116,7 +116,7 @@
         </v-tabs-items>
         <v-card v-else>
           <v-card-text class="d-flex align-center justify-center">
-            <v-progress-circular :size="50" color="primary" indeterminate />
+            <a-progress-circular :size="50" color="primary" indeterminate />
           </v-card-text>
         </v-card>
       </v-row>
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    AProgressCircular,
   },
   watch: {
     activeSubmissionId(id) {
