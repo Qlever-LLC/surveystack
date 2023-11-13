@@ -25,13 +25,13 @@
           localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version
         }`"
       />
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <v-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span>Publish update to library {{ value.name }}</span>
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -41,10 +41,11 @@ import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ACard },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions },
   props: {
     value: {
       type: Boolean,

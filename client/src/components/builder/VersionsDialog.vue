@@ -72,7 +72,7 @@
         </v-alert>
       </v-card-text>
       <v-divider></v-divider>
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer />
         <v-btn
           v-if="compareRevisions.length > 0"
@@ -94,7 +94,7 @@
           Delete {{ selectedVersionsToDelete.length }} versions
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
     <survey-diff-dialog
       v-if="surveyDiffDialogVisible"
@@ -112,9 +112,10 @@ import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
-  components: { SurveyDiffDialog, ACard },
+  components: { SurveyDiffDialog, ACard, ACardActions },
   props: {
     value: {
       type: Boolean,

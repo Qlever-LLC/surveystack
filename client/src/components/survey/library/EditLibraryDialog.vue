@@ -19,14 +19,14 @@
           label="Latest change type"
         />
       </v-card-text>
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <v-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span v-if="!librarySurvey.meta.isLibrary">Add to library</span>
           <span v-if="localLibrarySurvey.meta.isLibrary">Save</span>
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -35,10 +35,11 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor, ACard },
+  components: { LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions },
   props: {
     value: {
       type: Boolean,

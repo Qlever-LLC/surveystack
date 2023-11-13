@@ -246,9 +246,9 @@
         </div>
       </v-card-text>
       <v-spacer />
-      <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
+      <a-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
         <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </div>
 </template>
@@ -263,6 +263,7 @@ import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -292,6 +293,7 @@ export default {
     Date,
     Checkbox,
     ACard,
+    ACardActions,
   },
   props: {
     value: {

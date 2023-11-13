@@ -18,9 +18,9 @@
 
       <v-spacer />
 
-      <v-card-actions class="mr-3 d-flex justify-end">
+      <a-card-actions class="mr-3 d-flex justify-end">
         <v-btn text @click="open = false">Close</v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -31,11 +31,13 @@ import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadB
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default defineComponent({
   components: {
     SelectItemsDownloadButton,
     ACard,
+    ACardActions,
   },
   props: {
     value: {

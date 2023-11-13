@@ -67,14 +67,14 @@
               </div>
             </v-form>
           </v-card-text>
-          <v-card-actions class="d-flex justify-space-between">
+          <a-card-actions class="d-flex justify-space-between">
             <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
               <v-icon left>mdi-trash-can-outline</v-icon>Delete
             </v-btn>
             <v-btn text @click="showEditItemDialog = false" class="ma-2">
               Close <v-icon right>mdi-close</v-icon>
             </v-btn>
-          </v-card-actions>
+          </a-card-actions>
         </a-card>
       </div>
     </v-dialog>
@@ -157,6 +157,7 @@ import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -272,6 +273,7 @@ export default {
     appRequired,
     appRedacted,
     ACard,
+    ACardActions,
   },
   data() {
     return {

@@ -33,7 +33,7 @@
       </template>
     </v-card-text>
     <v-spacer />
-    <v-card-actions>
+    <a-card-actions>
       <v-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
       <v-tooltip top :disabled="!!path">
@@ -46,7 +46,7 @@
       </v-tooltip>
       <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
       <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
-    </v-card-actions>
+    </a-card-actions>
 
     <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />
   </a-card>
@@ -57,6 +57,7 @@ import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -67,7 +68,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview, ACard },
+  components: { OntologyReferencePreview, ACard, ACardActions },
   props: {
     resource: {
       type: Object,

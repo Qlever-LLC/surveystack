@@ -53,11 +53,11 @@
           ></v-checkbox>
         </v-card-text>
         <v-card-text class="mt-4"> Are you sure you want to remove this documentation link? </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
 
@@ -77,11 +77,11 @@
             ></v-checkbox>
           </v-form>
         </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
           <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
 
@@ -95,12 +95,14 @@
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
     ACard,
+    ACardActions,
   },
   data() {
     return {

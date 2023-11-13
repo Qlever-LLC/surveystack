@@ -66,10 +66,10 @@
           </p>
           <v-checkbox label="Also send a copy to myself" v-model="copy" />
         </v-card-text>
-        <v-card-actions class="d-flex justify-end">
+        <a-card-actions class="d-flex justify-end">
           <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
           <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
     <result-dialog
@@ -88,6 +88,7 @@ import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -105,6 +106,7 @@ export default {
     appSurveySelector,
     appConfirmMembershipButton,
     ACard,
+    ACardActions,
   },
   data() {
     return {

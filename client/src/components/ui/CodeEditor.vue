@@ -24,10 +24,10 @@
               <app-code-view :value="result"> </app-code-view>
             </div>
 
-            <v-card-actions>
+            <a-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
-            </v-card-actions>
+            </a-card-actions>
           </a-card>
         </v-dialog>
 
@@ -72,6 +72,7 @@
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -104,6 +105,7 @@ export default {
   components: {
     appCodeView,
     ACard,
+    ACardActions,
   },
   data() {
     return {

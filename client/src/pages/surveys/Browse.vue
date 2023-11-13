@@ -87,14 +87,14 @@
           </div>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-pagination
             v-if="surveys.content.length > 0"
             v-model="page"
             :length="activeTabPaginationLength"
             @input="() => getDataForTab(activeTab)"
           />
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-container>
   </div>
@@ -106,12 +106,14 @@ import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   data() {
     return {

@@ -95,11 +95,11 @@
         <v-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
   </v-container>
@@ -113,6 +113,7 @@ import EmailValidator from 'email-validator';
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -129,7 +130,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown, ACard },
+  components: { BtnDropdown, ACard, ACardActions },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

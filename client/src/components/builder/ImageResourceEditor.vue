@@ -43,20 +43,22 @@
         />
       </v-form>
     </v-card-text>
-    <v-card-actions class="d-flex justify-space-between px-6 pb-4">
+    <a-card-actions class="d-flex justify-space-between px-6 pb-4">
       <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>
       <v-btn @click="updateResource" text color="primary"> Update </v-btn>
-    </v-card-actions>
+    </a-card-actions>
   </a-card>
 </template>
 
 <script>
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   data() {
     return {};

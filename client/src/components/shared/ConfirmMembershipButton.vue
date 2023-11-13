@@ -10,11 +10,11 @@
         This will immediately activate the membership of the user "{{ email }}". They will receive an email with login
         instructions. You'll be able to send "Call for Submission" links to this user.
       </v-card-text>
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer />
         <v-btn text @click="isVisible = false"> Cancel </v-btn>
         <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -23,10 +23,12 @@
 import api from '@/services/api.service';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   data() {
     return {

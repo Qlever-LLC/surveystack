@@ -42,7 +42,7 @@
         You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by
         other means.
       </v-card-text>
-      <v-card-actions class="d-flex justify-space-between align-center">
+      <a-card-actions class="d-flex justify-space-between align-center">
         <div>
           <v-btn color="primary" @click="resend"> <v-icon left>mdi-email-send-outline</v-icon> Resend </v-btn>
           <span class="ml-1 caption text--secondary">{{
@@ -54,18 +54,18 @@
             <v-icon left>mdi-eye-outline</v-icon>View
           </v-btn>
         </div>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
 
     <v-dialog v-model="dialogRemoval" max-width="290">
       <a-card>
         <v-card-title> Delete Membership </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="dialogRemoval = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="remove"> Delete </v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
 
@@ -75,10 +75,10 @@
         <v-card-text class="mt-4">
           An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
         </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
 
@@ -102,6 +102,7 @@
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 const availableRoles = [
   {
@@ -129,6 +130,7 @@ export default {
   components: {
     appDialog,
     ACard,
+    ACardActions,
   },
   data() {
     return {

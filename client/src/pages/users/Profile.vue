@@ -37,12 +37,12 @@
                       Integrations which use your email will no longer work and will need to be updated. These
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
                     </v-card-text>
-                    <v-card-actions>
+                    <a-card-actions>
                       <v-spacer></v-spacer>
                       <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
                       </v-btn>
-                    </v-card-actions>
+                    </a-card-actions>
                   </a-card>
                 </v-dialog></v-row
               ></v-card-text
@@ -101,11 +101,11 @@
             <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
             >?
           </v-card-text>
-          <v-card-actions>
+          <a-card-actions>
             <v-spacer />
             <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
             <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
-          </v-card-actions>
+          </a-card-actions>
         </a-card>
       </v-dialog>
     </template>
@@ -125,6 +125,7 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -141,6 +142,7 @@ export default {
     appFeedback,
     ActiveGroupSelector,
     ACard,
+    ACardActions,
   },
   data() {
     return {

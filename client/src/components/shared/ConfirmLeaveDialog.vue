@@ -7,13 +7,13 @@
       <v-card-text>
         <slot />
       </v-card-text>
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer />
         <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
         <v-btn text color="primary" @click.stop="handleConfirm">
           {{ confirmText }}
         </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -21,10 +21,12 @@
 <script>
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   data() {
     return {

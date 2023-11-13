@@ -79,11 +79,11 @@
         </div>
       </v-card-text>
 
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer></v-spacer>
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -92,6 +92,7 @@
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 import MarkdownIt from 'markdown-it';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
@@ -99,6 +100,7 @@ const TEXT_LENGTH = 60;
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   props: {
     value: { type: String },

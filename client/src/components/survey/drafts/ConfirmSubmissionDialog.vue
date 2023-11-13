@@ -27,11 +27,11 @@
           {{ additionalMessage }}
         </div>
       </v-card-text>
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer />
         <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
         <v-btn text color="primary" @click.stop="handleConfirm"> Submit </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -40,6 +40,7 @@
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   data() {
@@ -78,6 +79,7 @@ export default {
   components: {
     ActiveGroupSelector,
     ACard,
+    ACardActions,
   },
   created() {
     if (this.groupId) {

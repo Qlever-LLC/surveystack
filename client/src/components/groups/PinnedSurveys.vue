@@ -51,11 +51,11 @@
         <v-card-text class="mt-4">
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
         </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
 
@@ -89,12 +89,14 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
     ACard,
+    ACardActions,
   },
   data() {
     return {

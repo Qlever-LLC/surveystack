@@ -22,7 +22,7 @@
               </template>
               <a-card>
                 <v-card-title class="text-h5"> Are you sure? </v-card-title>
-                <v-card-actions>
+                <a-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn
                     color="green darken-1"
@@ -32,7 +32,7 @@
                   >
                     Yes, remove Hylo integration
                   </v-btn>
-                </v-card-actions>
+                </a-card-actions>
               </a-card>
             </v-dialog>
           </v-app-bar>
@@ -121,10 +121,10 @@
                 </div>
               </v-card-text>
 
-              <v-card-actions>
+              <a-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn text @click="integrateDialog = false"> close </v-btn>
-              </v-card-actions>
+              </a-card-actions>
             </a-card>
           </v-dialog>
         </v-card-text>
@@ -137,10 +137,12 @@
 import api from '@/services/api.service';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   props: {
     groupId: String,

@@ -23,7 +23,7 @@
         :showNoChangesText="false"
         @discard-local-changes-changed="discardLocalChangesChanged"
       ></survey-diff>
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <v-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
           >Learn more...
         </v-btn>
@@ -37,7 +37,7 @@
           <span>update</span>
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
     <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
       <a-card>
@@ -49,11 +49,11 @@
             {{ discardLocalChanges.length }} of your modified questions.<br /><br />Click update to continue.</b
           >
         </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</v-btn>
           <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
   </v-dialog>
@@ -66,9 +66,10 @@ import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ACard },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions },
   props: {
     value: {
       required: true,

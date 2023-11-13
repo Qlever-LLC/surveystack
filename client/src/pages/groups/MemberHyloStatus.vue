@@ -17,11 +17,11 @@
     <a-card>
       <v-card-title> Confirm Invitation </v-card-title>
       <v-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </v-card-text>
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer />
         <v-btn text @click="isConfirming = false"> Cancel </v-btn>
         <v-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -30,10 +30,12 @@
 import api from '@/services/api.service';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   data() {
     return {

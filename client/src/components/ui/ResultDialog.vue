@@ -14,10 +14,10 @@
                 <v-divider class="mx-4"></v-divider>
                 <v-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-card-actions>
+                    <a-card-actions>
                       <v-spacer />
                       <v-btn text v-bind="attrs" v-on="on"> Logs </v-btn>
-                    </v-card-actions>
+                    </a-card-actions>
                   </template>
 
                   <a-card>
@@ -69,10 +69,10 @@
           </div>
         </v-card-text>
 
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
   </div>
@@ -84,10 +84,12 @@ import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   props: {
     value: {

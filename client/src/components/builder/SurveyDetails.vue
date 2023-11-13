@@ -22,10 +22,10 @@
               />
               <v-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
             </v-card-text>
-            <v-card-actions class="mr-3">
+            <a-card-actions class="mr-3">
               <v-spacer />
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
-            </v-card-actions>
+            </a-card-actions>
           </a-card>
         </v-dialog>
         <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
@@ -42,10 +42,10 @@
                 @set-survey-resources="(val) => $emit('set-survey-resources', val)"
               />
             </v-card-text>
-            <v-card-actions class="mr-3">
+            <a-card-actions class="mr-3">
               <v-spacer />
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
-            </v-card-actions>
+            </a-card-actions>
           </a-card>
         </v-dialog>
         <publish-updated-library-dialog
@@ -267,6 +267,7 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -333,6 +334,7 @@ export default {
     ActiveGroupSelector,
     appResources,
     ACard,
+    ACardActions,
   },
   methods: {
     async getGroupNameById(id) {

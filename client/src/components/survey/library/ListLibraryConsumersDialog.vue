@@ -21,10 +21,10 @@
         </v-list>
       </v-card-text>
       <v-divider></v-divider>
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -32,10 +32,11 @@
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: { ACard },
+  components: { ACard, ACardActions },
   props: {
     value: {
       type: Boolean,

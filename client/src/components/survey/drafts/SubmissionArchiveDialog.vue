@@ -15,20 +15,22 @@
           outlined
         />
       </v-card-text>
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer />
         <v-btn text @click="$emit('cancel')">Cancel</v-btn>
         <v-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   props: {
     persistent: Boolean,

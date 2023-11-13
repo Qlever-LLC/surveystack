@@ -40,17 +40,18 @@
 
       <v-divider></v-divider>
 
-      <v-card-actions>
+      <a-card-actions>
         <v-spacer></v-spacer>
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
@@ -58,6 +59,7 @@ function getArrayValue(source) {
 export default {
   components: {
     ACard,
+    ACardActions,
   },
   props: {
     value: { type: [String, Array] },

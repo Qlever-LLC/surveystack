@@ -38,11 +38,11 @@
               <v-card-text>
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
               </v-card-text>
-              <v-card-actions>
+              <a-card-actions>
                 <v-spacer />
                 <v-btn text color="red" @click="deleteResult">Delete</v-btn>
                 <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
-              </v-card-actions>
+              </a-card-actions>
             </a-card>
           </v-dialog>
         </div>
@@ -112,9 +112,9 @@
       </v-data-table>
     </v-card-text>
     <v-spacer />
-    <v-card-actions class="d-flex justify-end mr-3 align-start">
+    <a-card-actions class="d-flex justify-end mr-3 align-start">
       <v-btn text class="ml-4" @click="close">Close</v-btn>
-    </v-card-actions>
+    </a-card-actions>
 
     <v-dialog v-model="editItemDialogIsVisible" max-width="350">
       <a-card>
@@ -124,11 +124,11 @@
           <v-text-field v-model="editedItem.value" label="Value" />
           <v-text-field v-model="editedItem.tags" label="Tags" />
         </v-card-text>
-        <v-card-actions>
+        <a-card-actions>
           <v-spacer />
           <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
           <v-btn text color="primary" @click="saveItem">Save</v-btn>
-        </v-card-actions>
+        </a-card-actions>
       </a-card>
     </v-dialog>
   </a-card>
@@ -140,6 +140,7 @@ import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
   props: {
@@ -163,6 +164,7 @@ export default {
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
     ACard,
+    ACardActions,
   },
   data() {
     return {

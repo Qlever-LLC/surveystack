@@ -16,9 +16,9 @@
         :showHeader="true"
         :showNoChangesText="false"
       ></survey-diff>
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
-      </v-card-actions>
+      </a-card-actions>
     </a-card>
   </v-dialog>
 </template>
@@ -26,9 +26,10 @@
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 export default {
-  components: { SurveyDiff, ACard },
+  components: { SurveyDiff, ACard, ACardActions },
   props: {
     value: {
       required: true,

@@ -66,9 +66,9 @@
                 </template>
 
                 <v-spacer class="flex-grow-1" />
-                <v-card-actions>
+                <a-card-actions>
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
-                </v-card-actions>
+                </a-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
                 <v-row align="center" justify="center">
@@ -154,6 +154,7 @@ import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import ACard from '@/components/ui/ACard.vue';
+import ACardActions from '@/components/ui/ACardActions.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -164,6 +165,7 @@ export default {
     SubmittingDialog,
     ResultDialog,
     ACard,
+    ACardActions,
   },
   watch: {
     activeSubmissionId(id) {
