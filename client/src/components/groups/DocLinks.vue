@@ -5,7 +5,7 @@
       <v-spacer />
       <v-btn color="primary" text @click="showAddDialog = true">New.. </v-btn>
     </v-card-title>
-    <v-card-subtitle>Custom links which appear in the side menu when logged into your group</v-card-subtitle>
+    <a-card-subtitle>Custom links which appear in the side menu when logged into your group</a-card-subtitle>
     <draggable
       v-if="group.docs && group.docs.length !== 0"
       class="draggable list-group"
@@ -96,6 +96,7 @@ import draggable from 'vuedraggable';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 
 export default {
   name: 'nested-draggable',
@@ -103,6 +104,7 @@ export default {
     draggable,
     ACard,
     ACardActions,
+    ACardSubtitle,
   },
   data() {
     return {

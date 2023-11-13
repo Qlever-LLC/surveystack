@@ -8,13 +8,13 @@
     </v-banner>
     <a-card>
       <v-card-title>{{ survey.name }}</v-card-title>
-      <v-card-subtitle class="grey--text mt-n5">
+      <a-card-subtitle class="grey--text mt-n5">
         {{ submission._id }}
         <br />
         <strong v-if="submission.meta.dateSubmitted">
           <kbd>{{ submitted }}</kbd> submitted
         </strong>
-      </v-card-subtitle>
+      </a-card-subtitle>
       <v-card-text>
         Submitting to: {{ groupPath || '--' }}
         <br />
@@ -121,6 +121,7 @@ import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
 import ACard from '@/components/ui/ACard.vue';
+import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -149,6 +150,7 @@ function iconify(value, control, relevant) {
 export default {
   components: {
     ACard,
+    ACardSubtitle,
   },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {

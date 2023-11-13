@@ -32,7 +32,7 @@
     </a-card>
     <a-card>
       <v-card-title>Select members</v-card-title>
-      <v-card-subtitle>{{ selectedMembers.length }} selected</v-card-subtitle>
+      <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
       <v-card-text>
         <v-data-table
           v-model="selectedMembers"
@@ -89,6 +89,7 @@ import api from '@/services/api.service';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -107,6 +108,7 @@ export default {
     appConfirmMembershipButton,
     ACard,
     ACardActions,
+    ACardSubtitle,
   },
   data() {
     return {

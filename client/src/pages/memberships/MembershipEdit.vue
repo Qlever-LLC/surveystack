@@ -37,7 +37,7 @@
 
     <a-card class="my-3 pa-2" v-if="resendEnabled">
       <v-card-title> <v-icon left>mdi-account-clock</v-icon>Pending </v-card-title>
-      <v-card-subtitle>Membership has not been claimed</v-card-subtitle>
+      <a-card-subtitle>Membership has not been claimed</a-card-subtitle>
       <v-card-text>
         You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by
         other means.
@@ -103,6 +103,7 @@ import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 
 const availableRoles = [
   {
@@ -131,6 +132,7 @@ export default {
     appDialog,
     ACard,
     ACardActions,
+    ACardSubtitle,
   },
   data() {
     return {

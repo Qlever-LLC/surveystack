@@ -68,7 +68,7 @@
       <template v-else>
         <v-card-title> Hylo Integraton </v-card-title>
         <v-spacer />
-        <v-card-subtitle>This group is not integrated with Hylo yet</v-card-subtitle>
+        <a-card-subtitle>This group is not integrated with Hylo yet</a-card-subtitle>
 
         <v-card-text>
           <v-dialog v-model="integrateDialog" width="500">
@@ -138,11 +138,13 @@ import api from '@/services/api.service';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
+    ACardSubtitle,
   },
   props: {
     groupId: String,
