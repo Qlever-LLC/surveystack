@@ -4,12 +4,12 @@
       <a-card>
         <v-card-title v-if="title" class="headline mb-2">{{ title }}</v-card-title>
 
-        <v-card-text>
+        <a-card-text>
           <div v-for="(item, idx) in messages" :key="idx">
             <a-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
-              <v-card-text class="white--text">
+              <a-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
-              </v-card-text>
+              </a-card-text>
               <template v-if="item.logs && item.logs.length">
                 <v-divider class="mx-4"></v-divider>
                 <v-dialog width="500">
@@ -27,7 +27,7 @@
                       <copy-to-clipboard :value="JSON.stringify(item.logs, null, 2)" />
                     </v-card-title>
 
-                    <v-card-text>
+                    <a-card-text>
                       <v-expansion-panels accordion>
                         <v-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
@@ -50,7 +50,7 @@
                           </v-expansion-panel-content>
                         </v-expansion-panel>
                       </v-expansion-panels>
-                    </v-card-text>
+                    </a-card-text>
                   </a-card>
                 </v-dialog>
               </template>
@@ -67,7 +67,7 @@
               Email Submission
             </v-btn>
           </div>
-        </v-card-text>
+        </a-card-text>
 
         <a-card-actions>
           <v-spacer />
@@ -85,11 +85,13 @@ import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     value: {

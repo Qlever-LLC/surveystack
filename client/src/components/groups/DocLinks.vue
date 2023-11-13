@@ -18,7 +18,7 @@
       @end="drag = false"
     >
       <a-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" outlined>
-        <v-card-text>
+        <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
               <span class="title">{{ el.label }}</span>
@@ -31,28 +31,28 @@
               </v-btn>
             </div>
           </div>
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </draggable>
     <a-card class="ma-2" outlined elevation="1" v-else>
-      <v-card-text>
+      <a-card-text>
         <span class="title text--secondary">No documentation links yet</span><br />
         <span class="font-weight-light grey--text text--darken-2"
           >You can add documentation links from the menu in the top right</span
         >
-      </v-card-text>
+      </a-card-text>
     </a-card>
     <v-dialog v-model="deleteModalIsVisible" max-width="290">
       <a-card>
         <v-card-title> Remove Documentation </v-card-title>
-        <v-card-text class="mt-4">
+        <a-card-text class="mt-4">
           <v-checkbox
             v-model="removeFromDescendants"
             label="Also remove this documentation link from all descendant groups"
             hide-details
           ></v-checkbox>
-        </v-card-text>
-        <v-card-text class="mt-4"> Are you sure you want to remove this documentation link? </v-card-text>
+        </a-card-text>
+        <a-card-text class="mt-4"> Are you sure you want to remove this documentation link? </a-card-text>
         <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
@@ -64,7 +64,7 @@
     <v-dialog v-model="showAddDialog" max-width="500">
       <a-card>
         <v-card-title>Add documentation link</v-card-title>
-        <v-card-text>
+        <a-card-text>
           <v-form v-model="newIsValid" ref="form">
             <v-text-field class="mt-3" v-model="newDoc.label" label="Label" outlined required :rules="labelRules" />
 
@@ -76,7 +76,7 @@
               hide-details
             ></v-checkbox>
           </v-form>
-        </v-card-text>
+        </a-card-text>
         <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
@@ -97,6 +97,7 @@ import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'nested-draggable',
@@ -105,6 +106,7 @@ export default {
     ACard,
     ACardActions,
     ACardSubtitle,
+    ACardText,
   },
   data() {
     return {

@@ -12,7 +12,7 @@
         </v-tab>
       </v-tabs>
       <a-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
-        <v-card-text>
+        <a-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
             <v-list-item :to="`/surveys/${e._id}`">
               <v-list-item-icon>
@@ -30,12 +30,12 @@
             </v-list-item>
             <v-divider v-if="i < pinnedSurveys.length - 1" />
           </div>
-        </v-card-text>
+        </a-card-text>
       </a-card>
 
       <a-card min-height="60vh" class="d-flex flex-column">
         <v-card-title> </v-card-title>
-        <v-card-text class="flex-grow-1">
+        <a-card-text class="flex-grow-1">
           <div class="px-5 py-2">
             <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
             <div class="d-flex justify-end mb-4">
@@ -86,7 +86,7 @@
             <v-divider v-if="i < surveys.content.length - 1" />
           </div>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
-        </v-card-text>
+        </a-card-text>
         <a-card-actions>
           <v-pagination
             v-if="surveys.content.length > 0"
@@ -107,6 +107,7 @@ import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -114,6 +115,7 @@ export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   data() {
     return {

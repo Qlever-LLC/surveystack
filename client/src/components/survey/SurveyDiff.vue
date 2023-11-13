@@ -1,8 +1,8 @@
 <template>
-  <v-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
+  <a-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
     <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
-  </v-card-text>
+  </a-card-text>
   <v-expansion-panels v-else flat multiple v-model="mainPanelState">
     <v-expansion-panel>
       <v-expansion-panel-header v-if="showHeader" class="pt-0">
@@ -45,11 +45,13 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'survey-diff',
   components: {
     SurveyDiffCardTree,
+    ACardText,
   },
   props: {
     controlsLocalRevision: Array,

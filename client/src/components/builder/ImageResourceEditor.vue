@@ -8,7 +8,7 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-text>
+    <a-card-text>
       <v-form
         v-if="
           resource &&
@@ -42,7 +42,7 @@
           outlined
         />
       </v-form>
-    </v-card-text>
+    </a-card-text>
     <a-card-actions class="d-flex justify-space-between px-6 pb-4">
       <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>
       <v-btn @click="updateResource" text color="primary"> Update </v-btn>
@@ -54,11 +54,13 @@
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   data() {
     return {};

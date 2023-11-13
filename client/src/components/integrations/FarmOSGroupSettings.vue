@@ -3,16 +3,16 @@
     <v-dialog v-model="upgradeDialog" width="400">
       <a-card>
         <v-card-title> Upgrade </v-card-title>
-        <v-card-text>
+        <a-card-text>
           In order to change your current plan, please contact
           <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </v-dialog>
 
     <a-card v-if="superAdmin" class="px-4 mb-4">
       <v-card-title>Super Admin</v-card-title>
-      <v-card-text>
+      <a-card-text>
         <div class="d-flex flex-grow-1">
           <v-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
@@ -39,7 +39,7 @@
           </v-autocomplete>
         </div>
         <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
-      </v-card-text>
+      </a-card-text>
     </a-card>
     <div class="d-flex justify-space-between">
       <div>
@@ -110,11 +110,13 @@
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
     ACard,
+    ACardText,
   },
   props: {
     groupInfos: {

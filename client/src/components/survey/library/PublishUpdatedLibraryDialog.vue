@@ -8,11 +8,11 @@
         </v-chip>
         to Library
       </v-card-title>
-      <v-card-text class="mt-5">
+      <a-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-2" />
         <library-change-type-selector v-model="localLibrarySurvey.meta.libraryLastChangeType" :disabled="false" />
-      </v-card-text>
+      </a-card-text>
       <survey-diff
         :controls-remote-revision-old="
           localLibrarySurvey.revisions.find((revision) => revision.version === localLibrarySurvey.latestVersion)
@@ -42,10 +42,18 @@ import { reactive, toRefs } from '@vue/composition-api';
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions },
+  components: {
+    SurveyDiff,
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+    ACard,
+    ACardActions,
+    ACardText,
+  },
   props: {
     value: {
       type: Boolean,

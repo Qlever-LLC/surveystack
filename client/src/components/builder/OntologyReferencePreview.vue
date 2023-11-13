@@ -6,7 +6,7 @@
         <select-items-download-button :resourceName="resource.name" :items="items" />
       </v-card-title>
 
-      <v-card-text class="mt-4">
+      <a-card-text class="mt-4">
         <v-data-table
           :headers="tableHeaders"
           :items="items"
@@ -14,7 +14,7 @@
           item-key="id"
           :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
         />
-      </v-card-text>
+      </a-card-text>
 
       <v-spacer />
 
@@ -32,12 +32,14 @@ import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default defineComponent({
   components: {
     SelectItemsDownloadButton,
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     value: {

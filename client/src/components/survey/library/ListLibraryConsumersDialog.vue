@@ -5,7 +5,7 @@
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
       </v-card-title>
       <v-divider></v-divider>
-      <v-card-text>
+      <a-card-text>
         <v-list dense style="max-height: 500px" class="overflow-y-auto">
           <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
             <v-progress-circular :size="50" color="primary" indeterminate />
@@ -19,7 +19,7 @@
             </v-list-item>
           </template>
         </v-list>
-      </v-card-text>
+      </a-card-text>
       <v-divider></v-divider>
       <a-card-actions>
         <v-spacer />
@@ -33,10 +33,11 @@ import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: { ACard, ACardActions },
+  components: { ACard, ACardActions, ACardText },
   props: {
     value: {
       type: Boolean,

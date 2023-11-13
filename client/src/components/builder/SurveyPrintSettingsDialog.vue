@@ -3,7 +3,7 @@
     <a-card>
       <v-card-title> Print settings </v-card-title>
 
-      <v-card-text>
+      <a-card-text>
         <div class="d-flex">
           <checkbox
             v-model="survey.meta.printOptions.showInstruction"
@@ -18,7 +18,7 @@
             helper-text='Display unanswered questions on PDFs of completed submissions. Unanswered questions will show "No answer" in the PDF.'
           />
         </div>
-      </v-card-text>
+      </a-card-text>
 
       <a-card-actions class="mr-3">
         <v-spacer />
@@ -32,10 +32,16 @@
 import Checkbox from '@/components/ui/Checkbox.vue';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'survey-print-settings-dialog',
-  components: { Checkbox, ACard, ACardActions },
+  components: {
+    Checkbox,
+    ACard,
+    ACardActions,
+    ACardText,
+  },
   props: {
     value: {
       type: Boolean,

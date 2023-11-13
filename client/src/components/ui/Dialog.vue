@@ -4,9 +4,9 @@
       <v-card-title class="headline">
         <slot name="title">{{ title }}</slot>
       </v-card-title>
-      <v-card-text>
+      <a-card-text>
         <slot name="default">Default slot content</slot>
-      </v-card-text>
+      </a-card-text>
       <a-card-actions>
         <v-spacer />
         <v-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</v-btn>
@@ -19,10 +19,12 @@
 <script>
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     modal: {

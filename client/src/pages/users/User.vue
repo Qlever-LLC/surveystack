@@ -1,14 +1,14 @@
 <template>
   <v-container>
     <a-card>
-      <v-card-text>
+      <a-card-text>
         <div class="overline">{{ user._id }}</div>
         <v-btn v-if="$store.getters['auth/isSuperAdmin']" outlined small :href="`/users/${user._id}/edit`"
           ><v-icon small>mdi-pencil</v-icon>Edit</v-btn
         >
         <p class="display-1 text--primary mt-2 mb-1">{{ user.name }}</p>
         <p class="subtitle-1">{{ user.email }}</p>
-      </v-card-text>
+      </a-card-text>
     </a-card>
     <a-card v-if="memberships.length > 0" class="mt-3">
       <v-card-title>Memberships</v-card-title>
@@ -33,10 +33,12 @@
 <script>
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     ACard,
+    ACardText,
   },
   data() {
     return {

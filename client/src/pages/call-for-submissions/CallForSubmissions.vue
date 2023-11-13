@@ -10,7 +10,7 @@
       @selected="selectSurvey"
     />
     <a-card class="my-2">
-      <v-card-text>
+      <a-card-text>
         <label>Survey</label>
         <div class="mb-5 d-flex align-center">
           <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
@@ -28,12 +28,12 @@
           <v-btn text @click="cancel">Cancel</v-btn>
           <v-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</v-btn>
         </div>
-      </v-card-text>
+      </a-card-text>
     </a-card>
     <a-card>
       <v-card-title>Select members</v-card-title>
       <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
-      <v-card-text>
+      <a-card-text>
         <v-data-table
           v-model="selectedMembers"
           :items="activeMembers"
@@ -53,19 +53,19 @@
             />
           </template>
         </v-data-table>
-      </v-card-text>
+      </a-card-text>
     </a-card>
 
     <v-dialog v-model="showConfirmDialog" max-width="500">
       <a-card>
         <v-card-title class="headline">Confirmation</v-card-title>
-        <v-card-text>
+        <a-card-text>
           <p class="body-1">
             You are about to send an E-mail to {{ selectedMembers.length }}
             {{ selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
           </p>
           <v-checkbox label="Also send a copy to myself" v-model="copy" />
-        </v-card-text>
+        </a-card-text>
         <a-card-actions class="d-flex justify-end">
           <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
           <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
@@ -90,6 +90,7 @@ import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -109,6 +110,7 @@ export default {
     ACard,
     ACardActions,
     ACardSubtitle,
+    ACardText,
   },
   data() {
     return {

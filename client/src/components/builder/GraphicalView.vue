@@ -168,7 +168,7 @@
     <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
       <a-card>
         <v-card-title> Delete Question </v-card-title>
-        <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
+        <a-card-text class="mt-4"> Are you sure you want to remove this question? </a-card-text>
         <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
@@ -180,12 +180,12 @@
   <div v-else>
     <a-card class="text--secondary">
       <v-card-title>Empty survey</v-card-title>
-      <v-card-text v-if="!readOnly">
+      <a-card-text v-if="!readOnly">
         <div class="text--primary">
           You can add questions by clicking the <strong>plus icon</strong>
           below.
         </div>
-      </v-card-text>
+      </a-card-text>
     </a-card>
   </div>
 </template>
@@ -199,6 +199,7 @@ import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'nested-draggable',
@@ -207,6 +208,7 @@ export default {
     ControlCardHeader,
     ACard,
     ACardActions,
+    ACardText,
   },
   data() {
     return {

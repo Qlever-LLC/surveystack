@@ -46,10 +46,10 @@
 
     <v-dialog v-model="submitting" hide-overlay persistent width="300">
       <a-card>
-        <v-card-text class="pa-4">
+        <a-card-text class="pa-4">
           <span>Submitting Builder</span>
           <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </v-dialog>
 
@@ -97,10 +97,10 @@
       <!-- <v-alert type="error">
         Unsupported browser
       </v-alert> -->
-      <v-card-text>
+      <a-card-text>
         Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
         browser.
-      </v-card-text>
+      </a-card-text>
     </a-card>
   </div>
 </template>
@@ -118,6 +118,7 @@ import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -128,6 +129,7 @@ export default {
     appDialog,
     resultDialog,
     ACard,
+    ACardText,
   },
   mixins: [resultMixin],
   data() {

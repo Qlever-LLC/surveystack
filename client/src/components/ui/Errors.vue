@@ -5,9 +5,9 @@
         <v-card-title class="headline">{{ title }}</v-card-title>
         <template v-for="(error, idx) in errors">
           <div :key="'error_' + idx">
-            <v-card-text
-              ><span style="font-weight: bold">{{ error.title }}</span> {{ error.body }}
-            </v-card-text>
+            <a-card-text>
+              <span style="font-weight: bold">{{ error.title }}</span> {{ error.body }}
+            </a-card-text>
           </div>
         </template>
       </a-card>
@@ -17,9 +17,11 @@
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 export default {
   components: {
     ACard,
+    ACardText,
   },
   props: {
     value: Boolean,

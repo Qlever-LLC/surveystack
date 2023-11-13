@@ -1,11 +1,11 @@
 <template>
   <div>
     <a-card>
-      <v-card-text v-if="isLoading">
+      <a-card-text v-if="isLoading">
         <v-card-title> Hylo Integraton </v-card-title>
         <v-spacer />
         <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
-      </v-card-text>
+      </a-card-text>
       <template v-else-if="integratedHyloGroup">
         <v-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
@@ -55,11 +55,11 @@
           </v-card-title>
 
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
-          <v-card-text class="white--text">
+          <a-card-text class="white--text">
             &nbsp;Your group is integrated with
             <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo
-          </v-card-text>
+          </a-card-text>
 
           <!-- </v-col> -->
         </v-img>
@@ -70,7 +70,7 @@
         <v-spacer />
         <a-card-subtitle>This group is not integrated with Hylo yet</a-card-subtitle>
 
-        <v-card-text>
+        <a-card-text>
           <v-dialog v-model="integrateDialog" width="500">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </v-btn>
@@ -79,7 +79,7 @@
             <a-card>
               <v-card-title>Integrate group with Hylo</v-card-title>
 
-              <v-card-text>
+              <a-card-text>
                 <div class="font-italic text-body-2 mb-4">Find an existing group on Hylo</div>
                 <v-text-field
                   v-model="hyloGroupInput"
@@ -119,7 +119,7 @@
                   Default group settings are: anyone can find and see this group but people must apply to join this
                   group and must be approved. You can change the settings in this Group Settings page in Hylo.
                 </div>
-              </v-card-text>
+              </a-card-text>
 
               <a-card-actions>
                 <v-spacer></v-spacer>
@@ -127,7 +127,7 @@
               </a-card-actions>
             </a-card>
           </v-dialog>
-        </v-card-text>
+        </a-card-text>
       </template>
     </a-card>
   </div>
@@ -139,12 +139,14 @@ import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
     ACardSubtitle,
+    ACardText,
   },
   props: {
     groupId: String,

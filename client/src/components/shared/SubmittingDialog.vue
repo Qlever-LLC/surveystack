@@ -1,19 +1,21 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" hide-overlay persistent width="300">
     <a-card>
-      <v-card-text class="pa-4">
+      <a-card-text class="pa-4">
         <span>{{ message }}</span>
         <v-progress-linear indeterminate class="mb-0" />
-      </v-card-text>
+      </a-card-text>
     </a-card>
   </v-dialog>
 </template>
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 export default {
   components: {
     ACard,
+    ACardText,
   },
   props: {
     value: {

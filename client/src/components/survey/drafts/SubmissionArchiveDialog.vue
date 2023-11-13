@@ -4,7 +4,7 @@
       <v-card-title class="headline">
         <slot name="title">{{ title }}</slot>
       </v-card-title>
-      <v-card-text>
+      <a-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
         <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
@@ -14,7 +14,7 @@
           v-model="archiveReasonOther"
           outlined
         />
-      </v-card-text>
+      </a-card-text>
       <a-card-actions>
         <v-spacer />
         <v-btn text @click="$emit('cancel')">Cancel</v-btn>
@@ -27,10 +27,12 @@
 <script>
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     persistent: Boolean,

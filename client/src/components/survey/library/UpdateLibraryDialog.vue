@@ -7,11 +7,11 @@
         to
         <v-chip dark small color="green" class="mx-2"> Version {{ toSurvey.latestVersion }} </v-chip>
       </v-card-title>
-      <v-card-text class="mt-5">
+      <a-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
         <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mb-2" />
         <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
-      </v-card-text>
+      </a-card-text>
       <survey-diff
         :controls-local-revision="localRevisionControls"
         :controls-remote-revision-old="remoteOldRevisionControls"
@@ -42,13 +42,13 @@
     <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
       <a-card>
         <v-card-title>Confirm Update</v-card-title>
-        <v-card-text class="mt-4">
+        <a-card-text class="mt-4">
           <b
             >You have modified this question set compared to Version
             {{ libraryRootGroup.libraryVersion }}.<br /><br />You have chosen to override
             {{ discardLocalChanges.length }} of your modified questions.<br /><br />Click update to continue.</b
           >
-        </v-card-text>
+        </a-card-text>
         <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</v-btn>
@@ -67,9 +67,17 @@ import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions },
+  components: {
+    SurveyDiff,
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+    ACard,
+    ACardActions,
+    ACardText,
+  },
   props: {
     value: {
       required: true,

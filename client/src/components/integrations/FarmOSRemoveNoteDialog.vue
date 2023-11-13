@@ -2,7 +2,7 @@
   <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
     <a-card class="pa-4">
       <v-card-title class="headline"> Why is this instance being removed? </v-card-title>
-      <v-card-text>
+      <a-card-text>
         <v-checkbox
           v-model="note"
           label="Farmer is no longer part of the projet"
@@ -21,17 +21,19 @@
           <v-btn :disabled="loading" :loading="loading" @click="cancelNote" color="error">Don't Add Note</v-btn>
           <v-btn :disabled="btnDisabled" :loading="loading" @click="addNote" color="primary">Submit</v-btn>
         </div>
-      </v-card-text>
+      </a-card-text>
     </a-card>
   </v-dialog>
 </template>
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 export default {
   emits: ['addNote', 'cancelNote'],
   components: {
     ACard,
+    ACardText,
   },
   props: ['loading', 'value'],
   data() {

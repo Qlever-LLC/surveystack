@@ -35,9 +35,9 @@
             </template>
             <a-card>
               <v-card-title>Delete List</v-card-title>
-              <v-card-text>
+              <a-card-text>
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
-              </v-card-text>
+              </a-card-text>
               <a-card-actions>
                 <v-spacer />
                 <v-btn text color="red" @click="deleteResult">Delete</v-btn>
@@ -50,7 +50,7 @@
       <v-divider />
     </v-card-title>
 
-    <v-card-text class="pt-4">
+    <a-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
         <v-text-field
@@ -110,7 +110,7 @@
           </div>
         </template>
       </v-data-table>
-    </v-card-text>
+    </a-card-text>
     <v-spacer />
     <a-card-actions class="d-flex justify-end mr-3 align-start">
       <v-btn text class="ml-4" @click="close">Close</v-btn>
@@ -119,11 +119,11 @@
     <v-dialog v-model="editItemDialogIsVisible" max-width="350">
       <a-card>
         <v-card-title>Edit Item</v-card-title>
-        <v-card-text>
+        <a-card-text>
           <v-text-field v-model="editedItem.label" label="Label" />
           <v-text-field v-model="editedItem.value" label="Value" />
           <v-text-field v-model="editedItem.tags" label="Tags" />
-        </v-card-text>
+        </a-card-text>
         <a-card-actions>
           <v-spacer />
           <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
@@ -141,6 +141,7 @@ import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButto
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   props: {
@@ -165,6 +166,7 @@ export default {
     SelectItemsUploadButton,
     ACard,
     ACardActions,
+    ACardText,
   },
   data() {
     return {

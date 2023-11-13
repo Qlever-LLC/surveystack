@@ -38,10 +38,10 @@
     <a-card class="my-3 pa-2" v-if="resendEnabled">
       <v-card-title> <v-icon left>mdi-account-clock</v-icon>Pending </v-card-title>
       <a-card-subtitle>Membership has not been claimed</a-card-subtitle>
-      <v-card-text>
+      <a-card-text>
         You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by
         other means.
-      </v-card-text>
+      </a-card-text>
       <a-card-actions class="d-flex justify-space-between align-center">
         <div>
           <v-btn color="primary" @click="resend"> <v-icon left>mdi-email-send-outline</v-icon> Resend </v-btn>
@@ -60,7 +60,7 @@
     <v-dialog v-model="dialogRemoval" max-width="290">
       <a-card>
         <v-card-title> Delete Membership </v-card-title>
-        <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
+        <a-card-text class="mt-4"> Are you sure you want to delete this membership? </a-card-text>
         <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="dialogRemoval = false"> Cancel </v-btn>
@@ -72,9 +72,9 @@
     <v-dialog v-model="dialogSent" max-width="400">
       <a-card>
         <v-card-title> Sent </v-card-title>
-        <v-card-text class="mt-4">
+        <a-card-text class="mt-4">
           An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
-        </v-card-text>
+        </a-card-text>
         <a-card-actions>
           <v-spacer />
           <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
@@ -104,6 +104,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const availableRoles = [
   {
@@ -133,6 +134,7 @@ export default {
     ACard,
     ACardActions,
     ACardSubtitle,
+    ACardText,
   },
   data() {
     return {

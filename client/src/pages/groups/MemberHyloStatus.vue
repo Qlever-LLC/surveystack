@@ -16,7 +16,7 @@
     </template>
     <a-card>
       <v-card-title> Confirm Invitation </v-card-title>
-      <v-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </v-card-text>
+      <a-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </a-card-text>
       <a-card-actions>
         <v-spacer />
         <v-btn text @click="isConfirming = false"> Cancel </v-btn>
@@ -31,11 +31,13 @@ import api from '@/services/api.service';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   data() {
     return {

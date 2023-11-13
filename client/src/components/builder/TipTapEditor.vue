@@ -270,7 +270,7 @@
           </v-toolbar> -->
       </editor-menu-bar>
     </v-card-title>
-    <v-card-text class="pa-0">
+    <a-card-text class="pa-0">
       <editor-menu-bubble
         class="menububble"
         :editor="editor"
@@ -283,7 +283,7 @@
           :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
         >
           <a-card class="pa-0">
-            <v-card-text class="pa-0">
+            <a-card-text class="pa-0">
               <form
                 class="menububble__form"
                 v-if="linkMenuIsActive"
@@ -316,12 +316,12 @@
                   <v-icon>mdi-link</v-icon>
                 </v-btn>
               </template>
-            </v-card-text>
+            </a-card-text>
           </a-card>
         </div>
       </editor-menu-bubble>
       <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%" />
-    </v-card-text>
+    </a-card-text>
   </a-card>
 </template>
 
@@ -352,6 +352,7 @@ import {
 
 import CustomLink from '@/utils/TipTapCustomLink';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
@@ -359,6 +360,7 @@ export default {
     EditorMenuBar,
     EditorMenuBubble,
     ACard,
+    ACardText,
   },
   props: {
     value: {

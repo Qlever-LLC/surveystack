@@ -189,10 +189,10 @@
 
     <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
       <a-card>
-        <v-card-text class="pa-4">
+        <a-card-text class="pa-4">
           <span>Downloading file resource</span>
           <v-progress-linear indeterminate class="mb-0" />
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </v-dialog>
 
@@ -212,6 +212,7 @@ import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -275,6 +276,7 @@ export default {
   components: {
     SubmissionTableCellModal,
     ACard,
+    ACardText,
   },
   props: {
     actionsAreDisabled: {

@@ -93,10 +93,10 @@
         <v-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>
         </v-card-title>
-        <v-card-text>
+        <a-card-text>
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
-        </v-card-text>
-        <v-card-text>
+        </a-card-text>
+        <a-card-text>
           <v-row>
             <v-col md="2" sm="6">
               <v-select
@@ -141,7 +141,7 @@
               </div>
             </v-col>
           </v-row>
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </v-container>
 
@@ -224,6 +224,7 @@ import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -266,6 +267,7 @@ export default {
     appDialog,
     appSubmissionArchiveDialog,
     ACard,
+    ACardText,
   },
   data() {
     return {

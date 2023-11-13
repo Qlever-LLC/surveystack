@@ -15,7 +15,7 @@
           <kbd>{{ submitted }}</kbd> submitted
         </strong>
       </a-card-subtitle>
-      <v-card-text>
+      <a-card-text>
         Submitting to: {{ groupPath || '--' }}
         <br />
         <span v-if="submission.meta.submitAsUser">
@@ -26,7 +26,7 @@
         <br />
         Last modified: {{ modified }}
         <br />
-      </v-card-text>
+      </a-card-text>
     </a-card>
     <v-timeline v-if="controlDisplays" dense class="width: 100%">
       <template v-for="(display, idx) in controlDisplays">
@@ -66,17 +66,17 @@
             </v-card-title>
 
             <!-- path (not shown) -->
-            <v-card-text v-if="false" class="my-0 py-0">
+            <a-card-text v-if="false" class="my-0 py-0">
               <span
                 class="font-weight-light grey--text text--darken-2 mt-n1"
                 style="font-size: 0.9rem; position: relative"
               >
                 {{ display.path }}
               </span>
-            </v-card-text>
+            </a-card-text>
 
             <!-- value -->
-            <v-card-text v-if="display.value && display.ellipsis" class="pb-7">
+            <a-card-text v-if="display.value && display.ellipsis" class="pb-7">
               <div
                 class="d-flex"
                 style="max-width: 99%; position: absolute"
@@ -86,23 +86,23 @@
                   {{ display.value }}
                 </div>
               </div>
-            </v-card-text>
+            </a-card-text>
 
-            <v-card-text v-else-if="display.value && !display.ellipsis" style="padding-bottom: 2px">
+            <a-card-text v-else-if="display.value && !display.ellipsis" cssPaddingBottom2px>
               <div class="d-flex" @click.stop="display.ellipsis = !display.ellipsis">
                 <div class="overview-value">{{ display.value }}</div>
               </div>
-            </v-card-text>
+            </a-card-text>
 
-            <v-card-text v-else> No answer </v-card-text>
+            <a-card-text v-else> No answer </a-card-text>
 
             <!-- date modified -->
-            <v-card-text class="pt-1 pb-0" v-if="display.modified">
+            <a-card-text class="pt-1 pb-0" v-if="display.modified">
               <div class="d-flex justify-space-between text--secondary" style="font-size: 0.8rem">
                 <div v-if="display.modified">{{ display.modified }}</div>
                 <div v-if="display.modifiedHumanized">{{ display.modifiedHumanized }} ago</div>
               </div>
-            </v-card-text>
+            </a-card-text>
           </a-card>
 
           <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
@@ -122,6 +122,7 @@ import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
 import ACard from '@/components/ui/ACard.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -151,6 +152,7 @@ export default {
   components: {
     ACard,
     ACardSubtitle,
+    ACardText,
   },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {

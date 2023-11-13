@@ -49,7 +49,7 @@
       </v-btn>
     </div>
     <a-card :loading="isLoadingGroup" class="mb-4">
-      <v-card-text>
+      <a-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
           <v-text-field
             label="Name"
@@ -96,7 +96,7 @@
             <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
           </div>
         </form>
-      </v-card-text>
+      </a-card-text>
     </a-card>
 
     <v-row>
@@ -203,6 +203,7 @@ import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const integrations = [
   {
@@ -227,6 +228,7 @@ export default {
     appConfirmMembershipButton,
     appMemberHyloStatus,
     ACard,
+    ACardText,
   },
   data() {
     return {

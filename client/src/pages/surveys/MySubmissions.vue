@@ -115,9 +115,9 @@
           </v-tab-item>
         </v-tabs-items>
         <a-card v-else>
-          <v-card-text class="d-flex align-center justify-center">
+          <a-card-text class="d-flex align-center justify-center">
             <v-progress-circular :size="50" color="primary" indeterminate />
-          </v-card-text>
+          </a-card-text>
         </a-card>
       </v-row>
       <confirm-submission-dialog
@@ -155,6 +155,7 @@ import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -166,6 +167,7 @@ export default {
     ResultDialog,
     ACard,
     ACardActions,
+    ACardText,
   },
   watch: {
     activeSubmissionId(id) {

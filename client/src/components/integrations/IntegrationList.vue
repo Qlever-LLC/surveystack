@@ -6,7 +6,7 @@
         <v-spacer />
         <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
       </v-card-title>
-      <v-card-text>
+      <a-card-text>
         <v-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
         <template v-if="entities && entities.length > 0">
           <v-list-item
@@ -22,16 +22,18 @@
           </v-list-item>
         </template>
         <div v-else class="grey--text">No {{ title }} yet</div>
-      </v-card-text>
+      </a-card-text>
     </a-card>
   </div>
 </template>
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 export default {
   components: {
     ACard,
+    ACardText,
   },
   props: {
     entities: {

@@ -23,7 +23,7 @@
         <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </v-btn>
       </v-card-title>
 
-      <v-card-text class="dialog-content">
+      <a-card-text class="dialog-content">
         <div class="row-cell pr-11">
           <div class="flex-grow-1">Label</div>
           <div class="flex-grow-1">Value</div>
@@ -53,7 +53,7 @@
             <v-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</v-icon>
           </div>
         </draggable>
-      </v-card-text>
+      </a-card-text>
 
       <v-divider></v-divider>
 
@@ -70,12 +70,14 @@
 import draggable from 'vuedraggable';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     draggable,
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     value: {

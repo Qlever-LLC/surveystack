@@ -2,7 +2,7 @@
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <a-card>
       <v-card-title> Add Survey To Library </v-card-title>
-      <v-card-text>
+      <a-card-text>
         <v-text-field :value="localLibrarySurvey.name" label="Title" readonly />
         <h3>Description</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryDescription" class="mb-4" />
@@ -18,7 +18,7 @@
           :disabled="false"
           label="Latest change type"
         />
-      </v-card-text>
+      </a-card-text>
       <a-card-actions class="mr-3">
         <v-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
@@ -36,10 +36,11 @@ import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions },
+  components: { LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions, ACardText },
   props: {
     value: {
       type: Boolean,

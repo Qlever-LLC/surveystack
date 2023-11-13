@@ -12,18 +12,18 @@
     </v-dialog>
     <v-dialog :value="uploadingResource" hide-overlay persistent width="300">
       <a-card>
-        <v-card-text class="pa-4">
+        <a-card-text class="pa-4">
           <span>Uploading file resource</span>
           <v-progress-linear indeterminate class="mb-0" />
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </v-dialog>
     <v-dialog :value="downloadingResource" hide-overlay persistent width="300">
       <a-card>
-        <v-card-text class="pa-4">
+        <a-card-text class="pa-4">
           <span>Downloading file resource</span>
           <v-progress-linear indeterminate class="mb-0" />
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </v-dialog>
     <v-alert v-if="openResourceError" type="warning" dismissible>
@@ -109,11 +109,13 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     appOntologyListEditor,
     ACard,
+    ACardText,
   },
   props: {
     resources: {

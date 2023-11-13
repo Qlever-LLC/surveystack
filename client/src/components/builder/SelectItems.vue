@@ -19,7 +19,7 @@
     <a-card>
       <v-card-title class="grey--text text--darken-2"> Default value </v-card-title>
 
-      <v-card-text class="dialog-content">
+      <a-card-text class="dialog-content">
         <div v-if="multiple" class="checkbox-group">
           <v-checkbox
             v-for="(item, index) in items"
@@ -36,7 +36,7 @@
           <v-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
           <v-radio v-if="custom" label="other" value="other" />
         </v-radio-group>
-      </v-card-text>
+      </a-card-text>
 
       <v-divider></v-divider>
 
@@ -52,6 +52,8 @@
 <script>
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
+
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
@@ -60,6 +62,7 @@ export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     value: { type: [String, Array] },

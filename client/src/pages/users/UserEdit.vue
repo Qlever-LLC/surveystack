@@ -13,11 +13,11 @@
           </template>
           <a-card>
             <v-card-title class="text-h5"> Change Email </v-card-title>
-            <v-card-text>
+            <a-card-text>
               <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
               Integrations which use your email will no longer work and will need to be updated. These integrations will
               not work properly until you have re-mapped or updated them. Are you sure?
-            </v-card-text>
+            </a-card-text>
             <a-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
@@ -25,7 +25,7 @@
           </a-card>
         </v-dialog></v-card-title
       >
-      <v-card-text
+      <a-card-text
         ><v-form>
           <v-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
           <v-text-field tabindex="2" v-model="entity.name" label="Name" />
@@ -57,8 +57,8 @@
             <v-btn text @click="cancel">Cancel</v-btn>
             <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</v-btn>
           </div>
-        </v-form></v-card-text
-      >
+        </v-form>
+      </a-card-text>
     </a-card>
     <!-- <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert> -->
     <transition name="fade">
@@ -76,12 +76,14 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     appFeedback,
     ACard,
     ACardActions,
+    ACardText,
   },
   data() {
     return {

@@ -74,12 +74,12 @@
 
     <v-overlay class="text-center" :value="!value && !gpsLocation && !mapError && !geolocationError" light absolute>
       <a-card light>
-        <v-card-text>
+        <a-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>
           <div class="mt-2">
             <v-progress-linear indeterminate rounded height="6" />
           </div>
-        </v-card-text>
+        </a-card-text>
       </a-card>
     </v-overlay>
     <app-control-more-info :value="control.moreInfo" />

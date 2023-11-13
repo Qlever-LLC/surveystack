@@ -22,7 +22,7 @@
         </div>
       </v-card-title>
 
-      <v-card-text class="pt-0">
+      <a-card-text class="pt-0">
         <div class="d-flex justify-start"></div>
         <div>
           <draggable
@@ -76,7 +76,7 @@
                       <v-icon>mdi-trash-can-outline</v-icon>
                     </v-btn>
                   </div>
-                  <v-card-text>
+                  <a-card-text>
                     <v-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <v-text-field v-model="item.value" label="Value" dense />
                     <v-select
@@ -234,7 +234,7 @@
                       hint="Default 100"
                       persistent-hint
                     />
-                  </v-card-text>
+                  </a-card-text>
                 </a-card>
               </div>
             </div>
@@ -244,7 +244,7 @@
             </v-btn>
           </draggable>
         </div>
-      </v-card-text>
+      </a-card-text>
       <v-spacer />
       <a-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
         <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
@@ -264,6 +264,7 @@ import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -294,6 +295,7 @@ export default {
     Checkbox,
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     value: {

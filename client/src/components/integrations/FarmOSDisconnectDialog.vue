@@ -2,7 +2,7 @@
   <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <a-card class="pa-4">
       <v-card-title class="headline"> Manage Groups </v-card-title>
-      <v-card-text>
+      <a-card-text>
         Update Groups with Access to Farm Instance
         <br />
         <v-autocomplete
@@ -33,7 +33,7 @@
           <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
           <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
         </div>
-      </v-card-text>
+      </a-card-text>
     </a-card>
   </v-dialog>
 </template>
@@ -41,11 +41,13 @@
 <script>
 import './css/button.css';
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
   components: {
     ACard,
+    ACardText,
   },
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {

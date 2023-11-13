@@ -12,7 +12,7 @@
           </template>
           <a-card>
             <v-card-title> Edit Survey Details</v-card-title>
-            <v-card-text>
+            <a-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <v-select
                 outlined
@@ -21,7 +21,7 @@
                 :items="availableSubmissions"
               />
               <v-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
-            </v-card-text>
+            </a-card-text>
             <a-card-actions class="mr-3">
               <v-spacer />
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
@@ -36,12 +36,12 @@
           </template>
           <a-card>
             <v-card-title> Survey Resources</v-card-title>
-            <v-card-text>
+            <a-card-text>
               <app-resources
                 :resources="survey.resources"
                 @set-survey-resources="(val) => $emit('set-survey-resources', val)"
               />
-            </v-card-text>
+            </a-card-text>
             <a-card-actions class="mr-3">
               <v-spacer />
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
@@ -166,7 +166,7 @@
         </div>
       </div>
     </v-card-title>
-    <v-card-text>
+    <a-card-text>
       <div class="mt-4">
         <v-text-field
           :value="surveyGroupName"
@@ -251,7 +251,7 @@
           {{ error }}
         </div>
       </v-tooltip>
-    </v-card-text>
+    </a-card-text>
   </a-card>
 </template>
 
@@ -268,6 +268,7 @@ import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -335,6 +336,7 @@ export default {
     appResources,
     ACard,
     ACardActions,
+    ACardText,
   },
   methods: {
     async getGroupNameById(id) {

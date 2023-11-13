@@ -20,10 +20,10 @@
       </p>
 
       <a-card outlined>
-        <v-card-text> <div>User Details</div></v-card-text>
-        <v-card-text>
+        <a-card-text> <div>User Details</div></a-card-text>
+        <a-card-text>
           <v-form>
-            <v-card-text>
+            <a-card-text>
               <v-row>
                 <div class="text-h6">{{ email }}</div>
                 <v-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
@@ -32,11 +32,11 @@
                   </template>
                   <a-card>
                     <v-card-title class="text-h5"> Change Email </v-card-title>
-                    <v-card-text>
+                    <a-card-text>
                       <v-text-field tabindex="1" v-model="email" label="E-Mail" />
                       Integrations which use your email will no longer work and will need to be updated. These
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
-                    </v-card-text>
+                    </a-card-text>
                     <a-card-actions>
                       <v-spacer></v-spacer>
                       <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
@@ -45,7 +45,7 @@
                     </a-card-actions>
                   </a-card>
                 </v-dialog></v-row
-              ></v-card-text
+              ></a-card-text
             >
             <v-text-field tabindex="2" v-model="name" label="Name" />
             <v-text-field
@@ -73,8 +73,8 @@
             <div class="d-flex mt-2 justify-end">
               <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</v-btn>
             </div>
-          </v-form></v-card-text
-        >
+          </v-form>
+        </a-card-text>
       </a-card>
 
       <div class="mt-8 mb-4">
@@ -91,16 +91,16 @@
       <v-dialog v-model="isLeaveDialogOpen" max-width="290">
         <a-card>
           <v-card-title> Leave Group </v-card-title>
-          <v-card-text v-if="parentAdminGroup" class="mt-4">
+          <a-card-text v-if="parentAdminGroup" class="mt-4">
             To leave <strong>{{ activeGroup.name }}</strong
             >, you must leave <strong>{{ parentAdminGroup.name }}</strong> or change status from
             <strong>Admin</strong> to <strong>Member</strong>
-          </v-card-text>
-          <v-card-text v-else>
+          </a-card-text>
+          <a-card-text v-else>
             Are you sure you want to leave
             <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
             >?
-          </v-card-text>
+          </a-card-text>
           <a-card-actions>
             <v-spacer />
             <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
@@ -126,6 +126,7 @@ import api from '@/services/api.service';
 import { pick } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -143,6 +144,7 @@ export default {
     ActiveGroupSelector,
     ACard,
     ACardActions,
+    ACardText,
   },
   data() {
     return {

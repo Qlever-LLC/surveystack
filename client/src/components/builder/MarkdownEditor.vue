@@ -23,7 +23,7 @@
         <slot name="title"></slot>
       </v-card-title>
 
-      <v-card-text>
+      <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
           <v-btn-toggle v-model="viewMode" mandatory dense>
             <v-btn>Edit</v-btn>
@@ -77,7 +77,7 @@
             </v-list>
           </div>
         </div>
-      </v-card-text>
+      </a-card-text>
 
       <a-card-actions>
         <v-spacer></v-spacer>
@@ -93,6 +93,7 @@ import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/
 import MarkdownIt from 'markdown-it';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
@@ -101,6 +102,7 @@ export default {
   components: {
     ACard,
     ACardActions,
+    ACardText,
   },
   props: {
     value: { type: String },

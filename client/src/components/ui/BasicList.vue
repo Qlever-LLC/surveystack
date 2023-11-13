@@ -9,7 +9,7 @@
         <v-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</v-btn>
       </slot>
     </v-card-title>
-    <v-card-text>
+    <a-card-text>
       <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <v-list
         v-if="entities.length > 0"
@@ -32,15 +32,17 @@
       </v-list>
 
       <div v-else class="grey--text">No {{ title }} yet</div>
-    </v-card-text>
+    </a-card-text>
   </a-card>
 </template>
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 export default {
   components: {
     ACard,
+    ACardText,
   },
   props: {
     loading: {

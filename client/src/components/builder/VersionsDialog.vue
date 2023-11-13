@@ -2,7 +2,7 @@
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
     <a-card>
       <v-card-title>Survey Versions</v-card-title>
-      <v-card-text style="max-height: 500px">
+      <a-card-text cssMaxHeight500px>
         <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
@@ -70,7 +70,7 @@
         <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" dismissible>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
         </v-alert>
-      </v-card-text>
+      </a-card-text>
       <v-divider></v-divider>
       <a-card-actions>
         <v-spacer />
@@ -113,9 +113,10 @@ import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
-  components: { SurveyDiffDialog, ACard, ACardActions },
+  components: { SurveyDiffDialog, ACard, ACardActions, ACardText },
   props: {
     value: {
       type: Boolean,
