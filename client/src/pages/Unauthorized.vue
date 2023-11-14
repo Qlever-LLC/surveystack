@@ -1,13 +1,18 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>Access denied</h1>
     Only {{ allowed }} are allowed on <strong>{{ to.path }}</strong
     >. Goodbye!
-  </v-container>
+  </a-container>
 </template>
 
 <script>
+import AContainer from '@/components/ui/AContainer.vue';
+
 export default {
+  components: {
+    AContainer,
+  },
   props: {
     allowed: {
       type: String,

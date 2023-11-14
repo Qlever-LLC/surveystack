@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <v-container class="maxw-40">
+    <a-container class="maxw-40">
       <v-card class="pa-5">
         <h1>New password</h1>
         <p>Set a new password for {{ this.email }}</p>
@@ -37,7 +37,7 @@
           >.
         </app-feedback>
       </transition>
-    </v-container>
+    </a-container>
   </div>
 </template>
 
@@ -45,10 +45,12 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appFeedback,
+    AContainer,
   },
   data() {
     return {

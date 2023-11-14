@@ -13,10 +13,10 @@
     <div class="d-flex justify-end mb-4">
       <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
     </div>
-    <v-container v-if="loading" class="d-flex align-center justify-center" style="height: 100%">
+    <a-container v-if="loading" class="d-flex align-center justify-center" cssHeight100>
       <v-progress-circular :size="50" color="primary" indeterminate />
-    </v-container>
-    <v-container fluid class="pa-0" v-else>
+    </a-container>
+    <a-container fluid class="pa-0" v-else>
       <v-row dense>
         <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
@@ -118,7 +118,7 @@
           </v-card>
         </v-col>
       </v-row>
-    </v-container>
+    </a-container>
     <v-pagination
       v-if="surveys.content.length > 0 && !selectedSurvey"
       v-model="page"
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    AContainer,
   },
   props: ['survey', 'libraryId'],
   data() {

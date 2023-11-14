@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>Tabula Rasa</h1>
     <p>
       This will clear all surveys and all submissions. And furthermore create an example survey with corresponding
@@ -12,17 +12,19 @@
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import appFeedback from '@/components/ui/Feedback.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appFeedback,
+    AContainer,
   },
   data() {
     return {

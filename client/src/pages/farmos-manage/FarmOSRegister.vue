@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
       <v-autocomplete
         outlined
@@ -216,7 +216,7 @@
       width="400"
       >{{ successMessage }}</app-dialog
     >
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -224,6 +224,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 import { timezones } from './timezones';
 
@@ -233,6 +234,7 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
+    AContainer,
   },
   data() {
     return {

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <a-container fluid>
     <h1>Andreas' Sandbox</h1>
     <v-card class="pt-2">
       <v-data-table
@@ -36,14 +36,18 @@
         </template>
       </v-data-table>
     </v-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       excludeMeta: true,

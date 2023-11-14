@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
       successMessage
     }}</v-alert>
@@ -38,7 +38,7 @@
     </v-tabs-items>
 
     <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</v-alert>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -49,8 +49,12 @@ import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       mappings: null,

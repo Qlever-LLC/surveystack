@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <v-container>
+    <a-container>
       <v-tabs v-model="activeTab" fixed-tabs>
         <v-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
           <span v-if="tab.name === 'active-group'" class="text-no-wrap">
@@ -96,7 +96,7 @@
           />
         </v-card-actions>
       </v-card>
-    </v-container>
+    </a-container>
   </div>
 </template>
 
@@ -105,10 +105,14 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
+import AContainer from '@/components/ui/AContainer.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       selectedGroupIds: [],

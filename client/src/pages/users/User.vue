@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-card>
       <v-card-text>
         <div class="overline">{{ user._id }}</div>
@@ -27,13 +27,17 @@
         </v-list-item>
       </v-list>
     </v-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       user: {

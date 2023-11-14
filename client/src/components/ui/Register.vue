@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-card class="pa-6 pa-sm-12">
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
@@ -42,11 +42,12 @@
 
       <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
     </v-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import AContainer from '@/components/ui/AContainer.vue';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
@@ -57,6 +58,9 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       status: '',

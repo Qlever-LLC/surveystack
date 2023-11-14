@@ -45,7 +45,7 @@
       </template>
     </app-dialog>
 
-    <v-container>
+    <a-container>
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
@@ -143,9 +143,9 @@
           </v-row>
         </v-card-text>
       </v-card>
-    </v-container>
+    </a-container>
 
-    <v-container>
+    <a-container>
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -202,7 +202,7 @@
           </div>
         </v-col>
       </v-row>
-    </v-container>
+    </a-container>
   </div>
 </template>
 
@@ -223,6 +223,7 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -264,6 +265,7 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
+    AContainer,
   },
   data() {
     return {

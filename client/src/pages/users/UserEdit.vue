@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>{{ editMode ? 'Edit user' : 'Create user' }}</h1>
     <div v-if="hasMembership && groupEntity" class="subtitle-1">
       ... with role <span class="font-weight-bold">{{ $route.query.role }}</span> @
@@ -66,7 +66,7 @@
         status.message
       }}</app-feedback>
     </transition>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -74,10 +74,12 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appFeedback,
+    AContainer,
   },
   data() {
     return {

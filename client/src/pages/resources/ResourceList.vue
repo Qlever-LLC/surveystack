@@ -1,16 +1,18 @@
 <template>
-  <v-container>
+  <a-container>
     <app-basic-list :entities="entities" title="Resources" />
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appBasicList from '@/components/ui/BasicList.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appBasicList,
+    AContainer,
   },
   data() {
     return {

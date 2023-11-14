@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
@@ -102,7 +102,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import AContainer from '@/components/ui/AContainer.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,10 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: {
+    BtnDropdown,
+    AContainer,
+  },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

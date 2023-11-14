@@ -1,5 +1,5 @@
 <template>
-  <v-container class="wrapper">
+  <a-container class="wrapper">
     <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
@@ -111,7 +111,7 @@
         </v-timeline-item>
       </template>
     </v-timeline>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -120,6 +120,7 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
+import AContainer from '@/components/ui/AContainer.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -146,6 +147,9 @@ function iconify(value, control, relevant) {
 }
 
 export default {
+  components: {
+    AContainer,
+  },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {

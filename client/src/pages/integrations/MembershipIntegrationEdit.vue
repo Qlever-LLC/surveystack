@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-card class="pa-4 mb-4">
       <span class="text--secondary overline">{{ this.entity._id }}</span>
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
@@ -31,7 +31,7 @@
         </div>
       </v-form>
     </v-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -40,6 +40,7 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFarmosFarmPicker from '@/components/integrations/FarmosFarmPicker.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -64,6 +65,7 @@ export default {
   components: {
     appJsonEditor,
     appFarmosFarmPicker,
+    AContainer,
   },
   data() {
     return {

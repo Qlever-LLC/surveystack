@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage FarmOS Instances</h1>
 
@@ -231,14 +231,18 @@
         </template>
       </v-simple-table>
     </div>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import _ from 'lodash';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   emits: ['addSuperAdminNote'],
+  components: {
+    AContainer,
+  },
   props: {
     groups: Array,
     mappings: Object,

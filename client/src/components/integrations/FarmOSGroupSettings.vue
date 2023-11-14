@@ -48,7 +48,7 @@
 
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
-          <v-container class="pa-0" fluid>
+          <a-container class="pa-0" fluid>
             <v-tooltip bottom :disabled="canAddCoffeeShop">
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
@@ -82,7 +82,7 @@
               @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
             />
-          </v-container>
+          </a-container>
         </div>
       </div>
       <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">
@@ -109,10 +109,12 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
+    AContainer,
   },
   props: {
     groupInfos: {

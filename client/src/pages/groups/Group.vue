@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="initialized && status.code === 200">
+  <a-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
       <app-group-breadcrumbs :path="entity.path" />
 
@@ -59,25 +59,27 @@
         </app-basic-list>
       </v-col>
     </v-row>
-  </v-container>
-  <v-container v-else-if="status.code === 404">
+  </a-container>
+  <a-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>
     <p>
       No group under <strong>{{ $route.params.pathMatch }}</strong> was found :/
     </p>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   name: 'Group',
   components: {
     appGroupBreadcrumbs,
     appBasicList,
+    AContainer,
   },
   data() {
     return {

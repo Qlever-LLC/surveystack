@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center">
       <h1>Browse Users</h1>
 
@@ -22,13 +22,17 @@
         <v-divider />
       </div>
     </v-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       entities: [],

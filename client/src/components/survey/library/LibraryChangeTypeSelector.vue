@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="py-0">
+  <a-container fluid class="py-0">
     <v-row class="pa-0">
       <v-col v-if="disabled" cols="auto" class="pa-0 mt-1"
         ><b
@@ -43,11 +43,17 @@
         </v-tooltip>
       </v-col>
     </v-row>
-  </v-container>
+  </a-container>
 </template>
+
 <script>
+import AContainer from '@/components/ui/AContainer.vue';
+
 export default {
   name: 'library-change-type-selector',
+  components: {
+    AContainer,
+  },
   props: ['value', 'disabled', 'label'],
   data() {
     return {

@@ -7,9 +7,9 @@
       <v-divider></v-divider>
       <v-card-text>
         <v-list dense style="max-height: 500px" class="overflow-y-auto">
-          <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
+          <a-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" cssHeight100>
             <v-progress-circular :size="50" color="primary" indeterminate />
-          </v-container>
+          </a-container>
           <template v-if="libraryConsumers !== null">
             <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
@@ -31,10 +31,13 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {},
+  components: {
+    AContainer,
+  },
   props: {
     value: {
       type: Boolean,

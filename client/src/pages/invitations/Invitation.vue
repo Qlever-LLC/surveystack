@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-alert v-if="errorMsg" class="mt-4" mode="fade" text type="error">{{ errorMsg }}</v-alert>
     <template v-if="initialized && membership">
       <h1>Invitation</h1>
@@ -28,15 +28,19 @@
       </div>
     </template>
     <v-progress-circular v-else :size="50" color="primary" indeterminate></v-progress-circular>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       initialized: false,

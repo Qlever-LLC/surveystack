@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-layout text-center wrap>
       <v-flex xs12>
         <v-img :src="require('../assets/logo.svg')" class="my-3" contain height="200"></v-img>
@@ -44,13 +44,17 @@
         </v-layout>
       </v-flex>
     </v-layout>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
+import AContainer from '@/components/ui/AContainer.vue';
+
 export default {
   name: 'HelloWorld',
-
+  components: {
+    AContainer,
+  },
   data: () => ({
     ecosystem: [
       {

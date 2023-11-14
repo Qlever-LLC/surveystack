@@ -1,5 +1,15 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>Super Admin Interface</h1>
-  </v-container>
+  </a-container>
 </template>
+
+<script>
+import AContainer from '@/components/ui/AContainer.vue';
+
+export default {
+  components: {
+    AContainer,
+  },
+};
+</script>

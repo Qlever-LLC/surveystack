@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h1>Edit Membership</h1>
 
@@ -95,12 +95,13 @@
 
       <span class="body-1">{{ invitationLink }}</span>
     </app-dialog>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 const availableRoles = [
   {
@@ -127,6 +128,7 @@ const availableStatus = [
 export default {
   components: {
     appDialog,
+    AContainer,
   },
   data() {
     return {

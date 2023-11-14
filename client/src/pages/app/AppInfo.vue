@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>App Info</h1>
     <p>
       Current commit: <strong>{{ lcl.shortHash }}</strong>
@@ -10,11 +10,16 @@
     <br />
     To view the source code visit our
     <a href="https://gitlab.com/our-sci/software/surveystack" target="_blank">Gitlab repository</a>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
+import AContainer from '@/components/ui/AContainer.vue';
+
 export default {
+  components: {
+    AContainer,
+  },
   data() {
     return {
       version: process.env.VUE_APP_VERSION,

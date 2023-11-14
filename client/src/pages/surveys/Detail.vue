@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="entity && show" class="survey-detail">
+  <a-container v-if="entity && show" class="survey-detail">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
       <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <v-icon>mdi-pencil</v-icon>
@@ -74,12 +74,12 @@
         />
       </div>
     </div>
-  </v-container>
-  <v-container fill-height v-else>
+  </a-container>
+  <a-container fill-height v-else>
     <v-layout column justify-center align-center>
       <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
     </v-layout>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -90,6 +90,7 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   props: {
@@ -102,6 +103,7 @@ export default {
   components: {
     BtnDropdown,
     MemberSelector,
+    AContainer,
   },
   data() {
     return {

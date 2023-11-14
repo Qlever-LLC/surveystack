@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-card class="pa-3">
       <ul v-if="submissions.content.length > 0" class="list-group">
         <li v-for="submission in submissions.content" :key="submission._id" class="list-group-item pa-2">
@@ -13,16 +13,18 @@
         </li>
       </ul>
     </v-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import treeItem from '@/components/survey/TreeItem.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   props: ['submissions'],
   components: {
     treeItem,
+    AContainer,
   },
 };
 </script>

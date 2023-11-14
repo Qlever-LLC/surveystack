@@ -1,6 +1,6 @@
 <template>
   <v-card style="height: 90vh" color="grey darken-3">
-    <v-container>
+    <a-container>
       <v-row dark>
         <v-spacer></v-spacer>
         <v-autocomplete
@@ -20,12 +20,13 @@
       <div style="width: 100%; height: 80vh">
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>
       </div>
-    </v-container>
+    </a-container>
   </v-card>
 </template>
 
 <script>
 import appCodeView from '@/components/builder/CodeView.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 const reg = /.*\/(.*?)$/;
 
@@ -40,6 +41,7 @@ const examples = req.keys().map((key) => ({
 export default {
   components: {
     appCodeView,
+    AContainer,
   },
   props: ['category'],
   data() {

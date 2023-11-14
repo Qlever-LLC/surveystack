@@ -1,17 +1,19 @@
 <template>
-  <v-container>
+  <a-container>
     <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" clearable />
     <app-entity-list :entities="entities" collection="scripts" />
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appEntityList from '@/components/ui/EntityList.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appEntityList,
+    AContainer,
   },
   data() {
     return {

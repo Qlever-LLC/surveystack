@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <app-dialog
       v-model="learnMoreDialog"
       title="Premium Features"
@@ -187,7 +187,7 @@
     </v-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -202,6 +202,7 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+import AContainer from '@/components/ui/AContainer.vue';
 
 const integrations = [
   {
@@ -225,6 +226,7 @@ export default {
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
+    AContainer,
   },
   data() {
     return {

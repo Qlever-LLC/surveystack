@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-card class="pa-4 mb-4">
       <span class="text--secondary overline">{{ this.entity._id }}</span>
 
@@ -23,7 +23,7 @@
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -32,6 +32,7 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFeedback from '@/components/ui/Feedback.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -56,6 +57,7 @@ export default {
   components: {
     appJsonEditor,
     appFeedback,
+    AContainer,
   },
   data() {
     return {

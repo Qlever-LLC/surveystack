@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
 
     <div class="d-flex justify-space-between align-center ma-4">
@@ -97,11 +97,16 @@
         </tbody>
       </template>
     </v-simple-table>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
+import AContainer from '@/components/ui/AContainer.vue';
+
 export default {
+  components: {
+    AContainer,
+  },
   props: {
     groups: Array,
     mappings: Object,

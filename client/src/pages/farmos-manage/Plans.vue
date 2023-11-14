@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Plans</h1>
 
@@ -45,11 +45,16 @@
         </tbody>
       </template>
     </v-simple-table>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
+import AContainer from '@/components/ui/AContainer.vue';
+
 export default {
+  components: {
+    AContainer,
+  },
   props: ['viewModel', 'loading'],
   data() {
     return {

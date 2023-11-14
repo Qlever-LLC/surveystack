@@ -1,17 +1,19 @@
 <template>
   <div class="wrapper">
-    <v-container class="maxw-40">
+    <a-container class="maxw-40">
       <app-forgot-password :useLink="true" />
-    </v-container>
+    </a-container>
   </div>
 </template>
 
 <script>
 import AppForgotPassword from '@/components/ui/ForgotPassword.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     AppForgotPassword,
+    AContainer,
   },
 };
 </script>

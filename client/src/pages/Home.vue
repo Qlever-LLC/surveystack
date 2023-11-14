@@ -1,5 +1,5 @@
 <template>
-  <v-container class="home" :fluid="true">
+  <a-container class="home" fluid>
     <v-row>
       <v-col>
         <v-img
@@ -128,17 +128,19 @@
         <v-btn color="primary" x-large href="surveystack://measurement">Run Measurement</v-btn>
       </v-col>
     </v-row>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
+import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     AuthSelector,
     AppBasicList,
+    AContainer,
   },
   name: 'home',
   data() {

@@ -1,6 +1,6 @@
 <template>
   <div class="background wrapper">
-    <v-container>
+    <a-container>
       <v-row class="my-2">
         <v-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
@@ -140,7 +140,7 @@
         title="Result of Submission"
         persistent
       />
-    </v-container>
+    </a-container>
   </div>
 </template>
 
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import AContainer from '@/components/ui/AContainer.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    AContainer,
   },
   watch: {
     activeSubmissionId(id) {
