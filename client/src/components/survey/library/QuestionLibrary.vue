@@ -18,7 +18,7 @@
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
-        <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
+        <a-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
             @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
@@ -26,7 +26,7 @@
             elevation="7"
           >
             <v-row style="min-height: 96px">
-              <v-col :style="{ minWidth: '0px' }">
+              <a-col cssMinWidth0px>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
@@ -39,8 +39,8 @@
                 <v-chip dark small outlined color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
                 </v-chip>
-              </v-col>
-              <v-col align="right" md="auto">
+              </a-col>
+              <a-col align="right" md="auto">
                 <v-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
@@ -88,10 +88,10 @@
                     <span>Number of submission using this</span>
                   </v-tooltip>
                 </div>
-              </v-col>
+              </a-col>
             </v-row>
             <v-row v-if="selectedSurvey && selectedSurvey._id === c._id">
-              <v-col>
+              <a-col>
                 <h4>Description</h4>
                 <small v-html="selectedSurvey.meta.libraryDescription"></small>
                 <br />
@@ -103,8 +103,8 @@
                 <br />
                 <h4>Updates</h4>
                 <small v-html="selectedSurvey.meta.libraryHistory"></small>
-              </v-col>
-              <v-col>
+              </a-col>
+              <a-col>
                 <h4>Questions</h4>
                 <graphical-view
                   :readOnly="true"
@@ -113,10 +113,10 @@
                   class="graphical-view"
                   :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
                 />
-              </v-col>
+              </a-col>
             </v-row>
           </v-card>
-        </v-col>
+        </a-col>
       </v-row>
     </v-container>
     <v-pagination
@@ -130,12 +130,14 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import ACol from '@/components/ui/ACol.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
+    ACol,
   },
   props: ['survey', 'libraryId'],
   data() {

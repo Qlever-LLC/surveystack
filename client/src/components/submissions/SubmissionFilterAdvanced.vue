@@ -3,36 +3,36 @@
     <v-form class="d-flex flex-column">
       <v-textarea v-model="value.match" outlined label="Match" rows="3" />
       <v-row>
-        <v-col>
+        <a-col>
           <v-text-field v-model="value.sort" label="Sort" dense />
-        </v-col>
-        <v-col>
+        </a-col>
+        <a-col>
           <v-text-field v-model="value.project" label="Projection" dense />
-        </v-col>
-        <v-col cols="2">
+        </a-col>
+        <a-col cols="2">
           <v-text-field v-model.number="value.skip" label="Skip" dense />
-        </v-col>
-        <v-col cols="2">
+        </a-col>
+        <a-col cols="2">
           <v-text-field v-model.number="value.limit" label="Limit" dense />
-        </v-col>
+        </a-col>
       </v-row>
 
       <v-row dense>
-        <v-col>
+        <a-col>
           <v-checkbox label="Show irrelevant fields" v-model="value.showIrrelevant" class="my-0" hide-details />
-        </v-col>
+        </a-col>
       </v-row>
 
       <v-row dense>
-        <v-col>
+        <a-col>
           <v-checkbox label="Show data meta (CSV)" v-model="value.showCsvDataMeta" class="my-0" hide-details />
-        </v-col>
+        </a-col>
       </v-row>
 
       <v-row v-if="showRolesDebug">
-        <v-col cols="6">
+        <a-col cols="6">
           <v-text-field v-model.number="value.roles" label="Roles (Debug)" dense />
-        </v-col>
+        </a-col>
       </v-row>
 
       <div class="d-flex justify-end">
@@ -47,7 +47,11 @@
 </template>
 
 <script>
+import ACol from '@/components/ui/ACol.vue';
 export default {
+  components: {
+    ACol,
+  },
   props: {
     value: {
       type: Object,

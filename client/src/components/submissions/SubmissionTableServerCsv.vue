@@ -13,15 +13,15 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-row>
-              <v-col>
+              <a-col>
                 <v-toolbar-title>Simple CSV</v-toolbar-title>
-              </v-col>
-              <v-col>
+              </a-col>
+              <a-col>
                 <v-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
-              </v-col>
-              <v-col :cols="2">
+              </a-col>
+              <a-col :cols="2">
                 <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
-              </v-col>
+              </a-col>
             </v-row>
           </v-toolbar>
         </template>
@@ -42,8 +42,12 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
+import ACol from '@/components/ui/ACol.vue';
 
 export default {
+  components: {
+    ACol,
+  },
   data() {
     return {
       excludeMeta: true,

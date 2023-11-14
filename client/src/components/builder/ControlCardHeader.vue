@@ -6,7 +6,7 @@
       </template>
       <span>{{ typeName }}</span>
     </v-tooltip>
-    <v-col class="body-1 text-truncate">
+    <a-col class="body-1 text-truncate">
       <div class="font-weight-light grey--text text--darken-2">
         <span class="text-truncate">{{ index }}: {{ dataName }}</span>
         <v-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" outlined small :color="chipColor">
@@ -16,13 +16,17 @@
       <div class="text-truncate">
         {{ title }}
       </div>
-    </v-col>
+    </a-col>
   </v-row>
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';
+import ACol from '@/components/ui/ACol.vue';
 
 export default {
+  components: {
+    ACol,
+  },
   props: {
     index: { type: String, required: true },
     title: { type: String, required: true },

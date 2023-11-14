@@ -98,31 +98,28 @@
         </v-card-text>
         <v-card-text>
           <v-row>
-            <v-col md="2" sm="6">
-              <v-select
-                label="Format"
-                dense
-                :items="apiDownloadFormats"
-                hide-details
-                v-model="apiDownloadFormat"
-              /> </v-col
-            ><v-col md="2" sm="6">
-              <v-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" /></v-col
-            ><v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
+            <a-col md="2" sm="6">
+              <v-select label="Format" dense :items="apiDownloadFormats" hide-details v-model="apiDownloadFormat" />
+            </a-col>
+            <a-col md="2" sm="6">
+              <v-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
+            </a-col>
+            <a-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
               <v-select
                 label="Matrix answers"
                 dense
                 :items="apiDownloadExpandAllMatricesOptions"
                 hide-details
                 v-model="apiDownloadExpandAllMatrices"
-              /> </v-col
-            ><v-col md="2" sm="6">
+              />
+            </a-col>
+            <a-col md="2" sm="6">
               <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
-            </v-col></v-row
-          >
+            </a-col>
+          </v-row>
 
           <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
-            <v-col sm="2">
+            <a-col sm="2">
               <v-select
                 label="Page Size"
                 dense
@@ -131,15 +128,15 @@
                 v-model="pageSize"
                 @change="changedPaginationSize"
               />
-            </v-col>
-            <v-col cols="10">
+            </a-col>
+            <a-col cols="10">
               <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-            </v-col>
-            <v-col cols="1">
+            </a-col>
+            <a-col cols="1">
               <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
                 {{ submissions.pagination.total }} total
               </div>
-            </v-col>
+            </a-col>
           </v-row>
         </v-card-text>
       </v-card>
@@ -182,7 +179,7 @@
       </v-tabs>
 
       <v-row class="my-2">
-        <v-col cols="1">
+        <a-col cols="1">
           <v-select
             style="max-width: 5rem; display: inline-block"
             label="Page Size"
@@ -192,15 +189,15 @@
             v-model="pageSize"
             @change="changedPaginationSize"
           />
-        </v-col>
-        <v-col cols="10">
+        </a-col>
+        <a-col cols="10">
           <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-        </v-col>
-        <v-col cols="1">
+        </a-col>
+        <a-col cols="1">
           <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
             {{ submissions.pagination.total }} total
           </div>
-        </v-col>
+        </a-col>
       </v-row>
     </v-container>
   </div>
@@ -223,6 +220,7 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import ACol from '@/components/ui/ACol.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -264,6 +262,7 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
+    ACol,
   },
   data() {
     return {

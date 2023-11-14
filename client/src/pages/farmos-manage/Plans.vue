@@ -12,15 +12,15 @@
     </div>
 
     <v-row class="align-baseline">
-      <v-col>
+      <a-col>
         <v-text-field outlined primary label="New Plan Name" v-model.trim="planName"></v-text-field>
-      </v-col>
-      <v-col>
+      </a-col>
+      <a-col>
         <v-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl"></v-text-field>
-      </v-col>
-      <v-col>
+      </a-col>
+      <a-col>
         <v-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</v-btn>
-      </v-col>
+      </a-col>
     </v-row>
 
     <v-divider class="my-4"></v-divider>
@@ -49,7 +49,12 @@
 </template>
 
 <script>
+import ACol from '@/components/ui/ACol.vue';
+
 export default {
+  components: {
+    ACol,
+  },
   props: ['viewModel', 'loading'],
   data() {
     return {

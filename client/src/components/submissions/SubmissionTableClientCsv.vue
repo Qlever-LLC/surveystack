@@ -24,7 +24,7 @@
       <template v-slot:top>
         <v-toolbar flat class="my-5">
           <v-row>
-            <v-col>
+            <a-col>
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
                   <v-switch
@@ -92,7 +92,7 @@
                   </div>
                 </div>
               </div>
-            </v-col>
+            </a-col>
           </v-row>
         </v-toolbar>
       </template>
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import ACol from '@/components/ui/ACol.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -273,6 +274,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 export default {
   components: {
     SubmissionTableCellModal,
+    ACol,
   },
   props: {
     actionsAreDisabled: {

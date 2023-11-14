@@ -111,12 +111,12 @@
       <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
     <v-row v-if="loading">
-      <v-col>
+      <a-col>
         <v-progress-linear indeterminate class="mb-0" />
-      </v-col>
+      </a-col>
     </v-row>
     <v-row v-else>
-      <v-col lg="4" class="mx-auto">
+      <a-col lg="4" class="mx-auto">
         <v-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
@@ -130,7 +130,7 @@
             >Contact Our-Sci</v-btn
           >
         </v-card>
-      </v-col>
+      </a-col>
     </v-row>
   </v-container>
 </template>
@@ -146,6 +146,7 @@ import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemove
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
+import ACol from '@/components/ui/ACol.vue';
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
     FarmOSRemoveNoteDialog,
     appDialog,
     appGroupBreadcrumbs,
+    ACol,
   },
   computed: {
     superAdmin() {

@@ -25,7 +25,7 @@
       ></v-autocomplete>
 
       <v-row class="align-baseline">
-        <v-col>
+        <a-col>
           <v-text-field
             :disabled="!localViewModel.form.plan"
             v-model.trim="localViewModel.form.instanceName"
@@ -45,16 +45,16 @@
               >
             </template>
           </v-text-field>
-        </v-col>
+        </a-col>
 
-        <v-col>
+        <a-col>
           <v-btn
             @click="$emit('check-url', localViewModel)"
             color="primary"
             :disabled="!localViewModel.form.plan || localViewModel.loading"
             >Check URL</v-btn
           >
-        </v-col>
+        </a-col>
       </v-row>
 
       <v-text-field
@@ -224,6 +224,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
+import ACol from '@/components/ui/ACol.vue';
 
 import { timezones } from './timezones';
 
@@ -233,6 +234,7 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
+    ACol,
   },
   data() {
     return {

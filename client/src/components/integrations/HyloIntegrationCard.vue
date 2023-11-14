@@ -37,31 +37,23 @@
             </v-dialog>
           </v-app-bar>
           <v-spacer />
-          <!-- <v-col cols="4" sm="2" md="1"> -->
-          <!-- <v-avatar size="36px" class="mr-4">
-              <img alt="Avatar" :src="integratedHyloGroup.avatarUrl" />
-            </v-avatar> -->
-          <!-- </v-col> -->
 
           <v-card-title class="white--text mt-8">
             <v-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
             </v-avatar>
-            <v-col class="ml-3"
+            <a-col class="ml-3"
               ><p class="text-h5 mb-1">{{ integratedHyloGroup.name }}</p>
 
-              <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p></v-col
-            >
+              <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p>
+            </a-col>
           </v-card-title>
 
-          <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
           <v-card-text class="white--text">
             &nbsp;Your group is integrated with
             <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo
           </v-card-text>
-
-          <!-- </v-col> -->
         </v-img>
       </template>
 
@@ -89,7 +81,7 @@
                   :error-messages="findError"
                   class="mb-2"
                 ></v-text-field>
-                <v-col align="center">
+                <a-col align="center">
                   <v-btn
                     color="primary"
                     :disabled="!groupFound || isCreateIntegratedHyloGroupInProgress"
@@ -98,14 +90,14 @@
                   >
                     {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
                   </v-btn>
-                </v-col>
+                </a-col>
                 <v-row align="center" class="my-5">
                   <v-divider></v-divider><span class="mx-2">or</span><v-divider></v-divider
                 ></v-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 
-                <v-col align="center">
+                <a-col align="center">
                   <v-btn
                     color="primary"
                     :loading="isCreateIntegratedHyloGroupInProgress"
@@ -113,7 +105,7 @@
                     @click="createIntegratedHyloGroup"
                   >
                     Integrate with a new Hylo group
-                  </v-btn></v-col
+                  </v-btn></a-col
                 >
                 <div class="font-italic text-body-2 mb-4">
                   Default group settings are: anyone can find and see this group but people must apply to join this
@@ -136,8 +128,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ACol from '@/components/ui/ACol.vue';
 
 export default {
+  components: {
+    ACol,
+  },
   props: {
     groupId: String,
   },

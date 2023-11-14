@@ -100,7 +100,7 @@
     </v-card>
 
     <v-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-basic-list
           maxHeight="500px"
           :loading="isLoadingMembers || isLoadingHyloGroup"
@@ -151,11 +151,11 @@
             </v-list-item-action>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </v-row>
 
     <v-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-basic-list
           class="mb-4"
           v-if="editMode"
@@ -170,11 +170,11 @@
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </v-row>
 
     <v-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-pinned-surveys
           class="mb-4"
           v-if="editMode"
@@ -183,7 +183,7 @@
           @search="searchSurveys"
         >
         </app-pinned-surveys>
-      </v-col>
+      </a-col>
     </v-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
@@ -202,6 +202,7 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+import ACol from '@/components/ui/ACol.vue';
 
 const integrations = [
   {
@@ -225,6 +226,7 @@ export default {
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
+    ACol,
   },
   data() {
     return {

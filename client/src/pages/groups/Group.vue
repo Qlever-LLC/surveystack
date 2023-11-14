@@ -21,7 +21,7 @@
     <div class="text--secondary body-2">{{ entity._id }}</div>
 
     <v-row>
-      <v-col>
+      <a-col>
         <div class="d-flex justify-end">
           <v-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
         </div>
@@ -39,10 +39,10 @@
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </v-row>
     <v-row>
-      <v-col>
+      <a-col>
         <app-basic-list
           :editable="editable"
           :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []"
@@ -57,7 +57,7 @@
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </v-row>
   </v-container>
   <v-container v-else-if="status.code === 404">
@@ -72,12 +72,14 @@
 import api from '@/services/api.service';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
+import ACol from '@/components/ui/ACol.vue';
 
 export default {
   name: 'Group',
   components: {
     appGroupBreadcrumbs,
     appBasicList,
+    ACol,
   },
   data() {
     return {

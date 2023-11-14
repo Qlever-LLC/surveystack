@@ -72,9 +72,9 @@
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
                 <v-row align="center" justify="center">
-                  <v-col>
+                  <a-col>
                     <v-alert color="primary" class="black-text" text>No Drafts</v-alert>
-                  </v-col>
+                  </a-col>
                 </v-row>
               </div>
 
@@ -106,9 +106,9 @@
               </template>
               <div v-else>
                 <v-row align="center" justify="center">
-                  <v-col>
+                  <a-col>
                     <v-alert color="primary" class="black-text" text>No Submissions</v-alert>
-                  </v-col>
+                  </a-col>
                 </v-row>
               </div>
             </v-card>
@@ -153,6 +153,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import ACol from '@/components/ui/ACol.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -162,6 +163,7 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
+    ACol,
   },
   watch: {
     activeSubmissionId(id) {
