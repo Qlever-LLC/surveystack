@@ -31,7 +31,7 @@
                     <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
                   </template>
                   <a-card>
-                    <v-card-title class="text-h5"> Change Email </v-card-title>
+                    <a-card-title class="text-h5"> Change Email </a-card-title>
                     <a-card-text>
                       <v-text-field tabindex="1" v-model="email" label="E-Mail" />
                       Integrations which use your email will no longer work and will need to be updated. These
@@ -90,7 +90,7 @@
 
       <v-dialog v-model="isLeaveDialogOpen" max-width="290">
         <a-card>
-          <v-card-title> Leave Group </v-card-title>
+          <a-card-title> Leave Group </a-card-title>
           <a-card-text v-if="parentAdminGroup" class="mt-4">
             To leave <strong>{{ activeGroup.name }}</strong
             >, you must leave <strong>{{ parentAdminGroup.name }}</strong> or change status from
@@ -127,6 +127,7 @@ import { pick } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -145,6 +146,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

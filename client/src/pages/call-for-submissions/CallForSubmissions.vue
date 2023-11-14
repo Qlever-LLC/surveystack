@@ -31,7 +31,7 @@
       </a-card-text>
     </a-card>
     <a-card>
-      <v-card-title>Select members</v-card-title>
+      <a-card-title>Select members</a-card-title>
       <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
       <a-card-text>
         <v-data-table
@@ -58,7 +58,7 @@
 
     <v-dialog v-model="showConfirmDialog" max-width="500">
       <a-card>
-        <v-card-title class="headline">Confirmation</v-card-title>
+        <a-card-title class="headline">Confirmation</a-card-title>
         <a-card-text>
           <p class="body-1">
             You are about to send an E-mail to {{ selectedMembers.length }}
@@ -91,6 +91,7 @@ import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -111,6 +112,7 @@ export default {
     ACardActions,
     ACardSubtitle,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

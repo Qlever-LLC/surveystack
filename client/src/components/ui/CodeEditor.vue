@@ -1,7 +1,7 @@
 <template>
   <div class="full">
     <a-card dark color="dark-blue--lighten-2" class="card-height" slot="paneL">
-      <v-card-title
+      <a-card-title
         >{{ title || '' }}
 
         <v-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
@@ -19,7 +19,7 @@
 
         <v-dialog v-model="dialog" width="800">
           <a-card>
-            <v-card-title class="headline">Object Created</v-card-title>
+            <a-card-title class="headline">Object Created</a-card-title>
             <div style="width: 100%; height: 60vh">
               <app-code-view :value="result"> </app-code-view>
             </div>
@@ -40,7 +40,7 @@
           <v-icon left>mdi-play</v-icon> Run
         </v-btn>
         <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
-      </v-card-title>
+      </a-card-title>
       <div class="error red text--white pa-2" v-if="error">{{ error }}</div>
       <div class="editor-height" :id="'monaco-editor-' + _uid"></div>
     </a-card>
@@ -73,6 +73,7 @@ import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -106,6 +107,7 @@ export default {
     appCodeView,
     ACard,
     ACardActions,
+    ACardTitle,
   },
   data() {
     return {

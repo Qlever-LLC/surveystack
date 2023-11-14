@@ -1,7 +1,7 @@
 <template>
   <v-dialog :value="value" @input="$emit('input', $event)" width="350" max-width="75%">
     <a-card>
-      <v-card-title> Print settings </v-card-title>
+      <a-card-title> Print settings </a-card-title>
 
       <a-card-text>
         <div class="d-flex">
@@ -33,6 +33,7 @@ import Checkbox from '@/components/ui/Checkbox.vue';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'survey-print-settings-dialog',
@@ -41,6 +42,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: {

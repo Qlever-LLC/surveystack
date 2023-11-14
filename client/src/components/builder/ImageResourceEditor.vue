@@ -1,13 +1,13 @@
 <template>
   <a-card class="image-resource-editor p-relative">
-    <v-card-title class="d-flex">
+    <a-card-title class="d-flex">
       <div>Image Resource Editor</div>
       <v-spacer />
 
       <v-btn icon @click="closeDialog">
         <v-icon>mdi-close</v-icon>
       </v-btn>
-    </v-card-title>
+    </a-card-title>
     <a-card-text>
       <v-form
         v-if="
@@ -55,12 +55,14 @@ import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/util
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {};

@@ -36,7 +36,7 @@
     </a-card>
 
     <a-card class="my-3 pa-2" v-if="resendEnabled">
-      <v-card-title> <v-icon left>mdi-account-clock</v-icon>Pending </v-card-title>
+      <a-card-title> <v-icon left>mdi-account-clock</v-icon>Pending </a-card-title>
       <a-card-subtitle>Membership has not been claimed</a-card-subtitle>
       <a-card-text>
         You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by
@@ -59,7 +59,7 @@
 
     <v-dialog v-model="dialogRemoval" max-width="290">
       <a-card>
-        <v-card-title> Delete Membership </v-card-title>
+        <a-card-title> Delete Membership </a-card-title>
         <a-card-text class="mt-4"> Are you sure you want to delete this membership? </a-card-text>
         <a-card-actions>
           <v-spacer />
@@ -71,7 +71,7 @@
 
     <v-dialog v-model="dialogSent" max-width="400">
       <a-card>
-        <v-card-title> Sent </v-card-title>
+        <a-card-title> Sent </a-card-title>
         <a-card-text class="mt-4">
           An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
         </a-card-text>
@@ -105,6 +105,7 @@ import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const availableRoles = [
   {
@@ -135,6 +136,7 @@ export default {
     ACardActions,
     ACardSubtitle,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

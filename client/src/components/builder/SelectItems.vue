@@ -17,7 +17,7 @@
     </template>
 
     <a-card>
-      <v-card-title class="grey--text text--darken-2"> Default value </v-card-title>
+      <a-card-title class="grey--text text--darken-2"> Default value </a-card-title>
 
       <a-card-text class="dialog-content">
         <div v-if="multiple" class="checkbox-group">
@@ -53,6 +53,7 @@
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
@@ -63,6 +64,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: { type: [String, Array] },

@@ -1,6 +1,6 @@
 <template>
   <a-card outlined class="tiptap-editor">
-    <v-card-title class="pa-0">
+    <a-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
         <v-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" class="pa-0 editor-toolbar">
           <v-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
@@ -269,7 +269,7 @@
             </v-toolbar-items>
           </v-toolbar> -->
       </editor-menu-bar>
-    </v-card-title>
+    </a-card-title>
     <a-card-text class="pa-0">
       <editor-menu-bubble
         class="menububble"
@@ -353,6 +353,7 @@ import {
 import CustomLink from '@/utils/TipTapCustomLink';
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
@@ -361,6 +362,7 @@ export default {
     EditorMenuBubble,
     ACard,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: {

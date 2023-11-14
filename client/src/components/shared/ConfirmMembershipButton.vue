@@ -5,7 +5,7 @@
     </template>
 
     <a-card>
-      <v-card-title> Confirm Membership </v-card-title>
+      <a-card-title> Confirm Membership </a-card-title>
       <a-card-text>
         This will immediately activate the membership of the user "{{ email }}". They will receive an email with login
         instructions. You'll be able to send "Call for Submission" links to this user.
@@ -25,12 +25,14 @@ import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

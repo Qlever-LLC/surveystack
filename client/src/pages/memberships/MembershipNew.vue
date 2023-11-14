@@ -91,7 +91,7 @@
 
     <v-dialog v-model="dialogCreateUser" max-width="500">
       <a-card>
-        <v-card-title> User does not exist yet </v-card-title>
+        <a-card-title> User does not exist yet </a-card-title>
         <a-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </a-card-text>
@@ -115,6 +115,7 @@ import BtnDropdown from '@/components/ui/BtnDropdown';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -136,6 +137,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     const INVITATION_METHODS = {

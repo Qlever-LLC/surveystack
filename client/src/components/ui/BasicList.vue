@@ -1,6 +1,6 @@
 <template>
   <a-card :loading="loading">
-    <v-card-title class="heading--text">
+    <a-card-title class="heading--text">
       <slot name="title">
         {{ title }}
       </slot>
@@ -8,7 +8,7 @@
       <slot name="actions" v-if="editable">
         <v-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</v-btn>
       </slot>
-    </v-card-title>
+    </a-card-title>
     <a-card-text>
       <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <v-list
@@ -39,10 +39,13 @@
 <script>
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
+
 export default {
   components: {
     ACard,
     ACardText,
+    ACardTitle,
   },
   props: {
     loading: {

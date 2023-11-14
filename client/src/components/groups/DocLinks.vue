@@ -1,10 +1,10 @@
 <template>
   <a-card class="pb-2">
-    <v-card-title
+    <a-card-title
       >Documentation Links
       <v-spacer />
       <v-btn color="primary" text @click="showAddDialog = true">New.. </v-btn>
-    </v-card-title>
+    </a-card-title>
     <a-card-subtitle>Custom links which appear in the side menu when logged into your group</a-card-subtitle>
     <draggable
       v-if="group.docs && group.docs.length !== 0"
@@ -44,7 +44,7 @@
     </a-card>
     <v-dialog v-model="deleteModalIsVisible" max-width="290">
       <a-card>
-        <v-card-title> Remove Documentation </v-card-title>
+        <a-card-title> Remove Documentation </a-card-title>
         <a-card-text class="mt-4">
           <v-checkbox
             v-model="removeFromDescendants"
@@ -63,7 +63,7 @@
 
     <v-dialog v-model="showAddDialog" max-width="500">
       <a-card>
-        <v-card-title>Add documentation link</v-card-title>
+        <a-card-title>Add documentation link</a-card-title>
         <a-card-text>
           <v-form v-model="newIsValid" ref="form">
             <v-text-field class="mt-3" v-model="newDoc.label" label="Label" outlined required :rules="labelRules" />
@@ -98,6 +98,7 @@ import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'nested-draggable',
@@ -107,6 +108,7 @@ export default {
     ACardActions,
     ACardSubtitle,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

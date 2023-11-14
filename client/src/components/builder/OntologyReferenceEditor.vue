@@ -1,6 +1,6 @@
 <template>
   <a-card>
-    <v-card-title> Survey Reference Editor </v-card-title>
+    <a-card-title> Survey Reference Editor </a-card-title>
     <a-card-text>
       <v-autocomplete
         label="Select Survey"
@@ -59,6 +59,7 @@ import OntologyReferencePreview from './OntologyReferencePreview.vue';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -74,6 +75,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     resource: {

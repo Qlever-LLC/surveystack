@@ -15,7 +15,7 @@
       <v-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</v-btn>
     </template>
     <a-card>
-      <v-card-title> Confirm Invitation </v-card-title>
+      <a-card-title> Confirm Invitation </a-card-title>
       <a-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </a-card-text>
       <a-card-actions>
         <v-spacer />
@@ -32,12 +32,14 @@ import { get } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

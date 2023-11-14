@@ -12,7 +12,7 @@
     </v-dialog>
 
     <a-card class="d-flex flex-column">
-      <v-card-title class="d-block">
+      <a-card-title class="d-block">
         <div class="d-flex justify-space-between align-center">
           <div class="grey--text text--darken-2">Matrix Column Editor</div>
           <div class="d-flex align-center ml-auto mr-2">
@@ -20,7 +20,7 @@
           </div>
           <div class="d-flex align-center"></div>
         </div>
-      </v-card-title>
+      </a-card-title>
 
       <a-card-text class="pt-0">
         <div class="d-flex justify-start"></div>
@@ -265,6 +265,7 @@ import { getValueOrNull } from '@/utils/surveyStack';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -296,6 +297,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: {

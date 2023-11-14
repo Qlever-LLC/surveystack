@@ -1,9 +1,9 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
     <a-card>
-      <v-card-title>
+      <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
-      </v-card-title>
+      </a-card-title>
       <v-divider></v-divider>
       <a-card-text>
         <v-list dense style="max-height: 500px" class="overflow-y-auto">
@@ -34,10 +34,16 @@ import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: { ACard, ACardActions, ACardText },
+  components: {
+    ACard,
+    ACardActions,
+    ACardText,
+    ACardTitle,
+  },
   props: {
     value: {
       type: Boolean,

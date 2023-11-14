@@ -1,13 +1,13 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <a-card>
-      <v-card-title>
+      <a-card-title>
         Publish
         <v-chip dark small color="green" class="mx-2">
           Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
         </v-chip>
         to Library
-      </v-card-title>
+      </a-card-title>
       <a-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-2" />
@@ -43,6 +43,7 @@ import SurveyDiff from '@/components/survey/SurveyDiff';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
@@ -53,6 +54,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: {

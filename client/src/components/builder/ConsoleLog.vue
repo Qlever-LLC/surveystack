@@ -1,18 +1,21 @@
 <template>
   <a-card dark class="mt-4">
-    <v-card-title color="blue-grey"
-      >Console Log<v-spacer></v-spacer>
+    <a-card-title>
+      Console Log<v-spacer></v-spacer>
       <v-icon @click="$emit('clear')">mdi-delete</v-icon>
-    </v-card-title>
+    </a-card-title>
 
     <textarea class="console-container" readonly :value="log"> </textarea>
   </a-card>
 </template>
 <script>
 import ACard from '@/components/ui/ACard.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
+
 export default {
   components: {
     ACard,
+    ACardTitle,
   },
   props: {
     log: {

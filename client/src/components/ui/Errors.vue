@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="show" max-width="350">
       <a-card class="pa-4" dark color="red">
-        <v-card-title class="headline">{{ title }}</v-card-title>
+        <a-card-title class="headline">{{ title }}</a-card-title>
         <template v-for="(error, idx) in errors">
           <div :key="'error_' + idx">
             <a-card-text>
@@ -18,10 +18,13 @@
 <script>
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
+
 export default {
   components: {
     ACard,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: Boolean,

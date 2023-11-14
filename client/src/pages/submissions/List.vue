@@ -90,9 +90,9 @@
         </v-expansion-panel>
       </v-expansion-panels>
       <a-card class="my-5 px-2">
-        <v-card-title class="d-flex justify-space-between align-center">
+        <a-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>
-        </v-card-title>
+        </a-card-title>
         <a-card-text>
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
         </a-card-text>
@@ -225,6 +225,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -268,6 +269,7 @@ export default {
     appSubmissionArchiveDialog,
     ACard,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

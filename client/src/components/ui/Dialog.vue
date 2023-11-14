@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="modal" v-bind="$attrs">
     <a-card>
-      <v-card-title class="headline">
+      <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
-      </v-card-title>
+      </a-card-title>
       <a-card-text>
         <slot name="default">Default slot content</slot>
       </a-card-text>
@@ -20,11 +20,14 @@
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
+
 export default {
   components: {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     modal: {

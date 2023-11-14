@@ -11,7 +11,7 @@
       </a-card-text>
     </a-card>
     <a-card v-if="memberships.length > 0" class="mt-3">
-      <v-card-title>Memberships</v-card-title>
+      <a-card-title>Memberships</a-card-title>
       <v-list>
         <v-list-item
           v-for="membership in memberships"
@@ -34,11 +34,13 @@
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     ACard,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

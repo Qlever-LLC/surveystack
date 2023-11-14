@@ -1,10 +1,10 @@
 <template>
   <v-dialog v-model="open" max-width="50%" hide-overlay>
     <a-card min-height="50vh" class="d-flex flex-column">
-      <v-card-title class="justify-space-between align-center">
+      <a-card-title class="justify-space-between align-center">
         <p>Survey Reference Preview</p>
         <select-items-download-button :resourceName="resource.name" :items="items" />
-      </v-card-title>
+      </a-card-title>
 
       <a-card-text class="mt-4">
         <v-data-table
@@ -33,6 +33,7 @@ import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default defineComponent({
   components: {
@@ -40,6 +41,7 @@ export default defineComponent({
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: {

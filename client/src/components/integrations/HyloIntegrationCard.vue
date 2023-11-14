@@ -2,7 +2,7 @@
   <div>
     <a-card>
       <a-card-text v-if="isLoading">
-        <v-card-title> Hylo Integraton </v-card-title>
+        <a-card-title> Hylo Integraton </a-card-title>
         <v-spacer />
         <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
       </a-card-text>
@@ -21,7 +21,7 @@
                 <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
               </template>
               <a-card>
-                <v-card-title class="text-h5"> Are you sure? </v-card-title>
+                <a-card-title class="text-h5"> Are you sure? </a-card-title>
                 <a-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn
@@ -43,7 +43,7 @@
             </v-avatar> -->
           <!-- </v-col> -->
 
-          <v-card-title class="white--text mt-8">
+          <a-card-title class="white--text mt-8">
             <v-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
             </v-avatar>
@@ -52,7 +52,7 @@
 
               <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p></v-col
             >
-          </v-card-title>
+          </a-card-title>
 
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
           <a-card-text class="white--text">
@@ -66,7 +66,7 @@
       </template>
 
       <template v-else>
-        <v-card-title> Hylo Integraton </v-card-title>
+        <a-card-title> Hylo Integraton </a-card-title>
         <v-spacer />
         <a-card-subtitle>This group is not integrated with Hylo yet</a-card-subtitle>
 
@@ -77,7 +77,7 @@
             </template>
 
             <a-card>
-              <v-card-title>Integrate group with Hylo</v-card-title>
+              <a-card-title>Integrate group with Hylo</a-card-title>
 
               <a-card-text>
                 <div class="font-italic text-body-2 mb-4">Find an existing group on Hylo</div>
@@ -140,6 +140,7 @@ import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
@@ -147,6 +148,7 @@ export default {
     ACardActions,
     ACardSubtitle,
     ACardText,
+    ACardTitle,
   },
   props: {
     groupId: String,

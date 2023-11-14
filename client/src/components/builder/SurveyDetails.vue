@@ -1,6 +1,6 @@
 <template>
   <a-card>
-    <v-card-title class="d-block pb-0">
+    <a-card-title class="d-block pb-0">
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
         <v-spacer />
@@ -11,7 +11,7 @@
             </v-btn>
           </template>
           <a-card>
-            <v-card-title> Edit Survey Details</v-card-title>
+            <a-card-title> Edit Survey Details</a-card-title>
             <a-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <v-select
@@ -35,7 +35,7 @@
             </v-btn>
           </template>
           <a-card>
-            <v-card-title> Survey Resources</v-card-title>
+            <a-card-title> Survey Resources</a-card-title>
             <a-card-text>
               <app-resources
                 :resources="survey.resources"
@@ -165,7 +165,7 @@
           <v-chip dark small outlined color="grey"> Version {{ version }}</v-chip>
         </div>
       </div>
-    </v-card-title>
+    </a-card-title>
     <a-card-text>
       <div class="mt-4">
         <v-text-field
@@ -269,6 +269,7 @@ import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -337,6 +338,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   methods: {
     async getGroupNameById(id) {

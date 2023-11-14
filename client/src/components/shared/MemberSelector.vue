@@ -1,7 +1,7 @@
 <template>
   <v-dialog max-width="500" max-height="100" v-model="dialog">
     <a-card>
-      <v-card-title>Search members</v-card-title>
+      <a-card-title>Search members</a-card-title>
       <a-card-text>
         <active-group-selector
           v-if="!fixedGroupId"
@@ -46,8 +46,15 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
+
 export default {
-  components: { ActiveGroupSelector, ACard, ACardText },
+  components: {
+    ActiveGroupSelector,
+    ACard,
+    ACardText,
+    ACardTitle,
+  },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
     fixedGroupId: {

@@ -1,7 +1,7 @@
 <template>
   <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <a-card class="pa-4">
-      <v-card-title class="headline"> Manage Groups </v-card-title>
+      <a-card-title class="headline"> Manage Groups </a-card-title>
       <a-card-text>
         Update Groups with Access to Farm Instance
         <br />
@@ -42,12 +42,14 @@
 import './css/button.css';
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
   components: {
     ACard,
     ACardText,
+    ACardTitle,
   },
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {

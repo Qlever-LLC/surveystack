@@ -1,7 +1,7 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <a-card>
-      <v-card-title> Add Survey To Library </v-card-title>
+      <a-card-title> Add Survey To Library </a-card-title>
       <a-card-text>
         <v-text-field :value="localLibrarySurvey.name" label="Title" readonly />
         <h3>Description</h3>
@@ -37,10 +37,18 @@ import { ref } from '@vue/composition-api';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor, ACard, ACardActions, ACardText },
+  components: {
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+    ACard,
+    ACardActions,
+    ACardText,
+    ACardTitle,
+  },
   props: {
     value: {
       type: Boolean,

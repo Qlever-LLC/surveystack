@@ -1,7 +1,7 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
     <a-card>
-      <v-card-title> Confirm Submission </v-card-title>
+      <a-card-title> Confirm Submission </a-card-title>
       <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>
       <a-card-text v-else>
         Submit this draft <strong>{{ id }}</strong> to
@@ -42,6 +42,7 @@ import { getGroupNameById } from '@/utils/groups';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   data() {
@@ -82,6 +83,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   created() {
     if (this.groupId) {

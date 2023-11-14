@@ -1,39 +1,40 @@
 <template>
-  <div>
-    <a-card>
-      <v-card-title>
-        {{ title }}
-        <v-spacer />
-        <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
-      </v-card-title>
-      <a-card-text>
-        <v-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
-        <template v-if="entities && entities.length > 0">
-          <v-list-item
-            v-for="integration in integrations"
-            :key="integration._id"
-            two-line
-            :to="`/${integrationType}-integrations/${integration._id}/edit`"
-          >
-            <v-list-item-content>
-              <v-list-item-title>{{ integration.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ integration.type }}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-        <div v-else class="grey--text">No {{ title }} yet</div>
-      </a-card-text>
-    </a-card>
-  </div>
+  <a-card>
+    <a-card-title>
+      {{ title }}
+      <v-spacer />
+      <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
+    </a-card-title>
+    <a-card-text>
+      <v-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
+      <template v-if="entities && entities.length > 0">
+        <v-list-item
+          v-for="integration in integrations"
+          :key="integration._id"
+          two-line
+          :to="`/${integrationType}-integrations/${integration._id}/edit`"
+        >
+          <v-list-item-content>
+            <v-list-item-title>{{ integration.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ integration.type }}</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </template>
+      <div v-else class="grey--text">No {{ title }} yet</div>
+    </a-card-text>
+  </a-card>
 </template>
 
 <script>
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
+
 export default {
   components: {
     ACard,
     ACardText,
+    ACardTitle,
   },
   props: {
     entities: {

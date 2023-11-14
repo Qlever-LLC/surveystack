@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-model="isVisible" persistent width="300">
     <a-card>
-      <v-card-title>
+      <a-card-title>
         {{ title }}
-      </v-card-title>
+      </a-card-title>
       <a-card-text>
         <slot />
       </a-card-text>
@@ -23,12 +23,14 @@ import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

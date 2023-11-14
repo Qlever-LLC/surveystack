@@ -1,6 +1,6 @@
 <template>
   <div class="property-panel">
-    <v-card-title class="pl-0">Properties</v-card-title>
+    <a-card-title class="pl-0">Properties</a-card-title>
     <v-form v-if="control">
       <!-- Default properties -->
       <v-text-field v-model="control.label" label="Label" hide-details />
@@ -298,7 +298,7 @@
       <div v-else class="extra-options">
         <v-spacer></v-spacer>
         <div>
-          <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
+          <a-card-title class="px-0 py-0">Advanced Options</a-card-title>
           <v-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
@@ -364,7 +364,7 @@
         <div v-else class="extra-options">
           <v-spacer></v-spacer>
           <div>
-            <v-card-title class="px-0 py-0">Print Layout</v-card-title>
+            <a-card-title class="px-0 py-0">Print Layout</a-card-title>
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
           </div>
 
@@ -461,6 +461,7 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
@@ -474,6 +475,7 @@ export default {
     Date,
     Checkbox,
     MarkdownEditor,
+    ACardTitle,
   },
   props: {
     control: {

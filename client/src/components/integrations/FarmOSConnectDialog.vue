@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
     <a-card class="pa-4">
-      <v-card-title class="headline"> Connect Existing Farm </v-card-title>
+      <a-card-title class="headline"> Connect Existing Farm </a-card-title>
       <a-card-text>
         Select Farm from this Member's profile to include in this group.
 
@@ -46,7 +46,7 @@
       </a-card-text>
 
       <template v-if="allowCreate">
-        <v-card-title class="headline"> Connect New Farm </v-card-title>
+        <a-card-title class="headline"> Connect New Farm </a-card-title>
 
         <a-card-text>
           Add a new farm to the member's profile.
@@ -67,12 +67,14 @@ import { ref } from '@vue/composition-api';
 import './css/button.css';
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
   components: {
     ACard,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: Boolean,

@@ -19,9 +19,7 @@
     </template>
 
     <a-card>
-      <v-card-title class="grey--text text--darken-2">
-        <slot name="title"></slot>
-      </v-card-title>
+      <a-card-title class="grey--text text--darken-2"> <slot name="title" />!! </a-card-title>
 
       <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
@@ -94,6 +92,7 @@ import MarkdownIt from 'markdown-it';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
@@ -103,6 +102,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: { type: String },

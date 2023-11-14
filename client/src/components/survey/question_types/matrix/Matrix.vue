@@ -40,13 +40,13 @@
     >
       <div style="background: #1867c0; padding: 4px 0px">
         <a-card>
-          <v-card-title>
+          <a-card-title>
             <v-btn @click="duplicateRow(editedIndex)" text color="primary">
               <v-icon left>mdi-content-copy</v-icon>Duplicate
             </v-btn>
             <v-spacer />
             <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
-          </v-card-title>
+          </a-card-title>
           <a-card-text>
             <v-form autocomplete="off" @submit.prevent="">
               <div v-for="(header, idx) in headers" :key="header.value">
@@ -159,6 +159,7 @@ import farmosBase from '../FarmOsBase';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -276,6 +277,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

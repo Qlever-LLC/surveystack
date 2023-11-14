@@ -6,13 +6,14 @@
       <span class="font-weight-bold">{{ groupEntity.name }}</span>
     </div>
     <a-card class="pa-4 mb-4 mt-2">
-      <v-card-title v-if="editMode"
-        >{{ currentEmail }} <v-spacer /><v-dialog v-model="isEmailDialogOpen">
+      <a-card-title v-if="editMode">
+        {{ currentEmail }} <v-spacer />
+        <v-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
             <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
           </template>
           <a-card>
-            <v-card-title class="text-h5"> Change Email </v-card-title>
+            <a-card-title class="text-h5"> Change Email </a-card-title>
             <a-card-text>
               <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
               Integrations which use your email will no longer work and will need to be updated. These integrations will
@@ -23,8 +24,8 @@
               <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
             </a-card-actions>
           </a-card>
-        </v-dialog></v-card-title
-      >
+        </v-dialog>
+      </a-card-title>
       <a-card-text
         ><v-form>
           <v-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
@@ -77,6 +78,7 @@ import { pick } from 'lodash';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
@@ -84,6 +86,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

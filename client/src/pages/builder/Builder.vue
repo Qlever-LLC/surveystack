@@ -90,10 +90,10 @@
     style="background: rgba(0, 0, 0, 0.45); height: 100%"
   >
     <a-card max-width="500">
-      <v-card-title>
+      <a-card-title>
         <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
         Unsupported browser
-      </v-card-title>
+      </a-card-title>
       <!-- <v-alert type="error">
         Unsupported browser
       </v-alert> -->
@@ -119,6 +119,7 @@ import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -130,6 +131,7 @@ export default {
     resultDialog,
     ACard,
     ACardText,
+    ACardTitle,
   },
   mixins: [resultMixin],
   data() {

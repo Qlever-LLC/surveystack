@@ -34,7 +34,7 @@
       </a-card>
 
       <a-card min-height="60vh" class="d-flex flex-column">
-        <v-card-title> </v-card-title>
+        <a-card-title />
         <a-card-text class="flex-grow-1">
           <div class="px-5 py-2">
             <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
@@ -108,6 +108,7 @@ import api from '@/services/api.service';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -116,6 +117,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

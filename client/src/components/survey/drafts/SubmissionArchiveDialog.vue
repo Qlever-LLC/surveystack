@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="persistent">
     <a-card>
-      <v-card-title class="headline">
+      <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
-      </v-card-title>
+      </a-card-title>
       <a-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
@@ -28,11 +28,14 @@
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
+
 export default {
   components: {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     persistent: Boolean,

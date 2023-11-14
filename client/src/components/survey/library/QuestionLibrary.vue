@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-card-title class="pl-0">
+    <a-card-title class="pl-0">
       <v-icon class="mr-1">mdi-library</v-icon>
       Question Library
       <v-spacer></v-spacer>
       <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <v-icon> mdi-close </v-icon>
       </v-btn>
-    </v-card-title>
+    </a-card-title>
 
     <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
@@ -131,6 +131,7 @@
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import ACard from '@/components/ui/ACard.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const PAGINATION_LIMIT = 12;
 
@@ -138,6 +139,7 @@ export default {
   components: {
     graphicalView,
     ACard,
+    ACardTitle,
   },
   props: ['survey', 'libraryId'],
   data() {

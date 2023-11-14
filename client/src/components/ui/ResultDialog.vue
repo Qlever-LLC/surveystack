@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="show" max-width="350" :persistent="persistent">
       <a-card>
-        <v-card-title v-if="title" class="headline mb-2">{{ title }}</v-card-title>
+        <a-card-title v-if="title" class="headline mb-2">{{ title }}</a-card-title>
 
         <a-card-text>
           <div v-for="(item, idx) in messages" :key="idx">
@@ -21,11 +21,11 @@
                   </template>
 
                   <a-card>
-                    <v-card-title>
+                    <a-card-title>
                       Handler logs
                       <v-spacer></v-spacer>
                       <copy-to-clipboard :value="JSON.stringify(item.logs, null, 2)" />
-                    </v-card-title>
+                    </a-card-title>
 
                     <a-card-text>
                       <v-expansion-panels accordion>
@@ -86,12 +86,14 @@ import { isOnline } from '@/utils/surveyStack';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: {

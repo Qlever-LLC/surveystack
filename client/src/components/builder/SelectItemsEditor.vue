@@ -18,10 +18,10 @@
     </template>
 
     <a-card>
-      <v-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
+      <a-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
         <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </v-btn>
-      </v-card-title>
+      </a-card-title>
 
       <a-card-text class="dialog-content">
         <div class="row-cell pr-11">
@@ -71,6 +71,7 @@ import draggable from 'vuedraggable';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
@@ -78,6 +79,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   props: {
     value: {

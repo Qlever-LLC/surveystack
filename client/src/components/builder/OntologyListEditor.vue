@@ -1,6 +1,6 @@
 <template>
   <a-card min-height="70vh" class="d-flex flex-column">
-    <v-card-title class="d-block">
+    <a-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">Ontology List Editor</div>
         <div class="d-flex align-center ml-auto mr-2">
@@ -34,7 +34,7 @@
               </v-btn>
             </template>
             <a-card>
-              <v-card-title>Delete List</v-card-title>
+              <a-card-title>Delete List</a-card-title>
               <a-card-text>
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
               </a-card-text>
@@ -48,7 +48,7 @@
         </div>
       </div>
       <v-divider />
-    </v-card-title>
+    </a-card-title>
 
     <a-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
@@ -118,7 +118,7 @@
 
     <v-dialog v-model="editItemDialogIsVisible" max-width="350">
       <a-card>
-        <v-card-title>Edit Item</v-card-title>
+        <a-card-title>Edit Item</a-card-title>
         <a-card-text>
           <v-text-field v-model="editedItem.label" label="Label" />
           <v-text-field v-model="editedItem.value" label="Value" />
@@ -142,6 +142,7 @@ import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadB
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   props: {
@@ -167,6 +168,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {

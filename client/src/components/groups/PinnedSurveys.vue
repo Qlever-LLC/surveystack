@@ -1,10 +1,10 @@
 <template>
   <a-card class="pb-2">
-    <v-card-title
+    <a-card-title
       >Pinned Surveys
       <v-spacer />
       <v-btn color="primary" text @click="openSearchDialog">New..</v-btn>
-    </v-card-title>
+    </a-card-title>
     <draggable
       v-if="entities.length !== 0"
       class="draggable list-group"
@@ -47,7 +47,7 @@
     </a-card>
     <v-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
       <a-card>
-        <v-card-title> Remove Pinned Survey </v-card-title>
+        <a-card-title> Remove Pinned Survey </a-card-title>
         <a-card-text class="mt-4">
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
         </a-card-text>
@@ -61,7 +61,7 @@
 
     <v-dialog v-model="showSearchDialog" max-width="500">
       <a-card>
-        <v-card-title>Search surveys</v-card-title>
+        <a-card-title>Search surveys</a-card-title>
         <a-card-text>
           <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
           <v-list>
@@ -91,6 +91,7 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
 import ACardText from '@/components/ui/ACardText.vue';
+import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'nested-draggable',
@@ -99,6 +100,7 @@ export default {
     ACard,
     ACardActions,
     ACardText,
+    ACardTitle,
   },
   data() {
     return {
