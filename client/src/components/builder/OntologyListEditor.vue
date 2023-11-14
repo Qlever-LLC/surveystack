@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <v-data-table
+      <a-data-table
         :headers="tableHeaders"
         :items="resource.content"
         show-select
@@ -109,7 +109,7 @@
             </v-icon>
           </div>
         </template>
-      </v-data-table>
+      </a-data-table>
     </v-card-text>
     <v-spacer />
     <v-card-actions class="d-flex justify-end mr-3 align-start">
@@ -139,6 +139,7 @@ import { uniqWith, isEqual } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+import ADataTable from '@/components/ui/ADataTable.vue';
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
     },
   },
   components: {
+    ADataTable,
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
   },

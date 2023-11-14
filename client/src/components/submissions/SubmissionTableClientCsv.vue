@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-data-table
+    <a-data-table
       ref="table"
       v-model="tableSelected"
       :class="{ archived }"
@@ -176,7 +176,7 @@
           </td>
         </tr>
       </template>
-    </v-data-table>
+    </a-data-table>
 
     <submission-table-cell-modal
       v-if="cellText"
@@ -211,6 +211,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
+import ADataTable from '@/components/ui/ADataTable.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -272,6 +273,7 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 
 export default {
   components: {
+    ADataTable,
     SubmissionTableCellModal,
   },
   props: {

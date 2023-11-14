@@ -34,7 +34,7 @@
       <v-card-title>Select members</v-card-title>
       <v-card-subtitle>{{ selectedMembers.length }} selected</v-card-subtitle>
       <v-card-text>
-        <v-data-table
+        <a-data-table
           v-model="selectedMembers"
           :items="activeMembers"
           :headers="headers"
@@ -52,7 +52,7 @@
               @confirmed="loadMembers"
             />
           </template>
-        </v-data-table>
+        </a-data-table>
       </v-card-text>
     </v-card>
 
@@ -87,6 +87,7 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ADataTable from '@/components/ui/ADataTable.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -100,6 +101,7 @@ All the best
 
 export default {
   components: {
+    ADataTable,
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,

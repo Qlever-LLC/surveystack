@@ -7,11 +7,12 @@
       </v-card-title>
 
       <v-card-text class="mt-4">
-        <v-data-table
+        <a-data-table
           :headers="tableHeaders"
           :items="items"
           :loading="loading"
           item-key="id"
+          no-slots
           :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
         />
       </v-card-text>
@@ -30,9 +31,11 @@ import { computed, defineComponent, ref, watchEffect } from '@vue/composition-ap
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
+import ADataTable from '@/components/ui/ADataTable.vue';
 
 export default defineComponent({
   components: {
+    ADataTable,
     SelectItemsDownloadButton,
   },
   props: {
