@@ -10,6 +10,7 @@
     :label="label"
     :outlined="outlined"
     :small="small"
+    :title="title"
   >
     <slot />
   </v-chip>
@@ -27,6 +28,7 @@ export default {
     label: { type: Boolean, required: false },
     outlined: { type: Boolean, required: false },
     small: { type: Boolean, required: false },
+    title: { type: String, required: false },
   },
 };
 </script>
