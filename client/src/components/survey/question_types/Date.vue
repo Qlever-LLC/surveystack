@@ -11,7 +11,7 @@
     <app-control-hint :value="control.hint" />
     <v-row>
       <div :class="{ 'mx-auto': centered }">
-        <v-date-picker
+        <a-date-picker
           v-if="control.options.subtype !== 'date-year'"
           :value="dateForPicker"
           @input="updateDatePicker"
@@ -49,7 +49,7 @@
               color="focus"
             />
           </template>
-          <v-date-picker
+          <a-date-picker
             :value="dateForPicker"
             @input="updateDatePicker"
             :type="datePickerType"
@@ -68,9 +68,13 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import ADatePicker from '@/components/ui/ADatePicker.vue';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    ADatePicker,
+  },
   props: { centered: { type: Boolean, default: true } },
   data() {
     return {
@@ -135,18 +139,11 @@ export default {
       }
     },
   },
-  // mounted() {
-  //   if (this.control.options.subtype === 'date-year') {
-  //     setTimeout(() => {
-  //       this.$refs.picker.activePicker = 'YEAR';
-  //     });
-  //   }
-  // },
   watch: {
     datePickerIsVisible(val) {
       if (val) {
         setTimeout(() => {
-          this.$refs.picker.activePicker = 'YEAR';
+          this.$refs.picker.setActivePickerToYear();
         });
       }
     },
@@ -182,7 +179,7 @@ export default {
           : new Date(date);
       console.log('new Date', newDate, newDate.toISOString());
       if (this.control.options.subtype === 'date-year') {
-        this.$refs.picker.activePicker = 'YEAR';
+        this.$refs.picker.setActivePickerToYear();
       } else if (this.control.options.subtype === 'date-week-month-year') {
         // const offset = newDate.getDay() === 0 ? -1 : 0;
         const offset = -1;
