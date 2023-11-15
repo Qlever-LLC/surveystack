@@ -25,10 +25,9 @@
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
-  components: { SurveyDiff, AChip },
+  components: { SurveyDiff },
   props: {
     value: {
       required: true,

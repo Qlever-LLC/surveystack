@@ -236,13 +236,10 @@
 
 <script>
 import _ from 'lodash';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
   emits: ['addSuperAdminNote'],
-  components: {
-    AChip,
-  },
+
   props: {
     groups: Array,
     mappings: Object,

@@ -21,12 +21,8 @@
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
-  components: {
-    AChip,
-  },
   props: {
     index: { type: String, required: true },
     title: { type: String, required: true },

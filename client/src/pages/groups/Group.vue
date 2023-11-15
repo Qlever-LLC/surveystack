@@ -72,14 +72,12 @@
 import api from '@/services/api.service';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
   name: 'Group',
   components: {
     appGroupBreadcrumbs,
     appBasicList,
-    AChip,
   },
   data() {
     return {

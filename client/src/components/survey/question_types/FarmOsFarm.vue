@@ -58,13 +58,10 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
-  components: {
-    AChip,
-  },
+
   async created() {
     await this.fetchFarms();
   },

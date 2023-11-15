@@ -266,7 +266,6 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
-import AChip from '@/components/ui/AChip.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -332,7 +331,6 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
-    AChip,
   },
   methods: {
     async getGroupNameById(id) {

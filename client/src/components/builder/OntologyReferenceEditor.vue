@@ -56,7 +56,6 @@
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
-import AChip from '@/components/ui/AChip.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -67,7 +66,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview, AChip },
+  components: { OntologyReferencePreview },
   props: {
     resource: {
       type: Object,

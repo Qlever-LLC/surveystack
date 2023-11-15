@@ -137,7 +137,7 @@ describe('Ontology question', () => {
           value: ['cat', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
     });
 
     it('sets value as an array in multiple selection, custom mode', () => {
@@ -175,7 +175,7 @@ describe('Ontology question', () => {
           value: ['custom', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
     });
   });
 });

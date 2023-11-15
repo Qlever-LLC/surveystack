@@ -8,11 +8,7 @@
 </template>
 
 <script>
-import AChip from '@/components/ui/AChip.vue';
 export default {
-  components: {
-    AChip,
-  },
   props: {
     icon: {
       type: String,

@@ -20,6 +20,8 @@ import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 
+import AChip from '@/components/ui/AChip.vue';
+
 startToggle(store);
 
 startSentry(Vue, store, router);
@@ -28,6 +30,8 @@ Vue.component('app-control-label', appControlLabel);
 Vue.component('app-control-hint', appControlHint);
 Vue.component('app-control-more-info', appControlMoreInfo);
 Vue.component('app-control-error', appControlError);
+
+Vue.component('a-chip', AChip);
 
 api.init(process.env.VUE_APP_API_URL);
 

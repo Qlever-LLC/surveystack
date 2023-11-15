@@ -224,7 +224,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
-import AChip from '@/components/ui/AChip.vue';
 
 import { timezones } from './timezones';
 
@@ -234,7 +233,6 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
-    AChip,
   },
   data() {
     return {

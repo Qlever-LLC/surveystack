@@ -161,14 +161,12 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
     appControlLabel,
     appControlMoreInfo,
-    AChip,
   },
   data() {
     return {

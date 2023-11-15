@@ -120,7 +120,6 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
-import AChip from '@/components/ui/AChip.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -147,9 +146,6 @@ function iconify(value, control, relevant) {
 }
 
 export default {
-  components: {
-    AChip,
-  },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {

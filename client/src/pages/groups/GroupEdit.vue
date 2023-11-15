@@ -202,7 +202,6 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
-import AChip from '@/components/ui/AChip.vue';
 
 const integrations = [
   {
@@ -226,7 +225,6 @@ export default {
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
-    AChip,
   },
   data() {
     return {

@@ -130,14 +130,12 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import AChip from '@/components/ui/AChip.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
-    AChip,
   },
   props: ['survey', 'libraryId'],
   data() {

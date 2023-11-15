@@ -63,10 +63,9 @@
 <script>
 import {} from '@vue/composition-api';
 import MyButton from './common/Button.vue';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
-  components: { MyButton, AChip },
+  components: { MyButton },
   props: {
     headers: {
       type: Array,

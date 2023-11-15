@@ -116,12 +116,8 @@ import { isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
-import AChip from '@/components/ui/AChip.vue';
 
 export default {
-  components: {
-    AChip,
-  },
   props: {
     value: { required: true },
     multiple: { type: Boolean, default: false },
