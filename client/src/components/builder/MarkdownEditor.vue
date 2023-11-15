@@ -45,6 +45,7 @@
               @dragover.prevent="showAttach = true"
               @dragleave.prevent="showAttach = false"
               @drop.prevent="onDrop"
+              cssMarkdown
             />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
@@ -299,12 +300,6 @@ export default {
   pointer-events: none;
 }
 
->>> .editor .v-textarea {
-  margin: 0px;
-  padding: 0px;
-}
-
->>> .editor textarea,
 >>> .editor .preview {
   width: 100%;
   height: 100%;
@@ -315,27 +310,8 @@ export default {
   outline: none;
 }
 
->>> .editor .v-textarea.resource textarea {
-  min-height: 400px;
-}
-
->>> .editor textarea {
-  padding: 2px 8px;
-}
-
->>> .editor textarea:read-only {
-  border: 1.5px dashed #888;
-  border-radius: 4px;
-}
-
 >>> .editor .preview img {
   max-width: 100%;
-}
-
->>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:before,
->>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:after {
-  border: none !important;
-  transition: none;
 }
 
 .ressourceBloc {
