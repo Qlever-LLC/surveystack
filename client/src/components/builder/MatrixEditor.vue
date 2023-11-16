@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="editorDialog">
+    <a-dialog v-model="editorDialog">
       <app-ontology-list-editor
         :resources="resources"
         :resource="ontology"
@@ -9,7 +9,7 @@
         @delete="removeResource"
         @close-dialog="editorDialog = false"
       />
-    </v-dialog>
+    </a-dialog>
 
     <v-card class="d-flex flex-column">
       <v-card-title class="d-block">
@@ -262,6 +262,7 @@ import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
+import ADialog from '@/components/ui/ADialog.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -290,6 +291,7 @@ export default {
     Ontology,
     Date,
     Checkbox,
+    ADialog,
   },
   props: {
     value: {

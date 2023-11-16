@@ -10,7 +10,7 @@
     >See on Hylo</v-btn
   >
 
-  <v-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
+  <a-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
     <template v-slot:activator="{ on, attrs }">
       <v-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</v-btn>
     </template>
@@ -23,14 +23,18 @@
         <v-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
+  components: {
+    ADialog,
+  },
   data() {
     return {
       isConfirming: false,

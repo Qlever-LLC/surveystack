@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="show" max-width="350">
+    <a-dialog v-model="show" max-width="350">
       <v-card class="pa-4" dark color="red">
         <v-card-title class="headline">{{ title }}</v-card-title>
         <template v-for="(error, idx) in errors">
@@ -11,12 +11,17 @@
           </div>
         </template>
       </v-card>
-    </v-dialog>
+    </a-dialog>
   </div>
 </template>
 
 <script>
+import ADialog from '@/components/ui/ADialog.vue';
+
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     value: Boolean,
     errors: Array,

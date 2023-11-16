@@ -7,7 +7,7 @@
     </div>
     <v-card class="pa-4 mb-4 mt-2">
       <v-card-title v-if="editMode"
-        >{{ currentEmail }} <v-spacer /><v-dialog v-model="isEmailDialogOpen">
+        >{{ currentEmail }} <v-spacer /><a-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
             <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
           </template>
@@ -23,7 +23,7 @@
               <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
             </v-card-actions>
           </v-card>
-        </v-dialog></v-card-title
+        </a-dialog></v-card-title
       >
       <v-card-text
         ><v-form>
@@ -74,10 +74,12 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     appFeedback,
+    ADialog,
   },
   data() {
     return {

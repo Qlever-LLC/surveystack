@@ -111,9 +111,9 @@
       </v-col>
     </v-row>
 
-    <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
+    <a-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog" cssLoginPage>
       <auth-selector />
-    </v-dialog>
+    </a-dialog>
 
     <v-row>
       <v-col align="center">
@@ -134,11 +134,13 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     AuthSelector,
     AppBasicList,
+    ADialog,
   },
   name: 'home',
   data() {
@@ -171,12 +173,6 @@ export default {
 .home {
   background-color: var(--v-background-base);
   height: 100%;
-}
-
->>> .v-dialog {
-  height: auto;
-  width: auto;
-  max-width: 40rem;
 }
 
 >>> .container {

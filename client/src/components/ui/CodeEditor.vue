@@ -17,7 +17,7 @@
           Result Object (click to expand)
         </v-chip>
 
-        <v-dialog v-model="dialog" width="800">
+        <a-dialog v-model="dialog" width="800">
           <v-card>
             <v-card-title class="headline">Object Created</v-card-title>
             <div style="width: 100%; height: 60vh">
@@ -29,7 +29,7 @@
               <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
             </v-card-actions>
           </v-card>
-        </v-dialog>
+        </a-dialog>
 
         <v-spacer></v-spacer>
         <v-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</v-icon>
@@ -71,6 +71,7 @@
 <script>
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
+import ADialog from '@/components/ui/ADialog.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -102,6 +103,7 @@ function log(message){};
 export default {
   components: {
     appCodeView,
+    ADialog,
   },
   data() {
     return {

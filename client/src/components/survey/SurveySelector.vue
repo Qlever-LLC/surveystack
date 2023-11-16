@@ -1,5 +1,5 @@
 <template>
-  <v-dialog max-width="500" v-model="dialog">
+  <a-dialog max-width="500" v-model="dialog">
     <v-card>
       <v-card-title>Search surveys</v-card-title>
       <v-card-text>
@@ -26,15 +26,19 @@
         </v-list>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     searchResults: {
       type: Array,

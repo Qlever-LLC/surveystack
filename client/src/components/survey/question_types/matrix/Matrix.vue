@@ -29,15 +29,7 @@
       custom information you have entered.
     </app-dialog>
 
-    <v-dialog
-      v-model="showEditItemDialog"
-      v-bind="dialogProps"
-      v-if="showEditItemDialog"
-      title="Edit"
-      hideCancel
-      @confirm="showEditItemDialog = false"
-      max-width="800px"
-    >
+    <a-dialog v-model="showEditItemDialog" v-bind="dialogProps" v-if="showEditItemDialog" max-width="800px">
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
           <v-card-title>
@@ -77,7 +69,7 @@
           </v-card-actions>
         </v-card>
       </div>
-    </v-dialog>
+    </a-dialog>
     <app-control-label
       :value="control.label"
       :redacted="redacted"
@@ -156,6 +148,7 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import ADialog from '@/components/ui/ADialog.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -270,6 +263,7 @@ export default {
     appMatrixTable,
     appRequired,
     appRedacted,
+    ADialog,
   },
   data() {
     return {

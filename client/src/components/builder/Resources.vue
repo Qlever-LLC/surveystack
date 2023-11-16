@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="ontologyEditorDialog">
+    <a-dialog v-model="ontologyEditorDialog">
       <app-ontology-list-editor
         :resources="resources"
         :resource="resource"
@@ -9,23 +9,23 @@
         @delete="removeResource"
         @close-dialog="ontologyEditorDialog = false"
       />
-    </v-dialog>
-    <v-dialog :value="uploadingResource" hide-overlay persistent width="300">
+    </a-dialog>
+    <a-dialog :value="uploadingResource" hide-overlay persistent width="300">
       <v-card>
         <v-card-text class="pa-4">
           <span>Uploading file resource</span>
           <v-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
-    </v-dialog>
-    <v-dialog :value="downloadingResource" hide-overlay persistent width="300">
+    </a-dialog>
+    <a-dialog :value="downloadingResource" hide-overlay persistent width="300">
       <v-card>
         <v-card-text class="pa-4">
           <span>Downloading file resource</span>
           <v-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
-    </v-dialog>
+    </a-dialog>
     <v-alert v-if="openResourceError" type="warning" dismissible>
       {{ openResourceError }}
     </v-alert>
@@ -108,10 +108,12 @@ import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     appOntologyListEditor,
+    ADialog,
   },
   props: {
     resources: {

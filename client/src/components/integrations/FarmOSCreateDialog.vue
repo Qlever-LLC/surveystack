@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
+  <a-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
     <v-card class="pa-4">
       <FarmOSRegister
         :viewModel="viewModel"
@@ -7,11 +7,12 @@
         @create-instance="(f) => $emit('create-instance', f)"
       ></FarmOSRegister>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import FarmOSRegister from '@/pages/farmos-manage/FarmOSRegister.vue';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   emits: ['create', 'createInstance', 'checkUrl'],
@@ -32,6 +33,6 @@ export default {
       },
     },
   },
-  components: { FarmOSRegister },
+  components: { FarmOSRegister, ADialog },
 };
 </script>

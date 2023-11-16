@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
     <v-card>
       <v-card-title>Survey Versions</v-card-title>
       <v-card-text style="max-height: 500px">
@@ -103,7 +103,7 @@
       :revision-b="survey.revisions.find((r) => r.version === compareRevisions[1])"
       @cancel="surveyDiffDialogVisible = false"
     />
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -111,9 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: { SurveyDiffDialog, ADialog },
   props: {
     value: {
       type: Boolean,

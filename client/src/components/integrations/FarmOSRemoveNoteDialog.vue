@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
+  <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
     <v-card class="pa-4">
       <v-card-title class="headline"> Why is this instance being removed? </v-card-title>
       <v-card-text>
@@ -23,12 +23,17 @@
         </div>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
+import ADialog from '@/components/ui/ADialog.vue';
+
 export default {
   emits: ['addNote', 'cancelNote'],
+  components: {
+    ADialog,
+  },
   props: ['loading', 'value'],
   data() {
     return {

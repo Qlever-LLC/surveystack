@@ -42,7 +42,7 @@
         >
       </v-card-text>
     </v-card>
-    <v-dialog v-model="deleteModalIsVisible" max-width="290">
+    <a-dialog v-model="deleteModalIsVisible" max-width="290">
       <v-card>
         <v-card-title> Remove Documentation </v-card-title>
         <v-card-text class="mt-4">
@@ -59,9 +59,9 @@
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
 
-    <v-dialog v-model="showAddDialog" max-width="500">
+    <a-dialog v-model="showAddDialog" max-width="500">
       <v-card>
         <v-card-title>Add documentation link</v-card-title>
         <v-card-text>
@@ -83,7 +83,7 @@
           <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
 
     <slot name="footer">
       <div></div>
@@ -94,11 +94,13 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
+    ADialog,
   },
   data() {
     return {

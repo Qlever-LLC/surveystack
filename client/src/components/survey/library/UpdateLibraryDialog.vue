@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
     <v-card>
       <v-card-title>
         Update question set from Version
@@ -39,7 +39,7 @@
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
       </v-card-actions>
     </v-card>
-    <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
+    <a-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
       <v-card class="">
         <v-card-title>Confirm Update</v-card-title>
         <v-card-text class="mt-4">
@@ -55,8 +55,8 @@
           <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-  </v-dialog>
+    </a-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -65,9 +65,10 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ADialog },
   props: {
     value: {
       required: true,

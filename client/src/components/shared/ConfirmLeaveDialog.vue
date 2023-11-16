@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isVisible" persistent width="300">
+  <a-dialog v-model="isVisible" persistent width="300">
     <v-card>
       <v-card-title>
         {{ title }}
@@ -15,13 +15,17 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
+  components: {
+    ADialog,
+  },
   data() {
     return {
       isVisible: false,

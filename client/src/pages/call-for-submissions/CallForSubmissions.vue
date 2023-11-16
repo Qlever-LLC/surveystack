@@ -56,7 +56,7 @@
       </v-card-text>
     </v-card>
 
-    <v-dialog v-model="showConfirmDialog" max-width="500">
+    <a-dialog v-model="showConfirmDialog" max-width="500">
       <v-card>
         <v-card-title class="headline">Confirmation</v-card-title>
         <v-card-text>
@@ -71,7 +71,7 @@
           <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
     <result-dialog
       v-model="showSubmitResult"
       :items="submitResults"
@@ -87,6 +87,7 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ADialog from '@/components/ui/ADialog.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -103,6 +104,7 @@ export default {
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,
+    ADialog,
   },
   data() {
     return {

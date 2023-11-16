@@ -164,7 +164,7 @@
       />
     </v-card>
 
-    <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
+    <a-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
       <v-card class="">
         <v-card-title> Delete Question </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
@@ -174,7 +174,7 @@
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
   </draggable>
   <div v-else>
     <v-card class="text--secondary">
@@ -196,12 +196,14 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
     ControlCardHeader,
+    ADialog,
   },
   data() {
     return {

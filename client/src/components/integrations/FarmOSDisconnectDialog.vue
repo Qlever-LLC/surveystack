@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
+  <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <v-card class="pa-4">
       <v-card-title class="headline"> Manage Groups </v-card-title>
       <v-card-text>
@@ -35,14 +35,18 @@
         </div>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import './css/button.css';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
+  components: {
+    ADialog,
+  },
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {

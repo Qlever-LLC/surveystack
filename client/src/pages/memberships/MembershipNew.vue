@@ -89,7 +89,7 @@
       </v-form>
     </v-card>
 
-    <v-dialog v-model="dialogCreateUser" max-width="500">
+    <a-dialog v-model="dialogCreateUser" max-width="500">
       <v-card class="">
         <v-card-title> User does not exist yet </v-card-title>
         <v-card-text class="mt-4">
@@ -101,7 +101,7 @@
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
   </v-container>
 </template>
 
@@ -112,6 +112,7 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
+import ADialog from '@/components/ui/ADialog.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,7 +129,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { BtnDropdown, ADialog },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

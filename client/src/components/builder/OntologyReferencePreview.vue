@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" max-width="50%" hide-overlay>
+  <a-dialog v-model="open" max-width="50%" hide-overlay>
     <v-card min-height="50vh" class="d-flex flex-column">
       <v-card-title class="justify-space-between align-center">
         <p>Survey Reference Preview</p>
@@ -22,7 +22,7 @@
         <v-btn text @click="open = false">Close</v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -30,10 +30,12 @@ import { computed, defineComponent, ref, watchEffect } from '@vue/composition-ap
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default defineComponent({
   components: {
     SelectItemsDownloadButton,
+    ADialog,
   },
   props: {
     value: {

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" width="500" @click:outside="cancel">
+  <a-dialog v-model="open" width="500" @click:outside="cancel">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         ref="anchorRef"
@@ -46,15 +46,20 @@
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
+import ADialog from '@/components/ui/ADialog.vue';
+
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

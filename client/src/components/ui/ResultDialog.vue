@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="show" max-width="350" :persistent="persistent">
+    <a-dialog v-model="show" max-width="350" :persistent="persistent">
       <v-card>
         <v-card-title v-if="title" class="headline mb-2">{{ title }}</v-card-title>
 
@@ -12,7 +12,7 @@
               </v-card-text>
               <template v-if="item.logs && item.logs.length">
                 <v-divider class="mx-4"></v-divider>
-                <v-dialog width="500">
+                <a-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
                     <v-card-actions>
                       <v-spacer />
@@ -52,7 +52,7 @@
                       </v-expansion-panels>
                     </v-card-text>
                   </v-card>
-                </v-dialog>
+                </a-dialog>
               </template>
               <!-- <pre v-if="item.logs">{{ JSON.stringify(item.logs, null, 2) }}</pre> -->
             </v-card>
@@ -74,7 +74,7 @@
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
   </div>
 </template>
 
@@ -83,8 +83,12 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     value: {
       required: true,

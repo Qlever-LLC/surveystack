@@ -1,16 +1,21 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" hide-overlay persistent width="300">
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" hide-overlay persistent width="300">
     <v-card>
       <v-card-text class="pa-4">
         <span>{{ message }}</span>
         <v-progress-linear indeterminate class="mb-0" />
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
+import ADialog from '@/components/ui/ADialog.vue';
+
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     value: {
       type: Boolean,

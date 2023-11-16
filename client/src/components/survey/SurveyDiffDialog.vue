@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
     <v-card>
       <v-card-title>
         Compare
@@ -20,14 +20,15 @@
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
-  components: { SurveyDiff },
+  components: { SurveyDiff, ADialog },
   props: {
     value: {
       required: true,

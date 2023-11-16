@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
+  <a-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
     <v-card class="pa-4">
       <v-card-title class="headline"> Connect Existing Farm </v-card-title>
       <v-card-text>
@@ -59,15 +59,19 @@
         or add existing farmOS instance (currently in development)
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
+  components: {
+    ADialog,
+  },
   props: {
     value: Boolean,
     farmInstances: {

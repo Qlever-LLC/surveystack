@@ -16,7 +16,7 @@
             <v-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </v-toolbar-title>
 
             <v-spacer></v-spacer>
-            <v-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
+            <a-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
               </template>
@@ -34,7 +34,7 @@
                   </v-btn>
                 </v-card-actions>
               </v-card>
-            </v-dialog>
+            </a-dialog>
           </v-app-bar>
           <v-spacer />
           <!-- <v-col cols="4" sm="2" md="1"> -->
@@ -71,7 +71,7 @@
         <v-card-subtitle>This group is not integrated with Hylo yet</v-card-subtitle>
 
         <v-card-text>
-          <v-dialog v-model="integrateDialog" width="500">
+          <a-dialog v-model="integrateDialog" width="500">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </v-btn>
             </template>
@@ -126,7 +126,7 @@
                 <v-btn text @click="integrateDialog = false"> close </v-btn>
               </v-card-actions>
             </v-card>
-          </v-dialog>
+          </a-dialog>
         </v-card-text>
       </template>
     </v-card>
@@ -136,8 +136,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     groupId: String,
   },

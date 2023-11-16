@@ -29,7 +29,7 @@
       hide-details
     />
 
-    <v-dialog v-model="imageDialogIsVisible" width="500">
+    <a-dialog v-model="imageDialogIsVisible" width="500">
       <image-resource-editor
         :resources="filteredResources"
         :resource="resource"
@@ -37,7 +37,7 @@
         @delete="removeResource"
         @close-dialog="closeDialog"
       />
-    </v-dialog>
+    </a-dialog>
   </div>
 </template>
 
@@ -52,6 +52,7 @@ import {
   resourceLocations,
   appendResource,
 } from '@/utils/resources';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   data() {
@@ -63,6 +64,7 @@ export default {
   components: {
     ResourceSelector,
     ImageResourceEditor,
+    ADialog,
   },
   props: {
     value: {

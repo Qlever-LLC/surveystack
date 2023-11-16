@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="upgradeDialog" width="400">
+    <a-dialog v-model="upgradeDialog" width="400">
       <v-card>
         <v-card-title> Upgrade </v-card-title>
         <v-card-text>
@@ -8,7 +8,7 @@
           <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
         </v-card-text>
       </v-card>
-    </v-dialog>
+    </a-dialog>
 
     <v-card v-if="superAdmin" class="px-4 mb-4">
       <v-card-title>Super Admin</v-card-title>
@@ -109,10 +109,12 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
+    ADialog,
   },
   props: {
     groupInfos: {

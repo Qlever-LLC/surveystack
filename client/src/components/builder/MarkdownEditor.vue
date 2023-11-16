@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
+  <a-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         ref="anchorRef"
@@ -85,17 +85,21 @@
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 import MarkdownIt from 'markdown-it';
+import ADialog from '@/components/ui/ADialog.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     value: { type: String },
     label: { type: String },

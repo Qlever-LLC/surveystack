@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="modal" v-bind="$attrs">
+  <a-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="modal" v-bind="$attrs">
     <v-card>
       <v-card-title class="headline">
         <slot name="title">{{ title }}</slot>
@@ -13,11 +13,16 @@
         <v-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
+import ADialog from '@/components/ui/ADialog.vue';
+
 export default {
+  components: {
+    ADialog,
+  },
   props: {
     modal: {
       type: Boolean,

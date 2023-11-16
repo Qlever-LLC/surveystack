@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
+  <a-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         v-on="on"
@@ -63,15 +63,17 @@
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import draggable from 'vuedraggable';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     draggable,
+    ADialog,
   },
   props: {
     value: {

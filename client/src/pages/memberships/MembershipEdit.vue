@@ -57,7 +57,7 @@
       </v-card-actions>
     </v-card>
 
-    <v-dialog v-model="dialogRemoval" max-width="290">
+    <a-dialog v-model="dialogRemoval" max-width="290">
       <v-card class="">
         <v-card-title> Delete Membership </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
@@ -67,9 +67,9 @@
           <v-btn text color="red" @click.stop="remove"> Delete </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
 
-    <v-dialog v-model="dialogSent" max-width="400">
+    <a-dialog v-model="dialogSent" max-width="400">
       <v-card class="">
         <v-card-title> Sent </v-card-title>
         <v-card-text class="mt-4">
@@ -80,7 +80,7 @@
           <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
 
     <app-dialog
       v-model="dialogInvitationLink"
@@ -101,6 +101,7 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import ADialog from '@/components/ui/ADialog.vue';
 
 const availableRoles = [
   {
@@ -127,6 +128,7 @@ const availableStatus = [
 export default {
   components: {
     appDialog,
+    ADialog,
   },
   data() {
     return {

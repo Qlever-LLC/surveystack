@@ -4,7 +4,7 @@
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
         <v-spacer />
-        <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
+        <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
               <v-icon>mdi-pencil</v-icon>
@@ -27,8 +27,8 @@
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
-        </v-dialog>
-        <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
+        </a-dialog>
+        <a-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
               <v-icon>mdi-dresser</v-icon>
@@ -47,7 +47,7 @@
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
-        </v-dialog>
+        </a-dialog>
         <publish-updated-library-dialog
           v-if="updateLibraryDialogIsVisible"
           v-model="updateLibraryDialogIsVisible"
@@ -266,6 +266,7 @@ import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryC
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import ADialog from '@/components/ui/ADialog.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -331,6 +332,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    ADialog,
   },
   methods: {
     async getGroupNameById(id) {

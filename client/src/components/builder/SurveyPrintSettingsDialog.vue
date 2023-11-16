@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="$emit('input', $event)" width="350" max-width="75%">
+  <a-dialog :value="value" @input="$emit('input', $event)" width="350" max-width="75%">
     <v-card>
       <v-card-title> Print settings </v-card-title>
 
@@ -25,15 +25,16 @@
         <v-btn @click="$emit('input', false)" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import Checkbox from '@/components/ui/Checkbox.vue';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   name: 'survey-print-settings-dialog',
-  components: { Checkbox },
+  components: { Checkbox, ADialog },
   props: {
     value: {
       type: Boolean,

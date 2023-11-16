@@ -26,7 +26,7 @@
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </v-tooltip>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
-          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
+          <a-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
               <v-btn icon v-on="on" class="ml-2" :disabled="disabled">
                 <v-icon>mdi-delete</v-icon>
@@ -44,7 +44,7 @@
                 <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </v-card-actions>
             </v-card>
-          </v-dialog>
+          </a-dialog>
         </div>
       </div>
       <v-divider />
@@ -116,7 +116,7 @@
       <v-btn text class="ml-4" @click="close">Close</v-btn>
     </v-card-actions>
 
-    <v-dialog v-model="editItemDialogIsVisible" max-width="350">
+    <a-dialog v-model="editItemDialogIsVisible" max-width="350">
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
@@ -130,7 +130,7 @@
           <v-btn text color="primary" @click="saveItem">Save</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </a-dialog>
   </v-card>
 </template>
 
@@ -139,6 +139,7 @@ import { uniqWith, isEqual } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   props: {
@@ -161,6 +162,7 @@ export default {
   components: {
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
+    ADialog,
   },
   data() {
     return {

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
+  <a-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         v-on="on"
@@ -27,15 +27,17 @@
       @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       @set-control-required="(val) => $emit('set-control-required')"
     />
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 import MatrixEditor from '@/components/builder/MatrixEditor.vue';
+import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     MatrixEditor,
+    ADialog,
   },
   props: {
     value: {

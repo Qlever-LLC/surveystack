@@ -44,14 +44,14 @@
       You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
 
-    <v-dialog v-model="submitting" hide-overlay persistent width="300">
+    <a-dialog v-model="submitting" hide-overlay persistent width="300">
       <v-card>
         <v-card-text class="pa-4">
           <span>Submitting Builder</span>
           <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
         </v-card-text>
       </v-card>
-    </v-dialog>
+    </a-dialog>
 
     <result-dialog
       v-model="showResult"
@@ -117,6 +117,7 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import ADialog from '@/components/ui/ADialog.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -126,6 +127,7 @@ export default {
     SurveyBuilder,
     appDialog,
     resultDialog,
+    ADialog,
   },
   mixins: [resultMixin],
   data() {
