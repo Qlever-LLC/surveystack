@@ -139,8 +139,4 @@ export default {
   top: 10px;
   line-height: 24px;
 }
-
-.select-single >>> .v-label {
-  height: auto;
-}
 </style>
