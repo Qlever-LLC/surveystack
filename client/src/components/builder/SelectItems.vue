@@ -19,7 +19,7 @@
     <a-card>
       <a-card-title class="grey--text text--darken-2"> Default value </a-card-title>
 
-      <a-card-text class="dialog-content">
+      <a-card-text cssDialogContent>
         <div v-if="multiple" class="checkbox-group">
           <v-checkbox
             v-for="(item, index) in items"

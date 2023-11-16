@@ -20,10 +20,10 @@
     <a-card>
       <a-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-        <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </v-btn>
+        <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row</v-btn>
       </a-card-title>
 
-      <a-card-text class="dialog-content">
+      <a-card-text cssDialogContent>
         <div class="row-cell pr-11">
           <div class="flex-grow-1">Label</div>
           <div class="flex-grow-1">Value</div>
@@ -145,33 +145,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
->>> .dialog-content {
-  min-height: 400px;
-  max-height: calc(80% - 200px);
-  padding: 12px 16px;
-}
-
->>> .dialog-content > :first-child {
-  padding-right: 68px;
-}
-
->>> .dialog-content .row-cell {
-  max-width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
->>> .dialog-content .draggable {
-  display: flex;
-  flex-direction: column;
-  justify-items: start;
-  align-items: stretch;
-}
-
->>> .dialog-content .draggable .row-cell {
-  margin-top: 8px;
-}
-</style>
