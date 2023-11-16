@@ -2,7 +2,6 @@
   <!-- v-bind="$attrs" => question_types/Matrix has v-bind="dialogProps" 
   to keep the v-dialog on the matrix box and not full screen -->
   <v-dialog
-    ref="refDialog"
     v-bind="$attrs"
     @click:outside="$emit('click:outside', $event)"
     @input="$emit('input', $event)"
