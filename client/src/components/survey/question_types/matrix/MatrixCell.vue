@@ -354,7 +354,7 @@ export default {
     },
     setActivePickerMonth() {
       setTimeout(() => {
-        this.$refs.datepickerRef.$children[1].$children[0].activePicker = 'MONTH';
+        this.$refs.datepickerRef.$children[0].$children[1].$children[0].activePicker = 'MONTH';
       });
     },
     // copied/adapted from FarmOsPlanting.vue
