@@ -18,6 +18,7 @@
 
 <script>
 export default {
+  name: 'AChip',
   emits: ['click', 'click:close'],
   props: {
     //vuetify props
