@@ -1,6 +1,9 @@
 <template>
   <v-list-group :prepend-icon="prependIcon" :value="value" :color="color">
-    <slot name="activator" />
+    <template v-slot:activator>
+      <slot name="activator" />
+    </template>
+    <slot />
   </v-list-group>
 </template>
 
