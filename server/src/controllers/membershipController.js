@@ -132,9 +132,9 @@ const createMembership = async (req, res) => {
   }
 
   try {
-    let r = await db.collection(col).insertOne(entity);
-    assert.strictEqual(1, r.insertedCount);
-    return res.send(r);
+    const insertResult = await db.collection(col).insertOne(entity);
+    assert.strictEqual(insertResult?.acknowledged, true);
+    return res.send({ _id: insertResult.insertedId, ...entity });
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       throw boom.conflict(`Entity with _id already exists: ${entity._id}`);
@@ -144,7 +144,6 @@ const createMembership = async (req, res) => {
   throw boom.internal();
 };
 
-// Work in progress
 const joinGroup = async (req, res) => {
   const { id: groupId } = req.query;
 
@@ -186,10 +185,9 @@ const joinGroup = async (req, res) => {
   };
 
   try {
-    let r = await db.collection(col).insertOne(membership);
-    assert.strictEqual(1, r.insertedCount);
-    console.log(r);
-    return res.send(r);
+    const insertResult = await db.collection(col).insertOne(membership);
+    assert.strictEqual(insertResult?.acknowledged, true);
+    return res.send({ _id: insertResult.insertedId, ...membership });
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       throw boom.conflict(`Entity with _id already exists`);
@@ -227,7 +225,7 @@ const resendInvitation = async (req, res) => {
     .findOneAndUpdate(
       { _id: membership._id },
       { $set: { 'meta.dateSent': new Date() } },
-      { returnOriginal: false }
+      { returnDocument: 'after' }
     );
   return res.send(updated.value);
 };
@@ -248,7 +246,7 @@ const updateMembership = async (req, res) => {
   try {
     let updated = await db
       .collection(col)
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: update }, { returnOriginal: false });
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: update }, { returnDocument: 'after' });
     return res.send(updated);
   } catch (err) {
     console.log(err);
@@ -274,8 +272,8 @@ const deleteMembership = async (req, res, _, hook) => {
     const { origin } = req.headers;
     await hook(membership, origin); // hook before removal
 
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
+    const deleteResult = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    assert.equal(1, deleteResult.deletedCount);
 
     // delete associated integrations
     await db.collection('integrations.memberships').deleteMany({ membership: new ObjectId(id) });
@@ -350,10 +348,17 @@ const createConfirmedMembership = async (req, res) => {
     throw boom.badRequest('Need to supply an email address');
   }
 
-  let membership = (await db.collection(col).insertOne(entity)).ops[0];
-  await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
-
-  res.send({ ok: true });
+  try {
+    const insertResult = await db.collection(col).insertOne(entity);
+    assert.strictEqual(insertResult?.acknowledged, true);
+    await membershipService.activateMembershipByAdmin({
+      membershipId: insertResult.insertedId,
+      origin,
+    });
+    res.send({ ok: true });
+  } catch (err) {
+    throw boom.internal();
+  }
 };
 
 export default {

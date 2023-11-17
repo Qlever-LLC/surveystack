@@ -161,7 +161,7 @@ export const createPopulationPipeline = () => {
   return pipeline;
 };
 
-export const addMembership = async ({ user, group, role }) => {
+export const addMembership = ({ user, group, role }) => {
   const entity = { user, group, role };
   entity.meta = {
     status: 'active',
@@ -172,8 +172,7 @@ export const addMembership = async ({ user, group, role }) => {
     invitationEmail: null,
     invitationCode: null,
   };
-  const m = await db.collection(col).insertOne(entity);
-  return m;
+  return db.collection(col).insertOne(entity);
 };
 
 export const activateMembership = async ({ code, user }) => {

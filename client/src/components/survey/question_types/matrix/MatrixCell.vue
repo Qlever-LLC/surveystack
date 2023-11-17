@@ -311,7 +311,11 @@ export default {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     onInput(value) {
-      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      if (this.header.type === 'dropdown') {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : [value]);
+      } else {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      }
       this.$emit('changed');
     },
     onDateInput(value) {
@@ -378,9 +382,11 @@ export default {
             item.value.location.some((loc) => loc.id === field.location.id)
         )
       );
-      const noneExist = assetsToSelect.filter(
-        (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
-      );
+      const noneExist = assetsToSelect
+        .filter(
+          (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
+        )
+        .map((asset) => asset.value);
       assets.push(...noneExist);
 
       if (!Array.isArray(hashesArg)) {

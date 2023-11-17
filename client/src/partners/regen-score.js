@@ -1,9 +1,9 @@
 export default {
   name: 'Regen Score',
   domain: 'regen-score',
-  id: '62700ee569741e0001eabbf3',
-  slug: 'regen-digital',
-  path: '/regen-digital/',
+  id: '600f3077e51f5d000136b258',
+  slug: 'regen1',
+  path: '/regen1/',
   logo: '/partners/regen-score/img/logo.png',
   themes: {
     light: {
