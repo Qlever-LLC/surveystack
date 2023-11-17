@@ -99,14 +99,14 @@
       {{ getLabelForItemValue(data.item) }}
     </template>
     <template v-slot:no-data>
-      <v-list-item>
+      <a-list-item>
         <v-list-item-content>
           <a-list-item-title>
             No values matching "<strong>{{ comboboxSearch }}</strong
             >". Press <kbd>enter</kbd> <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
           </a-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </a-list-item>
     </template>
   </v-combobox>
 </template>
@@ -117,9 +117,10 @@ import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
-  components: { AListItemTitle },
+  components: { AListItem, AListItemTitle },
   props: {
     value: { required: true },
     multiple: { type: Boolean, default: false },

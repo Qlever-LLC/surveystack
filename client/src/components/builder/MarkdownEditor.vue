@@ -69,11 +69,11 @@
             <v-list class="resource-panel">
               <v-subheader class="px-2 py-0">Click to insert </v-subheader>
 
-              <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
+              <a-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
                 <v-list-item-content>
                   <a-list-item-title>{{ item.label }}</a-list-item-title>
                 </v-list-item-content>
-              </v-list-item>
+              </a-list-item>
             </v-list>
           </div>
         </div>
@@ -92,12 +92,13 @@
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 import MarkdownIt from 'markdown-it';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
-  components: { AListItemTitle },
+  components: { AListItem, AListItemTitle },
   props: {
     value: { type: String },
     label: { type: String },

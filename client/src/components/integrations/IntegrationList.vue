@@ -9,7 +9,7 @@
       <v-card-text>
         <v-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
         <template v-if="entities && entities.length > 0">
-          <v-list-item
+          <a-list-item
             v-for="integration in integrations"
             :key="integration._id"
             two-line
@@ -19,7 +19,7 @@
               <a-list-item-title>{{ integration.name }}</a-list-item-title>
               <a-list-item-subtitle>{{ integration.type }}</a-list-item-subtitle>
             </v-list-item-content>
-          </v-list-item>
+          </a-list-item>
         </template>
         <div v-else class="grey--text">No {{ title }} yet</div>
       </v-card-text>
@@ -30,9 +30,10 @@
 <script>
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
-  components: { AListItemSubtitle, AListItemTitle },
+  components: { AListItem, AListItemSubtitle, AListItemTitle },
   props: {
     entities: {
       type: Array,

@@ -72,7 +72,7 @@
     <v-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
-        <v-list-item
+        <a-list-item
           v-for="resource in filteredResources"
           :key="resource.id"
           two-line
@@ -92,7 +92,7 @@
               <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
             </v-btn>
           </a-list-item-action>
-        </v-list-item>
+        </a-list-item>
       </template>
       <a-list-item v-else>
         <v-list-item-content>

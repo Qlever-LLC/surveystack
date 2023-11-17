@@ -82,30 +82,30 @@
                 </v-input>
               </a-list-item-title>
             </a-list-item>
-            <v-list-item>
+            <a-list-item>
               <a-list-item-title>
                 <v-btn @click="$emit('export-survey')" text>
                   <v-icon color="grey">mdi-file-download</v-icon>
                   <div class="ml-1">Export</div>
                 </v-btn>
               </a-list-item-title>
-            </v-list-item>
-            <v-list-item>
+            </a-list-item>
+            <a-list-item>
               <a-list-item-title>
                 <v-btn @click="$emit('show-version-dialog')" text>
                   <v-icon color="grey">mdi-sitemap</v-icon>
                   <div class="ml-1">Manage Survey Versions</div>
                 </v-btn>
               </a-list-item-title>
-            </v-list-item>
-            <v-list-item>
+            </a-list-item>
+            <a-list-item>
               <a-list-item-title>
                 <v-btn @click="editLibraryDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-library</v-icon>
                   <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
                 </v-btn>
               </a-list-item-title>
-            </v-list-item>
+            </a-list-item>
             <a-list-item v-if="value.meta.isLibrary">
               <a-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>

@@ -5,7 +5,7 @@
       <v-card-text>
         <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
         <v-list>
-          <v-list-item
+          <a-list-item
             v-for="searchResult in searchResults"
             :key="searchResult._id"
             @click="
@@ -22,7 +22,7 @@
                 {{ searchResult.meta ? renderDateFromNow(searchResult.meta.dateModified) : '' }}</a-list-item-subtitle
               >
             </v-list-item-content>
-          </v-list-item>
+          </a-list-item>
         </v-list>
       </v-card-text>
     </v-card>
@@ -35,9 +35,10 @@ import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
-  components: { AListItemSubtitle, AListItemTitle },
+  components: { AListItem, AListItemSubtitle, AListItemTitle },
   props: {
     searchResults: {
       type: Array,

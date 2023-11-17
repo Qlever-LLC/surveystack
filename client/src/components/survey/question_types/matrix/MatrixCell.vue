@@ -102,14 +102,14 @@
       <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
     </template>
     <template v-slot:no-data>
-      <v-list-item>
+      <a-list-item>
         <v-list-item-content>
           <a-list-item-title>
             No values matching "<strong>{{ comboboxSearch }}</strong
             >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
           </a-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </a-list-item>
     </template>
   </v-combobox>
   <v-autocomplete
@@ -223,9 +223,11 @@ import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
   components: {
+    AListItem,
     AListItemTitle,
     appQrScanner,
     MatrixCellSelectionLabel,

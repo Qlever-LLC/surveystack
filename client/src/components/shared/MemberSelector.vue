@@ -12,7 +12,7 @@
         />
         <v-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
         <v-list>
-          <v-list-item
+          <a-list-item
             v-for="member in filteredMembers"
             :key="member._id"
             :disabled="member.meta.status === 'pending'"
@@ -34,7 +34,7 @@
               <a-list-item-title>{{ member.user.name }}</a-list-item-title>
               <a-list-item-subtitle>{{ member.user.email }}</a-list-item-subtitle>
             </v-list-item-content>
-          </v-list-item>
+          </a-list-item>
         </v-list>
       </v-card-text>
     </v-card>
@@ -46,8 +46,9 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 export default {
-  components: { AListItemSubtitle, AListItemTitle, ActiveGroupSelector },
+  components: { AListItem, AListItemSubtitle, AListItemTitle, ActiveGroupSelector },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
     fixedGroupId: {

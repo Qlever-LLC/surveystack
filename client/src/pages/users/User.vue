@@ -13,7 +13,7 @@
     <v-card v-if="memberships.length > 0" class="mt-3">
       <v-card-title>Memberships</v-card-title>
       <v-list>
-        <v-list-item
+        <a-list-item
           v-for="membership in memberships"
           :key="membership._id"
           :to="`/g${membership.group.path}`"
@@ -24,7 +24,7 @@
             <a-list-item-title>{{ membership.group.name }}</a-list-item-title>
             <a-list-item-subtitle class="text--secondary">{{ membership.role }}</a-list-item-subtitle>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
       </v-list>
     </v-card>
   </v-container>
@@ -34,9 +34,10 @@
 import api from '@/services/api.service';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
-  components: { AListItemSubtitle, AListItemTitle },
+  components: { AListItem, AListItemSubtitle, AListItemTitle },
   data() {
     return {
       user: {

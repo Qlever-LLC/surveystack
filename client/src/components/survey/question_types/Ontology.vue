@@ -134,7 +134,7 @@
         {{ getLabelForItemValue(data.item) }}
       </template>
       <template v-slot:no-data>
-        <v-list-item>
+        <a-list-item>
           <v-list-item-content>
             <a-list-item-title>
               No values matching "<strong>{{ comboboxSearch }}</strong
@@ -142,7 +142,7 @@
               create a new one
             </a-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
       </template>
     </v-combobox>
     <v-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading </v-banner>
@@ -162,10 +162,12 @@ import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
+    AListItem,
     AListItemTitle,
     appControlLabel,
     appControlMoreInfo,

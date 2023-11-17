@@ -20,7 +20,7 @@
         @change="localChange"
         :multiple="!!control.options.hasMultipleSelections"
       >
-        <v-list-item
+        <a-list-item
           v-for="(item, idx) in transformed"
           :value="hashItem(item)"
           :key="`item_${idx}`"
@@ -42,7 +42,7 @@
               <a-list-item-title v-html="item.label" />
             </v-list-item-content>
           </template>
-        </v-list-item>
+        </a-list-item>
       </v-list-item-group>
     </v-list>
     <app-control-more-info :value="control.moreInfo" />
@@ -54,6 +54,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 import AListItemAction from '@/components/ui/AListItemAction.vue';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
@@ -161,7 +162,7 @@ const transform = (assets) => {
 };
 
 export default {
-  components: { AListItemTitle, AListItemAction },
+  components: { AListItem, AListItemTitle, AListItemAction },
   mixins: [baseQuestionComponent, farmosBase()],
   data() {
     return {

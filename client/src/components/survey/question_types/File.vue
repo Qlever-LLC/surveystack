@@ -78,7 +78,7 @@
 
     <v-expand-transition>
       <v-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
-        <v-list-item
+        <a-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
           class="file-list-item my-2"
@@ -118,7 +118,7 @@
               <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
             </v-btn>
           </a-list-item-action>
-        </v-list-item>
+        </a-list-item>
       </v-list>
     </v-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
@@ -135,6 +135,7 @@ import { getLabelFromKey } from '@/utils/resources';
 import AListItemAction from '@/components/ui/AListItemAction.vue';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
+import AListItem from '@/components/ui/AListItem.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -142,6 +143,7 @@ const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //5
 export default {
   mixins: [baseQuestionComponent],
   components: {
+    AListItem,
     AListItemSubtitle,
     AListItemTitle,
     AListItemAction,
