@@ -12,7 +12,16 @@
         hide-details
       />
       <v-text-field v-model="control.hint" label="Hint" hide-details />
-      <v-text-field v-model="control.moreInfo" label="More info" hide-details />
+      <markdown-editor
+        v-model="control.moreInfo"
+        :resources="survey.resources"
+        label="More info"
+        placeholder="Add more info here"
+        class="mt-6"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+      >
+        <template #title>More info (markdown supported)</template>
+      </markdown-editor>
 
       <!-- Control properties -->
       <v-text-field
@@ -448,6 +457,7 @@ import InstructionsImageSplitEditor from '@/components/builder/InstructionsImage
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
+import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
@@ -463,6 +473,7 @@ export default {
     Ontology,
     Date,
     Checkbox,
+    MarkdownEditor,
   },
   props: {
     control: {
