@@ -42,6 +42,7 @@
           hide-default-footer
           show-select
           item-key="_id"
+          use-item-actions-slot
           loading="isLoadingMembers"
         >
           <template v-slot:item.actions="{ item }">

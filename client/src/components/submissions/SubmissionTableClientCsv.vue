@@ -13,6 +13,10 @@
       :server-items-length="submissions.pagination.total"
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
+      use-headers-slot
+      use-item-slot
+      use-header-data-table-select-slot
+      use-top-slot
       @update:sort-by="onUpdateSortBy"
       @update:sort-desc="onUpdateSortDesc"
       show-select

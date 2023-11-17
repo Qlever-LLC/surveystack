@@ -88,6 +88,10 @@
         :search="search"
         item-key="id"
         disable-sort
+        use-item-label-slot
+        use-item-value-slot
+        use-item-tags-slot
+        use-item-actions-slot
         :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
       >
         <template v-slot:item.label="{ item }">
