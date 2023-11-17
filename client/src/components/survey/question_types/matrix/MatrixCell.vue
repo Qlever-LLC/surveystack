@@ -180,7 +180,6 @@
       offset-y
       max-width="290px"
       min-width="290px"
-      ref="datepickerRef"
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
@@ -199,6 +198,7 @@
       </template>
       <v-date-picker
         :value="value"
+        ref="datepickerRef"
         @input="
           (v) => {
             onDateInput(v);
@@ -354,7 +354,7 @@ export default {
     },
     setActivePickerMonth() {
       setTimeout(() => {
-        this.$refs.datepickerRef.$children[0].$children[1].$children[0].activePicker = 'MONTH';
+        this.$refs.datepickerRef.activePicker = 'MONTH';
       });
     },
     // copied/adapted from FarmOsPlanting.vue
