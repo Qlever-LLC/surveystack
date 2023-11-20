@@ -32,10 +32,7 @@
 </template>
 
 <script>
-import AList from '@/components/ui/elements/AList.vue';
-
 export default {
-  components: { AList },
   props: {
     queryList: {
       type: Array,

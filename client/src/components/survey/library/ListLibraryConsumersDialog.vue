@@ -31,11 +31,9 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
-import AList from '@/components/ui/elements/AList.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: { AList },
   props: {
     value: {
       type: Boolean,

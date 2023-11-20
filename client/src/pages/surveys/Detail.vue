@@ -90,7 +90,6 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import AList from '@/components/ui/elements/AList.vue';
 
 export default {
   props: {
@@ -101,7 +100,6 @@ export default {
     },
   },
   components: {
-    AList,
     BtnDropdown,
     MemberSelector,
   },

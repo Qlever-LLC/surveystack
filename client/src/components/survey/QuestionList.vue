@@ -27,10 +27,7 @@
   </a-list>
 </template>
 <script>
-import AList from '@/components/ui/elements/AList.vue';
-
 export default {
-  components: { AList },
   data: () => ({
     selected: [],
   }),

@@ -52,7 +52,6 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import AList from '@/components/ui/elements/AList.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
@@ -160,7 +159,6 @@ const transform = (assets) => {
 };
 
 export default {
-  components: { AList },
   mixins: [baseQuestionComponent, farmosBase()],
   data() {
     return {

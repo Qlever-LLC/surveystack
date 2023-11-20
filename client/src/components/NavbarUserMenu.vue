@@ -52,11 +52,9 @@
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
 import api from '@/services/api.service';
-import AList from '@/components/ui/elements/AList.vue';
 
 export default {
   components: {
-    AList,
     ActiveGroupSelectorList,
   },
   data() {
