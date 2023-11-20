@@ -1,6 +1,8 @@
 .map {
   width: 100%;
-  height: 500px;
+  height: 450px;
+  --farmos-map-accent-color: var(--v-primary-base);
+
 }
 
 .map >>> .layer-switcher ul {
@@ -19,7 +21,24 @@
   top: 0.5em;
 }
 
- /* deep selector is required to pierce component boundary for scoped styles 
+.map >>> .geotrace-ctrl button.play {
+  background-color: var(--farmos-map-accent-color);
+}
+
+.map >>> .geotrace-ctrl button.play:active {
+  filter: brightness(0.75);
+}
+
+
+.map >>> .geotrace-ctrl button.play svg path {
+  fill: white;
+}
+
+.map >>> .geotrace-ctrl button.save:active {
+  filter: brightness(0.75);
+}
+
+/* deep selector is required to pierce component boundary for scoped styles 
 but jest doesn't understand the deep selector (>>>)
  */
 .hide-polygon >>> .ol-edit-polygon,
@@ -28,11 +47,27 @@ but jest doesn't understand the deep selector (>>>)
 .hide-circle >>> .ol-edit-circle,
 .hide-modify >>> .ol-edit-modify,
 .hide-move >>> .ol-edit-move,
+.hide-geotrace >>> .ol-edit-geotrace,
 .hide-polygon .ol-edit-polygon,
 .hide-point .ol-edit-point,
 .hide-line .ol-edit-line,
 .hide-circle .ol-edit-circle,
 .hide-modify .ol-edit-modify,
+.hide-geotrace .ol-edit-geotrace,
 .hide-move .ol-edit-move {
   display: none;
+}
+
+.fields-table td input {
+  width: 100%;
+  height: 100%;
+}
+
+.fields-table td input:focus {
+  outline: none;
+}
+
+
+.keep-open-alert {
+  
 }

@@ -333,6 +333,7 @@ const geoJSONControl = (overrides = {}, index = 1) => ({
       showLine: true,
       showCircle: true,
       showPoint: true,
+      showGeoTrace: false,
     },
   },
   hint: '',
