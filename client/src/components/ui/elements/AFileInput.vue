@@ -4,6 +4,7 @@
 
 <script>
 export default {
+  name: 'AFileInput',
   emits: ['change'],
   props: {
     label: { type: String, required: false },

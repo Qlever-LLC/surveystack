@@ -9,6 +9,7 @@
 
 <script>
 export default {
+  name: 'AListGroup',
   props: {
     prependIcon: { type: String, required: false },
     value: { type: undefined, required: false },

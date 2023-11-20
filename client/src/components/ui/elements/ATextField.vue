@@ -53,6 +53,7 @@
 
 <script>
 export default {
+  name: 'ATextField',
   // click event listened to by slot:activator
   emits: ['blur', 'click', 'click:append', 'change', 'focusout', 'input', 'keydown.esc', 'keyup.enter'],
   props: {

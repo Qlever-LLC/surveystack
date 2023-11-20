@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  name: 'AInput',
   props: {
     hideDetails: { type: [Boolean, String], required: false },
   },

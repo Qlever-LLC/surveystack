@@ -9,6 +9,8 @@ const { CHANGED, UNCHANGED, REMOVED, ADDED } = changeType;
 
 import { localVue } from '@/../tests/renderWithVuetify';
 
+const noRoutes = [];
+
 const createOptions = (props = {}) => {
   props = {
     controlsLocalRevision: null,
@@ -23,6 +25,7 @@ const createOptions = (props = {}) => {
     props,
     vuetify,
     localVue,
+    routes: noRoutes,
   };
 };
 
