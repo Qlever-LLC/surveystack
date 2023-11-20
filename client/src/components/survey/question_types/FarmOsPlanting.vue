@@ -52,8 +52,6 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import ARadio from '@/components/ui/ARadio.vue';
-import ARadioGroup from '@/components/ui/ARadioGroup.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
@@ -162,10 +160,7 @@ const transform = (assets) => {
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
-  components: {
-    ARadio,
-    ARadioGroup,
-  },
+
   data() {
     return {
       transformed: [],

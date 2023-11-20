@@ -63,8 +63,6 @@ import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
-import ARadio from '@/components/ui/ARadio.vue';
-import ARadioGroup from '@/components/ui/ARadioGroup.vue';
 
 export function getNextValue(value) {
   const nextValue = getValueOrNull(value);
@@ -79,8 +77,6 @@ export default {
     appControlLabel,
     appControlMoreInfo,
     appControlError,
-    ARadio,
-    ARadioGroup,
   },
   data() {
     return {

@@ -50,18 +50,11 @@
 </template>
 
 <script>
-import ARadio from '@/components/ui/ARadio.vue';
-import ARadioGroup from '@/components/ui/ARadioGroup.vue';
-
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
-  components: {
-    ARadio,
-    ARadioGroup,
-  },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },
