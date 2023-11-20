@@ -12,12 +12,12 @@
 
 <script>
 export default {
+  emits: ['input'],
   props: {
     value: { type: undefined, required: false },
     name: { type: String, required: false },
     disabled: { type: Boolean, required: false },
     hideDetails: { type: [Boolean, String], required: false },
   },
-  emits: ['input'],
 };
 </script>
