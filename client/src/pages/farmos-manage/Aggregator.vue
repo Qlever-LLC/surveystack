@@ -34,7 +34,7 @@
     </div>
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
-      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
+      <a-text-field v-model.trim="updatedNote" label="Note" hide-details />
       <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
     </div>
 
@@ -247,6 +247,7 @@ export default {
     loading: Boolean,
     users: Array,
   },
+
   data() {
     return {
       selectedInstance: null,

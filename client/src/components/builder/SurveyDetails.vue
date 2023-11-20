@@ -168,7 +168,7 @@
     </v-card-title>
     <v-card-text>
       <div class="mt-4">
-        <v-text-field
+        <a-text-field
           :value="surveyGroupName"
           label="Group"
           readonly
@@ -379,20 +379,5 @@ export default {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.survey-group-name-input >>> .v-input__slot ::before {
-  border: none;
-}
-
-.survey-group-name-input
-  >>> .theme--light.v-text-field.v-input--is-disabled
-  > .v-input__control
-  > .v-input__slot:before {
-  border: none;
-}
-
-.survey-group-name-input >>> .v-input__control >>> .v-input__slot ::before {
-  border: none;
 }
 </style>

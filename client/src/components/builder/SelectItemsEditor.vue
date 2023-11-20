@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         v-on="on"
         v-bind="attrs"
         ref="anchorRef"
@@ -34,7 +34,7 @@
         </div>
         <draggable v-else :list="items" class="draggable">
           <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.label"
               @input="(value) => onInput(index, 'label', value)"
@@ -42,7 +42,7 @@
               :hide-details="false"
               dense
             />
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.value"
               @input="(value) => onInput(index, 'value', value)"

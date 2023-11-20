@@ -1,6 +1,6 @@
 <template>
   <!-- v-if="state.isEditing" -->
-  <v-text-field
+  <a-text-field
     :value="value"
     @input="$emit('input', $event)"
     @blur="setIsEditing(false)"

@@ -10,7 +10,7 @@
       </slot>
     </v-card-title>
     <v-card-text>
-      <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
+      <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <v-list
         v-if="entities.length > 0"
         :style="{
@@ -78,6 +78,7 @@ export default {
       type: Function,
     },
   },
+
   computed: {
     filteredEntities() {
       if (this.filter) {

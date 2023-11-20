@@ -36,14 +36,14 @@
           min-width="290px"
         >
           <template v-slot:activator="{ on }">
-            <v-text-field
-              :value="dateFormatted"
-              @input="datePickerIsVisible = false"
+            <a-text-field
+              v-on="on"
               @change="updateDateInput"
+              @input="datePickerIsVisible = false"
+              :value="dateFormatted"
               label="Year"
               persistent-hint
               prepend-icon="mdi-calendar"
-              v-on="on"
               readonly
               outlined
               color="focus"
@@ -72,6 +72,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 export default {
   mixins: [baseQuestionComponent],
   props: { centered: { type: Boolean, default: true } },
+  components: { ATextField },
   data() {
     return {
       datePickerIsVisible: false,
