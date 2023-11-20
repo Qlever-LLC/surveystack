@@ -23,11 +23,8 @@
 </template>
 
 <script>
-import ASheet from '@/components/ui/ASheet.vue';
 export default {
-  components: {
-    ASheet,
-  },
+  components: {},
   props: ['value'],
   methods: {
     remove(e) {

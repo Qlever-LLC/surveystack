@@ -33,12 +33,10 @@ import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
 import appTooltip from '@/components/ui/Tooltip.vue';
-import ASheet from '@/components/ui/ASheet.vue';
 
 export default {
   components: {
     appTooltip,
-    ASheet,
   },
   props: ['value'],
   data() {
