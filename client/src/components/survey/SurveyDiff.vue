@@ -45,12 +45,10 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
-import ASwitch from '@/components/ui/ASwitch.vue';
 
 export default {
   name: 'survey-diff',
   components: {
-    ASwitch,
     SurveyDiffCardTree,
   },
   props: {

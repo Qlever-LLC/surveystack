@@ -42,10 +42,8 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
-import ASwitch from '@/components/ui/ASwitch.vue';
 
 export default {
-  components: { ASwitch },
   data() {
     return {
       excludeMeta: true,
