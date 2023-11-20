@@ -134,11 +134,9 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import AImg from '@/components/ui/AImg.vue';
 
 export default {
   components: {
-    AImg,
     AuthSelector,
     AppBasicList,
   },

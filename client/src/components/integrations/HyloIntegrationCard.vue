@@ -136,10 +136,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import AImg from '@/components/ui/AImg.vue';
 
 export default {
-  components: { AImg },
   props: {
     groupId: String,
   },

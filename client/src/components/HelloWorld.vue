@@ -48,11 +48,8 @@
 </template>
 
 <script>
-import AImg from '@/components/ui/AImg.vue';
-
 export default {
   name: 'HelloWorld',
-  components: { AImg },
 
   data: () => ({
     ecosystem: [
