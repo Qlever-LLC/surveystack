@@ -17,4 +17,10 @@ const renderWithVuetify = function (component, options, callback) {
   );
 };
 
-export { renderWithVuetify };
+import { createLocalVue } from '@vue/test-utils';
+// import AComp from '../src/components/ui/elements/AComp.vue';
+
+const localVue = createLocalVue();
+// localVue.component('a-comp', AComp);
+
+export { renderWithVuetify, localVue };
