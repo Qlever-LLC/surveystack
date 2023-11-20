@@ -26,7 +26,7 @@
           use text field with menu for year picker because year picker's
           UI placeholder year is the same as when year is selected
          -->
-        <v-menu
+        <a-menu
           v-else
           v-model="datePickerIsVisible"
           :close-on-content-click="false"
@@ -58,7 +58,7 @@
             no-title
             color="focus"
           />
-        </v-menu>
+        </a-menu>
       </div>
     </v-row>
 
