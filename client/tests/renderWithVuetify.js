@@ -17,4 +17,12 @@ const renderWithVuetify = function (component, options, callback) {
   );
 };
 
-export { renderWithVuetify };
+import { createLocalVue } from '@vue/test-utils';
+import AChip from '../src/components/ui/elements/AChip.vue';
+import ASheet from '../src/components/ui/elements/ASheet.vue';
+
+const localVue = createLocalVue();
+localVue.component('a-chip', AChip);
+localVue.component('a-sheet', ASheet);
+
+export { renderWithVuetify, localVue };

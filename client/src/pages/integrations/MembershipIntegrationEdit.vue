@@ -89,21 +89,17 @@ export default {
       this.entity.content = code;
     },
     async submit() {
-      const data = this.entity;
-      const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/membership-integrations/${this.entity._id}` : '/membership-integrations';
-
       if (this.entity.name.trim() === '') {
         console.log('Name must not be empty');
         // return;
       }
 
       try {
-        await api.customRequest({
-          method,
-          url,
-          data,
-        });
+        if (this.editMode) {
+          await api.put(`/membership-integrations/${this.entity._id}`, this.entity);
+        } else {
+          await api.post('/membership-integrations', this.entity);
+        }
 
         this.$router.back();
       } catch (err) {

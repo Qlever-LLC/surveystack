@@ -1,5 +1,6 @@
 import assert from 'assert';
 import boom from '@hapi/boom';
+import rolesService from '../services/roles.service';
 
 import { ObjectId } from 'mongodb';
 
@@ -78,10 +79,20 @@ const createScript = async (req, res) => {
   sanitize(entity);
   entity.meta.creator = res.locals.auth.user._id;
 
+  if (!entity.meta.group?.id) {
+    return res.status(400).send({ message: 'A script must be assigned to a group.' });
+  }
+
+  const hasAdminRoleForGroup = await rolesService.hasAdminRoleForRequest(res, entity.meta.group.id);
+
+  if (!hasAdminRoleForGroup) {
+    return res.status(401).send();
+  }
+
   try {
-    let r = await db.collection(col).insertOne(entity);
-    assert.equal(1, r.insertedCount);
-    return res.send(r);
+    const insertResult = await db.collection(col).insertOne(entity);
+    assert.equal(insertResult?.acknowledged, true);
+    return res.status(201).send({ _id: insertResult.insertedId, ...entity });
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       throw boom.conflict(`Entity with _id already exists: ${entity._id}`);
@@ -95,32 +106,53 @@ const updateScript = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
 
+  const hasAdminRoleForExistingGroup = await rolesService.hasAdminRoleForRequest(
+    res,
+    res.locals.existing.meta.group?.id
+  );
+
+  if (!hasAdminRoleForExistingGroup) {
+    return res.status(401).send();
+  }
+
+  const isUpdatingGroup = entity.meta.group?.id !== res.locals.existing.meta.group?.id;
+  if (isUpdatingGroup) {
+    const hasAdminRoleForNewGroup = await rolesService.hasAdminRoleForRequest(
+      res,
+      entity.meta.group?.id
+    );
+
+    if (!hasAdminRoleForNewGroup) {
+      return res.status(401).send();
+    }
+  }
+
   sanitize(entity);
   entity.meta.dateModified = new Date();
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
       { _id: new ObjectId(id) },
+      // TODO: only set updatable properties instead of replacing entire entity
       { $set: entity },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
     return res.send(updated);
   } catch (err) {
-    console.log(err);
-    return res.status(500).send({ message: 'Ouch :/' });
+    return res.status(500).send();
   }
 };
 
 const deleteScript = async (req, res) => {
   const { id } = req.params;
   try {
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
+    const deleteResult = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    assert.equal(1, deleteResult.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
-    return res.status(500).send({ message: 'Ouch :/' });
+    return res.status(500).send();
   }
 };
 

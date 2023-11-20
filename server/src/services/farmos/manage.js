@@ -139,7 +139,8 @@ export const getTree = async (group) => {
     if (domainRoot == null) {
       // may become root
       domainRoot = group;
-      return createFarmosGroupSettings(group._id, { groupHasFarmOSAccess: true });
+      await createFarmosGroupSettings(group._id, { groupHasFarmOSAccess: true });
+      return;
     }
 
     return null;
@@ -446,7 +447,11 @@ export const addFarmToSurveystackGroupAndSendNotification = async (
   groupId,
   origin
 ) => {
-  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
+  try {
+    await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
+  } catch (error) {
+    console.log(error);
+  }
   return await addFarmToSurveystackGroup(instanceName, groupId);
 };
 
@@ -650,20 +655,15 @@ const sendHandleNotification = async (instanceName, origin, subject, description
 export const removeFarmFromUser = async (instanceName, userId) => {
   const filter = { instanceName, userId: asMongoId(userId) };
 
-  // console.log('filter', filter);
-
   await db.collection('farmos-instances').deleteMany(filter);
 };
 
-export const createPlan = async (planName, planUrl) => {
-  const _id = new ObjectId();
-
-  return await db.collection('farmos-plans').insertOne({
-    _id,
+export const createPlan = (planName, planUrl) =>
+  db.collection('farmos-plans').insertOne({
+    _id: new ObjectId(),
     planName,
     planUrl,
   });
-};
 
 export const getPlans = async () => {
   return await db.collection('farmos-plans').find().toArray();
@@ -710,8 +710,8 @@ export const getPlanForGroup = async (groupId) => {
 };
 
 // TODO unit test for settings part
-export const createFarmosGroupSettings = async (groupId, specification) => {
-  return await db.collection('farmos-group-settings').insertOne({
+export const createFarmosGroupSettings = (groupId, specification) =>
+  db.collection('farmos-group-settings').insertOne({
     _id: new ObjectId(),
     groupId: asMongoId(groupId),
     planIds: [],
@@ -721,13 +721,11 @@ export const createFarmosGroupSettings = async (groupId, specification) => {
     maxSeats: 20,
     ...specification,
   });
-};
 
-export const setGroupSettings = async (groupId, settings) => {
-  return await db
+export const setGroupSettings = (groupId, settings) =>
+  db
     .collection('farmos-group-settings')
     .updateOne({ groupId: asMongoId(groupId) }, { $set: settings });
-};
 
 /**
  * @param {*} groupId

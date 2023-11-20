@@ -132,7 +132,7 @@
         <template v-slot:item="{ item }">
           <div v-if="item.userExists">
             {{ item.name }}
-            <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
+            <a-chip color="grey--darken-2" dark>{{ item.email }}</a-chip>
           </div>
           <div v-else>
             <v-icon left>mdi-account-clock</v-icon>
@@ -150,7 +150,7 @@
           >
             <v-icon left>mdi-account-plus</v-icon>Invite Member to Organization
           </v-btn>
-          <v-divider />
+          <a-divider />
         </template>
         <template v-slot:append-outer>
           <v-btn fab color="primary" style="margin-top: -16px">
@@ -159,7 +159,7 @@
         </template>
       </v-autocomplete> -->
 
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
 
       <app-field-list
         v-if="localViewModel.form.fields.length > 0"
@@ -177,7 +177,7 @@
         @cancel="cancelFieldImport"
       ></app-field-creator>
 
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
 
       <app-dialog
         labelConfirm="Refresh Members"

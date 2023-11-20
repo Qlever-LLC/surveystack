@@ -28,7 +28,7 @@
           <div class="flex-grow-1">Label</div>
           <div class="flex-grow-1">Value</div>
         </div>
-        <v-divider></v-divider>
+        <a-divider />
         <div v-if="items.length === 0" class="mt-8 text-center">
           Please click <strong>Add row</strong> button to add new item.
         </div>
@@ -55,7 +55,7 @@
         </draggable>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <a-divider />
 
       <v-card-actions>
         <v-spacer></v-spacer>

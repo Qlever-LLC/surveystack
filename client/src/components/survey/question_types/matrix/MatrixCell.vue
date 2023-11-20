@@ -127,9 +127,9 @@
     :disabled="disabled || loading"
   >
     <template v-slot:selection="data" v-if="!!header.multiple">
-      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
+      <a-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
         <span v-html="data.item.label" />
-      </v-chip>
+      </a-chip>
     </template>
     <template v-slot:selection="{ item }" v-else>
       <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
@@ -173,14 +173,13 @@
     </template>
   </v-autocomplete>
   <div v-else-if="header.type === 'date'">
-    <v-menu
+    <a-menu
       :close-on-content-click="false"
       v-model="menus[`${index}_${header.value}`]"
       transition="scale-transition"
       offset-y
       max-width="290px"
       min-width="290px"
-      ref="datepickerRef"
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
@@ -199,6 +198,7 @@
       </template>
       <v-date-picker
         :value="value"
+        ref="datepickerRef"
         @input="
           (v) => {
             onDateInput(v);
@@ -207,7 +207,7 @@
         "
         no-title
       />
-    </v-menu>
+    </a-menu>
   </div>
 
   <a-text-field v-else value="unknown cell type" outlined hide-details disabled />
@@ -313,7 +313,11 @@ export default {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     onInput(value) {
-      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      if (this.header.type === 'dropdown') {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : [value]);
+      } else {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      }
       this.$emit('changed');
     },
     onDateInput(value) {
@@ -350,7 +354,7 @@ export default {
     },
     setActivePickerMonth() {
       setTimeout(() => {
-        this.$refs.datepickerRef.$children[1].$children[0].activePicker = 'MONTH';
+        this.$refs.datepickerRef.activePicker = 'MONTH';
       });
     },
     // copied/adapted from FarmOsPlanting.vue
@@ -380,9 +384,11 @@ export default {
             item.value.location.some((loc) => loc.id === field.location.id)
         )
       );
-      const noneExist = assetsToSelect.filter(
-        (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
-      );
+      const noneExist = assetsToSelect
+        .filter(
+          (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
+        )
+        .map((asset) => asset.value);
       assets.push(...noneExist);
 
       if (!Array.isArray(hashesArg)) {

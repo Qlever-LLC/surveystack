@@ -1,6 +1,13 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <app-control-hint :value="control.hint" />
 
     <div v-if="sourceIsValid" class="py-2">
@@ -38,7 +45,7 @@
       </div>
     </div>
 
-    <app-control-error v-else>No options specified, please update survey definition</app-control-error>
+    <app-control-error v-else>No options specified, please update survey definition </app-control-error>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -84,6 +91,26 @@ export default {
       this.customSelected = !!v;
       this.onChange();
     },
+    initSelections() {
+      // fill pre-defined
+      this.selections.forEach((s) => {
+        if (this.value && Array.isArray(this.value)) {
+          console.log(this.value);
+          const valueFound = this.value.find((v) => s.value === v);
+          s.selected = !!valueFound;
+        } else {
+          s.selected = false;
+        }
+      });
+
+      // fill custom
+      if (this.control.options.allowCustomSelection && this.valueIncludesCustom) {
+        [this.customValue] = this.value.filter((x) => !this.findSource(x));
+        if (this.customValue) {
+          this.customSelected = true;
+        }
+      }
+    },
   },
   computed: {
     filteredSource() {
@@ -110,27 +137,22 @@ export default {
       return;
     }
 
-    this.selections = this.filteredSource.map((s) => ({ value: s.value, label: s.label, selected: false }));
+    this.selections = this.filteredSource.map((s) => ({
+      value: s.value,
+      label: s.label,
+      selected: false,
+    }));
 
     if (!Array.isArray(this.value)) {
       return;
     }
-
-    // fill pre-defined
-    this.value.forEach((v) => {
-      const selection = this.selections.find((s) => s.value === v);
-      if (selection) {
-        selection.selected = true;
-      }
-    });
-
-    // fill custom
-    if (this.control.options.allowCustomSelection && this.valueIncludesCustom) {
-      [this.customValue] = this.value.filter((x) => !this.findSource(x));
-      if (this.customValue) {
-        this.customSelected = true;
-      }
-    }
+    console.log(this.value);
+    this.initSelections();
+  },
+  watch: {
+    value() {
+      this.initSelections();
+    },
   },
 };
 </script>

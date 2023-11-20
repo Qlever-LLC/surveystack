@@ -12,7 +12,7 @@
     </div>
 
     <v-card outlined v-if="filters.length > 0">
-      <v-list dense>
+      <a-list dense>
         <v-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
           <v-list-item-content>
             <div>
@@ -27,7 +27,7 @@
             </v-btn>
           </v-list-item-action>
         </v-list-item>
-      </v-list>
+      </a-list>
     </v-card>
   </div>
 </template>

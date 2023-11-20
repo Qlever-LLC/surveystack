@@ -28,7 +28,7 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
-            <v-divider v-if="i < pinnedSurveys.length - 1" />
+            <a-divider v-if="i < pinnedSurveys.length - 1" />
           </div>
         </v-card-text>
       </v-card>
@@ -83,7 +83,7 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
-            <v-divider v-if="i < surveys.content.length - 1" />
+            <a-divider v-if="i < surveys.content.length - 1" />
           </div>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </v-card-text>

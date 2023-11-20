@@ -20,7 +20,7 @@
                 <a-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
               </v-col>
               <v-col :cols="2">
-                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
+                <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
               </v-col>
             </v-row>
           </v-toolbar>

@@ -21,7 +21,7 @@ export const COLL_GROUPS_HYLO_MAPPINGS = 'groups.hylo-mappings'; // TODO rename 
 const connectDatabase = async () => {
   const url = process.env.DATABASE_URL;
   const dbName = process.env.DATABASE_NAME;
-  mongoClient = new MongoClient(url, { poolSize: 10, useNewUrlParser: true });
+  mongoClient = new MongoClient(url, { maxPoolSize: 10, useNewUrlParser: true });
   await mongoClient.connect();
   db = mongoClient.db(dbName);
   await db.collection('users').createIndex({ email: 1 }, { unique: true });
@@ -79,7 +79,7 @@ const connectDatabase = async () => {
 };
 
 const migrateScripts_V1toV2 = async () => {
-  const r = await db.collection('scripts').updateMany({ specVersion: 1 }, [
+  const updateResult = await db.collection('scripts').updateMany({ specVersion: 1 }, [
     {
       $set: {
         meta: {
@@ -96,8 +96,8 @@ const migrateScripts_V1toV2 = async () => {
       $unset: 'specVersion', // specVersion is now under meta.specVersion and updated to version 2
     },
   ]);
-  if (r.modifiedCount > 0) {
-    console.log('Migration: updated this many scripts:', r.modifiedCount);
+  if (updateResult.modifiedCount > 0) {
+    console.log('Migration: updated this many scripts:', updateResult.modifiedCount);
   }
 };
 
@@ -158,7 +158,7 @@ const migrateSurveys_VXtoV4_control = (control, depth = 0) => {
 };
 
 const migrateGroups_VXtoV2 = async () => {
-  const r = await db.collection('groups').updateMany({ 'meta.specVersion': null }, [
+  const updateResult = await db.collection('groups').updateMany({ 'meta.specVersion': null }, [
     {
       $set: {
         meta: {
@@ -173,8 +173,8 @@ const migrateGroups_VXtoV2 = async () => {
     },
   ]);
 
-  if (r.modifiedCount > 0) {
-    console.log('Migration: updated this many groups:', r.modifiedCount);
+  if (updateResult.modifiedCount > 0) {
+    console.log('Migration: updated this many groups:', updateResult.modifiedCount);
   }
 };
 
@@ -204,7 +204,7 @@ const migrateLibraryIds = async () => {
       { _id: new ObjectId(survey._id) },
       { $set: survey },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
 
@@ -254,7 +254,7 @@ const migrateResourceLibraryIds = async () => {
       { _id: new ObjectId(survey._id) },
       { $set: survey },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
 
@@ -342,7 +342,7 @@ const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 6 } },
-          { returnOriginal: false }
+          { returnDocument: 'after' }
         );
 
       continue;
@@ -355,7 +355,7 @@ const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnOriginal: false }
+        { returnDocument: 'after' }
       );
 
     modifiedCount++;
@@ -423,7 +423,7 @@ const migrateSurveyOntologyOptions_VXtoV7 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 7 } },
-          { returnOriginal: false }
+          { returnDocument: 'after' }
         );
 
       continue;
@@ -436,7 +436,7 @@ const migrateSurveyOntologyOptions_VXtoV7 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnOriginal: false }
+        { returnDocument: 'after' }
       );
 
     modifiedCount++;
@@ -523,7 +523,7 @@ const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 9 } },
-          { returnOriginal: false }
+          { returnDocument: 'after' }
         );
 
       continue;
@@ -536,7 +536,7 @@ const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnOriginal: false }
+        { returnDocument: 'after' }
       );
 
     modifiedCount++;
