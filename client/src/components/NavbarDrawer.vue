@@ -31,12 +31,12 @@
       <v-divider dark class="my-1" />
 
       <v-list-item class="pa-0">
-        <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
-          <v-expansion-panel>
-            <v-expansion-panel-header class="pa-0 ma-0">
+        <a-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
+          <a-expansion-panel>
+            <a-expansion-panel-title class="pa-0 ma-0">
               <v-subheader>DOCUMENTATION</v-subheader>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content class="pa-0 ma-0 no-padding">
+            </a-expansion-panel-title>
+            <a-expansion-panel-text class="pa-0 ma-0 no-padding">
               <a-list class="pa-0 ma-0">
                 <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
                   <v-list-item-icon>
@@ -64,9 +64,9 @@
                   </v-list-item-content>
                 </v-list-item>
               </a-list>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
+            </a-expansion-panel-text>
+          </a-expansion-panel>
+        </a-expansion-panels>
       </v-list-item>
     </a-list>
 
