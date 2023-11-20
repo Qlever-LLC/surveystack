@@ -9,7 +9,7 @@
       </v-btn>
     </v-card-title>
 
-    <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+    <a-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
       <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
     </div>

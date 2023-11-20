@@ -1,18 +1,18 @@
 <template>
   <v-dialog v-model="open" width="500" @click:outside="cancel">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
+        v-on="on"
+        v-bind="attrs"
+        @input="onChange"
         ref="anchorRef"
         label="Default value"
         :value="getLabel"
-        @input="onChange"
         :class="$vnode.data.staticClass"
         clearable
         hide-details
         readonly
         :disabled="getDisabled"
-        v-on="on"
-        v-bind="attrs"
       />
     </template>
 
@@ -61,6 +61,7 @@ export default {
     custom: { type: Boolean },
     multiple: { type: Boolean },
   },
+
   data() {
     return {
       open: false,

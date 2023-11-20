@@ -8,7 +8,7 @@
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
         <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
-        <v-text-field
+        <a-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
           v-model="archiveReasonOther"
@@ -44,6 +44,7 @@ export default {
       default: 'TEST_DATA',
     },
   },
+
   data() {
     return {
       archiveReason: this.reason,

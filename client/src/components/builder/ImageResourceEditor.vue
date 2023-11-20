@@ -18,7 +18,7 @@
         "
         ref="form"
       >
-        <v-text-field
+        <a-text-field
           :value="resource.label"
           @input="handleUpdateLabel"
           label="Image Label"
@@ -26,7 +26,7 @@
           persistent-hint
           outlined
         />
-        <v-text-field
+        <a-text-field
           :value="resource.name"
           @input="handleUpdateName"
           label="Image Data Name"
@@ -34,7 +34,7 @@
           outlined
           :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
         />
-        <v-text-field
+        <a-text-field
           :value="resource.content"
           @input="handleUpdateContent"
           label="Image URL"

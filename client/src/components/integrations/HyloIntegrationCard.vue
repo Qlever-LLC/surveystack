@@ -81,14 +81,14 @@
 
               <v-card-text>
                 <div class="font-italic text-body-2 mb-4">Find an existing group on Hylo</div>
-                <v-text-field
+                <a-text-field
                   v-model="hyloGroupInput"
                   label="Hylo group"
                   placeholder="Link to your Hylo group"
                   :loading="isLoadingHyloGroup"
                   :error-messages="findError"
                   class="mb-2"
-                ></v-text-field>
+                />
                 <v-col align="center">
                   <v-btn
                     color="primary"
@@ -142,6 +142,7 @@ export default {
   props: {
     groupId: String,
   },
+
   data() {
     return {
       integratedHyloGroup: null,

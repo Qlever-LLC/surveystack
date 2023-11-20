@@ -51,14 +51,14 @@
     <v-card :loading="isLoadingGroup" class="mb-4">
       <v-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
-          <v-text-field
+          <a-text-field
             label="Name"
             placeholder="Enter group name"
             id="group-name"
             autocomplete="off"
             v-model="entity.name"
           />
-          <v-text-field
+          <a-text-field
             label="Slug"
             placeholder="Enter group slug or use suggested"
             id="group-slug"

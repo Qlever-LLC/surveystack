@@ -1,5 +1,5 @@
 <template>
-  <v-text-field
+  <a-text-field
     v-if="header.type === 'text'"
     :value="value"
     @input="onInput"
@@ -10,7 +10,7 @@
   />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
-      <v-text-field
+      <a-text-field
         ref="text-qrcode"
         :value="value"
         @input="onInput"
@@ -24,7 +24,7 @@
       <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
     </div>
   </div>
-  <v-text-field
+  <a-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
     @input="onFarmOsInput"
@@ -33,7 +33,7 @@
     autocomplete="off"
     :disabled="disabled"
   />
-  <v-text-field
+  <a-text-field
     v-else-if="header.type === 'number'"
     :value="value"
     @input="onNumberInput"
@@ -183,12 +183,12 @@
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-text-field
-          :value="getDateLabel"
-          @click="setActivePickerMonth"
-          hide-details
-          v-bind="attrs"
+        <a-text-field
           v-on="on"
+          v-bind="attrs"
+          @click="setActivePickerMonth"
+          :value="getDateLabel"
+          hide-details
           outlined
           autocomplete="off"
           :disabled="disabled"
@@ -210,7 +210,7 @@
     </a-menu>
   </div>
 
-  <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
+  <a-text-field v-else value="unknown cell type" outlined hide-details disabled />
 </template>
 
 <script>

@@ -2,7 +2,8 @@
   <div>
     <v-autocomplete :items="fieldItems" label="Field" v-model="selectedField" hide-details />
     <v-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
-    <v-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
+    <!-- TODO in Vue3 remove .native -->
+    <a-text-field label="Value" v-model="selectedValue" @keyup.native.enter="add" />
 
     <div class="d-flex justify-end">
       <v-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</v-btn>
@@ -43,6 +44,7 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
       selectedField: null,

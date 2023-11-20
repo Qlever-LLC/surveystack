@@ -6,7 +6,7 @@
       <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
-        <v-text-field
+        <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationEmail"
           label="Email"
@@ -16,7 +16,7 @@
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
-        <v-text-field
+        <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationName"
           outlined
@@ -25,7 +25,7 @@
           <template v-slot:label>
             <div>Name <small>(optional)</small></div>
           </template>
-        </v-text-field>
+        </a-text-field>
 
         <a-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
           <a-radio label="Send an invitation email" value="SEND_NOW">
@@ -128,7 +128,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { BtnDropdown, ATextField },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

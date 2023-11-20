@@ -26,7 +26,7 @@
 
       <v-row class="align-baseline">
         <v-col>
-          <v-text-field
+          <a-text-field
             :disabled="!localViewModel.form.plan"
             v-model.trim="localViewModel.form.instanceName"
             label="Instance URL"
@@ -44,7 +44,7 @@
                 >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
               >
             </template>
-          </v-text-field>
+          </a-text-field>
         </v-col>
 
         <v-col>
@@ -57,7 +57,7 @@
         </v-col>
       </v-row>
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.email"
         label="E-Mail Address of Primary User"
         placeholder="Farmer's E-Mail"
@@ -65,7 +65,7 @@
         :rules="emailRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.fullName"
         label="Full Name of the Farmer"
         placeholder="Farmer's Name"
@@ -73,7 +73,7 @@
         :rules="nameRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmName"
         label="Name of the Farm"
         placeholder="Farm Name"
@@ -81,7 +81,7 @@
         :rules="nameRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmAddress"
         label="Farm Address / Location"
         placeholder="123 Fake Street, Exampletown, NY"
