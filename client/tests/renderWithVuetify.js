@@ -18,9 +18,9 @@ const renderWithVuetify = function (component, options, callback) {
 };
 
 import { createLocalVue } from '@vue/test-utils';
-// import AComp from '../src/components/ui/elements/AComp.vue';
+import AChip from '../src/components/ui/elements/AChip.vue';
 
 const localVue = createLocalVue();
-// localVue.component('a-comp', AComp);
+localVue.component('a-chip', AChip);
 
 export { renderWithVuetify, localVue };
