@@ -173,14 +173,13 @@
     </template>
   </v-autocomplete>
   <div v-else-if="header.type === 'date'">
-    <v-menu
+    <a-menu
       :close-on-content-click="false"
       v-model="menus[`${index}_${header.value}`]"
       transition="scale-transition"
       offset-y
       max-width="290px"
       min-width="290px"
-      ref="datepickerRef"
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
@@ -199,6 +198,7 @@
       </template>
       <v-date-picker
         :value="value"
+        ref="datepickerRef"
         @input="
           (v) => {
             onDateInput(v);
@@ -207,7 +207,7 @@
         "
         no-title
       />
-    </v-menu>
+    </a-menu>
   </div>
 
   <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
@@ -352,7 +352,7 @@ export default {
     },
     setActivePickerMonth() {
       setTimeout(() => {
-        this.$refs.datepickerRef.$children[1].$children[0].activePicker = 'MONTH';
+        this.$refs.datepickerRef.activePicker = 'MONTH';
       });
     },
     // copied/adapted from FarmOsPlanting.vue

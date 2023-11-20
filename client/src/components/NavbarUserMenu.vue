@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-menu
+    <a-menu
       left
       attach="#app-menu"
       offset-y
@@ -40,7 +40,7 @@
 
       <!-- </v-card-text> -->
       <!-- </v-card> -->
-    </v-menu>
+    </a-menu>
 
     <v-btn v-else :to="{ name: 'auth-login' }" text>
       <v-icon>mdi-login-variant</v-icon>
