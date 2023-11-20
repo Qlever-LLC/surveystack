@@ -10,7 +10,7 @@
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 
     <v-row>
-      <v-file-input label="Upload KML file" @change="getFile"></v-file-input>
+      <a-file-input label="Upload KML file" @change="getFile" />
     </v-row>
     <template v-if="kml !== ''">
       <v-row>
