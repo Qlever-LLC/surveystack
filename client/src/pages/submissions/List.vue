@@ -226,10 +226,6 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
-import AExpansionPanelTitle from '@/components/ui/AExpansionPanelTitle.vue';
-import AExpansionPanelText from '@/components/ui/AExpansionPanelText.vue';
-import AExpansionPanel from '@/components/ui/AExpansionPanel.vue';
-import AExpansionPanels from '@/components/ui/AExpansionPanels.vue';
 
 const defaultPageSize = 10;
 
@@ -261,10 +257,6 @@ const apiDownloadExpandAllMatricesOptions = [
 
 export default {
   components: {
-    AExpansionPanels,
-    AExpansionPanel,
-    AExpansionPanelText,
-    AExpansionPanelTitle,
     appSubmissionsFilterBasic,
     appSubmissionsFilterAdvanced,
     appSubmissionsTree,

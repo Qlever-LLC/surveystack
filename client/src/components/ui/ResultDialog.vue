@@ -83,14 +83,10 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
-import AExpansionPanelTitle from '@/components/ui/AExpansionPanelTitle.vue';
-import AExpansionPanelText from '@/components/ui/AExpansionPanelText.vue';
-import AExpansionPanel from '@/components/ui/AExpansionPanel.vue';
-import AExpansionPanels from '@/components/ui/AExpansionPanels.vue';
 import CopyToClipboard from '@/components/submissions/CopyToClipboard.vue';
 
 export default {
-  components: { CopyToClipboard, AExpansionPanels, AExpansionPanel, AExpansionPanelText, AExpansionPanelTitle },
+  components: { CopyToClipboard },
   props: {
     value: {
       required: true,

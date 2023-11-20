@@ -45,18 +45,10 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
-import AExpansionPanelTitle from '@/components/ui/AExpansionPanelTitle.vue';
-import AExpansionPanelText from '@/components/ui/AExpansionPanelText.vue';
-import AExpansionPanel from '@/components/ui/AExpansionPanel.vue';
-import AExpansionPanels from '@/components/ui/AExpansionPanels.vue';
 
 export default {
   name: 'survey-diff',
   components: {
-    AExpansionPanels,
-    AExpansionPanel,
-    AExpansionPanelText,
-    AExpansionPanelTitle,
     SurveyDiffCardTree,
   },
   props: {

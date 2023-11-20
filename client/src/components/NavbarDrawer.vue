@@ -82,13 +82,7 @@
 </template>
 
 <script>
-import AExpansionPanelTitle from '@/components/ui/AExpansionPanelTitle.vue';
-import AExpansionPanel from '@/components/ui/AExpansionPanel.vue';
-import AExpansionPanels from '@/components/ui/AExpansionPanels.vue';
-import AExpansionPanelText from '@/components/ui/AExpansionPanelText.vue';
-
 export default {
-  components: { AExpansionPanelText, AExpansionPanels, AExpansionPanel, AExpansionPanelTitle },
   props: {
     value: {
       type: Boolean,
