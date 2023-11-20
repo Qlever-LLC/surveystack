@@ -26,10 +26,7 @@
 </template>
 
 <script>
-import AListGroup from '@/components/ui/AListGroup.vue';
-
 export default {
-  components: { AListGroup },
   props: {
     value: {
       type: [String, Object],
