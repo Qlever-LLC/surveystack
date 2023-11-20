@@ -20,13 +20,13 @@
         </v-tooltip>
 
         <v-spacer />
-        <v-switch
+        <a-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"
           @click.native.stop=""
           v-model="showChangesOnly"
           label="changes only"
-        ></v-switch>
+        />
       </a-expansion-panel-title>
       <a-expansion-panel-text>
         <survey-diff-card-tree
