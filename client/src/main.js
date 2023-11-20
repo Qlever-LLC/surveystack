@@ -29,6 +29,32 @@ Vue.component('app-control-hint', appControlHint);
 Vue.component('app-control-more-info', appControlMoreInfo);
 Vue.component('app-control-error', appControlError);
 
+const requireComponent = require.context(
+  // The relative path of the components folder
+  './components/ui/elements',
+  true,
+  // The regular expression used to match base component filenames
+  /[A]\w+\.vue$/
+);
+requireComponent.keys().forEach((fileName) => {
+  // Get component config
+  const componentConfig = requireComponent(fileName);
+  // PascalCase name of component is used
+  const componentName = fileName
+    .split('/')
+    .pop()
+    .replace(/\.\w+$/, '');
+  console.log('import', fileName, componentName);
+  // Register component globally
+  Vue.component(
+    componentName,
+    // Look for the component options on `.default`, which will
+    // exist if the component was exported with `export default`,
+    // otherwise fall back to module's root.
+    componentConfig.default || componentConfig
+  );
+});
+
 api.init(process.env.VUE_APP_API_URL);
 
 Vue.filter('capitalize', (value) => {
@@ -58,29 +84,3 @@ try {
 } catch (e) {
   console.error('Failed to remove loading screen', e);
 }
-
-const requireComponent = require.context(
-  // The relative path of the components folder
-  './components/ui/elements',
-  true,
-  // The regular expression used to match base component filenames
-  /[A]\w+\.vue$/
-);
-requireComponent.keys().forEach((fileName) => {
-  // Get component config
-  const componentConfig = requireComponent(fileName);
-  // PascalCase name of component is used
-  const componentName = fileName
-    .split('/')
-    .pop()
-    .replace(/\.\w+$/, '');
-  console.log('import', fileName, componentName);
-  // Register component globally
-  Vue.component(
-    componentName,
-    // Look for the component options on `.default`, which will
-    // exist if the component was exported with `export default`,
-    // otherwise fall back to module's root.
-    componentConfig.default || componentConfig
-  );
-});

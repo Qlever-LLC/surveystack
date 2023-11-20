@@ -64,7 +64,7 @@
           <v-list>
             <v-list-item class="d-flex align-center">
               <v-list-item-title>
-                <v-input hide-details>
+                <a-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
                     <v-btn class="pointer-events-none" text>
                       <v-icon color="grey">mdi-file-upload</v-icon>
@@ -79,7 +79,7 @@
                     class="d-none"
                     @change="(file) => $emit('import-survey', file)"
                   />
-                </v-input>
+                </a-input>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>
