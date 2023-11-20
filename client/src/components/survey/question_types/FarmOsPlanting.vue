@@ -12,7 +12,7 @@
 
     <v-progress-circular v-if="loading" indeterminate color="secondary" class="my-8"> </v-progress-circular>
 
-    <v-list style="overflow: auto">
+    <a-list style="overflow: auto">
       <v-list-item-group
         v-if="!loading"
         :disabled="loading"
@@ -44,7 +44,7 @@
           </template>
         </v-list-item>
       </v-list-item-group>
-    </v-list>
+    </a-list>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>

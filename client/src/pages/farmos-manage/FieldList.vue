@@ -1,6 +1,6 @@
 <template>
   <a-sheet outlined>
-    <v-list subheader>
+    <a-list subheader>
       <v-subheader>Fields added to Farmos Instance</v-subheader>
 
       <v-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
@@ -18,13 +18,12 @@
           </v-btn>
         </v-list-item-action>
       </v-list-item>
-    </v-list>
+    </a-list>
   </a-sheet>
 </template>
 
 <script>
 export default {
-  components: {},
   props: ['value'],
   methods: {
     remove(e) {
