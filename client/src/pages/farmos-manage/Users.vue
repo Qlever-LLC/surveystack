@@ -24,7 +24,7 @@
       :items="users"
     ></v-autocomplete>
 
-    <v-divider class="my-4"></v-divider>
+    <a-divider class="my-4" />
 
     <v-simple-table v-if="!loading">
       <template v-slot:default>

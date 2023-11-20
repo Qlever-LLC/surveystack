@@ -47,7 +47,7 @@
           </v-dialog>
         </div>
       </div>
-      <v-divider />
+      <a-divider />
     </v-card-title>
 
     <v-card-text class="pt-4">

@@ -27,7 +27,7 @@
               </v-list-item-content>
             </slot>
           </v-list-item>
-          <v-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
+          <a-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
         </div>
       </v-list>
 

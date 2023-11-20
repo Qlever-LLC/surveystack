@@ -4,7 +4,7 @@
       <v-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
       </v-card-title>
-      <v-divider></v-divider>
+      <a-divider />
       <v-card-text>
         <v-list dense style="max-height: 500px" class="overflow-y-auto">
           <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
@@ -20,7 +20,7 @@
           </template>
         </v-list>
       </v-card-text>
-      <v-divider></v-divider>
+      <a-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>

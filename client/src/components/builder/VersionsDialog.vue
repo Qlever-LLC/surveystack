@@ -71,7 +71,7 @@
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
         </v-alert>
       </v-card-text>
-      <v-divider></v-divider>
+      <a-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn

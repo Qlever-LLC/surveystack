@@ -42,7 +42,7 @@
 
     <div v-if="!loading && !!selectedGroup" class="px-3">{{ amountMappedInstances }}</div>
 
-    <v-divider class="my-4"></v-divider>
+    <a-divider class="my-4" />
 
     <v-simple-table v-if="!loading">
       <template v-slot:default>
