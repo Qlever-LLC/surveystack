@@ -34,9 +34,9 @@
     <div class="d-flex justify-space-between">
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
-        <v-chip v-if="isPremium" class="ml-2" color="success">
+        <a-chip v-if="isPremium" class="ml-2" color="success">
           <v-icon small left> mdi-octagram </v-icon>Premium
-        </v-chip>
+        </a-chip>
       </h1>
       <v-btn
         v-if="editMode"
