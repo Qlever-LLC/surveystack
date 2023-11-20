@@ -1,5 +1,5 @@
 <template>
-  <v-list two-line>
+  <a-list two-line>
     <v-list-item-group v-model="selected" single active-class="pink--text">
       <template v-for="(question, index) in questions">
         <v-list-item :key="question.number">
@@ -21,10 +21,10 @@
           </template>
         </v-list-item>
 
-        <v-divider v-if="index < questions.length - 1" :key="'div_' + question.number"></v-divider>
+        <a-divider v-if="index < questions.length - 1" :key="'div_' + question.number" />
       </template>
     </v-list-item-group>
-  </v-list>
+  </a-list>
 </template>
 <script>
 export default {

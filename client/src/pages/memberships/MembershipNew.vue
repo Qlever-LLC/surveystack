@@ -6,7 +6,7 @@
       <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
-        <v-text-field
+        <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationEmail"
           label="Email"
@@ -16,7 +16,7 @@
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
-        <v-text-field
+        <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationName"
           outlined
@@ -25,26 +25,26 @@
           <template v-slot:label>
             <div>Name <small>(optional)</small></div>
           </template>
-        </v-text-field>
+        </a-text-field>
 
-        <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
-          <v-radio label="Send an invitation email" value="SEND_NOW">
+        <a-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
+          <a-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Send an invitation email</div>
                 <div class="font-weight-regular caption">An email invitation will be sent right now</div>
               </div>
             </template>
-          </v-radio>
-          <v-radio label="Do not send an invitation email at this moment" value="SEND_LATER">
+          </a-radio>
+          <a-radio label="Do not send an invitation email at this moment" value="SEND_LATER">
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Do not send an invitation email now</div>
                 <div class="font-weight-regular caption">You can send an email invitation later on</div>
               </div>
             </template>
-          </v-radio>
-        </v-radio-group>
+          </a-radio>
+        </a-radio-group>
 
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
@@ -60,7 +60,7 @@
             top
             left
           >
-            <v-list class="pa-0 mx-auto" max-width="280">
+            <a-list class="pa-0 mx-auto" max-width="280">
               <v-list-item-group v-model="invitationMethod">
                 <v-list-item two-line :value="INVITATION_METHODS.INVITE">
                   <v-list-item-content>
@@ -83,7 +83,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list-item-group>
-            </v-list>
+            </a-list>
           </btn-dropdown>
         </div>
       </v-form>
@@ -128,7 +128,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown },
+  components: { BtnDropdown, ATextField },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

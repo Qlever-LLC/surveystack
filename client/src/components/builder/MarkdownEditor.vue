@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         ref="anchorRef"
         v-on="on"
         v-bind="attrs"
@@ -67,7 +67,7 @@
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
             <v-list class="resource-panel">
-              <a-list-subheader class="px-2 py-0" cssSticky>Clic to insert </a-list-subheader>
+              <a-list-subheader class="px-2 py-0" cssSticky>Click to insert </a-list-subheader>
 
               <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
                 <v-list-item-content>

@@ -3,15 +3,15 @@
     <v-card-title class="pl-0">Properties</v-card-title>
     <v-form v-if="control">
       <!-- Default properties -->
-      <v-text-field v-model="control.label" label="Label" hide-details />
-      <v-text-field
+      <a-text-field v-model="control.label" label="Label" hide-details />
+      <a-text-field
         v-model="control.name"
         label="Value"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         hide-details
       />
-      <v-text-field v-model="control.hint" label="Hint" hide-details />
+      <a-text-field v-model="control.hint" label="Hint" hide-details />
       <markdown-editor
         v-model="control.moreInfo"
         :resources="survey.resources"
@@ -24,14 +24,14 @@
       </markdown-editor>
 
       <!-- Control properties -->
-      <v-text-field
+      <a-text-field
         v-if="isText"
         v-model="control.defaultValue"
         @blur="handleDefaultValueTrim"
         label="Default value"
         hide-details
       />
-      <v-text-field
+      <a-text-field
         v-if="isNumber"
         type="number"
         v-model="control.defaultValue"
@@ -78,7 +78,7 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
-      <v-text-field
+      <a-text-field
         v-if="isMatrix"
         v-model="control.options.source.config.addRowLabel"
         label="Add Row label"
@@ -125,7 +125,7 @@
           <div>{{ item.name }}</div>
         </template>
       </v-autocomplete>
-      <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
+      <a-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea
         v-if="isScript"
