@@ -16,12 +16,13 @@
           <v-list-item-content>
             <v-list-item-title>
               {{ item.label }}
-              <v-chip
+              <a-chip
                 v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
                 color="accent"
                 small
-                >{{ readyToSubmitCount }}</v-chip
               >
+                {{ readyToSubmitCount }}
+              </a-chip>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -81,7 +82,7 @@
 </template>
 
 <script>
-import AList from '@/components/ui/AList.vue';
+import AList from '@/components/ui/elements/AList.vue';
 
 export default {
   components: { AList },

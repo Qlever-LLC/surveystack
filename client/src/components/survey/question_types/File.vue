@@ -3,7 +3,14 @@
     <v-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
       {{ alertMessage }}
     </v-snackbar>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <app-control-hint :value="control.hint" />
 
     <div @drop.prevent="onDrop" @dragover.prevent="onDragOver" @dragleave="onDragLeave">
@@ -125,7 +132,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 import { getLabelFromKey } from '@/utils/resources';
-import AList from '@/components/ui/AList.vue';
+import AList from '@/components/ui/elements/AList.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB

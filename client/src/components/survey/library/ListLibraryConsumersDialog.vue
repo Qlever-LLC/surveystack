@@ -31,7 +31,7 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
-import AList from '@/components/ui/AList.vue';
+import AList from '@/components/ui/elements/AList.vue';
 
 export default {
   name: 'list-library-consumers-dialog',

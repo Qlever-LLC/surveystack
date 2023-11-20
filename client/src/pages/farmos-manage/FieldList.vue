@@ -1,5 +1,5 @@
 <template>
-  <v-sheet outlined>
+  <a-sheet outlined>
     <a-list subheader>
       <v-subheader>Fields added to Farmos Instance</v-subheader>
 
@@ -19,14 +19,11 @@
         </v-list-item-action>
       </v-list-item>
     </a-list>
-  </v-sheet>
+  </a-sheet>
 </template>
 
 <script>
-import AList from '@/components/ui/AList.vue';
-
 export default {
-  components: { AList },
   props: ['value'],
   methods: {
     remove(e) {

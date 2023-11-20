@@ -1,6 +1,13 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled && value"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <div style="display: flex">
       <div style="flex: 1">
         <v-text-field
@@ -32,6 +39,8 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isIos } from '@/utils/compatibility';
 import appQrScanner from '@/components/ui/QrScanner.vue';
+import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
+import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 
 import { getValueOrNull } from '@/utils/surveyStack';
 
@@ -39,6 +48,8 @@ export default {
   mixins: [baseQuestionComponent],
   components: {
     appQrScanner,
+    appControlLabel,
+    appControlMoreInfo,
   },
   methods: {
     submit() {
