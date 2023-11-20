@@ -59,12 +59,10 @@
 
 <script>
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
-import ASpeedDial from '@/components/ui/ASpeedDial.vue';
 
 const group = availableControls.find((c) => c.type === 'group');
 
 export default {
-  components: { ASpeedDial },
   data() {
     return {
       group,
