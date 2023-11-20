@@ -132,7 +132,7 @@
         <template v-slot:item="{ item }">
           <div v-if="item.userExists">
             {{ item.name }}
-            <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
+            <a-chip color="grey--darken-2" dark>{{ item.email }}</a-chip>
           </div>
           <div v-else>
             <v-icon left>mdi-account-clock</v-icon>
