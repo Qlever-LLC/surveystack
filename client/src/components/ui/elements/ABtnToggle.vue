@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  name: 'ABtnToggle',
   props: {
     dense: { type: Boolean, required: false },
     value: { type: undefined, required: false },

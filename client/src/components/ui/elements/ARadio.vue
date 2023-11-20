@@ -8,6 +8,7 @@
 
 <script>
 export default {
+  name: 'ARadio',
   emits: ['change'],
   props: {
     label: { type: String, required: false },

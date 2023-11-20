@@ -4,17 +4,15 @@ import ForgotPassword from './ForgotPassword.vue';
 import { RouterLinkStub } from '@vue/test-utils';
 import mockAxios from 'axios';
 
+const noRoutes = [];
+
 describe('ForgotPassword component', () => {
   describe('navigation links and buttons', () => {
     it('Renders link to ForgotPassword by default', async () => {
       const { getByRole } = renderWithVuetify(ForgotPassword, {
+        routes: noRoutes,
         store: {},
         propsData: {},
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
         stubs: {
           RouterLink: RouterLinkStub,
         },
@@ -23,13 +21,9 @@ describe('ForgotPassword component', () => {
     });
     it('Renders button to ForgotPassword when useLink is false', async () => {
       const { getByRole } = renderWithVuetify(ForgotPassword, {
+        routes: noRoutes,
         store: {},
         propsData: { useLink: false },
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
         stubs: {
           RouterLink: RouterLinkStub,
         },
@@ -41,13 +35,9 @@ describe('ForgotPassword component', () => {
   describe('submitting form', () => {
     it('shows an error when email is empty', async () => {
       const { getByLabelText, getByText, queryByText } = renderWithVuetify(ForgotPassword, {
+        routes: noRoutes,
         propsData: {},
         store: {},
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
         stubs: {
           RouterLink: RouterLinkStub,
         },
@@ -72,13 +62,9 @@ describe('ForgotPassword component', () => {
     it('displays success message when submit is called with a non empty email', async () => {
       mockAxios.post.mockImplementation(() => Promise.resolve());
       const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
+        routes: noRoutes,
         propsData: {},
         store: {},
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
         stubs: {
           RouterLink: RouterLinkStub,
           transition: TransitionStub,
@@ -97,13 +83,9 @@ describe('ForgotPassword component', () => {
       let error500 = { response: { status: 500 } };
       mockAxios.post.mockImplementation(() => Promise.reject(error500));
       const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
+        routes: noRoutes,
         propsData: {},
         store: {},
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
         stubs: {
           RouterLink: RouterLinkStub,
           transition: TransitionStub,

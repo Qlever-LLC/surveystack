@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  name: 'AExpansionPanel',
   props: {
     readonly: { type: Boolean, required: false },
   },

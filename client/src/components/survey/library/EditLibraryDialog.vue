@@ -37,7 +37,7 @@ import { ref } from '@vue/composition-api';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor, ATextField },
+  components: { LibraryChangeTypeSelector, TipTapEditor },
   props: {
     value: {
       type: Boolean,

@@ -4,6 +4,7 @@
 
 <script>
 export default {
+  name: 'ASwitch',
   props: {
     value: { type: undefined, required: false },
     label: { type: String, required: false },
