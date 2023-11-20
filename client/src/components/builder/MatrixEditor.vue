@@ -47,9 +47,9 @@
                     v-bind="attrs"
                     v-on="on"
                   >
-                    <v-divider vertical class="lock-line-decor" />
+                    <a-divider vertical class="lock-line-decor" />
                     <v-icon class="my-1">mdi-arrow-horizontal-lock</v-icon>
-                    <v-divider vertical class="lock-line-decor" />
+                    <a-divider vertical class="lock-line-decor" />
                   </v-card>
                 </template>
                 <span>Columns to the left of this line will always be visible</span>

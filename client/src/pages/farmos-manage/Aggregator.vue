@@ -47,7 +47,7 @@
     </div>
 
     <template v-if="!!selectedInstance">
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
       <h2 ref="map-group">
         Group Mappings for
         <a-chip>{{ selectedInstance }}</a-chip>
@@ -93,7 +93,7 @@
         >No Group Mappings exist for {{ selectedInstance }}</v-alert
       >
 
-      <v-divider class="my-8"></v-divider>
+      <a-divider class="my-8" />
 
       <h2 ref="map-user">
         User Mappings for

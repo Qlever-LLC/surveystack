@@ -7,7 +7,7 @@
     </div>
     <a-list>
       <template v-for="(item, i) in items">
-        <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
+        <a-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
         <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
         <v-list-item v-else :key="i" :to="item.to">
           <v-list-item-icon v-if="item.icon" :class="item.class">
@@ -28,7 +28,7 @@
         </v-list-item>
       </template>
 
-      <v-divider dark class="my-1" />
+      <a-divider dark class="my-1" />
 
       <v-list-item class="pa-0">
         <a-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">

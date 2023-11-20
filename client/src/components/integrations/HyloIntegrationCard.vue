@@ -100,8 +100,9 @@
                   </v-btn>
                 </v-col>
                 <v-row align="center" class="my-5">
-                  <v-divider></v-divider><span class="mx-2">or</span><v-divider></v-divider
-                ></v-row>
+                  <a-divider /><span class="mx-2">or</span>
+                  <a-divider />
+                </v-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 

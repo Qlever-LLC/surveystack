@@ -26,10 +26,10 @@
           </v-list-item-icon>
           <v-list-item-title> FarmOS Profile </v-list-item-title>
         </v-list-item>
-        <v-divider />
+        <a-divider />
         <v-subheader>Active Group</v-subheader>
         <active-group-selector-list v-model="activeGroup" />
-        <v-divider />
+        <a-divider />
         <v-list-item link @click="logout" class="mt-2">
           <v-list-item-icon>
             <v-icon>mdi-logout-variant</v-icon>

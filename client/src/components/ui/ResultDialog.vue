@@ -11,7 +11,7 @@
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>
               <template v-if="item.logs && item.logs.length">
-                <v-divider class="mx-4"></v-divider>
+                <a-divider class="mx-4" />
                 <v-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
                     <v-card-actions>

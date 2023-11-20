@@ -21,7 +21,7 @@
           </template>
         </v-list-item>
 
-        <v-divider v-if="index < questions.length - 1" :key="'div_' + question.number"></v-divider>
+        <a-divider v-if="index < questions.length - 1" :key="'div_' + question.number" />
       </template>
     </v-list-item-group>
   </a-list>
