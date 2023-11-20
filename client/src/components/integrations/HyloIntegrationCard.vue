@@ -7,7 +7,7 @@
         <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
       </v-card-text>
       <template v-else-if="integratedHyloGroup">
-        <v-img
+        <a-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
           height="250"
           :src="integratedHyloGroup.bannerUrl"
@@ -62,7 +62,7 @@
           </v-card-text>
 
           <!-- </v-col> -->
-        </v-img>
+        </a-img>
       </template>
 
       <template v-else>
