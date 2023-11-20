@@ -12,6 +12,7 @@
 
 <script>
 export default {
+  name: 'ARadioGroup',
   emits: ['input'],
   props: {
     value: { type: undefined, required: false },
