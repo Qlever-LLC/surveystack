@@ -7,6 +7,8 @@ import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
 
 const { CHANGED, UNCHANGED, REMOVED, ADDED } = changeType;
 
+import { localVue } from '@/../tests/renderWithVuetify';
+
 const createOptions = (props = {}) => {
   props = {
     controlsLocalRevision: null,
@@ -20,6 +22,7 @@ const createOptions = (props = {}) => {
   return {
     props,
     vuetify,
+    localVue,
   };
 };
 

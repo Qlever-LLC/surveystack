@@ -162,7 +162,7 @@
           </v-btn>
         </div>
         <div class="text-left">
-          <v-chip dark small outlined color="grey"> Version {{ version }}</v-chip>
+          <a-chip dark small outlined color="grey"> Version {{ version }}</a-chip>
         </div>
       </div>
     </v-card-title>
