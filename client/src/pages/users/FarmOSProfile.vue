@@ -357,7 +357,7 @@
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
@@ -368,13 +368,13 @@
                     @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
                   >
                     {{ group.groupName }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
@@ -385,7 +385,7 @@
                     @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
                     ><span v-if="user.owner" class="mdi mdi-crown pr-1"></span>
                     {{ user.userEmail }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>

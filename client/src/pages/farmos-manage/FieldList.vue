@@ -1,5 +1,5 @@
 <template>
-  <v-sheet outlined>
+  <a-sheet outlined>
     <v-list subheader>
       <v-subheader>Fields added to Farmos Instance</v-subheader>
 
@@ -19,11 +19,12 @@
         </v-list-item-action>
       </v-list-item>
     </v-list>
-  </v-sheet>
+  </a-sheet>
 </template>
 
 <script>
 export default {
+  components: {},
   props: ['value'],
   methods: {
     remove(e) {
