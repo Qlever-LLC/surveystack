@@ -52,11 +52,9 @@
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
 import api from '@/services/api.service';
-import AMenu from '@/components/ui/AMenu.vue';
 
 export default {
   components: {
-    AMenu,
     ActiveGroupSelectorList,
   },
   data() {

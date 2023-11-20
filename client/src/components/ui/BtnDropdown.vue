@@ -11,11 +11,8 @@
 </template>
 
 <script>
-import AMenu from '@/components/ui/AMenu.vue';
-
 export default {
   name: 'BtnDropdown',
-  components: { AMenu },
   inheritAttrs: false,
   props: {
     label: {

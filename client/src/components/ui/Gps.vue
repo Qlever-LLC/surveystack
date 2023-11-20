@@ -31,10 +31,7 @@
 </template>
 
 <script>
-import AMenu from '@/components/ui/AMenu.vue';
-
 export default {
-  components: { AMenu },
   data() {
     return {
       snackbar: false,

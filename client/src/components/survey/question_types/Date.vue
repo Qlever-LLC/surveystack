@@ -68,10 +68,8 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import AMenu from '@/components/ui/AMenu.vue';
 
 export default {
-  components: { AMenu },
   mixins: [baseQuestionComponent],
   props: { centered: { type: Boolean, default: true } },
   data() {

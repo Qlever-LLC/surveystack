@@ -47,10 +47,8 @@ import endOfWeek from 'date-fns/endOfWeek';
 import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
-import AMenu from '@/components/ui/AMenu.vue';
 
 export default {
-  components: { AMenu },
   props: {
     value: { type: String },
     type: { type: String },
