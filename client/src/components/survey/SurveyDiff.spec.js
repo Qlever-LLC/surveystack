@@ -7,11 +7,7 @@ import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
 
 const { CHANGED, UNCHANGED, REMOVED, ADDED } = changeType;
 
-import { createLocalVue } from '@vue/test-utils';
-import AChip from '@/components/ui/elements/AChip.vue';
-
-const localVue = createLocalVue();
-localVue.component('a-chip', AChip);
+import { localVue } from '@/../tests/renderWithVuetify';
 
 const createOptions = (props = {}) => {
   props = {
