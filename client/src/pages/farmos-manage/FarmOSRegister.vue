@@ -99,10 +99,10 @@
       />
 
       <div class="text-left text--secondary">Unit System to use</div>
-      <v-radio-group v-model="localViewModel.form.units" col>
-        <v-radio label="Metric" value="metric"></v-radio>
-        <v-radio label="US" value="us"></v-radio>
-      </v-radio-group>
+      <a-radio-group v-model="localViewModel.form.units">
+        <a-radio label="Metric" value="metric" />
+        <a-radio label="US" value="us" />
+      </a-radio-group>
 
       <v-autocomplete
         label="Owner of the FarmOS Instance"

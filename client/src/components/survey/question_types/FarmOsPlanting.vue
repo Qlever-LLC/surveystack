@@ -34,9 +34,9 @@
                 :true-value="hashItem(item)"
                 color="focus"
               />
-              <v-radio-group v-else :value="active">
-                <v-radio :value="true" color="focus" />
-              </v-radio-group>
+              <a-radio-group v-else :value="active">
+                <a-radio :value="true" color="focus" />
+              </a-radio-group>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title v-html="item.label" />
@@ -160,6 +160,7 @@ const transform = (assets) => {
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
+
   data() {
     return {
       transformed: [],
