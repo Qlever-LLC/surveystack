@@ -48,7 +48,7 @@
           </v-list-item>
           <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
-              <v-input hide-details>
+              <a-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
                   <v-btn class="pointer-events-none" text>
                     <v-icon color="grey">mdi-upload</v-icon>
@@ -62,7 +62,7 @@
                   class="d-none"
                   @change="createFileResource"
                 />
-              </v-input>
+              </a-input>
             </v-list-item-title>
           </v-list-item>
         </v-list>
