@@ -44,7 +44,6 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 
 import { getValueOrNull } from '@/utils/surveyStack';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   mixins: [baseQuestionComponent],

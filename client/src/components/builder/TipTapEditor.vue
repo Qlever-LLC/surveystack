@@ -352,14 +352,12 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,
-    ATextField,
   },
   props: {
     value: {

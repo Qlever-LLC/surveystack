@@ -44,7 +44,7 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
-import ATextField from '@/components/ui/ATextField.vue';
+
 export default {
   components: { ActiveGroupSelector, ATextField },
   props: {

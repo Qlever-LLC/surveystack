@@ -50,8 +50,6 @@
 </template>
 
 <script>
-import ATextField from '@/components/ui/ATextField.vue';
-
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
@@ -63,9 +61,7 @@ export default {
     custom: { type: Boolean },
     multiple: { type: Boolean },
   },
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       open: false,

@@ -25,7 +25,6 @@
 </template>
 
 <script>
-import ATextField from '@/components/ui/ATextField.vue';
 export default {
   props: {
     persistent: Boolean,
@@ -45,9 +44,7 @@ export default {
       default: 'TEST_DATA',
     },
   },
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       archiveReason: this.reason,

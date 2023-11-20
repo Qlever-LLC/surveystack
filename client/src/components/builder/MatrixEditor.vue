@@ -262,7 +262,6 @@ import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
-import ATextField from '@/components/ui/ATextField.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -291,7 +290,6 @@ export default {
     Ontology,
     Date,
     Checkbox,
-    ATextField,
   },
   props: {
     value: {

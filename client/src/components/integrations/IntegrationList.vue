@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import ATextField from '@/components/ui/ATextField.vue';
 export default {
   props: {
     entities: {
@@ -46,9 +45,7 @@ export default {
       required: true,
     },
   },
-  components: {
-    ATextField,
-  },
+
   computed: {
     integrations() {
       if (!this.q) {

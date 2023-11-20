@@ -52,12 +52,8 @@
 
 <script>
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
-  components: {
-    ATextField,
-  },
   data() {
     return {};
   },

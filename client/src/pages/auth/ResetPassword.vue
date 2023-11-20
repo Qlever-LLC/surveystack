@@ -45,12 +45,10 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appFeedback,
-    ATextField,
   },
   data() {
     return {

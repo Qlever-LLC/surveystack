@@ -236,7 +236,6 @@
 
 <script>
 import _ from 'lodash';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   emits: ['addSuperAdminNote'],
@@ -248,9 +247,7 @@ export default {
     loading: Boolean,
     users: Array,
   },
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       selectedInstance: null,

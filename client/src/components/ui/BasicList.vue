@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import ATextField from '@/components/ui/ATextField.vue';
 export default {
   props: {
     loading: {
@@ -79,9 +78,7 @@ export default {
       type: Function,
     },
   },
-  components: {
-    ATextField,
-  },
+
   computed: {
     filteredEntities() {
       if (this.filter) {

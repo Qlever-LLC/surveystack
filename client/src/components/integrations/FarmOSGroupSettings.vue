@@ -109,12 +109,10 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
-    ATextField,
   },
   props: {
     groupInfos: {

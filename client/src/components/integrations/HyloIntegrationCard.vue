@@ -137,15 +137,12 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   props: {
     groupId: String,
   },
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       integratedHyloGroup: null,

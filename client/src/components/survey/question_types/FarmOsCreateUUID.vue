@@ -33,16 +33,13 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isIos } from '@/utils/compatibility';
-import ATextField from '@/components/ui/ATextField.vue';
 
 import { getValueOrNull } from '@/utils/surveyStack';
 import { uuidv4 } from '@/utils/surveys';
 
 export default {
   mixins: [baseQuestionComponent],
-  components: {
-    ATextField,
-  },
+
   methods: {
     getValueOrNull,
     submit() {

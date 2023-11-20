@@ -42,12 +42,8 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
-  components: {
-    ATextField,
-  },
   data() {
     return {
       excludeMeta: true,

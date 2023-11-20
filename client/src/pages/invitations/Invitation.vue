@@ -35,12 +35,8 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
-  components: {
-    ATextField,
-  },
   data() {
     return {
       initialized: false,

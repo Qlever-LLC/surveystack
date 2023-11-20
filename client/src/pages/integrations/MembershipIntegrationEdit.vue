@@ -40,7 +40,6 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFarmosFarmPicker from '@/components/integrations/FarmosFarmPicker.vue';
-import ATextField from '@/components/ui/ATextField.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -65,7 +64,6 @@ export default {
   components: {
     appJsonEditor,
     appFarmosFarmPicker,
-    ATextField,
   },
   data() {
     return {

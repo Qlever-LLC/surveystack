@@ -8,12 +8,10 @@
 <script>
 import api from '@/services/api.service';
 import appEntityList from '@/components/ui/EntityList.vue';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appEntityList,
-    ATextField,
   },
   data() {
     return {

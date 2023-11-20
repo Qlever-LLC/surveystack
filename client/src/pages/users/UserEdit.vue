@@ -74,12 +74,10 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appFeedback,
-    ATextField,
   },
   data() {
     return {

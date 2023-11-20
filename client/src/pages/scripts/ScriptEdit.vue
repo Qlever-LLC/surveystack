@@ -32,7 +32,6 @@ import ObjectId from 'bson-objectid';
 
 import api from '@/services/api.service';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
-import ATextField from '@/components/ui/ATextField.vue';
 
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 
@@ -134,7 +133,6 @@ export function render(props, state, setState) {
   components: {
     codeEditor,
     ActiveGroupSelector,
-    ATextField,
   },
   methods: {
     cancel() {

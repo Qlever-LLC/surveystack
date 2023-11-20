@@ -68,7 +68,6 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   mixins: [baseQuestionComponent],

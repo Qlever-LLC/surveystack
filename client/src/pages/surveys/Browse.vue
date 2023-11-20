@@ -105,14 +105,10 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
-import ATextField from '@/components/ui/ATextField.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
-  components: {
-    ATextField,
-  },
   data() {
     return {
       selectedGroupIds: [],

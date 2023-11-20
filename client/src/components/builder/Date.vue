@@ -48,7 +48,6 @@ import endOfWeek from 'date-fns/endOfWeek';
 import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   emits: ['blur', 'input'],
@@ -57,9 +56,7 @@ export default {
     type: { type: String },
     dense: { type: Boolean, default: false },
   },
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       open: false,

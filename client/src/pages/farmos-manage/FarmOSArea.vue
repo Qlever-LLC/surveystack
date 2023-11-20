@@ -9,13 +9,10 @@
 
 <script>
 import createMap from '@/external/instance/instance';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   props: ['value', 'center'],
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       layer: null,

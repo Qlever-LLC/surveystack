@@ -34,7 +34,6 @@
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   name: 'edit-library-dialog',

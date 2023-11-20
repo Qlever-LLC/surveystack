@@ -108,7 +108,6 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ATextField from '@/components/ui/ATextField.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -134,9 +133,7 @@ export default {
       default: true,
     },
   },
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       status: '',

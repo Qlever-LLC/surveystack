@@ -27,13 +27,10 @@
 </template>
 
 <script>
-import ATextField from '@/components/ui/ATextField.vue';
 export default {
   emits: ['addNote', 'cancelNote'],
   props: ['loading', 'value'],
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       note: [],

@@ -32,14 +32,12 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { isIos } from '@/utils/compatibility';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
     appControlLabel,
     appControlMoreInfo,
-    ATextField,
   },
   methods: {
     keyup(ev) {

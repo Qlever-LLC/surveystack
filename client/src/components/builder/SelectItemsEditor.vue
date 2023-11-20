@@ -68,12 +68,10 @@
 
 <script>
 import draggable from 'vuedraggable';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     draggable,
-    ATextField,
   },
   props: {
     value: {

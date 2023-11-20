@@ -108,12 +108,10 @@ import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appOntologyListEditor,
-    ATextField,
   },
   props: {
     resources: {

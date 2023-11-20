@@ -88,13 +88,11 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
-    ATextField,
   },
   data() {
     return {

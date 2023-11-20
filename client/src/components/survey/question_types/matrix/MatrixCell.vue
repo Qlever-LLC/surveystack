@@ -222,13 +222,11 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
-import ATextField from '@/components/ui/ATextField.vue';
 
 export default {
   components: {
     appQrScanner,
     MatrixCellSelectionLabel,
-    ATextField,
   },
   props: {
     header: {

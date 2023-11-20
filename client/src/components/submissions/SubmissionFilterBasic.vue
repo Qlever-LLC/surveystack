@@ -33,8 +33,6 @@
 </template>
 
 <script>
-import ATextField from '@/components/ui/ATextField.vue';
-
 export default {
   props: {
     queryList: {
@@ -46,9 +44,7 @@ export default {
       required: true,
     },
   },
-  components: {
-    ATextField,
-  },
+
   data() {
     return {
       selectedField: null,

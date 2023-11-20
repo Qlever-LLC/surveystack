@@ -47,16 +47,13 @@
 </template>
 
 <script>
-import ATextField from '@/components/ui/ATextField.vue';
 export default {
   props: {
     value: {
       type: Object,
     },
   },
-  components: {
-    ATextField,
-  },
+
   computed: {
     validQuery() {
       try {
