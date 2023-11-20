@@ -1,12 +1,9 @@
-import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import Ontology from './Ontology.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 
-import AChip from '@/components/ui/elements/AChip.vue';
-
-const localVue = createLocalVue();
-localVue.component('a-chip', AChip);
+import { localVue } from '@/../tests/renderWithVuetify';
 
 const vuetify = new Vuetify();
 

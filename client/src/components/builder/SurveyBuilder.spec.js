@@ -11,11 +11,7 @@ import { isString, last, cloneDeep, uniqueId, set } from 'lodash';
 import '@/components/survey/question_types';
 import api from '../../services/api.service.js';
 
-import { createLocalVue } from '@vue/test-utils';
-import AChip from '@/components/ui/elements/AChip.vue';
-
-const localVue = createLocalVue();
-localVue.component('a-chip', AChip);
+import { localVue } from '@/../tests/renderWithVuetify';
 
 // add a control and set its base parameters like a user would
 const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
