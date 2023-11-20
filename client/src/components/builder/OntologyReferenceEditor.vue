@@ -13,9 +13,9 @@
         item-text="name"
       >
         <template slot="append-outer">
-          <v-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
+          <a-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
-          </v-chip>
+          </a-chip>
         </template>
       </v-autocomplete>
 
