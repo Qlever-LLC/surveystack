@@ -51,13 +51,12 @@
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
-import AListSubheader from '@/components/ui/AListSubheader.vue';
+
 import api from '@/services/api.service';
 
 export default {
   components: {
     ActiveGroupSelectorList,
-    AListSubheader,
   },
   data() {
     return {

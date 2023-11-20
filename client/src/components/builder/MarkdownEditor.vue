@@ -91,7 +91,6 @@
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 import MarkdownIt from 'markdown-it';
-import AListSubheader from '@/components/ui/AListSubheader.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
@@ -104,9 +103,7 @@ export default {
     disabled: { type: Boolean },
     resources: { type: Array, default: () => [] },
   },
-  components: {
-    AListSubheader,
-  },
+
   data() {
     return {
       open: false,

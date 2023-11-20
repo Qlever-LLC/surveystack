@@ -23,12 +23,9 @@
 </template>
 
 <script>
-import AListSubheader from '@/components/ui/AListSubheader.vue';
 export default {
   props: ['value'],
-  components: {
-    AListSubheader,
-  },
+
   methods: {
     remove(e) {
       const arr = this.value.filter((v) => v !== e);

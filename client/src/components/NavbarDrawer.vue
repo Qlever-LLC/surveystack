@@ -82,7 +82,6 @@
 </template>
 
 <script>
-import AListSubheader from '@/components/ui/AListSubheader.vue';
 export default {
   props: {
     value: {
@@ -90,9 +89,7 @@ export default {
       required: true,
     },
   },
-  components: {
-    AListSubheader,
-  },
+
   data() {
     let groupsLink = { name: 'groups-list' };
     if (this.$store.getters['whitelabel/isWhitelabel']) {
