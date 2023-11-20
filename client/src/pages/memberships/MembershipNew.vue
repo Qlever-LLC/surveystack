@@ -60,7 +60,7 @@
             top
             left
           >
-            <v-list class="pa-0 mx-auto" max-width="280">
+            <a-list class="pa-0 mx-auto" max-width="280">
               <v-list-item-group v-model="invitationMethod">
                 <v-list-item two-line :value="INVITATION_METHODS.INVITE">
                   <v-list-item-content>
@@ -83,7 +83,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list-item-group>
-            </v-list>
+            </a-list>
           </btn-dropdown>
         </div>
       </v-form>

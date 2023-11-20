@@ -7,7 +7,7 @@
         <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
       </v-card-text>
       <template v-else-if="integratedHyloGroup">
-        <v-img
+        <a-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
           height="250"
           :src="integratedHyloGroup.bannerUrl"
@@ -62,7 +62,7 @@
           </v-card-text>
 
           <!-- </v-col> -->
-        </v-img>
+        </a-img>
       </template>
 
       <template v-else>
@@ -100,8 +100,9 @@
                   </v-btn>
                 </v-col>
                 <v-row align="center" class="my-5">
-                  <v-divider></v-divider><span class="mx-2">or</span><v-divider></v-divider
-                ></v-row>
+                  <a-divider /><span class="mx-2">or</span>
+                  <a-divider />
+                </v-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 

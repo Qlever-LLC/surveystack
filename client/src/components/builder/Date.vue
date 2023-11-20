@@ -9,7 +9,7 @@
     clearable
     hide-details
   />
-  <v-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+  <a-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         v-on="on"
@@ -33,7 +33,7 @@
       no-title
       scrollable
     />
-  </v-menu>
+  </a-menu>
 </template>
 
 <script>

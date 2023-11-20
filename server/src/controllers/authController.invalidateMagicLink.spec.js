@@ -9,8 +9,9 @@ describe('invalidateMagicLink', () => {
 
   beforeEach(async () => {
     res = await createRes();
-    accessCode = (await db.collection(COLL_ACCESS_CODES).insertOne({ code: uniqueId().toString() }))
-      .ops[0];
+    const codeToInsert = { code: uniqueId().toString() };
+    const insertResult = await db.collection(COLL_ACCESS_CODES).insertOne(codeToInsert);
+    accessCode = { _id: insertResult.insertedId, ...codeToInsert };
   });
 
   it('deletes accessCode from DB', async () => {

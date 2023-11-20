@@ -38,7 +38,7 @@
         </a-radio-group>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <a-divider />
 
       <v-card-actions>
         <v-spacer></v-spacer>

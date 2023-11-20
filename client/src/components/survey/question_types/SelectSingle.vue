@@ -1,6 +1,13 @@
 <template>
   <div class="select-single question">
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <app-control-hint :value="control.hint" />
     <div class="py-2">
       <a-radio-group

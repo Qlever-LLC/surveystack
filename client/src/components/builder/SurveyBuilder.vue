@@ -101,11 +101,13 @@
             v-if="control"
             :control="control"
             :survey="survey"
+            :initialize="optionsInitialize"
             :calculate="optionsCalculate"
             :relevance="optionsRelevance"
             :constraint="optionsConstraint"
             :api-compose="optionsApiCompose"
             :controls="currentControls"
+            @code-initialize="highlight('initialize')"
             @code-calculate="highlight('calculate')"
             @code-relevance="highlight('relevance')"
             @code-constraint="highlight('constraint')"
@@ -138,6 +140,7 @@
             <div style="height: 100%">
               <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
                 <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
+                <v-tab :disabled="!control.options.initialize.enabled"> Initialize</v-tab>
                 <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
                 <v-tab :disabled="!control.options.constraint.enabled"> Constraint</v-tab>
                 <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
@@ -199,7 +202,7 @@
             :forceMobile="isPreviewMobile"
           >
             <template v-slot:toolbar-actions>
-              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+              <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
                   <v-icon right> mdi-monitor</v-icon>
@@ -209,7 +212,7 @@
                   <span class="hidden-sm-and-down">mobile</span>
                   <v-icon right> mdi-cellphone</v-icon>
                 </v-btn>
-              </v-btn-toggle>
+              </a-btn-toggle>
 
               <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>
@@ -287,7 +290,20 @@ function ${variable}(submission, survey, parent) {
 }
 `;
 
-const tabMap = ['relevance', 'calculate', 'constraint', 'apiCompose'];
+const initialInitializeCode = (variable) => `\
+/**
+ * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
+ *
+ * @param {submission} submission
+ * @param {survey} survey
+ * @param {parent} parent
+ */
+function ${variable}(submission, survey, parent) {
+  return null;
+}
+`;
+
+const tabMap = ['relevance', 'initialize', 'calculate', 'constraint', 'apiCompose'];
 
 export default {
   mixins: [appMixin],
@@ -329,6 +345,7 @@ export default {
       evaluated: null,
       selectedTab: null,
       optionsRelevance: null,
+      optionsInitialize: null,
       optionsCalculate: null,
       optionsConstraint: null,
       optionsApiCompose: null,
@@ -351,24 +368,17 @@ export default {
   },
   methods: {
     async saveScript() {
-      console.log('saving script');
-      // post new script
-      const data = this.scriptCode;
-      const method = this.scriptCode._id !== null ? 'put' : 'post';
-      const url = this.scriptCode._id !== null ? `/scripts/${this.scriptCode._id}` : '/scripts';
-
       if (this.scriptCode.name.trim() === '') {
         console.log('Name must not be empty');
         return;
       }
 
       try {
-        await api.customRequest({
-          method,
-          url,
-          data,
-        });
-        // this.$router.push('/scripts');
+        if (this.scriptCode._id !== null) {
+          await api.put(`/scripts/${this.scriptCode._id}`, this.scriptCode);
+        } else {
+          await api.post('/scripts', this.scriptCode);
+        }
       } catch (err) {
         console.log(err);
       }
@@ -541,7 +551,13 @@ export default {
       this.activeCode = code;
     },
     highlightNext() {
-      [this.optionsRelevance, this.optionsCalculate, this.optionsConstraint, this.optionsApiCompose]
+      [
+        this.optionsRelevance,
+        this.optionsInitialize,
+        this.optionsCalculate,
+        this.optionsConstraint,
+        this.optionsApiCompose,
+      ]
         .filter((o) => o !== undefined)
         .forEach((item, idx) => {
           if (item.enabled) {
@@ -555,7 +571,12 @@ export default {
 
       this.hideCode = false;
 
-      if (this.control.options[tab] && !this.control.options[tab].enabled) {
+      //ealry leave in case of a missing option
+      if (!this.control.options[tab]) {
+        return;
+      }
+
+      if (!this.control.options[tab].enabled) {
         this.highlightNext();
         return;
       }
@@ -566,6 +587,8 @@ export default {
         let initialCode;
         if (tab === 'apiCompose') {
           initialCode = defaultApiCompose;
+        } else if (tab === 'initialize') {
+          initialCode = initialInitializeCode(tab);
         } else {
           initialCode = initialRelevanceCode(tab);
         }
@@ -592,6 +615,10 @@ export default {
         if (tab === 'apiCompose') {
           if (typeof res !== 'object') {
             throw Error('Function must return an object');
+          }
+        } else if (tab === 'initialize') {
+          if (this.control.type === 'matrix' && res !== null && !Array.isArray(res)) {
+            throw Error('Function must return row data in an array ( [ ] )');
           }
         } else if (typeof res !== 'boolean') {
           throw Error('Function must return true or false');
@@ -863,6 +890,7 @@ export default {
       }
       return (
         this.control.options.relevance.enabled ||
+        this.control.options.initialize.enabled ||
         this.control.options.calculate.enabled ||
         this.control.options.constraint.enabled ||
         this.control.options.apiCompose.enabled
@@ -911,6 +939,15 @@ export default {
       },
       deep: true,
     },
+    optionsInitialize: {
+      handler(newVal) {
+        if (!newVal) {
+          return;
+        }
+        this.highlight('initialize', newVal.enabled);
+      },
+      deep: true,
+    },
     optionsCalculate: {
       handler(newVal) {
         if (!newVal) {
@@ -946,17 +983,27 @@ export default {
         };
 
         if (!newVal) {
+          console.log('handler(newval): newVal is undef');
           this.optionsRelevance = null;
+          this.optionsInitialize = null;
           this.optionsCalculate = null;
           this.optionsConstraint = null;
           this.optionsApiCompose = null;
           return;
         }
 
-        this.optionsRelevance = newVal.options.relevance || cloneDeep(emptyOptions);
-        this.optionsCalculate = newVal.options.calculate || cloneDeep(emptyOptions);
-        this.optionsConstraint = newVal.options.constraint || cloneDeep(emptyOptions);
-        this.optionsApiCompose = newVal.options.apiCompose || cloneDeep(emptyOptions);
+        //heal missing expression options
+        !newVal.options.relevance ? (newVal.options.relevance = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.initialize ? (newVal.options.initialize = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.calculate ? (newVal.options.calculate = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.constraint ? (newVal.options.constraint = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.apiCompose ? (newVal.options.apiCompose = cloneDeep(emptyOptions)) : undefined;
+
+        this.optionsRelevance = newVal.options.relevance;
+        this.optionsInitialize = newVal.options.initialize;
+        this.optionsCalculate = newVal.options.calculate;
+        this.optionsConstraint = newVal.options.constraint;
+        this.optionsApiCompose = newVal.options.apiCompose;
       },
       deep: true,
     },
