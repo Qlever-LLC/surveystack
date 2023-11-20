@@ -46,7 +46,7 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
 
 export default {
-  components: { ActiveGroupSelector, ATextField },
+  components: { ActiveGroupSelector },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
     fixedGroupId: {

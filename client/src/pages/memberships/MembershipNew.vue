@@ -128,7 +128,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown, ATextField },
+  components: { BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',
