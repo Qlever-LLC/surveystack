@@ -16,12 +16,13 @@
           <v-list-item-content>
             <v-list-item-title>
               {{ item.label }}
-              <v-chip
+              <a-chip
                 v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
                 color="accent"
                 small
-                >{{ readyToSubmitCount }}</v-chip
               >
+                {{ readyToSubmitCount }}
+              </a-chip>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
