@@ -49,14 +49,8 @@ import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
-import ATabs from '@/components/ui/ATabs.vue';
-import ATab from '@/components/ui/ATab.vue';
 
 export default {
-  components: {
-    ATabs,
-    ATab,
-  },
   data() {
     return {
       mappings: null,

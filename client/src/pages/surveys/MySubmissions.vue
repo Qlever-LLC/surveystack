@@ -153,8 +153,6 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
-import ATabs from '@/components/ui/ATabs.vue';
-import ATab from '@/components/ui/ATab.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -164,8 +162,6 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
-    ATabs,
-    ATab,
   },
   watch: {
     activeSubmissionId(id) {

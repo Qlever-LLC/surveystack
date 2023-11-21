@@ -274,8 +274,6 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
-import ATabs from '@/components/ui/ATabs.vue';
-import ATab from '@/components/ui/ATab.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -324,8 +322,6 @@ export default {
     appCodeView,
     // ConfirmLeaveDialog,
     appExamplesView,
-    ATabs,
-    ATab,
   },
   props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {

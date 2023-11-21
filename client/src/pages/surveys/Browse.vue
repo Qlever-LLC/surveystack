@@ -105,16 +105,10 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
-import ATabs from '@/components/ui/ATabs.vue';
-import ATab from '@/components/ui/ATab.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
-  components: {
-    ATabs,
-    ATab,
-  },
   data() {
     return {
       selectedGroupIds: [],
