@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%">
     <a-form>
-      <v-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
+      <a-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
     </a-form>
     <div id="farmos-map" style="width: 100%; height: 500px"></div>
   </div>
@@ -14,6 +14,7 @@ import AForm from '@/components/ui/AForm.vue';
 export default {
   components: { AForm },
   props: ['value', 'center'],
+
   data() {
     return {
       layer: null,

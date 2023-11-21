@@ -4,16 +4,16 @@
       <v-textarea v-model="value.match" outlined label="Match" rows="3" />
       <v-row>
         <v-col>
-          <v-text-field v-model="value.sort" label="Sort" dense />
+          <a-text-field v-model="value.sort" label="Sort" dense />
         </v-col>
         <v-col>
-          <v-text-field v-model="value.project" label="Projection" dense />
+          <a-text-field v-model="value.project" label="Projection" dense />
         </v-col>
         <v-col cols="2">
-          <v-text-field v-model.number="value.skip" label="Skip" dense />
+          <a-text-field v-model.number="value.skip" label="Skip" dense />
         </v-col>
         <v-col cols="2">
-          <v-text-field v-model.number="value.limit" label="Limit" dense />
+          <a-text-field v-model.number="value.limit" label="Limit" dense />
         </v-col>
       </v-row>
 
@@ -31,7 +31,7 @@
 
       <v-row v-if="showRolesDebug">
         <v-col cols="6">
-          <v-text-field v-model.number="value.roles" label="Roles (Debug)" dense />
+          <a-text-field v-model.number="value.roles" label="Roles (Debug)" dense />
         </v-col>
       </v-row>
 
@@ -56,6 +56,7 @@ export default {
       type: Object,
     },
   },
+
   computed: {
     validQuery() {
       try {

@@ -5,7 +5,7 @@
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
 
       <a-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
+        <a-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
 
         <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
 

@@ -14,7 +14,7 @@
           <v-card>
             <v-card-title class="text-h5"> Change Email </v-card-title>
             <v-card-text>
-              <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
+              <a-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
               Integrations which use your email will no longer work and will need to be updated. These integrations will
               not work properly until you have re-mapped or updated them. Are you sure?
             </v-card-text>
@@ -27,9 +27,9 @@
       >
       <v-card-text>
         <a-form>
-          <v-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
-          <v-text-field tabindex="2" v-model="entity.name" label="Name" />
-          <v-text-field
+          <a-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
+          <a-text-field tabindex="2" v-model="entity.name" label="Name" />
+          <a-text-field
             tabindex="3"
             v-model="entity.password"
             :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -40,7 +40,7 @@
             persistent-hint
           />
 
-          <v-text-field
+          <a-text-field
             tabindex="4"
             v-model="passwordConfirmation"
             :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -74,11 +74,9 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: {
-    AForm,
     appFeedback,
   },
   data() {

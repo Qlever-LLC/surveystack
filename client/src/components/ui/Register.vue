@@ -4,7 +4,7 @@
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
       <a-form>
-        <v-text-field
+        <a-text-field
           label="E-Mail"
           type="text"
           class="form-control"
@@ -14,9 +14,9 @@
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
-        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
+        <a-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
 
-        <v-text-field
+        <a-text-field
           label="Password"
           :type="passwordInputType"
           class="form-control"

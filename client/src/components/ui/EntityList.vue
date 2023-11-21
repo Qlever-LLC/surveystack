@@ -15,7 +15,7 @@
             <v-list-item-subtitle>{{ e._id }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-        <v-divider />
+        <a-divider />
       </div>
     </v-card>
   </div>

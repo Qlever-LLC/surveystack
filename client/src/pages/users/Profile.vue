@@ -33,7 +33,7 @@
                   <v-card>
                     <v-card-title class="text-h5"> Change Email </v-card-title>
                     <v-card-text>
-                      <v-text-field tabindex="1" v-model="email" label="E-Mail" />
+                      <a-text-field tabindex="1" v-model="email" label="E-Mail" />
                       Integrations which use your email will no longer work and will need to be updated. These
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
                     </v-card-text>
@@ -47,8 +47,8 @@
                 </v-dialog></v-row
               ></v-card-text
             >
-            <v-text-field tabindex="2" v-model="name" label="Name" />
-            <v-text-field
+            <a-text-field tabindex="2" v-model="name" label="Name" />
+            <a-text-field
               tabindex="3"
               v-model="password"
               :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -59,7 +59,7 @@
               persistent-hint
             />
 
-            <v-text-field
+            <a-text-field
               tabindex="4"
               v-model="passwordConfirmation"
               :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
