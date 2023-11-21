@@ -8,6 +8,7 @@
 
 <script>
 export default {
+  name: 'AExpansionPanelTitle',
   props: {
     expandIcon: { type: String, default: '$expand' },
   },

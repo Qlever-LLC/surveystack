@@ -1,6 +1,7 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import Number from '@/components/survey/question_types/Number.vue';
+import { localVue } from '@/../tests/renderWithVuetify';
 
 const vuetify = new Vuetify();
 
@@ -27,6 +28,7 @@ function getMountOpts(opts = {}) {
       index: 'data.dropdown_1',
     },
     vuetify,
+    localVue,
   };
 }
 

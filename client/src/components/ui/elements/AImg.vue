@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  name: 'AImg',
   props: {
     contain: {
       type: Boolean,

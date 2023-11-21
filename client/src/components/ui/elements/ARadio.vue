@@ -8,11 +8,12 @@
 
 <script>
 export default {
+  name: 'ARadio',
+  emits: ['change'],
   props: {
     label: { type: String, required: false },
     value: { type: undefined, required: true },
     color: { type: String, required: false },
   },
-  emits: ['change'],
 };
 </script>

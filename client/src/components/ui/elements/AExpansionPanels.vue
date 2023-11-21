@@ -12,6 +12,7 @@
 
 <script>
 export default {
+  name: 'AExpansionPanels',
   props: {
     accordion: { type: Boolean, default: false },
     flat: { type: Boolean, default: false },
