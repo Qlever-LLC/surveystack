@@ -46,7 +46,7 @@
 
     <a-divider class="my-4" />
 
-    <v-simple-table v-if="!loading">
+    <a-table v-if="!loading">
       <template v-slot:default>
         <thead>
           <tr>
@@ -112,7 +112,7 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
   </v-container>
 </template>
 
