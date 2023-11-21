@@ -5,7 +5,7 @@
       This will clear all surveys and all submissions. And furthermore create an example survey with corresponding
       submissions.
     </p>
-    <v-checkbox label="Activate" v-model="activate" />
+    <a-checkbox label="Activate" v-model="activate" />
 
     <v-btn color="primary" @click="submit" :disabled="!activate">{{ activate ? 'CONFIRM!' : 'Activate first' }}</v-btn>
 

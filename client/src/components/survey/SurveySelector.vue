@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>Search surveys</v-card-title>
       <v-card-text>
-        <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
+        <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
         <v-list>
           <v-list-item
             v-for="searchResult in searchResults"
@@ -45,6 +45,7 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
       q: '',

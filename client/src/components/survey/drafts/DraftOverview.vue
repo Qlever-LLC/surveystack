@@ -1,11 +1,11 @@
 <template>
   <v-container class="wrapper">
-    <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
+    <a-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
         <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
       </li>
-    </v-banner>
+    </a-banner>
     <v-card>
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle class="grey--text mt-n5">
@@ -105,9 +105,9 @@
             </v-card-text>
           </v-card>
 
-          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
+          <a-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
-          </v-chip>
+          </a-chip>
         </v-timeline-item>
       </template>
     </v-timeline>

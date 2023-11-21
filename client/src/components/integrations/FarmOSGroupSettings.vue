@@ -14,7 +14,7 @@
       <v-card-title>Super Admin</v-card-title>
       <v-card-text>
         <div class="d-flex flex-grow-1">
-          <v-text-field
+          <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
             outlined
             v-model="seats"
@@ -23,7 +23,8 @@
             @change="$emit('seatsChanged', seats)"
           />
 
-          <v-autocomplete
+          <a-select
+            engineering="autocomplete"
             outlined
             class="flex-grow-1 flex-shrink-0"
             label="Select FarmOS Plans for Group"
@@ -35,8 +36,7 @@
             :item-value="(p) => p._id"
             small-chips
             :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          >
-          </v-autocomplete>
+          />
         </div>
         <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
       </v-card-text>
@@ -52,34 +52,34 @@
             <a-tooltip bottom :disabled="canAddCoffeeShop">
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
-                  <v-checkbox
+                  <a-checkbox
                     class="ma-0 pa-0"
                     label="Add this group to the Coffee Shop"
                     v-model="groupInfos.groupHasCoffeeShopAccess"
                     :ripple="false"
                     :disabled="!canAddCoffeeShop"
                     hide-details
-                    @change="$emit('addGrpCoffeeShop', $event)"
+                    @input="$emit('addGrpCoffeeShop', $event)"
                   />
                 </div>
               </template>
               <span>Talk to your parent group administrator to enable this option</span>
             </a-tooltip>
-            <v-checkbox
+            <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               hide-details
               :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-              @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
+              @input="$emit('allowSbGrpsJoinCoffeeShop', $event)"
               :label="`Allow subgroups to join the Coffee Shop`"
             />
-            <v-checkbox
+            <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
-              @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
+              @input="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
             />
           </v-container>
@@ -95,7 +95,7 @@
     </div>
 
     <div class="search">
-      <v-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search"></v-text-field>
+      <a-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search" />
     </div>
     <FarmOSGroupTable
       :members="filteredMembers"

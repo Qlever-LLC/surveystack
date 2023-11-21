@@ -1,5 +1,5 @@
 <template>
-  <v-sheet outlined class="pa-8">
+  <a-sheet outlined class="pa-8">
     <div class="display-1">
       KML Importer
       <a-tooltip bottom>
@@ -14,23 +14,24 @@
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 
     <v-row>
-      <v-file-input label="Upload KML file" @change="getFile"></v-file-input>
+      <a-file-input label="Upload KML file" @change="getFile" />
     </v-row>
     <template v-if="kml !== ''">
       <v-row>
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           v-model="field"
           :items="fields"
           outlined
           label="Select Field"
           @change="selected"
-        ></v-autocomplete>
+        />
       </v-row>
       <v-row class="text-center">
         <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
       </v-row>
     </template>
-  </v-sheet>
+  </a-sheet>
 </template>
 <script>
 import togeojson from '@mapbox/togeojson';
