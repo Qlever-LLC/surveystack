@@ -510,7 +510,6 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
-import ATextarea from '@/components/ui/ATextarea.vue';
 
 export default {
   components: {
@@ -524,7 +523,6 @@ export default {
     Date,
 
     MarkdownEditor,
-    ATextarea,
   },
   props: {
     control: {

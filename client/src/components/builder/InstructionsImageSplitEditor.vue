@@ -52,7 +52,6 @@ import {
   resourceLocations,
   appendResource,
 } from '@/utils/resources';
-import ATextarea from '@/components/ui/ATextarea.vue';
 
 export default {
   data() {
@@ -64,7 +63,6 @@ export default {
   components: {
     ResourceSelector,
     ImageResourceEditor,
-    ATextarea,
   },
   props: {
     value: {

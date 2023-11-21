@@ -47,11 +47,7 @@
 </template>
 
 <script>
-import ATextarea from '@/components/ui/ATextarea.vue';
 export default {
-  components: {
-    ATextarea,
-  },
   props: {
     value: {
       type: Object,

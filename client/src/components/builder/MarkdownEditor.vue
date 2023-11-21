@@ -93,15 +93,11 @@
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 
 import MarkdownIt from 'markdown-it';
-import ATextarea from '@/components/ui/ATextarea.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
-  components: {
-    ATextarea,
-  },
   props: {
     value: { type: String },
     label: { type: String },

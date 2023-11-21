@@ -267,7 +267,6 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
-import ATextarea from '@/components/ui/ATextarea.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -333,7 +332,6 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
-    ATextarea,
   },
   methods: {
     async getGroupNameById(id) {
