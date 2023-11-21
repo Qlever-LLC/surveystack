@@ -33,7 +33,7 @@
           :disabled="!customValue"
           color="focus"
         />
-        <v-text-field
+        <a-text-field
           label="other"
           v-model="customValue"
           outlined
@@ -59,6 +59,7 @@ import ACheckbox from '@/components/ui/ACheckbox.vue';
 export default {
   components: { ACheckbox },
   mixins: [baseQuestionComponent],
+
   data() {
     return {
       customSelection: 'other',

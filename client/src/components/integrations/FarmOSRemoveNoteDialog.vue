@@ -14,7 +14,7 @@
         <a-checkbox v-model="note" label="To reduce costs" value="To reduce costs" />
 
         <div class="d-flex mb-4">
-          <v-text-field v-model.trim="noteTF" label="Other" hide-details></v-text-field>
+          <a-text-field v-model.trim="noteTF" label="Other" hide-details />
         </div>
 
         <div class="d-flex justify-space-around">
@@ -33,6 +33,7 @@ export default {
   components: { ACheckbox },
   emits: ['addNote', 'cancelNote'],
   props: ['loading', 'value'],
+
   data() {
     return {
       note: [],

@@ -3,12 +3,12 @@
     <v-card>
       <v-card-title>Survey Versions</v-card-title>
       <v-card-text style="max-height: 500px">
-        <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
+        <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
             <div class="col-10 mt-1 py-0">
-              <v-chip
+              <a-chip
                 dark
                 small
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
@@ -22,8 +22,8 @@
                     : revision.version === survey.latestVersion
                     ? ' (published) '
                     : '')
-                }}</v-chip
-              >
+                }}
+              </a-chip>
               <span class="ml-2"
                 >{{ getSubmissionCount(revision.version) || 'no' }} submission{{
                   getSubmissionCount(revision.version) > 1 ? 's' : ''
@@ -64,16 +64,16 @@
             <span v-else> none </span>
           </p>
         </div>
-        <v-alert v-if="deleteVersionsHasError" type="error" class="mt-1" dismissible>
+        <a-alert v-if="deleteVersionsHasError" type="error" class="mt-1" closable>
           An error occurred deleting survey versions.
-        </v-alert>
-        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" dismissible>
+        </a-alert>
+        <a-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" closable>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
-        </v-alert>
+        </a-alert>
       </v-card-text>
-      <v-divider></v-divider>
+      <a-divider />
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn
           v-if="compareRevisions.length > 0"
           :disabled="compareRevisions.length === 1"
