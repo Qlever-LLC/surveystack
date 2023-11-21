@@ -22,6 +22,7 @@ import ARadioGroup from '../src/components/ui/elements/ARadioGroup.vue';
 import ASheet from '../src/components/ui/elements/ASheet.vue';
 import ASwitch from '../src/components/ui/elements/ASwitch.vue';
 import ATextField from '../src/components/ui/elements/ATextField.vue';
+import ASpeedDial from '../src/components/ui/elements/ASpeedDial.vue';
 
 const localVue = createLocalVue();
 localVue.component('a-btn-toggle', ABtnToggle);
@@ -42,6 +43,7 @@ localVue.component('a-radio-group', ARadioGroup);
 localVue.component('a-sheet', ASheet);
 localVue.component('a-switch', ASwitch);
 localVue.component('a-text-field', ATextField);
+localVue.component('a-speed-dial', ASpeedDial);
 
 localVue.use(Vuex);
 localVue.use(VueRouter);
