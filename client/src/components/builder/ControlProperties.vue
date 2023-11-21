@@ -521,8 +521,8 @@ export default {
     InstructionsImageSplitEditor,
     Ontology,
     Date,
-    MarkdownEditor,
     ACheckbox,
+    MarkdownEditor,
   },
   props: {
     control: {
