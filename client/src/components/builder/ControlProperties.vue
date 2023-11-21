@@ -129,7 +129,7 @@
       </a-select>
       <a-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
-      <v-textarea
+      <a-textarea
         v-if="isScript"
         v-model="scriptParams"
         @input="handleScriptParamsChange"
