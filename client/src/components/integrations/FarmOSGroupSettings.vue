@@ -109,12 +109,10 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import ATooltip from '@/components/ui/ATooltip.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
-    ATooltip,
   },
   props: {
     groupInfos: {

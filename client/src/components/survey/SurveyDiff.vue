@@ -45,13 +45,11 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
-import ATooltip from '@/components/ui/ATooltip.vue';
 
 export default {
   name: 'survey-diff',
   components: {
     SurveyDiffCardTree,
-    ATooltip,
   },
   props: {
     controlsLocalRevision: Array,

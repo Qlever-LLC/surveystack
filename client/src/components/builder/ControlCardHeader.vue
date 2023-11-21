@@ -21,12 +21,8 @@
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';
-import ATooltip from '@/components/ui/ATooltip.vue';
 
 export default {
-  components: {
-    ATooltip,
-  },
   props: {
     index: { type: String, required: true },
     title: { type: String, required: true },

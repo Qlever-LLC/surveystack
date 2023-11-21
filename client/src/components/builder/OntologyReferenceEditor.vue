@@ -59,7 +59,6 @@
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 import OntologyReferencePreview from './OntologyReferencePreview.vue';
-import ATooltip from '@/components/ui/ATooltip.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -70,7 +69,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview, ATooltip },
+  components: { OntologyReferencePreview },
   props: {
     resource: {
       type: Object,

@@ -275,7 +275,6 @@ import Date from '@/components/builder/Date.vue';
 
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
-import ATooltip from '@/components/ui/ATooltip.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },

@@ -48,11 +48,7 @@
 </template>
 
 <script>
-import ATooltip from '@/components/ui/ATooltip.vue';
 export default {
-  components: {
-    ATooltip,
-  },
   data() {
     return {
       more: [],

@@ -46,12 +46,9 @@
   </v-container>
 </template>
 <script>
-import ATooltip from '@/components/ui/ATooltip.vue';
 export default {
   name: 'library-change-type-selector',
-  components: {
-    ATooltip,
-  },
+
   props: ['value', 'disabled', 'label'],
   data() {
     return {

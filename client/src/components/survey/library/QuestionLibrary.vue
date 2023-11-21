@@ -130,14 +130,12 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import ATooltip from '@/components/ui/ATooltip.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
-    ATooltip,
   },
   props: ['survey', 'libraryId'],
   data() {
