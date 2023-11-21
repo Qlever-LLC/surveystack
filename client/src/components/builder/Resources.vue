@@ -26,9 +26,9 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
+    </a-alert>
     <div class="d-flex justify-end">
       <a-menu offset-y left>
         <template v-slot:activator="{ on }">

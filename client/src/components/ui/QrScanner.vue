@@ -21,9 +21,9 @@
           <v-toolbar-title>QR Code Scanner</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
-        <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
+        <a-alert v-if="hasCameraError" border="left" border-color type="error" elevation="2">
           No camera detected.
-        </v-alert>
+        </a-alert>
         <v-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />

@@ -64,12 +64,12 @@
             <span v-else> none </span>
           </p>
         </div>
-        <v-alert v-if="deleteVersionsHasError" type="error" class="mt-1" dismissible>
+        <a-alert v-if="deleteVersionsHasError" type="error" class="mt-1" closable>
           An error occurred deleting survey versions.
-        </v-alert>
-        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" dismissible>
+        </a-alert>
+        <a-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" closable>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
-        </v-alert>
+        </a-alert>
       </v-card-text>
       <a-divider />
       <v-card-actions>

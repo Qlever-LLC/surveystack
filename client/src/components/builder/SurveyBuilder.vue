@@ -21,16 +21,16 @@
       @cancel="updateLibraryCancelled"
     />
 
-    <v-alert
+    <a-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
       text
       type="warning"
       color="orange"
       elevation="2"
-      dismissible
+      closable
     >
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
-    </v-alert>
+    </a-alert>
 
     <splitpanes class="pane-root" vertical>
       <pane class="pane pane-survey">

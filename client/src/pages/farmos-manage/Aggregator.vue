@@ -89,8 +89,8 @@
           </tbody>
         </template>
       </v-simple-table>
-      <v-alert v-else class="mt-4" mode="fade" text type="warning"
-        >No Group Mappings exist for {{ selectedInstance }}</v-alert
+      <a-alert v-else class="mt-4" mode="fade" text type="warning"
+        >No Group Mappings exist for {{ selectedInstance }}</a-alert
       >
 
       <a-divider class="my-8" />
