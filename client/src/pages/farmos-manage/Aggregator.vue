@@ -11,16 +11,17 @@
       ></v-progress-circular>
     </div>
 
-    <v-autocomplete
+    <a-select
+      engineering="autocomplete"
+      v-if="!loading && !!mappings"
       outlined
       primary
       label="Select Instance from Aggregator"
       v-model="selectedInstance"
-      v-if="!loading && !!mappings"
       item-text="url"
       item-value="url"
       :items="mappings.aggregatorFarms"
-    ></v-autocomplete>
+    />
 
     <div class="d-flex flex-column mb-5" v-if="!!selectedInstance">
       <h3>Notes</h3>
@@ -54,7 +55,8 @@
       </h2>
 
       <div class="d-flex my-2 align-baseline">
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           outlined
           primary
           label="Map Group to Instance"
@@ -63,7 +65,7 @@
           item-value="_id"
           :items="groups"
           class="mt-4 mr-4"
-        ></v-autocomplete>
+        />
         <v-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
           >Map</v-btn
         >
@@ -101,18 +103,19 @@
       </h2>
 
       <div class="d-flex my-2 justify-space-between align-baseline">
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
+          v-if="!loading && !!groups"
           class="mt-4"
           outlined
           primary
           hint="Select User"
           label="Map User to Instance"
           v-model="selectedUser"
-          v-if="!loading && !!groups"
           :item-text="(item) => `${item.name} (${item.email})`"
           item-value="_id"
           :items="users"
-        ></v-autocomplete>
+        />
 
         <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
 
@@ -243,7 +246,7 @@ export default {
   props: {
     groups: Array,
     mappings: Object,
-    notes: String,
+    notes: Array,
     loading: Boolean,
     users: Array,
   },

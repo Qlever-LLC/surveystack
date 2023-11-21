@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-autocomplete :items="fieldItems" label="Field" v-model="selectedField" hide-details />
-    <v-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
+    <a-select engineering="autocomplete" :items="fieldItems" label="Field" v-model="selectedField" hide-details />
+    <a-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
     <!-- TODO in Vue3 remove .native -->
     <a-text-field label="Value" v-model="selectedValue" @keyup.native.enter="add" />
 

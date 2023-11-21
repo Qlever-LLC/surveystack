@@ -4,7 +4,7 @@
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
       <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined />
 
         <a-text-field
           class="mt-3"

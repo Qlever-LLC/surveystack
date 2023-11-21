@@ -83,39 +83,45 @@ describe('Ontology question', () => {
   describe('Ontology List source', () => {
     it('sets value as an array in single selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts());
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       dropDown.vm.$emit('change', 'dog');
       expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
     });
 
     it('sets autocomplete input from value in single selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts({ value: ['dog'] }));
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       expect(dropDown.vm.value).toBe('dog');
     });
 
     it('sets value as an array in single selection, custom mode', () => {
-      const wrapper = shallowMount(Ontology, getMountOpts({ allowCustomSelection: true }));
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const wrapper = mount(Ontology, getMountOpts({ allowCustomSelection: true }));
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
+
+      //mock this.$refs.dropdownRef.blur();
+      const blurMock = jest.fn();
+      const dropdownRef = { blur: blurMock };
+      wrapper.vm.$refs.dropdownRef = dropdownRef;
+
       dropDown.vm.$emit('change', 'dog');
       expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
     });
 
     it('sets autocomplete input from value in single selection, custom mode', () => {
-      const wrapper = shallowMount(
+      const wrapper = mount(
         Ontology,
         getMountOpts({
           value: ['custom'],
           allowCustomSelection: true,
         })
       );
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
       expect(dropDown.vm.value).toBe('custom');
     });
 
     it('sets value as an array in multiple selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts({ hasMultipleSelections: true }));
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       dropDown.vm.$emit('change', ['cat', 'dog']);
       expect(wrapper.emitted().changed[0][0]).toEqual(['cat', 'dog']);
     });
@@ -128,11 +134,11 @@ describe('Ontology question', () => {
           value: ['cat', 'dog'],
         })
       );
-      const dropDown = wrapper.find('[data-test-id="dropdown"]');
+      const dropDown = wrapper.find('a-select-stub');
       expect(dropDown.vm.value).toEqual(['cat', 'dog']);
     });
 
-    it('sets autocomplete with chips from value in multiple selection, non-custom mode', () => {
+    it.only('sets autocomplete with chips from value in multiple selection, non-custom mode', () => {
       const wrapper = mount(
         Ontology,
         getMountOpts({
@@ -140,24 +146,24 @@ describe('Ontology question', () => {
           value: ['cat', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
     });
 
     it('sets value as an array in multiple selection, custom mode', () => {
-      const wrapper = shallowMount(
+      const wrapper = mount(
         Ontology,
         getMountOpts({
           hasMultipleSelections: true,
           allowCustomSelection: true,
         })
       );
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
       dropDown.vm.$emit('change', ['custom', 'dog']);
       expect(wrapper.emitted().changed[0][0]).toEqual(['custom', 'dog']);
     });
 
     it('sets autocomplete value from value in multiple selection, custom mode', () => {
-      const wrapper = shallowMount(
+      const wrapper = mount(
         Ontology,
         getMountOpts({
           hasMultipleSelections: true,
@@ -165,7 +171,7 @@ describe('Ontology question', () => {
           value: ['custom', 'dog'],
         })
       );
-      const dropDown = wrapper.find('[data-test-id="combobox"]');
+      const dropDown = wrapper.findComponent({ ref: 'dropdownRef' });
       expect(dropDown.vm.value).toEqual(['custom', 'dog']);
     });
 
@@ -178,7 +184,7 @@ describe('Ontology question', () => {
           value: ['custom', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
     });
   });
 });

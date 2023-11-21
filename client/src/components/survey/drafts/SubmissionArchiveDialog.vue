@@ -7,7 +7,7 @@
       <v-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
-        <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
+        <a-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
         <a-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
