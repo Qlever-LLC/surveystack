@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         v-on="on"
         v-bind="attrs"
         ref="anchorRef"
@@ -28,13 +28,13 @@
           <div class="flex-grow-1">Label</div>
           <div class="flex-grow-1">Value</div>
         </div>
-        <v-divider></v-divider>
+        <a-divider />
         <div v-if="items.length === 0" class="mt-8 text-center">
           Please click <strong>Add row</strong> button to add new item.
         </div>
         <draggable v-else :list="items" class="draggable">
           <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.label"
               @input="(value) => onInput(index, 'label', value)"
@@ -42,7 +42,7 @@
               :hide-details="false"
               dense
             />
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.value"
               @input="(value) => onInput(index, 'value', value)"
@@ -55,10 +55,10 @@
         </draggable>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <a-divider />
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>

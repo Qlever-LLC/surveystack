@@ -1,18 +1,18 @@
 <template>
   <v-dialog v-model="open" width="500" @click:outside="cancel">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
+        v-on="on"
+        v-bind="attrs"
+        @input="onChange"
         ref="anchorRef"
         label="Default value"
         :value="getLabel"
-        @input="onChange"
         :class="$vnode.data.staticClass"
         clearable
         hide-details
         readonly
         :disabled="getDisabled"
-        v-on="on"
-        v-bind="attrs"
       />
     </template>
 
@@ -21,27 +21,27 @@
 
       <v-card-text class="dialog-content">
         <div v-if="multiple" class="checkbox-group">
-          <v-checkbox
+          <a-checkbox
             v-for="(item, index) in items"
             :key="index"
             v-model="selected"
             :label="item.label"
-            :value="item.value"
+            :selected-item="item.value"
             class="mt-2"
             hide-details
           />
-          <v-checkbox v-if="custom" v-model="selected" label="other" value="other" class="mt-2" hide-details />
+          <a-checkbox v-if="custom" v-model="selected" label="other" selected-item="other" class="mt-2" hide-details />
         </div>
-        <v-radio-group v-else :value="selected ? selected[0] : null" @change="selected = [$event]">
-          <v-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
-          <v-radio v-if="custom" label="other" value="other" />
-        </v-radio-group>
+        <a-radio-group v-else :value="selected ? selected[0] : null" @input="selected = [$event]">
+          <a-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
+          <a-radio v-if="custom" label="other" value="other" />
+        </a-radio-group>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <a-divider />
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
@@ -61,6 +61,7 @@ export default {
     custom: { type: Boolean },
     multiple: { type: Boolean },
   },
+
   data() {
     return {
       open: false,
