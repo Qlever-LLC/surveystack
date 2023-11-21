@@ -49,7 +49,6 @@
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
-import AForm from '@/components/ui/AForm.vue';
 
 const DEFAULT_ENTITY = {
   email: '',

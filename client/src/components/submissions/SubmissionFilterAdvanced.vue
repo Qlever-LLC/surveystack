@@ -47,8 +47,6 @@
 </template>
 
 <script>
-import AForm from '@/components/ui/AForm.vue';
-
 export default {
   components: { AForm },
   props: {

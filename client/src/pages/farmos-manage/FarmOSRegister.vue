@@ -226,12 +226,10 @@ import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 
 import { timezones } from './timezones';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   props: ['viewModel'],
   components: {
-    AForm,
     appDialog,
     appFieldCreator,
     appFieldList,

@@ -45,11 +45,9 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: {
-    AForm,
     appFeedback,
   },
   data() {

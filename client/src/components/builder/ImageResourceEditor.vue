@@ -52,7 +52,6 @@
 
 <script>
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: { AForm },

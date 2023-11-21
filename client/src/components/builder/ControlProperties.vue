@@ -461,11 +461,9 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: {
-    AForm,
     SelectItems,
     SelectItemsEditor,
     OntologyProperties,

@@ -9,7 +9,6 @@
 
 <script>
 import createMap from '@/external/instance/instance';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: { AForm },

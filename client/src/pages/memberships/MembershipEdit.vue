@@ -101,7 +101,6 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-import AForm from '@/components/ui/AForm.vue';
 
 const availableRoles = [
   {
@@ -127,7 +126,6 @@ const availableStatus = [
 
 export default {
   components: {
-    AForm,
     appDialog,
   },
   data() {

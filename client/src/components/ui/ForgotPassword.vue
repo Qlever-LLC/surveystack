@@ -23,7 +23,6 @@
 
 <script>
 import api from '@/services/api.service';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   components: { AForm },

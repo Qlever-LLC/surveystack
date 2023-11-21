@@ -94,12 +94,10 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
-import AForm from '@/components/ui/AForm.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
-    AForm,
     draggable,
   },
   data() {
