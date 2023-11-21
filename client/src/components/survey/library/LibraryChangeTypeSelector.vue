@@ -8,7 +8,7 @@
         </b></v-col
       >
       <v-col v-else cols="auto" class="pa-0">
-        <v-select
+        <a-select
           outlined
           dense
           hide-details

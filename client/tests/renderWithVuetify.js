@@ -19,10 +19,12 @@ import AListGroup from '../src/components/ui/elements/AListGroup.vue';
 import AMenu from '../src/components/ui/elements/AMenu.vue';
 import ARadio from '../src/components/ui/elements/ARadio.vue';
 import ARadioGroup from '../src/components/ui/elements/ARadioGroup.vue';
+import ASelect from '../src/components/ui/elements/ASelect.vue';
 import ASheet from '../src/components/ui/elements/ASheet.vue';
 import ASwitch from '../src/components/ui/elements/ASwitch.vue';
 import ATextField from '../src/components/ui/elements/ATextField.vue';
 import ASpeedDial from '../src/components/ui/elements/ASpeedDial.vue';
+import AAlert from '../src/components/ui/elements/AAlert.vue';
 import AForm from '../src/components/ui/elements/AForm.vue';
 import ATable from '../src/components/ui/elements/ATable.vue';
 
@@ -42,10 +44,12 @@ localVue.component('a-list-group', AListGroup);
 localVue.component('a-menu', AMenu);
 localVue.component('a-radio', ARadio);
 localVue.component('a-radio-group', ARadioGroup);
+localVue.component('a-select', ASelect);
 localVue.component('a-sheet', ASheet);
 localVue.component('a-switch', ASwitch);
 localVue.component('a-text-field', ATextField);
 localVue.component('a-speed-dial', ASpeedDial);
+localVue.component('a-alert', AAlert);
 localVue.component('a-form', AForm);
 localVue.component('a-table', ATable);
 

@@ -2,25 +2,28 @@
   <v-card>
     <v-card-title> Survey Reference Editor </v-card-title>
     <v-card-text>
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         label="Select Survey"
         outlined
         :items="surveys"
         v-model="surveyId"
-        @change="surveyChanged()"
+        @change="surveyChanged"
         :loading="loading"
         item-value="_id"
         item-text="name"
+        appendOuterSlot
       >
         <template slot="append-outer">
           <a-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
           </a-chip>
         </template>
-      </v-autocomplete>
+      </a-select>
 
       <template v-if="surveyId">
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           label="Select Path"
           outlined
           @change="updateResource"
@@ -32,9 +35,9 @@
         />
       </template>
     </v-card-text>
-    <v-spacer />
+    <a-spacer />
     <v-card-actions>
-      <v-spacer />
+      <a-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
       <v-tooltip top :disabled="!!path">
         <template v-slot:activator="{ on }">
@@ -120,7 +123,7 @@ export default {
       this.updateResource();
       this.$emit('close-dialog');
     },
-    async surveyChanged(version) {
+    async surveyChanged({ version }) {
       const versionParam = version || 'latest';
       const { data } = await api.get(`/surveys/${this.surveyId}?version=${versionParam}`);
       if (!version) {
@@ -169,7 +172,7 @@ export default {
       this.surveyVersion = this.resource.content.version || '';
 
       if (this.surveyVersion) {
-        await this.surveyChanged(this.surveyVersion);
+        await this.surveyChanged({ version: this.surveyVersion });
       }
     }
 

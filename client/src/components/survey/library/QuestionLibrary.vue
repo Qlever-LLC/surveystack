@@ -3,7 +3,7 @@
     <v-card-title class="pl-0">
       <v-icon class="mr-1">mdi-library</v-icon>
       Question Library
-      <v-spacer></v-spacer>
+      <a-spacer />
       <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <v-icon> mdi-close </v-icon>
       </v-btn>

@@ -4,7 +4,7 @@
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
       <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined />
 
         <a-text-field
           class="mt-3"
@@ -96,7 +96,7 @@
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>

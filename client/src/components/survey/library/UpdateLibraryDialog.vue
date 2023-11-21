@@ -27,7 +27,7 @@
         <v-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
           >Learn more...
         </v-btn>
-        <v-spacer />
+        <a-spacer />
         <v-btn
           @click="update"
           color="primary"
@@ -50,7 +50,7 @@
           >
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</v-btn>
           <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
         </v-card-actions>

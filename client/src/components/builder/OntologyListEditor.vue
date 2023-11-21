@@ -39,7 +39,7 @@
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
               </v-card-text>
               <v-card-actions>
-                <v-spacer />
+                <a-spacer />
                 <v-btn text color="red" @click="deleteResult">Delete</v-btn>
                 <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </v-card-actions>
@@ -111,7 +111,7 @@
         </template>
       </v-data-table>
     </v-card-text>
-    <v-spacer />
+    <a-spacer />
     <v-card-actions class="d-flex justify-end mr-3 align-start">
       <v-btn text class="ml-4" @click="close">Close</v-btn>
     </v-card-actions>
@@ -125,7 +125,7 @@
           <a-text-field v-model="editedItem.tags" label="Tags" />
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
           <v-btn text color="primary" @click="saveItem">Save</v-btn>
         </v-card-actions>

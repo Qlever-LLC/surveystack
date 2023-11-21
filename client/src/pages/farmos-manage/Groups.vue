@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
+    <a-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</a-alert>
 
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Groups</h1>
@@ -13,27 +13,29 @@
       ></v-progress-circular>
     </div>
 
-    <v-autocomplete
+    <a-select
+      engineering="autocomplete"
+      v-if="!loading && !!groups"
       outlined
       primary
       label="Select Group"
       v-model="selectedGroup"
-      v-if="!loading && !!groups"
       :item-text="(g) => `${g.name} (${g.path})`"
       item-value="_id"
       :items="groups"
-    ></v-autocomplete>
+    />
 
     <!-- <v-row class="align-baseline">
       <v-col>
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
+          v-if="!loading && !!groups"
           outlined
           primary
           label="Select Group Plan"
           v-model="selectedPlan"
-          v-if="!loading && !!groups"
           :items="plans"
-        ></v-autocomplete>
+        />
       </v-col>
       <v-col>
         <v-btn color="primary" @click="$emit('save-plan', selectedPlan)">Save Plan</v-btn>
@@ -56,17 +58,18 @@
         <tbody>
           <tr>
             <td>
-              <v-autocomplete
+              <a-select
+                engineering="autocomplete"
+                v-if="!loading && !!mappings"
                 class="mt-6"
                 outlined
                 primary
                 label="Select FarmOS Instance"
                 v-model="selectedInstance"
-                v-if="!loading && !!mappings"
                 item-value="instanceName"
                 item-text="instanceName"
                 :items="instances"
-              ></v-autocomplete>
+              />
             </td>
             <td></td>
             <td>

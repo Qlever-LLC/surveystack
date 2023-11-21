@@ -25,13 +25,13 @@
             </div>
 
             <v-card-actions>
-              <v-spacer></v-spacer>
+              <a-spacer />
               <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</v-icon>
         <v-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
           <v-icon left>mdi-code-braces</v-icon>Examples

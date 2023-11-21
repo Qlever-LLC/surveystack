@@ -71,7 +71,7 @@
                     >
                       <v-icon>mdi-arrow-right</v-icon>
                     </v-btn>
-                    <v-spacer />
+                    <a-spacer />
                     <v-btn icon @click="deleteColumn(i)" tabindex="-1" small>
                       <v-icon>mdi-trash-can-outline</v-icon>
                     </v-btn>
@@ -79,7 +79,7 @@
                   <v-card-text>
                     <a-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <a-text-field v-model="item.value" label="Value" dense />
-                    <v-select
+                    <a-select
                       label="Type"
                       :value="item.type"
                       @input="(type) => onChanged(item, { type, defaultValue: null })"
@@ -89,7 +89,7 @@
 
                     <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
-                        <v-select
+                        <a-select
                           v-model="item.resource"
                           @input="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
@@ -175,7 +175,7 @@
                     />
 
                     <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
-                      <v-select
+                      <a-select
                         dense
                         v-model="item.options.farmOsType"
                         :items="item.options.farmOsTypes"
@@ -245,7 +245,7 @@
           </draggable>
         </div>
       </v-card-text>
-      <v-spacer />
+      <a-spacer />
       <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
         <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
       </v-card-actions>
@@ -260,6 +260,7 @@ import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
+
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 

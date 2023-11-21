@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
+    <a-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</a-alert>
 
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Users</h1>
@@ -13,16 +13,17 @@
       ></v-progress-circular>
     </div>
 
-    <v-autocomplete
+    <a-select
+      engineering="autocomplete"
+      v-if="!loading && !!groups"
       outlined
       primary
       label="Select User"
       v-model="selectedUser"
-      v-if="!loading && !!groups"
       :item-text="(item) => `${item.name} (${item.email})`"
       item-value="_id"
       :items="users"
-    ></v-autocomplete>
+    />
 
     <a-divider class="my-4" />
 
@@ -39,17 +40,18 @@
         <tbody>
           <tr>
             <td>
-              <v-autocomplete
+              <a-select
+                engineering="autocomplete"
+                v-if="!loading && !!mappings"
                 class="mt-6"
                 outlined
                 primary
                 label="Select FarmOS Instance"
                 v-model="selectedInstance"
-                v-if="!loading && !!mappings"
                 item-value="instanceName"
                 item-text="instanceName"
                 :items="instances"
-              ></v-autocomplete>
+              />
             </td>
             <td></td>
             <td>

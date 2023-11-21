@@ -26,9 +26,9 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
+    </a-alert>
     <div class="d-flex justify-end">
       <a-menu offset-y left>
         <template v-slot:activator="{ on }">
@@ -68,7 +68,7 @@
         </v-list>
       </a-menu>
     </div>
-    <v-select :items="availableFilters" v-model="filter" label="Filter" />
+    <a-select :items="availableFilters" v-model="filter" label="Filter" />
     <a-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
@@ -106,6 +106,7 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
 

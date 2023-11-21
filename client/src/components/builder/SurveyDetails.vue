@@ -3,7 +3,7 @@
     <v-card-title class="d-block pb-0">
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
-        <v-spacer />
+        <a-spacer />
         <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
@@ -14,7 +14,7 @@
             <v-card-title> Edit Survey Details</v-card-title>
             <v-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
-              <v-select
+              <a-select
                 outlined
                 v-model="value.meta.submissions"
                 label="Allow Submissions for..."
@@ -23,7 +23,7 @@
               <v-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
             </v-card-text>
             <v-card-actions class="mr-3">
-              <v-spacer />
+              <a-spacer />
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
@@ -43,7 +43,7 @@
               />
             </v-card-text>
             <v-card-actions class="mr-3">
-              <v-spacer />
+              <a-spacer />
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
@@ -243,9 +243,9 @@
 
       <v-tooltip bottom v-if="validationErrors.length > 0">
         <template v-slot:activator="{ on }">
-          <v-alert type="error" colored-border border="left" class="mt-2" elevation="2" v-on="on">
+          <a-alert type="error" border-color border="left" class="mt-2" elevation="2" v-on="on">
             Survey contains errors
-          </v-alert>
+          </a-alert>
         </template>
         <div v-for="error in validationErrors" :key="error">
           {{ error }}
@@ -264,6 +264,7 @@ import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
+
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
 

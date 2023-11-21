@@ -54,7 +54,7 @@
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />
-      <v-select
+      <a-select
         v-if="isDate"
         :items="dateTypes"
         label="Type"
@@ -95,7 +95,7 @@
         @set-control-required="control.options.required = true"
         class="mt-3"
       />
-      <v-select
+      <a-select
         v-if="this.control.type === 'file'"
         label="Restrict uploaded file types (.csv, .pdf, etc.)"
         v-model="control.options.source.types"
@@ -107,24 +107,26 @@
         deletable-chips
         hide-details
       />
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         v-if="isScript"
+        @change="handleScriptSourceChange"
+        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
+        @focus="handleScriptSourceFocus"
         label="Script Source"
         v-model="scriptSourceId"
         :items="scriptSourceItems"
         item-text="name"
         item-value="_id"
         append-outer-icon="mdi-open-in-new"
-        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
-        @focus="handleScriptSourceFocus"
-        @change="handleScriptSourceChange"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         hide-details
+        selectionSlot
       >
         <template v-slot:selection="{ item }">
           <div>{{ item.name }}</div>
         </template>
-      </v-autocomplete>
+      </a-select>
       <a-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea
@@ -137,7 +139,8 @@
         class="pt-3"
         hide-details
       />
-      <v-combobox
+      <a-select
+        engineering="combobox"
         v-if="isFarmOsUuid"
         label="FarmOS Type"
         v-model="control.options.farmOsType"
@@ -212,7 +215,7 @@
       />
 
       <!-- Control options -->
-      <v-spacer></v-spacer>
+      <a-spacer />
       <checkbox
         v-if="hasRequiredOption"
         label="Required"
@@ -296,7 +299,7 @@
         advanced
       </v-btn>
       <div v-else class="extra-options">
-        <v-spacer></v-spacer>
+        <a-spacer />
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
           <v-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</v-icon>
@@ -362,7 +365,7 @@
           Print Layout
         </v-btn>
         <div v-else class="extra-options">
-          <v-spacer></v-spacer>
+          <a-spacer />
           <div>
             <v-card-title class="px-0 py-0">Print Layout</v-card-title>
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
@@ -403,15 +406,18 @@
               />
             </div>
 
-            <v-select
+            <a-select
               label="Answer layout"
               v-model="control.options.printLayout.columns"
               :items="[1, 2, 3, 4, 5]"
               color="focus"
               :menu-props="{ contentClass: 'layout-select' }"
               hide-details
+              selectionSlot
+              itemSlot
+              appendOuterSlot
             >
-              <template v-slot:selection="{ item, index }">
+              <template v-slot:selection="{ item }">
                 {{ item === 1 ? '1 column' : `${item} columns` }}
               </template>
 
@@ -436,12 +442,12 @@
                   Set the number of items in a row
                 </v-tooltip>
               </template>
-            </v-select>
+            </a-select>
           </template>
         </div>
       </template>
 
-      <v-spacer></v-spacer>
+      <a-spacer />
     </a-form>
   </div>
 </template>

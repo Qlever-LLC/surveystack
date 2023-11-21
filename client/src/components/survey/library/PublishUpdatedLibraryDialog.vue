@@ -26,7 +26,7 @@
         }`"
       />
       <v-card-actions class="mr-3">
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span>Publish update to library {{ value.name }}</span>
         </v-btn>

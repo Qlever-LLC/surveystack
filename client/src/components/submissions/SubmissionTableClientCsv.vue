@@ -196,9 +196,9 @@
       </v-card>
     </v-dialog>
 
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
+    </a-alert>
   </v-card>
 </template>
 <script>

@@ -15,7 +15,7 @@
           :chip-color="diffInfo.color"
           class="ml-3 align-self-center"
         />
-        <v-spacer />
+        <a-spacer />
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
         </v-icon>

@@ -26,7 +26,7 @@
             <v-card-text>
               <v-row>
                 <div class="text-h6">{{ email }}</div>
-                <v-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
+                <a-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
                   </template>
@@ -38,7 +38,7 @@
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
                     </v-card-text>
                     <v-card-actions>
-                      <v-spacer></v-spacer>
+                      <a-spacer />
                       <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
                       </v-btn>
@@ -102,7 +102,7 @@
             >?
           </v-card-text>
           <v-card-actions>
-            <v-spacer />
+            <a-spacer />
             <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
             <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
           </v-card-actions>
@@ -113,9 +113,9 @@
       <h1>Profile</h1>
       You are not logged in... <router-link to="/auth/login">Go to Login</router-link></template
     >
-    <v-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
+    <a-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
       status.message
-    }}</v-alert>
+    }}</a-alert>
   </v-container>
 </template>
 

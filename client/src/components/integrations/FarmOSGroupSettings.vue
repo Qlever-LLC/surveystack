@@ -23,7 +23,8 @@
             @change="$emit('seatsChanged', seats)"
           />
 
-          <v-autocomplete
+          <a-select
+            engineering="autocomplete"
             outlined
             class="flex-grow-1 flex-shrink-0"
             label="Select FarmOS Plans for Group"
@@ -35,8 +36,7 @@
             :item-value="(p) => p._id"
             small-chips
             :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          >
-          </v-autocomplete>
+          />
         </div>
         <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
       </v-card-text>

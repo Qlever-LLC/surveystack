@@ -44,7 +44,7 @@
             <v-btn @click="duplicateRow(editedIndex)" text color="primary">
               <v-icon left>mdi-content-copy</v-icon>Duplicate
             </v-btn>
-            <v-spacer />
+            <a-spacer />
             <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
           </v-card-title>
           <v-card-text>

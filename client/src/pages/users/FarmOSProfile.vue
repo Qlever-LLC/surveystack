@@ -1,7 +1,7 @@
 <template>
   <v-container class="maxw-4">
     <template v-if="isLoggedIn">
-      <v-alert
+      <a-alert
         v-if="successMessage"
         class="mt-4"
         style="cursor: pointer"
@@ -9,12 +9,12 @@
         text
         type="success"
         @click="successMessage = null"
-        >{{ successMessage }}</v-alert
+        >{{ successMessage }}</a-alert
       >
 
-      <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+      <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
         errorMessage
-      }}</v-alert>
+      }}</a-alert>
 
       <p class="mt-4 mb-6">
         You are logged in as
@@ -38,14 +38,14 @@
             <a-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details />
             <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
             text
             type="error"
-            >{{ errorDialogMessage }}</v-alert
+            >{{ errorDialogMessage }}</a-alert
           >
           <v-btn block @click="addUser" color="primary" target="_blank"> Add </v-btn>
         </div>
@@ -83,14 +83,14 @@
           <div class="d-flex mb-4">
             <a-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details />
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
             text
             type="error"
-            >{{ errorDialogMessage }}</v-alert
+            >{{ errorDialogMessage }}</a-alert
           >
           <v-btn block @click="changeOwner" color="primary" target="_blank"> Update</v-btn>
         </div>

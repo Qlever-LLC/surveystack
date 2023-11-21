@@ -22,7 +22,7 @@
       </v-card-text>
       <a-divider />
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
