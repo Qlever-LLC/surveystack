@@ -30,7 +30,7 @@
       {{ openResourceError }}
     </a-alert>
     <div class="d-flex justify-end">
-      <v-menu offset-y left>
+      <a-menu offset-y left>
         <template v-slot:activator="{ on }">
           <v-btn color="primary" v-on="on">
             <v-icon left>mdi-plus</v-icon>
@@ -48,7 +48,7 @@
           </v-list-item>
           <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
-              <v-input hide-details>
+              <a-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
                   <v-btn class="pointer-events-none" text>
                     <v-icon color="grey">mdi-upload</v-icon>
@@ -62,14 +62,14 @@
                   class="d-none"
                   @change="createFileResource"
                 />
-              </v-input>
+              </a-input>
             </v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu>
+      </a-menu>
     </div>
     <v-select :items="availableFilters" v-model="filter" label="Filter" />
-    <v-text-field v-model="search" label="Search" autocomplete="off" />
+    <a-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
         <v-list-item

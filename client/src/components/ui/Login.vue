@@ -5,7 +5,7 @@
         <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
         <h1 class="heading--text" v-else>Welcome Back!</h1>
         <v-form>
-          <v-text-field
+          <a-text-field
             label="E-Mail"
             type="text"
             class="form-control"
@@ -16,7 +16,7 @@
           <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
             We'll send you an email to sign you in - no password needed! <b>Click send</b> then <b>check your email</b>.
           </div>
-          <v-text-field
+          <a-text-field
             v-if="usePassword"
             label="Password"
             :type="passwordInputType"
@@ -135,6 +135,7 @@ export default {
       default: true,
     },
   },
+
   data() {
     return {
       status: '',

@@ -202,7 +202,7 @@
             :forceMobile="isPreviewMobile"
           >
             <template v-slot:toolbar-actions>
-              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+              <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
                   <v-icon right> mdi-monitor</v-icon>
@@ -212,7 +212,7 @@
                   <span class="hidden-sm-and-down">mobile</span>
                   <v-icon right> mdi-cellphone</v-icon>
                 </v-btn>
-              </v-btn-toggle>
+              </a-btn-toggle>
 
               <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>

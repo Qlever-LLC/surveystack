@@ -35,7 +35,7 @@
         <div class="my-8">
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
-            <v-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details></v-text-field>
+            <a-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details />
             <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
           </div>
           <a-alert
@@ -81,7 +81,7 @@
         <div class="my-8">
           <p>To whom do you wish to transfer the ownership of this farm?</p>
           <div class="d-flex mb-4">
-            <v-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details></v-text-field>
+            <a-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details />
           </div>
           <a-alert
             v-if="errorDialogMessage"
@@ -357,7 +357,7 @@
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
@@ -368,13 +368,13 @@
                     @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
                   >
                     {{ group.groupName }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
@@ -385,7 +385,7 @@
                     @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
                     ><span v-if="user.owner" class="mdi mdi-crown pr-1"></span>
                     {{ user.userEmail }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>
