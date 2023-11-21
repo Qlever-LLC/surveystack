@@ -77,7 +77,7 @@
     </div>
 
     <v-expand-transition>
-      <v-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
+      <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0">
         <v-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
@@ -97,7 +97,7 @@
               v-text="getLabelFromKey(fileResourceKey)"
             ></v-list-item-title>
             <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
-              <v-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
+              <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
             </v-list-item-title>
             <v-list-item-subtitle v-if="showUploadProgressIndex === index"
               ><v-progress-linear indeterminate class="mb-0"
@@ -119,7 +119,7 @@
             </v-btn>
           </v-list-item-action>
         </v-list-item>
-      </v-list>
+      </a-list>
     </v-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
   </div>

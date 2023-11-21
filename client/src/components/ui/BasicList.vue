@@ -10,7 +10,7 @@
       </slot>
     </v-card-title>
     <v-card-text>
-      <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
+      <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <v-list
         v-if="entities.length > 0"
         :style="{
@@ -27,7 +27,7 @@
               </v-list-item-content>
             </slot>
           </v-list-item>
-          <v-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
+          <a-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
         </div>
       </v-list>
 
@@ -78,6 +78,7 @@ export default {
       type: Function,
     },
   },
+
   computed: {
     filteredEntities() {
       if (this.filter) {

@@ -9,16 +9,16 @@
           <v-icon left>mdi-trash-can-outline</v-icon> Delete
         </v-btn>
       </div>
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
+        <a-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
 
-        <v-text-field v-model="entity.group" label="Group" disabled />
+        <a-text-field v-model="entity.group" label="Group" disabled />
 
-        <v-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
+        <a-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
 
-        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
+        <a-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
 
-        <v-text-field
+        <a-text-field
           v-if="entity.meta.status === 'pending'"
           class="mt-3"
           v-model="entity.meta.invitationName"
@@ -26,13 +26,13 @@
           hint="Default name for newly registered users"
         />
 
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" />
 
         <div class="d-flex mt-2">
           <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
           <v-btn color="primary" @click="submit">Save</v-btn>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
 
     <v-card class="my-3 pa-2" v-if="resendEnabled">
