@@ -137,13 +137,11 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ASkeletonLoader from '@/components/ui/ASkeletonLoader.vue';
 
 export default {
   props: {
     groupId: String,
   },
-
   data() {
     return {
       integratedHyloGroup: null,

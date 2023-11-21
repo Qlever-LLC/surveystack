@@ -111,10 +111,9 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
-import ASkeletonLoader from '@/components/ui/ASkeletonLoader.vue';
 
 export default {
-  components: { SurveyDiffDialog, ASkeletonLoader },
+  components: { SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,
