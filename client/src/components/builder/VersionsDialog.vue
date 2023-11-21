@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>Survey Versions</v-card-title>
       <v-card-text style="max-height: 500px">
-        <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
+        <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">

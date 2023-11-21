@@ -4,7 +4,7 @@
       <v-card-text v-if="isLoading">
         <v-card-title> Hylo Integraton </v-card-title>
         <v-spacer />
-        <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
+        <a-skeleton-loader type="list-item-avatar, card-heading" />
       </v-card-text>
       <template v-else-if="integratedHyloGroup">
         <a-img
@@ -142,7 +142,6 @@ export default {
   props: {
     groupId: String,
   },
-
   data() {
     return {
       integratedHyloGroup: null,

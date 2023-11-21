@@ -138,7 +138,7 @@ describe('Ontology question', () => {
       expect(dropDown.vm.value).toEqual(['cat', 'dog']);
     });
 
-    it.only('sets autocomplete with chips from value in multiple selection, non-custom mode', () => {
+    it('sets autocomplete with chips from value in multiple selection, non-custom mode', () => {
       const wrapper = mount(
         Ontology,
         getMountOpts({
