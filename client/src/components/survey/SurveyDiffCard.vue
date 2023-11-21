@@ -21,7 +21,7 @@
         </v-icon>
       </v-row>
     </button>
-    <v-simple-table v-if="isOpen" fixed-header dense class="mb-4">
+    <a-table v-if="isOpen" fixed-header dense class="mb-4">
       <template v-slot:default>
         <thead>
           <tr>
@@ -74,7 +74,7 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
     <slot></slot>
     <v-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
       Selecting your Version of this question is not possible because the new

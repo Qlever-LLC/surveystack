@@ -26,6 +26,7 @@ import ATextField from '../src/components/ui/elements/ATextField.vue';
 import ASpeedDial from '../src/components/ui/elements/ASpeedDial.vue';
 import AAlert from '../src/components/ui/elements/AAlert.vue';
 import AForm from '../src/components/ui/elements/AForm.vue';
+import ATable from '../src/components/ui/elements/ATable.vue';
 
 const localVue = createLocalVue();
 localVue.component('a-btn-toggle', ABtnToggle);
@@ -50,6 +51,7 @@ localVue.component('a-text-field', ATextField);
 localVue.component('a-speed-dial', ASpeedDial);
 localVue.component('a-alert', AAlert);
 localVue.component('a-form', AForm);
+localVue.component('a-table', ATable);
 
 localVue.use(Vuex);
 localVue.use(VueRouter);
