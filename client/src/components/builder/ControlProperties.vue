@@ -1,7 +1,7 @@
 <template>
   <div class="property-panel">
     <v-card-title class="pl-0">Properties</v-card-title>
-    <v-form v-if="control">
+    <a-form v-if="control">
       <!-- Default properties -->
       <a-text-field v-model="control.label" label="Label" hide-details />
       <a-text-field
@@ -442,7 +442,7 @@
       </template>
 
       <v-spacer></v-spacer>
-    </v-form>
+    </a-form>
   </div>
 </template>
 <script>

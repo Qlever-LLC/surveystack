@@ -22,7 +22,7 @@
       <v-card outlined>
         <v-card-text> <div>User Details</div></v-card-text>
         <v-card-text>
-          <v-form>
+          <a-form>
             <v-card-text>
               <v-row>
                 <div class="text-h6">{{ email }}</div>
@@ -73,7 +73,7 @@
             <div class="d-flex mt-2 justify-end">
               <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</v-btn>
             </div>
-          </v-form></v-card-text
+          </a-form></v-card-text
         >
       </v-card>
 

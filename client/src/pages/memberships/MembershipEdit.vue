@@ -9,7 +9,7 @@
           <v-icon left>mdi-trash-can-outline</v-icon> Delete
         </v-btn>
       </div>
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
         <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
 
         <a-text-field v-model="entity.group" label="Group" disabled />
@@ -32,7 +32,7 @@
           <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
           <v-btn color="primary" @click="submit">Save</v-btn>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
 
     <v-card class="my-3 pa-2" v-if="resendEnabled">
