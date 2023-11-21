@@ -3,11 +3,11 @@
     <v-card>
       <v-card-title>
         {{ title }}
-        <v-spacer />
+        <a-spacer />
         <v-btn color="primary" class="ml-4" :to="{ name: 'groups-new', query: { dir: dir } }" text>New...</v-btn>
       </v-card-title>
       <v-card-text>
-        <v-text-field label="Search" v-model="q" id="surveystack-group-list-search" append-icon="mdi-magnify" />
+        <a-text-field label="Search" v-model="q" id="surveystack-group-list-search" append-icon="mdi-magnify" />
         <template v-if="entities.length > 0">
           <v-list-item v-for="group in groups" :key="group._id" two-line :to="`/g${group.path}`">
             <v-list-item-content>

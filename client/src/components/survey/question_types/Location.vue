@@ -44,9 +44,9 @@
     </div>
 
     <div id="map-error-alert" class="my-4" v-else-if="offlineMode">
-      <v-alert type="info" border="right" prominent>
+      <a-alert type="info" border="right" prominent>
         <b>Offline-Mode</b>: Map unavailable, but position can be determined if permission is granted
-      </v-alert>
+      </a-alert>
       <div>
         Current location:
         <samp v-if="currentLocation && currentLocation.location">
@@ -66,7 +66,7 @@
     </div>
 
     <div id="map-error-alert" class="my-4" v-else>
-      <v-alert type="info" border="right" prominent> Error loading map. </v-alert>
+      <a-alert type="info" border="right" prominent> Error loading map. </a-alert>
       <app-gps :expanded="true" :location="currentLocation.location">
         {{ currentLocation.label }}
       </app-gps>

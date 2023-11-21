@@ -39,7 +39,7 @@
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
               </v-card-text>
               <v-card-actions>
-                <v-spacer />
+                <a-spacer />
                 <v-btn text color="red" @click="deleteResult">Delete</v-btn>
                 <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </v-card-actions>
@@ -47,13 +47,13 @@
           </v-dialog>
         </div>
       </div>
-      <v-divider />
+      <a-divider />
     </v-card-title>
 
     <v-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
-        <v-text-field
+        <a-text-field
           :value="resource.label"
           :disabled="disabled"
           @input="handleUpdateLabel"
@@ -62,7 +62,7 @@
           class="mx-2"
         />
         <!-- TODO: validate unique data name -->
-        <v-text-field
+        <a-text-field
           :value="resource.name"
           :disabled="disabled"
           @input="handleUpdateName"
@@ -72,7 +72,7 @@
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
 
-        <v-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
+        <a-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
           <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
             <v-icon>mdi-delete</v-icon>
@@ -91,13 +91,13 @@
         :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
       >
         <template v-slot:item.label="{ item }">
-          <v-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.value="{ item }">
-          <v-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.tags="{ item }">
-          <v-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
@@ -111,7 +111,7 @@
         </template>
       </v-data-table>
     </v-card-text>
-    <v-spacer />
+    <a-spacer />
     <v-card-actions class="d-flex justify-end mr-3 align-start">
       <v-btn text class="ml-4" @click="close">Close</v-btn>
     </v-card-actions>
@@ -120,12 +120,12 @@
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
-          <v-text-field v-model="editedItem.label" label="Label" />
-          <v-text-field v-model="editedItem.value" label="Value" />
-          <v-text-field v-model="editedItem.tags" label="Tags" />
+          <a-text-field v-model="editedItem.label" label="Label" />
+          <a-text-field v-model="editedItem.value" label="Value" />
+          <a-text-field v-model="editedItem.tags" label="Tags" />
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
           <v-btn text color="primary" @click="saveItem">Save</v-btn>
         </v-card-actions>

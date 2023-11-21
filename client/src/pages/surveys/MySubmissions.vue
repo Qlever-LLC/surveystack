@@ -2,7 +2,7 @@
   <div class="background wrapper">
     <v-container>
       <v-row class="my-2">
-        <v-spacer />
+        <a-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
           <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
@@ -65,7 +65,7 @@
                   </v-list-item>
                 </template>
 
-                <v-spacer class="flex-grow-1" />
+                <a-spacer class="flex-grow-1" />
                 <v-card-actions>
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
@@ -73,7 +73,7 @@
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
                 <v-row align="center" justify="center">
                   <v-col>
-                    <v-alert color="primary" class="black-text" text>No Drafts</v-alert>
+                    <a-alert color="primary" class="black-text" text>No Drafts</a-alert>
                   </v-col>
                 </v-row>
               </div>
@@ -107,7 +107,7 @@
               <div v-else>
                 <v-row align="center" justify="center">
                   <v-col>
-                    <v-alert color="primary" class="black-text" text>No Submissions</v-alert>
+                    <a-alert color="primary" class="black-text" text>No Submissions</a-alert>
                   </v-col>
                 </v-row>
               </div>

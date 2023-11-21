@@ -105,9 +105,9 @@
             </v-card-text>
           </v-card>
 
-          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
+          <a-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
-          </v-chip>
+          </a-chip>
         </v-timeline-item>
       </template>
     </v-timeline>
