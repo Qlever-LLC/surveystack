@@ -11,7 +11,7 @@
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>
               <template v-if="item.logs && item.logs.length">
-                <v-divider class="mx-4"></v-divider>
+                <a-divider class="mx-4" />
                 <v-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
                     <v-card-actions>
@@ -28,13 +28,13 @@
                     </v-card-title>
 
                     <v-card-text>
-                      <v-expansion-panels accordion>
-                        <v-expansion-panel
+                      <a-expansion-panels accordion>
+                        <a-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
                           :key="i"
                           :readonly="!item.data"
                         >
-                          <v-expansion-panel-header>
+                          <a-expansion-panel-title>
                             <template v-slot:actions v-if="!item.data"><v-spacer></v-spacer> </template>
                             <div class="mr-4 flex-grow-0">
                               <a-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </a-icon>
@@ -44,12 +44,12 @@
                               <a-icon v-else color="primary"> $expand </a-icon>
                             </div>
                             {{ item.message }}
-                          </v-expansion-panel-header>
-                          <v-expansion-panel-content>
+                          </a-expansion-panel-title>
+                          <a-expansion-panel-text>
                             <pre>{{ JSON.stringify(item.data, (k, v) => (v === undefined ? null : v), 2) }}</pre>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
+                          </a-expansion-panel-text>
+                        </a-expansion-panel>
+                      </a-expansion-panels>
                     </v-card-text>
                   </v-card>
                 </v-dialog>
@@ -83,10 +83,10 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
-import AIcon from '@/components/ui/AIcon.vue';
+import CopyToClipboard from '@/components/submissions/CopyToClipboard.vue';
 
 export default {
-  components: { AIcon },
+  components: { CopyToClipboard },
   props: {
     value: {
       required: true,

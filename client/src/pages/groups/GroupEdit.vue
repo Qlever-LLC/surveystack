@@ -34,9 +34,9 @@
     <div class="d-flex justify-space-between">
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
-        <v-chip v-if="isPremium" class="ml-2" color="success">
+        <a-chip v-if="isPremium" class="ml-2" color="success">
           <a-icon small left> mdi-octagram </a-icon>Premium
-        </v-chip>
+        </a-chip>
       </h1>
       <v-btn
         v-if="editMode"
@@ -51,14 +51,14 @@
     <v-card :loading="isLoadingGroup" class="mb-4">
       <v-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
-          <v-text-field
+          <a-text-field
             label="Name"
             placeholder="Enter group name"
             id="group-name"
             autocomplete="off"
             v-model="entity.name"
           />
-          <v-text-field
+          <a-text-field
             label="Slug"
             placeholder="Enter group slug or use suggested"
             id="group-slug"
@@ -290,16 +290,13 @@ export default {
         return;
       }
 
-      const data = this.entity;
-      const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/groups/${this.entity._id}` : '/groups';
-
       try {
-        await api.customRequest({
-          method,
-          url,
-          data,
-        });
+        if (this.editMode) {
+          await api.put(`/groups/${this.entity._id}`, this.entity);
+        } else {
+          await api.post('/groups', this.entity);
+        }
+
         this.$router.push(`/g${this.entity.dir}${this.entity.slug}/`);
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);

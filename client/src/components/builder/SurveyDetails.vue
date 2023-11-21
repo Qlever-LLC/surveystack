@@ -55,7 +55,7 @@
           @ok="publishUpdateToLibrary"
           @cancel="updateLibraryDialogIsVisible = false"
         />
-        <v-menu offset-y left>
+        <a-menu offset-y left>
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
               <a-icon>mdi-dots-vertical</a-icon>
@@ -64,7 +64,7 @@
           <v-list>
             <v-list-item class="d-flex align-center">
               <v-list-item-title>
-                <v-input hide-details>
+                <a-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
                     <v-btn class="pointer-events-none" text>
                       <a-icon color="grey">mdi-file-upload</a-icon>
@@ -79,7 +79,7 @@
                     class="d-none"
                     @change="(file) => $emit('import-survey', file)"
                   />
-                </v-input>
+                </a-input>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>
@@ -131,7 +131,7 @@
               </v-list-item-title>
             </v-list-item>
           </v-list>
-        </v-menu>
+        </a-menu>
         <edit-library-dialog
           v-if="editLibraryDialogIsVisible"
           v-model="editLibraryDialogIsVisible"
@@ -162,13 +162,13 @@
           </v-btn>
         </div>
         <div class="text-left">
-          <v-chip dark small outlined color="grey"> Version {{ version }}</v-chip>
+          <a-chip dark small outlined color="grey"> Version {{ version }}</a-chip>
         </div>
       </div>
     </v-card-title>
     <v-card-text>
       <div class="mt-4">
-        <v-text-field
+        <a-text-field
           :value="surveyGroupName"
           label="Group"
           readonly
@@ -381,20 +381,5 @@ export default {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.survey-group-name-input >>> .v-input__slot ::before {
-  border: none;
-}
-
-.survey-group-name-input
-  >>> .theme--light.v-text-field.v-input--is-disabled
-  > .v-input__control
-  > .v-input__slot:before {
-  border: none;
-}
-
-.survey-group-name-input >>> .v-input__control >>> .v-input__slot ::before {
-  border: none;
 }
 </style>

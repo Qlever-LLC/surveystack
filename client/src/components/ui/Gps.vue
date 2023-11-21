@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-menu offset-y>
+    <a-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
         <v-btn v-bind="attrs" v-on="on" class="button">
           <a-icon>mdi-dots-vertical</a-icon>
@@ -21,7 +21,7 @@
         </div>
         <v-btn @click="clipboard" outlined class="mt-1"> <a-icon left>mdi-content-copy</a-icon>Copy </v-btn>
       </div>
-    </v-menu>
+    </a-menu>
     <!-- TODO: fix copied snack notification -->
     <v-snackbar v-model="snackbar">
       {{ snackbarText }}

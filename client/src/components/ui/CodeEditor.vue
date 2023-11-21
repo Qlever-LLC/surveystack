@@ -4,18 +4,18 @@
       <v-card-title
         >{{ title || '' }}
 
-        <v-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
+        <a-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
           {{ result }}
-        </v-chip>
+        </a-chip>
 
-        <v-chip
+        <a-chip
           v-if="result !== null && typeof result === 'object'"
           class="mx-4"
           color="blue"
           @click.stop="dialog = true"
         >
           Result Object (click to expand)
-        </v-chip>
+        </a-chip>
 
         <v-dialog v-model="dialog" width="800">
           <v-card>

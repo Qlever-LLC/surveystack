@@ -47,13 +47,13 @@
           </v-dialog>
         </div>
       </div>
-      <v-divider />
+      <a-divider />
     </v-card-title>
 
     <v-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
-        <v-text-field
+        <a-text-field
           :value="resource.label"
           :disabled="disabled"
           @input="handleUpdateLabel"
@@ -62,7 +62,7 @@
           class="mx-2"
         />
         <!-- TODO: validate unique data name -->
-        <v-text-field
+        <a-text-field
           :value="resource.name"
           :disabled="disabled"
           @input="handleUpdateName"
@@ -72,7 +72,7 @@
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
 
-        <v-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
+        <a-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
           <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
             <a-icon>mdi-delete</a-icon>
@@ -91,13 +91,13 @@
         :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
       >
         <template v-slot:item.label="{ item }">
-          <v-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.value="{ item }">
-          <v-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.tags="{ item }">
-          <v-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
@@ -120,9 +120,9 @@
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
-          <v-text-field v-model="editedItem.label" label="Label" />
-          <v-text-field v-model="editedItem.value" label="Value" />
-          <v-text-field v-model="editedItem.tags" label="Tags" />
+          <a-text-field v-model="editedItem.label" label="Label" />
+          <a-text-field v-model="editedItem.value" label="Value" />
+          <a-text-field v-model="editedItem.tags" label="Tags" />
         </v-card-text>
         <v-card-actions>
           <v-spacer />

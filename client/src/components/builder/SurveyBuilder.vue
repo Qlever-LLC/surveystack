@@ -202,7 +202,7 @@
             :forceMobile="isPreviewMobile"
           >
             <template v-slot:toolbar-actions>
-              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+              <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
                   <a-icon right> mdi-monitor</a-icon>
@@ -212,7 +212,7 @@
                   <span class="hidden-sm-and-down">mobile</span>
                   <a-icon right> mdi-cellphone</a-icon>
                 </v-btn>
-              </v-btn-toggle>
+              </a-btn-toggle>
 
               <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>
@@ -370,24 +370,17 @@ export default {
   },
   methods: {
     async saveScript() {
-      console.log('saving script');
-      // post new script
-      const data = this.scriptCode;
-      const method = this.scriptCode._id !== null ? 'put' : 'post';
-      const url = this.scriptCode._id !== null ? `/scripts/${this.scriptCode._id}` : '/scripts';
-
       if (this.scriptCode.name.trim() === '') {
         console.log('Name must not be empty');
         return;
       }
 
       try {
-        await api.customRequest({
-          method,
-          url,
-          data,
-        });
-        // this.$router.push('/scripts');
+        if (this.scriptCode._id !== null) {
+          await api.put(`/scripts/${this.scriptCode._id}`, this.scriptCode);
+        } else {
+          await api.post('/scripts', this.scriptCode);
+        }
       } catch (err) {
         console.log(err);
       }

@@ -37,7 +37,6 @@ import {
   addFarmToSurveystackGroupAndSendNotification,
   removeFarmFromSurveystackGroupAndSendNotification,
   setPlanForGroup,
-  getGroupInformation,
   createFarmosGroupSettings,
 } from '../services/farmos/manage';
 import * as farmosManageModule from '../services/farmos/manage';
@@ -1126,8 +1125,10 @@ describe('farmos-controller', () => {
           },
         },
         {
-          email: 1,
-          name: 1,
+          projection: {
+            email: 1,
+            name: 1,
+          },
         }
       )
       .toArray();

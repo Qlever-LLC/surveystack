@@ -10,7 +10,6 @@
       :tooltip="initializeTooltip"
     />
     <app-redacted v-if="redacted" bottom />
-    <app-redacted v-if="redacted" bottom />
     <app-required v-if="required" bottom />
   </div>
 </template>

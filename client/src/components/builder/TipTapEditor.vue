@@ -289,13 +289,14 @@
                 v-if="linkMenuIsActive"
                 @submit.prevent="setLinkUrl(commands.link, linkUrl)"
               >
-                <v-text-field
+                <!-- TODO in Vue3 remove .native -->
+                <a-text-field
                   class="menububble__input ml-4"
                   dense
                   v-model="linkUrl"
                   placeholder="https://"
                   ref="linkInput"
-                  @keydown.esc="hideLinkMenu"
+                  @keydown.native.esc="hideLinkMenu"
                 />
                 <v-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
                   <a-icon>mdi-check</a-icon>

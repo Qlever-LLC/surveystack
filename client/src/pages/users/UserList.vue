@@ -19,7 +19,7 @@
             </v-btn>
           </v-list-item-icon>
         </v-list-item>
-        <v-divider />
+        <a-divider />
       </div>
     </v-card>
   </v-container>

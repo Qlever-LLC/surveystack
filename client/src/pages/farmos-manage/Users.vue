@@ -24,7 +24,7 @@
       :items="users"
     ></v-autocomplete>
 
-    <v-divider class="my-4"></v-divider>
+    <a-divider class="my-4" />
 
     <v-simple-table v-if="!loading">
       <template v-slot:default>
@@ -64,7 +64,7 @@
             <td>{{ instance.instanceName }}</td>
             <td>
               <div>
-                <v-chip
+                <a-chip
                   small
                   class="ma-1"
                   dark
@@ -73,11 +73,11 @@
                   :key="`instance-${idx}-user-${uidx}`"
                 >
                   {{ userMapping.user }}
-                </v-chip>
+                </a-chip>
               </div>
 
               <div>
-                <v-chip
+                <a-chip
                   class="ma-1"
                   small
                   dark
@@ -86,7 +86,7 @@
                   :key="`instance-${idx}-group-${gidx}`"
                 >
                   {{ groupMapping.group }}
-                </v-chip>
+                </a-chip>
               </div>
             </td>
             <td>{{ instance.owner }}</td>

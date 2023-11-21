@@ -15,7 +15,7 @@
     </div>
     <h1>
       <span>{{ entity.name }}</span>
-      <v-chip v-if="isPremium" class="ml-2" color="success"> <a-icon small left> mdi-octagram </a-icon>Premium </v-chip>
+      <a-chip v-if="isPremium" class="ml-2" color="success"> <a-icon small left> mdi-octagram </a-icon>Premium </a-chip>
     </h1>
     <h3 class="text--secondary">{{ entity.path }}</h3>
     <div class="text--secondary body-2">{{ entity._id }}</div>

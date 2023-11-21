@@ -235,7 +235,7 @@ router.put(
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'scripts' })],
   catchErrors(scriptController.updateScript)
 );
-router.delete('/scripts/:id', [assertAuthenticated], catchErrors(scriptController.deleteScript));
+router.delete('/scripts/:id', [assertIsSuperAdmin], catchErrors(scriptController.deleteScript));
 
 /** Memberships */
 router.get('/memberships', catchErrors(membershipController.getMemberships));

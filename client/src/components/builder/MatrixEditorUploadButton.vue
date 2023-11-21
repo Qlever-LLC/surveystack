@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-input>
+    <a-input>
       <label for="select-items-file-input" class="cursor-pointer">
         <v-btn class="pointer-events-none" color="primary">
           <a-icon left>mdi-upload</a-icon>
@@ -15,7 +15,7 @@
         class="d-none"
         @change="handleFileChange"
       />
-    </v-input>
+    </a-input>
   </div>
 </template>
 

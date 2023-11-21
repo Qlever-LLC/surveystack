@@ -10,7 +10,7 @@
           label="Group"
           @input="setGroup"
         />
-        <v-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
+        <a-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
         <v-list>
           <v-list-item
             v-for="member in filteredMembers"

@@ -1,6 +1,6 @@
 <template>
-  <v-sheet outlined>
-    <v-list subheader>
+  <a-sheet outlined>
+    <a-list subheader>
       <v-subheader>Fields added to Farmos Instance</v-subheader>
 
       <v-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
@@ -18,8 +18,8 @@
           </v-btn>
         </v-list-item-action>
       </v-list-item>
-    </v-list>
-  </v-sheet>
+    </a-list>
+  </a-sheet>
 </template>
 
 <script>
