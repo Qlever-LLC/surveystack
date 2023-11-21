@@ -3,7 +3,7 @@
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
-      <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
+      <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
         <a-text-field
@@ -86,7 +86,7 @@
             </a-list>
           </btn-dropdown>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
 
     <v-dialog v-model="dialogCreateUser" max-width="500">

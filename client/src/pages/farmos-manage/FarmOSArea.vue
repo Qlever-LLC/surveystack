@@ -1,8 +1,8 @@
 <template>
   <div style="width: 100%">
-    <v-form>
+    <a-form>
       <a-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
-    </v-form>
+    </a-form>
     <div id="farmos-map" style="width: 100%; height: 500px"></div>
   </div>
 </template>

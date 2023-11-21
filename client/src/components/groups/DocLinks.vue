@@ -65,7 +65,7 @@
       <v-card>
         <v-card-title>Add documentation link</v-card-title>
         <v-card-text>
-          <v-form v-model="newIsValid" ref="form">
+          <a-form v-model="newIsValid" ref="form">
             <a-text-field class="mt-3" v-model="newDoc.label" label="Label" outlined required :rules="labelRules" />
 
             <a-text-field class="mt-3" v-model="newDoc.link" label="Link" outlined required :rules="linkRules" />
@@ -75,7 +75,7 @@
               label="Also add this documentation link to all descendant groups"
               hide-details
             ></v-checkbox>
-          </v-form>
+          </a-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer />

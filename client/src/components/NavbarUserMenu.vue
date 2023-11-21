@@ -27,7 +27,7 @@
           <v-list-item-title> FarmOS Profile </v-list-item-title>
         </v-list-item>
         <a-divider />
-        <v-subheader>Active Group</v-subheader>
+        <a-list-subheader>Active Group</a-list-subheader>
         <active-group-selector-list v-model="activeGroup" />
         <a-divider />
         <v-list-item link @click="logout" class="mt-2">
@@ -51,6 +51,7 @@
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+
 import api from '@/services/api.service';
 
 export default {

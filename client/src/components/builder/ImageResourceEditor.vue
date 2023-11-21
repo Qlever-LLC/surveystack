@@ -9,7 +9,7 @@
       </v-btn>
     </v-card-title>
     <v-card-text>
-      <v-form
+      <a-form
         v-if="
           resource &&
           (resource.label || resource.label === '') &&
@@ -41,7 +41,7 @@
           persistent-hint
           outlined
         />
-      </v-form>
+      </a-form>
     </v-card-text>
     <v-card-actions class="d-flex justify-space-between px-6 pb-4">
       <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>

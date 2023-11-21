@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
+    <a-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
       <v-autocomplete
         outlined
         primary
@@ -205,7 +205,7 @@
       <v-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
         >Register FarmOS Instance</v-btn
       >
-    </v-form>
+    </a-form>
     <app-dialog
       title="Field Import"
       labelConfirm="OK"

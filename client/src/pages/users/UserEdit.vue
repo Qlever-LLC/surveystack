@@ -25,8 +25,8 @@
           </v-card>
         </v-dialog></v-card-title
       >
-      <v-card-text
-        ><v-form>
+      <v-card-text>
+        <a-form>
           <a-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
           <a-text-field tabindex="2" v-model="entity.name" label="Name" />
           <a-text-field
@@ -57,8 +57,8 @@
             <v-btn text @click="cancel">Cancel</v-btn>
             <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</v-btn>
           </div>
-        </v-form></v-card-text
-      >
+        </a-form>
+      </v-card-text>
     </v-card>
     <!-- <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert> -->
     <transition name="fade">
