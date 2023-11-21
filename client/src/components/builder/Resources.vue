@@ -38,16 +38,16 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item class="d-flex align-center">
-            <v-list-item-title>
+          <a-list-item class="d-flex align-center">
+            <a-list-item-title>
               <v-btn text @click="createOntology">
                 <v-icon color="grey">mdi-plus</v-icon>
                 <div class="ml-1">Create Ontology</div>
               </v-btn>
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
-            <v-list-item-title>
+            </a-list-item-title>
+          </a-list-item>
+          <a-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
+            <a-list-item-title>
               <a-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
                   <v-btn class="pointer-events-none" text>
@@ -63,8 +63,8 @@
                   @change="createFileResource"
                 />
               </a-input>
-            </v-list-item-title>
-          </v-list-item>
+            </a-list-item-title>
+          </a-list-item>
         </v-list>
       </a-menu>
     </div>
@@ -72,7 +72,7 @@
     <a-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
-        <v-list-item
+        <a-list-item
           v-for="resource in filteredResources"
           :key="resource.id"
           two-line
@@ -80,25 +80,25 @@
           :inactive="resource.type !== resourceTypes.FILE && resource.type !== resourceTypes.ONTOLOGY_LIST"
         >
           <v-list-item-content style="user-select: text">
-            <v-list-item-title>{{ resource.label }}</v-list-item-title>
-            <v-list-item-subtitle v-if="resource.type === resourceTypes.FILE">
+            <a-list-item-title>{{ resource.label }}</a-list-item-title>
+            <a-list-item-subtitle v-if="resource.type === resourceTypes.FILE">
               {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
-            </v-list-item-subtitle>
-            <v-list-item-subtitle v-else> {{ resource.name }}</v-list-item-subtitle>
+            </a-list-item-subtitle>
+            <a-list-item-subtitle v-else> {{ resource.name }}</a-list-item-subtitle>
           </v-list-item-content>
           <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
-          <v-list-item-action v-if="resource.type === resourceTypes.FILE">
+          <a-list-item-action v-if="resource.type === resourceTypes.FILE">
             <v-btn icon>
               <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
             </v-btn>
-          </v-list-item-action>
-        </v-list-item>
+          </a-list-item-action>
+        </a-list-item>
       </template>
-      <v-list-item v-else>
+      <a-list-item v-else>
         <v-list-item-content>
-          <v-list-item-title class="text--secondary">No resources found</v-list-item-title>
+          <a-list-item-title class="text--secondary">No resources found</a-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </a-list-item>
     </v-list>
   </div>
 </template>

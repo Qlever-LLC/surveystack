@@ -32,22 +32,22 @@
             <v-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <template v-for="(item, i) in activeTabPageContent">
-                  <v-list-item :key="i">
+                  <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
-                        </v-list-item-title>
-                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-title>
+                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
-                        </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-subtitle>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </v-list-item-subtitle>
+                        </a-list-item-subtitle>
                       </v-card>
                     </v-list-item-content>
-                    <v-list-item-action>
+                    <a-list-item-action>
                       <a-tooltip bottom>
                         <template v-slot:activator="{ on }">
                           <v-btn
@@ -61,8 +61,8 @@
                         </template>
                         <span>Upload Submission</span>
                       </a-tooltip>
-                    </v-list-item-action>
-                  </v-list-item>
+                    </a-list-item-action>
+                  </a-list-item>
                 </template>
 
                 <a-spacer class="flex-grow-1" />
@@ -80,22 +80,22 @@
 
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <template v-for="(item, i) in tab.content">
-                  <v-list-item :key="i">
+                  <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
-                        </v-list-item-title>
-                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-title>
+                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
-                        </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-subtitle>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </v-list-item-subtitle>
+                        </a-list-item-subtitle>
                       </v-card>
                     </v-list-item-content>
-                  </v-list-item>
+                  </a-list-item>
                 </template>
                 <v-pagination
                   v-model="remotePage"

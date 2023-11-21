@@ -8,17 +8,17 @@
 
     <v-card>
       <div v-for="e in entities" :key="e._id">
-        <v-list-item :to="`/users/${e._id}`">
+        <a-list-item :to="`/users/${e._id}`">
           <v-list-item-content>
-            <v-list-item-title>{{ e.email }}</v-list-item-title>
-            <v-list-item-subtitle>{{ e.name }}</v-list-item-subtitle>
+            <a-list-item-title>{{ e.email }}</a-list-item-title>
+            <a-list-item-subtitle>{{ e.name }}</a-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-icon>
+          <a-list-item-icon>
             <v-btn v-if="false" :to="`/users/${e._id}/edit`" text>
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-          </v-list-item-icon>
-        </v-list-item>
+          </a-list-item-icon>
+        </a-list-item>
         <a-divider />
       </div>
     </v-card>

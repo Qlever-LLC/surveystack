@@ -118,19 +118,19 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-              <v-list-item-title class="text--secondary"
+              <a-list-item-title class="text--secondary"
                 >[Pending] {{ entity.meta.invitationEmail
-                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title
+                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</a-list-item-title
               >
-              <v-list-item-subtitle>{{
+              <a-list-item-subtitle>{{
                 entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
-              }}</v-list-item-subtitle>
+              }}</a-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <v-list-item-title>{{ entity.user.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.user.email }}</v-list-item-subtitle>
+              <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
             </v-list-item-content>
-            <v-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
+            <a-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
               <v-row style="gap: 12px">
                 <app-confirm-membership-button
                   v-if="entity.meta && entity.meta.status === 'pending'"
@@ -148,7 +148,7 @@
                 />
                 <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
               </v-row>
-            </v-list-item-action>
+            </a-list-item-action>
           </template>
         </app-basic-list>
       </v-col>
@@ -165,8 +165,8 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>

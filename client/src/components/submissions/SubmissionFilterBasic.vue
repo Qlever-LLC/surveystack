@@ -13,7 +13,7 @@
 
     <v-card outlined v-if="filters.length > 0">
       <a-list dense>
-        <v-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
+        <a-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
           <v-list-item-content>
             <div>
               <span class="font-weight-medium mr-1">{{ filter.field }}</span>
@@ -21,12 +21,12 @@
               <span class="font-weight-boldmr-1">{{ filter.value }}</span>
             </div>
           </v-list-item-content>
-          <v-list-item-action @click="remove(i)">
+          <a-list-item-action @click="remove(i)">
             <v-btn icon small>
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
-          </v-list-item-action>
-        </v-list-item>
+          </a-list-item-action>
+        </a-list-item>
       </a-list>
     </v-card>
   </div>

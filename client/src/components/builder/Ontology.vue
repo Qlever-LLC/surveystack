@@ -22,12 +22,12 @@
   >
     <template v-slot:item="data">
       <v-list-item-content>
-        <v-list-item-title>
+        <a-list-item-title>
           {{ data.item.label }}
           <a-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
           </a-chip>
-        </v-list-item-title>
+        </a-list-item-title>
       </v-list-item-content>
     </template>
   </a-select>
@@ -56,12 +56,12 @@
   >
     <template v-slot:item="data">
       <v-list-item-content>
-        <v-list-item-title>
+        <a-list-item-title>
           {{ data.item.label }}
           <a-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
           </a-chip>
-        </v-list-item-title>
+        </a-list-item-title>
       </v-list-item-content>
     </template>
   </a-select>
@@ -102,14 +102,14 @@
       {{ getLabelForItemValue(data.item) }}
     </template>
     <template v-slot:no-data>
-      <v-list-item>
+      <a-list-item>
         <v-list-item-content>
-          <v-list-item-title>
+          <a-list-item-title>
             No values matching "<strong>{{ comboboxSearch }}</strong
             >". Press <kbd>enter</kbd> <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
-          </v-list-item-title>
+          </a-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </a-list-item>
     </template>
   </a-select>
 </template>

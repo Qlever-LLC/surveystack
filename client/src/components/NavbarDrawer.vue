@@ -7,14 +7,14 @@
     </div>
     <a-list>
       <template v-for="(item, i) in items">
-        <a-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
+        <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
         <a-list-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</a-list-subheader>
-        <v-list-item v-else :key="i" :to="item.to">
-          <v-list-item-icon v-if="item.icon" :class="item.class">
+        <a-list-item v-else :key="i" :to="item.to">
+          <a-list-item-icon v-if="item.icon" :class="item.class">
             <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+          </a-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>
+            <a-list-item-title>
               {{ item.label }}
               <a-chip
                 v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
@@ -23,14 +23,14 @@
               >
                 {{ readyToSubmitCount }}
               </a-chip>
-            </v-list-item-title>
+            </a-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
       </template>
 
       <a-divider dark class="my-1" />
 
-      <v-list-item class="pa-0">
+      <a-list-item class="pa-0">
         <a-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
           <a-expansion-panel>
             <a-expansion-panel-title class="pa-0 ma-0">
@@ -38,36 +38,36 @@
             </a-expansion-panel-title>
             <a-expansion-panel-text class="pa-0 ma-0 no-padding">
               <a-list class="pa-0 ma-0">
-                <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
-                  <v-list-item-icon>
+                <a-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
+                  <a-list-item-icon>
                     <v-icon>mdi-notebook</v-icon>
-                  </v-list-item-icon>
+                  </a-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>{{ doc.label }}</v-list-item-title>
+                    <a-list-item-title>{{ doc.label }}</a-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
 
-                <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
-                  <v-list-item-icon>
+                <a-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
+                  <a-list-item-icon>
                     <v-icon>mdi-help-circle-outline</v-icon>
-                  </v-list-item-icon>
+                  </a-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>SurveyStack Help</v-list-item-title>
+                    <a-list-item-title>SurveyStack Help</a-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
-                <v-list-item href="https://www.surveystack.io" target="_blank">
-                  <v-list-item-icon>
+                </a-list-item>
+                <a-list-item href="https://www.surveystack.io" target="_blank">
+                  <a-list-item-icon>
                     <v-icon>mdi-information-outline</v-icon>
-                  </v-list-item-icon>
+                  </a-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>About</v-list-item-title>
+                    <a-list-item-title>About</a-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
               </a-list>
             </a-expansion-panel-text>
           </a-expansion-panel>
         </a-expansion-panels>
-      </v-list-item>
+      </a-list-item>
     </a-list>
 
     <template v-slot:append>

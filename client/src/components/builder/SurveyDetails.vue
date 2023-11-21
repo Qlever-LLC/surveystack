@@ -62,8 +62,8 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-item class="d-flex align-center">
-              <v-list-item-title>
+            <a-list-item class="d-flex align-center">
+              <a-list-item-title>
                 <a-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
                     <v-btn class="pointer-events-none" text>
@@ -80,56 +80,56 @@
                     @change="(file) => $emit('import-survey', file)"
                   />
                 </a-input>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn @click="$emit('export-survey')" text>
                   <v-icon color="grey">mdi-file-download</v-icon>
                   <div class="ml-1">Export</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn @click="$emit('show-version-dialog')" text>
                   <v-icon color="grey">mdi-sitemap</v-icon>
                   <div class="ml-1">Manage Survey Versions</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn @click="editLibraryDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-library</v-icon>
                   <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="value.meta.isLibrary">
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item v-if="value.meta.isLibrary">
+              <a-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-layers-search</v-icon>
                   <div class="ml-1">List library consumers</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn text @click="printSettingDialogIsVisible = true">
                   <v-icon color="grey">mdi-printer-settings</v-icon>
                   <div class="ml-1">Print settings</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="!isNew">
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item v-if="!isNew">
+              <a-list-item-title>
                 <v-btn text @click="$emit('delete')">
                   <v-icon color="grey">mdi-delete</v-icon>
                   <div class="ml-1">Delete</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
+              </a-list-item-title>
+            </a-list-item>
           </v-list>
         </a-menu>
         <edit-library-dialog

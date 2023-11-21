@@ -65,14 +65,14 @@
         <v-card-text>
           <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
           <v-list>
-            <v-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
+            <a-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
               <v-list-item-content>
-                <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
-                <v-list-item-subtitle v-if="searchResult.meta">
+                <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
+                <a-list-item-subtitle v-if="searchResult.meta">
                   last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}
-                </v-list-item-subtitle>
+                </a-list-item-subtitle>
               </v-list-item-content>
-            </v-list-item>
+            </a-list-item>
           </v-list>
         </v-card-text>
       </v-card>

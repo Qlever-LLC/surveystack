@@ -47,7 +47,7 @@
 
       <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
         <v-list-item-content>
-          <v-list-item-title>{{ data.item.label }} </v-list-item-title>
+          <a-list-item-title v-html="data.item.label" />
         </v-list-item-content>
       </template>
       <template v-slot:item="{ item }" v-else>
