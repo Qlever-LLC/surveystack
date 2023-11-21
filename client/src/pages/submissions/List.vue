@@ -146,10 +146,10 @@
     </v-container>
 
     <v-container>
-      <v-tabs v-model="tab">
-        <v-tab v-for="view in views" :key="view.tab">
+      <a-tabs v-model="tab">
+        <a-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
-        </v-tab>
+        </a-tab>
         <v-tabs-items v-model="tab" touchless>
           <v-tab-item>
             <app-submissions-table-client-csv
@@ -179,7 +179,7 @@
             <app-submissions-code :submissions="submissions" />
           </v-tab-item>
         </v-tabs-items>
-      </v-tabs>
+      </a-tabs>
 
       <v-row class="my-2">
         <v-col cols="1">

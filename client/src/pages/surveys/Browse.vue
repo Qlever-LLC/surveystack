@@ -1,16 +1,16 @@
 <template>
   <div class="wrapper">
     <v-container>
-      <v-tabs v-model="activeTab" fixed-tabs>
-        <v-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
+      <a-tabs v-model="activeTab" fixed-tabs>
+        <a-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
           <span v-if="tab.name === 'active-group'" class="text-no-wrap">
             {{ activeGroupName }}
           </span>
           <span v-else class="text-no-wrap">
             {{ tab.label }}
           </span>
-        </v-tab>
-      </v-tabs>
+        </a-tab>
+      </a-tabs>
       <v-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
         <v-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
