@@ -23,13 +23,7 @@
 </template>
 
 <script>
-import AToolbar from '@/components/ui/AToolbar.vue';
-import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 export default {
-  components: {
-    AToolbar,
-    AToolbarTitle,
-  },
   props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
 };
 </script>

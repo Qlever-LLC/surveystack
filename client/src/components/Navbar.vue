@@ -24,14 +24,12 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
-import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 
 export default {
   components: {
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,
-    AToolbarTitle,
   },
   computed: {
     drawerIsVisible: {

@@ -42,14 +42,8 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
-import AToolbar from '@/components/ui/AToolbar.vue';
-import AToolbarTitle from '@/components/ui/AToolbarTitle.vue';
 
 export default {
-  components: {
-    AToolbar,
-    AToolbarTitle,
-  },
   data() {
     return {
       excludeMeta: true,

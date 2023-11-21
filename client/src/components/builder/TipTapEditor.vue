@@ -352,16 +352,12 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
-import AToolbar from '@/components/ui/AToolbar.vue';
-import AToolbarItems from '@/components/ui/AToolbarItems.vue';
 
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,
-    AToolbar,
-    AToolbarItems,
   },
   props: {
     value: {
