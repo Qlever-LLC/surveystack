@@ -1,7 +1,7 @@
 <template>
   <v-container class="maxw-4">
     <template v-if="isLoggedIn">
-      <v-alert
+      <a-alert
         v-if="successMessage"
         class="mt-4"
         style="cursor: pointer"
@@ -9,12 +9,12 @@
         text
         type="success"
         @click="successMessage = null"
-        >{{ successMessage }}</v-alert
+        >{{ successMessage }}</a-alert
       >
 
-      <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+      <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
         errorMessage
-      }}</v-alert>
+      }}</a-alert>
 
       <p class="mt-4 mb-6">
         You are logged in as
@@ -35,17 +35,17 @@
         <div class="my-8">
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
-            <v-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details></v-text-field>
+            <a-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details />
             <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
             text
             type="error"
-            >{{ errorDialogMessage }}</v-alert
+            >{{ errorDialogMessage }}</a-alert
           >
           <v-btn block @click="addUser" color="primary" target="_blank"> Add </v-btn>
         </div>
@@ -81,16 +81,16 @@
         <div class="my-8">
           <p>To whom do you wish to transfer the ownership of this farm?</p>
           <div class="d-flex mb-4">
-            <v-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details></v-text-field>
+            <a-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details />
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
             text
             type="error"
-            >{{ errorDialogMessage }}</v-alert
+            >{{ errorDialogMessage }}</a-alert
           >
           <v-btn block @click="changeOwner" color="primary" target="_blank"> Update</v-btn>
         </div>
@@ -357,7 +357,7 @@
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
@@ -368,13 +368,13 @@
                     @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
                   >
                     {{ group.groupName }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
@@ -385,7 +385,7 @@
                     @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
                     ><span v-if="user.owner" class="mdi mdi-crown pr-1"></span>
                     {{ user.userEmail }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>
