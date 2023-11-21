@@ -49,10 +49,7 @@
 </template>
 
 <script>
-import ATable from '@/components/ui/ATable.vue';
-
 export default {
-  components: { ATable },
   props: ['viewModel', 'loading'],
 
   data() {

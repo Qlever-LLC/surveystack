@@ -89,12 +89,10 @@
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
-import ATable from '@/components/ui/ATable.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
-    ATable,
     ControlCardHeader,
   },
   data() {

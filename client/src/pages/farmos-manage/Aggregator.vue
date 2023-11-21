@@ -236,10 +236,8 @@
 
 <script>
 import _ from 'lodash';
-import ATable from '@/components/ui/ATable.vue';
 
 export default {
-  components: { ATable },
   emits: ['addSuperAdminNote'],
 
   props: {

@@ -114,10 +114,7 @@
 </template>
 
 <script>
-import ATable from '@/components/ui/ATable.vue';
-
 export default {
-  components: { ATable },
   props: {
     groups: Array,
     users: Array,

@@ -408,11 +408,9 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-import ATable from '@/components/ui/ATable.vue';
 
 export default {
   components: {
-    ATable,
     appDialog,
   },
   data() {
