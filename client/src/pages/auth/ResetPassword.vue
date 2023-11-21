@@ -4,15 +4,15 @@
       <v-card class="pa-5">
         <h1>New password</h1>
         <p>Set a new password for {{ this.email }}</p>
-        <v-form @submit.prevent="submit">
-          <v-text-field
+        <a-form @submit.prevent="submit">
+          <a-text-field
             v-model="newPassword"
             label="Password"
             :type="passwordInputType"
             :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append="showPasswords = !showPasswords"
           />
-          <v-text-field
+          <a-text-field
             v-model="newPasswordConfirmation"
             label="Password confirmation"
             :type="passwordInputType"
@@ -22,7 +22,7 @@
           <div class="d-flex justify-end">
             <v-btn type="submit" color="primary">Set password</v-btn>
           </div>
-        </v-form>
+        </a-form>
       </v-card>
       <transition name="fade">
         <app-feedback v-if="status" class="mt-5" @closed="status = {}" :type="status.type">{{

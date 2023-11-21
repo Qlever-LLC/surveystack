@@ -27,24 +27,24 @@
             <v-col>
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
-                  <v-switch
-                    :input-value="!excludeMeta"
-                    @change="$emit('excludeMetaChange', $event)"
+                  <a-switch
+                    :value="!excludeMeta"
+                    @input="$emit('excludeMetaChange', $event)"
                     label="Show metadata"
                     class="mt-2"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="archived"
-                    @change="$emit('showArchived', $event)"
+                  />
+                  <a-switch
+                    :value="archived"
+                    @input="$emit('showArchived', $event)"
                     label="View archived only"
                     class="mt-2 ml-5"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="isExpandMatrix"
-                    @change="isExpandMatrix = $event"
+                  />
+                  <a-switch
+                    :value="isExpandMatrix"
+                    @input="isExpandMatrix = $event"
                     label="Expand matrix questions"
                     class="mt-2 ml-5"
-                  ></v-switch>
+                  />
                 </div>
                 <div class="d-flex align-center" v-if="selected.length > 0">
                   <div>

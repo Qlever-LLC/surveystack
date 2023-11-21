@@ -56,7 +56,7 @@ const base = () => ({
           .map((f) => ({
             label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
             value: {
-              archived: f.archived !== null,
+              archived: f.archived,
               farmName: f.instanceName,
               url: f.instanceName,
               name: f.name.trim(),
@@ -140,7 +140,7 @@ const base = () => ({
                 url: asset.instanceName,
                 name: asset.name.trim(),
                 id: asset.id,
-                archived: asset.archived !== null,
+                archived: asset.archived,
                 location,
               },
             };
