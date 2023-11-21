@@ -3,7 +3,7 @@
     <v-card-title class="d-block pb-0">
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
-        <v-spacer />
+        <a-spacer />
         <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
@@ -23,7 +23,7 @@
               <v-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
             </v-card-text>
             <v-card-actions class="mr-3">
-              <v-spacer />
+              <a-spacer />
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
@@ -43,7 +43,7 @@
               />
             </v-card-text>
             <v-card-actions class="mr-3">
-              <v-spacer />
+              <a-spacer />
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>

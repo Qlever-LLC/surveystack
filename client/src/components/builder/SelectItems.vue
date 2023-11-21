@@ -41,7 +41,7 @@
       <a-divider />
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>

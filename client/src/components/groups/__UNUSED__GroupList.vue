@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>
         {{ title }}
-        <v-spacer />
+        <a-spacer />
         <v-btn color="primary" class="ml-4" :to="{ name: 'groups-new', query: { dir: dir } }" text>New...</v-btn>
       </v-card-title>
       <v-card-text>

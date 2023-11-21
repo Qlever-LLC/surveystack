@@ -62,7 +62,7 @@
         <v-card-title> Delete Membership </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="dialogRemoval = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="remove"> Delete </v-btn>
         </v-card-actions>
@@ -76,7 +76,7 @@
           An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
         </v-card-actions>
       </v-card>

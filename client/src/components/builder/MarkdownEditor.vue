@@ -80,7 +80,7 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
@@ -90,6 +90,7 @@
 
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
+
 import MarkdownIt from 'markdown-it';
 
 const md = new MarkdownIt({ linkify: true });

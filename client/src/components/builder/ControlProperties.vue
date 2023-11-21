@@ -215,7 +215,7 @@
       />
 
       <!-- Control options -->
-      <v-spacer></v-spacer>
+      <a-spacer />
       <checkbox
         v-if="hasRequiredOption"
         label="Required"
@@ -299,7 +299,7 @@
         advanced
       </v-btn>
       <div v-else class="extra-options">
-        <v-spacer></v-spacer>
+        <a-spacer />
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
           <v-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</v-icon>
@@ -365,7 +365,7 @@
           Print Layout
         </v-btn>
         <div v-else class="extra-options">
-          <v-spacer></v-spacer>
+          <a-spacer />
           <div>
             <v-card-title class="px-0 py-0">Print Layout</v-card-title>
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
@@ -447,7 +447,7 @@
         </div>
       </template>
 
-      <v-spacer></v-spacer>
+      <a-spacer />
     </a-form>
   </div>
 </template>

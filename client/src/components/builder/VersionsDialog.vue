@@ -73,7 +73,7 @@
       </v-card-text>
       <a-divider />
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn
           v-if="compareRevisions.length > 0"
           :disabled="compareRevisions.length === 1"

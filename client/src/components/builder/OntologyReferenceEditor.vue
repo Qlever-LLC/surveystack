@@ -35,9 +35,9 @@
         />
       </template>
     </v-card-text>
-    <v-spacer />
+    <a-spacer />
     <v-card-actions>
-      <v-spacer />
+      <a-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
       <v-tooltip top :disabled="!!path">
         <template v-slot:activator="{ on }">

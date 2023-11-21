@@ -16,7 +16,7 @@
         />
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn text @click="$emit('cancel')">Cancel</v-btn>
         <v-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
       </v-card-actions>

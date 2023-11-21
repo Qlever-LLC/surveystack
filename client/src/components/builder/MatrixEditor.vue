@@ -71,7 +71,7 @@
                     >
                       <v-icon>mdi-arrow-right</v-icon>
                     </v-btn>
-                    <v-spacer />
+                    <a-spacer />
                     <v-btn icon @click="deleteColumn(i)" tabindex="-1" small>
                       <v-icon>mdi-trash-can-outline</v-icon>
                     </v-btn>
@@ -245,7 +245,7 @@
           </draggable>
         </div>
       </v-card-text>
-      <v-spacer />
+      <a-spacer />
       <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
         <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
       </v-card-actions>

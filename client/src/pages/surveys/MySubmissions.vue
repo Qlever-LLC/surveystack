@@ -2,7 +2,7 @@
   <div class="background wrapper">
     <v-container>
       <v-row class="my-2">
-        <v-spacer />
+        <a-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
           <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
@@ -65,7 +65,7 @@
                   </v-list-item>
                 </template>
 
-                <v-spacer class="flex-grow-1" />
+                <a-spacer class="flex-grow-1" />
                 <v-card-actions>
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>

@@ -96,7 +96,7 @@
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>

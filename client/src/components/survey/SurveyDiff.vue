@@ -19,7 +19,7 @@
           <span>{{ tooltip }}</span>
         </v-tooltip>
 
-        <v-spacer />
+        <a-spacer />
         <a-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"

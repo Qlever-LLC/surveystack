@@ -2,7 +2,7 @@
   <v-card style="height: 90vh" color="grey darken-3">
     <v-container>
       <v-row dark>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <a-select
           engineering="autocomplete"
           style="max-width: 800px"
