@@ -22,29 +22,29 @@
       hide-default-footer
     >
       <template v-slot:top>
-        <v-toolbar flat class="my-5">
+        <a-toolbar flat class="my-5" cssBackgroundCream>
           <v-row>
             <v-col>
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
-                  <v-switch
-                    :input-value="!excludeMeta"
-                    @change="$emit('excludeMetaChange', $event)"
+                  <a-switch
+                    :value="!excludeMeta"
+                    @input="$emit('excludeMetaChange', $event)"
                     label="Show metadata"
                     class="mt-2"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="archived"
-                    @change="$emit('showArchived', $event)"
+                  />
+                  <a-switch
+                    :value="archived"
+                    @input="$emit('showArchived', $event)"
                     label="View archived only"
                     class="mt-2 ml-5"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="isExpandMatrix"
-                    @change="isExpandMatrix = $event"
+                  />
+                  <a-switch
+                    :value="isExpandMatrix"
+                    @input="isExpandMatrix = $event"
                     label="Expand matrix questions"
                     class="mt-2 ml-5"
-                  ></v-switch>
+                  />
                 </div>
                 <div class="d-flex align-center" v-if="selected.length > 0">
                   <div>
@@ -94,12 +94,12 @@
               </div>
             </v-col>
           </v-row>
-        </v-toolbar>
+        </a-toolbar>
       </template>
 
       <template v-slot:header.data-table-select="{ props }">
-        <v-checkbox
-          :value="selected.length === selectableItems.length"
+        <a-checkbox
+          :selected-item="selected.length === selectableItems.length"
           :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
           @click="toggleSelectAllItems"
           color="#777"
@@ -124,7 +124,7 @@
       <template v-slot:item="{ item, index, isSelected, select }">
         <tr :key="item._id">
           <td :class="{ 'expand-cell': isExpandMatrix }">
-            <v-checkbox
+            <a-checkbox
               :value="isSelected"
               :disabled="!isSelectable(item)"
               @click="select(!isSelected)"
@@ -196,9 +196,9 @@
       </v-card>
     </v-dialog>
 
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
+    </a-alert>
   </v-card>
 </template>
 <script>
@@ -544,9 +544,6 @@ export default {
 </script>
 
 <style scoped>
->>> .v-toolbar__content {
-  background: #f5f5f5 !important;
-}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;

@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         ref="anchorRef"
         v-on="on"
         v-bind="attrs"
@@ -67,7 +67,7 @@
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
             <v-list class="resource-panel">
-              <v-subheader class="px-2 py-0">Click to insert </v-subheader>
+              <a-list-subheader class="px-2 py-0" cssSticky>Click to insert </a-list-subheader>
 
               <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
                 <v-list-item-content>
@@ -80,7 +80,7 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </v-card-actions>
@@ -90,6 +90,7 @@
 
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
+
 import MarkdownIt from 'markdown-it';
 
 const md = new MarkdownIt({ linkify: true });
@@ -103,6 +104,7 @@ export default {
     disabled: { type: Boolean },
     resources: { type: Array, default: () => [] },
   },
+
   data() {
     return {
       open: false,
@@ -351,15 +353,5 @@ export default {
 
 >>> .resource-panel > * {
   border-bottom: 1px solid #eee;
-}
-
->>> .resource-panel .v-subheader {
-  position: sticky;
-  top: 0;
-  background: white;
-  border-bottom: 2px solid #ddd;
-  font-weight: 600;
-  font-size: 1rem;
-  z-index: 1;
 }
 </style>
