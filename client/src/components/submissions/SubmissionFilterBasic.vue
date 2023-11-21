@@ -1,8 +1,9 @@
 <template>
   <div>
-    <v-autocomplete :items="fieldItems" label="Field" v-model="selectedField" hide-details />
-    <v-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
-    <v-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
+    <a-select engineering="autocomplete" :items="fieldItems" label="Field" v-model="selectedField" hide-details />
+    <a-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
+    <!-- TODO in Vue3 remove .native -->
+    <a-text-field label="Value" v-model="selectedValue" @keyup.native.enter="add" />
 
     <div class="d-flex justify-end">
       <v-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</v-btn>
@@ -11,7 +12,7 @@
     </div>
 
     <v-card outlined v-if="filters.length > 0">
-      <v-list dense>
+      <a-list dense>
         <v-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
           <v-list-item-content>
             <div>
@@ -26,7 +27,7 @@
             </v-btn>
           </v-list-item-action>
         </v-list-item>
-      </v-list>
+      </a-list>
     </v-card>
   </div>
 </template>
@@ -43,6 +44,7 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
       selectedField: null,

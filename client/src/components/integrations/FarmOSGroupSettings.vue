@@ -14,7 +14,7 @@
       <v-card-title>Super Admin</v-card-title>
       <v-card-text>
         <div class="d-flex flex-grow-1">
-          <v-text-field
+          <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
             outlined
             v-model="seats"
@@ -23,7 +23,8 @@
             @change="$emit('seatsChanged', seats)"
           />
 
-          <v-autocomplete
+          <a-select
+            engineering="autocomplete"
             outlined
             class="flex-grow-1 flex-shrink-0"
             label="Select FarmOS Plans for Group"
@@ -35,8 +36,7 @@
             :item-value="(p) => p._id"
             small-chips
             :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          >
-          </v-autocomplete>
+          />
         </div>
         <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
       </v-card-text>
@@ -95,7 +95,7 @@
     </div>
 
     <div class="search">
-      <v-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search"></v-text-field>
+      <a-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search" />
     </div>
     <FarmOSGroupTable
       :members="filteredMembers"

@@ -21,7 +21,7 @@
       </v-card-text>
 
       <v-card-actions class="mr-3">
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('input', false)" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
