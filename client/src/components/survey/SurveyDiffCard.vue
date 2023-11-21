@@ -15,13 +15,13 @@
           :chip-color="diffInfo.color"
           class="ml-3 align-self-center"
         />
-        <v-spacer />
+        <a-spacer />
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
         </v-icon>
       </v-row>
     </button>
-    <v-simple-table v-if="isOpen" fixed-header dense class="mb-4">
+    <a-table v-if="isOpen" fixed-header dense class="mb-4">
       <template v-slot:default>
         <thead>
           <tr>
@@ -74,7 +74,7 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
     <slot></slot>
     <a-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
       Selecting your Version of this question is not possible because the new

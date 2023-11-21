@@ -1,43 +1,43 @@
 <template>
-  <v-sheet outlined class="pa-8">
+  <a-sheet outlined class="pa-8">
     <div class="display-1">
       KML Importer
-      <app-tooltip
-        >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz
-        first.</app-tooltip
-      >
+      <a-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon color="primary" dark v-bind="attrs" v-on="on">mdi-information</v-icon>
+        </template>
+        <span>
+          Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz first.
+        </span>
+      </a-tooltip>
     </div>
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 
     <v-row>
-      <v-file-input label="Upload KML file" @change="getFile"></v-file-input>
+      <a-file-input label="Upload KML file" @change="getFile" />
     </v-row>
     <template v-if="kml !== ''">
       <v-row>
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           v-model="field"
           :items="fields"
           outlined
           label="Select Field"
           @change="selected"
-        ></v-autocomplete>
+        />
       </v-row>
       <v-row class="text-center">
         <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
       </v-row>
     </template>
-  </v-sheet>
+  </a-sheet>
 </template>
 <script>
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
-import appTooltip from '@/components/ui/Tooltip.vue';
-
 export default {
-  components: {
-    appTooltip,
-  },
   props: ['value'],
   data() {
     return {

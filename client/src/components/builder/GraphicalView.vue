@@ -58,7 +58,7 @@
           >
             <v-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</v-icon>
           </v-btn>
-          <v-chip
+          <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
@@ -86,7 +86,7 @@
               mdi-refresh
             </v-icon>
             Version {{ el.libraryVersion }}
-          </v-chip>
+          </a-chip>
           <v-btn
             icon
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
@@ -169,7 +169,7 @@
         <v-card-title> Delete Question </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>

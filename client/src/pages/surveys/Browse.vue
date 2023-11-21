@@ -1,16 +1,16 @@
 <template>
   <div class="wrapper">
     <v-container>
-      <v-tabs v-model="activeTab" fixed-tabs>
-        <v-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
+      <a-tabs v-model="activeTab" fixed-tabs>
+        <a-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
           <span v-if="tab.name === 'active-group'" class="text-no-wrap">
             {{ activeGroupName }}
           </span>
           <span v-else class="text-no-wrap">
             {{ tab.label }}
           </span>
-        </v-tab>
-      </v-tabs>
+        </a-tab>
+      </a-tabs>
       <v-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
         <v-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
@@ -28,7 +28,7 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
-            <v-divider v-if="i < pinnedSurveys.length - 1" />
+            <a-divider v-if="i < pinnedSurveys.length - 1" />
           </div>
         </v-card-text>
       </v-card>
@@ -37,7 +37,7 @@
         <v-card-title> </v-card-title>
         <v-card-text class="flex-grow-1">
           <div class="px-5 py-2">
-            <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+            <a-text-field v-model="search" label="Search" prepend-icon="mdi-magnify" />
             <div class="d-flex justify-end mb-4">
               <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
             </div>
@@ -83,7 +83,7 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
-            <v-divider v-if="i < surveys.content.length - 1" />
+            <a-divider v-if="i < surveys.content.length - 1" />
           </div>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </v-card-text>

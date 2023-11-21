@@ -1,5 +1,5 @@
 <template>
-  <v-select
+  <a-select
     label="Resource"
     :placeholder="placeholder"
     :value="value"
