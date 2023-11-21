@@ -28,9 +28,9 @@
         >
           <template v-slot:default="{ active }">
             <v-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
-              <v-checkbox
+              <a-checkbox
                 v-if="control.options.hasMultipleSelections"
-                :input-value="active"
+                :value="active"
                 :true-value="hashItem(item)"
                 color="focus"
               />

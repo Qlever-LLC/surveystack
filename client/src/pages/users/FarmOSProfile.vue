@@ -36,7 +36,7 @@
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
             <a-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details />
-            <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
+            <a-checkbox v-model="userIsOwner" label="this user will be an owner too" />
           </div>
           <a-alert
             v-if="errorDialogMessage"

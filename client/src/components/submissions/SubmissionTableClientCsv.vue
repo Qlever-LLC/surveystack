@@ -98,8 +98,8 @@
       </template>
 
       <template v-slot:header.data-table-select="{ props }">
-        <v-checkbox
-          :value="selected.length === selectableItems.length"
+        <a-checkbox
+          :selected-item="selected.length === selectableItems.length"
           :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
           @click="toggleSelectAllItems"
           color="#777"
@@ -124,7 +124,7 @@
       <template v-slot:item="{ item, index, isSelected, select }">
         <tr :key="item._id">
           <td :class="{ 'expand-cell': isExpandMatrix }">
-            <v-checkbox
+            <a-checkbox
               :value="isSelected"
               :disabled="!isSelectable(item)"
               @click="select(!isSelected)"

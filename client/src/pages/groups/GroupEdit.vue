@@ -72,7 +72,7 @@
             :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
           />
           <div class="d-flex align-center mt-6">
-            <v-checkbox
+            <a-checkbox
               label="Invitation Only"
               v-model="entity.meta.invitationOnly"
               :hint="
@@ -90,7 +90,7 @@
               </v-btn>
             </div>
           </div>
-          <v-checkbox label="Archived" v-model="entity.meta.archived" />
+          <a-checkbox label="Archived" v-model="entity.meta.archived" />
           <div class="d-flex justify-end pa-2">
             <v-btn text @click="cancel">Cancel</v-btn>
             <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>

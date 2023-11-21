@@ -23,7 +23,7 @@
     <v-row>
       <v-col>
         <div class="d-flex justify-end">
-          <v-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
+          <a-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
         </div>
         <app-basic-list
           :editable="editable"

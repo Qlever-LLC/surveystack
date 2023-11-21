@@ -45,9 +45,9 @@
               >
             </div>
             <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
-              <v-checkbox
+              <a-checkbox
                 v-model="selectedVersionsToDelete"
-                :value="String(revision.version)"
+                :selected-item="String(revision.version)"
                 hide-details
                 title="Delete version"
                 class="mt-0"

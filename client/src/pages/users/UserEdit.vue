@@ -51,7 +51,7 @@
             persistent-hint
           />
 
-          <v-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
+          <a-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
 
           <div class="d-flex mt-2 justify-end">
             <v-btn text @click="cancel">Cancel</v-btn>

@@ -148,17 +148,19 @@
         :items="control.options.farmOsTypes"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
-      <checkbox
+      <a-checkbox
         v-if="control.type === 'ontology'"
-        class="ml-2"
+        class="ml-2 align-center align-self-start"
+        color="grey darken-1"
         label="Multiple select"
         v-model="control.options.hasMultipleSelections"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         dense
       />
-      <checkbox
+      <a-checkbox
         v-if="isSelect || isOntology"
-        class="ml-2"
+        class="ml-2 align-center align-self-start"
+        color="grey darken-1"
         label="Allow custom answer"
         v-model="control.options.allowCustomSelection"
         @input="
@@ -174,10 +176,11 @@
           Allows the user to input answers that do not exist within the provided items.
           <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
         </template>
-      </checkbox>
-      <checkbox
+      </a-checkbox>
+      <a-checkbox
         v-if="isOntology"
-        class="ml-2"
+        class="ml-2 align-center align-self-start"
+        color="grey darken-1"
         label="Autocomplete"
         v-model="control.options.allowAutocomplete"
         :disabled="
@@ -216,74 +219,96 @@
 
       <!-- Control options -->
       <a-spacer />
-      <checkbox
+      <a-checkbox
         v-if="hasRequiredOption"
         label="Required"
         v-model="control.options.required"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         helper-text="Make this a required field"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         label="Private"
         v-model="control.options.redacted"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         helper-text="Only admins and original submitters can see this field"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="isPage"
         label="Compact"
         v-model="control.options.compact"
         helper-text="Reduce the spaces and combine fields into one card"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="isText"
         label="QR Code"
         v-model="control.options.enableQr"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         label="Allow modify"
         v-model="control.options.allowModify"
         helper-text="Allow users of this question set to modify this question"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         label="Allow hide"
         v-model="control.options.allowHide"
         helper-text="Allow users of this question set to hide this question"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="control.libraryId && control.options.allowHide"
         label="Hidden"
         v-model="control.options.hidden"
         helper-text="Submitters can not see this field. This option is intentionally allowed by the question set designer"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="control.type === 'farmOsPlanting' || control.type === 'farmOsFarm' || control.type === 'farmOsField'"
         label="Multiple select"
         v-model="control.options.hasMultipleSelections"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="isFile"
         label="Multiple upload"
         v-model="control.options.source.allowMultiple"
         helper-text="Allow user to upload multiple files"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
-      <checkbox
+      <a-checkbox
         v-if="control.type === 'script'"
         label="Native Script"
         v-model="control.options.isNativeScript"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         helper-text="Show Download Link for Surveystack Kit APK"
+        color="grey darken-1"
+        class="align-center align-self-start"
       />
       <template v-if="isGeoJSON">
-        <checkbox
+        <a-checkbox
           v-for="opt in geoJsonOptions"
           :key="opt.key"
           :label="opt.text"
           v-model="control.options.geoJSON[opt.key]"
+          color="grey darken-1"
+          class="align-center align-self-start"
         />
       </template>
 
@@ -306,19 +331,23 @@
         </div>
 
         <div>
-          <checkbox
+          <a-checkbox
             label="Relevance Expression"
             v-model="relevance.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            color="grey darken-1"
+            class="align-center align-self-start"
           />
           <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
         </div>
 
         <div v-if="isText || isNumber || isDate || isMatrix || isOntology || isSelect">
-          <checkbox
+          <a-checkbox
             label="Initialize Expression"
             v-model="initialize.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            color="grey darken-1"
+            class="align-center align-self-start"
           />
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-initialize')" size="20">
             mdi-open-in-new
@@ -327,20 +356,24 @@
 
         <!-- TODO not implemented yet - decide to implement or remove-->
         <!--div>
-          <checkbox
+          <a-checkbox
             label="Calculate Expression"
             v-model="calculate.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            color="grey darken-1"
+            class="align-center align-self-start"
           />
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
             mdi-open-in-new
           </v-icon>
         </div-->
         <!--div>
-          <checkbox
+          <a-checkbox
             label="Constraint Expression"
             v-model="constraint.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            color="grey darken-1"
+            class="align-center align-self-start"
           />
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
             mdi-open-in-new
@@ -348,10 +381,12 @@
         </div-->
 
         <div>
-          <checkbox
+          <a-checkbox
             label="Api Compose Expression"
             v-model="apiCompose.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            color="grey darken-1"
+            class="align-center align-self-start"
           />
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')" size="20">
             mdi-open-in-new
@@ -372,37 +407,45 @@
           </div>
 
           <div v-if="isMatrix">
-            <checkbox
+            <a-checkbox
               label="Table format"
               v-model="control.options.printLayout.table"
               helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
+              color="grey darken-1"
+              class="align-center align-self-start"
             />
           </div>
 
           <div v-if="isFile">
-            <checkbox
+            <a-checkbox
               label="Show preview"
               v-model="control.options.printLayout.preview"
               helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
+              color="grey darken-1"
+              class="align-center align-self-start"
             />
           </div>
 
           <template v-if="isSelect || isOntology">
             <div>Blank Survey (from title page)</div>
             <div class="mt-2">
-              <checkbox
+              <a-checkbox
                 label="Show all resource list options"
                 v-model="control.options.printLayout.showAllOptionsPrintable"
                 helper-text="Show the complete list of possible options when printing a fresh survey"
+                color="grey darken-1"
+                class="align-center align-self-start"
               />
             </div>
 
             <div>Filled Submission</div>
             <div class="mt-2">
-              <checkbox
+              <a-checkbox
                 label="Show all resource list options"
                 v-model="control.options.printLayout.showAllOptions"
                 helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
+                color="grey darken-1"
+                class="align-center align-self-start"
               />
             </div>
 
@@ -462,8 +505,8 @@ import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/ui/Checkbox.vue';
 import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
+
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
@@ -478,7 +521,7 @@ export default {
     InstructionsImageSplitEditor,
     Ontology,
     Date,
-    Checkbox,
+
     MarkdownEditor,
   },
   props: {

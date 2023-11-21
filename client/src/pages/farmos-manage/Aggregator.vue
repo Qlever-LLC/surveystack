@@ -117,7 +117,7 @@
           :items="users"
         />
 
-        <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
+        <a-checkbox v-model="owner" label="owner" class="mx-6" />
 
         <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
       </div>

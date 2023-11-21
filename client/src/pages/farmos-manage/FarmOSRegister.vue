@@ -196,13 +196,11 @@
         >To show new members in the dropdown, please press refresh.</app-dialog
       >
 
-      <v-checkbox
+      <a-checkbox
         :rules="agreeRules"
         v-model="localViewModel.form.agree"
         label="Agree to Terms of Serviceand  Privacy Policy of Farmos"
-      >
-        <template v-slot:label></template>
-      </v-checkbox>
+      />
       <div class="text-left mb-4">
         Visit
         <a href="https://farmier.com/terms" target="blank">Terms of Service</a>

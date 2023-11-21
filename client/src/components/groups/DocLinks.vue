@@ -46,11 +46,11 @@
       <v-card>
         <v-card-title> Remove Documentation </v-card-title>
         <v-card-text class="mt-4">
-          <v-checkbox
+          <a-checkbox
             v-model="removeFromDescendants"
             label="Also remove this documentation link from all descendant groups"
             hide-details
-          ></v-checkbox>
+          />
         </v-card-text>
         <v-card-text class="mt-4"> Are you sure you want to remove this documentation link? </v-card-text>
         <v-card-actions>
@@ -70,11 +70,11 @@
 
             <a-text-field class="mt-3" v-model="newDoc.link" label="Link" outlined required :rules="linkRules" />
 
-            <v-checkbox
+            <a-checkbox
               v-model="addToDescendants"
               label="Also add this documentation link to all descendant groups"
               hide-details
-            ></v-checkbox>
+            />
           </a-form>
         </v-card-text>
         <v-card-actions>
