@@ -49,7 +49,6 @@
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
-import AAlert from '@/components/ui/AAlert.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -58,7 +57,6 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
-  components: { AAlert },
   data() {
     return {
       status: '',

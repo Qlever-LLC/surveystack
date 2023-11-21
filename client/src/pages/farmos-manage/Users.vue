@@ -101,10 +101,7 @@
 </template>
 
 <script>
-import AAlert from '@/components/ui/AAlert.vue';
-
 export default {
-  components: { AAlert },
   props: {
     groups: Array,
     mappings: Object,

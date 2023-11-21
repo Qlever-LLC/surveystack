@@ -49,10 +49,8 @@ import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
-import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
-  components: { AAlert },
   data() {
     return {
       mappings: null,

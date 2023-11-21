@@ -274,7 +274,6 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
-import AAlert from '@/components/ui/AAlert.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -309,7 +308,6 @@ const tabMap = ['relevance', 'initialize', 'calculate', 'constraint', 'apiCompos
 export default {
   mixins: [appMixin],
   components: {
-    AAlert,
     UpdateLibraryDialog,
     Splitpanes,
     Pane,

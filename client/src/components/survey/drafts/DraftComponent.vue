@@ -124,11 +124,9 @@ import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 import { queueAction } from '@/utils/surveyStack';
-import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
   components: {
-    AAlert,
     appControl,
     appDraftFooter,
     appDraftOverview,

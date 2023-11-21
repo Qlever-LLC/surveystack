@@ -153,14 +153,12 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
-import AAlert from '@/components/ui/AAlert.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   mixins: [ResultMixin],
   components: {
-    AAlert,
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,

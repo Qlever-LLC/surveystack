@@ -111,10 +111,9 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
-import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
-  components: { AAlert, SurveyDiffDialog },
+  components: { SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

@@ -4,7 +4,6 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isOnline } from '@/utils/surveyStack';
-import AAlert from '@/components/ui/AAlert.vue';
 
 const requestWakeLock = async () => {
   try {
@@ -41,7 +40,6 @@ const geoJsonFromPosition = ({ coords }) => ({
 export default {
   mixins: [baseQuestionComponent],
   components: {
-    AAlert,
     AppGps,
   },
   data() {

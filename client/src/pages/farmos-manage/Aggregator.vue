@@ -236,10 +236,8 @@
 
 <script>
 import _ from 'lodash';
-import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
-  components: { AAlert },
   emits: ['addSuperAdminNote'],
 
   props: {

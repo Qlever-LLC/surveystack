@@ -35,10 +35,8 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
-import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
-  components: { AAlert },
   data() {
     return {
       initialized: false,

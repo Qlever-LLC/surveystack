@@ -23,10 +23,8 @@
 
 <script>
 import api from '@/services/api.service';
-import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
-  components: { AAlert },
   data() {
     return {
       status: { type: '' },

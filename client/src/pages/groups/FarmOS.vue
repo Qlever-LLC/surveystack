@@ -146,14 +146,12 @@ import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemove
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
-import AAlert from '@/components/ui/AAlert.vue';
 
 export default {
   props: {
     id: String,
   },
   components: {
-    AAlert,
     FarmOSGroupSettings,
     FarmOSConnectDialog,
     FarmOSCreateDialog,
