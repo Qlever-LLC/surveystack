@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-menu
+    <a-menu
       left
       attach="#app-menu"
       offset-y
@@ -13,7 +13,7 @@
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>
-      <v-list flat>
+      <a-list flat>
         <v-list-item link :to="{ name: 'auth-profile' }">
           <v-list-item-icon>
             <v-icon>mdi-account-circle</v-icon>
@@ -26,21 +26,21 @@
           </v-list-item-icon>
           <v-list-item-title> FarmOS Profile </v-list-item-title>
         </v-list-item>
-        <v-divider />
+        <a-divider />
         <v-subheader>Active Group</v-subheader>
         <active-group-selector-list v-model="activeGroup" />
-        <v-divider />
+        <a-divider />
         <v-list-item link @click="logout" class="mt-2">
           <v-list-item-icon>
             <v-icon>mdi-logout-variant</v-icon>
           </v-list-item-icon>
           <v-list-item-title> Sign Out </v-list-item-title>
         </v-list-item>
-      </v-list>
+      </a-list>
 
       <!-- </v-card-text> -->
       <!-- </v-card> -->
-    </v-menu>
+    </a-menu>
 
     <v-btn v-else :to="{ name: 'auth-login' }" text>
       <v-icon>mdi-login-variant</v-icon>

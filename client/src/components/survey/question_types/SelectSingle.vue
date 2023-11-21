@@ -10,38 +10,46 @@
     />
     <app-control-hint :value="control.hint" />
     <div class="py-2">
-      <v-radio-group
+      <a-radio-group
         :value="Array.isArray(value) ? value[0] : value"
-        @change="onChange"
+        @input="onChange"
         v-if="sourceIsValid"
         class="mt-0"
         data-test-id="radio-group"
         hide-details
       >
-        <v-radio v-for="item in filteredSource" :label="item.label" :value="item.value" :key="item.key" color="focus" />
-        <v-radio
-          :value="customSelection || 'other'"
-          v-if="control.options.allowCustomSelection"
-          class="mt-1"
-          @change="customSelection = customSelection || 'other'"
-          data-test-id="custom-input-radio"
-          color="focus"
-        >
-          <template v-slot:label>
-            <v-text-field
-              class="text-field-other"
-              :value="customSelection"
-              @input="handleCustomSelectionInput"
-              data-test-id="custom-input"
-              hide-details
-              outlined
-              dense
-              label="other"
-              color="focus"
-            />
-          </template>
-        </v-radio>
-      </v-radio-group>
+        <template>
+          <a-radio
+            v-for="(item, index) in filteredSource"
+            :label="item.label"
+            :value="item.value"
+            :key="index"
+            color="focus"
+          />
+          <a-radio
+            :value="customSelection || 'other'"
+            v-if="control.options.allowCustomSelection"
+            class="mt-1"
+            @change="customSelection = customSelection || 'other'"
+            data-test-id="custom-input-radio"
+            color="focus"
+          >
+            <template v-slot:label>
+              <v-text-field
+                class="text-field-other"
+                :value="customSelection"
+                @input="handleCustomSelectionInput"
+                data-test-id="custom-input"
+                hide-details
+                outlined
+                dense
+                label="other"
+                color="focus"
+              />
+            </template>
+          </a-radio>
+        </template>
+      </a-radio-group>
       <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     </div>
     <app-control-more-info :value="control.moreInfo" />

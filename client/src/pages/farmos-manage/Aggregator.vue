@@ -34,7 +34,7 @@
     </div>
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
-      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
+      <a-text-field v-model.trim="updatedNote" label="Note" hide-details />
       <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
     </div>
 
@@ -47,7 +47,7 @@
     </div>
 
     <template v-if="!!selectedInstance">
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
       <h2 ref="map-group">
         Group Mappings for
         <a-chip>{{ selectedInstance }}</a-chip>
@@ -93,7 +93,7 @@
         >No Group Mappings exist for {{ selectedInstance }}</v-alert
       >
 
-      <v-divider class="my-8"></v-divider>
+      <a-divider class="my-8" />
 
       <h2 ref="map-user">
         User Mappings for
@@ -247,6 +247,7 @@ export default {
     loading: Boolean,
     users: Array,
   },
+
   data() {
     return {
       selectedInstance: null,

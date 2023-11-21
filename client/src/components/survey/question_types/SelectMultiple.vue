@@ -33,7 +33,7 @@
           :disabled="!customValue"
           color="focus"
         />
-        <v-text-field
+        <a-text-field
           label="other"
           v-model="customValue"
           outlined
@@ -57,6 +57,7 @@ import { getValueOrNull } from '@/utils/surveyStack';
 
 export default {
   mixins: [baseQuestionComponent],
+
   data() {
     return {
       customSelection: 'other',

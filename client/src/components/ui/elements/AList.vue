@@ -1,0 +1,18 @@
+<template>
+  <v-list :flat="flat" :dense="dense" :two-line="twoLine" :subheader="subheader" :max-width="maxWidth">
+    <slot />
+  </v-list>
+</template>
+
+<script>
+export default {
+  name: 'AList',
+  props: {
+    flat: { type: Boolean, required: false },
+    dense: { type: Boolean, required: false },
+    twoLine: { type: Boolean, required: false },
+    subheader: { type: Boolean, required: false },
+    maxWidth: { type: [Number, String], required: false },
+  },
+};
+</script>
