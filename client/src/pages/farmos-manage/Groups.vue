@@ -118,7 +118,6 @@
 
 <script>
 export default {
-  ,
   props: {
     groups: Array,
     users: Array,

@@ -104,7 +104,6 @@
 
 <script>
 export default {
-  ,
   props: {
     groups: Array,
     mappings: Object,
