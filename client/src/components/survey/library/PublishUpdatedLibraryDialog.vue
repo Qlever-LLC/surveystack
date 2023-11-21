@@ -3,9 +3,9 @@
     <v-card>
       <v-card-title>
         Publish
-        <v-chip dark small color="green" class="mx-2">
+        <a-chip dark small color="green" class="mx-2">
           Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
-        </v-chip>
+        </a-chip>
         to Library
       </v-card-title>
       <v-card-text class="mt-5">

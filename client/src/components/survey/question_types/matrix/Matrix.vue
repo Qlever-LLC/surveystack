@@ -48,7 +48,7 @@
             <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-form autocomplete="off" @submit.prevent="">
+            <a-form autocomplete="off" @submit.prevent="">
               <div v-for="(header, idx) in headers" :key="header.value">
                 <div class="d-flex align-center">
                   <h4>{{ header.label }}</h4>
@@ -65,7 +65,7 @@
                   class="my-2"
                 />
               </div>
-            </v-form>
+            </a-form>
           </v-card-text>
           <v-card-actions class="d-flex justify-space-between">
             <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
@@ -111,7 +111,7 @@
         <app-required v-if="header.required" />
       </template>
       <template v-slot:row-cell="{ header, row, colIdx }">
-        <v-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
+        <a-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
           <app-matrix-cell
             :header="header"
             :item="row"
@@ -123,7 +123,7 @@
             class="mt-2"
             :loading="isFarmOsLoading"
           />
-        </v-form>
+        </a-form>
       </template>
       <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
         <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">

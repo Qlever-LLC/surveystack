@@ -4,10 +4,10 @@
       <v-card-text v-if="isLoading">
         <v-card-title> Hylo Integraton </v-card-title>
         <a-spacer />
-        <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
+        <a-skeleton-loader type="list-item-avatar, card-heading" />
       </v-card-text>
       <template v-else-if="integratedHyloGroup">
-        <v-img
+        <a-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
           height="250"
           :src="integratedHyloGroup.bannerUrl"
@@ -37,16 +37,11 @@
             </v-dialog>
           </v-app-bar>
           <a-spacer />
-          <!-- <v-col cols="4" sm="2" md="1"> -->
-          <!-- <v-avatar size="36px" class="mr-4">
-              <img alt="Avatar" :src="integratedHyloGroup.avatarUrl" />
-            </v-avatar> -->
-          <!-- </v-col> -->
 
           <v-card-title class="white--text mt-8">
-            <v-avatar size="56">
+            <a-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
-            </v-avatar>
+            </a-avatar>
             <v-col class="ml-3"
               ><p class="text-h5 mb-1">{{ integratedHyloGroup.name }}</p>
 
@@ -62,7 +57,7 @@
           </v-card-text>
 
           <!-- </v-col> -->
-        </v-img>
+        </a-img>
       </template>
 
       <template v-else>
@@ -81,14 +76,14 @@
 
               <v-card-text>
                 <div class="font-italic text-body-2 mb-4">Find an existing group on Hylo</div>
-                <v-text-field
+                <a-text-field
                   v-model="hyloGroupInput"
                   label="Hylo group"
                   placeholder="Link to your Hylo group"
                   :loading="isLoadingHyloGroup"
                   :error-messages="findError"
                   class="mb-2"
-                ></v-text-field>
+                />
                 <v-col align="center">
                   <v-btn
                     color="primary"
@@ -100,8 +95,9 @@
                   </v-btn>
                 </v-col>
                 <v-row align="center" class="my-5">
-                  <v-divider></v-divider><span class="mx-2">or</span><v-divider></v-divider
-                ></v-row>
+                  <a-divider /><span class="mx-2">or</span>
+                  <a-divider />
+                </v-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 

@@ -9,7 +9,7 @@
       </v-btn>
     </v-card-title>
 
-    <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+    <a-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
       <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
     </div>
@@ -36,9 +36,9 @@
                 <div>
                   <small class="grey--text">{{ c._id }}</small>
                 </div>
-                <v-chip dark small outlined color="grey" class="font-weight-medium mt-1">
+                <a-chip dark small outlined color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
-                </v-chip>
+                </a-chip>
               </v-col>
               <v-col align="right" md="auto">
                 <v-btn

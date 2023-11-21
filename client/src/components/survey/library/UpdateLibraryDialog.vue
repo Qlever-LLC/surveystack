@@ -3,9 +3,9 @@
     <v-card>
       <v-card-title>
         Update question set from Version
-        <v-chip dark small color="green" class="mx-2"> Version {{ libraryRootGroup.libraryVersion }} </v-chip>
+        <a-chip dark small color="green" class="mx-2"> Version {{ libraryRootGroup.libraryVersion }} </a-chip>
         to
-        <v-chip dark small color="green" class="mx-2"> Version {{ toSurvey.latestVersion }} </v-chip>
+        <a-chip dark small color="green" class="mx-2"> Version {{ toSurvey.latestVersion }} </a-chip>
       </v-card-title>
       <v-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>

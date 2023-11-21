@@ -1,17 +1,17 @@
 <template>
   <div class="property-panel">
     <v-card-title class="pl-0">Properties</v-card-title>
-    <v-form v-if="control">
+    <a-form v-if="control">
       <!-- Default properties -->
-      <v-text-field v-model="control.label" label="Label" hide-details />
-      <v-text-field
+      <a-text-field v-model="control.label" label="Label" hide-details />
+      <a-text-field
         v-model="control.name"
         label="Value"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         hide-details
       />
-      <v-text-field v-model="control.hint" label="Hint" hide-details />
+      <a-text-field v-model="control.hint" label="Hint" hide-details />
       <markdown-editor
         v-model="control.moreInfo"
         :resources="survey.resources"
@@ -24,14 +24,14 @@
       </markdown-editor>
 
       <!-- Control properties -->
-      <v-text-field
+      <a-text-field
         v-if="isText"
         v-model="control.defaultValue"
         @blur="handleDefaultValueTrim"
         label="Default value"
         hide-details
       />
-      <v-text-field
+      <a-text-field
         v-if="isNumber"
         type="number"
         v-model="control.defaultValue"
@@ -54,7 +54,7 @@
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />
-      <v-select
+      <a-select
         v-if="isDate"
         :items="dateTypes"
         label="Type"
@@ -78,7 +78,7 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
-      <v-text-field
+      <a-text-field
         v-if="isMatrix"
         v-model="control.options.source.config.addRowLabel"
         label="Add Row label"
@@ -95,7 +95,7 @@
         @set-control-required="control.options.required = true"
         class="mt-3"
       />
-      <v-select
+      <a-select
         v-if="this.control.type === 'file'"
         label="Restrict uploaded file types (.csv, .pdf, etc.)"
         v-model="control.options.source.types"
@@ -107,25 +107,27 @@
         deletable-chips
         hide-details
       />
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         v-if="isScript"
+        @change="handleScriptSourceChange"
+        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
+        @focus="handleScriptSourceFocus"
         label="Script Source"
         v-model="scriptSourceId"
         :items="scriptSourceItems"
         item-text="name"
         item-value="_id"
         append-outer-icon="mdi-open-in-new"
-        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
-        @focus="handleScriptSourceFocus"
-        @change="handleScriptSourceChange"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         hide-details
+        selectionSlot
       >
         <template v-slot:selection="{ item }">
           <div>{{ item.name }}</div>
         </template>
-      </v-autocomplete>
-      <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
+      </a-select>
+      <a-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea
         v-if="isScript"
@@ -137,7 +139,8 @@
         class="pt-3"
         hide-details
       />
-      <v-combobox
+      <a-select
+        engineering="combobox"
         v-if="isFarmOsUuid"
         label="FarmOS Type"
         v-model="control.options.farmOsType"
@@ -403,15 +406,18 @@
               />
             </div>
 
-            <v-select
+            <a-select
               label="Answer layout"
               v-model="control.options.printLayout.columns"
               :items="[1, 2, 3, 4, 5]"
               color="focus"
               :menu-props="{ contentClass: 'layout-select' }"
               hide-details
+              selectionSlot
+              itemSlot
+              appendOuterSlot
             >
-              <template v-slot:selection="{ item, index }">
+              <template v-slot:selection="{ item }">
                 {{ item === 1 ? '1 column' : `${item} columns` }}
               </template>
 
@@ -436,13 +442,13 @@
                   Set the number of items in a row
                 </v-tooltip>
               </template>
-            </v-select>
+            </a-select>
           </template>
         </div>
       </template>
 
       <a-spacer />
-    </v-form>
+    </a-form>
   </div>
 </template>
 <script>

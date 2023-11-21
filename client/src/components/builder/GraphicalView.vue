@@ -58,7 +58,7 @@
           >
             <v-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</v-icon>
           </v-btn>
-          <v-chip
+          <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
@@ -86,7 +86,7 @@
               mdi-refresh
             </v-icon>
             Version {{ el.libraryVersion }}
-          </v-chip>
+          </a-chip>
           <v-btn
             icon
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
