@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
       {{ alertMessage }}
-    </v-snackbar>
+    </a-snackbar>
     <app-control-label
       :value="control.label"
       :redacted="redacted"

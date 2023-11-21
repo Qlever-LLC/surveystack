@@ -79,10 +79,10 @@
       @reload-survey="onReloadSurvey"
     />
 
-    <v-snackbar v-model="showSnackbar" :timeout="4000">
+    <a-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
       <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
-    </v-snackbar>
+    </a-snackbar>
   </div>
   <div
     v-else

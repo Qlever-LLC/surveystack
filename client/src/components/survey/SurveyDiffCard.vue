@@ -76,13 +76,13 @@
       </template>
     </a-table>
     <slot></slot>
-    <v-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
       Selecting your Version of this question is not possible because the new
       {{ versionNameRemoteRevisionNew }} contains a required change.
       <template v-slot:action="{ attrs }">
         <v-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </v-btn>
       </template>
-    </v-snackbar>
+    </a-snackbar>
   </v-card>
 </template>
 
