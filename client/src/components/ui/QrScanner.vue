@@ -14,13 +14,13 @@
 
     <v-dialog v-model="isScannerOpen" fullscreen>
       <v-card>
-        <v-toolbar dark color="primary">
+        <a-toolbar dark color="primary">
           <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>QR Code Scanner</v-toolbar-title>
+          <a-toolbar-title>QR Code Scanner</a-toolbar-title>
           <a-spacer />
-        </v-toolbar>
+        </a-toolbar>
         <a-alert v-if="hasCameraError" border="left" border-color type="error" elevation="2">
           No camera detected.
         </a-alert>
@@ -52,7 +52,6 @@ QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { 
 
 export default defineComponent({
   emits: ['codeDetected'],
-
   props: {
     small: {
       type: Boolean,
