@@ -506,7 +506,7 @@ import InstructionsImageSplitEditor from '@/components/builder/InstructionsImage
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
+
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
@@ -521,7 +521,7 @@ export default {
     InstructionsImageSplitEditor,
     Ontology,
     Date,
-    ACheckbox,
+
     MarkdownEditor,
   },
   props: {

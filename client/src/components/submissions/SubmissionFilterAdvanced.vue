@@ -47,10 +47,7 @@
 </template>
 
 <script>
-import ACheckbox from '@/components/ui/ACheckbox.vue';
-
 export default {
-  components: { ACheckbox },
   props: {
     value: {
       type: Object,

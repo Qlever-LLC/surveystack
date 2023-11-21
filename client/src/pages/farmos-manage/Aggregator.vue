@@ -239,10 +239,8 @@
 
 <script>
 import _ from 'lodash';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
-  components: { ACheckbox },
   emits: ['addSuperAdminNote'],
 
   props: {

@@ -72,12 +72,10 @@
 import api from '@/services/api.service';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   name: 'Group',
   components: {
-    ACheckbox,
     appGroupBreadcrumbs,
     appBasicList,
   },

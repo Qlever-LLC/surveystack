@@ -94,12 +94,10 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
-    ACheckbox,
     draggable,
   },
   data() {

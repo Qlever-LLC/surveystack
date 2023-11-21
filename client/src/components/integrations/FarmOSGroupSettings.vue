@@ -109,11 +109,9 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   components: {
-    ACheckbox,
     FarmOSGroupTable,
   },
   props: {

@@ -33,11 +33,9 @@
 </template>
 
 <script>
-import ACheckbox from '@/components/ui/ACheckbox.vue';
-
 export default {
   name: 'survey-print-settings-dialog',
-  components: { ACheckbox },
+
   props: {
     value: {
       type: Boolean,

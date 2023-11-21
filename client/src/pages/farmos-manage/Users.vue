@@ -103,10 +103,7 @@
 </template>
 
 <script>
-import ACheckbox from '@/components/ui/ACheckbox.vue';
-
 export default {
-  components: { ACheckbox },
   props: {
     groups: Array,
     mappings: Object,

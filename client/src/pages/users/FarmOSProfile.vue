@@ -408,11 +408,9 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   components: {
-    ACheckbox,
     appDialog,
   },
   data() {

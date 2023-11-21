@@ -52,7 +52,6 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
@@ -160,7 +159,6 @@ const transform = (assets) => {
 };
 
 export default {
-  components: { ACheckbox },
   mixins: [baseQuestionComponent, farmosBase()],
 
   data() {

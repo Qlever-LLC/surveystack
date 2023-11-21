@@ -232,12 +232,10 @@ import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 
 import { timezones } from './timezones';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   props: ['viewModel'],
   components: {
-    ACheckbox,
     appDialog,
     appFieldCreator,
     appFieldList,

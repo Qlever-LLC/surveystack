@@ -24,11 +24,9 @@
 <script>
 import api from '@/services/api.service';
 import appBasicList from '@/components/ui/BasicList.vue';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
   components: {
-    ACheckbox,
     appBasicList,
   },
   data() {

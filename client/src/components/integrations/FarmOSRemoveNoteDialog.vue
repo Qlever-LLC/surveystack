@@ -27,10 +27,7 @@
 </template>
 
 <script>
-import ACheckbox from '@/components/ui/ACheckbox.vue';
-
 export default {
-  components: { ACheckbox },
   emits: ['addNote', 'cancelNote'],
   props: ['loading', 'value'],
 

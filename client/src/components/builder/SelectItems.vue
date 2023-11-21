@@ -50,14 +50,11 @@
 </template>
 
 <script>
-import ACheckbox from '@/components/ui/ACheckbox.vue';
-
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
-  components: { ACheckbox },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

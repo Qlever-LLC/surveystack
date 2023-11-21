@@ -272,7 +272,6 @@ import Draggable from 'vuedraggable';
 import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
@@ -303,7 +302,6 @@ export default {
     Draggable,
     Ontology,
     Date,
-    ACheckbox,
   },
   props: {
     value: {

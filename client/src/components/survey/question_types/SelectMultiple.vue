@@ -54,10 +54,8 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 
 import { getValueOrNull } from '@/utils/surveyStack';
-import ACheckbox from '@/components/ui/ACheckbox.vue';
 
 export default {
-  components: { ACheckbox },
   mixins: [baseQuestionComponent],
 
   data() {
