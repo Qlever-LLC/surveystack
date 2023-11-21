@@ -10,7 +10,7 @@
           label="Group"
           @input="setGroup"
         />
-        <v-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
+        <a-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
         <v-list>
           <a-list-item
             v-for="member in filteredMembers"
@@ -44,11 +44,9 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
-import AListItem from '@/components/ui/AListItem.vue';
+
 export default {
-  components: { AListItem, AListItemSubtitle, AListItemTitle, ActiveGroupSelector },
+  components: { ActiveGroupSelector },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
     fixedGroupId: {

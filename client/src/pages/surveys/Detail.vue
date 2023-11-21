@@ -37,7 +37,7 @@
           top
           left
         >
-          <v-list class="pa-0 mx-auto" max-width="260">
+          <a-list max-width="260">
             <a-list-item @click="startDraft(entity)">
               <v-list-item-content>
                 <a-list-item-title>Start survey</a-list-item-title>
@@ -54,7 +54,7 @@
                 </v-list-item-content>
               </v-list-item-content>
             </a-list-item>
-          </v-list>
+          </a-list>
         </btn-dropdown>
 
         <div class="my-3 d-flex justify-center">

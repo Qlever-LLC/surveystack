@@ -21,16 +21,16 @@
       @cancel="updateLibraryCancelled"
     />
 
-    <v-alert
+    <a-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
       text
       type="warning"
       color="orange"
       elevation="2"
-      dismissible
+      closable
     >
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
-    </v-alert>
+    </a-alert>
 
     <splitpanes class="pane-root" vertical>
       <pane class="pane pane-survey">
@@ -202,7 +202,7 @@
             :forceMobile="isPreviewMobile"
           >
             <template v-slot:toolbar-actions>
-              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+              <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
                   <v-icon right> mdi-monitor</v-icon>
@@ -212,7 +212,7 @@
                   <span class="hidden-sm-and-down">mobile</span>
                   <v-icon right> mdi-cellphone</v-icon>
                 </v-btn>
-              </v-btn-toggle>
+              </a-btn-toggle>
 
               <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>

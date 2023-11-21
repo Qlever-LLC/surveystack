@@ -4,9 +4,9 @@
       <v-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
       </v-card-title>
-      <v-divider></v-divider>
+      <a-divider />
       <v-card-text>
-        <v-list dense style="max-height: 500px" class="overflow-y-auto">
+        <a-list dense style="max-height: 500px" class="overflow-y-auto">
           <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
             <v-progress-circular :size="50" color="primary" indeterminate />
           </v-container>
@@ -18,11 +18,11 @@
               </v-list-item-content>
             </a-list-item>
           </template>
-        </v-list>
+        </a-list>
       </v-card-text>
-      <v-divider></v-divider>
+      <a-divider />
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
@@ -31,12 +31,9 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: { AListItemTitle, AListItem },
   props: {
     value: {
       type: Boolean,

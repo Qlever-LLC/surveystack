@@ -4,6 +4,7 @@ import Vuetify from 'vuetify';
 import FileComp from './File.vue';
 import { Blob } from 'buffer';
 import store from '@/store';
+import { localVue } from '@/../tests/renderWithVuetify';
 
 const vuetify = new Vuetify();
 
@@ -31,6 +32,7 @@ function getMountOpts(opts = {}) {
     },
     vuetify,
     store: store,
+    localVue,
   };
 }
 

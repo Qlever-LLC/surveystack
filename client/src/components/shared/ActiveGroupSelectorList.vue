@@ -1,5 +1,5 @@
 <template>
-  <v-list-group prepend-icon="mdi-account-check" :value="true" color="focus">
+  <a-list-group prepend-icon="mdi-account-check" :value="true" color="focus">
     <template v-slot:activator>
       <a-list-item-title v-if="activeGroup">{{ activeGroupName }}</a-list-item-title>
       <a-list-item-title v-else>No Group selected</a-list-item-title>
@@ -22,7 +22,7 @@
         </a-list-item>
       </v-list-item-group>
     </a-list-item>
-  </v-list-group>
+  </a-list-group>
 </template>
 
 <script>

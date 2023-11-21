@@ -28,7 +28,7 @@
                 </div>
               </v-list-item-content>
             </a-list-item>
-            <v-divider v-if="i < pinnedSurveys.length - 1" />
+            <a-divider v-if="i < pinnedSurveys.length - 1" />
           </div>
         </v-card-text>
       </v-card>
@@ -37,7 +37,7 @@
         <v-card-title> </v-card-title>
         <v-card-text class="flex-grow-1">
           <div class="px-5 py-2">
-            <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+            <a-text-field v-model="search" label="Search" prepend-icon="mdi-magnify" />
             <div class="d-flex justify-end mb-4">
               <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
             </div>
@@ -83,7 +83,7 @@
                 </div>
               </v-list-item-content>
             </a-list-item>
-            <v-divider v-if="i < surveys.content.length - 1" />
+            <a-divider v-if="i < surveys.content.length - 1" />
           </div>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </v-card-text>

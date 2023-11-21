@@ -4,13 +4,13 @@
       <slot name="title">
         {{ title }}
       </slot>
-      <v-spacer />
+      <a-spacer />
       <slot name="actions" v-if="editable">
         <v-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</v-btn>
       </slot>
     </v-card-title>
     <v-card-text>
-      <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
+      <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <v-list
         v-if="entities.length > 0"
         :style="{
@@ -27,7 +27,7 @@
               </v-list-item-content>
             </slot>
           </a-list-item>
-          <v-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
+          <a-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
         </div>
       </v-list>
 
@@ -83,6 +83,7 @@ export default {
       type: Function,
     },
   },
+
   computed: {
     filteredEntities() {
       if (this.filter) {

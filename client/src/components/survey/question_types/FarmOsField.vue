@@ -8,7 +8,9 @@
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize"
     />
-    <v-autocomplete
+    <!-- TODO in Vue3 remove .native -->
+    <a-select
+      engineering="autocomplete"
       :disabled="loading"
       :value="getValue"
       @change="onChange"
@@ -19,22 +21,25 @@
       :label="control.hint"
       :chips="this.control.options.hasMultipleSelections"
       :multiple="this.control.options.hasMultipleSelections"
-      @keyup.enter.prevent="submit"
+      @keyup.native.enter.prevent="submit"
       :loading="loading"
       color="focus"
+      selectionSlot
+      itemSlot
+      cssFlexWrap
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
+        <a-chip
           close
           v-bind="data.attrs"
           :input-value="data.selected"
-          @click="data.select"
+          @click="clickOnChip(data)"
           @click:close="remove(data.item)"
         >
           <template v-slot:default>
             <span v-html="data.item.label" />
           </template>
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:selection="{ item }" v-else>
         <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
@@ -48,7 +53,7 @@
       <template v-slot:item="{ item }" v-else>
         <div v-html="item.label"></div>
       </template>
-    </v-autocomplete>
+    </a-select>
 
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -62,17 +67,19 @@ import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 export default {
   components: { AListItemTitle },
   mixins: [baseQuestionComponent, farmosBase()],
+
   async created() {
     await this.fetchAreas();
+  },
+  methods: {
+    clickOnChip(data) {
+      data.select;
+    },
   },
 };
 </script>
 
 <style scoped>
->>> .v-select__selections {
-  flex-wrap: wrap !important;
-}
-
 div >>> .blue-chip,
 div >>> .orange-chip,
 div >>> .green-chip {

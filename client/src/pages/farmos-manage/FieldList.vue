@@ -1,7 +1,7 @@
 <template>
-  <v-sheet outlined>
-    <v-list subheader>
-      <v-subheader>Fields added to Farmos Instance</v-subheader>
+  <a-sheet outlined>
+    <a-list subheader>
+      <a-list-subheader>Fields added to Farmos Instance</a-list-subheader>
 
       <a-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
         <v-list-item-avatar>
@@ -18,8 +18,8 @@
           </v-btn>
         </a-list-item-action>
       </a-list-item>
-    </v-list>
-  </v-sheet>
+    </a-list>
+  </a-sheet>
 </template>
 
 <script>
@@ -30,6 +30,7 @@ import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 export default {
   components: { AListItemTitle, AListItemAction, AListItem },
   props: ['value'],
+
   methods: {
     remove(e) {
       const arr = this.value.filter((v) => v !== e);

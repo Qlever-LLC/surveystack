@@ -4,18 +4,18 @@
       <v-card-title
         >{{ title || '' }}
 
-        <v-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
+        <a-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
           {{ result }}
-        </v-chip>
+        </a-chip>
 
-        <v-chip
+        <a-chip
           v-if="result !== null && typeof result === 'object'"
           class="mx-4"
           color="blue"
           @click.stop="dialog = true"
         >
           Result Object (click to expand)
-        </v-chip>
+        </a-chip>
 
         <v-dialog v-model="dialog" width="800">
           <v-card>
@@ -25,13 +25,13 @@
             </div>
 
             <v-card-actions>
-              <v-spacer></v-spacer>
+              <a-spacer />
               <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</v-icon>
         <v-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
           <v-icon left>mdi-code-braces</v-icon>Examples

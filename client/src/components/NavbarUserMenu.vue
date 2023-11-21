@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-menu
+    <a-menu
       left
       attach="#app-menu"
       offset-y
@@ -13,7 +13,7 @@
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>
-      <v-list flat>
+      <a-list flat>
         <a-list-item link :to="{ name: 'auth-profile' }">
           <a-list-item-icon>
             <v-icon>mdi-account-circle</v-icon>
@@ -26,21 +26,21 @@
           </a-list-item-icon>
           <a-list-item-title> FarmOS Profile </a-list-item-title>
         </a-list-item>
-        <v-divider />
-        <v-subheader>Active Group</v-subheader>
+        <a-divider />
+        <a-list-subheader>Active Group</a-list-subheader>
         <active-group-selector-list v-model="activeGroup" />
-        <v-divider />
+        <a-divider />
         <a-list-item link @click="logout" class="mt-2">
           <a-list-item-icon>
             <v-icon>mdi-logout-variant</v-icon>
           </a-list-item-icon>
           <a-list-item-title> Sign Out </a-list-item-title>
         </a-list-item>
-      </v-list>
+      </a-list>
 
       <!-- </v-card-text> -->
       <!-- </v-card> -->
-    </v-menu>
+    </a-menu>
 
     <v-btn v-else :to="{ name: 'auth-login' }" text>
       <v-icon>mdi-login-variant</v-icon>
@@ -51,6 +51,7 @@
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+
 import api from '@/services/api.service';
 import AListItem from '@/components/ui/AListItem.vue';
 import AListItemTitle from '@/components/ui/AListItemTitle.vue';
