@@ -19,11 +19,7 @@
 </template>
 
 <script>
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemAction from '@/components/ui/AListItemAction.vue';
-
 export default {
-  components: { AListItemAction, AListItem },
   data() {
     return {
       activeImage: null,

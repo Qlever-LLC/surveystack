@@ -243,13 +243,9 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
   components: {
-    AListItem,
-    AListItemTitle,
     appQrScanner,
     MatrixCellSelectionLabel,
   },

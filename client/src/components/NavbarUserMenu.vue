@@ -53,15 +53,9 @@
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
 
 import api from '@/services/api.service';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemIcon from '@/components/ui/AListItemIcon.vue';
 
 export default {
   components: {
-    AListItemIcon,
-    AListItemTitle,
-    AListItem,
     ActiveGroupSelectorList,
   },
   data() {

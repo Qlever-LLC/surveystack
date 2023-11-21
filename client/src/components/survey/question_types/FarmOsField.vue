@@ -62,10 +62,8 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 export default {
-  components: { AListItemTitle },
   mixins: [baseQuestionComponent, farmosBase()],
 
   async created() {

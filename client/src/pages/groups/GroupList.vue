@@ -24,13 +24,9 @@
 <script>
 import api from '@/services/api.service';
 import appBasicList from '@/components/ui/BasicList.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   components: {
-    AListItemSubtitle,
-    AListItemTitle,
     appBasicList,
   },
   data() {

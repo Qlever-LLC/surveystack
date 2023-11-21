@@ -119,11 +119,8 @@ import { isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
-  components: { AListItem, AListItemTitle },
   props: {
     value: { required: true },
     multiple: { type: Boolean, default: false },

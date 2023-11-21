@@ -72,14 +72,10 @@
 import api from '@/services/api.service';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   name: 'Group',
   components: {
-    AListItemSubtitle,
-    AListItemTitle,
     appGroupBreadcrumbs,
     appBasicList,
   },

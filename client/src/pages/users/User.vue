@@ -32,12 +32,8 @@
 
 <script>
 import api from '@/services/api.service';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
-import AListItem from '@/components/ui/AListItem.vue';
 
 export default {
-  components: { AListItem, AListItemSubtitle, AListItemTitle },
   data() {
     return {
       user: {

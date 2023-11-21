@@ -88,16 +88,10 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
-    AListItemSubtitle,
-    AListItemTitle,
-    AListItem,
     draggable,
   },
   data() {

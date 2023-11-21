@@ -112,8 +112,6 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -130,7 +128,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { AListItemTitle, AListItem, BtnDropdown },
+  components: { BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

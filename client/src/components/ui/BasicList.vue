@@ -37,12 +37,7 @@
 </template>
 
 <script>
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
-
 export default {
-  components: { AListItemSubtitle, AListItemTitle, AListItem },
   props: {
     loading: {
       type: Boolean,

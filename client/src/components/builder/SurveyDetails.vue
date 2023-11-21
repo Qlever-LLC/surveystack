@@ -267,8 +267,6 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -327,8 +325,6 @@ export default {
     },
   },
   components: {
-    AListItemTitle,
-    AListItem,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,

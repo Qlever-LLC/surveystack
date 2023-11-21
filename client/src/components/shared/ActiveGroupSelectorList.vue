@@ -26,12 +26,7 @@
 </template>
 
 <script>
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemIcon from '@/components/ui/AListItemIcon.vue';
-
 export default {
-  components: { AListItemIcon, AListItemTitle, AListItem },
   props: {
     value: {
       type: [String, Object],

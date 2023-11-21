@@ -93,14 +93,11 @@
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 
 import MarkdownIt from 'markdown-it';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItem from '@/components/ui/AListItem.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
-  components: { AListItem, AListItemTitle },
   props: {
     value: { type: String },
     label: { type: String },

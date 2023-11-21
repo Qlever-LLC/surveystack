@@ -153,20 +153,12 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemAction from '@/components/ui/AListItemAction.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   mixins: [ResultMixin],
   components: {
-    AListItemSubtitle,
-    AListItemTitle,
-    AListItemAction,
-    AListItem,
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,

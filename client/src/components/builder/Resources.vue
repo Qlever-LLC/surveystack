@@ -109,17 +109,9 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemAction from '@/components/ui/AListItemAction.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   components: {
-    AListItemSubtitle,
-    AListItemTitle,
-    AListItemAction,
-    AListItem,
     appOntologyListEditor,
   },
   props: {

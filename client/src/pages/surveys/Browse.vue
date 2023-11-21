@@ -105,15 +105,10 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemIcon from '@/components/ui/AListItemIcon.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
-  components: { AListItemSubtitle, AListItemIcon, AListItemTitle, AListItem },
   data() {
     return {
       selectedGroupIds: [],

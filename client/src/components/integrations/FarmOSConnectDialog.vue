@@ -68,11 +68,8 @@
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
-  components: { AListItemSubtitle, AListItemTitle },
   emits: ['connect', 'addExisting', 'create'],
   props: {
     value: Boolean,

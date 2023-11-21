@@ -134,15 +134,9 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemIcon from '@/components/ui/AListItemIcon.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
   components: {
-    AListItemSubtitle,
-    AListItemIcon,
-    AListItemTitle,
     AuthSelector,
     AppBasicList,
   },

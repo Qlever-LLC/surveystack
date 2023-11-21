@@ -27,13 +27,8 @@
 
 <script>
 import api from '@/services/api.service';
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-import AListItemIcon from '@/components/ui/AListItemIcon.vue';
-import AListItemSubtitle from '@/components/ui/AListItemSubtitle.vue';
 
 export default {
-  components: { AListItemSubtitle, AListItemIcon, AListItemTitle, AListItem },
   data() {
     return {
       entities: [],

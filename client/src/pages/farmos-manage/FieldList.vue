@@ -23,12 +23,7 @@
 </template>
 
 <script>
-import AListItem from '@/components/ui/AListItem.vue';
-import AListItemAction from '@/components/ui/AListItemAction.vue';
-import AListItemTitle from '@/components/ui/AListItemTitle.vue';
-
 export default {
-  components: { AListItemTitle, AListItemAction, AListItem },
   props: ['value'],
 
   methods: {
