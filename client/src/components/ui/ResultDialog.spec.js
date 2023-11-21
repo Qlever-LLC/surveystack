@@ -31,22 +31,22 @@ describe('ResultDialog', () => {
     getByText('wrecking yard');
     getByText('more text');
   });
-  // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
-  // describe('close event', () => {
-  //   it('emits close event', async () => {
-  //     const { getByText, emitted } = renderWithVuetify(ResultDialog, {
-  //       propsData: {
-  //         value: true,
-  //       },
-  //       mocks: {
-  //         $router: {
-  //           push: jest.fn(),
-  //         },
-  //       },
-  //     });
-  //     const button = getByText('Ok');
-  //     await fireEvent.click(button);
-  //     expect(emitted().close.length).toBe(1);
-  //   });
-  // });
+  describe('close event', () => {
+    // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
+    it.skip('emits close event', async () => {
+      const { getByText, emitted } = renderWithVuetify(ResultDialog, {
+        propsData: {
+          value: true,
+        },
+        mocks: {
+          $router: {
+            push: jest.fn(),
+          },
+        },
+      });
+      const button = getByText('Ok');
+      await fireEvent.click(button);
+      expect(emitted().close.length).toBe(1);
+    });
+  });
 });
