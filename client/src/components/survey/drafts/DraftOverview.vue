@@ -28,9 +28,9 @@
         <br />
       </v-card-text>
     </v-card>
-    <v-timeline v-if="controlDisplays" dense class="width: 100%">
+    <a-timeline v-if="controlDisplays" dense>
       <template v-for="(display, idx) in controlDisplays">
-        <v-timeline-item
+        <a-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :key="idx"
           :icon="display.icon"
@@ -108,9 +108,9 @@
           <a-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
           </a-chip>
-        </v-timeline-item>
+        </a-timeline-item>
       </template>
-    </v-timeline>
+    </a-timeline>
   </v-container>
 </template>
 
