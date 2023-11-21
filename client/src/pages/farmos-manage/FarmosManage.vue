@@ -8,9 +8,9 @@
       errorMessage
     }}</a-alert>
 
-    <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
-      <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
-    </v-tabs>
+    <a-tabs v-model="tab" background-color="transparent" color="basil" grow>
+      <a-tab v-for="item in items" :key="item.name">{{ item.name }}</a-tab>
+    </a-tabs>
 
     <v-tabs-items v-model="tab">
       <v-tab-item v-for="item in items" :key="item.name">
