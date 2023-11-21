@@ -45,13 +45,11 @@
 import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
-import ABadge from '@/components/ui/ABadge.vue';
 
 export default {
   name: 'survey-diff',
   components: {
     SurveyDiffCardTree,
-    ABadge,
   },
   props: {
     controlsLocalRevision: Array,
