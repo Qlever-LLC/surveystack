@@ -248,7 +248,7 @@
                 <div class="pt-3" style="white-space: nowrap">{{ instance.instanceName }}</div>
                 <div class="pb-3">
                   <span v-if="instance.isOwner">
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -264,9 +264,9 @@
                         </v-btn>
                       </template>
                       <span>Access FarmOS instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -281,9 +281,9 @@
                         </v-btn>
                       </template>
                       <span>Add a user to your instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -298,9 +298,9 @@
                         </v-btn>
                       </template>
                       <span>Re-assign the instance's ownership</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -315,10 +315,10 @@
                         </v-btn>
                       </template>
                       <span>Delete this instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
                   </span>
                   <span v-else>
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -334,9 +334,9 @@
                         </v-btn>
                       </template>
                       <span>Access FarmOS instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -351,7 +351,7 @@
                         </v-btn>
                       </template>
                       <span>Remove this instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
                   </span>
                 </div>
               </td>

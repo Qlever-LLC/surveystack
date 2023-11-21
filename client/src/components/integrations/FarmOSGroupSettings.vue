@@ -49,7 +49,7 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-tooltip bottom :disabled="canAddCoffeeShop">
+            <a-tooltip bottom :disabled="canAddCoffeeShop">
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
                   <a-checkbox
@@ -64,7 +64,7 @@
                 </div>
               </template>
               <span>Talk to your parent group administrator to enable this option</span>
-            </v-tooltip>
+            </a-tooltip>
             <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"

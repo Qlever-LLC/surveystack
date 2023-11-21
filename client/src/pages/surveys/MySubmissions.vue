@@ -48,7 +48,7 @@
                       </v-card>
                     </v-list-item-content>
                     <v-list-item-action>
-                      <v-tooltip bottom>
+                      <a-tooltip bottom>
                         <template v-slot:activator="{ on }">
                           <v-btn
                             v-if="readyToSubmitHas(item._id)"
@@ -60,7 +60,7 @@
                           </v-btn>
                         </template>
                         <span>Upload Submission</span>
-                      </v-tooltip>
+                      </a-tooltip>
                     </v-list-item-action>
                   </v-list-item>
                 </template>

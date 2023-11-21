@@ -2,10 +2,14 @@
   <a-sheet outlined class="pa-8">
     <div class="display-1">
       KML Importer
-      <app-tooltip
-        >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz
-        first.</app-tooltip
-      >
+      <a-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon color="primary" dark v-bind="attrs" v-on="on">mdi-information</v-icon>
+        </template>
+        <span>
+          Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz first.
+        </span>
+      </a-tooltip>
     </div>
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 
@@ -33,12 +37,7 @@
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
-import appTooltip from '@/components/ui/Tooltip.vue';
-
 export default {
-  components: {
-    appTooltip,
-  },
   props: ['value'],
   data() {
     return {

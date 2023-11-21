@@ -20,7 +20,7 @@
         />
       </v-col>
       <v-col cols="auto" class="pa-0 align-self-center">
-        <v-tooltip bottom>
+        <a-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
               mdi-information-outline
@@ -40,7 +40,7 @@
             <b>Small fix:</b><br />
             Fixes a problem or error. Everyone should update.
           </p>
-        </v-tooltip>
+        </a-tooltip>
       </v-col>
     </v-row>
   </v-container>
@@ -48,6 +48,7 @@
 <script>
 export default {
   name: 'library-change-type-selector',
+
   props: ['value', 'disabled', 'label'],
   data() {
     return {
