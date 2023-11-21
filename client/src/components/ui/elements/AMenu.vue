@@ -22,6 +22,7 @@
 
 <script>
 export default {
+  name: 'AMenu',
   props: {
     attach: { type: undefined, default: false },
     closeOnContentClick: { type: Boolean, default: true },

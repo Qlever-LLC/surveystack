@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  name: 'AList',
   props: {
     flat: { type: Boolean, required: false },
     dense: { type: Boolean, required: false },

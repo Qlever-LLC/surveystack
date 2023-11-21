@@ -4,6 +4,7 @@
 
 <script>
 export default {
+  name: 'ASheet',
   props: {
     //TODO Vuetify 3 change to border type [Number, String, Boolean]
     outlined: { type: Boolean, required: false },
