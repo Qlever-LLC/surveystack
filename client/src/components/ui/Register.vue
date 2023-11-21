@@ -57,7 +57,6 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
-  components: { AForm },
   data() {
     return {
       status: '',

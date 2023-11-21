@@ -54,7 +54,6 @@
 import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 
 export default {
-  components: { AForm },
   data() {
     return {};
   },

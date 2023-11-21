@@ -25,7 +25,6 @@
 import api from '@/services/api.service';
 
 export default {
-  components: { AForm },
   data() {
     return {
       status: { type: '' },

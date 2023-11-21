@@ -11,7 +11,6 @@
 import createMap from '@/external/instance/instance';
 
 export default {
-  components: { AForm },
   props: ['value', 'center'],
 
   data() {

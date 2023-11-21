@@ -48,7 +48,6 @@
 
 <script>
 export default {
-  components: { AForm },
   props: {
     value: {
       type: Object,

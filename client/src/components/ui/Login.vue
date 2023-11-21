@@ -118,7 +118,6 @@ const DEFAULT_ENTITY = {
 const LS_DEFAULT_USE_PASSWORD = 'use-password-on-login-page-by-default';
 
 export default {
-  components: { AForm },
   props: {
     initialEmail: {
       type: String,
