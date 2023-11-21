@@ -8,12 +8,3 @@
     </div>
   </a-banner>
 </template>
-
-<script>
-import ABanner from '@/components/ui/ABanner.vue';
-export default {
-  components: {
-    ABanner,
-  },
-};
-</script>

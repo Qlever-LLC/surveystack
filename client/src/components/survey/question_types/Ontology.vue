@@ -171,14 +171,12 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
-import ABanner from '@/components/ui/ABanner.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
     appControlLabel,
     appControlMoreInfo,
-    ABanner,
   },
   data() {
     return {
