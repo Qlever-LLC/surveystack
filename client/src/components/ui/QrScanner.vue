@@ -19,11 +19,11 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <a-toolbar-title>QR Code Scanner</a-toolbar-title>
-          <v-spacer></v-spacer>
+          <a-spacer />
         </a-toolbar>
-        <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
+        <a-alert v-if="hasCameraError" border="left" border-color type="error" elevation="2">
           No camera detected.
-        </v-alert>
+        </a-alert>
         <v-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />
@@ -54,10 +54,6 @@ QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { 
 
 export default defineComponent({
   emits: ['codeDetected'],
-  components: {
-    AToolbar,
-    AToolbarTitle,
-  },
   props: {
     small: {
       type: Boolean,

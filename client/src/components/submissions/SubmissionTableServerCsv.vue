@@ -17,10 +17,10 @@
                 <a-toolbar-title>Simple CSV</a-toolbar-title>
               </v-col>
               <v-col>
-                <v-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
+                <a-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
               </v-col>
               <v-col :cols="2">
-                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
+                <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
               </v-col>
             </v-row>
           </a-toolbar>
@@ -29,7 +29,7 @@
           <thead>
             <tr>
               <th v-for="(header, i) in headers" :key="header.text">
-                <v-text-field v-if="i > 0" @input="(v) => hello(v, header.text)" />
+                <a-text-field v-if="i > 0" @input="(v) => hello(v, header.text)" />
               </th>
             </tr>
           </thead>

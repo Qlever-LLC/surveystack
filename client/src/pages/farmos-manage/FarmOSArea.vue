@@ -1,8 +1,8 @@
 <template>
   <div style="width: 100%">
-    <v-form>
-      <v-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
-    </v-form>
+    <a-form>
+      <a-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
+    </a-form>
     <div id="farmos-map" style="width: 100%; height: 500px"></div>
   </div>
 </template>
@@ -12,6 +12,7 @@ import createMap from '@/external/instance/instance';
 
 export default {
   props: ['value', 'center'],
+
   data() {
     return {
       layer: null,

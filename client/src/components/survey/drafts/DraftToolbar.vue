@@ -10,7 +10,7 @@
           </div>
         </a-toolbar-title>
 
-        <v-spacer />
+        <a-spacer />
 
         <slot name="toolbar-actions"></slot>
 
