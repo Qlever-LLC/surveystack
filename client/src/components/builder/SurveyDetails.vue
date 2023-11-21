@@ -264,7 +264,7 @@ import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
-import ASelect from '@/components/ui/ASelect.vue';
+
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
 
@@ -332,7 +332,6 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
-    ASelect,
   },
   methods: {
     async getGroupNameById(id) {

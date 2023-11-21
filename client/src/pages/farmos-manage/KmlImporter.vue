@@ -34,12 +34,10 @@ import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
 import appTooltip from '@/components/ui/Tooltip.vue';
-import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   components: {
     appTooltip,
-    ASelect,
   },
   props: ['value'],
   data() {

@@ -14,8 +14,6 @@
 </template>
 
 <script>
-import ASelect from '@/components/ui/ASelect.vue';
-
 const NEW_RESOURCE_PREFIX = 'NEW_';
 
 export default {
@@ -46,9 +44,6 @@ export default {
     outlined: {
       type: Boolean,
     },
-  },
-  components: {
-    ASelect,
   },
   computed: {
     filteredResources() {

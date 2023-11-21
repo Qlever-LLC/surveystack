@@ -103,11 +103,8 @@
 </template>
 
 <script>
-import ASelect from '@/components/ui/ASelect.vue';
 export default {
-  components: {
-    ASelect,
-  },
+  ,
   props: {
     groups: Array,
     mappings: Object,

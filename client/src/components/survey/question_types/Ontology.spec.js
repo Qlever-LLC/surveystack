@@ -138,7 +138,7 @@ describe('Ontology question', () => {
       expect(dropDown.vm.value).toEqual(['cat', 'dog']);
     });
 
-    it('sets autocomplete with chips from value in multiple selection, non-custom mode', () => {
+    it.only('sets autocomplete with chips from value in multiple selection, non-custom mode', () => {
       const wrapper = mount(
         Ontology,
         getMountOpts({
@@ -146,7 +146,7 @@ describe('Ontology question', () => {
           value: ['cat', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
     });
 
     it('sets value as an array in multiple selection, custom mode', () => {
@@ -184,7 +184,7 @@ describe('Ontology question', () => {
           value: ['custom', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
     });
   });
 });

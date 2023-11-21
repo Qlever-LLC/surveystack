@@ -68,13 +68,9 @@
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
-import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
-  components: {
-    ASelect,
-  },
   props: {
     value: Boolean,
     farmInstances: {

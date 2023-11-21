@@ -239,7 +239,6 @@
 
 <script>
 import _ from 'lodash';
-import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   emits: ['addSuperAdminNote'],

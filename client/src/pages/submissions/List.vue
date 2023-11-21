@@ -223,7 +223,6 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
-import ASelect from '@/components/ui/ASelect.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -265,7 +264,6 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
-    ASelect,
   },
   data() {
     return {

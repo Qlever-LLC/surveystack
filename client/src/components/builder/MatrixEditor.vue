@@ -260,7 +260,7 @@ import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
-import ASelect from '@/components/ui/ASelect.vue';
+
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 
@@ -291,7 +291,6 @@ export default {
     Ontology,
     Date,
     Checkbox,
-    ASelect,
   },
   props: {
     value: {

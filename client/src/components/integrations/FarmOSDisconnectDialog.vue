@@ -42,13 +42,9 @@
 
 <script>
 import './css/button.css';
-import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
-  components: {
-    ASelect,
-  },
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {

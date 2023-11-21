@@ -62,16 +62,12 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
 
   async created() {
     await this.fetchFarms();
-  },
-  components: {
-    ASelect,
   },
   methods: {
     clickOnChip(data) {

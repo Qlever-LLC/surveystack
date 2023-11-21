@@ -106,14 +106,13 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
-import ASelect from '@/components/ui/ASelect.vue';
+
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
 
 export default {
   components: {
     appOntologyListEditor,
-    ASelect,
   },
   props: {
     resources: {

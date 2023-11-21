@@ -119,7 +119,6 @@ import { isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
-import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   props: {
@@ -131,9 +130,6 @@ export default {
     outlined: { type: Boolean, default: false },
     source: { type: String },
     resources: { default: () => [] },
-  },
-  components: {
-    ASelect,
   },
   data() {
     return {

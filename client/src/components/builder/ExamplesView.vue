@@ -26,7 +26,6 @@
 
 <script>
 import appCodeView from '@/components/builder/CodeView.vue';
-import ASelect from '@/components/ui/ASelect.vue';
 
 const reg = /.*\/(.*?)$/;
 
@@ -41,7 +40,6 @@ const examples = req.keys().map((key) => ({
 export default {
   components: {
     appCodeView,
-    ASelect,
   },
   props: ['category'],
   data() {

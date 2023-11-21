@@ -25,8 +25,6 @@
 </template>
 
 <script>
-import ASelect from '@/components/ui/ASelect.vue';
-
 export default {
   props: {
     persistent: Boolean,

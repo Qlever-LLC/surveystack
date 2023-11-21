@@ -50,8 +50,6 @@ import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
 
-import ASelect from '@/components/ui/ASelect.vue';
-
 export default {
   emits: ['blur', 'input'],
   props: {

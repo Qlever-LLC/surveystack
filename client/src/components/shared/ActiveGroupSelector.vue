@@ -20,8 +20,6 @@
 </template>
 
 <script>
-import ASelect from '@/components/ui/ASelect.vue';
-
 function getGroupLevel(group) {
   return group.dir.match(/\//g).length;
 }
@@ -64,9 +62,6 @@ export default {
       type: Boolean,
       default: false,
     },
-  },
-  components: {
-    ASelect,
   },
   computed: {
     groups() {

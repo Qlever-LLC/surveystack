@@ -109,12 +109,10 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
-    ASelect,
   },
   props: {
     groupInfos: {
