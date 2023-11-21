@@ -8,7 +8,7 @@
     <a-list>
       <template v-for="(item, i) in items">
         <a-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
-        <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
+        <a-list-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</a-list-subheader>
         <v-list-item v-else :key="i" :to="item.to">
           <v-list-item-icon v-if="item.icon" :class="item.class">
             <v-icon>{{ item.icon }}</v-icon>
@@ -34,7 +34,7 @@
         <a-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
           <a-expansion-panel>
             <a-expansion-panel-title class="pa-0 ma-0">
-              <v-subheader>DOCUMENTATION</v-subheader>
+              <a-list-subheader>DOCUMENTATION</a-list-subheader>
             </a-expansion-panel-title>
             <a-expansion-panel-text class="pa-0 ma-0 no-padding">
               <a-list class="pa-0 ma-0">
@@ -89,6 +89,7 @@ export default {
       required: true,
     },
   },
+
   data() {
     let groupsLink = { name: 'groups-list' };
     if (this.$store.getters['whitelabel/isWhitelabel']) {
