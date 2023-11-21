@@ -132,14 +132,10 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import AAvatar from '@/components/ui/AAvatar.vue';
 
 export default {
   props: {
     groupId: String,
-  },
-  components: {
-    AAvatar,
   },
   data() {
     return {
