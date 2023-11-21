@@ -39,7 +39,6 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   data() {
@@ -77,7 +76,6 @@ export default {
   },
   components: {
     ActiveGroupSelector,
-    ASpacer,
   },
   created() {
     if (this.groupId) {

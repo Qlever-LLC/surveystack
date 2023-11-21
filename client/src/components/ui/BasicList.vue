@@ -37,11 +37,7 @@
 </template>
 
 <script>
-import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
-  components: {
-    ASpacer,
-  },
   props: {
     loading: {
       type: Boolean,

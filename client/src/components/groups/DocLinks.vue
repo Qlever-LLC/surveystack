@@ -94,13 +94,11 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
-    ASpacer,
   },
   data() {
     return {

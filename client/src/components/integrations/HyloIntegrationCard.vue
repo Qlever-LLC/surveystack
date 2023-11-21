@@ -132,12 +132,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
-  components: {
-    ASpacer,
-  },
   props: {
     groupId: String,
   },

@@ -34,11 +34,10 @@
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor, ASpacer },
+  components: { LibraryChangeTypeSelector, TipTapEditor },
   props: {
     value: {
       type: Boolean,

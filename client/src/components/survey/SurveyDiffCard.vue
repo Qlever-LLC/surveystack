@@ -89,13 +89,11 @@
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
     ControlCardHeader,
-    ASpacer,
   },
   data() {
     return {

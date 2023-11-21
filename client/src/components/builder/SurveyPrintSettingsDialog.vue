@@ -30,11 +30,10 @@
 
 <script>
 import Checkbox from '@/components/ui/Checkbox.vue';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'survey-print-settings-dialog',
-  components: { Checkbox, ASpacer },
+  components: { Checkbox },
   props: {
     value: {
       type: Boolean,

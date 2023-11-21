@@ -28,14 +28,13 @@
 <script>
 import { computed, defineComponent, ref, watchEffect } from '@vue/composition-api';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
-import ASpacer from '@/components/ui/ASpacer.vue';
+
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
 
 export default defineComponent({
   components: {
     SelectItemsDownloadButton,
-    ASpacer,
   },
   props: {
     value: {

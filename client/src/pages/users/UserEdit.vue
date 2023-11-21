@@ -74,12 +74,10 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   components: {
     appFeedback,
-    ASpacer,
   },
   data() {
     return {

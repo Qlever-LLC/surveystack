@@ -26,7 +26,6 @@
 
 <script>
 import appCodeView from '@/components/builder/CodeView.vue';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 const reg = /.*\/(.*?)$/;
 
@@ -41,7 +40,6 @@ const examples = req.keys().map((key) => ({
 export default {
   components: {
     appCodeView,
-    ASpacer,
   },
   props: ['category'],
   data() {

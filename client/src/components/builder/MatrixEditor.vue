@@ -263,7 +263,6 @@ import Checkbox from '@/components/ui/Checkbox.vue';
 
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -292,7 +291,6 @@ export default {
     Ontology,
     Date,
     Checkbox,
-    ASpacer,
   },
   props: {
     value: {

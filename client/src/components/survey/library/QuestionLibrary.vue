@@ -130,14 +130,12 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
-    ASpacer,
   },
   props: ['survey', 'libraryId'],
   data() {

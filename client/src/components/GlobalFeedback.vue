@@ -11,11 +11,7 @@
 </template>
 
 <script>
-import ASpacer from '@/components/ui/ASpacer.vue';
 export default {
-  components: {
-    ASpacer,
-  },
   data() {
     return {};
   },

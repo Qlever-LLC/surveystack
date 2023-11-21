@@ -31,7 +31,6 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'list-library-consumers-dialog',

@@ -65,10 +65,9 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ASpacer },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
   props: {
     value: {
       required: true,

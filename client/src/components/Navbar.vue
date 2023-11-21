@@ -24,14 +24,12 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   components: {
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,
-    ASpacer,
   },
   computed: {
     drawerIsVisible: {

@@ -50,16 +50,11 @@
 </template>
 
 <script>
-import ASpacer from '@/components/ui/ASpacer.vue';
-
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
-  components: {
-    ASpacer,
-  },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

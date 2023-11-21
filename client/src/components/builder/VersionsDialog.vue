@@ -111,10 +111,9 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
-  components: { SurveyDiffDialog, ASpacer },
+  components: { SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

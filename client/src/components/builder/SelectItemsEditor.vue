@@ -68,12 +68,10 @@
 
 <script>
 import draggable from 'vuedraggable';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   components: {
     draggable,
-    ASpacer,
   },
   props: {
     value: {

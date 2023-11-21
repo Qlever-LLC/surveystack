@@ -467,7 +467,6 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   components: {
@@ -481,7 +480,6 @@ export default {
     Date,
     Checkbox,
     MarkdownEditor,
-    ASpacer,
   },
   props: {
     control: {

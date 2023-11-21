@@ -71,7 +71,6 @@
 <script>
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -103,7 +102,6 @@ function log(message){};
 export default {
   components: {
     appCodeView,
-    ASpacer,
   },
   data() {
     return {

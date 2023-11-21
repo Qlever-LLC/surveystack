@@ -40,11 +40,10 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor, ASpacer },
+  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
   props: {
     value: {
       type: Boolean,

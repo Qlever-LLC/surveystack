@@ -47,15 +47,12 @@ import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@v
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
   emits: ['codeDetected'],
-  components: {
-    ASpacer,
-  },
+
   props: {
     small: {
       type: Boolean,

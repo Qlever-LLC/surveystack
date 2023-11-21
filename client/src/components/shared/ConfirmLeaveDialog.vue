@@ -20,12 +20,8 @@
 
 <script>
 import api from '@/services/api.service';
-import ASpacer from '@/components/ui/ASpacer.vue';
 
 export default {
-  components: {
-    ASpacer,
-  },
   data() {
     return {
       isVisible: false,
