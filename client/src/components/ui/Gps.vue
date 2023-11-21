@@ -31,11 +31,7 @@
 </template>
 
 <script>
-import ASnackbar from '@/components/ui/ASnackbar.vue';
 export default {
-  components: {
-    ASnackbar,
-  },
   data() {
     return {
       snackbar: false,

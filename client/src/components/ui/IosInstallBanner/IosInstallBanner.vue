@@ -16,11 +16,7 @@
 </template>
 
 <script>
-import ASnackbar from '@/components/ui/ASnackbar.vue';
 export default {
-  components: {
-    ASnackbar,
-  },
   props: {
     value: Boolean,
   },
