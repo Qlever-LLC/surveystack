@@ -21,9 +21,9 @@
           When installing you will be asked to allow installing applications from unknown sources.
         </p>
 
-        <v-alert outlined class="pa-4" type="success" color="blue">
+        <a-alert outlined class="pa-4" type="success" color="blue">
           If you have already installed the Android App once, you don't need install the App again.
-        </v-alert>
+        </a-alert>
 
         <br />
         <v-btn
@@ -61,12 +61,12 @@
         {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
       </v-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">
-        <v-chip dark> {{ meta && meta.status }}</v-chip>
+        <a-chip dark> {{ meta && meta.status }}</a-chip>
         <br />
-        <v-chip dark class="mt-1">
+        <a-chip dark class="mt-1">
           <v-icon small left>mdi-message-bulleted</v-icon>
-          {{ meta && meta.statusMessage }}</v-chip
-        >
+          {{ meta && meta.statusMessage }}
+        </a-chip>
       </p>
     </div>
     <div v-else-if="isLoading" class="d-flex align-center justify-center">

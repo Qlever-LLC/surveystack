@@ -15,7 +15,7 @@
     </div>
     <h1>
       <span>{{ entity.name }}</span>
-      <v-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </v-chip>
+      <a-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </a-chip>
     </h1>
     <h3 class="text--secondary">{{ entity.path }}</h3>
     <div class="text--secondary body-2">{{ entity._id }}</div>
@@ -23,7 +23,7 @@
     <v-row>
       <v-col>
         <div class="d-flex justify-end">
-          <v-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
+          <a-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
         </div>
         <app-basic-list
           :editable="editable"
