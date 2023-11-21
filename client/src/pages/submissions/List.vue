@@ -68,12 +68,12 @@
           </v-btn>
         </div>
       </div>
-      <v-expansion-panels class="mb-6">
-        <v-expansion-panel>
-          <v-expansion-panel-header expand-icon="mdi-menu-down"
-            ><span class="text-body-1">Filters</span>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+      <a-expansion-panels class="mb-6">
+        <a-expansion-panel>
+          <a-expansion-panel-title expand-icon="mdi-menu-down">
+            <span class="text-body-1">Filters</span>
+          </a-expansion-panel-title>
+          <a-expansion-panel-text>
             <app-submissions-filter-basic
               v-if="!showAdvancedFilters && queryList"
               :queryList="queryList"
@@ -89,9 +89,9 @@
               @apply-advanced-filters="fetchData"
               @reset="reset"
             />
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
+          </a-expansion-panel-text>
+        </a-expansion-panel>
+      </a-expansion-panels>
       <v-card class="my-5 px-2">
         <v-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>

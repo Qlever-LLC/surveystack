@@ -23,7 +23,6 @@
 <script>
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
-import { isOnline } from '@/utils/surveyStack';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
 
 export default {

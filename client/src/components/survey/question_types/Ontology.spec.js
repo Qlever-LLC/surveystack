@@ -3,6 +3,8 @@ import Vuetify from 'vuetify';
 import Ontology from './Ontology.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 
+import { localVue } from '@/../tests/renderWithVuetify';
+
 const vuetify = new Vuetify();
 
 const resources = [
@@ -73,6 +75,7 @@ function getMountOpts(opts = {}) {
       index: 'data.dropdown_1',
     },
     vuetify,
+    localVue,
   };
 }
 
@@ -143,7 +146,7 @@ describe('Ontology question', () => {
           value: ['cat', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
     });
 
     it('sets value as an array in multiple selection, custom mode', () => {
@@ -181,7 +184,7 @@ describe('Ontology question', () => {
           value: ['custom', 'dog'],
         })
       );
-      expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
+      expect(wrapper.findAll('.v-chip--select').wrappers.length).toBe(2);
     });
   });
 });

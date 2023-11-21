@@ -24,9 +24,9 @@
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
-          <v-chip v-if="data.item.count" small class="ma-2">
+          <a-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
-          </v-chip>
+          </a-chip>
         </v-list-item-title>
       </v-list-item-content>
     </template>
@@ -58,9 +58,9 @@
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
-          <v-chip v-if="data.item.count" small class="ma-2">
+          <a-chip v-if="data.item.count" small class="ma-2">
             {{ data.item.count }}
-          </v-chip>
+          </a-chip>
         </v-list-item-title>
       </v-list-item-content>
     </template>
@@ -94,9 +94,9 @@
     cssMinHeightAuto
   >
     <template v-slot:selection="data" v-if="multiple">
-      <v-chip :input-value="data.selected" close @click="clickOnChip(data)" @click:close="remove(data.item)">
+      <a-chip :input-value="data.selected" close @click="clickOnChip(data)" @click:close="remove(data.item)">
         {{ getLabelForItemValue(data.item) }}
-      </v-chip>
+      </a-chip>
     </template>
     <template v-slot:selection="data" v-else>
       {{ getLabelForItemValue(data.item) }}

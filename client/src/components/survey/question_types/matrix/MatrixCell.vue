@@ -1,5 +1,5 @@
 <template>
-  <v-text-field
+  <a-text-field
     v-if="header.type === 'text'"
     :value="value"
     @input="onInput"
@@ -10,7 +10,7 @@
   />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
-      <v-text-field
+      <a-text-field
         ref="text-qrcode"
         :value="value"
         @input="onInput"
@@ -24,7 +24,7 @@
       <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
     </div>
   </div>
-  <v-text-field
+  <a-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
     @input="onFarmOsInput"
@@ -33,7 +33,7 @@
     autocomplete="off"
     :disabled="disabled"
   />
-  <v-text-field
+  <a-text-field
     v-else-if="header.type === 'number'"
     :value="value"
     @input="onNumberInput"
@@ -143,9 +143,9 @@
     cssOneLineSpan
   >
     <template v-slot:selection="data" v-if="!!header.multiple">
-      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="clickOnChip(data)">
+      <a-chip v-bind="data.attrs" :input-value="data.selected" @click="clickOnChip(data)">
         <span v-html="data.item.label" />
-      </v-chip>
+      </a-chip>
     </template>
     <template v-slot:selection="{ item }" v-else>
       <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
@@ -194,23 +194,22 @@
     </template>
   </a-select>
   <div v-else-if="header.type === 'date'">
-    <v-menu
+    <a-menu
       :close-on-content-click="false"
       v-model="menus[`${index}_${header.value}`]"
       transition="scale-transition"
       offset-y
       max-width="290px"
       min-width="290px"
-      ref="datepickerRef"
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-text-field
-          :value="getDateLabel"
-          @click="setActivePickerMonth"
-          hide-details
-          v-bind="attrs"
+        <a-text-field
           v-on="on"
+          v-bind="attrs"
+          @click="setActivePickerMonth"
+          :value="getDateLabel"
+          hide-details
           outlined
           autocomplete="off"
           :disabled="disabled"
@@ -220,6 +219,7 @@
       </template>
       <v-date-picker
         :value="value"
+        ref="datepickerRef"
         @input="
           (v) => {
             onDateInput(v);
@@ -228,10 +228,10 @@
         "
         no-title
       />
-    </v-menu>
+    </a-menu>
   </div>
 
-  <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
+  <a-text-field v-else value="unknown cell type" outlined hide-details disabled />
 </template>
 
 <script>
@@ -337,7 +337,11 @@ export default {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     onInput(value) {
-      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      if (this.header.type === 'dropdown') {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : [value]);
+      } else {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      }
       this.$emit('changed');
     },
     onDateInput(value) {
@@ -374,7 +378,7 @@ export default {
     },
     setActivePickerMonth() {
       setTimeout(() => {
-        this.$refs.datepickerRef.$children[1].$children[0].activePicker = 'MONTH';
+        this.$refs.datepickerRef.activePicker = 'MONTH';
       });
     },
     // copied/adapted from FarmOsPlanting.vue
@@ -404,9 +408,11 @@ export default {
             item.value.location.some((loc) => loc.id === field.location.id)
         )
       );
-      const noneExist = assetsToSelect.filter(
-        (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
-      );
+      const noneExist = assetsToSelect
+        .filter(
+          (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
+        )
+        .map((asset) => asset.value);
       assets.push(...noneExist);
 
       if (!Array.isArray(hashesArg)) {

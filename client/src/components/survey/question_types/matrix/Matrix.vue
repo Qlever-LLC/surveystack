@@ -13,6 +13,22 @@
       Do you want to delete this row?
     </app-dialog>
 
+    <app-dialog
+      v-model="showConfirmInitializeDialog"
+      v-bind="dialogProps"
+      @confirm="
+        showConfirmInitializeDialog = false;
+        initialize();
+      "
+      @cancel="showConfirmInitializeDialog = false"
+      title="Confirm Reset"
+      labelConfirm="RESET"
+      :maxWidth="400"
+    >
+      Do you want to reset this spreadsheet based on the previous answers in your survey? You will have to re-enter any
+      custom information you have entered.
+    </app-dialog>
+
     <v-dialog
       v-model="showEditItemDialog"
       v-bind="dialogProps"
@@ -32,7 +48,7 @@
             <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-form autocomplete="off" @submit.prevent="">
+            <a-form autocomplete="off" @submit.prevent="">
               <div v-for="(header, idx) in headers" :key="header.value">
                 <div class="d-flex align-center">
                   <h4>{{ header.label }}</h4>
@@ -49,7 +65,7 @@
                   class="my-2"
                 />
               </div>
-            </v-form>
+            </a-form>
           </v-card-text>
           <v-card-actions class="d-flex justify-space-between">
             <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
@@ -62,8 +78,15 @@
         </v-card>
       </div>
     </v-dialog>
-
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      initializeTooltip="Reset rows"
+      @initialize="initializeConfirm"
+    />
     <app-control-hint :value="control.hint" />
 
     <app-matrix-table
@@ -88,7 +111,7 @@
         <app-required v-if="header.required" />
       </template>
       <template v-slot:row-cell="{ header, row, colIdx }">
-        <v-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
+        <a-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
           <app-matrix-cell
             :header="header"
             :item="row"
@@ -100,7 +123,7 @@
             class="mt-2"
             :loading="isFarmOsLoading"
           />
-        </v-form>
+        </a-form>
       </template>
       <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
         <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
@@ -125,7 +148,7 @@
 </template>
 
 <script>
-import { cloneDeep, isNil, sortBy, uniq, without } from 'lodash';
+import { cloneDeep, isNil, uniq, without } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/matrix/MatrixCell.vue';
 import appMatrixTable from '@/components/survey/question_types/matrix/MatrixTable.vue';
@@ -258,6 +281,7 @@ export default {
       editedIndex: -1,
       editedItem: null,
       isFarmOsLoading: false,
+      showConfirmInitializeDialog: false,
     };
   },
   computed: {
@@ -357,6 +381,13 @@ export default {
       this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
     },
+    initializeConfirm() {
+      if (this.meta && !!this.meta.dateModified) {
+        this.showConfirmInitializeDialog = true;
+      } else {
+        this.initialize();
+      }
+    },
   },
   async created() {
     this.isFarmOsLoading = true;
@@ -373,6 +404,11 @@ export default {
     }
 
     this.isFarmOsLoading = false;
+  },
+  watch: {
+    value() {
+      this.rows = this.value || [];
+    },
   },
 };
 </script>

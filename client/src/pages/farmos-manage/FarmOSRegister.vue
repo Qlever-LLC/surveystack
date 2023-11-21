@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
+    <a-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
       <a-select
         engineering="autocomplete"
         v-if="!!localViewModel.groups"
@@ -28,7 +28,7 @@
 
       <v-row class="align-baseline">
         <v-col>
-          <v-text-field
+          <a-text-field
             :disabled="!localViewModel.form.plan"
             v-model.trim="localViewModel.form.instanceName"
             label="Instance URL"
@@ -46,7 +46,7 @@
                 >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
               >
             </template>
-          </v-text-field>
+          </a-text-field>
         </v-col>
 
         <v-col>
@@ -59,7 +59,7 @@
         </v-col>
       </v-row>
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.email"
         label="E-Mail Address of Primary User"
         placeholder="Farmer's E-Mail"
@@ -67,7 +67,7 @@
         :rules="emailRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.fullName"
         label="Full Name of the Farmer"
         placeholder="Farmer's Name"
@@ -75,7 +75,7 @@
         :rules="nameRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmName"
         label="Name of the Farm"
         placeholder="Farm Name"
@@ -83,7 +83,7 @@
         :rules="nameRules"
       />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmAddress"
         label="Farm Address / Location"
         placeholder="123 Fake Street, Exampletown, NY"
@@ -102,10 +102,10 @@
       />
 
       <div class="text-left text--secondary">Unit System to use</div>
-      <v-radio-group v-model="localViewModel.form.units" col>
-        <v-radio label="Metric" value="metric"></v-radio>
-        <v-radio label="US" value="us"></v-radio>
-      </v-radio-group>
+      <a-radio-group v-model="localViewModel.form.units">
+        <a-radio label="Metric" value="metric" />
+        <a-radio label="US" value="us" />
+      </a-radio-group>
 
       <a-select
         engineering="autocomplete"
@@ -140,7 +140,7 @@
         <template v-slot:item="{ item }">
           <div v-if="item.userExists">
             {{ item.name }}
-            <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
+            <a-chip color="grey--darken-2" dark>{{ item.email }}</a-chip>
           </div>
           <div v-else>
             <v-icon left>mdi-account-clock</v-icon>
@@ -158,7 +158,7 @@
           >
             <v-icon left>mdi-account-plus</v-icon>Invite Member to Organization
           </v-btn>
-          <v-divider />
+          <a-divider />
         </template>
         <template v-slot:append-outer>
           <v-btn fab color="primary" style="margin-top: -16px">
@@ -167,7 +167,7 @@
         </template>
       </a-select> -->
 
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
 
       <app-field-list
         v-if="localViewModel.form.fields.length > 0"
@@ -185,7 +185,7 @@
         @cancel="cancelFieldImport"
       ></app-field-creator>
 
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
 
       <app-dialog
         labelConfirm="Refresh Members"
@@ -213,7 +213,7 @@
       <v-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
         >Register FarmOS Instance</v-btn
       >
-    </v-form>
+    </a-form>
     <app-dialog
       title="Field Import"
       labelConfirm="OK"

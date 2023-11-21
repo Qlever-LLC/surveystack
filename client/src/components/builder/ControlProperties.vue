@@ -1,28 +1,37 @@
 <template>
   <div class="property-panel">
     <v-card-title class="pl-0">Properties</v-card-title>
-    <v-form v-if="control">
+    <a-form v-if="control">
       <!-- Default properties -->
-      <v-text-field v-model="control.label" label="Label" hide-details />
-      <v-text-field
+      <a-text-field v-model="control.label" label="Label" hide-details />
+      <a-text-field
         v-model="control.name"
         label="Value"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         hide-details
       />
-      <v-text-field v-model="control.hint" label="Hint" hide-details />
-      <v-text-field v-model="control.moreInfo" label="More info" hide-details />
+      <a-text-field v-model="control.hint" label="Hint" hide-details />
+      <markdown-editor
+        v-model="control.moreInfo"
+        :resources="survey.resources"
+        label="More info"
+        placeholder="Add more info here"
+        class="mt-6"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+      >
+        <template #title>More info (markdown supported)</template>
+      </markdown-editor>
 
       <!-- Control properties -->
-      <v-text-field
+      <a-text-field
         v-if="isText"
         v-model="control.defaultValue"
         @blur="handleDefaultValueTrim"
         label="Default value"
         hide-details
       />
-      <v-text-field
+      <a-text-field
         v-if="isNumber"
         type="number"
         v-model="control.defaultValue"
@@ -69,7 +78,7 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
-      <v-text-field
+      <a-text-field
         v-if="isMatrix"
         v-model="control.options.source.config.addRowLabel"
         label="Add Row label"
@@ -118,7 +127,7 @@
           <div>{{ item.name }}</div>
         </template>
       </a-select>
-      <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
+      <a-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea
         v-if="isScript"
@@ -279,14 +288,21 @@
       </template>
 
       <!-- Advanced properties -->
-      <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
-        Advanced
+      <v-btn
+        v-if="!showAdvanced && !hasExpressionEnabled"
+        color="grey darken-1"
+        class="align-self-end"
+        @click="showAdvanced = true"
+        small
+        text
+      >
+        advanced
       </v-btn>
       <div v-else class="extra-options">
         <v-spacer></v-spacer>
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
-          <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
+          <v-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
         <div>
@@ -298,7 +314,19 @@
           <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
         </div>
 
-        <div>
+        <div v-if="isText || isNumber || isDate || isMatrix || isOntology || isSelect">
+          <checkbox
+            label="Initialize Expression"
+            v-model="initialize.enabled"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          />
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-initialize')" size="20">
+            mdi-open-in-new
+          </v-icon>
+        </div>
+
+        <!-- TODO not implemented yet - decide to implement or remove-->
+        <!--div>
           <checkbox
             label="Calculate Expression"
             v-model="calculate.enabled"
@@ -307,9 +335,8 @@
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
             mdi-open-in-new
           </v-icon>
-        </div>
-
-        <div>
+        </div-->
+        <!--div>
           <checkbox
             label="Constraint Expression"
             v-model="constraint.enabled"
@@ -318,7 +345,7 @@
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
             mdi-open-in-new
           </v-icon>
-        </div>
+        </div-->
 
         <div>
           <checkbox
@@ -421,7 +448,7 @@
       </template>
 
       <v-spacer></v-spacer>
-    </v-form>
+    </a-form>
   </div>
 </template>
 <script>
@@ -436,7 +463,7 @@ import InstructionsImageSplitEditor from '@/components/builder/InstructionsImage
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
-import ASelect from '@/components/ui/ASelect.vue';
+import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
@@ -452,12 +479,13 @@ export default {
     Ontology,
     Date,
     Checkbox,
-    ASelect,
+    MarkdownEditor,
   },
   props: {
     control: {
       required: false,
     },
+    initialize: {},
     calculate: {},
     relevance: {},
     constraint: {},
@@ -575,6 +603,15 @@ export default {
       return (
         this.control.options.required ||
         !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
+      );
+    },
+    hasExpressionEnabled() {
+      return (
+        (this.initialize && this.initialize.enabled) ||
+        (this.calculate && this.calculate.enabled) ||
+        (this.relevance && this.relevance.enabled) ||
+        (this.constraint && this.constraint.enabled) ||
+        (this.apiCompose && this.apiCompose.enabled)
       );
     },
     hasLayoutOptions() {

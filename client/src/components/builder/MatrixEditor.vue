@@ -47,9 +47,9 @@
                     v-bind="attrs"
                     v-on="on"
                   >
-                    <v-divider vertical class="lock-line-decor" />
+                    <a-divider vertical class="lock-line-decor" />
                     <v-icon class="my-1">mdi-arrow-horizontal-lock</v-icon>
-                    <v-divider vertical class="lock-line-decor" />
+                    <a-divider vertical class="lock-line-decor" />
                   </v-card>
                 </template>
                 <span>Columns to the left of this line will always be visible</span>
@@ -77,8 +77,8 @@
                     </v-btn>
                   </div>
                   <v-card-text>
-                    <v-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
-                    <v-text-field v-model="item.value" label="Value" dense />
+                    <a-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
+                    <a-text-field v-model="item.value" label="Value" dense />
                     <a-select
                       label="Type"
                       :value="item.type"
@@ -137,7 +137,7 @@
                       />
                     </div>
 
-                    <v-text-field
+                    <a-text-field
                       v-if="item.type === 'text'"
                       v-model="item.defaultValue"
                       @blur="() => handleDefaultValueTrim(i)"
@@ -145,7 +145,7 @@
                       dense
                       hide-details
                     />
-                    <v-text-field
+                    <a-text-field
                       v-if="item.type === 'number'"
                       type="number"
                       v-model="item.defaultValue"
@@ -225,7 +225,7 @@
                     />
 
                     <h4 class="mt-6 mb-4">Display Options</h4>
-                    <v-text-field
+                    <a-text-field
                       type="number"
                       v-model.number="item.scaleWidth"
                       label="Scale minimum width %"

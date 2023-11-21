@@ -1,6 +1,13 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <app-control-hint :value="control.hint" />
     <v-row>
       <div :class="{ 'mx-auto': centered }">
@@ -19,7 +26,7 @@
           use text field with menu for year picker because year picker's
           UI placeholder year is the same as when year is selected
          -->
-        <v-menu
+        <a-menu
           v-else
           v-model="datePickerIsVisible"
           :close-on-content-click="false"
@@ -29,14 +36,14 @@
           min-width="290px"
         >
           <template v-slot:activator="{ on }">
-            <v-text-field
-              :value="dateFormatted"
-              @input="datePickerIsVisible = false"
+            <a-text-field
+              v-on="on"
               @change="updateDateInput"
+              @input="datePickerIsVisible = false"
+              :value="dateFormatted"
               label="Year"
               persistent-hint
               prepend-icon="mdi-calendar"
-              v-on="on"
               readonly
               outlined
               color="focus"
@@ -51,7 +58,7 @@
             no-title
             color="focus"
           />
-        </v-menu>
+        </a-menu>
       </div>
     </v-row>
 

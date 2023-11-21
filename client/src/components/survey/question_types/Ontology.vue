@@ -1,6 +1,13 @@
 <template>
   <div class="ontology question">
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <a-select
       v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
       :label="control.hint"
@@ -25,7 +32,7 @@
       cssMinHeight56px
     >
       <template v-slot:selection="data">
-        <v-chip
+        <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
@@ -33,15 +40,15 @@
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:item="data">
         <v-list-item-content>
           <v-list-item-title>
             {{ data.item.label }}
-            <v-chip v-if="data.item.count" small class="ma-2">
+            <a-chip v-if="data.item.count" small class="ma-2">
               {{ data.item.count }}
-            </v-chip>
+            </a-chip>
           </v-list-item-title>
         </v-list-item-content>
       </template>
@@ -73,7 +80,7 @@
       cssMinHeight56px
     >
       <template v-slot:selection="data">
-        <v-chip
+        <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
@@ -81,15 +88,15 @@
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:item="data">
         <v-list-item-content>
           <v-list-item-title>
             {{ data.item.label }}
-            <v-chip v-if="data.item.count" small class="ma-2">
+            <a-chip v-if="data.item.count" small class="ma-2">
               {{ data.item.count }}
-            </v-chip>
+            </a-chip>
           </v-list-item-title>
         </v-list-item-content>
       </template>
@@ -123,7 +130,7 @@
       cssMinHeight56px
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
+        <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
@@ -131,7 +138,7 @@
           @click:close="removeValue(data.item)"
         >
           {{ getLabelForItemValue(data.item) }}
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:selection="data" v-else>
         {{ getLabelForItemValue(data.item) }}
@@ -157,7 +164,7 @@
 </template>
 
 <script>
-import { isNil, sortBy, uniq, without } from 'lodash';
+import { isNil, uniq, without } from 'lodash';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';

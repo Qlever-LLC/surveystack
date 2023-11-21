@@ -5,6 +5,29 @@ import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtil
 
 const { actions, mutations } = draftStore;
 
+// marker control ID's to setup the initial state
+const INITIAL_FIRST_CONTROL_ID = 'first-node';
+const INITIAL_CURRENT_CONTROL_ID = 'current-node'; // if not set, it'll be the same as the first
+const EXPECTED_NEXT_CONTROL_ID = 'next-node'; // if not set, commit('SHOW_OVERVIEW', true) is expected
+
+const createStateWithControls = (controls) => {
+  const survey = {
+    ...createSurvey({ group: { id: null, path: null } }),
+  };
+  addRevisionToSurvey(survey, controls);
+  const submission = createSubmissionFromSurvey({ survey, version: survey.latestVersion });
+  const state = {};
+  mutations.INIT(state, { survey, submission, persist: false });
+
+  // setup the submission draft state
+  const currentNode = state.root.first(({ model }) => model.id === INITIAL_CURRENT_CONTROL_ID);
+  const firstNode = state.root.first(({ model }) => model.id === INITIAL_FIRST_CONTROL_ID);
+  state.node = currentNode || firstNode || null;
+  state.firstNode = firstNode || null;
+
+  return state;
+};
+
 describe('draft store', () => {
   describe('actions', () => {
     describe('init', () => {
@@ -35,30 +58,153 @@ describe('draft store', () => {
         await expect(call).toHaveBeenNthCalledWith(3, 'dispatch', 'next');
       });
     });
-    describe('next', () => {
-      // marker control ID's to setup the initial state
-      const INITIAL_FIRST_CONTROL_ID = 'first-node';
-      const INITIAL_CURRENT_CONTROL_ID = 'current-node'; // if not set, it'll be the same as the first
-      const EXPECTED_NEXT_CONTROL_ID = 'next-node'; // if not set, commit('SHOW_OVERVIEW', true) is expected
-
-      const createStateWithControls = (controls) => {
-        const survey = {
-          ...createSurvey({ group: { id: null, path: null } }),
-        };
-        addRevisionToSurvey(survey, controls);
-        const submission = createSubmissionFromSurvey({ survey, version: survey.latestVersion });
-        const state = {};
-        mutations.INIT(state, { survey, submission, persist: false });
-
-        // setup the submission draft state
+    describe('setProperty', () => {
+      const runTestWithControls = async (controls) => {
+        const state = createStateWithControls(controls);
         const currentNode = state.root.first(({ model }) => model.id === INITIAL_CURRENT_CONTROL_ID);
-        const firstNode = state.root.first(({ model }) => model.id === INITIAL_FIRST_CONTROL_ID);
-        state.node = currentNode || firstNode || null;
-        state.firstNode = firstNode || null;
 
-        return state;
+        const dispatch = jest.fn();
+        const commit = jest.fn();
+        const path = currentNode
+          .getPath()
+          .map((n) => currentNode.model.name)
+          .join('.');
+        const value = 'foo';
+        await actions.setProperty({ state, dispatch, commit }, { path, value });
+        return { commit, dispatch, currentNode, path, value };
       };
+      it('calls if node is a page', async () => {
+        const { commit, dispatch, currentNode, path, value } = await runTestWithControls([
+          createControl({ type: 'page', id: INITIAL_CURRENT_CONTROL_ID }),
+        ]);
+        expect(commit).toHaveBeenCalledWith('SET_PROPERTY', { path, value });
+        expect(dispatch).toHaveBeenCalledWith('initialize', currentNode);
+      });
+      it('does not call initialize if node is not a page (initialize shall be called only on next', async () => {
+        const { commit, dispatch, currentNode, path, value } = await runTestWithControls([
+          createControl({ type: 'text', id: INITIAL_CURRENT_CONTROL_ID }),
+        ]);
+        expect(commit).toHaveBeenCalledWith('SET_PROPERTY', { path, value });
+        expect(dispatch).not.toHaveBeenCalledWith('initialize', currentNode);
+      });
+    });
+    describe('initialize', () => {
+      const runTestWithControls = async (controls, nodeNameToBeModified = undefined, force = false) => {
+        const state = createStateWithControls(controls);
+        const nextNode = state.root.first(({ model }) => model.id === EXPECTED_NEXT_CONTROL_ID);
 
+        if (nodeNameToBeModified) {
+          state.submission.data[nodeNameToBeModified].meta.dateModified = 'dummy-modification-date';
+        }
+        const dispatch = jest.fn();
+        const path = nextNode
+          .getPath()
+          .map((n) => nextNode.model.name)
+          .join('.');
+        if (force) {
+          await actions.initializeForced({ state, dispatch }, nextNode);
+        } else {
+          await actions.initialize({ state, dispatch }, nextNode);
+        }
+        return { dispatch, path, state };
+      };
+      it("initializes the value of the passed node if the user didn't modify the value manually", async () => {
+        const expectedValue = 'foo bar';
+        const control1 = createControl({
+          type: 'text',
+          id: INITIAL_CURRENT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: '',
+            },
+          },
+        });
+        const control2 = createControl({
+          type: 'text',
+          id: EXPECTED_NEXT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: "function initialize(submission, survey, parent) {return 'foo bar';}",
+            },
+          },
+        });
+        const { dispatch, path } = await runTestWithControls([control1, control2]);
+        expect(dispatch).toHaveBeenCalledWith('setProperty', {
+          path: 'data.' + control2.name + '.value',
+          value: expectedValue,
+          calculate: true,
+          initialize: false,
+        });
+      });
+      it('does not initialize the value of the passed node if the user did modify the value manually', async () => {
+        const expectedValue = 'foo bar';
+        const control1 = createControl({
+          type: 'text',
+          name: 'text_1',
+          id: INITIAL_CURRENT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: '',
+            },
+          },
+        });
+        const control2 = createControl({
+          type: 'text',
+          name: 'text_2',
+          id: EXPECTED_NEXT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: "function initialize(submission, survey, parent) {return 'foo bar';}",
+            },
+          },
+        });
+        const { dispatch, path } = await runTestWithControls([control1, control2], 'text_2');
+        expect(dispatch).not.toHaveBeenCalledWith('setProperty', {
+          path: 'data.' + control2.name + '.value',
+          value: expectedValue,
+          calculate: true,
+          initialize: false,
+        });
+      });
+      it('if forced, does initialize the value of the passed node even if the user did modify the value manually', async () => {
+        const expectedValue = 'foo bar';
+        const control1 = createControl({
+          type: 'text',
+          name: 'text_1',
+          id: INITIAL_CURRENT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: '',
+            },
+          },
+        });
+        const control2 = createControl({
+          type: 'text',
+          name: 'text_2',
+          id: EXPECTED_NEXT_CONTROL_ID,
+          options: {
+            initialize: {
+              enabled: true,
+              code: "function initialize(submission, survey, parent) {return 'foo bar';}",
+            },
+          },
+        });
+        const { dispatch, path, state } = await runTestWithControls([control1, control2], 'text_2', true);
+        expect(dispatch).toHaveBeenNthCalledWith(1, 'setProperty', {
+          path: 'data.' + control2.name + '.meta.dateModified',
+          value: null,
+          calculate: false,
+          initialize: false,
+        });
+        expect(dispatch).toHaveBeenNthCalledWith(2, 'initialize', expect.objectContaining({ model: control2 }));
+      });
+    });
+    describe('next', () => {
       const runTestWithControls = async (controls) => {
         const state = createStateWithControls(controls);
         const nextNode = state.root.first(({ model }) => model.id === EXPECTED_NEXT_CONTROL_ID);
@@ -69,6 +215,7 @@ describe('draft store', () => {
 
         if (nextNode) {
           expect(commit).toHaveBeenCalledWith('NEXT', nextNode);
+          expect(dispatch).toHaveBeenCalledWith('initialize', nextNode);
         } else {
           expect(commit).toHaveBeenCalledWith('SHOW_OVERVIEW', true);
         }
@@ -183,6 +330,12 @@ describe('draft store', () => {
           createControl({ type: 'number', id: INITIAL_FIRST_CONTROL_ID }),
           createControl({ type: 'number', id: 'hidden-control', options: { hidden: true } }),
         ]));
+      it('dispatches initialize for the next control', async () => {
+        await runTestWithControls([
+          createControl({ type: 'number', id: INITIAL_FIRST_CONTROL_ID }),
+          createControl({ type: 'number', id: EXPECTED_NEXT_CONTROL_ID }),
+        ]);
+      });
     });
   });
 

@@ -1,6 +1,13 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <!-- TODO in Vue3 remove .native -->
     <a-select
       engineering="autocomplete"
@@ -23,7 +30,7 @@
       itemSlot
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
+        <a-chip
           close
           v-bind="data.attrs"
           :input-value="data.selected"
@@ -33,7 +40,7 @@
           <template v-slot:default>
             <span v-html="data.item.label" />
           </template>
-        </v-chip>
+        </a-chip>
       </template>
       <template v-slot:selection="{ item }" v-else>
         <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
@@ -59,6 +66,7 @@ import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
+
   async created() {
     await this.fetchFarms();
   },

@@ -22,7 +22,7 @@
       </div>
     </template>
     <template v-else-if="initialized && !membership">
-      <v-text-field v-model="code" label="Invitation"></v-text-field>
+      <a-text-field v-model="code" label="Invitation" />
       <div class="d-flex justify-end">
         <v-btn class="primary" @click="fetchData">Try code</v-btn>
       </div>

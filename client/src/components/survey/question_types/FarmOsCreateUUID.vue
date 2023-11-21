@@ -1,14 +1,22 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize"
+    />
     <div style="display: flex">
       <div style="flex: 1">
-        <v-text-field
+        <!-- TODO in Vue3 remove .native -->
+        <a-text-field
           outlined
           :label="control.hint"
-          v-bind:value="localValue"
-          v-on:input="onInput"
-          @keyup.enter.prevent="submit"
+          :value="localValue"
+          @input="onInput"
+          @keyup.native.enter.prevent="submit"
           ref="textField"
           class="full-width"
           :disabled="!relevant"
@@ -31,6 +39,7 @@ import { uuidv4 } from '@/utils/surveys';
 
 export default {
   mixins: [baseQuestionComponent],
+
   methods: {
     getValueOrNull,
     submit() {
@@ -47,20 +56,13 @@ export default {
       }
     },
     tryAutofocus() {
-      if (
-        typeof document === 'undefined' ||
-        !this.$refs.textField.$refs.input ||
-        document.activeElement === this.$refs.input
-      ) {
-        return false;
+      if (this.$refs.textField) {
+        this.$refs.textField.focus({ preventScroll: true });
+        return true;
       }
-
-      this.$refs.textField.$refs.input.focus({ preventScroll: true });
-
+      return false;
       // could we use this instead?
-      // this.$nextTick(() => this.$refs.textField.$refs.input.focus());
-
-      return true;
+      // this.$nextTick(() => this.$refs.textField.focus());
     },
   },
   computed: {

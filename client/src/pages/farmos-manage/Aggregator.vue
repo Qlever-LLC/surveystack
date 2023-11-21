@@ -35,23 +35,23 @@
     </div>
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
-      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
+      <a-text-field v-model.trim="updatedNote" label="Note" hide-details />
       <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
     </div>
 
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
       <v-label>Tags for instance on FarmOS Aggregator</v-label>
       <div class="d-flex mt-4">
-        <v-chip v-for="(tag, idx) in tags" :key="`tag-${idx}`" green>{{ tag }}</v-chip>
-        <v-chip v-if="tags.length === 0" color="secondary">No Tags associated with instance</v-chip>
+        <a-chip v-for="(tag, idx) in tags" :key="`tag-${idx}`">{{ tag }}</a-chip>
+        <a-chip v-if="tags.length === 0" color="secondary">No Tags associated with instance</a-chip>
       </div>
     </div>
 
     <template v-if="!!selectedInstance">
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
       <h2 ref="map-group">
         Group Mappings for
-        <v-chip>{{ selectedInstance }}</v-chip>
+        <a-chip>{{ selectedInstance }}</a-chip>
       </h2>
 
       <div class="d-flex my-2 align-baseline">
@@ -95,11 +95,11 @@
         >No Group Mappings exist for {{ selectedInstance }}</v-alert
       >
 
-      <v-divider class="my-8"></v-divider>
+      <a-divider class="my-8" />
 
       <h2 ref="map-user">
         User Mappings for
-        <v-chip>{{ selectedInstance }}</v-chip>
+        <a-chip>{{ selectedInstance }}</a-chip>
       </h2>
 
       <div class="d-flex my-2 justify-space-between align-baseline">
@@ -162,7 +162,7 @@
               <td>{{ `${farm.instanceName}` }}</td>
               <td>
                 <div>
-                  <v-chip
+                  <a-chip
                     small
                     class="ma-1"
                     dark
@@ -171,11 +171,11 @@
                     :key="`farm-${idx}-user-${uidx}`"
                   >
                     {{ userMapping.user }}
-                  </v-chip>
+                  </a-chip>
                 </div>
 
                 <div>
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     dark
@@ -184,7 +184,7 @@
                     :key="`farm-${idx}-group-${gidx}`"
                   >
                     {{ groupMapping.group }}
-                  </v-chip>
+                  </a-chip>
                 </div>
               </td>
               <td>
@@ -218,9 +218,9 @@
               <td>{{ `${farm.instanceName}` }}</td>
               <td>
                 <div>
-                  <v-chip small class="ma-1" dark v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
+                  <a-chip small class="ma-1" dark v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
                     {{ tag }}
-                  </v-chip>
+                  </a-chip>
                 </div>
               </td>
               <td>
@@ -243,9 +243,7 @@ import ASelect from '@/components/ui/ASelect.vue';
 
 export default {
   emits: ['addSuperAdminNote'],
-  components: {
-    ASelect,
-  },
+
   props: {
     groups: Array,
     mappings: Object,
@@ -253,6 +251,7 @@ export default {
     loading: Boolean,
     users: Array,
   },
+
   data() {
     return {
       selectedInstance: null,

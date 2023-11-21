@@ -14,7 +14,6 @@ export default {
       this.resultItems = [];
       let hasErrors = false;
 
-      // debugger;
       if (error) {
         hasErrors = true;
         if (isOnline()) {
