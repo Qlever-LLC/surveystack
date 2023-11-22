@@ -49,11 +49,8 @@ import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
-import AWindow from '@/components/ui/AWindow.vue';
-import AWindowItem from '@/components/ui/AWindowItem.vue';
 
 export default {
-  components: { AWindowItem, AWindow },
   data() {
     return {
       mappings: null,

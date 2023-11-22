@@ -22,7 +22,7 @@
           </a-tab>
         </a-tabs>
         <a-window v-model="activeTab" class="flex-grow-1" v-if="!isLoading">
-          <a-tab-item
+          <a-window-item
             v-for="tab in tabs"
             :key="tab.name"
             :value="tab.name"
@@ -112,7 +112,7 @@
                 </v-row>
               </div>
             </v-card>
-          </a-tab-item>
+          </a-window-item>
         </a-window>
         <v-card v-else>
           <v-card-text class="d-flex align-center justify-center">
@@ -153,16 +153,12 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
-import ATabItem from '@/components/ui/AWindowItem.vue';
-import AWindow from '@/components/ui/AWindow.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   mixins: [ResultMixin],
   components: {
-    AWindow,
-    ATabItem,
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
