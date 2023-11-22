@@ -8,7 +8,7 @@
 <script>
 import IosInstallBanner from '@/components/ui/IosInstallBanner/IosInstallBanner.vue';
 import DefaultInstallBanner from '@/components/ui/DefaultInstallBanner.vue';
-import { isIosSafari, isInStandaloneMode } from '@/utils/compatibility';
+import { isInStandaloneMode, isIosSafari } from '@/utils/compatibility';
 
 export default {
   components: {

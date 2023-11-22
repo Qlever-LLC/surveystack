@@ -4,7 +4,7 @@
     :data-testid="`diff-card-${diffInfo.indexPath}-${diffInfo.changeType}`"
   >
     <button @click="isOpen = !isOpen" :disabled="!haveChangeDetails">
-      <v-row>
+      <a-row>
         <control-card-header
           :index="diffInfo.indexPath"
           :title="diffInfo.label"
@@ -15,13 +15,13 @@
           :chip-color="diffInfo.color"
           class="ml-3 align-self-center"
         />
-        <v-spacer />
-        <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
+        <a-spacer />
+        <a-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
-        </v-icon>
-      </v-row>
+        </a-icon>
+      </a-row>
     </button>
-    <v-simple-table v-if="isOpen" fixed-header dense class="mb-4">
+    <a-table v-if="isOpen" fixed-header dense class="mb-4">
       <template v-slot:default>
         <thead>
           <tr>
@@ -33,8 +33,12 @@
               @click="isLocalVersionSelectable && changeDiscarded(false)"
             >
               {{ versionNameLocalRevision }}
-              <v-icon v-if="isLocalVersionSelected" style="margin-top: -3px" small title="this version is selected"
-                >mdi-checkbox-marked-circle-outline</v-icon
+              <a-icon
+                v-if="isLocalVersionSelected"
+                style="margin-top: -3px"
+                size="small"
+                title="this version is selected"
+                >mdi-checkbox-marked-circle-outline</a-icon
               >
             </th>
             <th class="text-left">{{ versionNameRemoteRevisionOld }}</th>
@@ -46,8 +50,12 @@
               @click="isNewRemoteVersionSelectable && changeDiscarded(true)"
             >
               {{ versionNameRemoteRevisionNew }}
-              <v-icon v-if="isNewRemoteVersionSelected" style="margin-top: -3px" small title="this version is selected"
-                >mdi-checkbox-marked-circle-outline</v-icon
+              <a-icon
+                v-if="isNewRemoteVersionSelected"
+                style="margin-top: -3px"
+                size="small"
+                title="this version is selected"
+                >mdi-checkbox-marked-circle-outline</a-icon
               >
             </th>
           </tr>
@@ -74,15 +82,15 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
     <slot></slot>
-    <v-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
       Selecting your Version of this question is not possible because the new
       {{ versionNameRemoteRevisionNew }} contains a required change.
       <template v-slot:action="{ attrs }">
         <v-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </v-btn>
       </template>
-    </v-snackbar>
+    </a-snackbar>
   </v-card>
 </template>
 
