@@ -1,6 +1,6 @@
 <template>
   <div class="control-adder">
-    <v-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
+    <a-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
         <v-btn v-model="fabIsOpen" fab color="blue darken-2" dark data-testid="control-adder-open">
           <v-icon v-if="fabIsOpen">mdi-close</v-icon>
@@ -53,7 +53,7 @@
           </v-btn>
         </div>
       </template>
-    </v-speed-dial>
+    </a-speed-dial>
   </div>
 </template>
 
@@ -120,11 +120,6 @@ export default {
   left: 50%;
   transform: translateX(-50%);
 }
-
-/* .control-adder >>> .v-speed-dial--direction-top .v-speed-dial__list,
-.control-adder >>> .v-speed-dial--direction-bottom .v-speed-dial__list {
-  with
-} */
 
 .bg-white {
   background-color: white;

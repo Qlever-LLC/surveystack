@@ -1,7 +1,11 @@
 <template>
   <v-container>
-    <v-row class="text-center">
+    <a-row class="text-center">
       <v-col>Please install SurveyStack Kit from the Play Store to use with hardware. </v-col>
-    </v-row>
+    </a-row>
   </v-container>
 </template>
+
+<script>
+export default {};
+</script>
