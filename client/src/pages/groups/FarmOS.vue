@@ -1,9 +1,9 @@
 <template>
   <v-container v-if="farmosEnabled" class="max-800">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-alert
+    <a-alert
       v-if="successMessage"
       class="mt-4"
       style="cursor: pointer"
@@ -11,11 +11,11 @@
       text
       type="success"
       @click="successMessage = null"
-      >{{ successMessage }}</v-alert
+      >{{ successMessage }}</a-alert
     >
-    <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+    <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
       errorMessage
-    }}</v-alert>
+    }}</a-alert>
 
     <app-dialog
       modal
@@ -108,30 +108,30 @@
 
   <v-container v-else>
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-row v-if="loading">
+    <a-row v-if="loading">
       <a-col>
-        <v-progress-linear indeterminate class="mb-0" />
+        <a-progress-linear indeterminate class="mb-0" />
       </a-col>
-    </v-row>
-    <v-row v-else>
+    </a-row>
+    <a-row v-else>
       <a-col lg="4" class="mx-auto">
-        <v-card class="pa-8 text-center" v-if="superAdmin">
+        <a-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
             Contact Our-Sci</v-btn
           >
-        </v-card>
-        <v-card class="pa-8 text-center" v-else>
+        </a-card>
+        <a-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
             >Contact Our-Sci</v-btn
           >
-        </v-card>
+        </a-card>
       </a-col>
-    </v-row>
+    </a-row>
   </v-container>
 </template>
 
@@ -144,7 +144,6 @@ import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDiscon
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 import ACol from '@/components/ui/ACol.vue';
 
@@ -159,8 +158,6 @@ export default {
     FarmOSDisconnectDialog,
     FarmOSRemoveNoteDialog,
     appDialog,
-    appGroupBreadcrumbs,
-    ACol,
   },
   computed: {
     superAdmin() {

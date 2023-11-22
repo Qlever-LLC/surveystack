@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="py-0">
-    <v-row class="pa-0">
+    <a-row class="pa-0">
       <a-col v-if="disabled" cols="auto" class="pa-0 mt-1"
         ><b
           >Change level:
@@ -8,7 +8,7 @@
         </b>
       </a-col>
       <a-col v-else cols="auto" class="pa-0">
-        <v-select
+        <a-select
           outlined
           dense
           hide-details
@@ -20,11 +20,11 @@
         />
       </a-col>
       <a-col cols="auto" class="pa-0 align-self-center">
-        <v-tooltip bottom>
+        <a-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
+            <a-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
               mdi-information-outline
-            </v-icon>
+            </a-icon>
           </template>
           <p>
             <b>Major:</b><br />
@@ -40,9 +40,9 @@
             <b>Small fix:</b><br />
             Fixes a problem or error. Everyone should update.
           </p>
-        </v-tooltip>
+        </a-tooltip>
       </a-col>
-    </v-row>
+    </a-row>
   </v-container>
 </template>
 

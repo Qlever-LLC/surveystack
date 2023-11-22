@@ -1,19 +1,19 @@
 <template>
   <v-container>
-    <v-card>
-      <v-card-text>
+    <a-card>
+      <a-card-text>
         <div class="overline">{{ user._id }}</div>
-        <v-btn v-if="$store.getters['auth/isSuperAdmin']" outlined small :href="`/users/${user._id}/edit`"
-          ><v-icon small>mdi-pencil</v-icon>Edit</v-btn
-        >
+        <v-btn v-if="$store.getters['auth/isSuperAdmin']" outlined small :href="`/users/${user._id}/edit`">
+          <a-icon small>mdi-pencil</a-icon>Edit
+        </v-btn>
         <p class="display-1 text--primary mt-2 mb-1">{{ user.name }}</p>
         <p class="subtitle-1">{{ user.email }}</p>
-      </v-card-text>
-    </v-card>
-    <v-card v-if="memberships.length > 0" class="mt-3">
-      <v-card-title>Memberships</v-card-title>
+      </a-card-text>
+    </a-card>
+    <a-card v-if="memberships.length > 0" class="mt-3">
+      <a-card-title>Memberships</a-card-title>
       <v-list>
-        <v-list-item
+        <a-list-item
           v-for="membership in memberships"
           :key="membership._id"
           :to="`/g${membership.group.path}`"
@@ -21,12 +21,12 @@
         >
           <v-list-item-content>
             <span class="text--secondary caption">{{ membership.group.path }}</span>
-            <v-list-item-title>{{ membership.group.name }}</v-list-item-title>
-            <v-list-item-subtitle class="text--secondary">{{ membership.role }}</v-list-item-subtitle>
+            <a-list-item-title>{{ membership.group.name }}</a-list-item-title>
+            <a-list-item-subtitle class="text--secondary">{{ membership.role }}</a-list-item-subtitle>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
       </v-list>
-    </v-card>
+    </a-card>
   </v-container>
 </template>
 

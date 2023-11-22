@@ -1,6 +1,6 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
-import { MembershipService, GroupService } from '@/services/storage.service';
+import { GroupService, MembershipService } from '@/services/storage.service';
 import { get } from 'lodash';
 
 const createInitialState = () => ({

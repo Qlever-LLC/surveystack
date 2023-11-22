@@ -2,11 +2,11 @@
   <v-container v-if="entity && show" class="survey-detail">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
       <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
-        <v-icon>mdi-pencil</v-icon>
+        <a-icon>mdi-pencil</a-icon>
         <span class="ml-2">Edit</span>
       </v-btn>
       <v-btn class="mx-2" :to="`/submissions?survey=${entity._id}`">
-        <v-icon>mdi-table</v-icon>
+        <a-icon>mdi-table</a-icon>
         <span class="ml-2">Results</span>
       </v-btn>
     </div>
@@ -37,24 +37,24 @@
           top
           left
         >
-          <v-list class="pa-0 mx-auto" max-width="260">
-            <v-list-item @click="startDraft(entity)">
+          <a-list max-width="260">
+            <a-list-item @click="startDraft(entity)">
               <v-list-item-content>
-                <v-list-item-title>Start survey</v-list-item-title>
+                <a-list-item-title>Start survey</a-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
                   Start a survey as the user you are signed in with
                 </v-list-item-content>
               </v-list-item-content>
-            </v-list-item>
-            <v-list-item @click="showSelectMember = true">
+            </a-list-item>
+            <a-list-item @click="showSelectMember = true">
               <v-list-item-content>
-                <v-list-item-title>Start survey as a member</v-list-item-title>
+                <a-list-item-title>Start survey as a member</a-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
                   Select the member for whom you want to start the survey
                 </v-list-item-content>
               </v-list-item-content>
-            </v-list-item>
-          </v-list>
+            </a-list-item>
+          </a-list>
         </btn-dropdown>
 
         <div class="my-3 d-flex justify-center">
@@ -77,7 +77,7 @@
   </v-container>
   <v-container fill-height v-else>
     <v-layout column justify-center align-center>
-      <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </v-layout>
   </v-container>
 </template>

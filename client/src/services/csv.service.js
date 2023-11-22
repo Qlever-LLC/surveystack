@@ -1,7 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-param-reassign: 0 */
 import papa from 'papaparse';
-import { cloneDeep, omitBy, isObject, isEmpty } from 'lodash';
+import { cloneDeep, isEmpty, isObject, omitBy } from 'lodash';
 import { flatten } from 'flat';
 import { getPublicDownloadUrl } from '@/utils/resources';
 
