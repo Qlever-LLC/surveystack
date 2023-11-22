@@ -23,11 +23,13 @@
     >
       <template v-slot:title>Reassign Submission</template>
       <template>
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           :items="reassignment.groups"
           v-model="reassignment.group"
           label="Group"
           :filter="reassignGroupFilter"
+          itemSlot
         >
           <template v-slot:item="{ item }">
             <div class="d-flex flex-column py-1">
@@ -35,13 +37,14 @@
               <div class="text--secondary caption">{{ item.path }}</div>
             </div>
           </template>
-        </v-autocomplete>
-        <v-autocomplete
+        </a-select>
+        <a-select
+          engineering="autocomplete"
           :disabled="reassignment.group === null"
           :items="reassignment.users"
           v-model="reassignment.user"
           label="User"
-        ></v-autocomplete>
+        />
       </template>
     </app-dialog>
 
@@ -65,12 +68,12 @@
           </v-btn>
         </div>
       </div>
-      <v-expansion-panels class="mb-6">
-        <v-expansion-panel>
-          <v-expansion-panel-header expand-icon="mdi-menu-down"
-            ><span class="text-body-1">Filters</span>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+      <a-expansion-panels class="mb-6">
+        <a-expansion-panel>
+          <a-expansion-panel-title expand-icon="mdi-menu-down">
+            <span class="text-body-1">Filters</span>
+          </a-expansion-panel-title>
+          <a-expansion-panel-text>
             <app-submissions-filter-basic
               v-if="!showAdvancedFilters && queryList"
               :queryList="queryList"
@@ -86,9 +89,9 @@
               @apply-advanced-filters="fetchData"
               @reset="reset"
             />
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
+          </a-expansion-panel-text>
+        </a-expansion-panel>
+      </a-expansion-panels>
       <v-card class="my-5 px-2">
         <v-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>
@@ -99,13 +102,13 @@
         <v-card-text>
           <v-row>
             <v-col md="2" sm="6">
-              <v-select label="Format" dense :items="apiDownloadFormats" hide-details v-model="apiDownloadFormat" />
+              <a-select label="Format" dense :items="apiDownloadFormats" hide-details v-model="apiDownloadFormat" />
             </v-col>
             <v-col md="2" sm="6">
-              <v-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
+              <a-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
             </v-col>
             <v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
-              <v-select
+              <a-select
                 label="Matrix answers"
                 dense
                 :items="apiDownloadExpandAllMatricesOptions"
@@ -114,16 +117,13 @@
               />
             </v-col>
             <v-col md="2" sm="6">
-              <v-btn @click="startDownload" color="primary">
-                <v-icon left>mdi-download</v-icon>
-                Download
-              </v-btn>
+              <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
             </v-col>
           </v-row>
 
           <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
             <v-col sm="2">
-              <v-select
+              <a-select
                 label="Page Size"
                 dense
                 :items="pageSizes"
@@ -146,11 +146,11 @@
     </v-container>
 
     <v-container>
-      <v-tabs v-model="tab">
-        <v-tab v-for="view in views" :key="view.tab">
+      <a-tabs v-model="tab">
+        <a-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
-        </v-tab>
-      </v-tabs>
+        </a-tab>
+      </a-tabs>
       <v-window v-model="tab" touchless>
         <a-window-item>
           <app-submissions-table-client-csv
@@ -183,7 +183,7 @@
 
       <v-row class="my-2">
         <v-col cols="1">
-          <v-select
+          <a-select
             style="max-width: 5rem; display: inline-block"
             label="Page Size"
             dense
