@@ -1,6 +1,6 @@
 <template>
   <v-container class="home" :fluid="true">
-    <v-row>
+    <a-row>
       <v-col>
         <a-img
           v-if="isWhitelabel"
@@ -11,9 +11,9 @@
         />
         <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
       </v-col>
-    </v-row>
+    </a-row>
 
-    <v-row>
+    <a-row>
       <v-col align="center">
         <app-basic-list
           class="maxw-40 text-left"
@@ -60,9 +60,9 @@
           </template>
         </app-basic-list>
       </v-col>
-    </v-row>
+    </a-row>
 
-    <v-row>
+    <a-row>
       <v-col align="center">
         <app-basic-list
           class="maxw-40 text-left"
@@ -109,25 +109,25 @@
           </template>
         </app-basic-list>
       </v-col>
-    </v-row>
+    </a-row>
 
     <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
       <auth-selector />
     </v-dialog>
 
-    <v-row>
+    <a-row>
       <v-col align="center">
         <v-btn x-large text :to="`/surveys/browse`">
           <v-icon left>mdi-text-box-search-outline</v-icon>Browse All Surveys
         </v-btn>
       </v-col>
-    </v-row>
+    </a-row>
 
-    <v-row v-if="false">
+    <a-row v-if="false">
       <v-col align="center">
         <v-btn color="primary" x-large href="surveystack://measurement">Run Measurement</v-btn>
       </v-col>
-    </v-row>
+    </a-row>
   </v-container>
 </template>
 

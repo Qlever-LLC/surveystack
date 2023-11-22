@@ -39,6 +39,11 @@ import AToolbarTitle from '../src/components/ui/elements/AToolbarTitle.vue';
 import ABanner from '../src/components/ui/elements/ABanner.vue';
 import ABadge from '../src/components/ui/elements/ABadge.vue';
 import ATab from '../src/components/ui/elements/ATab.vue';
+import ASnackbar from '../src/components/ui/elements/ASnackbar.vue';
+import ARow from '../src/components/ui/elements/ARow.vue';
+import ATextarea from '../src/components/ui/elements/ATextarea.vue';
+import ATabs from '../src/components/ui/elements/ATabs.vue';
+import AToolbarItems from '../src/components/ui/elements/AToolbarItems.vue';
 
 const localVue = createLocalVue();
 localVue.component('a-btn-toggle', ABtnToggle);
@@ -76,6 +81,11 @@ localVue.component('a-toolbar-title', AToolbarTitle);
 localVue.component('a-banner', ABanner);
 localVue.component('a-badge', ABadge);
 localVue.component('a-tab', ATab);
+localVue.component('a-snackbar', ASnackbar);
+localVue.component('a-row', ARow);
+localVue.component('a-textarea', ATextarea);
+localVue.component('a-tabs', ATabs);
+localVue.component('a-toolbar-items', AToolbarItems);
 
 localVue.use(Vuex);
 localVue.use(VueRouter);

@@ -12,7 +12,7 @@
       >
         <template v-slot:top>
           <a-toolbar flat>
-            <v-row>
+            <a-row>
               <v-col>
                 <a-toolbar-title>Simple CSV</a-toolbar-title>
               </v-col>
@@ -22,7 +22,7 @@
               <v-col :cols="2">
                 <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
               </v-col>
-            </v-row>
+            </a-row>
           </a-toolbar>
         </template>
         <template v-slot:header="{ props: { headers } }">

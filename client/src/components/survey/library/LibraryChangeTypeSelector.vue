@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="py-0">
-    <v-row class="pa-0">
+    <a-row class="pa-0">
       <v-col v-if="disabled" cols="auto" class="pa-0 mt-1"
         ><b
           >Change level:
@@ -42,13 +42,12 @@
           </p>
         </a-tooltip>
       </v-col>
-    </v-row>
+    </a-row>
   </v-container>
 </template>
 <script>
 export default {
   name: 'library-change-type-selector',
-
   props: ['value', 'disabled', 'label'],
   data() {
     return {
