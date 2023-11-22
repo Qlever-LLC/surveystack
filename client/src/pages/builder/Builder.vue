@@ -17,7 +17,7 @@
       @show-version-dialog="versionsDialogIsVisible = true"
     />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </div>
     <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
@@ -48,7 +48,7 @@
       <v-card>
         <v-card-text class="pa-4">
           <span>Submitting Builder</span>
-          <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
+          <a-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
     </v-dialog>

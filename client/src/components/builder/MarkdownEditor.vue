@@ -49,7 +49,7 @@
             />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
-              <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
+              <a-progress-circular v-if="isLoading" indeterminate color="primary" />
               <v-icon v-else color="gray darken-4">mdi-paperclip</v-icon>
             </div>
           </div>

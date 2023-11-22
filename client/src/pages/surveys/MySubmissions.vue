@@ -116,7 +116,7 @@
         </a-window>
         <v-card v-else>
           <v-card-text class="d-flex align-center justify-center">
-            <v-progress-circular :size="50" color="primary" indeterminate />
+            <a-progress-circular :size="50" color="primary" indeterminate />
           </v-card-text>
         </v-card>
       </a-row>

@@ -27,13 +27,7 @@
         <v-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />
-            <v-progress-circular
-              v-if="isLoading"
-              indeterminate
-              :width="7"
-              :size="80"
-              color="primary"
-            ></v-progress-circular>
+            <a-progress-circular v-if="isLoading" indeterminate :width="7" :size="80" color="primary" />
             <div v-if="!isLoading" class="scan-region-outline" />
           </div>
         </v-container>
@@ -52,6 +46,7 @@ QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { 
 
 export default defineComponent({
   emits: ['codeDetected'],
+
   props: {
     small: {
       type: Boolean,

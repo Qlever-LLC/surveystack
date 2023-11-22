@@ -3,12 +3,7 @@
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage FarmOS Instances</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
     <a-select
@@ -242,7 +237,6 @@ import _ from 'lodash';
 
 export default {
   emits: ['addSuperAdminNote'],
-
   props: {
     groups: Array,
     mappings: Object,

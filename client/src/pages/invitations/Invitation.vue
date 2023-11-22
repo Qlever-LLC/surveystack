@@ -27,7 +27,7 @@
         <v-btn class="primary" @click="fetchData">Try code</v-btn>
       </div>
     </template>
-    <v-progress-circular v-else :size="50" color="primary" indeterminate></v-progress-circular>
+    <a-progress-circular v-else :size="50" color="primary" indeterminate />
   </v-container>
 </template>
 
