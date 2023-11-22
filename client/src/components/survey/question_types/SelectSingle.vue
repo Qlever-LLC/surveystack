@@ -35,7 +35,7 @@
             color="focus"
           >
             <template v-slot:label>
-              <v-text-field
+              <a-text-field
                 class="text-field-other"
                 :value="customSelection"
                 @input="handleCustomSelectionInput"

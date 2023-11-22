@@ -1,19 +1,21 @@
 <template>
   <v-container>
-    <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
-      <v-autocomplete
+    <a-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
+      <a-select
+        engineering="autocomplete"
+        v-if="!!localViewModel.groups"
         outlined
         primary
         label="Select Group"
         v-model="localViewModel.form.groupId"
-        v-if="!!localViewModel.groups"
         :item-text="(g) => `${g.name} (${g.path})`"
         item-value="_id"
         :items="localViewModel.groups"
         :rules="[(v) => !!v || `select group`]"
-      ></v-autocomplete>
+      />
 
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         outlined
         primary
         label="Select Plan"
@@ -22,7 +24,7 @@
         :item-text="(p) => `${p.planName}, ${p.planUrl}`"
         item-value="_id"
         :rules="[(v) => !!v || `select plan`]"
-      ></v-autocomplete>
+      />
 
       <v-row class="align-baseline">
         <v-col>
@@ -89,7 +91,8 @@
         :rules="addressRules"
       />
 
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         label="Timezone"
         outlined
         :items="timezones"
@@ -104,7 +107,8 @@
         <a-radio label="US" value="us" />
       </a-radio-group>
 
-      <v-autocomplete
+      <a-select
+        engineering="autocomplete"
         label="Owner of the FarmOS Instance"
         outlined
         :items="localViewModel.users"
@@ -115,7 +119,8 @@
         return-object
       />
 
-      <!-- <v-autocomplete
+      <!-- <a-select
+        engineering="autocomplete"
         label="Admins with Access to Farm"
         v-model="localViewModel.form.admins"
         :items="localViewModel.users"
@@ -128,6 +133,9 @@
         return-object
         :loading="localViewModel.loading"
         ref="members"
+        itemSlot
+        prependItemSlot
+        appendOuterSlot
       >
         <template v-slot:item="{ item }">
           <div v-if="item.userExists">
@@ -157,7 +165,7 @@
             <a-icon>mdi-refresh</a-icon>
           </v-btn>
         </template>
-      </v-autocomplete> -->
+      </a-select> -->
 
       <a-divider class="my-4" />
 
@@ -188,13 +196,11 @@
         >To show new members in the dropdown, please press refresh.</app-dialog
       >
 
-      <v-checkbox
+      <a-checkbox
         :rules="agreeRules"
         v-model="localViewModel.form.agree"
         label="Agree to Terms of Serviceand  Privacy Policy of Farmos"
-      >
-        <template v-slot:label></template>
-      </v-checkbox>
+      />
       <div class="text-left mb-4">
         Visit
         <a href="https://farmier.com/terms" target="blank">Terms of Service</a>
@@ -205,7 +211,7 @@
       <v-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
         >Register FarmOS Instance</v-btn
       >
-    </v-form>
+    </a-form>
     <app-dialog
       title="Field Import"
       labelConfirm="OK"

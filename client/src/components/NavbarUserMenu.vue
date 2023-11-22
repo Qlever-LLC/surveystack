@@ -14,28 +14,28 @@
         </v-btn>
       </template>
       <a-list flat>
-        <v-list-item link :to="{ name: 'auth-profile' }">
-          <v-list-item-icon>
+        <a-list-item link :to="{ name: 'auth-profile' }">
+          <a-list-item-icon>
             <a-icon>mdi-account-circle</a-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Profile </v-list-item-title>
-        </v-list-item>
-        <v-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
-          <v-list-item-icon>
+          </a-list-item-icon>
+          <a-list-item-title> Profile </a-list-item-title>
+        </a-list-item>
+        <a-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
+          <a-list-item-icon>
             <a-icon>mdi-leaf-circle-outline</a-icon>
-          </v-list-item-icon>
-          <v-list-item-title> FarmOS Profile </v-list-item-title>
-        </v-list-item>
+          </a-list-item-icon>
+          <a-list-item-title> FarmOS Profile </a-list-item-title>
+        </a-list-item>
         <a-divider />
-        <v-subheader>Active Group</v-subheader>
+        <a-list-subheader>Active Group</a-list-subheader>
         <active-group-selector-list v-model="activeGroup" />
         <a-divider />
-        <v-list-item link @click="logout" class="mt-2">
-          <v-list-item-icon>
+        <a-list-item link @click="logout" class="mt-2">
+          <a-list-item-icon>
             <a-icon>mdi-logout-variant</a-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Sign Out </v-list-item-title>
-        </v-list-item>
+          </a-list-item-icon>
+          <a-list-item-title> Sign Out </a-list-item-title>
+        </a-list-item>
       </a-list>
 
       <!-- </v-card-text> -->
@@ -51,6 +51,7 @@
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+
 import api from '@/services/api.service';
 import AIcon from '@/components/ui/AIcon.vue';
 

@@ -11,18 +11,18 @@
             <v-progress-circular :size="50" color="primary" indeterminate />
           </v-container>
           <template v-if="libraryConsumers !== null">
-            <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+            <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
                 <small class="grey--text">{{ c._id }}</small>
-                <v-list-item-title>{{ c.name }}</v-list-item-title>
+                <a-list-item-title>{{ c.name }}</a-list-item-title>
               </v-list-item-content>
-            </v-list-item>
+            </a-list-item>
           </template>
         </a-list>
       </v-card-text>
       <a-divider />
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>

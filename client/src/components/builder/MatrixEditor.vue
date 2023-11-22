@@ -37,7 +37,7 @@
           >
             <div class="draggable-column" v-for="(item, i) in columns" :key="i">
               <!-- vertical bar indicating which columns are locked to the left -->
-              <v-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
+              <a-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
                 <template v-slot:activator="{ on, attrs }">
                   <v-card
                     width="26px"
@@ -53,7 +53,7 @@
                   </v-card>
                 </template>
                 <span>Columns to the left of this line will always be visible</span>
-              </v-tooltip>
+              </a-tooltip>
 
               <div v-else>
                 <v-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
@@ -71,7 +71,7 @@
                     >
                       <a-icon>mdi-arrow-right</a-icon>
                     </v-btn>
-                    <v-spacer />
+                    <a-spacer />
                     <v-btn icon @click="deleteColumn(i)" tabindex="-1" small>
                       <a-icon>mdi-trash-can-outline</a-icon>
                     </v-btn>
@@ -79,7 +79,7 @@
                   <v-card-text>
                     <a-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <a-text-field v-model="item.value" label="Value" dense />
-                    <v-select
+                    <a-select
                       label="Type"
                       :value="item.type"
                       @input="(type) => onChanged(item, { type, defaultValue: null })"
@@ -89,7 +89,7 @@
 
                     <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
-                        <v-select
+                        <a-select
                           v-model="item.resource"
                           @input="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
@@ -111,29 +111,37 @@
                           <a-icon>mdi-pencil</a-icon>
                         </v-btn>
                       </div>
-                      <checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
-                      <checkbox
-                        class="mt-0 ml-2"
+                      <a-checkbox
+                        v-model="item.multiple"
+                        label="Multi-select"
+                        hide-details
+                        dense
+                        color="grey darken-1"
+                        class="mt-0 ml-2 align-center align-self-start"
+                      />
+                      <a-checkbox
                         v-model="item.custom"
-                        :checked="item.custom"
                         @input="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
                         label="Allow custom answer"
                         hide-details
                         dense
+                        color="grey darken-1"
+                        class="mt-0 ml-2 align-center align-self-start"
                       >
                         <template slot="helper-text">
                           Allows the user to input answers that do not exist within the provided items. This will also
                           require <strong>Autocomplete</strong> is on
                         </template>
-                      </checkbox>
-                      <checkbox
-                        class="mt-0 ml-2"
+                      </a-checkbox>
+                      <a-checkbox
                         v-model="item.autocomplete"
                         label="Autocomplete"
                         :disabled="Boolean(item.custom)"
                         helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
                         hide-details
                         dense
+                        color="grey darken-1"
+                        class="mt-0 ml-2 align-center align-self-start"
                       />
                     </div>
 
@@ -175,7 +183,7 @@
                     />
 
                     <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
-                      <v-select
+                      <a-select
                         dense
                         v-model="item.options.farmOsType"
                         :items="item.options.farmOsTypes"
@@ -185,9 +193,9 @@
                       />
                     </div>
 
-                    <checkbox
+                    <a-checkbox
                       v-model="item.required"
-                      @change="
+                      @input="
                         (v) => {
                           v && $emit('set-control-required');
                         }
@@ -195,33 +203,38 @@
                       label="Required"
                       helper-text="Make this a required field"
                       hide-details
-                      class="mt-4"
+                      class="mt-4 align-center align-self-start"
+                      color="grey darken-1"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-model="item.redacted"
                       label="Private"
                       helper-text="Visible to submitter and admins only"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
+                      color="grey darken-1"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-if="allowSetAllowHide"
                       v-model="item.allowHide"
                       label="Allow hide"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
                       helper-text="Allow users of this question set to hide this column"
+                      color="grey darken-1"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-if="!allowSetAllowHide && item.allowHide"
                       v-model="item.hidden"
                       label="Hidden"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
                       helper-text="Submitters can not see this column. This option is intentionally allowed by the question set designer"
+                      color="grey darken-1"
                     />
-                    <checkbox
+                    <a-checkbox
                       v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
                       v-model="item.multiple"
                       label="Multi-select"
-                      class="mt-2"
+                      class="mt-2 align-center align-self-start"
+                      color="grey darken-1"
                     />
 
                     <h4 class="mt-6 mb-4">Display Options</h4>
@@ -245,7 +258,7 @@
           </draggable>
         </div>
       </v-card-text>
-      <v-spacer />
+      <a-spacer />
       <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
         <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
       </v-card-actions>
@@ -259,7 +272,7 @@ import Draggable from 'vuedraggable';
 import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/ui/Checkbox.vue';
+
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
 import AIcon from '@/components/ui/AIcon.vue';
@@ -291,7 +304,6 @@ export default {
     Draggable,
     Ontology,
     Date,
-    Checkbox,
   },
   props: {
     value: {

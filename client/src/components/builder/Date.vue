@@ -1,5 +1,6 @@
 <template>
-  <v-autocomplete
+  <a-select
+    engineering="autocomplete"
     v-if="type === 'date-year'"
     label="Default value"
     v-model="year"

@@ -3,7 +3,7 @@
     <v-card-title class="pl-0">
       <a-icon class="mr-1">mdi-library</a-icon>
       Question Library
-      <v-spacer></v-spacer>
+      <a-spacer />
       <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <a-icon> mdi-close </a-icon>
       </v-btn>
@@ -27,12 +27,12 @@
           >
             <v-row style="min-height: 96px">
               <v-col :style="{ minWidth: '0px' }">
-                <v-tooltip bottom>
+                <a-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
                   </template>
                   <span>{{ c.name }}</span>
-                </v-tooltip>
+                </a-tooltip>
                 <div>
                   <small class="grey--text">{{ c._id }}</small>
                 </div>
@@ -67,7 +67,7 @@
                 </v-btn>
                 <!--TODO Resolve #48, then uncomment this
                 div>
-                  <v-tooltip bottom>
+                  <a-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <div v-bind="attrs" v-on="on">
                         <a-icon class="mr-1 pb-1">mdi-account-group</a-icon>
@@ -75,10 +75,10 @@
                       </div>
                     </template>
                     <span>Number of surveys using this</span>
-                  </v-tooltip>
+                  </a-tooltip>
                 </div-->
                 <div>
-                  <v-tooltip bottom>
+                  <a-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <div v-bind="attrs" v-on="on">
                         <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
@@ -86,7 +86,7 @@
                       </div>
                     </template>
                     <span>Number of submission using this</span>
-                  </v-tooltip>
+                  </a-tooltip>
                 </div>
               </v-col>
             </v-row>

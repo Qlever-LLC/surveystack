@@ -8,7 +8,7 @@
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize"
     />
-    <v-select
+    <a-select
       v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
       :label="control.hint"
       :placeholder="getPlaceholder"
@@ -27,39 +27,42 @@
       outlined
       class="full-width dropdown"
       data-test-id="dropdown"
+      :selectionSlot="!!control.options.hasMultipleSelections"
+      :itemSlot="!!control.options.hasMultipleSelections"
+      cssMinHeight56px
     >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:selection="data">
         <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
-          @click="data.select"
+          @click="clickOnChip(data)"
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
         </a-chip>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:item="data">
         <v-list-item-content>
-          <v-list-item-title>
+          <a-list-item-title>
             {{ data.item.label }}
             <a-chip v-if="data.item.count" small class="ma-2">
               {{ data.item.count }}
             </a-chip>
-          </v-list-item-title>
+          </a-list-item-title>
         </v-list-item-content>
       </template>
-    </v-select>
-    <v-autocomplete
+    </a-select>
+    <a-select
+      engineering="autocomplete"
       v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
+      @blur="onBlur"
+      @change="onChange"
+      @focus="onFocus"
       ref="dropdownRef"
       :label="control.hint"
       :placeholder="getPlaceholder"
       :value="getValue"
-      @change="onChange"
-      @focus="onFocus"
-      @blur="onBlur"
-      :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
       item-value="value"
@@ -72,30 +75,34 @@
       hide-details
       class="full-width dropdown"
       data-test-id="autocomplete"
+      :selectionSlot="!!control.options.hasMultipleSelections"
+      :itemSlot="!!control.options.hasMultipleSelections"
+      cssMinHeight56px
     >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:selection="data">
         <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
-          @click="data.select"
+          @click="clickOnChip(data)"
           @click:close="remove(data.item)"
         >
           {{ data.item.label }}
         </a-chip>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:item="data">
         <v-list-item-content>
-          <v-list-item-title>
+          <a-list-item-title>
             {{ data.item.label }}
             <a-chip v-if="data.item.count" small class="ma-2">
               {{ data.item.count }}
             </a-chip>
-          </v-list-item-title>
+          </a-list-item-title>
         </v-list-item-content>
       </template>
-    </v-autocomplete>
-    <v-combobox
+    </a-select>
+    <a-select
+      engineering="combobox"
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
       ref="dropdownRef"
       :label="control.hint"
@@ -118,13 +125,16 @@
       hide-details
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
+      selectionSlot
+      noDataSlot
+      cssMinHeight56px
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <a-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
-          @click="data.select"
+          @click="clickOnChip(data)"
           @click:close="removeValue(data.item)"
         >
           {{ getLabelForItemValue(data.item) }}
@@ -134,21 +144,21 @@
         {{ getLabelForItemValue(data.item) }}
       </template>
       <template v-slot:no-data>
-        <v-list-item>
+        <a-list-item>
           <v-list-item-content>
-            <v-list-item-title>
+            <a-list-item-title>
               No values matching "<strong>{{ comboboxSearch }}</strong
               >". Press <kbd>enter</kbd> <span v-if="!!control.options.hasMultipleSelections">or <kbd>,</kbd></span> to
               create a new one
-            </v-list-item-title>
+            </a-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
       </template>
-    </v-combobox>
-    <v-banner v-else-if="isLoading"> <a-icon class="mr-2 mdi-spin">mdi-loading</a-icon>Loading </v-banner>
-    <v-banner v-else color="red lighten-2" dark>
+    </a-select>
+    <a-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading !</a-banner>
+    <a-banner v-else color="red lighten-2" dark>
       <a-icon class="mr-2">mdi-alert</a-icon>Invalid select options, please update Survey Definition
-    </v-banner>
+    </a-banner>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -179,10 +189,13 @@ export default {
     };
   },
   methods: {
+    clickOnChip(data) {
+      data.select;
+    },
     onChange(value) {
       this.comboboxSearch = null;
       if (this.$refs.dropdownRef && !this.control.options.hasMultipleSelections) {
-        this.$refs.dropdownRef.isMenuActive = false;
+        this.$refs.dropdownRef.blur();
       }
       if (this.value !== value) {
         if (Array.isArray(value)) {
@@ -269,16 +282,6 @@ export default {
       return undefined;
     },
   },
-  watch: {
-    comboboxSearch(newVal) {
-      const match = newVal
-        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
-        : undefined;
-      if (!match && this.$refs.dropdownRef) {
-        this.$refs.dropdownRef.setMenuIndex(-1);
-      }
-    },
-  },
   async mounted() {
     if (this.hasReference) {
       const { id, path } = this.resource.content;
@@ -300,9 +303,5 @@ export default {
 
 .dropdown >>> .v-list-item.v-list-item--active {
   color: var(--v-focus-base) !important;
-}
-
-.dropdown >>> .v-select__selections {
-  min-height: 56px !important;
 }
 </style>

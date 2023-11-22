@@ -2,7 +2,7 @@
   <v-card class="pb-2">
     <v-card-title
       >Documentation Links
-      <v-spacer />
+      <a-spacer />
       <v-btn color="primary" text @click="showAddDialog = true">New.. </v-btn>
     </v-card-title>
     <v-card-subtitle>Custom links which appear in the side menu when logged into your group</v-card-subtitle>
@@ -46,15 +46,15 @@
       <v-card>
         <v-card-title> Remove Documentation </v-card-title>
         <v-card-text class="mt-4">
-          <v-checkbox
+          <a-checkbox
             v-model="removeFromDescendants"
             label="Also remove this documentation link from all descendant groups"
             hide-details
-          ></v-checkbox>
+          />
         </v-card-text>
         <v-card-text class="mt-4"> Are you sure you want to remove this documentation link? </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
@@ -65,20 +65,20 @@
       <v-card>
         <v-card-title>Add documentation link</v-card-title>
         <v-card-text>
-          <v-form v-model="newIsValid" ref="form">
+          <a-form v-model="newIsValid" ref="form">
             <a-text-field class="mt-3" v-model="newDoc.label" label="Label" outlined required :rules="labelRules" />
 
             <a-text-field class="mt-3" v-model="newDoc.link" label="Link" outlined required :rules="linkRules" />
 
-            <v-checkbox
+            <a-checkbox
               v-model="addToDescendants"
               label="Also add this documentation link to all descendant groups"
               hide-details
-            ></v-checkbox>
-          </v-form>
+            />
+          </a-form>
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
           <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
         </v-card-actions>

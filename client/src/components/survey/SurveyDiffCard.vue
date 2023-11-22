@@ -15,13 +15,13 @@
           :chip-color="diffInfo.color"
           class="ml-3 align-self-center"
         />
-        <v-spacer />
-        <a-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }">
-          mdi-chevron-down
+        <a-spacer />
+        <a-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
+          >mdi-chevron-down
         </a-icon>
       </v-row>
     </button>
-    <v-simple-table v-if="isOpen" fixed-header dense class="mb-4">
+    <a-table v-if="isOpen" fixed-header dense class="mb-4">
       <template v-slot:default>
         <thead>
           <tr>
@@ -82,15 +82,15 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
     <slot></slot>
-    <v-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
       Selecting your Version of this question is not possible because the new
       {{ versionNameRemoteRevisionNew }} contains a required change.
       <template v-slot:action="{ attrs }">
         <v-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </v-btn>
       </template>
-    </v-snackbar>
+    </a-snackbar>
   </v-card>
 </template>
 

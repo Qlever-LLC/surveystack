@@ -22,7 +22,7 @@
       hide-default-footer
     >
       <template v-slot:top>
-        <v-toolbar flat class="my-5">
+        <a-toolbar flat class="my-5" cssBackgroundCream>
           <v-row>
             <v-col>
               <div class="d-flex justify-space-between align-center">
@@ -94,12 +94,12 @@
               </div>
             </v-col>
           </v-row>
-        </v-toolbar>
+        </a-toolbar>
       </template>
 
       <template v-slot:header.data-table-select="{ props }">
-        <v-checkbox
-          :value="selected.length === selectableItems.length"
+        <a-checkbox
+          :selected-item="selected.length === selectableItems.length"
           :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
           @click="toggleSelectAllItems"
           color="#777"
@@ -124,7 +124,7 @@
       <template v-slot:item="{ item, index, isSelected, select }">
         <tr :key="item._id">
           <td :class="{ 'expand-cell': isExpandMatrix }">
-            <v-checkbox
+            <a-checkbox
               :value="isSelected"
               :disabled="!isSelectable(item)"
               @click="select(!isSelected)"
@@ -196,9 +196,9 @@
       </v-card>
     </v-dialog>
 
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
+    </a-alert>
   </v-card>
 </template>
 <script>
@@ -544,9 +544,6 @@ export default {
 </script>
 
 <style scoped>
->>> .v-toolbar__content {
-  background: #f5f5f5 !important;
-}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;

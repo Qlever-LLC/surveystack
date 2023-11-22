@@ -1,7 +1,7 @@
 <template>
   <v-container class="maxw-4">
     <template v-if="isLoggedIn">
-      <v-alert
+      <a-alert
         v-if="successMessage"
         class="mt-4"
         style="cursor: pointer"
@@ -9,12 +9,12 @@
         text
         type="success"
         @click="successMessage = null"
-        >{{ successMessage }}</v-alert
+        >{{ successMessage }}</a-alert
       >
 
-      <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+      <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
         errorMessage
-      }}</v-alert>
+      }}</a-alert>
 
       <p class="mt-4 mb-6">
         You are logged in as
@@ -36,16 +36,16 @@
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
             <a-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details />
-            <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
+            <a-checkbox v-model="userIsOwner" label="this user will be an owner too" />
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
             text
             type="error"
-            >{{ errorDialogMessage }}</v-alert
+            >{{ errorDialogMessage }}</a-alert
           >
           <v-btn block @click="addUser" color="primary" target="_blank"> Add </v-btn>
         </div>
@@ -83,14 +83,14 @@
           <div class="d-flex mb-4">
             <a-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details />
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
             text
             type="error"
-            >{{ errorDialogMessage }}</v-alert
+            >{{ errorDialogMessage }}</a-alert
           >
           <v-btn block @click="changeOwner" color="primary" target="_blank"> Update</v-btn>
         </div>
@@ -233,7 +233,7 @@
         <h2>FarmOS Integrations</h2>
       </div>
 
-      <v-simple-table class="mt-8">
+      <a-table class="mt-8">
         <template v-slot>
           <thead>
             <tr>
@@ -248,7 +248,7 @@
                 <div class="pt-3" style="white-space: nowrap">{{ instance.instanceName }}</div>
                 <div class="pb-3">
                   <span v-if="instance.isOwner">
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -264,9 +264,9 @@
                         </v-btn>
                       </template>
                       <span>Access FarmOS instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -281,9 +281,9 @@
                         </v-btn>
                       </template>
                       <span>Add a user to your instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -298,9 +298,9 @@
                         </v-btn>
                       </template>
                       <span>Re-assign the instance's ownership</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -315,10 +315,10 @@
                         </v-btn>
                       </template>
                       <span>Delete this instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
                   </span>
                   <span v-else>
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -334,9 +334,9 @@
                         </v-btn>
                       </template>
                       <span>Access FarmOS instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
 
-                    <v-tooltip top>
+                    <a-tooltip top>
                       <template v-slot:activator="{ on }">
                         <v-btn
                           v-on="on"
@@ -351,7 +351,7 @@
                         </v-btn>
                       </template>
                       <span>Remove this instance</span>
-                    </v-tooltip>
+                    </a-tooltip>
                   </span>
                 </div>
               </td>
@@ -392,7 +392,7 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
 
       <div style="margin-top: 100px !important">
         <p><b>If you have questions or need support reach out to your group admin or email info@our-sci.net.</b></p>

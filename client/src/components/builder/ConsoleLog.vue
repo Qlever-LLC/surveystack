@@ -1,7 +1,7 @@
 <template>
   <v-card dark background-color="dark-blue" class="mt-4">
-    <v-card-title color="blue-grey"
-      >Console Log<v-spacer></v-spacer>
+    <v-card-title color="blue-grey">
+      Console Log<a-spacer />
       <a-icon @click="$emit('clear')">mdi-delete</a-icon>
     </v-card-title>
 

@@ -11,10 +11,10 @@
         :mobile-breakpoint="0"
       >
         <template v-slot:top>
-          <v-toolbar flat>
+          <a-toolbar flat>
             <v-row>
               <v-col>
-                <v-toolbar-title>Simple CSV</v-toolbar-title>
+                <a-toolbar-title>Simple CSV</a-toolbar-title>
               </v-col>
               <v-col>
                 <a-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
@@ -23,7 +23,7 @@
                 <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
               </v-col>
             </v-row>
-          </v-toolbar>
+          </a-toolbar>
         </template>
         <template v-slot:header="{ props: { headers } }">
           <thead>

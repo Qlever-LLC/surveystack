@@ -20,29 +20,29 @@
         @change="localChange"
         :multiple="!!control.options.hasMultipleSelections"
       >
-        <v-list-item
+        <a-list-item
           v-for="(item, idx) in transformed"
           :value="hashItem(item)"
           :key="`item_${idx}`"
           :disabled="!control.options.hasMultipleSelections && item.value.isField"
         >
           <template v-slot:default="{ active }">
-            <v-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
-              <v-checkbox
+            <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
+              <a-checkbox
                 v-if="control.options.hasMultipleSelections"
-                :input-value="active"
+                :value="active"
                 :true-value="hashItem(item)"
                 color="focus"
               />
               <a-radio-group v-else :value="active">
                 <a-radio :value="true" color="focus" />
               </a-radio-group>
-            </v-list-item-action>
+            </a-list-item-action>
             <v-list-item-content>
-              <v-list-item-title v-html="item.label" />
+              <a-list-item-title v-html="item.label" />
             </v-list-item-content>
           </template>
-        </v-list-item>
+        </a-list-item>
       </v-list-item-group>
     </a-list>
     <app-control-more-info :value="control.moreInfo" />

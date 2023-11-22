@@ -9,8 +9,8 @@
           <a-icon left>mdi-trash-can-outline</a-icon> Delete
         </v-btn>
       </div>
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
+        <a-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
 
         <a-text-field v-model="entity.group" label="Group" disabled />
 
@@ -26,13 +26,13 @@
           hint="Default name for newly registered users"
         />
 
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" />
 
         <div class="d-flex mt-2">
           <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
           <v-btn color="primary" @click="submit">Save</v-btn>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
 
     <v-card class="my-3 pa-2" v-if="resendEnabled">
@@ -62,7 +62,7 @@
         <v-card-title> Delete Membership </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="dialogRemoval = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="remove"> Delete </v-btn>
         </v-card-actions>
@@ -76,7 +76,7 @@
           An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
         </v-card-actions>
       </v-card>

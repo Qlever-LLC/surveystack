@@ -1,11 +1,11 @@
 <template>
   <v-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" :style="{ minWidth: '0px' }">
-    <v-tooltip bottom>
+    <a-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
         <a-icon :color="iconColor" large class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</a-icon>
       </template>
       <span>{{ typeName }}</span>
-    </v-tooltip>
+    </a-tooltip>
     <v-col class="body-1 text-truncate">
       <div class="font-weight-light grey--text text--darken-2">
         <span class="text-truncate">{{ index }}: {{ dataName }}</span>

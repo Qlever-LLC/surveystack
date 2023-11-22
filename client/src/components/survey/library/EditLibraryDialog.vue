@@ -20,7 +20,7 @@
         />
       </v-card-text>
       <v-card-actions class="mr-3">
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span v-if="!librarySurvey.meta.isLibrary">Add to library</span>
           <span v-if="localLibrarySurvey.meta.isLibrary">Save</span>

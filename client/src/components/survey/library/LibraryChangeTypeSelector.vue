@@ -8,7 +8,7 @@
         </b></v-col
       >
       <v-col v-else cols="auto" class="pa-0">
-        <v-select
+        <a-select
           outlined
           dense
           hide-details
@@ -20,7 +20,7 @@
         />
       </v-col>
       <v-col cols="auto" class="pa-0 align-self-center">
-        <v-tooltip bottom>
+        <a-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <a-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
               mdi-information-outline
@@ -40,7 +40,7 @@
             <b>Small fix:</b><br />
             Fixes a problem or error. Everyone should update.
           </p>
-        </v-tooltip>
+        </a-tooltip>
       </v-col>
     </v-row>
   </v-container>
@@ -50,7 +50,6 @@ import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   name: 'library-change-type-selector',
-  components: { AIcon },
   props: ['value', 'disabled', 'label'],
   data() {
     return {

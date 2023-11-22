@@ -4,7 +4,7 @@
       <slot name="title">
         {{ title }}
       </slot>
-      <v-spacer />
+      <a-spacer />
       <slot name="actions" v-if="editable">
         <v-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</v-btn>
       </slot>
@@ -19,14 +19,14 @@
         }"
       >
         <div v-for="(entity, idx) in filteredEntities" :key="idx">
-          <v-list-item two-line :to="link(entity)">
+          <a-list-item two-line :to="link(entity)">
             <slot name="entity" v-bind:entity="entity">
               <v-list-item-content>
-                <v-list-item-title>Title #{{ idx }}</v-list-item-title>
-                <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
+                <a-list-item-title>Title #{{ idx }}</a-list-item-title>
+                <a-list-item-subtitle>Subtitle</a-list-item-subtitle>
               </v-list-item-content>
             </slot>
-          </v-list-item>
+          </a-list-item>
           <a-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
         </div>
       </v-list>

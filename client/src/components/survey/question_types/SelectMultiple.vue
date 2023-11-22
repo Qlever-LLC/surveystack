@@ -13,10 +13,10 @@
     <div v-if="sourceIsValid" class="py-2">
       <div class="select-multiple-source">
         <div v-for="item in selections" :key="item.value">
-          <v-checkbox
+          <a-checkbox
             v-model="item.selected"
             :label="item.label"
-            @change="onChange"
+            @input="onChange"
             hide-details
             class="my-1"
             color="focus"
@@ -25,9 +25,9 @@
       </div>
 
       <div v-if="control.options.allowCustomSelection" class="select-multiple-custom mt-3 d-flex align-center">
-        <v-checkbox
+        <a-checkbox
           v-model="customSelected"
-          @change="onChange"
+          @input="onChange"
           hide-details
           class="mt-0"
           :disabled="!customValue"
@@ -154,17 +154,4 @@ export default {
 };
 </script>
 
-<style scoped>
->>> .v-list-item {
-  min-height: initial;
-  padding: 0px;
-}
-
->>> .v-list-item__content {
-  padding: 0px;
-}
-
->>> .v-list-item__action {
-  margin: 4px 8px 4px 0px !important;
-}
-</style>
+<style scoped></style>

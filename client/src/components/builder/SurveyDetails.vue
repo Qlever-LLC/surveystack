@@ -3,7 +3,7 @@
     <v-card-title class="d-block pb-0">
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
-        <v-spacer />
+        <a-spacer />
         <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
@@ -14,16 +14,16 @@
             <v-card-title> Edit Survey Details</v-card-title>
             <v-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
-              <v-select
+              <a-select
                 outlined
                 v-model="value.meta.submissions"
                 label="Allow Submissions for..."
                 :items="availableSubmissions"
               />
-              <v-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
+              <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
             </v-card-text>
             <v-card-actions class="mr-3">
-              <v-spacer />
+              <a-spacer />
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
@@ -43,7 +43,7 @@
               />
             </v-card-text>
             <v-card-actions class="mr-3">
-              <v-spacer />
+              <a-spacer />
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
@@ -62,8 +62,8 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-item class="d-flex align-center">
-              <v-list-item-title>
+            <a-list-item class="d-flex align-center">
+              <a-list-item-title>
                 <a-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
                     <v-btn class="pointer-events-none" text>
@@ -80,56 +80,56 @@
                     @change="(file) => $emit('import-survey', file)"
                   />
                 </a-input>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn @click="$emit('export-survey')" text>
                   <a-icon color="grey">mdi-file-download</a-icon>
                   <div class="ml-1">Export</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn @click="$emit('show-version-dialog')" text>
                   <a-icon color="grey">mdi-sitemap</a-icon>
                   <div class="ml-1">Manage Survey Versions</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn @click="editLibraryDialogIsVisible = true" text>
                   <a-icon color="grey">mdi-library</a-icon>
                   <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="value.meta.isLibrary">
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item v-if="value.meta.isLibrary">
+              <a-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <a-icon color="grey">mdi-layers-search</a-icon>
                   <div class="ml-1">List library consumers</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-title>
                 <v-btn text @click="printSettingDialogIsVisible = true">
                   <a-icon color="grey">mdi-printer-settings</a-icon>
                   <div class="ml-1">Print settings</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="!isNew">
-              <v-list-item-title>
+              </a-list-item-title>
+            </a-list-item>
+            <a-list-item v-if="!isNew">
+              <a-list-item-title>
                 <v-btn text @click="$emit('delete')">
                   <a-icon color="grey">mdi-delete</a-icon>
                   <div class="ml-1">Delete</div>
                 </v-btn>
-              </v-list-item-title>
-            </v-list-item>
+              </a-list-item-title>
+            </a-list-item>
           </v-list>
         </a-menu>
         <edit-library-dialog
@@ -178,7 +178,7 @@
           class="mb-2 survey-group-name-input"
         />
         <div class="d-flex flex-wrap justify-end align-center">
-          <v-tooltip bottom v-if="!isNew">
+          <a-tooltip bottom v-if="!isNew">
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
@@ -200,8 +200,8 @@
               <br />
               Updating is only possible <em>only</em> when changing Labels of a Question.</span
             >
-          </v-tooltip>
-          <v-tooltip bottom>
+          </a-tooltip>
+          <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
@@ -218,9 +218,9 @@
             </template>
 
             <span>Publish current version of Survey to users</span>
-          </v-tooltip>
+          </a-tooltip>
 
-          <v-tooltip bottom>
+          <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
@@ -237,20 +237,20 @@
               </div>
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
-          </v-tooltip>
+          </a-tooltip>
         </div>
       </div>
 
-      <v-tooltip bottom v-if="validationErrors.length > 0">
+      <a-tooltip bottom v-if="validationErrors.length > 0">
         <template v-slot:activator="{ on }">
-          <v-alert type="error" colored-border border="left" class="mt-2" elevation="2" v-on="on">
+          <a-alert type="error" border-color border="left" class="mt-2" elevation="2" v-on="on">
             Survey contains errors
-          </v-alert>
+          </a-alert>
         </template>
         <div v-for="error in validationErrors" :key="error">
           {{ error }}
         </div>
-      </v-tooltip>
+      </a-tooltip>
     </v-card-text>
   </v-card>
 </template>
@@ -264,6 +264,7 @@ import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
+
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
 import AIcon from '@/components/ui/AIcon.vue';

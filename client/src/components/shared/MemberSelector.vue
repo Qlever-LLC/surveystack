@@ -12,7 +12,7 @@
         />
         <a-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
         <v-list>
-          <v-list-item
+          <a-list-item
             v-for="member in filteredMembers"
             :key="member._id"
             :disabled="member.meta.status === 'pending'"
@@ -22,19 +22,19 @@
             "
           >
             <v-list-item-content v-if="member.meta && member.meta.status === 'pending'">
-              <v-list-item-title class="text--secondary"
+              <a-list-item-title class="text--secondary"
                 >[Pending] {{ member.meta.invitationEmail
-                }}{{ member.meta.invitationName ? ` - ${member.meta.invitationName}` : '' }}</v-list-item-title
+                }}{{ member.meta.invitationName ? ` - ${member.meta.invitationName}` : '' }}</a-list-item-title
               >
-              <v-list-item-subtitle>{{
+              <a-list-item-subtitle>{{
                 member.meta.dateSent ? `sent ${member.meta.dateSent}` : 'Invitation not sent yet'
-              }}</v-list-item-subtitle>
+              }}</a-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <v-list-item-title>{{ member.user.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ member.user.email }}</v-list-item-subtitle>
+              <a-list-item-title>{{ member.user.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ member.user.email }}</a-list-item-subtitle>
             </v-list-item-content>
-          </v-list-item>
+          </a-list-item>
         </v-list>
       </v-card-text>
     </v-card>

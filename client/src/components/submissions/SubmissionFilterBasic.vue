@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-autocomplete :items="fieldItems" label="Field" v-model="selectedField" hide-details />
-    <v-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
+    <a-select engineering="autocomplete" :items="fieldItems" label="Field" v-model="selectedField" hide-details />
+    <a-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
     <!-- TODO in Vue3 remove .native -->
     <a-text-field label="Value" v-model="selectedValue" @keyup.native.enter="add" />
 
@@ -13,7 +13,7 @@
 
     <v-card outlined v-if="filters.length > 0">
       <a-list dense>
-        <v-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
+        <a-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
           <v-list-item-content>
             <div>
               <span class="font-weight-medium mr-1">{{ filter.field }}</span>
@@ -21,12 +21,12 @@
               <span class="font-weight-boldmr-1">{{ filter.value }}</span>
             </div>
           </v-list-item-content>
-          <v-list-item-action @click="remove(i)">
+          <a-list-item-action @click="remove(i)">
             <v-btn icon small>
               <a-icon>mdi-trash-can-outline</a-icon>
             </v-btn>
-          </v-list-item-action>
-        </v-list-item>
+          </a-list-item-action>
+        </a-list-item>
       </a-list>
     </v-card>
   </div>

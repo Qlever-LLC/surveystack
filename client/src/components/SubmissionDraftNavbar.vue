@@ -3,7 +3,7 @@
     <navbar-drawer v-model="drawerIsVisible" />
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column flex-grow-1">
+      <a-toolbar-title class="flex-column flex-grow-1">
         <draft-toolbar
           :groupPath="groupPath"
           :required="control && control.options && control.options.required"
@@ -12,7 +12,7 @@
           :questionNumber="$store.getters['draft/questionNumber']"
           @showOverviewClicked="showOverview = !showOverview"
         />
-      </v-toolbar-title>
+      </a-toolbar-title>
 
       <navbar-user-menu />
     </v-app-bar>

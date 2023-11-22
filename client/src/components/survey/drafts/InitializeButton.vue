@@ -1,12 +1,12 @@
 <template>
-  <v-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left">
+  <a-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left">
     <template v-slot:activator="{ on, attrs }">
       <v-btn icon v-bind="attrs" v-on="on">
         <a-icon :color="highlight ? 'blue' : 'grey lighten-1'" @click.stop="$emit('initialize')"> mdi-refresh </a-icon>
       </v-btn>
     </template>
     <span>{{ tooltip }}</span>
-  </v-tooltip>
+  </a-tooltip>
 </template>
 
 <script>

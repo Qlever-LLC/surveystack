@@ -23,10 +23,10 @@
       </div>
     </a-menu>
     <!-- TODO: fix copied snack notification -->
-    <v-snackbar v-model="snackbar">
+    <a-snackbar v-model="snackbar">
       {{ snackbarText }}
       <v-btn color="pink" text @click="snackbar = false"> Close </v-btn>
-    </v-snackbar>
+    </a-snackbar>
   </div>
 </template>
 

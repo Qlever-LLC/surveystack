@@ -38,22 +38,22 @@
           left
         >
           <a-list max-width="260">
-            <v-list-item @click="startDraft(entity)">
+            <a-list-item @click="startDraft(entity)">
               <v-list-item-content>
-                <v-list-item-title>Start survey</v-list-item-title>
+                <a-list-item-title>Start survey</a-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
                   Start a survey as the user you are signed in with
                 </v-list-item-content>
               </v-list-item-content>
-            </v-list-item>
-            <v-list-item @click="showSelectMember = true">
+            </a-list-item>
+            <a-list-item @click="showSelectMember = true">
               <v-list-item-content>
-                <v-list-item-title>Start survey as a member</v-list-item-title>
+                <a-list-item-title>Start survey as a member</a-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
                   Select the member for whom you want to start the survey
                 </v-list-item-content>
               </v-list-item-content>
-            </v-list-item>
+            </a-list-item>
           </a-list>
         </btn-dropdown>
 

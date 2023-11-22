@@ -3,8 +3,8 @@
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
-      <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
+      <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined />
 
         <a-text-field
           class="mt-3"
@@ -62,31 +62,31 @@
           >
             <a-list class="pa-0 mx-auto" max-width="280">
               <v-list-item-group v-model="invitationMethod">
-                <v-list-item two-line :value="INVITATION_METHODS.INVITE">
+                <a-list-item two-line :value="INVITATION_METHODS.INVITE">
                   <v-list-item-content>
-                    <v-list-item-title>Invite Member</v-list-item-title>
+                    <a-list-item-title>Invite Member</a-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
                       Send them an email to agree to join your group. They only join once they click the "Join" link in
                       the email.
                     </v-list-item-content>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
 
-                <v-list-item three-line :value="INVITATION_METHODS.ADD">
+                <a-list-item three-line :value="INVITATION_METHODS.ADD">
                   <v-list-item-content>
-                    <v-list-item-title>Add Member</v-list-item-title>
+                    <a-list-item-title>Add Member</a-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
                       The member joins immediately. An email is still sent informing them they are joined. This is
                       useful when using "Call for Submissions" to send this member survey requests without waiting for
                       them to check their email.
                     </v-list-item-content>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
               </v-list-item-group>
             </a-list>
           </btn-dropdown>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
 
     <v-dialog v-model="dialogCreateUser" max-width="500">
@@ -96,7 +96,7 @@
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>

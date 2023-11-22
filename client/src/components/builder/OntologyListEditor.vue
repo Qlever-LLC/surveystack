@@ -17,14 +17,14 @@
           </v-btn>
         </div>
         <div class="d-flex align-center">
-          <v-tooltip bottom>
+          <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled" />
               </div>
             </template>
             CSV must have column headers 'label', 'value', and optionally 'tags'
-          </v-tooltip>
+          </a-tooltip>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
           <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
@@ -39,7 +39,7 @@
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
               </v-card-text>
               <v-card-actions>
-                <v-spacer />
+                <a-spacer />
                 <v-btn text color="red" @click="deleteResult">Delete</v-btn>
                 <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </v-card-actions>
@@ -111,7 +111,7 @@
         </template>
       </v-data-table>
     </v-card-text>
-    <v-spacer />
+    <a-spacer />
     <v-card-actions class="d-flex justify-end mr-3 align-start">
       <v-btn text class="ml-4" @click="close">Close</v-btn>
     </v-card-actions>
@@ -125,7 +125,7 @@
           <a-text-field v-model="editedItem.tags" label="Tags" />
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
           <v-btn text color="primary" @click="saveItem">Save</v-btn>
         </v-card-actions>
