@@ -1,31 +1,31 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
-    <v-card>
-      <v-card-title>
+    <a-card>
+      <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
-      </v-card-title>
-      <v-divider></v-divider>
-      <v-card-text>
-        <v-list dense style="max-height: 500px" class="overflow-y-auto">
+      </a-card-title>
+      <a-divider />
+      <a-card-text>
+        <a-list dense style="max-height: 500px" class="overflow-y-auto">
           <a-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" cssHeight100>
-            <v-progress-circular :size="50" color="primary" indeterminate />
+            <a-progress-circular :size="50" color="primary" indeterminate />
           </a-container>
           <template v-if="libraryConsumers !== null">
-            <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+            <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
                 <small class="grey--text">{{ c._id }}</small>
-                <v-list-item-title>{{ c.name }}</v-list-item-title>
+                <a-list-item-title>{{ c.name }}</a-list-item-title>
               </v-list-item-content>
-            </v-list-item>
+            </a-list-item>
           </template>
-        </v-list>
-      </v-card-text>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer />
+        </a-list>
+      </a-card-text>
+      <a-divider />
+      <a-card-actions>
+        <a-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 <script>
@@ -35,9 +35,6 @@ import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {
-    AContainer,
-  },
   props: {
     value: {
       type: Boolean,

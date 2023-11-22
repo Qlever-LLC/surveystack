@@ -1,26 +1,29 @@
 <template>
-  <v-card>
-    <v-card-title> Survey Reference Editor </v-card-title>
-    <v-card-text>
-      <v-autocomplete
+  <a-card>
+    <a-card-title> Survey Reference Editor </a-card-title>
+    <a-card-text>
+      <a-select
+        engineering="autocomplete"
         label="Select Survey"
         outlined
         :items="surveys"
         v-model="surveyId"
-        @change="surveyChanged()"
+        @change="surveyChanged"
         :loading="loading"
         item-value="_id"
         item-text="name"
+        appendOuterSlot
       >
         <template slot="append-outer">
-          <v-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
+          <a-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
-          </v-chip>
+          </a-chip>
         </template>
-      </v-autocomplete>
+      </a-select>
 
       <template v-if="surveyId">
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           label="Select Path"
           outlined
           @change="updateResource"
@@ -31,25 +34,25 @@
           item-text="name"
         />
       </template>
-    </v-card-text>
-    <v-spacer />
-    <v-card-actions>
-      <v-spacer />
+    </a-card-text>
+    <a-spacer />
+    <a-card-actions>
+      <a-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
-      <v-tooltip top :disabled="!!path">
+      <a-tooltip top :disabled="!!path">
         <template v-slot:activator="{ on }">
           <div v-on="on">
             <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
           </div>
         </template>
         <span>No Submitted Surveys Available</span>
-      </v-tooltip>
+      </a-tooltip>
       <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
       <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
-    </v-card-actions>
+    </a-card-actions>
 
     <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />
-  </v-card>
+  </a-card>
 </template>
 
 <script>
@@ -66,7 +69,9 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: {
+    OntologyReferencePreview,
+  },
   props: {
     resource: {
       type: Object,
@@ -120,7 +125,7 @@ export default {
       this.updateResource();
       this.$emit('close-dialog');
     },
-    async surveyChanged(version) {
+    async surveyChanged({ version }) {
       const versionParam = version || 'latest';
       const { data } = await api.get(`/surveys/${this.surveyId}?version=${versionParam}`);
       if (!version) {
@@ -169,7 +174,7 @@ export default {
       this.surveyVersion = this.resource.content.version || '';
 
       if (this.surveyVersion) {
-        await this.surveyChanged(this.surveyVersion);
+        await this.surveyChanged({ version: this.surveyVersion });
       }
     }
 

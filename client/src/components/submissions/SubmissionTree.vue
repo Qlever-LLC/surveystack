@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <v-card class="pa-3">
+    <a-card class="pa-3">
       <ul v-if="submissions.content.length > 0" class="list-group">
         <li v-for="submission in submissions.content" :key="submission._id" class="list-group-item pa-2">
           <small class="grey--text text--darken-1">{{ submission._id }}</small>
@@ -12,7 +12,7 @@
           </div>
         </li>
       </ul>
-    </v-card>
+    </a-card>
   </a-container>
 </template>
 

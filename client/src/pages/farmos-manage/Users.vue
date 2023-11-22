@@ -1,32 +1,28 @@
 <template>
   <a-container>
-    <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
+    <a-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</a-alert>
 
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Users</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
-    <v-autocomplete
+    <a-select
+      engineering="autocomplete"
+      v-if="!loading && !!groups"
       outlined
       primary
       label="Select User"
       v-model="selectedUser"
-      v-if="!loading && !!groups"
       :item-text="(item) => `${item.name} (${item.email})`"
       item-value="_id"
       :items="users"
-    ></v-autocomplete>
+    />
 
-    <v-divider class="my-4"></v-divider>
+    <a-divider class="my-4" />
 
-    <v-simple-table v-if="!loading">
+    <a-table v-if="!loading">
       <template v-slot:default>
         <thead>
           <tr>
@@ -39,21 +35,22 @@
         <tbody>
           <tr>
             <td>
-              <v-autocomplete
+              <a-select
+                engineering="autocomplete"
+                v-if="!loading && !!mappings"
                 class="mt-6"
                 outlined
                 primary
                 label="Select FarmOS Instance"
                 v-model="selectedInstance"
-                v-if="!loading && !!mappings"
                 item-value="instanceName"
                 item-text="instanceName"
                 :items="instances"
-              ></v-autocomplete>
+              />
             </td>
             <td></td>
             <td>
-              <v-checkbox v-model="owner" label="owner"></v-checkbox>
+              <a-checkbox v-model="owner" label="owner" />
             </td>
             <td>
               <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
@@ -64,7 +61,7 @@
             <td>{{ instance.instanceName }}</td>
             <td>
               <div>
-                <v-chip
+                <a-chip
                   small
                   class="ma-1"
                   dark
@@ -73,11 +70,11 @@
                   :key="`instance-${idx}-user-${uidx}`"
                 >
                   {{ userMapping.user }}
-                </v-chip>
+                </a-chip>
               </div>
 
               <div>
-                <v-chip
+                <a-chip
                   class="ma-1"
                   small
                   dark
@@ -86,7 +83,7 @@
                   :key="`instance-${idx}-group-${gidx}`"
                 >
                   {{ groupMapping.group }}
-                </v-chip>
+                </a-chip>
               </div>
             </td>
             <td>{{ instance.owner }}</td>
@@ -96,7 +93,7 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
   </a-container>
 </template>
 

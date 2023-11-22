@@ -11,6 +11,7 @@
 </template>
 <script>
 import CopyToClipboard from './CopyToClipboard.vue';
+
 export default {
   components: {
     CopyToClipboard,

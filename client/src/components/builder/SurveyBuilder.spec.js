@@ -1,15 +1,17 @@
 jest.mock('../../services/api.service.js');
 
-import { render, fireEvent, findByText, screen, within } from '@testing-library/vue';
+import { findByText, fireEvent, render, screen, within } from '@testing-library/vue';
 import SurveyBuilder from './SurveyBuilder.vue';
 import { createSurvey } from '@/utils/surveys';
 import { createStoreObject } from '@/store';
 import vuetify from '@/plugins/vuetify';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
-import { isString, last, cloneDeep, uniqueId, set } from 'lodash';
+import { cloneDeep, isString, last, set, uniqueId } from 'lodash';
 import '@/components/survey/question_types';
 import api from '../../services/api.service.js';
+
+import { localVue } from '@/../tests/renderWithVuetify';
 
 // add a control and set its base parameters like a user would
 const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
@@ -39,8 +41,7 @@ const updateProperty = async (label, value, openAdvanced) => {
 };
 
 // saves the survey to the draft store and returns the newly created revision
-export const saveDraft = async (store) => {
-  const surveyDetails = screen.getByTestId('survey-details');
+export const saveDraft = async (store, surveyDetails) => {
   await fireEvent.click(within(surveyDetails).getByText('Save'));
   return last(store.modules.draft.state.survey.revisions);
 };
@@ -68,6 +69,7 @@ export const optionsWithControls = (controls = []) => {
     router,
     vuetify,
     store,
+    localVue,
   };
 };
 
@@ -105,6 +107,7 @@ describe('add control', () => {
         const options = optionsWithControls();
         const spyDraftInit = jest.spyOn(options.store.modules.draft.actions, 'init');
         render(SurveyBuilder, options);
+        const surveyDetails = screen.getByTestId('survey-details');
 
         // add the new control
         const label = `Test add ${info.type}`;
@@ -115,7 +118,6 @@ describe('add control', () => {
         await findByText(screen.getByTestId('graphical-view'), label);
 
         // the control is saved in the draft store
-        const surveyDetails = screen.getByTestId('survey-details');
         await fireEvent.click(within(surveyDetails).getByText('Save'));
         expect(spyDraftInit).toHaveBeenCalled();
         const controls = last(last(spyDraftInit.mock.calls)[1].survey.revisions).controls;
@@ -246,6 +248,7 @@ describe('add control', () => {
         const options = optionsWithControls();
         options.props.survey.meta.isLibrary = isLibrary;
         render(SurveyBuilder, options);
+        const surveyDetails = screen.getByTestId('survey-details');
 
         // add the new control
         await addControl(type);
@@ -253,7 +256,7 @@ describe('add control', () => {
         updateProperty(new RegExp(inputLabel, 'i'), value, openAdvanced);
 
         // get the saved draft controls from the vuex store
-        const draftRevision = await saveDraft(options.store);
+        const draftRevision = await saveDraft(options.store, surveyDetails);
         const expectedControl = { type };
         set(expectedControl, propPath, propValue);
         expect(draftRevision.controls).toMatchObject([expectedControl]);
@@ -339,6 +342,7 @@ describe('add control', () => {
       it(name, async () => {
         const options = optionsWithControls(controls);
         render(SurveyBuilder, options);
+        const surveyDetails = screen.getByTestId('survey-details');
 
         // select the parent card
         const selectedCard = screen.queryByTestId(`control-card-${SELECTED}`);
@@ -351,7 +355,7 @@ describe('add control', () => {
         // new card appears
         expect(within(screen.getByTestId('graphical-view')).queryByText(label)).toBeInTheDocument();
 
-        const draftRevision = await saveDraft(options.store);
+        const draftRevision = await saveDraft(options.store, surveyDetails);
 
         // build the minimal expected control tree
         const expectedControls = cloneDeep(controls);

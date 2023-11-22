@@ -1,14 +1,14 @@
 <template>
   <a-container fluid class="py-0">
-    <v-row class="pa-0">
-      <v-col v-if="disabled" cols="auto" class="pa-0 mt-1"
+    <a-row class="pa-0">
+      <a-col v-if="disabled" cols="auto" class="pa-0 mt-1"
         ><b
           >Change level:
           <span class="primary--text">{{ textByValue }}</span>
-        </b></v-col
-      >
-      <v-col v-else cols="auto" class="pa-0">
-        <v-select
+        </b>
+      </a-col>
+      <a-col v-else cols="auto" class="pa-0">
+        <a-select
           outlined
           dense
           hide-details
@@ -18,13 +18,13 @@
           :items="availableLibraryChangeTypes"
           @input="$emit('input', content)"
         />
-      </v-col>
-      <v-col cols="auto" class="pa-0 align-self-center">
-        <v-tooltip bottom>
+      </a-col>
+      <a-col cols="auto" class="pa-0 align-self-center">
+        <a-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
+            <a-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
               mdi-information-outline
-            </v-icon>
+            </a-icon>
           </template>
           <p>
             <b>Major:</b><br />
@@ -40,9 +40,9 @@
             <b>Small fix:</b><br />
             Fixes a problem or error. Everyone should update.
           </p>
-        </v-tooltip>
-      </v-col>
-    </v-row>
+        </a-tooltip>
+      </a-col>
+    </a-row>
   </a-container>
 </template>
 
@@ -51,9 +51,6 @@ import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   name: 'library-change-type-selector',
-  components: {
-    AContainer,
-  },
   props: ['value', 'disabled', 'label'],
   data() {
     return {

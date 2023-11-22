@@ -1,7 +1,7 @@
 <template>
   <a-container>
     <div class="d-flex justify-end">
-      <v-checkbox v-model="showArchived" label="View archived" dense hide-details />
+      <a-checkbox v-model="showArchived" label="View archived" dense hide-details />
     </div>
     <app-basic-list
       editable
@@ -13,8 +13,8 @@
     >
       <template v-slot:entity="{ entity }">
         <v-list-item-content>
-          <v-list-item-title>{{ entity.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ entity.path }}</v-list-item-subtitle>
+          <a-list-item-title>{{ entity.name }}</a-list-item-title>
+          <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
         </v-list-item-content>
       </template>
     </app-basic-list>

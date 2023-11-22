@@ -8,7 +8,7 @@ import defaults from './defaults';
 // Import instance methods.
 import addLayer, { getLayerByName } from './methods/layer';
 import addPopup from './methods/popup';
-import { zoomToVectors, zoomToLayer } from './methods/zoom';
+import { zoomToLayer, zoomToVectors } from './methods/zoom';
 import { addBehavior, attachBehavior } from './methods/behavior';
 import { measureGeometry } from '../utils/measure';
 

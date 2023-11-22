@@ -3,29 +3,24 @@
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Plans</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
-    <v-row class="align-baseline">
-      <v-col>
-        <v-text-field outlined primary label="New Plan Name" v-model.trim="planName"></v-text-field>
-      </v-col>
-      <v-col>
-        <v-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl"></v-text-field>
-      </v-col>
-      <v-col>
+    <a-row class="align-baseline">
+      <a-col>
+        <a-text-field outlined primary label="New Plan Name" v-model.trim="planName" />
+      </a-col>
+      <a-col>
+        <a-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl" />
+      </a-col>
+      <a-col>
         <v-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</v-btn>
-      </v-col>
-    </v-row>
+      </a-col>
+    </a-row>
 
-    <v-divider class="my-4"></v-divider>
+    <a-divider class="my-4" />
 
-    <v-simple-table v-if="!loading">
+    <a-table v-if="!loading">
       <template v-slot:default>
         <thead>
           <tr>
@@ -44,7 +39,7 @@
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
+    </a-table>
   </a-container>
 </template>
 
@@ -56,6 +51,7 @@ export default {
     AContainer,
   },
   props: ['viewModel', 'loading'],
+
   data() {
     return {
       planName: '',

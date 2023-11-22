@@ -1,26 +1,26 @@
 <template>
   <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="persistent">
-    <v-card>
-      <v-card-title class="headline">
+    <a-card>
+      <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
-      </v-card-title>
-      <v-card-text>
+      </a-card-title>
+      <a-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
-        <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
-        <v-text-field
+        <a-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
+        <a-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
           v-model="archiveReasonOther"
           outlined
         />
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
+      </a-card-text>
+      <a-card-actions>
+        <a-spacer />
         <v-btn text @click="$emit('cancel')">Cancel</v-btn>
         <v-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 
@@ -44,6 +44,7 @@ export default {
       default: 'TEST_DATA',
     },
   },
+
   data() {
     return {
       archiveReason: this.reason,

@@ -1,11 +1,11 @@
 <template>
   <a-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="entity.path" />
+      <a-breadcrumbs :path="entity.path" />
 
       <div v-if="editable">
         <v-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
-          <v-icon left>mdi-cog</v-icon> Admin
+          <a-icon left>mdi-cog</a-icon> Admin
         </v-btn>
       </div>
     </div>
@@ -15,15 +15,15 @@
     </div>
     <h1>
       <span>{{ entity.name }}</span>
-      <v-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </v-chip>
+      <a-chip v-if="isPremium" class="ml-2" color="success"> <a-icon small left> mdi-octagram </a-icon>Premium </a-chip>
     </h1>
     <h3 class="text--secondary">{{ entity.path }}</h3>
     <div class="text--secondary body-2">{{ entity._id }}</div>
 
-    <v-row>
-      <v-col>
+    <a-row>
+      <a-col>
         <div class="d-flex justify-end">
-          <v-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
+          <a-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
         </div>
         <app-basic-list
           :editable="editable"
@@ -34,15 +34,15 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.path }}</v-list-item-subtitle>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
+      </a-col>
+    </a-row>
+    <a-row>
+      <a-col>
         <app-basic-list
           :editable="editable"
           :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []"
@@ -52,13 +52,13 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity._id }}</v-list-item-subtitle>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity._id }}</a-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
+      </a-col>
+    </a-row>
   </a-container>
   <a-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>
@@ -70,14 +70,12 @@
 
 <script>
 import api from '@/services/api.service';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   name: 'Group',
   components: {
-    appGroupBreadcrumbs,
     appBasicList,
     AContainer,
   },
