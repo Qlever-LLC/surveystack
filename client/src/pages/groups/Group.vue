@@ -70,13 +70,11 @@
 
 <script>
 import api from '@/services/api.service';
-import ABreadcrumbs from '@/components/ui/ABreadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   name: 'Group',
   components: {
-    ABreadcrumbs,
     appBasicList,
   },
   data() {

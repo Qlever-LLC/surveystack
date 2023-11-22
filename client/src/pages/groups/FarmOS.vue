@@ -144,7 +144,6 @@ import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDiscon
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import ABreadcrumbs from '@/components/ui/ABreadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
@@ -158,7 +157,6 @@ export default {
     FarmOSDisconnectDialog,
     FarmOSRemoveNoteDialog,
     appDialog,
-    ABreadcrumbs,
   },
   computed: {
     superAdmin() {

@@ -196,7 +196,6 @@ import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import ABreadcrumbs from '@/components/ui/ABreadcrumbs.vue';
 import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
 import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
@@ -222,7 +221,6 @@ export default {
     appDocLinks,
     appBasicList,
     appDialog,
-    ABreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
   },
