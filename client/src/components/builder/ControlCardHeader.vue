@@ -1,5 +1,5 @@
 <template>
-  <v-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" :style="{ minWidth: '0px' }">
+  <a-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" cssMinWidth0px>
     <a-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
         <a-icon :color="iconColor" large class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</a-icon>
@@ -17,7 +17,7 @@
         {{ title }}
       </div>
     </v-col>
-  </v-row>
+  </a-row>
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';

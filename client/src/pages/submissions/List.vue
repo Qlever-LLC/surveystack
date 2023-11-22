@@ -100,10 +100,7 @@
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
         </v-card-text>
         <v-card-text>
-          <v-row>
-            <v-col md="2" sm="6">
-              <a-select label="Format" dense :items="apiDownloadFormats" hide-details v-model="apiDownloadFormat" />
-            </v-col>
+          <a-row>
             <v-col md="2" sm="6">
               <a-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
             </v-col>
@@ -119,9 +116,9 @@
             <v-col md="2" sm="6">
               <v-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </v-btn>
             </v-col>
-          </v-row>
+          </a-row>
 
-          <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
+          <a-row class="mt-5" v-if="apiDownloadRange === 'page'">
             <v-col sm="2">
               <a-select
                 label="Page Size"
@@ -140,7 +137,7 @@
                 {{ submissions.pagination.total }} total
               </div>
             </v-col>
-          </v-row>
+          </a-row>
         </v-card-text>
       </v-card>
     </v-container>
@@ -181,7 +178,7 @@
         </a-window-item>
       </v-window>
 
-      <v-row class="my-2">
+      <a-row class="my-2">
         <v-col cols="1">
           <a-select
             style="max-width: 5rem; display: inline-block"
@@ -201,7 +198,7 @@
             {{ submissions.pagination.total }} total
           </div>
         </v-col>
-      </v-row>
+      </a-row>
     </v-container>
   </div>
 </template>

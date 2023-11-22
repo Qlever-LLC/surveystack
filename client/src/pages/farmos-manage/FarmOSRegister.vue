@@ -26,7 +26,7 @@
         :rules="[(v) => !!v || `select plan`]"
       />
 
-      <v-row class="align-baseline">
+      <a-row class="align-baseline">
         <v-col>
           <a-text-field
             :disabled="!localViewModel.form.plan"
@@ -57,7 +57,7 @@
             >Check URL</v-btn
           >
         </v-col>
-      </v-row>
+      </a-row>
 
       <a-text-field
         v-model="localViewModel.form.email"

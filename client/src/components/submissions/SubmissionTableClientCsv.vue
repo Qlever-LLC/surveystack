@@ -23,7 +23,7 @@
     >
       <template v-slot:top>
         <a-toolbar flat class="my-5" cssBackgroundCream>
-          <v-row>
+          <a-row>
             <v-col>
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
@@ -93,7 +93,7 @@
                 </div>
               </div>
             </v-col>
-          </v-row>
+          </a-row>
         </a-toolbar>
       </template>
 

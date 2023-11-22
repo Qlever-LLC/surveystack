@@ -94,10 +94,10 @@
                     {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
                   </v-btn>
                 </v-col>
-                <v-row align="center" class="my-5">
+                <a-row align="center" class="my-5">
                   <a-divider /><span class="mx-2">or</span>
                   <a-divider />
-                </v-row>
+                </a-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 

@@ -110,12 +110,12 @@
     <div class="d-flex justify-space-between align-center">
       <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-row v-if="loading">
+    <a-row v-if="loading">
       <v-col>
         <v-progress-linear indeterminate class="mb-0" />
       </v-col>
-    </v-row>
-    <v-row v-else>
+    </a-row>
+    <a-row v-else>
       <v-col lg="4" class="mx-auto">
         <v-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
@@ -131,7 +131,7 @@
           >
         </v-card>
       </v-col>
-    </v-row>
+    </a-row>
   </v-container>
 </template>
 

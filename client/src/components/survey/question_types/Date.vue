@@ -9,7 +9,7 @@
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
-    <v-row>
+    <a-row>
       <div :class="{ 'mx-auto': centered }">
         <v-date-picker
           v-if="control.options.subtype !== 'date-year'"
@@ -60,7 +60,7 @@
           />
         </a-menu>
       </div>
-    </v-row>
+    </a-row>
 
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -71,6 +71,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
+
   props: { centered: { type: Boolean, default: true } },
   data() {
     return {

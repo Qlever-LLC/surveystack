@@ -20,7 +20,7 @@
     <h3 class="text--secondary">{{ entity.path }}</h3>
     <div class="text--secondary body-2">{{ entity._id }}</div>
 
-    <v-row>
+    <a-row>
       <v-col>
         <div class="d-flex justify-end">
           <a-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
@@ -40,8 +40,8 @@
           </template>
         </app-basic-list>
       </v-col>
-    </v-row>
-    <v-row>
+    </a-row>
+    <a-row>
       <v-col>
         <app-basic-list
           :editable="editable"
@@ -58,7 +58,7 @@
           </template>
         </app-basic-list>
       </v-col>
-    </v-row>
+    </a-row>
   </v-container>
   <v-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>

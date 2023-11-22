@@ -24,7 +24,7 @@
         <v-card-text>
           <a-form>
             <v-card-text>
-              <v-row>
+              <a-row>
                 <div class="text-h6">{{ email }}</div>
                 <a-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
@@ -44,9 +44,9 @@
                       </v-btn>
                     </v-card-actions>
                   </v-card>
-                </v-dialog></v-row
-              ></v-card-text
-            >
+                </v-dialog>
+              </a-row>
+            </v-card-text>
             <a-text-field tabindex="2" v-model="name" label="Name" />
             <a-text-field
               tabindex="3"

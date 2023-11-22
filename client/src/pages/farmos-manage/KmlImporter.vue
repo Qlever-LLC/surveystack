@@ -13,11 +13,11 @@
     </div>
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 
-    <v-row>
+    <a-row>
       <a-file-input label="Upload KML file" @change="getFile" />
-    </v-row>
+    </a-row>
     <template v-if="kml !== ''">
-      <v-row>
+      <a-row>
         <a-select
           engineering="autocomplete"
           v-model="field"
@@ -26,10 +26,10 @@
           label="Select Field"
           @change="selected"
         />
-      </v-row>
-      <v-row class="text-center">
+      </a-row>
+      <a-row class="text-center">
         <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
-      </v-row>
+      </a-row>
     </template>
   </a-sheet>
 </template>
