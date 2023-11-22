@@ -2,17 +2,17 @@
   <nav class="app-navbar">
     <a-app-bar app clipped-left color="appbar" absolute>
       <a-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column">
+      <a-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
         </div>
         <div class="app-bar-subtitle subtitle py-0 my-0" v-html="appSubtitle" />
-      </v-toolbar-title>
+      </a-toolbar-title>
 
-      <v-spacer />
+      <a-spacer />
       <offline-indicator />
       <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
-        <v-icon size="22">mdi-help-circle-outline</v-icon>
+        <a-icon size="22">mdi-help-circle-outline</a-icon>
       </v-btn>
       <navbar-user-menu />
     </a-app-bar>

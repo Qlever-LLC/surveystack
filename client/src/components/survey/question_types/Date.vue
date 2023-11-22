@@ -9,7 +9,7 @@
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
-    <v-row>
+    <a-row>
       <div :class="{ 'mx-auto': centered }">
         <v-date-picker
           v-if="control.options.subtype !== 'date-year'"
@@ -26,7 +26,7 @@
           use text field with menu for year picker because year picker's
           UI placeholder year is the same as when year is selected
          -->
-        <v-menu
+        <a-menu
           v-else
           v-model="datePickerIsVisible"
           :close-on-content-click="false"
@@ -36,14 +36,14 @@
           min-width="290px"
         >
           <template v-slot:activator="{ on }">
-            <v-text-field
-              :value="dateFormatted"
-              @input="datePickerIsVisible = false"
+            <a-text-field
+              v-on="on"
               @change="updateDateInput"
+              @input="datePickerIsVisible = false"
+              :value="dateFormatted"
               label="Year"
               persistent-hint
               prepend-icon="mdi-calendar"
-              v-on="on"
               readonly
               outlined
               color="focus"
@@ -58,9 +58,9 @@
             no-title
             color="focus"
           />
-        </v-menu>
+        </a-menu>
       </div>
-    </v-row>
+    </a-row>
 
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -71,6 +71,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
+
   props: { centered: { type: Boolean, default: true } },
   data() {
     return {

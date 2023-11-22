@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import VueCompositionApi from '@vue/composition-api';
-Vue.use(VueCompositionApi);
-
 import TableComponent from '../components/integrations/FarmOSProfile.vue';
 import TableGroup from '../components/integrations/FarmOSGroupSettings.vue';
 import UpdatedTable from '../components/integrations/FarmOSGroupTable.vue';
 
 import { action } from '@storybook/addon-actions';
+
+Vue.use(VueCompositionApi);
 
 export default {
   title: 'FarmOS',

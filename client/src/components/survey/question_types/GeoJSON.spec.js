@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
-import GeoJSON, { addBaseLayer, getNextValue, addDrawingLayer } from './GeoJSON.vue';
+import GeoJSON, { addBaseLayer, addDrawingLayer, getNextValue } from './GeoJSON.vue';
 
 import ControlProperties from '../../builder/ControlProperties.vue';
 import { createControlInstance } from '../../../utils/surveyConfig';

@@ -1,5 +1,6 @@
 <template>
-  <v-autocomplete
+  <a-select
+    engineering="autocomplete"
     v-if="type === 'date-year'"
     label="Default value"
     v-model="year"
@@ -9,14 +10,15 @@
     clearable
     hide-details
   />
-  <v-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+  <a-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         v-on="on"
         v-bind="attrs"
+        @input="onChange"
+        @blur="$emit('blur')"
         label="Default value"
         :value="formattedDate"
-        @input="onChange"
         :class="$vnode.data.staticClass"
         :dense="dense"
         readonly
@@ -33,7 +35,7 @@
       no-title
       scrollable
     />
-  </v-menu>
+  </a-menu>
 </template>
 
 <script>
@@ -49,11 +51,13 @@ import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
 
 export default {
+  emits: ['blur', 'input'],
   props: {
     value: { type: String },
     type: { type: String },
     dense: { type: Boolean, default: false },
   },
+
   data() {
     return {
       open: false,

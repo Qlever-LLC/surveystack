@@ -1,5 +1,5 @@
 <template>
-  <v-icon v-if="!isOnline" size="22" title="device is offline" color="warning" class="px-1">mdi-wifi-off</v-icon>
+  <a-icon v-if="!isOnline" size="22" title="device is offline" color="warning" class="px-1">mdi-wifi-off</a-icon>
 </template>
 
 <script>

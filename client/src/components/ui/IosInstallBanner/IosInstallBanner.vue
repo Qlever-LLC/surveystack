@@ -1,7 +1,7 @@
 <template>
-  <v-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
+  <a-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary lighten-1" fixed bottom cssIosSnackbar>
     <v-btn @click="handleClose" icon class="close-button">
-      <v-icon>mdi-close</v-icon>
+      <a-icon>mdi-close</a-icon>
     </v-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
@@ -12,7 +12,7 @@
         <img src="./ios-safari-add-icon.svg" alt="" class="icon" />
       </div>
     </div>
-  </v-snackbar>
+  </a-snackbar>
 </template>
 
 <script>
@@ -41,27 +41,6 @@ export default {
 
 .wrapper {
   width: 100%;
-}
-
-.snackbar {
-  height: auto !important;
-}
-
-.snackbar >>> .v-snack__content {
-  position: relative;
-}
-
-.snackbar >>> .v-snack__content::after {
-  content: '';
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 8px solid var(--v-primary-lighten1);
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  margin-left: -12px;
 }
 
 .close-button {
