@@ -42,21 +42,18 @@
             <a-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
             </a-avatar>
-            <v-col class="ml-3"
+            <a-col class="ml-3"
               ><p class="text-h5 mb-1">{{ integratedHyloGroup.name }}</p>
 
-              <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p></v-col
-            >
+              <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p>
+            </a-col>
           </a-card-title>
 
-          <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
           <a-card-text class="white--text">
             &nbsp;Your group is integrated with
             <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo
           </a-card-text>
-
-          <!-- </v-col> -->
         </a-img>
       </template>
 
@@ -84,7 +81,7 @@
                   :error-messages="findError"
                   class="mb-2"
                 />
-                <v-col align="center">
+                <a-col align="center">
                   <v-btn
                     color="primary"
                     :disabled="!groupFound || isCreateIntegratedHyloGroupInProgress"
@@ -93,7 +90,7 @@
                   >
                     {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
                   </v-btn>
-                </v-col>
+                </a-col>
                 <a-row align="center" class="my-5">
                   <a-divider /><span class="mx-2">or</span>
                   <a-divider />
@@ -101,7 +98,7 @@
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 
-                <v-col align="center">
+                <a-col align="center">
                   <v-btn
                     color="primary"
                     :loading="isCreateIntegratedHyloGroupInProgress"
@@ -109,7 +106,7 @@
                     @click="createIntegratedHyloGroup"
                   >
                     Integrate with a new Hylo group
-                  </v-btn></v-col
+                  </v-btn></a-col
                 >
                 <div class="font-italic text-body-2 mb-4">
                   Default group settings are: anyone can find and see this group but people must apply to join this

@@ -18,7 +18,7 @@
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <a-row dense>
-        <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
+        <a-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <a-card
             @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
@@ -26,7 +26,7 @@
             elevation="7"
           >
             <a-row cssMinHeight96px>
-              <v-col :style="{ minWidth: '0px' }">
+              <a-col cssMinWidth0px>
                 <a-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
@@ -39,8 +39,8 @@
                 <a-chip dark small outlined color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
                 </a-chip>
-              </v-col>
-              <v-col align="right" md="auto">
+              </a-col>
+              <a-col align="right" md="auto">
                 <v-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
@@ -88,10 +88,10 @@
                     <span>Number of submission using this</span>
                   </a-tooltip>
                 </div>
-              </v-col>
+              </a-col>
             </a-row>
             <a-row v-if="selectedSurvey && selectedSurvey._id === c._id">
-              <v-col>
+              <a-col>
                 <h4>Description</h4>
                 <small v-html="selectedSurvey.meta.libraryDescription"></small>
                 <br />
@@ -103,8 +103,8 @@
                 <br />
                 <h4>Updates</h4>
                 <small v-html="selectedSurvey.meta.libraryHistory"></small>
-              </v-col>
-              <v-col>
+              </a-col>
+              <a-col>
                 <h4>Questions</h4>
                 <graphical-view
                   :readOnly="true"
@@ -113,10 +113,10 @@
                   class="graphical-view"
                   :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
                 />
-              </v-col>
+              </a-col>
             </a-row>
           </a-card>
-        </v-col>
+        </a-col>
       </a-row>
     </v-container>
     <a-pagination

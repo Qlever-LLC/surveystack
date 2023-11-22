@@ -100,7 +100,7 @@
     </a-card>
 
     <a-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-basic-list
           maxHeight="500px"
           :loading="isLoadingMembers || isLoadingHyloGroup"
@@ -151,11 +151,11 @@
             </a-list-item-action>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-basic-list
           class="mb-4"
           v-if="editMode"
@@ -170,11 +170,11 @@
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-pinned-surveys
           class="mb-4"
           v-if="editMode"
@@ -183,7 +183,7 @@
           @search="searchSurveys"
         >
         </app-pinned-surveys>
-      </v-col>
+      </a-col>
     </a-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>

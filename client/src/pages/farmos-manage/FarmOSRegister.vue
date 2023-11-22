@@ -27,7 +27,7 @@
       />
 
       <a-row class="align-baseline">
-        <v-col>
+        <a-col>
           <a-text-field
             :disabled="!localViewModel.form.plan"
             v-model.trim="localViewModel.form.instanceName"
@@ -47,16 +47,16 @@
               >
             </template>
           </a-text-field>
-        </v-col>
+        </a-col>
 
-        <v-col>
+        <a-col>
           <v-btn
             @click="$emit('check-url', localViewModel)"
             color="primary"
             :disabled="!localViewModel.form.plan || localViewModel.loading"
             >Check URL</v-btn
           >
-        </v-col>
+        </a-col>
       </a-row>
 
       <a-text-field

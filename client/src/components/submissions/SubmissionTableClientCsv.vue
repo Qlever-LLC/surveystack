@@ -24,7 +24,7 @@
       <template v-slot:top>
         <a-toolbar flat class="my-5" cssBackgroundCream>
           <a-row>
-            <v-col>
+            <a-col>
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
                   <a-switch
@@ -92,7 +92,7 @@
                   </div>
                 </div>
               </div>
-            </v-col>
+            </a-col>
           </a-row>
         </a-toolbar>
       </template>

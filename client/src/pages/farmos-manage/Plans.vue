@@ -7,15 +7,15 @@
     </div>
 
     <a-row class="align-baseline">
-      <v-col>
+      <a-col>
         <a-text-field outlined primary label="New Plan Name" v-model.trim="planName" />
-      </v-col>
-      <v-col>
+      </a-col>
+      <a-col>
         <a-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl" />
-      </v-col>
-      <v-col>
+      </a-col>
+      <a-col>
         <v-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</v-btn>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-divider class="my-4" />

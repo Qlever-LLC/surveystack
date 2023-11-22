@@ -111,12 +111,12 @@
       <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
     <a-row v-if="loading">
-      <v-col>
+      <a-col>
         <a-progress-linear indeterminate class="mb-0" />
-      </v-col>
+      </a-col>
     </a-row>
     <a-row v-else>
-      <v-col lg="4" class="mx-auto">
+      <a-col lg="4" class="mx-auto">
         <a-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
@@ -130,7 +130,7 @@
             >Contact Our-Sci</v-btn
           >
         </a-card>
-      </v-col>
+      </a-col>
     </a-row>
   </v-container>
 </template>

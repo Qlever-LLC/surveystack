@@ -1,7 +1,7 @@
 <template>
   <v-container class="home" :fluid="true">
     <a-row>
-      <v-col>
+      <a-col>
         <a-img
           v-if="isWhitelabel"
           :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
@@ -10,11 +10,11 @@
           height="128"
         />
         <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-row>
-      <v-col align="center">
+      <a-col align="center">
         <app-basic-list
           class="maxw-40 text-left"
           v-if="isWhitelabel && pinnedWhitelabelSurveys.length > 0"
@@ -59,11 +59,11 @@
             </div>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-row>
-      <v-col align="center">
+      <a-col align="center">
         <app-basic-list
           class="maxw-40 text-left"
           v-if="pinned && pinned.length > 0"
@@ -108,7 +108,7 @@
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </a-row>
 
     <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
@@ -116,17 +116,17 @@
     </v-dialog>
 
     <a-row>
-      <v-col align="center">
+      <a-col align="center">
         <v-btn x-large text :to="`/surveys/browse`">
           <a-icon left>mdi-text-box-search-outline</a-icon>Browse All Surveys
         </v-btn>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-row v-if="false">
-      <v-col align="center">
+      <a-col align="center">
         <v-btn color="primary" x-large href="surveystack://measurement">Run Measurement</v-btn>
-      </v-col>
+      </a-col>
     </a-row>
   </v-container>
 </template>

@@ -72,9 +72,9 @@
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
                 <a-row align="center" justify="center">
-                  <v-col>
+                  <a-col>
                     <a-alert color="primary" class="black-text" text>No Drafts</a-alert>
-                  </v-col>
+                  </a-col>
                 </a-row>
               </div>
 
@@ -106,9 +106,9 @@
               </template>
               <div v-else>
                 <a-row align="center" justify="center">
-                  <v-col>
+                  <a-col>
                     <a-alert color="primary" class="black-text" text>No Submissions</a-alert>
-                  </v-col>
+                  </a-col>
                 </a-row>
               </div>
             </a-card>

@@ -101,10 +101,10 @@
         </a-card-text>
         <a-card-text>
           <a-row>
-            <v-col md="2" sm="6">
+            <a-col md="2" sm="6">
               <a-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
-            </v-col>
-            <v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
+            </a-col>
+            <a-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
               <a-select
                 label="Matrix answers"
                 dense
@@ -112,14 +112,14 @@
                 hide-details
                 v-model="apiDownloadExpandAllMatrices"
               />
-            </v-col>
-            <v-col md="2" sm="6">
+            </a-col>
+            <a-col md="2" sm="6">
               <v-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </v-btn>
-            </v-col>
+            </a-col>
           </a-row>
 
           <a-row class="mt-5" v-if="apiDownloadRange === 'page'">
-            <v-col sm="2">
+            <a-col sm="2">
               <a-select
                 label="Page Size"
                 dense
@@ -128,15 +128,15 @@
                 v-model="pageSize"
                 @change="changedPaginationSize"
               />
-            </v-col>
-            <v-col cols="10">
+            </a-col>
+            <a-col cols="10">
               <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-            </v-col>
-            <v-col cols="1">
+            </a-col>
+            <a-col cols="1">
               <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
                 {{ submissions.pagination.total }} total
               </div>
-            </v-col>
+            </a-col>
           </a-row>
         </a-card-text>
       </a-card>
@@ -179,7 +179,7 @@
       </v-window>
 
       <a-row class="my-2">
-        <v-col cols="1">
+        <a-col cols="1">
           <a-select
             style="max-width: 5rem; display: inline-block"
             label="Page Size"
@@ -189,15 +189,15 @@
             v-model="pageSize"
             @change="changedPaginationSize"
           />
-        </v-col>
-        <v-col cols="10">
+        </a-col>
+        <a-col cols="10">
           <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-        </v-col>
-        <v-col cols="1">
+        </a-col>
+        <a-col cols="1">
           <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
             {{ submissions.pagination.total }} total
           </div>
-        </v-col>
+        </a-col>
       </a-row>
     </v-container>
   </div>
