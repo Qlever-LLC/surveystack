@@ -1,7 +1,7 @@
 <template>
   <nav class="app-navbar">
-    <v-app-bar app clipped-left color="appbar" absolute>
-      <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
+    <a-app-bar app clipped-left color="appbar" absolute>
+      <a-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <a-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
@@ -15,7 +15,7 @@
         <a-icon size="22">mdi-help-circle-outline</a-icon>
       </v-btn>
       <navbar-user-menu />
-    </v-app-bar>
+    </a-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />
   </nav>
 </template>

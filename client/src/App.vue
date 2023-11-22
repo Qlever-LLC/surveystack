@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
+  <a-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
     <router-view name="navbar" />
     <div id="app-menu"></div>
     <a-main>
@@ -7,7 +7,7 @@
       <router-view />
     </a-main>
     <install-banner />
-  </v-app>
+  </a-app>
 </template>
 
 <script>

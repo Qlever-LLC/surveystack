@@ -12,7 +12,7 @@
           height="250"
           :src="integratedHyloGroup.bannerUrl"
         >
-          <v-app-bar flat color="rgba(0, 0, 0, 0)">
+          <a-app-bar flat color="rgba(0, 0, 0, 0)">
             <a-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </a-toolbar-title>
 
             <a-spacer />
@@ -35,7 +35,7 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-          </v-app-bar>
+          </a-app-bar>
           <a-spacer />
 
           <v-card-title class="white--text mt-8">
