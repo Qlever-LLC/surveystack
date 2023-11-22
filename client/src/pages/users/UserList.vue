@@ -6,7 +6,7 @@
       <v-btn to="/users/new" color="primary">ADD</v-btn>
     </div>
 
-    <v-card>
+    <a-card>
       <div v-for="e in entities" :key="e._id">
         <a-list-item :to="`/users/${e._id}`">
           <v-list-item-content>
@@ -21,7 +21,7 @@
         </a-list-item>
         <a-divider />
       </div>
-    </v-card>
+    </a-card>
   </v-container>
 </template>
 

@@ -29,12 +29,12 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
           >
             <!-- -->
-            <v-card class="d-flex flex-column justify-space-between background">
+            <a-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <template v-for="(item, i) in activeTabPageContent">
                   <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <v-card :elevation="3" class="py-3 px-4">
+                      <a-card :elevation="3" class="py-3 px-4">
                         <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
                         </a-list-item-title>
@@ -45,7 +45,7 @@
                         <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </a-list-item-subtitle>
-                      </v-card>
+                      </a-card>
                     </v-list-item-content>
                     <a-list-item-action>
                       <a-tooltip bottom>
@@ -66,9 +66,9 @@
                 </template>
 
                 <a-spacer class="flex-grow-1" />
-                <v-card-actions>
+                <a-card-actions>
                   <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
-                </v-card-actions>
+                </a-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
                 <a-row align="center" justify="center">
@@ -82,7 +82,7 @@
                 <template v-for="(item, i) in tab.content">
                   <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <v-card :elevation="3" class="py-3 px-4">
+                      <a-card :elevation="3" class="py-3 px-4">
                         <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
                         </a-list-item-title>
@@ -93,7 +93,7 @@
                         <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </a-list-item-subtitle>
-                      </v-card>
+                      </a-card>
                     </v-list-item-content>
                   </a-list-item>
                 </template>
@@ -111,14 +111,14 @@
                   </v-col>
                 </a-row>
               </div>
-            </v-card>
+            </a-card>
           </a-window-item>
         </a-window>
-        <v-card v-else>
-          <v-card-text class="d-flex align-center justify-center">
+        <a-card v-else>
+          <a-card-text class="d-flex align-center justify-center">
             <a-progress-circular :size="50" color="primary" indeterminate />
-          </v-card-text>
-        </v-card>
+          </a-card-text>
+        </a-card>
       </a-row>
       <confirm-submission-dialog
         ref="confirm-submission-dialog"

@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <a-card>
     <v-data-table
       ref="table"
       v-model="tableSelected"
@@ -188,18 +188,18 @@
     />
 
     <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
-      <v-card>
-        <v-card-text class="pa-4">
+      <a-card>
+        <a-card-text class="pa-4">
           <span>Downloading file resource</span>
           <a-progress-linear indeterminate class="mb-0" />
-        </v-card-text>
-      </v-card>
+        </a-card-text>
+      </a-card>
     </v-dialog>
 
     <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
     </a-alert>
-  </v-card>
+  </a-card>
 </template>
 <script>
 import papa from 'papaparse';

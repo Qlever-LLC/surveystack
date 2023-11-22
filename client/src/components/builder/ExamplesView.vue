@@ -1,5 +1,5 @@
 <template>
-  <v-card style="height: 90vh" color="grey darken-3">
+  <a-card cssHeight90vh color="grey darken-3">
     <v-container>
       <a-row>
         <a-spacer />
@@ -21,7 +21,7 @@
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>
       </div>
     </v-container>
-  </v-card>
+  </a-card>
 </template>
 
 <script>

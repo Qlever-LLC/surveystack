@@ -1,8 +1,8 @@
 <template>
   <v-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
-    <v-card class="pa-4">
-      <v-card-title class="headline"> Connect Existing Farm </v-card-title>
-      <v-card-text>
+    <a-card class="pa-4">
+      <a-card-title class="headline"> Connect Existing Farm </a-card-title>
+      <a-card-text>
         Select Farm from this Member's profile to include in this group.
 
         <br />
@@ -46,22 +46,22 @@
         <v-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
           Connect selected Farms
         </v-btn>
-      </v-card-text>
+      </a-card-text>
 
       <template v-if="allowCreate">
-        <v-card-title class="headline"> Connect New Farm </v-card-title>
+        <a-card-title class="headline"> Connect New Farm </a-card-title>
 
-        <v-card-text>
+        <a-card-text>
           Add a new farm to the member's profile.
           <br />
           <v-btn block class="mt-4" color="primary" @click="$emit('create')">Create Farm</v-btn>
-        </v-card-text>
+        </a-card-text>
       </template>
 
-      <v-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
+      <a-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
         or add existing farmOS instance (currently in development)
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </v-dialog>
 </template>
 
@@ -71,6 +71,7 @@ import './css/button.css';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
+
   props: {
     value: Boolean,
     farmInstances: {

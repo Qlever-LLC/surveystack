@@ -19,34 +19,34 @@
         >.
       </p>
 
-      <v-card outlined>
-        <v-card-text> <div>User Details</div></v-card-text>
-        <v-card-text>
+      <a-card outlined>
+        <a-card-text> <div>User Details</div></a-card-text>
+        <a-card-text>
           <a-form>
-            <v-card-text>
+            <a-card-text>
               <a-row>
                 <div class="text-h6">{{ email }}</div>
                 <a-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
                   </template>
-                  <v-card>
-                    <v-card-title class="text-h5"> Change Email </v-card-title>
-                    <v-card-text>
+                  <a-card>
+                    <a-card-title class="text-h5"> Change Email </a-card-title>
+                    <a-card-text>
                       <a-text-field tabindex="1" v-model="email" label="E-Mail" />
                       Integrations which use your email will no longer work and will need to be updated. These
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
-                    </v-card-text>
-                    <v-card-actions>
+                    </a-card-text>
+                    <a-card-actions>
                       <a-spacer />
                       <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
                       </v-btn>
-                    </v-card-actions>
-                  </v-card>
+                    </a-card-actions>
+                  </a-card>
                 </v-dialog>
               </a-row>
-            </v-card-text>
+            </a-card-text>
             <a-text-field tabindex="2" v-model="name" label="Name" />
             <a-text-field
               tabindex="3"
@@ -73,9 +73,9 @@
             <div class="d-flex mt-2 justify-end">
               <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</v-btn>
             </div>
-          </a-form></v-card-text
-        >
-      </v-card>
+          </a-form>
+        </a-card-text>
+      </a-card>
 
       <div class="mt-8 mb-4">
         <h3>Group Memberships</h3>
@@ -89,24 +89,24 @@
       </div>
 
       <v-dialog v-model="isLeaveDialogOpen" max-width="290">
-        <v-card>
-          <v-card-title> Leave Group </v-card-title>
-          <v-card-text v-if="parentAdminGroup" class="mt-4">
+        <a-card>
+          <a-card-title> Leave Group </a-card-title>
+          <a-card-text v-if="parentAdminGroup" class="mt-4">
             To leave <strong>{{ activeGroup.name }}</strong
             >, you must leave <strong>{{ parentAdminGroup.name }}</strong> or change status from
             <strong>Admin</strong> to <strong>Member</strong>
-          </v-card-text>
-          <v-card-text v-else>
+          </a-card-text>
+          <a-card-text v-else>
             Are you sure you want to leave
             <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
             >?
-          </v-card-text>
-          <v-card-actions>
+          </a-card-text>
+          <a-card-actions>
             <a-spacer />
             <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
             <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
-          </v-card-actions>
-        </v-card>
+          </a-card-actions>
+        </a-card>
       </v-dialog>
     </template>
     <template v-else>

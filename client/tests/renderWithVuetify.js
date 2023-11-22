@@ -49,6 +49,11 @@ import AProgressCircular from '../src/components/ui/elements/AProgressCircular.v
 import AProgressLinear from '../src/components/ui/elements/AProgressLinear.vue';
 import APagination from '../src/components/ui/elements/APagination.vue';
 import AOverlay from '../src/components/ui/elements/AOverlay.vue';
+import ACard from '../src/components/ui/elements/ACard.vue';
+import ACardActions from '../src/components/ui/elements/ACardActions.vue';
+import ACardSubtitle from '../src/components/ui/elements/ACardSubtitle.vue';
+import ACardText from '../src/components/ui/elements/ACardText.vue';
+import ACardTitle from '../src/components/ui/elements/ACardTitle.vue';
 
 const localVue = createLocalVue();
 localVue.component('a-btn-toggle', ABtnToggle);
@@ -96,6 +101,11 @@ localVue.component('a-progress-circular', AProgressCircular);
 localVue.component('a-progress-linear', AProgressLinear);
 localVue.component('a-pagination', APagination);
 localVue.component('a-overlay', AOverlay);
+localVue.component('a-card', ACard);
+localVue.component('a-card-actions', ACardActions);
+localVue.component('a-card-subtitle', ACardSubtitle);
+localVue.component('a-card-text', ACardText);
+localVue.component('a-card-title', ACardTitle);
 
 localVue.use(Vuex);
 localVue.use(VueRouter);

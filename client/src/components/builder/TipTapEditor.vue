@@ -1,6 +1,6 @@
 <template>
-  <v-card outlined class="tiptap-editor">
-    <v-card-title class="pa-0">
+  <a-card outlined class="tiptap-editor">
+    <a-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
         <a-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
           <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
@@ -269,8 +269,8 @@
             </a-toolbar-items>
           </a-toolbar> -->
       </editor-menu-bar>
-    </v-card-title>
-    <v-card-text class="pa-0">
+    </a-card-title>
+    <a-card-text class="pa-0">
       <editor-menu-bubble
         class="menububble"
         :editor="editor"
@@ -282,8 +282,8 @@
           :class="{ 'is-active': menu.isActive }"
           :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
         >
-          <v-card class="pa-0">
-            <v-card-text class="pa-0">
+          <a-card class="pa-0">
+            <a-card-text class="pa-0">
               <form
                 class="menububble__form"
                 v-if="linkMenuIsActive"
@@ -317,13 +317,13 @@
                   <a-icon>mdi-link</a-icon>
                 </v-btn>
               </template>
-            </v-card-text>
-          </v-card>
+            </a-card-text>
+          </a-card>
         </div>
       </editor-menu-bubble>
       <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%" />
-    </v-card-text>
-  </v-card>
+    </a-card-text>
+  </a-card>
 </template>
 
 <script>

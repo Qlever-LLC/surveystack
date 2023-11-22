@@ -1,11 +1,11 @@
 <template>
-  <v-card class="pb-2">
-    <v-card-title
+  <a-card class="pb-2">
+    <a-card-title
       >Documentation Links
       <a-spacer />
       <v-btn color="primary" text @click="showAddDialog = true">New.. </v-btn>
-    </v-card-title>
-    <v-card-subtitle>Custom links which appear in the side menu when logged into your group</v-card-subtitle>
+    </a-card-title>
+    <a-card-subtitle>Custom links which appear in the side menu when logged into your group</a-card-subtitle>
     <draggable
       v-if="group.docs && group.docs.length !== 0"
       class="draggable list-group"
@@ -17,8 +17,8 @@
       @start="drag = true"
       @end="drag = false"
     >
-      <v-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" outlined>
-        <v-card-text>
+      <a-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" outlined>
+        <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
               <span class="title">{{ el.label }}</span>
@@ -31,40 +31,40 @@
               </v-btn>
             </div>
           </div>
-        </v-card-text>
-      </v-card>
+        </a-card-text>
+      </a-card>
     </draggable>
-    <v-card class="ma-2" outlined elevation="1" v-else>
-      <v-card-text>
+    <a-card class="ma-2" outlined elevation="1" v-else>
+      <a-card-text>
         <span class="title text--secondary">No documentation links yet</span><br />
         <span class="font-weight-light grey--text text--darken-2"
           >You can add documentation links from the menu in the top right</span
         >
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
     <v-dialog v-model="deleteModalIsVisible" max-width="290">
-      <v-card>
-        <v-card-title> Remove Documentation </v-card-title>
-        <v-card-text class="mt-4">
+      <a-card>
+        <a-card-title> Remove Documentation </a-card-title>
+        <a-card-text class="mt-4">
           <a-checkbox
             v-model="removeFromDescendants"
             label="Also remove this documentation link from all descendant groups"
             hide-details
           />
-        </v-card-text>
-        <v-card-text class="mt-4"> Are you sure you want to remove this documentation link? </v-card-text>
-        <v-card-actions>
+        </a-card-text>
+        <a-card-text class="mt-4"> Are you sure you want to remove this documentation link? </a-card-text>
+        <a-card-actions>
           <a-spacer />
           <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
-        </v-card-actions>
-      </v-card>
+        </a-card-actions>
+      </a-card>
     </v-dialog>
 
     <v-dialog v-model="showAddDialog" max-width="500">
-      <v-card>
-        <v-card-title>Add documentation link</v-card-title>
-        <v-card-text>
+      <a-card>
+        <a-card-title>Add documentation link</a-card-title>
+        <a-card-text>
           <a-form v-model="newIsValid" ref="form">
             <a-text-field class="mt-3" v-model="newDoc.label" label="Label" outlined required :rules="labelRules" />
 
@@ -76,19 +76,19 @@
               hide-details
             />
           </a-form>
-        </v-card-text>
-        <v-card-actions>
+        </a-card-text>
+        <a-card-actions>
           <a-spacer />
           <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
           <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
-        </v-card-actions>
-      </v-card>
+        </a-card-actions>
+      </a-card>
     </v-dialog>
 
     <slot name="footer">
       <div></div>
     </slot>
-  </v-card>
+  </a-card>
 </template>
 
 <script>

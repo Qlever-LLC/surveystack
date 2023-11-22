@@ -18,12 +18,10 @@
       />
     </template>
 
-    <v-card>
-      <v-card-title class="grey--text text--darken-2">
-        <slot name="title"></slot>
-      </v-card-title>
+    <a-card>
+      <a-card-title class="grey--text text--darken-2"> <slot name="title" />!! </a-card-title>
 
-      <v-card-text>
+      <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
           <v-btn-toggle v-model="viewMode" mandatory dense>
             <v-btn>Edit</v-btn>
@@ -78,14 +76,14 @@
             </v-list>
           </div>
         </div>
-      </v-card-text>
+      </a-card-text>
 
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 

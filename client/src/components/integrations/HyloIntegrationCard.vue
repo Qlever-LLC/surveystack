@@ -1,11 +1,11 @@
 <template>
   <div>
-    <v-card>
-      <v-card-text v-if="isLoading">
-        <v-card-title> Hylo Integraton </v-card-title>
+    <a-card>
+      <a-card-text v-if="isLoading">
+        <a-card-title> Hylo Integraton </a-card-title>
         <a-spacer />
         <a-skeleton-loader type="list-item-avatar, card-heading" />
-      </v-card-text>
+      </a-card-text>
       <template v-else-if="integratedHyloGroup">
         <a-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
@@ -20,9 +20,9 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
               </template>
-              <v-card>
-                <v-card-title class="text-h5"> Are you sure? </v-card-title>
-                <v-card-actions>
+              <a-card>
+                <a-card-title class="text-h5"> Are you sure? </a-card-title>
+                <a-card-actions>
                   <a-spacer />
                   <v-btn
                     color="green darken-1"
@@ -32,13 +32,13 @@
                   >
                     Yes, remove Hylo integration
                   </v-btn>
-                </v-card-actions>
-              </v-card>
+                </a-card-actions>
+              </a-card>
             </v-dialog>
           </a-app-bar>
           <a-spacer />
 
-          <v-card-title class="white--text mt-8">
+          <a-card-title class="white--text mt-8">
             <a-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
             </a-avatar>
@@ -47,34 +47,34 @@
 
               <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p></v-col
             >
-          </v-card-title>
+          </a-card-title>
 
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
-          <v-card-text class="white--text">
+          <a-card-text class="white--text">
             &nbsp;Your group is integrated with
             <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo
-          </v-card-text>
+          </a-card-text>
 
           <!-- </v-col> -->
         </a-img>
       </template>
 
       <template v-else>
-        <v-card-title> Hylo Integraton </v-card-title>
+        <a-card-title> Hylo Integraton </a-card-title>
         <a-spacer />
-        <v-card-subtitle>This group is not integrated with Hylo yet</v-card-subtitle>
+        <a-card-subtitle>This group is not integrated with Hylo yet</a-card-subtitle>
 
-        <v-card-text>
+        <a-card-text>
           <v-dialog v-model="integrateDialog" width="500">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </v-btn>
             </template>
 
-            <v-card>
-              <v-card-title>Integrate group with Hylo</v-card-title>
+            <a-card>
+              <a-card-title>Integrate group with Hylo</a-card-title>
 
-              <v-card-text>
+              <a-card-text>
                 <div class="font-italic text-body-2 mb-4">Find an existing group on Hylo</div>
                 <a-text-field
                   v-model="hyloGroupInput"
@@ -115,17 +115,17 @@
                   Default group settings are: anyone can find and see this group but people must apply to join this
                   group and must be approved. You can change the settings in this Group Settings page in Hylo.
                 </div>
-              </v-card-text>
+              </a-card-text>
 
-              <v-card-actions>
+              <a-card-actions>
                 <a-spacer />
                 <v-btn text @click="integrateDialog = false"> close </v-btn>
-              </v-card-actions>
-            </v-card>
+              </a-card-actions>
+            </a-card>
           </v-dialog>
-        </v-card-text>
+        </a-card-text>
       </template>
-    </v-card>
+    </a-card>
   </div>
 </template>
 

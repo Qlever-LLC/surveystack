@@ -1,11 +1,11 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
-    <v-card>
-      <v-card-title>
+    <a-card>
+      <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
-      </v-card-title>
+      </a-card-title>
       <a-divider />
-      <v-card-text>
+      <a-card-text>
         <a-list dense style="max-height: 500px" class="overflow-y-auto">
           <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
             <a-progress-circular :size="50" color="primary" indeterminate />
@@ -19,13 +19,13 @@
             </a-list-item>
           </template>
         </a-list>
-      </v-card-text>
+      </a-card-text>
       <a-divider />
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 <script>

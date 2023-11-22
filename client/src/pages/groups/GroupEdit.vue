@@ -48,8 +48,8 @@
         <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
       </v-btn>
     </div>
-    <v-card :loading="isLoadingGroup" class="mb-4">
-      <v-card-text>
+    <a-card :loading="isLoadingGroup" class="mb-4">
+      <a-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
           <a-text-field
             label="Name"
@@ -96,8 +96,8 @@
             <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
           </div>
         </form>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
 
     <a-row>
       <v-col cols="12" lg="12">

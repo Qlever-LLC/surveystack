@@ -1,8 +1,8 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
-    <v-card>
-      <v-card-title>Survey Versions</v-card-title>
-      <v-card-text style="max-height: 500px">
+    <a-card>
+      <a-card-title>Survey Versions</a-card-title>
+      <a-card-text cssMaxHeight500px>
         <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
@@ -70,9 +70,9 @@
         <a-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" closable>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
         </a-alert>
-      </v-card-text>
+      </a-card-text>
       <a-divider />
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <v-btn
           v-if="compareRevisions.length > 0"
@@ -94,8 +94,8 @@
           Delete {{ selectedVersionsToDelete.length }} versions
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
     <survey-diff-dialog
       v-if="surveyDiffDialogVisible"
       :value="surveyDiffDialogVisible"
@@ -113,7 +113,9 @@ import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: {
+    SurveyDiffDialog,
+  },
   props: {
     value: {
       type: Boolean,

@@ -13,7 +13,7 @@
     </v-btn>
 
     <v-dialog v-model="isScannerOpen" fullscreen>
-      <v-card>
+      <a-card>
         <a-toolbar dark color="primary">
           <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <a-icon>mdi-close</a-icon>
@@ -31,7 +31,7 @@
             <div v-if="!isLoading" class="scan-region-outline" />
           </div>
         </v-container>
-      </v-card>
+      </a-card>
     </v-dialog>
   </div>
 </template>
@@ -46,7 +46,6 @@ QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { 
 
 export default defineComponent({
   emits: ['codeDetected'],
-
   props: {
     small: {
       type: Boolean,

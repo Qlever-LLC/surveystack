@@ -1,8 +1,8 @@
 <template>
   <v-dialog max-width="500" max-height="100" v-model="dialog">
-    <v-card>
-      <v-card-title>Search members</v-card-title>
-      <v-card-text>
+    <a-card>
+      <a-card-title>Search members</a-card-title>
+      <a-card-text>
         <active-group-selector
           v-if="!fixedGroupId"
           :value="selectedGroupId"
@@ -36,8 +36,8 @@
             </v-list-item-content>
           </a-list-item>
         </v-list>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </v-dialog>
 </template>
 
@@ -46,7 +46,9 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
 
 export default {
-  components: { ActiveGroupSelector },
+  components: {
+    ActiveGroupSelector,
+  },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
     fixedGroupId: {

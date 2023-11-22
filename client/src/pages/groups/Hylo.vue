@@ -1,8 +1,8 @@
 <template>
   <v-col cols="12" lg="6">
-    <v-card v-if="$route.params.id" class="mb-4">
+    <a-card v-if="$route.params.id" class="mb-4">
       <app-hylo-integration-card :groupId="$route.params.id" />
-    </v-card>
+    </a-card>
   </v-col>
 </template>
 <script>

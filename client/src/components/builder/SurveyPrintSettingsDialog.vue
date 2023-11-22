@@ -1,9 +1,9 @@
 <template>
   <v-dialog :value="value" @input="$emit('input', $event)" width="350" max-width="75%">
-    <v-card>
-      <v-card-title> Print settings </v-card-title>
+    <a-card>
+      <a-card-title> Print settings </a-card-title>
 
-      <v-card-text>
+      <a-card-text>
         <div class="d-flex">
           <a-checkbox
             v-model="survey.meta.printOptions.showInstruction"
@@ -22,13 +22,13 @@
             class="align-center align-self-start"
           />
         </div>
-      </v-card-text>
+      </a-card-text>
 
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <a-spacer />
         <v-btn @click="$emit('input', false)" color="primary" text> Close </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 

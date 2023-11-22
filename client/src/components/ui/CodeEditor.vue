@@ -1,7 +1,7 @@
 <template>
   <div class="full">
-    <v-card dark color="dark-blue--lighten-2" class="card-height" slot="paneL">
-      <v-card-title
+    <a-card dark color="dark-blue--lighten-2" class="card-height" slot="paneL">
+      <a-card-title
         >{{ title || '' }}
 
         <a-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
@@ -18,17 +18,17 @@
         </a-chip>
 
         <v-dialog v-model="dialog" width="800">
-          <v-card>
-            <v-card-title class="headline">Object Created</v-card-title>
+          <a-card>
+            <a-card-title class="headline">Object Created</a-card-title>
             <div style="width: 100%; height: 60vh">
               <app-code-view :value="result"> </app-code-view>
             </div>
 
-            <v-card-actions>
+            <a-card-actions>
               <a-spacer />
               <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
-            </v-card-actions>
-          </v-card>
+            </a-card-actions>
+          </a-card>
         </v-dialog>
 
         <a-spacer />
@@ -40,10 +40,10 @@
           <a-icon left>mdi-play</a-icon> Run
         </v-btn>
         <a-icon @click="$emit('close')">mdi-close-circle-outline</a-icon>
-      </v-card-title>
+      </a-card-title>
       <div class="error red text--white pa-2" v-if="error">{{ error }}</div>
       <div class="editor-height" :id="'monaco-editor-' + _uid"></div>
-    </v-card>
+    </a-card>
   </div>
 </template>
 

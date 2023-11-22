@@ -1,9 +1,9 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
-    <v-card>
-      <v-card-title> Confirm Submission </v-card-title>
-      <v-card-text v-if="!groupChangeAllowed"> Submit Survey </v-card-text>
-      <v-card-text v-else>
+    <a-card>
+      <a-card-title> Confirm Submission </a-card-title>
+      <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>
+      <a-card-text v-else>
         Submit this draft <strong>{{ id }}</strong> to
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
@@ -26,13 +26,13 @@
         <div v-if="additionalMessage">
           {{ additionalMessage }}
         </div>
-      </v-card-text>
-      <v-card-actions>
+      </a-card-text>
+      <a-card-actions>
         <a-spacer />
         <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
         <v-btn text color="primary" @click.stop="handleConfirm"> Submit </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 

@@ -1,18 +1,18 @@
 <template>
   <div>
     <v-dialog v-model="upgradeDialog" width="400">
-      <v-card>
-        <v-card-title> Upgrade </v-card-title>
-        <v-card-text>
+      <a-card>
+        <a-card-title> Upgrade </a-card-title>
+        <a-card-text>
           In order to change your current plan, please contact
           <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
-        </v-card-text>
-      </v-card>
+        </a-card-text>
+      </a-card>
     </v-dialog>
 
-    <v-card v-if="superAdmin" class="px-4 mb-4">
-      <v-card-title>Super Admin</v-card-title>
-      <v-card-text>
+    <a-card v-if="superAdmin" class="px-4 mb-4">
+      <a-card-title>Super Admin</a-card-title>
+      <a-card-text>
         <div class="d-flex flex-grow-1">
           <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
@@ -39,8 +39,8 @@
           />
         </div>
         <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>

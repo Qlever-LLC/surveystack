@@ -95,8 +95,7 @@
       </pane>
 
       <pane class="pane pane-controls" v-if="control">
-        <v-card class="px-4 pb-3 m-2 mb-3">
-          <!-- <v-card-title class="pl-0">Details</v-card-title> -->
+        <a-card class="px-4 pb-3 m-2 mb-3">
           <control-properties
             v-if="control"
             :control="control"
@@ -118,7 +117,7 @@
             @set-script-editor-is-visible="setScriptIsVisible"
             data-testid="control-properties"
           />
-        </v-card>
+        </a-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
         <code-editor
@@ -228,9 +227,9 @@
         </div>
 
         <a-overlay :value="enableSaveDraft">
-          <v-card>
-            <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
-          </v-card>
+          <a-card>
+            <a-card-text> Please Save Draft to update Survey Preview.</a-card-text>
+          </a-card>
         </a-overlay>
       </pane>
 

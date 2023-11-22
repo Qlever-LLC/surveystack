@@ -1,30 +1,28 @@
 <template>
-  <div>
-    <v-card>
-      <v-card-title>
-        {{ title }}
-        <a-spacer />
-        <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
-      </v-card-title>
-      <v-card-text>
-        <a-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
-        <template v-if="entities && entities.length > 0">
-          <a-list-item
-            v-for="integration in integrations"
-            :key="integration._id"
-            two-line
-            :to="`/${integrationType}-integrations/${integration._id}/edit`"
-          >
-            <v-list-item-content>
-              <a-list-item-title>{{ integration.name }}</a-list-item-title>
-              <a-list-item-subtitle>{{ integration.type }}</a-list-item-subtitle>
-            </v-list-item-content>
-          </a-list-item>
-        </template>
-        <div v-else class="grey--text">No {{ title }} yet</div>
-      </v-card-text>
-    </v-card>
-  </div>
+  <a-card>
+    <a-card-title>
+      {{ title }}
+      <a-spacer />
+      <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
+    </a-card-title>
+    <a-card-text>
+      <a-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
+      <template v-if="entities && entities.length > 0">
+        <a-list-item
+          v-for="integration in integrations"
+          :key="integration._id"
+          two-line
+          :to="`/${integrationType}-integrations/${integration._id}/edit`"
+        >
+          <v-list-item-content>
+            <a-list-item-title>{{ integration.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ integration.type }}</a-list-item-subtitle>
+          </v-list-item-content>
+        </a-list-item>
+      </template>
+      <div v-else class="grey--text">No {{ title }} yet</div>
+    </a-card-text>
+  </a-card>
 </template>
 
 <script>

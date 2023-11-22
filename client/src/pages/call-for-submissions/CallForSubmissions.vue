@@ -9,8 +9,8 @@
       @search="searchSurveys"
       @selected="selectSurvey"
     />
-    <v-card class="my-2">
-      <v-card-text>
+    <a-card class="my-2">
+      <a-card-text>
         <label>Survey</label>
         <div class="mb-5 d-flex align-center">
           <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
@@ -28,12 +28,12 @@
           <v-btn text @click="cancel">Cancel</v-btn>
           <v-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</v-btn>
         </div>
-      </v-card-text>
-    </v-card>
-    <v-card>
-      <v-card-title>Select members</v-card-title>
-      <v-card-subtitle>{{ selectedMembers.length }} selected</v-card-subtitle>
-      <v-card-text>
+      </a-card-text>
+    </a-card>
+    <a-card>
+      <a-card-title>Select members</a-card-title>
+      <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
+      <a-card-text>
         <v-data-table
           v-model="selectedMembers"
           :items="activeMembers"
@@ -53,24 +53,24 @@
             />
           </template>
         </v-data-table>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
 
     <v-dialog v-model="showConfirmDialog" max-width="500">
-      <v-card>
-        <v-card-title class="headline">Confirmation</v-card-title>
-        <v-card-text>
+      <a-card>
+        <a-card-title class="headline">Confirmation</a-card-title>
+        <a-card-text>
           <p class="body-1">
             You are about to send an E-mail to {{ selectedMembers.length }}
             {{ selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
           </p>
           <a-checkbox label="Also send a copy to myself" v-model="copy" />
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
+        </a-card-text>
+        <a-card-actions class="d-flex justify-end">
           <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
           <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
-        </v-card-actions>
-      </v-card>
+        </a-card-actions>
+      </a-card>
     </v-dialog>
     <result-dialog
       v-model="showSubmitResult"

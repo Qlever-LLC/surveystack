@@ -1,7 +1,7 @@
 <template>
-  <v-card>
-    <v-card-title> Survey Reference Editor </v-card-title>
-    <v-card-text>
+  <a-card>
+    <a-card-title> Survey Reference Editor </a-card-title>
+    <a-card-text>
       <a-select
         engineering="autocomplete"
         label="Select Survey"
@@ -34,9 +34,9 @@
           item-text="name"
         />
       </template>
-    </v-card-text>
+    </a-card-text>
     <a-spacer />
-    <v-card-actions>
+    <a-card-actions>
       <a-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
       <a-tooltip top :disabled="!!path">
@@ -49,10 +49,10 @@
       </a-tooltip>
       <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
       <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
-    </v-card-actions>
+    </a-card-actions>
 
     <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />
-  </v-card>
+  </a-card>
 </template>
 
 <script>
@@ -69,7 +69,9 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: {
+    OntologyReferencePreview,
+  },
   props: {
     resource: {
       type: Object,

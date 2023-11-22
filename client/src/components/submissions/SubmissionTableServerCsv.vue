@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <h1>Andreas' Sandbox</h1>
-    <v-card class="pt-2">
+    <a-card class="pt-2">
       <v-data-table
         :headers="headers"
         :items="items"
@@ -35,7 +35,7 @@
           </thead>
         </template>
       </v-data-table>
-    </v-card>
+    </a-card>
   </v-container>
 </template>
 

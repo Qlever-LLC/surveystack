@@ -1,8 +1,8 @@
 <template>
   <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
-    <v-card class="pa-4">
-      <v-card-title class="headline"> Manage Groups </v-card-title>
-      <v-card-text>
+    <a-card class="pa-4">
+      <a-card-title class="headline"> Manage Groups </a-card-title>
+      <a-card-text>
         Update Groups with Access to Farm Instance
         <br />
         <a-select
@@ -35,8 +35,8 @@
           <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
           <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
         </div>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </v-dialog>
 </template>
 
@@ -45,6 +45,7 @@ import './css/button.css';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
+
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {

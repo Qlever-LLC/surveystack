@@ -92,14 +92,14 @@
           </a-expansion-panel-text>
         </a-expansion-panel>
       </a-expansion-panels>
-      <v-card class="my-5 px-2">
-        <v-card-title class="d-flex justify-space-between align-center">
+      <a-card class="my-5 px-2">
+        <a-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>
-        </v-card-title>
-        <v-card-text>
+        </a-card-title>
+        <a-card-text>
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
-        </v-card-text>
-        <v-card-text>
+        </a-card-text>
+        <a-card-text>
           <a-row>
             <v-col md="2" sm="6">
               <a-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
@@ -138,8 +138,8 @@
               </div>
             </v-col>
           </a-row>
-        </v-card-text>
-      </v-card>
+        </a-card-text>
+      </a-card>
     </v-container>
 
     <v-container>

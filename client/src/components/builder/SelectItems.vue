@@ -16,10 +16,10 @@
       />
     </template>
 
-    <v-card>
-      <v-card-title class="grey--text text--darken-2"> Default value </v-card-title>
+    <a-card>
+      <a-card-title class="grey--text text--darken-2"> Default value </a-card-title>
 
-      <v-card-text class="dialog-content">
+      <a-card-text cssDialogContent>
         <div v-if="multiple" class="checkbox-group">
           <a-checkbox
             v-for="(item, index) in items"
@@ -36,16 +36,16 @@
           <a-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
           <a-radio v-if="custom" label="other" value="other" />
         </a-radio-group>
-      </v-card-text>
+      </a-card-text>
 
       <a-divider />
 
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 

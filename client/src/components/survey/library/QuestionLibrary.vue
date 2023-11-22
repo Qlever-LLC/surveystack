@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-card-title class="pl-0">
+    <a-card-title class="pl-0">
       <a-icon class="mr-1">mdi-library</a-icon>
       Question Library
       <a-spacer />
       <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <a-icon> mdi-close </a-icon>
       </v-btn>
-    </v-card-title>
+    </a-card-title>
 
     <a-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
@@ -19,7 +19,7 @@
     <v-container fluid class="pa-0" v-else>
       <a-row dense>
         <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
-          <v-card
+          <a-card
             @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
             class="control-item mb-2"
@@ -115,7 +115,7 @@
                 />
               </v-col>
             </a-row>
-          </v-card>
+          </a-card>
         </v-col>
       </a-row>
     </v-container>

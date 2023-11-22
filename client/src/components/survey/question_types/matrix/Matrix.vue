@@ -39,15 +39,15 @@
       max-width="800px"
     >
       <div style="background: #1867c0; padding: 4px 0px">
-        <v-card>
-          <v-card-title>
+        <a-card>
+          <a-card-title>
             <v-btn @click="duplicateRow(editedIndex)" text color="primary">
               <a-icon left>mdi-content-copy</a-icon>Duplicate
             </v-btn>
             <a-spacer />
             <v-btn text @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </v-btn>
-          </v-card-title>
-          <v-card-text>
+          </a-card-title>
+          <a-card-text>
             <a-form autocomplete="off" @submit.prevent="">
               <div v-for="(header, idx) in headers" :key="header.value">
                 <div class="d-flex align-center">
@@ -66,16 +66,16 @@
                 />
               </div>
             </a-form>
-          </v-card-text>
-          <v-card-actions class="d-flex justify-space-between">
+          </a-card-text>
+          <a-card-actions class="d-flex justify-space-between">
             <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
               <a-icon left>mdi-trash-can-outline</a-icon>Delete
             </v-btn>
             <v-btn text @click="showEditItemDialog = false" class="ma-2">
               Close <a-icon right>mdi-close</a-icon>
             </v-btn>
-          </v-card-actions>
-        </v-card>
+          </a-card-actions>
+        </a-card>
       </div>
     </v-dialog>
     <app-control-label

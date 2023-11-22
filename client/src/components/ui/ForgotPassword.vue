@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card class="pa-6 pa-sm-12">
+    <a-card class="pa-6 pa-sm-12">
       <h1>Forgot Password?</h1>
       <p>Enter your email address and we will send you a link for setting a new password.</p>
 
@@ -17,7 +17,7 @@
         >
       </div>
       <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</a-alert>
-    </v-card>
+    </a-card>
   </v-container>
 </template>
 

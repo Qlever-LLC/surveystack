@@ -1,33 +1,33 @@
 <template>
   <div>
     <v-dialog v-model="show" max-width="350" :persistent="persistent">
-      <v-card>
-        <v-card-title v-if="title" class="headline mb-2">{{ title }}</v-card-title>
+      <a-card>
+        <a-card-title v-if="title" class="headline mb-2">{{ title }}</a-card-title>
 
-        <v-card-text>
+        <a-card-text>
           <div v-for="(item, idx) in messages" :key="idx">
-            <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
-              <v-card-text class="white--text">
+            <a-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
+              <a-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
-              </v-card-text>
+              </a-card-text>
               <template v-if="item.logs && item.logs.length">
                 <a-divider class="mx-4" />
                 <v-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-card-actions>
+                    <a-card-actions>
                       <a-spacer />
                       <v-btn text v-bind="attrs" v-on="on"> Logs </v-btn>
-                    </v-card-actions>
+                    </a-card-actions>
                   </template>
 
-                  <v-card>
-                    <v-card-title>
+                  <a-card>
+                    <a-card-title>
                       Handler logs
                       <a-spacer />
                       <copy-to-clipboard :value="JSON.stringify(item.logs, null, 2)" />
-                    </v-card-title>
+                    </a-card-title>
 
-                    <v-card-text>
+                    <a-card-text>
                       <a-expansion-panels accordion>
                         <a-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
@@ -50,12 +50,12 @@
                           </a-expansion-panel-text>
                         </a-expansion-panel>
                       </a-expansion-panels>
-                    </v-card-text>
-                  </v-card>
+                    </a-card-text>
+                  </a-card>
                 </v-dialog>
               </template>
               <!-- <pre v-if="item.logs">{{ JSON.stringify(item.logs, null, 2) }}</pre> -->
-            </v-card>
+            </a-card>
           </div>
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
@@ -67,13 +67,13 @@
               Email Submission
             </v-btn>
           </div>
-        </v-card-text>
+        </a-card-text>
 
-        <v-card-actions>
+        <a-card-actions>
           <a-spacer />
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
-        </v-card-actions>
-      </v-card>
+        </a-card-actions>
+      </a-card>
     </v-dialog>
   </div>
 </template>
