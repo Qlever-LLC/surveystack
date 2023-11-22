@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex align-center control-label-wrapper" :class="className">
     <div class="control-label" v-if="value">{{ value }}</div>
-    <v-spacer />
+    <a-spacer />
     <initialize-button
       v-if="initializable"
       bottom

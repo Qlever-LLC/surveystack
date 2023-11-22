@@ -164,7 +164,3 @@ body {
 ::placeholder {
   color: rgba(0, 0, 0, 0.6) !important;
 }
-
-.v-select .v-select__selections > input:not(:first-child) {
-  margin-left: 4px;
-}

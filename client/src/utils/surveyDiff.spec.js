@@ -1,12 +1,12 @@
 import {
-  flatSurveyControls,
-  diffControls,
   changeType,
+  diffControls,
   diffSurveyVersions,
-  merge,
   diffThreeSurveyVersions,
+  flatSurveyControls,
+  merge,
 } from './surveyDiff';
-import { cloneDeep, find, uniqueId, set, map } from 'lodash';
+import { cloneDeep, find, map, set, uniqueId } from 'lodash';
 import { createControlInstance } from './surveyConfig';
 
 const createControl = ({ type, ...overrides }) => ({

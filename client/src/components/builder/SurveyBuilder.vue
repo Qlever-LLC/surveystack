@@ -21,16 +21,16 @@
       @cancel="updateLibraryCancelled"
     />
 
-    <v-alert
+    <a-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
       text
       type="warning"
       color="orange"
       elevation="2"
-      dismissible
+      closable
     >
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
-    </v-alert>
+    </a-alert>
 
     <splitpanes class="pane-root" vertical>
       <pane class="pane pane-survey">
@@ -138,16 +138,16 @@
         <splitpanes horizontal class="code-resizer">
           <pane size="80">
             <div style="height: 100%">
-              <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
-                <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
-                <v-tab :disabled="!control.options.initialize.enabled"> Initialize</v-tab>
-                <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
-                <v-tab :disabled="!control.options.constraint.enabled"> Constraint</v-tab>
-                <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
+              <a-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
+                <a-tab :disabled="!control.options.relevance.enabled"> Relevance</a-tab>
+                <a-tab :disabled="!control.options.initialize.enabled"> Initialize</a-tab>
+                <a-tab :disabled="!control.options.calculate.enabled"> Calculate</a-tab>
+                <a-tab :disabled="!control.options.constraint.enabled"> Constraint</a-tab>
+                <a-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
-                </v-tab>
-                <v-tab v-if="control.type === 'script'"> Script</v-tab>
-              </v-tabs>
+                </a-tab>
+                <a-tab v-if="control.type === 'script'"> Script</a-tab>
+              </a-tabs>
 
               <code-editor
                 v-if="selectedTab !== null"
@@ -202,36 +202,36 @@
             :forceMobile="isPreviewMobile"
           >
             <template v-slot:toolbar-actions>
-              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+              <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
-                  <v-icon right> mdi-monitor</v-icon>
+                  <a-icon right> mdi-monitor</a-icon>
                 </v-btn>
 
                 <v-btn :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
-                  <v-icon right> mdi-cellphone</v-icon>
+                  <a-icon right> mdi-cellphone</a-icon>
                 </v-btn>
-              </v-btn-toggle>
+              </a-btn-toggle>
 
               <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>
-                <v-icon right>mdi-code-tags</v-icon>
+                <a-icon right>mdi-code-tags</a-icon>
               </v-btn>
 
               <v-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">submission</span>
-                <v-icon right>mdi-code-tags</v-icon>
+                <a-icon right>mdi-code-tags</a-icon>
               </v-btn>
             </template>
           </app-draft-component>
         </div>
 
-        <v-overlay :value="enableSaveDraft">
+        <a-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
           </v-card>
-        </v-overlay>
+        </a-overlay>
       </pane>
 
       <!-- Padding pane - DO NOT DELETE -->
