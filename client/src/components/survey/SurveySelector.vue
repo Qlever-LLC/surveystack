@@ -3,9 +3,9 @@
     <v-card>
       <v-card-title>Search surveys</v-card-title>
       <v-card-text>
-        <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
+        <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
         <v-list>
-          <v-list-item
+          <a-list-item
             v-for="searchResult in searchResults"
             :key="searchResult._id"
             @click="
@@ -16,13 +16,13 @@
             "
           >
             <v-list-item-content>
-              <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
-              <v-list-item-subtitle
+              <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
+              <a-list-item-subtitle
                 >last modified
-                {{ searchResult.meta ? renderDateFromNow(searchResult.meta.dateModified) : '' }}</v-list-item-subtitle
+                {{ searchResult.meta ? renderDateFromNow(searchResult.meta.dateModified) : '' }}</a-list-item-subtitle
               >
             </v-list-item-content>
-          </v-list-item>
+          </a-list-item>
         </v-list>
       </v-card-text>
     </v-card>
@@ -45,6 +45,7 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
       q: '',

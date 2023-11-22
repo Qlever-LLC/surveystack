@@ -1,10 +1,9 @@
-import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
+import { renderWithVuetify, localVue } from '../../../../tests/renderWithVuetify';
 import Draft from './Draft.vue';
 import router from '@/router';
 import { createSurvey } from '@/utils/surveys';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import draftStore from '@/store/modules/draft.store';
-import { createLocalVue } from '@vue/test-utils';
 import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 
 function mockSurvey() {
@@ -42,7 +41,6 @@ describe('Draft', () => {
       },
     };
 
-    const localVue = createLocalVue();
     localVue.component('AppControlNumber', AppControlNumberStub);
 
     renderWithVuetify(Draft, {

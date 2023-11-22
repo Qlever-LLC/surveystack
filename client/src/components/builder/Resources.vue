@@ -14,7 +14,7 @@
       <v-card>
         <v-card-text class="pa-4">
           <span>Uploading file resource</span>
-          <v-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -22,36 +22,36 @@
       <v-card>
         <v-card-text class="pa-4">
           <span>Downloading file resource</span>
-          <v-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear indeterminate class="mb-0" />
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
+    </a-alert>
     <div class="d-flex justify-end">
-      <v-menu offset-y left>
+      <a-menu offset-y left>
         <template v-slot:activator="{ on }">
           <v-btn color="primary" v-on="on">
-            <v-icon left>mdi-plus</v-icon>
+            <a-icon left>mdi-plus</a-icon>
             Add resource
           </v-btn>
         </template>
         <v-list>
-          <v-list-item class="d-flex align-center">
-            <v-list-item-title>
+          <a-list-item class="d-flex align-center">
+            <a-list-item-title>
               <v-btn text @click="createOntology">
-                <v-icon color="grey">mdi-plus</v-icon>
+                <a-icon color="grey">mdi-plus</a-icon>
                 <div class="ml-1">Create Ontology</div>
               </v-btn>
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
-            <v-list-item-title>
-              <v-input hide-details>
+            </a-list-item-title>
+          </a-list-item>
+          <a-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
+            <a-list-item-title>
+              <a-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
                   <v-btn class="pointer-events-none" text>
-                    <v-icon color="grey">mdi-upload</v-icon>
+                    <a-icon color="grey">mdi-upload</a-icon>
                     <div class="ml-1">Add File Resource</div>
                   </v-btn>
                 </label>
@@ -62,17 +62,17 @@
                   class="d-none"
                   @change="createFileResource"
                 />
-              </v-input>
-            </v-list-item-title>
-          </v-list-item>
+              </a-input>
+            </a-list-item-title>
+          </a-list-item>
         </v-list>
-      </v-menu>
+      </a-menu>
     </div>
-    <v-select :items="availableFilters" v-model="filter" label="Filter" />
-    <v-text-field v-model="search" label="Search" autocomplete="off" />
+    <a-select :items="availableFilters" v-model="filter" label="Filter" />
+    <a-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
-        <v-list-item
+        <a-list-item
           v-for="resource in filteredResources"
           :key="resource.id"
           two-line
@@ -80,25 +80,25 @@
           :inactive="resource.type !== resourceTypes.FILE && resource.type !== resourceTypes.ONTOLOGY_LIST"
         >
           <v-list-item-content style="user-select: text">
-            <v-list-item-title>{{ resource.label }}</v-list-item-title>
-            <v-list-item-subtitle v-if="resource.type === resourceTypes.FILE">
+            <a-list-item-title>{{ resource.label }}</a-list-item-title>
+            <a-list-item-subtitle v-if="resource.type === resourceTypes.FILE">
               {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
-            </v-list-item-subtitle>
-            <v-list-item-subtitle v-else> {{ resource.name }}</v-list-item-subtitle>
+            </a-list-item-subtitle>
+            <a-list-item-subtitle v-else> {{ resource.name }}</a-list-item-subtitle>
           </v-list-item-content>
-          <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
-          <v-list-item-action v-if="resource.type === resourceTypes.FILE">
+          <a-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</a-icon>
+          <a-list-item-action v-if="resource.type === resourceTypes.FILE">
             <v-btn icon>
-              <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
+              <a-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </a-icon>
             </v-btn>
-          </v-list-item-action>
-        </v-list-item>
+          </a-list-item-action>
+        </a-list-item>
       </template>
-      <v-list-item v-else>
+      <a-list-item v-else>
         <v-list-item-content>
-          <v-list-item-title class="text--secondary">No resources found</v-list-item-title>
+          <a-list-item-title class="text--secondary">No resources found</a-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </a-list-item>
     </v-list>
   </div>
 </template>
@@ -106,6 +106,7 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
 

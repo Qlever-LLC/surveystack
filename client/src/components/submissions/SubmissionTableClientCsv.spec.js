@@ -1,4 +1,4 @@
-import {
+import SubmissionTableClientCsv, {
   getPropertiesFromMatrix,
   transformGeoJsonHeaders,
   transformMatrixHeaders,
@@ -6,7 +6,6 @@ import {
 import { fireEvent } from '@testing-library/vue';
 import { within } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
-import SubmissionTableClientCsv from './SubmissionTableClientCsv.vue';
 import router from '@/router';
 import { createStoreObject } from '@/store';
 

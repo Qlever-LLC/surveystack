@@ -1,10 +1,10 @@
 <template>
   <div class="control-adder">
-    <v-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
+    <a-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
         <v-btn v-model="fabIsOpen" fab color="blue darken-2" dark data-testid="control-adder-open">
-          <v-icon v-if="fabIsOpen">mdi-close</v-icon>
-          <v-icon v-else>mdi-plus</v-icon>
+          <a-icon v-if="fabIsOpen">mdi-close</a-icon>
+          <a-icon v-else>mdi-plus</a-icon>
         </v-btn>
       </template>
       <template v-slot:default>
@@ -31,9 +31,9 @@
             small
             data-testid="add-control-group"
           >
-            <v-icon left v-if="group.icon" color="indigo lighten-2">
+            <a-icon left v-if="group.icon" color="indigo lighten-2">
               {{ group.icon }}
-            </v-icon>
+            </a-icon>
             Group
           </v-btn>
           <v-btn
@@ -46,19 +46,19 @@
             class="ma-1 d-inline-block shadow"
             :data-testid="'add-control-' + el.type"
           >
-            <v-icon dark left v-if="el.icon">
+            <a-icon dark left v-if="el.icon">
               {{ el.icon }}
-            </v-icon>
+            </a-icon>
             {{ el.name.replace('_', ' ') }}
           </v-btn>
         </div>
       </template>
-    </v-speed-dial>
+    </a-speed-dial>
   </div>
 </template>
 
 <script>
-import { createControlInstance, availableControls } from '@/utils/surveyConfig';
+import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 
 const group = availableControls.find((c) => c.type === 'group');
 
@@ -120,11 +120,6 @@ export default {
   left: 50%;
   transform: translateX(-50%);
 }
-
-/* .control-adder >>> .v-speed-dial--direction-top .v-speed-dial__list,
-.control-adder >>> .v-speed-dial--direction-bottom .v-speed-dial__list {
-  with
-} */
 
 .bg-white {
   background-color: white;
