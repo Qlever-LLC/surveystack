@@ -71,13 +71,11 @@
 <script>
 import api from '@/services/api.service';
 import appBasicList from '@/components/ui/BasicList.vue';
-import ARow from '@/components/ui/ARow.vue';
 
 export default {
   name: 'Group',
   components: {
     appBasicList,
-    ARow,
   },
   data() {
     return {

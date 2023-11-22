@@ -49,11 +49,7 @@
 </template>
 
 <script>
-import ARow from '@/components/ui/ARow.vue';
 export default {
-  components: {
-    ARow,
-  },
   props: ['viewModel', 'loading'],
 
   data() {

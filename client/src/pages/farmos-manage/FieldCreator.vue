@@ -36,7 +36,6 @@
 import appDialog from '@/components/ui/Dialog.vue';
 import appFarmArea from './FarmOSArea.vue';
 import appKmlImporter from './KmlImporter.vue';
-import ARow from '@/components/ui/ARow.vue';
 
 const states = {
   IDLE: 0,
@@ -51,7 +50,6 @@ export default {
     appDialog,
     appFarmArea,
     appKmlImporter,
-    ARow,
   },
   props: ['value', 'center', 'loading'],
   data() {

@@ -134,13 +134,11 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import ARow from '@/components/ui/ARow.vue';
 
 export default {
   components: {
     AuthSelector,
     AppBasicList,
-    ARow,
   },
   name: 'home',
   data() {

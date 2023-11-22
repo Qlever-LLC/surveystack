@@ -7,10 +7,5 @@
 </template>
 
 <script>
-import ARow from '@/components/ui/ARow.vue';
-export default {
-  components: {
-    ARow,
-  },
-};
+export default {};
 </script>

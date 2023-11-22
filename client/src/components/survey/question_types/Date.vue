@@ -68,13 +68,10 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import ARow from '@/components/ui/ARow.vue';
 
 export default {
   mixins: [baseQuestionComponent],
-  components: {
-    ARow,
-  },
+
   props: { centered: { type: Boolean, default: true } },
   data() {
     return {

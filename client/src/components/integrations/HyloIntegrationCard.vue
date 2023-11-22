@@ -132,12 +132,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ARow from '@/components/ui/ARow.vue';
 
 export default {
-  components: {
-    ARow,
-  },
   props: {
     groupId: String,
   },

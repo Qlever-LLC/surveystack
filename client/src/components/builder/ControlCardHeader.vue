@@ -21,12 +21,8 @@
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';
-import ARow from '@/components/ui/ARow.vue';
 
 export default {
-  components: {
-    ARow,
-  },
   props: {
     index: { type: String, required: true },
     title: { type: String, required: true },
