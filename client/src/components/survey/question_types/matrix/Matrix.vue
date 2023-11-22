@@ -156,7 +156,6 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -271,7 +270,6 @@ export default {
     appMatrixTable,
     appRequired,
     appRedacted,
-    AProgressCircular,
   },
   data() {
     return {

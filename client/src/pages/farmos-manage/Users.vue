@@ -98,11 +98,7 @@
 </template>
 
 <script>
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 export default {
-  components: {
-    AProgressCircular,
-  },
   props: {
     groups: Array,
     mappings: Object,

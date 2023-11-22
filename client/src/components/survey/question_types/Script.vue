@@ -87,13 +87,11 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
     appDialog,
-    AProgressCircular,
   },
   props: {
     submission: {

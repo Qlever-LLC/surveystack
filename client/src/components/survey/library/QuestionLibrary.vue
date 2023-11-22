@@ -130,14 +130,12 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
-    AProgressCircular,
   },
   props: ['survey', 'libraryId'],
   data() {

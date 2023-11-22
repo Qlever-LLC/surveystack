@@ -78,7 +78,6 @@ import { getApiComposeErrors } from '@/utils/draft';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -88,7 +87,6 @@ export default {
     ConfirmLeaveDialog,
     SubmittingDialog,
     appSubmissionArchiveDialog,
-    AProgressCircular,
   },
   data() {
     return {

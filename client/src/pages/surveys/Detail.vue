@@ -90,7 +90,6 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   props: {
@@ -103,7 +102,6 @@ export default {
   components: {
     BtnDropdown,
     MemberSelector,
-    AProgressCircular,
   },
   data() {
     return {

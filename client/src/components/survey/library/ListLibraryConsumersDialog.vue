@@ -31,7 +31,6 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   name: 'list-library-consumers-dialog',

@@ -93,15 +93,11 @@
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 
 import MarkdownIt from 'markdown-it';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
-  components: {
-    AProgressCircular,
-  },
   props: {
     value: { type: String },
     label: { type: String },

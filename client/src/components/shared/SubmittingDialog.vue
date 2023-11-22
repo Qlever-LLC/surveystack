@@ -10,11 +10,7 @@
 </template>
 
 <script>
-import AProgressLinear from '@/components/ui/AProgressLinear.vue';
 export default {
-  components: {
-    AProgressLinear,
-  },
   props: {
     value: {
       type: Boolean,

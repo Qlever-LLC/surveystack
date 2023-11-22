@@ -109,12 +109,10 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
-import AProgressLinear from '@/components/ui/AProgressLinear.vue';
 
 export default {
   components: {
     appOntologyListEditor,
-    AProgressLinear,
   },
   props: {
     resources: {

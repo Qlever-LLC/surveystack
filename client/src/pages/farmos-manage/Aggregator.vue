@@ -234,7 +234,6 @@
 
 <script>
 import _ from 'lodash';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 export default {
   emits: ['addSuperAdminNote'],

@@ -52,7 +52,6 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import AProgressCircular from '@/components/ui/AProgressCircular.vue';
 
 const hashItem = (listItem) => {
   if (listItem === null || listItem.value === null) {
