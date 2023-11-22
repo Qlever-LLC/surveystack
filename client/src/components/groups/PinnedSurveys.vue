@@ -2,7 +2,7 @@
   <a-card class="pb-2">
     <a-card-title
       >Pinned Surveys
-      <v-spacer />
+      <a-spacer />
       <v-btn color="primary" text @click="openSearchDialog">New..</v-btn>
     </a-card-title>
     <draggable
@@ -30,7 +30,7 @@
             </div>
             <div class="d-flex">
               <v-btn icon @click.stop="() => showDeleteModal(idx)">
-                <v-icon color="grey lighten-1">mdi-delete</v-icon>
+                <a-icon color="grey lighten-1">mdi-delete</a-icon>
               </v-btn>
             </div>
           </div>
@@ -52,7 +52,7 @@
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
         </a-card-text>
         <a-card-actions>
-          <v-spacer />
+          <a-spacer />
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </a-card-actions>
@@ -63,16 +63,16 @@
       <a-card>
         <a-card-title>Search surveys</a-card-title>
         <a-card-text>
-          <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
+          <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
           <v-list>
-            <v-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
+            <a-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
               <v-list-item-content>
-                <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
-                <v-list-item-subtitle v-if="searchResult.meta">
+                <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
+                <a-list-item-subtitle v-if="searchResult.meta">
                   last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}
-                </v-list-item-subtitle>
+                </a-list-item-subtitle>
               </v-list-item-content>
-            </v-list-item>
+            </a-list-item>
           </v-list>
         </a-card-text>
       </a-card>

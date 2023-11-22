@@ -1,15 +1,17 @@
 jest.mock('../../services/api.service.js');
 
-import { render, fireEvent, findByText, screen, within } from '@testing-library/vue';
+import { findByText, fireEvent, render, screen, within } from '@testing-library/vue';
 import SurveyBuilder from './SurveyBuilder.vue';
 import { createSurvey } from '@/utils/surveys';
 import { createStoreObject } from '@/store';
 import vuetify from '@/plugins/vuetify';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
-import { isString, last, cloneDeep, uniqueId, set } from 'lodash';
+import { cloneDeep, isString, last, set, uniqueId } from 'lodash';
 import '@/components/survey/question_types';
 import api from '../../services/api.service.js';
+
+import { localVue } from '@/../tests/renderWithVuetify';
 
 // add a control and set its base parameters like a user would
 const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
@@ -67,6 +69,7 @@ export const optionsWithControls = (controls = []) => {
     router,
     vuetify,
     store,
+    localVue,
   };
 };
 

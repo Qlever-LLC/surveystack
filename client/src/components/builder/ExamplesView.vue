@@ -1,9 +1,10 @@
 <template>
   <a-card cssHeight90vh color="grey darken-3">
     <v-container>
-      <v-row dark>
-        <v-spacer></v-spacer>
-        <v-autocomplete
+      <a-row>
+        <a-spacer />
+        <a-select
+          engineering="autocomplete"
           style="max-width: 800px"
           rounded
           dark
@@ -13,10 +14,9 @@
           :items="files"
           single-line
           filled
-        >
-        </v-autocomplete>
+        />
         <v-btn outlined class="ma-2" dark color="white" text @click="close"> Close </v-btn>
-      </v-row>
+      </a-row>
       <div style="width: 100%; height: 80vh">
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>
       </div>

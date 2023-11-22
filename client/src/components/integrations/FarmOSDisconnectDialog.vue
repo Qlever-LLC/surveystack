@@ -5,7 +5,8 @@
       <a-card-text>
         Update Groups with Access to Farm Instance
         <br />
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           label="Select Groups"
           multiple
           chips
@@ -16,6 +17,7 @@
           v-model="selectedGroups"
           dense
           open-on-clear
+          prependItemSlot
         >
           <template slot="prepend-item">
             <v-btn
@@ -28,7 +30,7 @@
               Update Groups
             </v-btn>
           </template>
-        </v-autocomplete>
+        </a-select>
         <div class="d-flex justify-space-around">
           <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
           <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>

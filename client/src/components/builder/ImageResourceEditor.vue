@@ -2,14 +2,14 @@
   <a-card class="image-resource-editor p-relative">
     <a-card-title class="d-flex">
       <div>Image Resource Editor</div>
-      <v-spacer />
+      <a-spacer />
 
       <v-btn icon @click="closeDialog">
-        <v-icon>mdi-close</v-icon>
+        <a-icon>mdi-close</a-icon>
       </v-btn>
     </a-card-title>
     <a-card-text>
-      <v-form
+      <a-form
         v-if="
           resource &&
           (resource.label || resource.label === '') &&
@@ -18,7 +18,7 @@
         "
         ref="form"
       >
-        <v-text-field
+        <a-text-field
           :value="resource.label"
           @input="handleUpdateLabel"
           label="Image Label"
@@ -26,7 +26,7 @@
           persistent-hint
           outlined
         />
-        <v-text-field
+        <a-text-field
           :value="resource.name"
           @input="handleUpdateName"
           label="Image Data Name"
@@ -34,14 +34,14 @@
           outlined
           :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
         />
-        <v-text-field
+        <a-text-field
           :value="resource.content"
           @input="handleUpdateContent"
           label="Image URL"
           persistent-hint
           outlined
         />
-      </v-form>
+      </a-form>
     </a-card-text>
     <a-card-actions class="d-flex justify-space-between px-6 pb-4">
       <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>
@@ -51,19 +51,9 @@
 </template>
 
 <script>
-import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
+import { nameHasValidCharacters, nameHasValidLength, nameIsUnique } from '@/utils/resources';
 
 export default {
-  components: {
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
-  },
   data() {
     return {};
   },

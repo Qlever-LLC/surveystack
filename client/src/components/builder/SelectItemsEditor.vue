@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         v-on="on"
         v-bind="attrs"
         ref="anchorRef"
@@ -20,7 +20,7 @@
     <a-card>
       <a-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-        <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row</v-btn>
+        <v-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row</v-btn>
       </a-card-title>
 
       <a-card-text cssDialogContent>
@@ -28,13 +28,13 @@
           <div class="flex-grow-1">Label</div>
           <div class="flex-grow-1">Value</div>
         </div>
-        <v-divider></v-divider>
+        <a-divider />
         <div v-if="items.length === 0" class="mt-8 text-center">
           Please click <strong>Add row</strong> button to add new item.
         </div>
         <draggable v-else :list="items" class="draggable">
           <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.label"
               @input="(value) => onInput(index, 'label', value)"
@@ -42,7 +42,7 @@
               :hide-details="false"
               dense
             />
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.value"
               @input="(value) => onInput(index, 'value', value)"
@@ -50,15 +50,15 @@
               :hide-details="false"
               dense
             />
-            <v-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</v-icon>
+            <a-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</a-icon>
           </div>
         </draggable>
       </a-card-text>
 
-      <v-divider></v-divider>
+      <a-divider />
 
       <a-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </a-card-actions>

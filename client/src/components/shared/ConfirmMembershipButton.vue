@@ -11,7 +11,7 @@
         instructions. You'll be able to send "Call for Submission" links to this user.
       </a-card-text>
       <a-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn text @click="isVisible = false"> Cancel </v-btn>
         <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
       </a-card-actions>

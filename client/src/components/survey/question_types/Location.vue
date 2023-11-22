@@ -18,7 +18,7 @@
       </app-gps>
 
       <v-btn class="layer-switch" @click="switchMapStyle">
-        <v-icon>mdi-layers-outline</v-icon>
+        <a-icon>mdi-layers-outline</a-icon>
       </v-btn>
 
       <div style="background-color: #000" :id="`map-question-${index}`" class="map-question" v-if="!mapError">
@@ -44,9 +44,9 @@
     </div>
 
     <div id="map-error-alert" class="my-4" v-else-if="offlineMode">
-      <v-alert type="info" border="right" prominent>
+      <a-alert type="info" border="right" prominent>
         <b>Offline-Mode</b>: Map unavailable, but position can be determined if permission is granted
-      </v-alert>
+      </a-alert>
       <div>
         Current location:
         <samp v-if="currentLocation && currentLocation.location">
@@ -66,22 +66,22 @@
     </div>
 
     <div id="map-error-alert" class="my-4" v-else>
-      <v-alert type="info" border="right" prominent> Error loading map. </v-alert>
+      <a-alert type="info" border="right" prominent> Error loading map. </a-alert>
       <app-gps :expanded="true" :location="currentLocation.location">
         {{ currentLocation.label }}
       </app-gps>
     </div>
 
-    <v-overlay class="text-center" :value="!value && !gpsLocation && !mapError && !geolocationError" light absolute>
+    <a-overlay class="text-center" :value="!value && !gpsLocation && !mapError && !geolocationError" light absolute>
       <a-card light>
         <a-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>
           <div class="mt-2">
-            <v-progress-linear indeterminate rounded height="6" />
+            <a-progress-linear indeterminate rounded height="6" />
           </div>
         </a-card-text>
       </a-card>
-    </v-overlay>
+    </a-overlay>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>

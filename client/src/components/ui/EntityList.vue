@@ -9,13 +9,13 @@
     </div>
     <a-card>
       <div v-for="e in entities" :key="e._id">
-        <v-list-item :to="`/${collection}/${e._id}`">
+        <a-list-item :to="`/${collection}/${e._id}`">
           <v-list-item-content>
-            <v-list-item-title>{{ e.name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ e._id }}</v-list-item-subtitle>
+            <a-list-item-title>{{ e.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ e._id }}</a-list-item-subtitle>
           </v-list-item-content>
-        </v-list-item>
-        <v-divider />
+        </a-list-item>
+        <a-divider />
       </div>
     </a-card>
   </div>

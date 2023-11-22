@@ -1,14 +1,14 @@
 <template>
   <div>
-    <v-textarea
+    <a-textarea
       filled
       :rows="rows"
       :value="valueString"
       @input="writeBack($event)"
       outlined
-      style="font-family: monospace; font-size: 0.8rem"
       :label="label"
-    ></v-textarea>
+      cssFontMonospace
+    />
   </div>
 </template>
 <script>
@@ -45,9 +45,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-textarea {
-  font-family: monospace;
-}
-</style>

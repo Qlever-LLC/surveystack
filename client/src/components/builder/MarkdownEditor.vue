@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         ref="anchorRef"
         v-on="on"
         v-bind="attrs"
@@ -31,7 +31,7 @@
 
         <div class="d-flex align-stretch">
           <div class="editor">
-            <v-textarea
+            <a-textarea
               v-if="viewMode === 0"
               ref="editorRef"
               v-model="markdown"
@@ -43,10 +43,11 @@
               @dragover.prevent="showAttach = true"
               @dragleave.prevent="showAttach = false"
               @drop.prevent="onDrop"
-            ></v-textarea>
+              cssMarkdown
+            />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
-              <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
+              <a-progress-circular v-if="isLoading" indeterminate color="primary" />
               <v-icon v-else color="gray darken-4">mdi-paperclip</v-icon>
             </div>
           </div>
@@ -65,20 +66,20 @@
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
             <v-list class="resource-panel">
-              <v-subheader class="px-2 py-0">Click to insert </v-subheader>
+              <a-list-subheader class="px-2 py-0" cssSticky>Click to insert </a-list-subheader>
 
-              <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
+              <a-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
                 <v-list-item-content>
-                  <v-list-item-title>{{ item.label }}</v-list-item-title>
+                  <a-list-item-title>{{ item.label }}</a-list-item-title>
                 </v-list-item-content>
-              </v-list-item>
+              </a-list-item>
             </v-list>
           </div>
         </div>
       </a-card-text>
 
       <a-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
       </a-card-actions>
@@ -88,6 +89,7 @@
 
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
+
 import MarkdownIt from 'markdown-it';
 import ACard from '@/components/ui/ACard.vue';
 import ACardActions from '@/components/ui/ACardActions.vue';
@@ -111,6 +113,7 @@ export default {
     disabled: { type: Boolean },
     resources: { type: Array, default: () => [] },
   },
+
   data() {
     return {
       open: false,
@@ -186,7 +189,7 @@ export default {
     updateCaretPosition() {
       const el = this.$refs.editorRef;
       this.caretPosition =
-        el && el.$refs.input.selectionStart ? el.$refs.input.selectionStart : Math.max(this.markdown.length - 1, 0);
+        el && el.inputSelectionStart() ? el.inputSelectionStart() : Math.max(this.markdown.length - 1, 0);
     },
     onAddResource(resId) {
       // Load resource
@@ -303,12 +306,6 @@ export default {
   pointer-events: none;
 }
 
->>> .editor .v-textarea {
-  margin: 0px;
-  padding: 0px;
-}
-
->>> .editor textarea,
 >>> .editor .preview {
   width: 100%;
   height: 100%;
@@ -319,27 +316,8 @@ export default {
   outline: none;
 }
 
->>> .editor .v-textarea.resource textarea {
-  min-height: 400px;
-}
-
->>> .editor textarea {
-  padding: 2px 8px;
-}
-
->>> .editor textarea:read-only {
-  border: 1.5px dashed #888;
-  border-radius: 4px;
-}
-
 >>> .editor .preview img {
   max-width: 100%;
-}
-
->>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:before,
->>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:after {
-  border: none !important;
-  transition: none;
 }
 
 .ressourceBloc {
@@ -359,15 +337,5 @@ export default {
 
 >>> .resource-panel > * {
   border-bottom: 1px solid #eee;
-}
-
->>> .resource-panel .v-subheader {
-  position: sticky;
-  top: 0;
-  background: white;
-  border-bottom: 2px solid #ddd;
-  font-weight: 600;
-  font-size: 1rem;
-  z-index: 1;
 }
 </style>

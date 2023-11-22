@@ -3,18 +3,18 @@
     <a-card class="pa-4">
       <a-card-title class="headline"> Why is this instance being removed? </a-card-title>
       <a-card-text>
-        <v-checkbox
+        <a-checkbox
           v-model="note"
           label="Farmer is no longer part of the projet"
           value="Farmer is no longer part of the projet"
-        ></v-checkbox>
+        ></a-checkbox>
 
-        <v-checkbox v-model="note" label="Accidentally added" value="Accidentally added"></v-checkbox>
+        <a-checkbox v-model="note" label="Accidentally added" value="Accidentally added" />
 
-        <v-checkbox v-model="note" label="To reduce costs" value="To reduce costs"></v-checkbox>
+        <a-checkbox v-model="note" label="To reduce costs" value="To reduce costs" />
 
         <div class="d-flex mb-4">
-          <v-text-field v-model.trim="noteTF" label="Other" hide-details></v-text-field>
+          <a-text-field v-model.trim="noteTF" label="Other" hide-details />
         </div>
 
         <div class="d-flex justify-space-around">
@@ -39,6 +39,7 @@ export default {
     ACardTitle,
   },
   props: ['loading', 'value'],
+
   data() {
     return {
       note: [],

@@ -3,7 +3,7 @@
     <a-card>
       <a-card-title>
         Farm Hub Onboarding
-        <v-spacer />
+        <a-spacer />
       </a-card-title>
       <a-card-text class="d-flex justify-center">
         <div class="pa-8">

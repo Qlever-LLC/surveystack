@@ -3,9 +3,9 @@
     <a-card>
       <a-card-title>
         Publish
-        <v-chip dark small color="green" class="mx-2">
+        <a-chip dark small color="green" class="mx-2">
           Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
-        </v-chip>
+        </a-chip>
         to Library
       </a-card-title>
       <a-card-text class="mt-5">
@@ -26,7 +26,7 @@
         }`"
       />
       <a-card-actions class="mr-3">
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span>Publish update to library {{ value.name }}</span>
         </v-btn>

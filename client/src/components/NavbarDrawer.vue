@@ -1,73 +1,74 @@
 <template>
-  <v-navigation-drawer :value="value" app>
+  <a-navigation-drawer :value="value" app>
     <div class="d-flex justify-end mt-3 mr-3">
       <v-btn large icon @click="$emit('input', !value)">
-        <v-icon>mdi-close</v-icon>
+        <a-icon>mdi-close</a-icon>
       </v-btn>
     </div>
-    <v-list class="mt-0 pt-0">
+    <a-list>
       <template v-for="(item, i) in items">
-        <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
-        <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
-        <v-list-item v-else :key="i" :to="item.to">
-          <v-list-item-icon v-if="item.icon" :class="item.class">
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+        <a-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
+        <a-list-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</a-list-subheader>
+        <a-list-item v-else :key="i" :to="item.to">
+          <a-list-item-icon v-if="item.icon" :class="item.class">
+            <a-icon>{{ item.icon }}</a-icon>
+          </a-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>
+            <a-list-item-title>
               {{ item.label }}
-              <v-chip
+              <a-chip
                 v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
                 color="accent"
                 small
-                >{{ readyToSubmitCount }}</v-chip
               >
-            </v-list-item-title>
+                {{ readyToSubmitCount }}
+              </a-chip>
+            </a-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </a-list-item>
       </template>
 
-      <v-divider dark class="my-1" />
+      <a-divider dark class="my-1" />
 
-      <v-list-item class="pa-0">
-        <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
-          <v-expansion-panel>
-            <v-expansion-panel-header class="pa-0 ma-0">
-              <v-subheader>DOCUMENTATION</v-subheader>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content class="pa-0 ma-0 no-padding">
-              <v-list class="pa-0 ma-0">
-                <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
-                  <v-list-item-icon>
-                    <v-icon>mdi-notebook</v-icon>
-                  </v-list-item-icon>
+      <a-list-item class="pa-0">
+        <a-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
+          <a-expansion-panel>
+            <a-expansion-panel-title class="pa-0 ma-0">
+              <a-list-subheader>DOCUMENTATION</a-list-subheader>
+            </a-expansion-panel-title>
+            <a-expansion-panel-text class="pa-0 ma-0 no-padding">
+              <a-list class="pa-0 ma-0">
+                <a-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
+                  <a-list-item-icon>
+                    <a-icon>mdi-notebook</a-icon>
+                  </a-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>{{ doc.label }}</v-list-item-title>
+                    <a-list-item-title>{{ doc.label }}</a-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
 
-                <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
-                  <v-list-item-icon>
-                    <v-icon>mdi-help-circle-outline</v-icon>
-                  </v-list-item-icon>
+                <a-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
+                  <a-list-item-icon>
+                    <a-icon>mdi-help-circle-outline</a-icon>
+                  </a-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>SurveyStack Help</v-list-item-title>
+                    <a-list-item-title>SurveyStack Help</a-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
-                <v-list-item href="https://www.surveystack.io" target="_blank">
-                  <v-list-item-icon>
-                    <v-icon>mdi-information-outline</v-icon>
-                  </v-list-item-icon>
+                </a-list-item>
+                <a-list-item href="https://www.surveystack.io" target="_blank">
+                  <a-list-item-icon>
+                    <a-icon>mdi-information-outline</a-icon>
+                  </a-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>About</v-list-item-title>
+                    <a-list-item-title>About</a-list-item-title>
                   </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-list-item>
-    </v-list>
+                </a-list-item>
+              </a-list>
+            </a-expansion-panel-text>
+          </a-expansion-panel>
+        </a-expansion-panels>
+      </a-list-item>
+    </a-list>
 
     <template v-slot:append>
       <div dark class="grey--text">
@@ -77,7 +78,7 @@
         </p>
       </div>
     </template>
-  </v-navigation-drawer>
+  </a-navigation-drawer>
 </template>
 
 <script>
@@ -88,6 +89,7 @@ export default {
       required: true,
     },
   },
+
   data() {
     let groupsLink = { name: 'groups-list' };
     if (this.$store.getters['whitelabel/isWhitelabel']) {

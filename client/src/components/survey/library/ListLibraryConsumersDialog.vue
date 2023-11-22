@@ -4,25 +4,25 @@
       <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
       </a-card-title>
-      <v-divider></v-divider>
+      <a-divider />
       <a-card-text>
-        <v-list dense style="max-height: 500px" class="overflow-y-auto">
+        <a-list dense style="max-height: 500px" class="overflow-y-auto">
           <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
-            <v-progress-circular :size="50" color="primary" indeterminate />
+            <a-progress-circular :size="50" color="primary" indeterminate />
           </v-container>
           <template v-if="libraryConsumers !== null">
-            <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+            <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
                 <small class="grey--text">{{ c._id }}</small>
-                <v-list-item-title>{{ c.name }}</v-list-item-title>
+                <a-list-item-title>{{ c.name }}</a-list-item-title>
               </v-list-item-content>
-            </v-list-item>
+            </a-list-item>
           </template>
-        </v-list>
+        </a-list>
       </a-card-text>
-      <v-divider></v-divider>
+      <a-divider />
       <a-card-actions>
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </a-card-actions>
     </a-card>
@@ -38,12 +38,6 @@ import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
-  },
   props: {
     value: {
       type: Boolean,

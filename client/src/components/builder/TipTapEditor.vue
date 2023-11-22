@@ -2,8 +2,8 @@
   <a-card outlined class="tiptap-editor">
     <a-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-        <v-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" class="pa-0 editor-toolbar">
-          <v-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
+        <a-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
+          <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
             <div>
               <v-btn
                 icon
@@ -13,7 +13,7 @@
                 @click="commands.paragraph"
                 :disabled="disabled"
               >
-                <v-icon>mdi-format-pilcrow</v-icon>
+                <a-icon>mdi-format-pilcrow</a-icon>
               </v-btn>
 
               <v-btn
@@ -23,7 +23,7 @@
                 :class="{ 'v-btn--active': isActive.heading({ level: 1 }) }"
                 @click="commands.heading({ level: 1 })"
               >
-                <v-icon>mdi-format-header-1</v-icon>
+                <a-icon>mdi-format-header-1</a-icon>
               </v-btn>
 
               <v-btn
@@ -33,7 +33,7 @@
                 :class="{ 'v-btn--active': isActive.heading({ level: 2 }) }"
                 @click="commands.heading({ level: 2 })"
               >
-                <v-icon>mdi-format-header-2</v-icon>
+                <a-icon>mdi-format-header-2</a-icon>
               </v-btn>
 
               <v-btn
@@ -43,7 +43,7 @@
                 :class="{ 'v-btn--active': isActive.heading({ level: 3 }) }"
                 @click="commands.heading({ level: 3 })"
               >
-                <v-icon>mdi-format-header-3</v-icon>
+                <a-icon>mdi-format-header-3</a-icon>
               </v-btn>
             </div>
 
@@ -55,7 +55,7 @@
                 :class="{ 'v-btn--active': isActive.blockquote() }"
                 @click="commands.blockquote"
               >
-                <v-icon>mdi-format-quote-close</v-icon>
+                <a-icon>mdi-format-quote-close</a-icon>
               </v-btn>
 
               <!-- <v-btn
@@ -65,7 +65,7 @@
                   :class="{ 'v-btn--active': isActive.code() }"
                   @click="commands.code"
                 >
-                  <v-icon>mdi-code-tags</v-icon>
+                  <a-icon>mdi-code-tags</a-icon>
                 </v-btn> -->
 
               <!-- <v-select
@@ -79,7 +79,7 @@
                       :class="{ 'v-btn--active': condition }"
                       @click="item.action"
                     >
-                      <v-icon>{{ item.icon }}</v-icon>
+                      <a-icon>{{ item.icon }}</a-icon>
                     </v-btn>
                   </template>
 
@@ -92,7 +92,7 @@
                 :class="{ 'v-btn--active': isActive.bullet_list() }"
                 @click="commands.bullet_list"
               >
-                <v-icon>mdi-format-list-bulleted</v-icon>
+                <a-icon>mdi-format-list-bulleted</a-icon>
               </v-btn>
 
               <v-btn
@@ -102,7 +102,7 @@
                 :class="{ 'v-btn--active': isActive.ordered_list() }"
                 @click="commands.ordered_list"
               >
-                <v-icon>mdi-format-list-numbered</v-icon>
+                <a-icon>mdi-format-list-numbered</a-icon>
               </v-btn>
             </div>
 
@@ -112,7 +112,7 @@
                 class="menubar__button"
                 @click="commands.undo"
               >
-                <v-icon>mdi-undo</v-icon>
+                <a-icon>mdi-undo</a-icon>
               </v-btn>
 
               <v-btn
@@ -121,7 +121,7 @@
                 class="menubar__button"
                 @click="commands.redo"
               >
-                <v-icon>mdi-redo</v-icon>
+                <a-icon>mdi-redo</a-icon>
               </v-btn> -->
 
             <div>
@@ -132,7 +132,7 @@
                 :class="{ 'v-btn--active': isActive.bold() }"
                 @click="commands.bold"
               >
-                <v-icon>mdi-format-bold</v-icon>
+                <a-icon>mdi-format-bold</a-icon>
               </v-btn>
 
               <v-btn
@@ -142,7 +142,7 @@
                 :class="{ 'v-btn--active': isActive.italic() }"
                 @click="commands.italic"
               >
-                <v-icon>mdi-format-italic</v-icon>
+                <a-icon>mdi-format-italic</a-icon>
               </v-btn>
 
               <v-btn
@@ -152,7 +152,7 @@
                 :class="{ 'v-btn--active': isActive.strike() }"
                 @click="commands.strike"
               >
-                <v-icon>mdi-format-strikethrough</v-icon>
+                <a-icon>mdi-format-strikethrough</a-icon>
               </v-btn>
 
               <v-btn
@@ -162,7 +162,7 @@
                 :class="{ 'v-btn--active': isActive.underline() }"
                 @click="commands.underline"
               >
-                <v-icon>mdi-format-underline</v-icon>
+                <a-icon>mdi-format-underline</a-icon>
               </v-btn>
             </div>
 
@@ -173,7 +173,7 @@
                 :class="{ 'v-btn--active': isActive.code_block() }"
                 @click="commands.code_block"
               >
-                <v-icon>mdi-code-braces</v-icon>
+                <a-icon>mdi-code-braces</a-icon>
               </v-btn> -->
 
             <!-- <v-btn
@@ -182,13 +182,13 @@
                 class="menubar__button"
                 @click="commands.horizontal_rule"
               >
-                <v-icon>mdi-minus</v-icon>
+                <a-icon>mdi-minus</a-icon>
               </v-btn> -->
-          </v-toolbar-items>
-        </v-toolbar>
+          </a-toolbar-items>
+        </a-toolbar>
         <!--
-          <v-toolbar dense class="pa-0">
-            <v-toolbar-items class="pa-0">
+          <a-toolbar dense class="pa-0">
+            <a-toolbar-items class="pa-0">
 
 
               <v-btn
@@ -197,7 +197,7 @@
                 class="menubar__button"
                 @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })"
               >
-                <v-icon>mdi-table</v-icon>
+                <a-icon>mdi-table</a-icon>
               </v-btn>
 
               <span v-if="isActive.table()">
@@ -207,7 +207,7 @@
                   class="menubar__button"
                   @click="commands.deleteTable"
                 >
-                  <v-icon>mdi-delete_table</v-icon>
+                  <a-icon>mdi-delete_table</a-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -215,7 +215,7 @@
                   class="menubar__button"
                   @click="commands.addColumnBefore"
                 >
-                  <v-icon>mdi-add_col_before</v-icon>
+                  <a-icon>mdi-add_col_before</a-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -223,7 +223,7 @@
                   class="menubar__button"
                   @click="commands.addColumnAfter"
                 >
-                  <v-icon>mdi-add_col_after</v-icon>
+                  <a-icon>mdi-add_col_after</a-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -231,7 +231,7 @@
                   class="menubar__button"
                   @click="commands.deleteColumn"
                 >
-                  <v-icon>mdi-delete_col</v-icon>
+                  <a-icon>mdi-delete_col</a-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -239,7 +239,7 @@
                   class="menubar__button"
                   @click="commands.addRowBefore"
                 >
-                  <v-icon>mdi-add_row_before</v-icon>
+                  <a-icon>mdi-add_row_before</a-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -247,7 +247,7 @@
                   class="menubar__button"
                   @click="commands.addRowAfter"
                 >
-                  <v-icon>mdi-add_row_after</v-icon>
+                  <a-icon>mdi-add_row_after</a-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -255,7 +255,7 @@
                   class="menubar__button"
                   @click="commands.deleteRow"
                 >
-                  <v-icon>mdi-delete_row</v-icon>
+                  <a-icon>mdi-delete_row</a-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -263,11 +263,11 @@
                   class="menubar__button"
                   @click="commands.toggleCellMerge"
                 >
-                  <v-icon>mdi-combine_cells</v-icon>
+                  <a-icon>mdi-combine_cells</a-icon>
                 </v-btn>
               </span>
-            </v-toolbar-items>
-          </v-toolbar> -->
+            </a-toolbar-items>
+          </a-toolbar> -->
       </editor-menu-bar>
     </a-card-title>
     <a-card-text class="pa-0">
@@ -289,19 +289,20 @@
                 v-if="linkMenuIsActive"
                 @submit.prevent="setLinkUrl(commands.link, linkUrl)"
               >
-                <v-text-field
+                <!-- TODO in Vue3 remove .native -->
+                <a-text-field
                   class="menububble__input ml-4"
                   dense
                   v-model="linkUrl"
                   placeholder="https://"
                   ref="linkInput"
-                  @keydown.esc="hideLinkMenu"
+                  @keydown.native.esc="hideLinkMenu"
                 />
                 <v-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
-                  <v-icon>mdi-check</v-icon>
+                  <a-icon>mdi-check</a-icon>
                 </v-btn>
                 <v-btn small class="menububble__button mr-1" @click="setLinkUrl(commands.link, null)" icon>
-                  <v-icon>mdi-close</v-icon>
+                  <a-icon>mdi-close</a-icon>
                 </v-btn>
               </form>
 
@@ -313,7 +314,7 @@
                   icon
                 >
                   <span>{{ isActive.link() ? 'Update Link' : 'Add Link' }}</span>
-                  <v-icon>mdi-link</v-icon>
+                  <a-icon>mdi-link</a-icon>
                 </v-btn>
               </template>
             </a-card-text>
@@ -329,25 +330,25 @@
 import { Editor, EditorContent, EditorMenuBar, EditorMenuBubble } from 'tiptap';
 import {
   Blockquote,
+  Bold,
+  BulletList,
+  Code,
   CodeBlock,
   HardBreak,
   Heading,
+  History,
   HorizontalRule,
-  OrderedList,
-  BulletList,
+  Italic,
   ListItem,
+  OrderedList,
+  Strike,
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
   TodoItem,
   TodoList,
-  Bold,
-  Code,
-  Italic,
-  Table,
-  TableHeader,
-  TableCell,
-  TableRow,
-  Strike,
   Underline,
-  History,
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
@@ -552,14 +553,5 @@ export default {
   border: none;
   background: transparent;
   color: var(--color-white);
-}
-
-.tiptap-editor >>> .editor-toolbar .v-toolbar__items {
-  width: 100%;
-}
-.tiptap-editor >>> .editor-toolbar .v-toolbar__content {
-  padding-left: 4px;
-  padding-right: 4px;
-  width: 100%;
 }
 </style>

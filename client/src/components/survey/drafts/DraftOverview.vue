@@ -1,11 +1,11 @@
 <template>
   <v-container class="wrapper">
-    <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
+    <a-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
         <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
       </li>
-    </v-banner>
+    </a-banner>
     <a-card>
       <a-card-title>{{ survey.name }}</a-card-title>
       <a-card-subtitle class="grey--text mt-n5">
@@ -28,9 +28,9 @@
         <br />
       </a-card-text>
     </a-card>
-    <v-timeline v-if="controlDisplays" dense class="width: 100%">
+    <a-timeline v-if="controlDisplays" dense>
       <template v-for="(display, idx) in controlDisplays">
-        <v-timeline-item
+        <a-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :key="idx"
           :icon="display.icon"
@@ -105,12 +105,12 @@
             </a-card-text>
           </a-card>
 
-          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
+          <a-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
-          </v-chip>
-        </v-timeline-item>
+          </a-chip>
+        </a-timeline-item>
       </template>
-    </v-timeline>
+    </a-timeline>
   </v-container>
 </template>
 
