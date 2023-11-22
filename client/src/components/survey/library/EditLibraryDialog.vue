@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title> Add Survey To Library </v-card-title>
       <v-card-text>
-        <v-text-field :value="localLibrarySurvey.name" label="Title" readonly />
+        <a-text-field :value="localLibrarySurvey.name" label="Title" readonly />
         <h3>Description</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryDescription" class="mb-4" />
         <h3>Applications</h3>
@@ -20,7 +20,7 @@
         />
       </v-card-text>
       <v-card-actions class="mr-3">
-        <v-spacer />
+        <a-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span v-if="!librarySurvey.meta.isLibrary">Add to library</span>
           <span v-if="localLibrarySurvey.meta.isLibrary">Save</span>

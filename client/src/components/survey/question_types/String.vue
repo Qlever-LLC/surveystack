@@ -10,12 +10,13 @@
     />
     <div style="display: flex">
       <div style="flex: 1">
-        <v-text-field
+        <!-- TODO in Vue3 remove .native -->
+        <a-text-field
           outlined
           :label="control.hint"
-          v-bind:value="value"
-          v-on:input="onInput"
-          @keyup.enter.prevent="submit"
+          :value="value"
+          @input="onInput"
+          @keyup.native.enter.prevent="submit"
           ref="textField"
           class="full-width"
           :disabled="!relevant"
@@ -66,20 +67,13 @@ export default {
       }
     },
     tryAutofocus() {
-      if (
-        typeof document === 'undefined' ||
-        !this.$refs.textField.$refs.input ||
-        document.activeElement === this.$refs.input
-      ) {
-        return false;
+      if (this.$refs.textField) {
+        this.$refs.textField.focus({ preventScroll: true });
+        return true;
       }
-
-      this.$refs.textField.$refs.input.focus({ preventScroll: true });
-
+      return false;
       // could we use this instead?
-      // this.$nextTick(() => this.$refs.textField.$refs.input.focus());
-
-      return true;
+      // this.$nextTick(() => this.$refs.textField.focus());
     },
   },
   mounted() {

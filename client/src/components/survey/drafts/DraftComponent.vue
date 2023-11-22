@@ -79,7 +79,7 @@
     />
   </div>
   <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
-    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
+    <a-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
       <div class="text-body-1 my-4 text-center">
         Click on the
         <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
@@ -101,9 +101,9 @@
         </v-btn>
         to allow users to submit to your survey
       </div>
-    </v-sheet>
+    </a-sheet>
   </div>
-  <v-alert v-else border="left" prominent text type="error">
+  <a-alert v-else border="left" prominent text type="error">
     <a-row align="center">
       <v-col class="grow">
         This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
@@ -113,7 +113,7 @@
         <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
       </v-col>
     </a-row>
-  </v-alert>
+  </a-alert>
 </template>
 
 <script>

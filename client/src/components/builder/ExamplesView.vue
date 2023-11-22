@@ -2,8 +2,9 @@
   <v-card style="height: 90vh" color="grey darken-3">
     <v-container>
       <a-row>
-        <v-spacer></v-spacer>
-        <v-autocomplete
+        <a-spacer />
+        <a-select
+          engineering="autocomplete"
           style="max-width: 800px"
           rounded
           dark
@@ -13,8 +14,7 @@
           :items="files"
           single-line
           filled
-        >
-        </v-autocomplete>
+        />
         <v-btn outlined class="ma-2" dark color="white" text @click="close"> Close </v-btn>
       </a-row>
       <div style="width: 100%; height: 80vh">

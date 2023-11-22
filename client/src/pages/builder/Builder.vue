@@ -79,10 +79,10 @@
       @reload-survey="onReloadSurvey"
     />
 
-    <v-snackbar v-model="showSnackbar" :timeout="4000">
+    <a-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
       <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
-    </v-snackbar>
+    </a-snackbar>
   </div>
   <div
     v-else
@@ -94,9 +94,9 @@
         <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
         Unsupported browser
       </v-card-title>
-      <!-- <v-alert type="error">
+      <!-- <a-alert type="error">
         Unsupported browser
-      </v-alert> -->
+      </a-alert> -->
       <v-card-text>
         Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
         browser.

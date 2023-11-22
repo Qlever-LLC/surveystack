@@ -1,9 +1,9 @@
 <template>
   <v-container v-if="farmosEnabled" class="max-800">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-alert
+    <a-alert
       v-if="successMessage"
       class="mt-4"
       style="cursor: pointer"
@@ -11,11 +11,11 @@
       text
       type="success"
       @click="successMessage = null"
-      >{{ successMessage }}</v-alert
+      >{{ successMessage }}</a-alert
     >
-    <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+    <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
       errorMessage
-    }}</v-alert>
+    }}</a-alert>
 
     <app-dialog
       modal
@@ -108,7 +108,7 @@
 
   <v-container v-else>
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
     <a-row v-if="loading">
       <v-col>
@@ -144,7 +144,6 @@ import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDiscon
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 import ARow from '@/components/ui/ARow.vue';
 
@@ -159,8 +158,6 @@ export default {
     FarmOSDisconnectDialog,
     FarmOSRemoveNoteDialog,
     appDialog,
-    appGroupBreadcrumbs,
-    ARow,
   },
   computed: {
     superAdmin() {
