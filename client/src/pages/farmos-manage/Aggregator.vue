@@ -234,7 +234,6 @@
 
 <script>
 import _ from 'lodash';
-import ALabel from '@/components/ui/ALabel.vue';
 
 export default {
   emits: ['addSuperAdminNote'],
