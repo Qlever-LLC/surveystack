@@ -1,24 +1,24 @@
 <template>
-  <v-container>
-    <v-card class="pa-6 pa-sm-12">
+  <a-container>
+    <a-card class="pa-6 pa-sm-12">
       <h1>Forgot Password?</h1>
       <p>Enter your email address and we will send you a link for setting a new password.</p>
 
-      <v-form @submit.prevent="submit">
-        <v-text-field v-model="email" label="Email" />
+      <a-form @submit.prevent="submit">
+        <a-text-field v-model="email" label="Email" />
         <div class="d-flex justify-end">
           <v-btn type="submit" color="primary" class="px-8">Submit</v-btn>
         </div>
-      </v-form>
+      </a-form>
       <div class="text-center text-muted mt-5">
         <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">Back to login</router-link>
         <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button"
           >Back to login</a
         >
       </div>
-      <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert>
-    </v-card>
-  </v-container>
+      <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</a-alert>
+    </a-card>
+  </a-container>
 </template>
 
 <script>

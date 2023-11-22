@@ -8,13 +8,14 @@
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize"
     />
-    <v-text-field
+    <!-- TODO in Vue3 remove .native -->
+    <a-text-field
       outlined
       type="number"
       :label="control.hint"
-      v-bind:value="value"
-      v-on:input="onInput"
-      @keyup.enter.prevent="submit"
+      :value="value"
+      @input="onInput"
+      @keyup.native.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"
       hide-details="auto"
@@ -47,16 +48,11 @@ export default {
       this.$emit('next');
     },
     tryAutofocus() {
-      if (
-        typeof document === 'undefined' ||
-        !this.$refs.textField.$refs.input ||
-        document.activeElement === this.$refs.input
-      ) {
-        return false;
+      if (this.$refs.textField) {
+        this.$refs.textField.focus({ preventScroll: true });
+        return true;
       }
-      this.$refs.textField.$refs.input.focus({ preventScroll: true });
-
-      return true;
+      return false;
     },
     parseInputToNumber(v) {
       // TODO: implicitly parse as Integer or Float?

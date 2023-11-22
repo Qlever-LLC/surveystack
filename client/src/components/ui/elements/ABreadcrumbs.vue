@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <v-breadcrumbs :items="links">
-      <template v-slot:divider>
-        <v-icon>mdi-chevron-right</v-icon>
-      </template>
-    </v-breadcrumbs>
-  </div>
+  <v-breadcrumbs :items="links">
+    <template v-slot:divider>
+      <a-icon>mdi-chevron-right</a-icon>
+    </template>
+  </v-breadcrumbs>
 </template>
 
 <script>

@@ -1,15 +1,15 @@
 <template>
-  <v-card class="image-resource-editor p-relative">
-    <v-card-title class="d-flex">
+  <a-card class="image-resource-editor p-relative">
+    <a-card-title class="d-flex">
       <div>Image Resource Editor</div>
-      <v-spacer />
+      <a-spacer />
 
       <v-btn icon @click="closeDialog">
-        <v-icon>mdi-close</v-icon>
+        <a-icon>mdi-close</a-icon>
       </v-btn>
-    </v-card-title>
-    <v-card-text>
-      <v-form
+    </a-card-title>
+    <a-card-text>
+      <a-form
         v-if="
           resource &&
           (resource.label || resource.label === '') &&
@@ -18,7 +18,7 @@
         "
         ref="form"
       >
-        <v-text-field
+        <a-text-field
           :value="resource.label"
           @input="handleUpdateLabel"
           label="Image Label"
@@ -26,7 +26,7 @@
           persistent-hint
           outlined
         />
-        <v-text-field
+        <a-text-field
           :value="resource.name"
           @input="handleUpdateName"
           label="Image Data Name"
@@ -34,24 +34,24 @@
           outlined
           :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
         />
-        <v-text-field
+        <a-text-field
           :value="resource.content"
           @input="handleUpdateContent"
           label="Image URL"
           persistent-hint
           outlined
         />
-      </v-form>
-    </v-card-text>
-    <v-card-actions class="d-flex justify-space-between px-6 pb-4">
+      </a-form>
+    </a-card-text>
+    <a-card-actions class="d-flex justify-space-between px-6 pb-4">
       <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>
       <v-btn @click="updateResource" text color="primary"> Update </v-btn>
-    </v-card-actions>
-  </v-card>
+    </a-card-actions>
+  </a-card>
 </template>
 
 <script>
-import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
+import { nameHasValidCharacters, nameHasValidLength, nameIsUnique } from '@/utils/resources';
 
 export default {
   data() {

@@ -1,26 +1,22 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage FarmOS Instances</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
-    <v-autocomplete
+    <a-select
+      engineering="autocomplete"
+      v-if="!loading && !!mappings"
       outlined
       primary
       label="Select Instance from Aggregator"
       v-model="selectedInstance"
-      v-if="!loading && !!mappings"
       item-text="url"
       item-value="url"
       :items="mappings.aggregatorFarms"
-    ></v-autocomplete>
+    />
 
     <div class="d-flex flex-column mb-5" v-if="!!selectedInstance">
       <h3>Notes</h3>
@@ -34,27 +30,28 @@
     </div>
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
-      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
+      <a-text-field v-model.trim="updatedNote" label="Note" hide-details />
       <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
     </div>
 
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
       <v-label>Tags for instance on FarmOS Aggregator</v-label>
       <div class="d-flex mt-4">
-        <v-chip v-for="(tag, idx) in tags" :key="`tag-${idx}`" green>{{ tag }}</v-chip>
-        <v-chip v-if="tags.length === 0" color="secondary">No Tags associated with instance</v-chip>
+        <a-chip v-for="(tag, idx) in tags" :key="`tag-${idx}`">{{ tag }}</a-chip>
+        <a-chip v-if="tags.length === 0" color="secondary">No Tags associated with instance</a-chip>
       </div>
     </div>
 
     <template v-if="!!selectedInstance">
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
       <h2 ref="map-group">
         Group Mappings for
-        <v-chip>{{ selectedInstance }}</v-chip>
+        <a-chip>{{ selectedInstance }}</a-chip>
       </h2>
 
       <div class="d-flex my-2 align-baseline">
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           outlined
           primary
           label="Map Group to Instance"
@@ -63,7 +60,7 @@
           item-value="_id"
           :items="groups"
           class="mt-4 mr-4"
-        ></v-autocomplete>
+        />
         <v-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
           >Map</v-btn
         >
@@ -71,7 +68,7 @@
 
       <v-label class="vy-4">Current Group Mappings</v-label>
 
-      <v-simple-table v-if="mappedGroups.length > 0">
+      <a-table v-if="mappedGroups.length > 0">
         <template v-slot:default>
           <thead>
             <tr>
@@ -88,39 +85,40 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
-      <v-alert v-else class="mt-4" mode="fade" text type="warning"
-        >No Group Mappings exist for {{ selectedInstance }}</v-alert
-      >
+      </a-table>
+      <a-alert v-else class="mt-4" mode="fade" text type="warning">
+        No Group Mappings exist for {{ selectedInstance }}
+      </a-alert>
 
-      <v-divider class="my-8"></v-divider>
+      <a-divider class="my-8" />
 
       <h2 ref="map-user">
         User Mappings for
-        <v-chip>{{ selectedInstance }}</v-chip>
+        <a-chip>{{ selectedInstance }}</a-chip>
       </h2>
 
       <div class="d-flex my-2 justify-space-between align-baseline">
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
+          v-if="!loading && !!groups"
           class="mt-4"
           outlined
           primary
           hint="Select User"
           label="Map User to Instance"
           v-model="selectedUser"
-          v-if="!loading && !!groups"
           :item-text="(item) => `${item.name} (${item.email})`"
           item-value="_id"
           :items="users"
-        ></v-autocomplete>
+        />
 
-        <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
+        <a-checkbox v-model="owner" label="owner" class="mx-6" />
 
         <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
       </div>
 
       <v-label class="vy-4">Current User Mappings</v-label>
-      <v-simple-table v-if="!loading">
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -139,13 +137,13 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </template>
 
     <div v-if="farmsNotInAggregator.length > 0 && !loading">
       <h2>Farms in Surveystack which are not present on FarmOS Aggregator</h2>
       <p class="grey--text text--darken-2">These instances have likely been removed from the aggregator.</p>
-      <v-simple-table v-if="!loading">
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -159,7 +157,7 @@
               <td>{{ `${farm.instanceName}` }}</td>
               <td>
                 <div>
-                  <v-chip
+                  <a-chip
                     small
                     class="ma-1"
                     dark
@@ -168,11 +166,11 @@
                     :key="`farm-${idx}-user-${uidx}`"
                   >
                     {{ userMapping.user }}
-                  </v-chip>
+                  </a-chip>
                 </div>
 
                 <div>
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     dark
@@ -181,7 +179,7 @@
                     :key="`farm-${idx}-group-${gidx}`"
                   >
                     {{ groupMapping.group }}
-                  </v-chip>
+                  </a-chip>
                 </div>
               </td>
               <td>
@@ -192,7 +190,7 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </div>
 
     <div v-if="farmsNotInSurvestack.length > 0 && !loading">
@@ -200,7 +198,7 @@
       <p class="grey--text text--darken-2">
         These instances are likely self hosted or have not been added to a payment plan of a group.
       </p>
-      <v-simple-table v-if="!loading">
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -215,9 +213,9 @@
               <td>{{ `${farm.instanceName}` }}</td>
               <td>
                 <div>
-                  <v-chip small class="ma-1" dark v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
+                  <a-chip small class="ma-1" dark v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
                     {{ tag }}
-                  </v-chip>
+                  </a-chip>
                 </div>
               </td>
               <td>
@@ -229,9 +227,9 @@
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </div>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -239,13 +237,15 @@ import _ from 'lodash';
 
 export default {
   emits: ['addSuperAdminNote'],
+
   props: {
     groups: Array,
     mappings: Object,
-    notes: String,
+    notes: Array,
     loading: Boolean,
     users: Array,
   },
+
   data() {
     return {
       selectedInstance: null,

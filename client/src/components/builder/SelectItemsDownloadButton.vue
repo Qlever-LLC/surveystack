@@ -1,6 +1,6 @@
 <template>
   <v-btn outlined color="primary" @click="download" style="margin-bottom: 1px">
-    <v-icon left>mdi-download</v-icon>
+    <a-icon left>mdi-download</a-icon>
     Export CSV
   </v-btn>
 </template>
