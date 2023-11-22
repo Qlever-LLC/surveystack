@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <a-container fluid>
     <h1>Andreas' Sandbox</h1>
     <a-card class="pt-2">
       <v-data-table
@@ -36,7 +36,7 @@
         </template>
       </v-data-table>
     </a-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

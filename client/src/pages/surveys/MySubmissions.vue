@@ -1,6 +1,6 @@
 <template>
   <div class="background wrapper">
-    <v-container>
+    <a-container>
       <a-row class="my-2">
         <a-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
@@ -140,7 +140,7 @@
         title="Result of Submission"
         persistent
       />
-    </v-container>
+    </a-container>
   </div>
 </template>
 

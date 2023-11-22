@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <v-layout text-center wrap>
       <v-flex xs12>
         <a-img :src="require('../assets/logo.svg')" class="my-3" contain height="200" />
@@ -44,7 +44,7 @@
         </v-layout>
       </v-flex>
     </v-layout>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

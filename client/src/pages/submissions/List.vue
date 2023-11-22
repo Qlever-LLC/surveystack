@@ -48,7 +48,7 @@
       </template>
     </app-dialog>
 
-    <v-container>
+    <a-container>
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
@@ -140,9 +140,9 @@
           </a-row>
         </a-card-text>
       </a-card>
-    </v-container>
+    </a-container>
 
-    <v-container>
+    <a-container>
       <a-tabs v-model="tab">
         <a-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -199,7 +199,7 @@
           </div>
         </a-col>
       </a-row>
-    </v-container>
+    </a-container>
   </div>
 </template>
 

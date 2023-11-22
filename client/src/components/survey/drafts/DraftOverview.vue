@@ -1,5 +1,5 @@
 <template>
-  <v-container class="wrapper">
+  <a-container class="wrapper">
     <a-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
@@ -111,7 +111,7 @@
         </a-timeline-item>
       </template>
     </a-timeline>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

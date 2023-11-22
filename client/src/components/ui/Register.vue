@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-card class="pa-6 pa-sm-12">
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
@@ -42,7 +42,7 @@
 
       <a-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</a-alert>
     </a-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

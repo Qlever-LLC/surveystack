@@ -1,5 +1,5 @@
 <template>
-  <v-container class="maxw-40">
+  <a-container class="maxw-40">
     <template v-if="isLoggedIn">
       <app-feedback
         title="Shapeshift:"
@@ -116,7 +116,7 @@
     <a-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
       status.message
     }}</a-alert>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

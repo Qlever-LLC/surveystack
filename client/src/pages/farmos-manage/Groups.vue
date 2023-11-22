@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</a-alert>
 
     <div class="d-flex justify-space-between align-center ma-4">
@@ -108,7 +108,7 @@
         </tbody>
       </template>
     </a-table>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

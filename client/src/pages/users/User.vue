@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-card>
       <a-card-text>
         <div class="overline">{{ user._id }}</div>
@@ -27,7 +27,7 @@
         </a-list-item>
       </v-list>
     </a-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

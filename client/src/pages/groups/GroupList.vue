@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-end">
       <a-checkbox v-model="showArchived" label="View archived" dense hide-details />
     </div>
@@ -18,7 +18,7 @@
         </v-list-item-content>
       </template>
     </app-basic-list>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
     <span class="text--secondary">{{ this.entity._id }}</span>
     <a-form class="mt-3" @keydown.enter.prevent="submit">
@@ -24,7 +24,7 @@
         <v-btn color="primary" @click="submit">Save</v-btn>
       </div>
     </a-form>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

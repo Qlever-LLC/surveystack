@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <v-container>
+    <a-container>
       <a-tabs v-model="activeTab" fixed-tabs>
         <a-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
           <span v-if="tab.name === 'active-group'" class="text-no-wrap">
@@ -96,7 +96,7 @@
           />
         </a-card-actions>
       </a-card>
-    </v-container>
+    </a-container>
   </div>
 </template>
 

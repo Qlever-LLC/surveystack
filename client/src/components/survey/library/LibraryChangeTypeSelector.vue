@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="py-0">
+  <a-container fluid class="py-0">
     <a-row class="pa-0">
       <a-col v-if="disabled" cols="auto" class="pa-0 mt-1"
         ><b
@@ -43,13 +43,12 @@
         </a-tooltip>
       </a-col>
     </a-row>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 export default {
   name: 'library-change-type-selector',
-
   props: ['value', 'disabled', 'label'],
   data() {
     return {

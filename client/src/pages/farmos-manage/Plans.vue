@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Plans</h1>
 
@@ -40,7 +40,7 @@
         </tbody>
       </template>
     </a-table>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

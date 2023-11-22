@@ -1,5 +1,5 @@
 <template>
-  <v-container class="maxw-4">
+  <a-container class="maxw-4">
     <template v-if="isLoggedIn">
       <a-alert
         v-if="successMessage"
@@ -402,7 +402,7 @@
       <h1>FarmOS Profile</h1>
       You are not logged in... <router-link to="/auth/login">Go to Login</router-link>
     </template>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

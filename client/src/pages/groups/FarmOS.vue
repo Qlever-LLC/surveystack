@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="farmosEnabled" class="max-800">
+  <a-container v-if="farmosEnabled" class="max-800">
     <div class="d-flex justify-space-between align-center">
       <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
@@ -104,9 +104,9 @@
       :superAdmin="superAdmin"
     >
     </FarmOSGroupSettings>
-  </v-container>
+  </a-container>
 
-  <v-container v-else>
+  <a-container v-else>
     <div class="d-flex justify-space-between align-center">
       <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
@@ -132,7 +132,7 @@
         </a-card>
       </a-col>
     </a-row>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

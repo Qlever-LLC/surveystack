@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-card class="pa-4 mb-4">
       <span class="text--secondary overline">{{ this.entity._id }}</span>
 
@@ -23,7 +23,7 @@
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

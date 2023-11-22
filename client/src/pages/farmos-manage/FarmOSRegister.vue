@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
       <a-select
         engineering="autocomplete"
@@ -222,7 +222,7 @@
       width="400"
       >{{ successMessage }}</app-dialog
     >
-  </v-container>
+  </a-container>
 </template>
 
 <script>

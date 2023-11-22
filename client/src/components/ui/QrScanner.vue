@@ -24,13 +24,13 @@
         <a-alert v-if="hasCameraError" border="left" border-color type="error" elevation="2">
           No camera detected.
         </a-alert>
-        <v-container class="pa-0" v-if="!hasCameraError">
+        <a-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />
             <a-progress-circular v-if="isLoading" indeterminate :width="7" :size="80" color="primary" />
             <div v-if="!isLoading" class="scan-region-outline" />
           </div>
-        </v-container>
+        </a-container>
       </a-card>
     </v-dialog>
   </div>
@@ -46,6 +46,7 @@ QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { 
 
 export default defineComponent({
   emits: ['codeDetected'],
+
   props: {
     small: {
       type: Boolean,

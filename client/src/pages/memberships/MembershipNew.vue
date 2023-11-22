@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <a-card class="pa-4 mb-4">
@@ -102,7 +102,7 @@
         </a-card-actions>
       </a-card>
     </v-dialog>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

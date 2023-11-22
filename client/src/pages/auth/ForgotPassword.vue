@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper">
-    <v-container class="maxw-40">
+    <a-container class="maxw-40">
       <app-forgot-password :useLink="true" />
-    </v-container>
+    </a-container>
   </div>
 </template>
 

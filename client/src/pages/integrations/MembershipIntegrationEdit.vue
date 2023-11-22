@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-card class="pa-4 mb-4">
       <span class="text--secondary overline">{{ this.entity._id }}</span>
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
@@ -31,7 +31,7 @@
         </div>
       </a-form>
     </a-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

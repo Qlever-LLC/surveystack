@@ -1,5 +1,5 @@
 <template>
-  <v-container class="home" :fluid="true">
+  <a-container class="home" fluid>
     <a-row>
       <a-col>
         <a-img
@@ -128,7 +128,7 @@
         <v-btn color="primary" x-large href="surveystack://measurement">Run Measurement</v-btn>
       </a-col>
     </a-row>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

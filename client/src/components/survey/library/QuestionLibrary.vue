@@ -13,10 +13,10 @@
     <div class="d-flex justify-end mb-4">
       <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
     </div>
-    <v-container v-if="loading" class="d-flex align-center justify-center" style="height: 100%">
+    <a-container v-if="loading" class="d-flex align-center justify-center" cssHeight100>
       <a-progress-circular :size="50" color="primary" indeterminate />
-    </v-container>
-    <v-container fluid class="pa-0" v-else>
+    </a-container>
+    <a-container fluid class="pa-0" v-else>
       <a-row dense>
         <a-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <a-card
@@ -118,7 +118,7 @@
           </a-card>
         </a-col>
       </a-row>
-    </v-container>
+    </a-container>
     <a-pagination
       v-if="surveys.content.length > 0 && !selectedSurvey"
       v-model="page"

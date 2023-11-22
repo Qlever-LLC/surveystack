@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage FarmOS Instances</h1>
 
@@ -229,7 +229,7 @@
         </template>
       </a-table>
     </div>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -237,6 +237,7 @@ import _ from 'lodash';
 
 export default {
   emits: ['addSuperAdminNote'],
+
   props: {
     groups: Array,
     mappings: Object,

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <app-dialog
       v-model="learnMoreDialog"
       title="Premium Features"
@@ -187,7 +187,7 @@
     </a-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

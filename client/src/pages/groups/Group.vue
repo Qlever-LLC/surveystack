@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="initialized && status.code === 200">
+  <a-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
       <a-breadcrumbs :path="entity.path" />
 
@@ -59,13 +59,13 @@
         </app-basic-list>
       </a-col>
     </a-row>
-  </v-container>
-  <v-container v-else-if="status.code === 404">
+  </a-container>
+  <a-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>
     <p>
       No group under <strong>{{ $route.params.pathMatch }}</strong> was found :/
     </p>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

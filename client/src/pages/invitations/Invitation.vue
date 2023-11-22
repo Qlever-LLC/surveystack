@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-alert v-if="errorMsg" class="mt-4" mode="fade" text type="error">{{ errorMsg }}</a-alert>
     <template v-if="initialized && membership">
       <h1>Invitation</h1>
@@ -28,7 +28,7 @@
       </div>
     </template>
     <a-progress-circular v-else :size="50" color="primary" indeterminate />
-  </v-container>
+  </a-container>
 </template>
 
 <script>

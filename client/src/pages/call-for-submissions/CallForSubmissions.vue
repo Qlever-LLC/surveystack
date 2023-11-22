@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>Call for Submissions</h1>
 
     <app-survey-selector
@@ -78,7 +78,7 @@
       title="Call for Submissions"
       @close="showSubmitResult = false"
     />
-  </v-container>
+  </a-container>
 </template>
 
 <script>

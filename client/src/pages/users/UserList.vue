@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center">
       <h1>Browse Users</h1>
 
@@ -22,7 +22,7 @@
         <a-divider />
       </div>
     </a-card>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
