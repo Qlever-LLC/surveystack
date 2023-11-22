@@ -116,10 +116,4 @@ export default {
 .v-data-table >>> td {
   font-family: monospace;
 }
-
-/*
-.v-data-table >>> .v-label {
-  font-size: 12px;
-}
-*/
 </style>

@@ -35,7 +35,7 @@
     </div>
 
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
-      <v-label>Tags for instance on FarmOS Aggregator</v-label>
+      <a-label>Tags for instance on FarmOS Aggregator</a-label>
       <div class="d-flex mt-4">
         <a-chip v-for="(tag, idx) in tags" :key="`tag-${idx}`">{{ tag }}</a-chip>
         <a-chip v-if="tags.length === 0" color="secondary">No Tags associated with instance</a-chip>
@@ -66,7 +66,7 @@
         >
       </div>
 
-      <v-label class="vy-4">Current Group Mappings</v-label>
+      <a-label class="vy-4">Current Group Mappings</a-label>
 
       <a-table v-if="mappedGroups.length > 0">
         <template v-slot:default>
@@ -117,7 +117,7 @@
         <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
       </div>
 
-      <v-label class="vy-4">Current User Mappings</v-label>
+      <a-label class="vy-4">Current User Mappings</a-label>
       <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
@@ -237,7 +237,6 @@ import _ from 'lodash';
 
 export default {
   emits: ['addSuperAdminNote'],
-
   props: {
     groups: Array,
     mappings: Object,
