@@ -38,6 +38,7 @@ import AListItem from '../src/components/ui/elements/AListItem.vue';
 import AToolbarTitle from '../src/components/ui/elements/AToolbarTitle.vue';
 import ABanner from '../src/components/ui/elements/ABanner.vue';
 import ABadge from '../src/components/ui/elements/ABadge.vue';
+import ATab from '../src/components/ui/elements/ATab.vue';
 
 const localVue = createLocalVue();
 localVue.component('a-btn-toggle', ABtnToggle);
@@ -74,6 +75,7 @@ localVue.component('a-list-item', AListItem);
 localVue.component('a-toolbar-title', AToolbarTitle);
 localVue.component('a-banner', ABanner);
 localVue.component('a-badge', ABadge);
+localVue.component('a-tab', ATab);
 
 localVue.use(Vuex);
 localVue.use(VueRouter);

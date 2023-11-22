@@ -12,8 +12,8 @@
       <a-tab v-for="item in items" :key="item.name">{{ item.name }}</a-tab>
     </a-tabs>
 
-    <v-tabs-items v-model="tab">
-      <v-tab-item v-for="item in items" :key="item.name">
+    <a-window v-model="tab">
+      <a-window-item v-for="item in items" :key="item.name">
         <v-component
           @map-group="mapGroup"
           @unmap-group="unmapGroup"
@@ -34,8 +34,8 @@
           @delete-plan="deletePlan"
           @addSuperAdminNote="addSuperAdminNote"
         ></v-component>
-      </v-tab-item>
-    </v-tabs-items>
+      </a-window-item>
+    </a-window>
 
     <a-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</a-alert>
   </v-container>
