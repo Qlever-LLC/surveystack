@@ -26,7 +26,7 @@
         hide-details
       />
     </template>
-    <v-date-picker
+    <a-date-picker
       v-model="date"
       @input="open = false"
       :type="type === 'date-month-year' ? 'month' : 'date'"
