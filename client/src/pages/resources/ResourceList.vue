@@ -1,7 +1,7 @@
 <template>
-  <v-container>
+  <a-container>
     <app-basic-list :entities="entities" title="Resources" />
-  </v-container>
+  </a-container>
 </template>
 
 <script>

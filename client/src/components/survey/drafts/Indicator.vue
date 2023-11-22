@@ -1,10 +1,10 @@
 <template>
-  <v-chip class="px-4 mx-1" small :color="color">
+  <a-chip class="px-4 mx-1" small :color="color">
     <span class="font-weight-bold white--text">
-      <v-icon x-small left>{{ icon }}</v-icon>
+      <a-icon x-small left>{{ icon }}</a-icon>
       <slot>???</slot>
     </span>
-  </v-chip>
+  </a-chip>
 </template>
 
 <script>

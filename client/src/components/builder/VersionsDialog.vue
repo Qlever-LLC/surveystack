@@ -1,14 +1,14 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
-    <v-card>
-      <v-card-title>Survey Versions</v-card-title>
-      <v-card-text style="max-height: 500px">
-        <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
+    <a-card>
+      <a-card-title>Survey Versions</a-card-title>
+      <a-card-text cssMaxHeight500px>
+        <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
             <div class="col-10 mt-1 py-0">
-              <v-chip
+              <a-chip
                 dark
                 small
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
@@ -22,8 +22,8 @@
                     : revision.version === survey.latestVersion
                     ? ' (published) '
                     : '')
-                }}</v-chip
-              >
+                }}
+              </a-chip>
               <span class="ml-2"
                 >{{ getSubmissionCount(revision.version) || 'no' }} submission{{
                   getSubmissionCount(revision.version) > 1 ? 's' : ''
@@ -36,18 +36,18 @@
               </span>
             </div>
             <div class="col-1 py-0">
-              <v-icon
+              <a-icon
                 @click="toggleCompare(revision.version)"
                 class="mt-1"
                 title="Compare version"
                 :color="compareRevisions.includes(revision.version) ? 'primary' : ''"
-                >mdi-compare-horizontal</v-icon
+                >mdi-compare-horizontal</a-icon
               >
             </div>
             <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
-              <v-checkbox
+              <a-checkbox
                 v-model="selectedVersionsToDelete"
-                :value="String(revision.version)"
+                :selected-item="String(revision.version)"
                 hide-details
                 title="Delete version"
                 class="mt-0"
@@ -64,16 +64,16 @@
             <span v-else> none </span>
           </p>
         </div>
-        <v-alert v-if="deleteVersionsHasError" type="error" class="mt-1" dismissible>
+        <a-alert v-if="deleteVersionsHasError" type="error" class="mt-1" closable>
           An error occurred deleting survey versions.
-        </v-alert>
-        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" dismissible>
+        </a-alert>
+        <a-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" closable>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
-        </v-alert>
-      </v-card-text>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer />
+        </a-alert>
+      </a-card-text>
+      <a-divider />
+      <a-card-actions>
+        <a-spacer />
         <v-btn
           v-if="compareRevisions.length > 0"
           :disabled="compareRevisions.length === 1"
@@ -94,8 +94,8 @@
           Delete {{ selectedVersionsToDelete.length }} versions
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
     <survey-diff-dialog
       v-if="surveyDiffDialogVisible"
       :value="surveyDiffDialogVisible"
@@ -113,7 +113,9 @@ import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 
 export default {
-  components: { SurveyDiffDialog },
+  components: {
+    SurveyDiffDialog,
+  },
   props: {
     value: {
       type: Boolean,

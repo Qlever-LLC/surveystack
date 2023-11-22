@@ -1,9 +1,9 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
-    <v-card>
-      <v-card-title> Add Survey To Library </v-card-title>
-      <v-card-text>
-        <v-text-field :value="localLibrarySurvey.name" label="Title" readonly />
+    <a-card>
+      <a-card-title> Add Survey To Library </a-card-title>
+      <a-card-text>
+        <a-text-field :value="localLibrarySurvey.name" label="Title" readonly />
         <h3>Description</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryDescription" class="mb-4" />
         <h3>Applications</h3>
@@ -18,16 +18,16 @@
           :disabled="false"
           label="Latest change type"
         />
-      </v-card-text>
-      <v-card-actions class="mr-3">
-        <v-spacer />
+      </a-card-text>
+      <a-card-actions class="mr-3">
+        <a-spacer />
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span v-if="!librarySurvey.meta.isLibrary">Add to library</span>
           <span v-if="localLibrarySurvey.meta.isLibrary">Save</span>
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </v-dialog>
 </template>
 <script>
@@ -37,7 +37,10 @@ import { ref } from '@vue/composition-api';
 
 export default {
   name: 'edit-library-dialog',
-  components: { LibraryChangeTypeSelector, TipTapEditor },
+  components: {
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+  },
   props: {
     value: {
       type: Boolean,

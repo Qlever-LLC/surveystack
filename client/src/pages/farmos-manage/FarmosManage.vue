@@ -1,19 +1,19 @@
 <template>
-  <v-container>
-    <v-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
+  <a-container>
+    <a-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
       successMessage
-    }}</v-alert>
+    }}</a-alert>
 
-    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error" @click="errorMessage = null">{{
+    <a-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error" @click="errorMessage = null">{{
       errorMessage
-    }}</v-alert>
+    }}</a-alert>
 
-    <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
-      <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
-    </v-tabs>
+    <a-tabs v-model="tab" background-color="transparent" color="basil" grow>
+      <a-tab v-for="item in items" :key="item.name">{{ item.name }}</a-tab>
+    </a-tabs>
 
-    <v-tabs-items v-model="tab">
-      <v-tab-item v-for="item in items" :key="item.name">
+    <a-window v-model="tab">
+      <a-window-item v-for="item in items" :key="item.name">
         <v-component
           @map-group="mapGroup"
           @unmap-group="unmapGroup"
@@ -34,11 +34,11 @@
           @delete-plan="deletePlan"
           @addSuperAdminNote="addSuperAdminNote"
         ></v-component>
-      </v-tab-item>
-    </v-tabs-items>
+      </a-window-item>
+    </a-window>
 
-    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</v-alert>
-  </v-container>
+    <a-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</a-alert>
+  </a-container>
 </template>
 
 <script>
