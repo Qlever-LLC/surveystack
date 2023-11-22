@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-menu
+    <a-menu
       left
       attach="#app-menu"
       offset-y
@@ -13,34 +13,34 @@
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>
-      <v-list flat>
-        <v-list-item link :to="{ name: 'auth-profile' }">
-          <v-list-item-icon>
+      <a-list flat>
+        <a-list-item link :to="{ name: 'auth-profile' }">
+          <a-list-item-icon>
             <v-icon>mdi-account-circle</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Profile </v-list-item-title>
-        </v-list-item>
-        <v-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
-          <v-list-item-icon>
+          </a-list-item-icon>
+          <a-list-item-title> Profile </a-list-item-title>
+        </a-list-item>
+        <a-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
+          <a-list-item-icon>
             <v-icon>mdi-leaf-circle-outline</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> FarmOS Profile </v-list-item-title>
-        </v-list-item>
-        <v-divider />
-        <v-subheader>Active Group</v-subheader>
+          </a-list-item-icon>
+          <a-list-item-title> FarmOS Profile </a-list-item-title>
+        </a-list-item>
+        <a-divider />
+        <a-list-subheader>Active Group</a-list-subheader>
         <active-group-selector-list v-model="activeGroup" />
-        <v-divider />
-        <v-list-item link @click="logout" class="mt-2">
-          <v-list-item-icon>
+        <a-divider />
+        <a-list-item link @click="logout" class="mt-2">
+          <a-list-item-icon>
             <v-icon>mdi-logout-variant</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Sign Out </v-list-item-title>
-        </v-list-item>
-      </v-list>
+          </a-list-item-icon>
+          <a-list-item-title> Sign Out </a-list-item-title>
+        </a-list-item>
+      </a-list>
 
       <!-- </v-card-text> -->
       <!-- </v-card> -->
-    </v-menu>
+    </a-menu>
 
     <v-btn v-else :to="{ name: 'auth-login' }" text>
       <v-icon>mdi-login-variant</v-icon>
@@ -51,6 +51,7 @@
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+
 import api from '@/services/api.service';
 
 export default {

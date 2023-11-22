@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
       {{ alertMessage }}
-    </v-snackbar>
+    </a-snackbar>
     <app-control-label
       :value="control.label"
       :redacted="redacted"
@@ -77,8 +77,8 @@
     </div>
 
     <v-expand-transition>
-      <v-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
-        <v-list-item
+      <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0">
+        <a-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
           class="file-list-item my-2"
@@ -90,36 +90,36 @@
             <v-icon v-else large>mdi-file-outline</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title
+            <a-list-item-title
               v-if="editIndex !== index"
               :data-test-id="'file_' + index"
               class="text-wrap font-bold"
               v-text="getLabelFromKey(fileResourceKey)"
-            ></v-list-item-title>
-            <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
-              <v-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
-            </v-list-item-title>
-            <v-list-item-subtitle v-if="showUploadProgressIndex === index"
+            ></a-list-item-title>
+            <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
+              <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
+            </a-list-item-title>
+            <a-list-item-subtitle v-if="showUploadProgressIndex === index"
               ><v-progress-linear indeterminate class="mb-0"
-            /></v-list-item-subtitle>
+            /></a-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
+          <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
             <v-btn icon @click="editResourceName(fileResourceKey, index)">
               <v-icon color="grey lighten-1">mdi-pencil</v-icon>
             </v-btn>
-          </v-list-item-action>
-          <v-list-item-action v-if="editIndex === index">
+          </a-list-item-action>
+          <a-list-item-action v-if="editIndex === index">
             <v-btn icon @click="commitResourceName(fileResourceKey, index)">
               <v-icon color="success">mdi-check</v-icon>
             </v-btn>
-          </v-list-item-action>
-          <v-list-item-action>
+          </a-list-item-action>
+          <a-list-item-action>
             <v-btn icon @click="remove(index)">
               <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
             </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
+          </a-list-item-action>
+        </a-list-item>
+      </a-list>
     </v-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
   </div>

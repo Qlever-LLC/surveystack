@@ -34,9 +34,9 @@
     <div class="d-flex justify-space-between">
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
-        <v-chip v-if="isPremium" class="ml-2" color="success">
+        <a-chip v-if="isPremium" class="ml-2" color="success">
           <v-icon small left> mdi-octagram </v-icon>Premium
-        </v-chip>
+        </a-chip>
       </h1>
       <v-btn
         v-if="editMode"
@@ -51,14 +51,14 @@
     <v-card :loading="isLoadingGroup" class="mb-4">
       <v-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
-          <v-text-field
+          <a-text-field
             label="Name"
             placeholder="Enter group name"
             id="group-name"
             autocomplete="off"
             v-model="entity.name"
           />
-          <v-text-field
+          <a-text-field
             label="Slug"
             placeholder="Enter group slug or use suggested"
             id="group-slug"
@@ -72,7 +72,7 @@
             :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
           />
           <div class="d-flex align-center mt-6">
-            <v-checkbox
+            <a-checkbox
               label="Invitation Only"
               v-model="entity.meta.invitationOnly"
               :hint="
@@ -90,7 +90,7 @@
               </v-btn>
             </div>
           </div>
-          <v-checkbox label="Archived" v-model="entity.meta.archived" />
+          <a-checkbox label="Archived" v-model="entity.meta.archived" />
           <div class="d-flex justify-end pa-2">
             <v-btn text @click="cancel">Cancel</v-btn>
             <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
@@ -118,19 +118,19 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-              <v-list-item-title class="text--secondary"
+              <a-list-item-title class="text--secondary"
                 >[Pending] {{ entity.meta.invitationEmail
-                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title
+                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</a-list-item-title
               >
-              <v-list-item-subtitle>{{
+              <a-list-item-subtitle>{{
                 entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
-              }}</v-list-item-subtitle>
+              }}</a-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <v-list-item-title>{{ entity.user.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.user.email }}</v-list-item-subtitle>
+              <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
             </v-list-item-content>
-            <v-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
+            <a-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
               <v-row style="gap: 12px">
                 <app-confirm-membership-button
                   v-if="entity.meta && entity.meta.status === 'pending'"
@@ -148,7 +148,7 @@
                 />
                 <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
               </v-row>
-            </v-list-item-action>
+            </a-list-item-action>
           </template>
         </app-basic-list>
       </v-col>
@@ -165,8 +165,8 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>

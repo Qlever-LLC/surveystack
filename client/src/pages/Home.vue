@@ -2,14 +2,14 @@
   <v-container class="home" :fluid="true">
     <v-row>
       <v-col>
-        <v-img
+        <a-img
           v-if="isWhitelabel"
           :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
           class="my-3"
           contain
           height="128"
-        ></v-img>
-        <v-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128"></v-img>
+        />
+        <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
       </v-col>
     </v-row>
 
@@ -24,7 +24,7 @@
           :searchable="false"
         >
           <template v-slot:entity="{ entity }">
-            <v-list-item-icon class="mr-2 d-flex align-center mb-2">
+            <a-list-item-icon class="mr-2 d-flex align-center mb-2">
               <v-btn
                 v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
                 :to="`/surveys/${entity.id}`"
@@ -49,10 +49,10 @@
               >
                 <v-icon>mdi-account-group</v-icon>
               </v-btn>
-            </v-list-item-icon>
+            </a-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
             </v-list-item-content>
             <div class="d-flex align-center ml-3">
               <v-btn color="primary" small>Take Survey</v-btn>
@@ -101,8 +101,8 @@
                   </v-btn>
                 </div>
                 <div>
-                  <v-list-item-title>{{ entity.name }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
+                  <a-list-item-title>{{ entity.name }}</a-list-item-title>
+                  <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
                 </div>
               </div>
             </v-list-item-content>

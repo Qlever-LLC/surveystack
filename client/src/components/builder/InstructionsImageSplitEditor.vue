@@ -20,7 +20,7 @@
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
     </div>
-    <v-textarea
+    <a-textarea
       class="mt-3"
       label="Instructions Body (Markdown)"
       :value="value.body"
