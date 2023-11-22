@@ -122,7 +122,6 @@ import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
-import ACol from '@/components/ui/ACol.vue';
 
 import { queueAction } from '@/utils/surveyStack';
 
@@ -133,7 +132,6 @@ export default {
     appDraftOverview,
     appDraftToolbar,
     appConfirmSubmissionDialog,
-    ACol,
   },
   props: {
     survey: { type: Object },

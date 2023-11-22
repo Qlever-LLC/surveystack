@@ -44,12 +44,7 @@
 </template>
 
 <script>
-import ACol from '@/components/ui/ACol.vue';
-
 export default {
-  components: {
-    ACol,
-  },
   props: ['viewModel', 'loading'],
 
   data() {

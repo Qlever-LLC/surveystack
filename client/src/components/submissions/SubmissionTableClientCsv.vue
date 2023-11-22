@@ -211,7 +211,6 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
-import ACol from '@/components/ui/ACol.vue';
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -274,7 +273,6 @@ const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted
 export default {
   components: {
     SubmissionTableCellModal,
-    ACol,
   },
   props: {
     actionsAreDisabled: {

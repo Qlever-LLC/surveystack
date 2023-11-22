@@ -134,13 +134,11 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import ACol from '@/components/ui/ACol.vue';
 
 export default {
   components: {
     AuthSelector,
     AppBasicList,
-    ACol,
   },
   name: 'home',
   data() {

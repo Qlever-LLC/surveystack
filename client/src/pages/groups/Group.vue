@@ -71,13 +71,11 @@
 <script>
 import api from '@/services/api.service';
 import appBasicList from '@/components/ui/BasicList.vue';
-import ACol from '@/components/ui/ACol.vue';
 
 export default {
   name: 'Group',
   components: {
     appBasicList,
-    ACol,
   },
   data() {
     return {

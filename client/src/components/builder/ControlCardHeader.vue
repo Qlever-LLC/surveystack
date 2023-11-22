@@ -21,12 +21,8 @@
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';
-import ACol from '@/components/ui/ACol.vue';
 
 export default {
-  components: {
-    ACol,
-  },
   props: {
     index: { type: String, required: true },
     title: { type: String, required: true },

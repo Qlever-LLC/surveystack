@@ -47,13 +47,9 @@
 </template>
 
 <script>
-import ACol from '@/components/ui/ACol.vue';
-
 export default {
   name: 'library-change-type-selector',
-  components: {
-    ACol,
-  },
+
   props: ['value', 'disabled', 'label'],
   data() {
     return {

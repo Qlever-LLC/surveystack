@@ -7,12 +7,10 @@
 </template>
 <script>
 import appHyloIntegrationCard from '@/components/integrations/HyloIntegrationCard.vue';
-import ACol from '@/components/ui/ACol.vue';
 
 export default {
   components: {
     appHyloIntegrationCard,
-    ACol,
   },
 };
 </script>

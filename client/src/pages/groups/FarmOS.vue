@@ -145,7 +145,6 @@ import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDial
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
-import ACol from '@/components/ui/ACol.vue';
 
 export default {
   props: {

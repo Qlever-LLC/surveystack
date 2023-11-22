@@ -129,12 +129,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ACol from '@/components/ui/ACol.vue';
 
 export default {
-  components: {
-    ACol,
-  },
   props: {
     groupId: String,
   },
