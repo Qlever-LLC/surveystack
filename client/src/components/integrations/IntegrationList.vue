@@ -26,16 +26,7 @@
 </template>
 
 <script>
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
-
 export default {
-  components: {
-    ACard,
-    ACardText,
-    ACardTitle,
-  },
   props: {
     entities: {
       type: Array,

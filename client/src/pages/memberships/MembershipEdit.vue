@@ -101,11 +101,6 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const availableRoles = [
   {
@@ -132,11 +127,6 @@ const availableStatus = [
 export default {
   components: {
     appDialog,
-    ACard,
-    ACardActions,
-    ACardSubtitle,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

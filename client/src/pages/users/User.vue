@@ -32,16 +32,8 @@
 
 <script>
 import api from '@/services/api.service';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
-  components: {
-    ACard,
-    ACardText,
-    ACardTitle,
-  },
   data() {
     return {
       user: {

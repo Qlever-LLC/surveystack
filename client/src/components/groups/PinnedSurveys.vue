@@ -88,19 +88,11 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

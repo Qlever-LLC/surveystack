@@ -197,20 +197,12 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
     ControlCardHeader,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

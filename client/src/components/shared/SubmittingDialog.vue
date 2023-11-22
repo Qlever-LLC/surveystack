@@ -10,13 +10,7 @@
 </template>
 
 <script>
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
 export default {
-  components: {
-    ACard,
-    ACardText,
-  },
   props: {
     value: {
       type: Boolean,

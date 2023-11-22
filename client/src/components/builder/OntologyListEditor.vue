@@ -139,10 +139,6 @@ import { isEqual, uniqWith } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   props: {
@@ -165,10 +161,6 @@ export default {
   components: {
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

@@ -68,17 +68,10 @@
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
-  components: {
-    ACard,
-    ACardText,
-    ACardTitle,
-  },
+
   props: {
     value: Boolean,
     farmInstances: {

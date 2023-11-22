@@ -31,18 +31,10 @@ import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadB
 
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default defineComponent({
   components: {
     SelectItemsDownloadButton,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   props: {
     value: {

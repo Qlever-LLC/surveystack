@@ -514,7 +514,6 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
@@ -528,7 +527,6 @@ export default {
     Date,
 
     MarkdownEditor,
-    ACardTitle,
   },
   props: {
     control: {

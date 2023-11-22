@@ -39,10 +39,6 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   data() {
@@ -80,10 +76,6 @@ export default {
   },
   components: {
     ActiveGroupSelector,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   created() {
     if (this.groupId) {

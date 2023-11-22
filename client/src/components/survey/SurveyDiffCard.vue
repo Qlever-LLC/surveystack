@@ -97,13 +97,11 @@
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
-import ACard from '@/components/ui/ACard.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
     ControlCardHeader,
-    ACard,
   },
   data() {
     return {

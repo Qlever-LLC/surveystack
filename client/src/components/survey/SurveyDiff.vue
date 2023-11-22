@@ -45,13 +45,11 @@
 import { changeType, diffSurveyVersions, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { get, isNumber, remove, sortBy } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
-import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   name: 'survey-diff',
   components: {
     SurveyDiffCardTree,
-    ACardText,
   },
   props: {
     controlsLocalRevision: Array,

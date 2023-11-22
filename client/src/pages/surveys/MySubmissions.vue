@@ -153,9 +153,6 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -165,9 +162,6 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
-    ACard,
-    ACardActions,
-    ACardText,
   },
   watch: {
     activeSubmissionId(id) {

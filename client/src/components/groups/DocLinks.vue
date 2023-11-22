@@ -94,21 +94,11 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
     draggable,
-    ACard,
-    ACardActions,
-    ACardSubtitle,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

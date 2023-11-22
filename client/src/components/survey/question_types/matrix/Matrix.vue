@@ -156,10 +156,6 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -274,10 +270,6 @@ export default {
     appMatrixTable,
     appRequired,
     appRedacted,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

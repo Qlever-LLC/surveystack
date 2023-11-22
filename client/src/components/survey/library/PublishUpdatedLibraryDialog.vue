@@ -40,10 +40,6 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
@@ -51,10 +47,6 @@ export default {
     SurveyDiff,
     LibraryChangeTypeSelector,
     TipTapEditor,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   props: {
     value: {

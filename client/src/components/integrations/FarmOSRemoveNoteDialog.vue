@@ -27,17 +27,9 @@
 </template>
 
 <script>
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
-
 export default {
   emits: ['addNote', 'cancelNote'],
-  components: {
-    ACard,
-    ACardText,
-    ACardTitle,
-  },
+
   props: ['loading', 'value'],
 
   data() {

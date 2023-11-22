@@ -25,18 +25,7 @@
 </template>
 
 <script>
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
-
 export default {
-  components: {
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
-  },
   props: {
     persistent: Boolean,
     value: Boolean,

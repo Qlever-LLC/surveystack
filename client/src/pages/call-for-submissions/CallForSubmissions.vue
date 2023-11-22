@@ -87,11 +87,6 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardSubtitle from '@/components/ui/ACardSubtitle.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -108,11 +103,6 @@ export default {
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,
-    ACard,
-    ACardActions,
-    ACardSubtitle,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

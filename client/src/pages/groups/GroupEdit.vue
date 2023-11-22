@@ -201,8 +201,6 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
 
 const integrations = [
   {
@@ -225,8 +223,6 @@ export default {
     appDialog,
     appConfirmMembershipButton,
     appMemberHyloStatus,
-    ACard,
-    ACardText,
   },
   data() {
     return {

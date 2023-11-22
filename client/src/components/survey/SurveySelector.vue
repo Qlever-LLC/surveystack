@@ -33,16 +33,8 @@
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
-  components: {
-    ACard,
-    ACardText,
-    ACardTitle,
-  },
   props: {
     searchResults: {
       type: Array,

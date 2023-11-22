@@ -25,16 +25,10 @@
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     SurveyDiff,
-    ACard,
-    ACardActions,
-    ACardTitle,
   },
   props: {
     value: {

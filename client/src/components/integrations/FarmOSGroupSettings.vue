@@ -109,16 +109,10 @@
 <script>
 import { computed, ref } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
-    ACard,
-    ACardText,
-    ACardTitle,
   },
   props: {
     groupInfos: {

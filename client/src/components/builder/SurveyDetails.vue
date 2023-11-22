@@ -267,10 +267,6 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -336,10 +332,6 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   methods: {
     async getGroupNameById(id) {

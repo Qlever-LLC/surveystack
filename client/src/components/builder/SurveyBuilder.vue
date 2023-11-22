@@ -273,8 +273,6 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -323,8 +321,6 @@ export default {
     appCodeView,
     // ConfirmLeaveDialog,
     appExamplesView,
-    ACard,
-    ACardText,
   },
   props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {

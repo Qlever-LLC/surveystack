@@ -50,22 +50,11 @@
 </template>
 
 <script>
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
-
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
-  components: {
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
-  },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

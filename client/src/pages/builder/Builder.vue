@@ -117,9 +117,6 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -129,9 +126,6 @@ export default {
     SurveyBuilder,
     appDialog,
     resultDialog,
-    ACard,
-    ACardText,
-    ACardTitle,
   },
   mixins: [resultMixin],
   data() {

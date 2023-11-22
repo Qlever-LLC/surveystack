@@ -4,8 +4,6 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isOnline } from '@/utils/surveyStack';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
 
 const requestWakeLock = async () => {
   try {
@@ -43,8 +41,6 @@ export default {
   mixins: [baseQuestionComponent],
   components: {
     AppGps,
-    ACard,
-    ACardText,
   },
   data() {
     return {

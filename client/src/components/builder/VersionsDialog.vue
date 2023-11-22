@@ -111,18 +111,10 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     SurveyDiffDialog,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   props: {
     value: {

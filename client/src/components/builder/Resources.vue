@@ -109,14 +109,10 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
 
 export default {
   components: {
     appOntologyListEditor,
-    ACard,
-    ACardText,
   },
   props: {
     resources: {

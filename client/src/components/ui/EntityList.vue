@@ -22,11 +22,7 @@
 </template>
 
 <script>
-import ACard from '@/components/ui/ACard.vue';
 export default {
-  components: {
-    ACard,
-  },
   props: {
     collection: {
       type: String,

@@ -130,16 +130,12 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import ACard from '@/components/ui/ACard.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
-    ACard,
-    ACardTitle,
   },
   props: ['survey', 'libraryId'],
   data() {

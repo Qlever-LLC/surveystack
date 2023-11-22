@@ -12,7 +12,6 @@
 
 <script>
 import FarmOSRegister from '@/pages/farmos-manage/FarmOSRegister.vue';
-import ACard from '@/components/ui/ACard.vue';
 
 export default {
   emits: ['create', 'createInstance', 'checkUrl'],
@@ -33,6 +32,6 @@ export default {
       },
     },
   },
-  components: { FarmOSRegister, ACard },
+  components: { FarmOSRegister },
 };
 </script>

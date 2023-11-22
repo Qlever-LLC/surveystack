@@ -275,10 +275,6 @@ import Date from '@/components/builder/Date.vue';
 
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },

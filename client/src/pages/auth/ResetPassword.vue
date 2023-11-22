@@ -45,12 +45,10 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
-import ACard from '@/components/ui/ACard.vue';
 
 export default {
   components: {
     appFeedback,
-    ACard,
   },
   data() {
     return {

@@ -49,7 +49,6 @@
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
-import ACard from '@/components/ui/ACard.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -58,9 +57,6 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
-  components: {
-    ACard,
-  },
   data() {
     return {
       status: '',

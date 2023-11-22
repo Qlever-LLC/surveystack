@@ -9,14 +9,7 @@
   </a-card>
 </template>
 <script>
-import ACard from '@/components/ui/ACard.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
-
 export default {
-  components: {
-    ACard,
-    ACardTitle,
-  },
   props: {
     log: {
       required: false,

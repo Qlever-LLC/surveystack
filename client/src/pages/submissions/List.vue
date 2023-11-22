@@ -220,9 +220,6 @@ import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
@@ -264,9 +261,6 @@ export default {
     appSubmissionsCode,
     appDialog,
     appSubmissionArchiveDialog,
-    ACard,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

@@ -42,12 +42,8 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
-import ACard from '@/components/ui/ACard.vue';
 
 export default {
-  components: {
-    ACard,
-  },
   data() {
     return {
       excludeMeta: true,

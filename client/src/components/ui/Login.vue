@@ -108,7 +108,6 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ACard from '@/components/ui/ACard.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -119,9 +118,6 @@ const DEFAULT_ENTITY = {
 const LS_DEFAULT_USE_PASSWORD = 'use-password-on-login-page-by-default';
 
 export default {
-  components: {
-    ACard,
-  },
   props: {
     initialEmail: {
       type: String,

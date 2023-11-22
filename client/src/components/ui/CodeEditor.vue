@@ -71,9 +71,6 @@
 <script>
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -105,9 +102,6 @@ function log(message){};
 export default {
   components: {
     appCodeView,
-    ACard,
-    ACardActions,
-    ACardTitle,
   },
   data() {
     return {

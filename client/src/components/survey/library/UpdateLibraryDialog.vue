@@ -65,20 +65,12 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     SurveyDiff,
     LibraryChangeTypeSelector,
     TipTapEditor,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   props: {
     value: {

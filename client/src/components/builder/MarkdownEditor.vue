@@ -91,21 +91,11 @@
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
 
 import MarkdownIt from 'markdown-it';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const md = new MarkdownIt({ linkify: true });
 const TEXT_LENGTH = 60;
 
 export default {
-  components: {
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
-  },
   props: {
     value: { type: String },
     label: { type: String },

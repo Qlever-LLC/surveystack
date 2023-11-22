@@ -112,10 +112,6 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -134,10 +130,6 @@ const availableRoles = [
 export default {
   components: {
     BtnDropdown,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   data() {
     const INVITATION_METHODS = {

@@ -105,20 +105,10 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
-  components: {
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
-  },
   data() {
     return {
       selectedGroupIds: [],

@@ -42,17 +42,10 @@
 
 <script>
 import './css/button.css';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
-  components: {
-    ACard,
-    ACardText,
-    ACardTitle,
-  },
+
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {

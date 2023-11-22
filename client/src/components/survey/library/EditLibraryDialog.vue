@@ -34,20 +34,12 @@
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { ref } from '@vue/composition-api';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   name: 'edit-library-dialog',
   components: {
     LibraryChangeTypeSelector,
     TipTapEditor,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   props: {
     value: {

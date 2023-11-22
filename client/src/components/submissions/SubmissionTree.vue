@@ -18,13 +18,11 @@
 
 <script>
 import treeItem from '@/components/survey/TreeItem.vue';
-import ACard from '@/components/ui/ACard.vue';
 
 export default {
   props: ['submissions'],
   components: {
     treeItem,
-    ACard,
   },
 };
 </script>

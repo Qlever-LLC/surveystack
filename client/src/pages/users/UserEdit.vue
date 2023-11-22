@@ -75,18 +75,10 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
-import ACard from '@/components/ui/ACard.vue';
-import ACardActions from '@/components/ui/ACardActions.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     appFeedback,
-    ACard,
-    ACardActions,
-    ACardText,
-    ACardTitle,
   },
   data() {
     return {

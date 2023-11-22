@@ -352,18 +352,12 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
-import ACard from '@/components/ui/ACard.vue';
-import ACardText from '@/components/ui/ACardText.vue';
-import ACardTitle from '@/components/ui/ACardTitle.vue';
 
 export default {
   components: {
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,
-    ACard,
-    ACardText,
-    ACardTitle,
   },
   props: {
     value: {
