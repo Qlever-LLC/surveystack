@@ -67,7 +67,7 @@
 
                 <a-spacer class="flex-grow-1" />
                 <v-card-actions>
-                  <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
+                  <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
@@ -97,7 +97,7 @@
                     </v-list-item-content>
                   </a-list-item>
                 </template>
-                <v-pagination
+                <a-pagination
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"

@@ -130,7 +130,7 @@
               />
             </v-col>
             <v-col cols="10">
-              <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
+              <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
             </v-col>
             <v-col cols="1">
               <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
@@ -191,7 +191,7 @@
           />
         </v-col>
         <v-col cols="10">
-          <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
+          <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
         </v-col>
         <v-col cols="1">
           <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">

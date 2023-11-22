@@ -119,7 +119,7 @@
         </v-col>
       </a-row>
     </v-container>
-    <v-pagination
+    <a-pagination
       v-if="surveys.content.length > 0 && !selectedSurvey"
       v-model="page"
       :length="activeTabPaginationLength"
