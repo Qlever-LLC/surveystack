@@ -49,14 +49,14 @@
         </div>
         <div class="mb-2 context-actions">
           <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
-            <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
+            <a-icon color="grey lighten-1">mdi-content-copy</a-icon>
           </v-btn>
           <v-btn
             icon
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             @mousedown.stop="toggleLibrary(el.libraryId)"
           >
-            <v-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</v-icon>
+            <a-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</a-icon>
           </v-btn>
           <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
@@ -78,13 +78,13 @@
                 : 'newest available version'
             "
           >
-            <v-icon
+            <a-icon
               v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
               @click.stop="$emit('update-library-control', el)"
               left
             >
               mdi-refresh
-            </v-icon>
+            </a-icon>
             Version {{ el.libraryVersion }}
           </a-chip>
           <v-btn
@@ -92,9 +92,9 @@
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
             @click.stop="() => showDeleteModal(idx)"
           >
-            <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
+            <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
               mdi-delete
-            </v-icon>
+            </a-icon>
           </v-btn>
           <v-btn
             text

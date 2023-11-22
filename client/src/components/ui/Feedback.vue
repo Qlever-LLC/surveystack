@@ -2,7 +2,7 @@
   <a-alert border="left" :type="type" border-color :elevation="elevation" :color="color" :icon="icon">
     <strong v-if="title" class="mr-1">{{ title }}</strong>
     <slot />
-    <v-icon v-if="closeable" class="float-right" @click="$emit('closed')">mdi-close-circle</v-icon>
+    <a-icon v-if="closeable" class="float-right" @click="$emit('closed')">mdi-close-circle</a-icon>
   </a-alert>
 </template>
 

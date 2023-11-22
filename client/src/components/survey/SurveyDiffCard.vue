@@ -16,9 +16,9 @@
           class="ml-3 align-self-center"
         />
         <a-spacer />
-        <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
+        <a-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
-        </v-icon>
+        </a-icon>
       </a-row>
     </button>
     <a-table v-if="isOpen" fixed-header dense class="mb-4">
@@ -33,8 +33,12 @@
               @click="isLocalVersionSelectable && changeDiscarded(false)"
             >
               {{ versionNameLocalRevision }}
-              <v-icon v-if="isLocalVersionSelected" style="margin-top: -3px" small title="this version is selected"
-                >mdi-checkbox-marked-circle-outline</v-icon
+              <a-icon
+                v-if="isLocalVersionSelected"
+                style="margin-top: -3px"
+                size="small"
+                title="this version is selected"
+                >mdi-checkbox-marked-circle-outline</a-icon
               >
             </th>
             <th class="text-left">{{ versionNameRemoteRevisionOld }}</th>
@@ -46,8 +50,12 @@
               @click="isNewRemoteVersionSelectable && changeDiscarded(true)"
             >
               {{ versionNameRemoteRevisionNew }}
-              <v-icon v-if="isNewRemoteVersionSelected" style="margin-top: -3px" small title="this version is selected"
-                >mdi-checkbox-marked-circle-outline</v-icon
+              <a-icon
+                v-if="isNewRemoteVersionSelected"
+                style="margin-top: -3px"
+                size="small"
+                title="this version is selected"
+                >mdi-checkbox-marked-circle-outline</a-icon
               >
             </th>
           </tr>

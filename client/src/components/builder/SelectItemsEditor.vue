@@ -20,7 +20,7 @@
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-        <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </v-btn>
+        <v-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row </v-btn>
       </v-card-title>
 
       <v-card-text class="dialog-content">
@@ -50,7 +50,7 @@
               :hide-details="false"
               dense
             />
-            <v-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</v-icon>
+            <a-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</a-icon>
           </div>
         </draggable>
       </v-card-text>

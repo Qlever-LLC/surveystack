@@ -35,7 +35,7 @@
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
         <a-chip v-if="isPremium" class="ml-2" color="success">
-          <v-icon small left> mdi-octagram </v-icon>Premium
+          <a-icon small left> mdi-octagram </a-icon>Premium
         </a-chip>
       </h1>
       <v-btn
@@ -45,7 +45,7 @@
         :to="`/call-for-submissions?group=${entity._id}`"
         color="secondary"
       >
-        <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
+        <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
       </v-btn>
     </div>
     <v-card :loading="isLoadingGroup" class="mb-4">
@@ -146,7 +146,7 @@
                   :userName="entity.user.name"
                   @updated="loadHyloGroup"
                 />
-                <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
+                <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
               </a-row>
             </a-list-item-action>
           </template>

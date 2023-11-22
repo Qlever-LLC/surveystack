@@ -9,14 +9,14 @@
       color="primary"
       @click="isScannerOpen = true"
     >
-      <v-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</v-icon>
+      <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
     </v-btn>
 
     <v-dialog v-model="isScannerOpen" fullscreen>
       <v-card>
         <a-toolbar dark color="primary">
           <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
-            <v-icon>mdi-close</v-icon>
+            <a-icon>mdi-close</a-icon>
           </v-btn>
           <a-toolbar-title>QR Code Scanner</a-toolbar-title>
           <a-spacer />
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@vue/composition-api';
+import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from '@vue/composition-api';
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';

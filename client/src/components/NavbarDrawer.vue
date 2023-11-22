@@ -2,16 +2,16 @@
   <v-navigation-drawer :value="value" app>
     <div class="d-flex justify-end mt-3 mr-3">
       <v-btn large icon @click="$emit('input', !value)">
-        <v-icon>mdi-close</v-icon>
+        <a-icon>mdi-close</a-icon>
       </v-btn>
     </div>
     <a-list>
       <template v-for="(item, i) in items">
-        <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
+        <a-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
         <a-list-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</a-list-subheader>
         <a-list-item v-else :key="i" :to="item.to">
           <a-list-item-icon v-if="item.icon" :class="item.class">
-            <v-icon>{{ item.icon }}</v-icon>
+            <a-icon>{{ item.icon }}</a-icon>
           </a-list-item-icon>
           <v-list-item-content>
             <a-list-item-title>
@@ -40,7 +40,7 @@
               <a-list class="pa-0 ma-0">
                 <a-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
                   <a-list-item-icon>
-                    <v-icon>mdi-notebook</v-icon>
+                    <a-icon>mdi-notebook</a-icon>
                   </a-list-item-icon>
                   <v-list-item-content>
                     <a-list-item-title>{{ doc.label }}</a-list-item-title>
@@ -49,7 +49,7 @@
 
                 <a-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
                   <a-list-item-icon>
-                    <v-icon>mdi-help-circle-outline</v-icon>
+                    <a-icon>mdi-help-circle-outline</a-icon>
                   </a-list-item-icon>
                   <v-list-item-content>
                     <a-list-item-title>SurveyStack Help</a-list-item-title>
@@ -57,7 +57,7 @@
                 </a-list-item>
                 <a-list-item href="https://www.surveystack.io" target="_blank">
                   <a-list-item-icon>
-                    <v-icon>mdi-information-outline</v-icon>
+                    <a-icon>mdi-information-outline</a-icon>
                   </a-list-item-icon>
                   <v-list-item-content>
                     <a-list-item-title>About</a-list-item-title>

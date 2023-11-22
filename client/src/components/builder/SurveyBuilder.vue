@@ -205,23 +205,23 @@
               <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
-                  <v-icon right> mdi-monitor</v-icon>
+                  <a-icon right> mdi-monitor</a-icon>
                 </v-btn>
 
                 <v-btn :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
-                  <v-icon right> mdi-cellphone</v-icon>
+                  <a-icon right> mdi-cellphone</a-icon>
                 </v-btn>
               </a-btn-toggle>
 
               <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>
-                <v-icon right>mdi-code-tags</v-icon>
+                <a-icon right>mdi-code-tags</a-icon>
               </v-btn>
 
               <v-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">submission</span>
-                <v-icon right>mdi-code-tags</v-icon>
+                <a-icon right>mdi-code-tags</a-icon>
               </v-btn>
             </template>
           </app-draft-component>

@@ -5,19 +5,19 @@
         <a-spacer />
         <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
-          <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
+          <a-icon class="ml-2">mdi-cloud-upload-outline</a-icon>
         </v-btn>
       </a-row>
       <a-row class="d-flex flex-grow-1">
         <a-tabs v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
           <a-tab href="#drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
-              <v-icon class="mr-2">mdi-file-document-edit</v-icon>Drafts
+              <a-icon class="mr-2">mdi-file-document-edit</a-icon>Drafts
             </span>
           </a-tab>
           <a-tab href="#sent" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
-              <v-icon class="mr-2">mdi-email-check</v-icon>Sent
+              <a-icon class="mr-2">mdi-email-check</a-icon>Sent
             </span>
           </a-tab>
         </a-tabs>
@@ -56,7 +56,7 @@
                             @click="() => handleSubmitClick(item._id)"
                             v-on="on"
                           >
-                            <v-icon> mdi-cloud-upload-outline </v-icon>
+                            <a-icon> mdi-cloud-upload-outline </a-icon>
                           </v-btn>
                         </template>
                         <span>Upload Submission</span>

@@ -91,7 +91,7 @@
   >
     <v-card max-width="500">
       <v-card-title>
-        <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
+        <a-icon class="mr-2 error--text">mdi-close-octagon</a-icon>
         Unsupported browser
       </v-card-title>
       <!-- <a-alert type="error">

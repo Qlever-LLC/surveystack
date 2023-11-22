@@ -30,7 +30,7 @@
             </div>
             <div class="d-flex">
               <v-btn icon @click.stop="() => showDeleteModal(idx)">
-                <v-icon color="grey lighten-1">mdi-delete</v-icon>
+                <a-icon color="grey lighten-1">mdi-delete</a-icon>
               </v-btn>
             </div>
           </div>

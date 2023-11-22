@@ -1,6 +1,6 @@
 <template>
   <v-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
-    <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
+    <a-icon color="success" class="mr-1">mdi-check-bold</a-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </v-card-text>
   <a-expansion-panels v-else flat multiple v-model="mainPanelState">
@@ -12,7 +12,7 @@
           <template v-slot:activator="{ on, attrs }">
             <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on">
               <a-badge overlap bordered left :color="color" :content="count.toString()">
-                <v-icon :color="color">{{ icon }}</v-icon>
+                <a-icon :color="color">{{ icon }}</a-icon>
               </a-badge>
             </span>
           </template>
@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
-import { isNumber, sortBy, get, remove } from 'lodash';
+import { changeType, diffSurveyVersions, diffThreeSurveyVersions } from '@/utils/surveyDiff';
+import { get, isNumber, remove, sortBy } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
 
 export default {

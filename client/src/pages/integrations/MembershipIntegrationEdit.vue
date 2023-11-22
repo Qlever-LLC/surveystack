@@ -24,7 +24,7 @@
 
         <div class="d-flex ma-2">
           <v-btn v-if="editMode" color="error" outlined @click="deleteEntity">
-            <v-icon left>mdi-trash-can-outline</v-icon> Delete
+            <a-icon left>mdi-trash-can-outline</a-icon> Delete
           </v-btn>
           <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
           <v-btn color="primary" @click="submit">Submit</v-btn>

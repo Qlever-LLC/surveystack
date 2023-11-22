@@ -3,10 +3,11 @@ import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import Login from './Login.vue';
 import { RouterLinkStub } from '@vue/test-utils';
 import mockAxios from 'axios';
-jest.mock('@/utils/memberships');
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
 const noRoutes = [];
+
+jest.mock('@/utils/memberships');
 
 const TransitionStub = {
   render(h) {

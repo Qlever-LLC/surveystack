@@ -14,9 +14,9 @@
 
             <a-list-item-action>
               <v-list-item-action-text v-text="question.control.type"></v-list-item-action-text>
-              <v-icon v-if="!active" color="grey lighten-1"> mdi-star-outline </v-icon>
+              <a-icon v-if="!active" color="grey lighten-1"> mdi-star-outline </a-icon>
 
-              <v-icon v-else color="yellow"> mdi-star </v-icon>
+              <a-icon v-else color="yellow"> mdi-star </a-icon>
             </a-list-item-action>
           </template>
         </a-list-item>

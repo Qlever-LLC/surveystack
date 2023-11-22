@@ -23,7 +23,7 @@
           </v-list-item-content>
           <a-list-item-action @click="remove(i)">
             <v-btn icon small>
-              <v-icon>mdi-trash-can-outline</v-icon>
+              <a-icon>mdi-trash-can-outline</a-icon>
             </v-btn>
           </a-list-item-action>
         </a-list-item>

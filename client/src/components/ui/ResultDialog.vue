@@ -37,11 +37,11 @@
                           <a-expansion-panel-title>
                             <template v-slot:actions v-if="!item.data"><a-spacer /> </template>
                             <div class="mr-4 flex-grow-0">
-                              <v-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </v-icon>
-                              <v-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </v-icon>
-                              <v-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </v-icon>
-                              <v-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </v-icon>
-                              <v-icon v-else color="primary"> $expand </v-icon>
+                              <a-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </a-icon>
+                              <a-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </a-icon>
+                              <a-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </a-icon>
+                              <a-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </a-icon>
+                              <a-icon v-else color="primary"> $expand </a-icon>
                             </div>
                             {{ item.message }}
                           </a-expansion-panel-title>

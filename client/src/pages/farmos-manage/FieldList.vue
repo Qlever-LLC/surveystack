@@ -5,7 +5,7 @@
 
       <a-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
         <v-list-item-avatar>
-          <v-icon class="primary lighten-1" dark> mdi-map </v-icon>
+          <a-icon class="primary lighten-1" dark> mdi-map </a-icon>
         </v-list-item-avatar>
 
         <v-list-item-content>
@@ -14,7 +14,7 @@
 
         <a-list-item-action>
           <v-btn icon>
-            <v-icon color="grey lighten-1" @click="remove(field)">mdi-delete</v-icon>
+            <a-icon color="grey lighten-1" @click="remove(field)">mdi-delete</a-icon>
           </v-btn>
         </a-list-item-action>
       </a-list-item>

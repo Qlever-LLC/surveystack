@@ -36,12 +36,12 @@
               </span>
             </div>
             <div class="col-1 py-0">
-              <v-icon
+              <a-icon
                 @click="toggleCompare(revision.version)"
                 class="mt-1"
                 title="Compare version"
                 :color="compareRevisions.includes(revision.version) ? 'primary' : ''"
-                >mdi-compare-horizontal</v-icon
+                >mdi-compare-horizontal</a-icon
               >
             </div>
             <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">

@@ -7,7 +7,7 @@
         <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
-              <v-icon>mdi-pencil</v-icon>
+              <a-icon>mdi-pencil</a-icon>
             </v-btn>
           </template>
           <v-card>
@@ -31,7 +31,7 @@
         <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
-              <v-icon>mdi-dresser</v-icon>
+              <a-icon>mdi-dresser</a-icon>
             </v-btn>
           </template>
           <v-card>
@@ -58,7 +58,7 @@
         <a-menu offset-y left>
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
-              <v-icon>mdi-dots-vertical</v-icon>
+              <a-icon>mdi-dots-vertical</a-icon>
             </v-btn>
           </template>
           <v-list>
@@ -67,7 +67,7 @@
                 <a-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
                     <v-btn class="pointer-events-none" text>
-                      <v-icon color="grey">mdi-file-upload</v-icon>
+                      <a-icon color="grey">mdi-file-upload</a-icon>
                       <div class="ml-1">Import</div>
                     </v-btn>
                   </label>
@@ -85,7 +85,7 @@
             <a-list-item>
               <a-list-item-title>
                 <v-btn @click="$emit('export-survey')" text>
-                  <v-icon color="grey">mdi-file-download</v-icon>
+                  <a-icon color="grey">mdi-file-download</a-icon>
                   <div class="ml-1">Export</div>
                 </v-btn>
               </a-list-item-title>
@@ -93,7 +93,7 @@
             <a-list-item>
               <a-list-item-title>
                 <v-btn @click="$emit('show-version-dialog')" text>
-                  <v-icon color="grey">mdi-sitemap</v-icon>
+                  <a-icon color="grey">mdi-sitemap</a-icon>
                   <div class="ml-1">Manage Survey Versions</div>
                 </v-btn>
               </a-list-item-title>
@@ -101,7 +101,7 @@
             <a-list-item>
               <a-list-item-title>
                 <v-btn @click="editLibraryDialogIsVisible = true" text>
-                  <v-icon color="grey">mdi-library</v-icon>
+                  <a-icon color="grey">mdi-library</a-icon>
                   <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
                 </v-btn>
               </a-list-item-title>
@@ -109,7 +109,7 @@
             <a-list-item v-if="value.meta.isLibrary">
               <a-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>
-                  <v-icon color="grey">mdi-layers-search</v-icon>
+                  <a-icon color="grey">mdi-layers-search</a-icon>
                   <div class="ml-1">List library consumers</div>
                 </v-btn>
               </a-list-item-title>
@@ -117,7 +117,7 @@
             <a-list-item>
               <a-list-item-title>
                 <v-btn text @click="printSettingDialogIsVisible = true">
-                  <v-icon color="grey">mdi-printer-settings</v-icon>
+                  <a-icon color="grey">mdi-printer-settings</a-icon>
                   <div class="ml-1">Print settings</div>
                 </v-btn>
               </a-list-item-title>
@@ -125,7 +125,7 @@
             <a-list-item v-if="!isNew">
               <a-list-item-title>
                 <v-btn text @click="$emit('delete')">
-                  <v-icon color="grey">mdi-delete</v-icon>
+                  <a-icon color="grey">mdi-delete</a-icon>
                   <div class="ml-1">Delete</div>
                 </v-btn>
               </a-list-item-title>
@@ -158,7 +158,7 @@
             elevation="0"
             class="mb-1"
           >
-            <v-icon x-small color="warning">mdi-alert</v-icon>try to clean up
+            <a-icon x-small color="warning">mdi-alert</a-icon>try to clean up
           </v-btn>
         </div>
         <div class="text-left">
@@ -190,7 +190,7 @@
                   color="primary"
                   class="my-1 mr-1"
                 >
-                  <v-icon class="mr-1">mdi-update</v-icon>
+                  <a-icon class="mr-1">mdi-update</a-icon>
                   Update
                 </v-btn>
               </div>
@@ -211,7 +211,7 @@
                   color="green"
                   :disabled="!enablePublish"
                 >
-                  <v-icon class="mr-1">mdi-cloud-upload</v-icon>
+                  <a-icon class="mr-1">mdi-cloud-upload</a-icon>
                   Publish
                 </v-btn>
               </div>
@@ -231,7 +231,7 @@
                   :loading="isSaving"
                   class="my-1 mr-1"
                 >
-                  <v-icon class="mr-1">mdi-content-save</v-icon>
+                  <a-icon class="mr-1">mdi-content-save</a-icon>
                   Save
                 </v-btn>
               </div>

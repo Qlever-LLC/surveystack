@@ -1,9 +1,9 @@
-import { render, fireEvent, screen, within } from '@testing-library/vue';
+import { fireEvent, render, screen, within } from '@testing-library/vue';
 import SurveyDiff from './SurveyDiff.vue';
 import vuetify from '@/plugins/vuetify';
 import { createControlInstance } from '@/utils/surveyConfig';
-import { cloneDeep, pick, uniqueId, shuffle, range } from 'lodash';
-import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
+import { cloneDeep, pick, range, shuffle, uniqueId } from 'lodash';
+import { changeType, diffSurveyVersions } from '@/utils/surveyDiff';
 
 const { CHANGED, UNCHANGED, REMOVED, ADDED } = changeType;
 

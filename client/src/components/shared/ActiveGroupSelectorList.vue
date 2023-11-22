@@ -14,7 +14,7 @@
           color="focus"
         >
           <a-list-item-icon>
-            <v-icon>mdi-account-group</v-icon>
+            <a-icon>mdi-account-group</a-icon>
           </a-list-item-icon>
           <a-list-item-title>
             {{ item.text }}

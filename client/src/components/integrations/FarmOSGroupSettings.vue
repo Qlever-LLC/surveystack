@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { ref, computed } from '@vue/composition-api';
+import { computed, ref } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
 
 export default {

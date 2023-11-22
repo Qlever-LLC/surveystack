@@ -10,19 +10,19 @@
     >
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on" @click="checkIsOwner">
-          <v-icon>mdi-account</v-icon>
+          <a-icon>mdi-account</a-icon>
         </v-btn>
       </template>
       <a-list flat>
         <a-list-item link :to="{ name: 'auth-profile' }">
           <a-list-item-icon>
-            <v-icon>mdi-account-circle</v-icon>
+            <a-icon>mdi-account-circle</a-icon>
           </a-list-item-icon>
           <a-list-item-title> Profile </a-list-item-title>
         </a-list-item>
         <a-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
           <a-list-item-icon>
-            <v-icon>mdi-leaf-circle-outline</v-icon>
+            <a-icon>mdi-leaf-circle-outline</a-icon>
           </a-list-item-icon>
           <a-list-item-title> FarmOS Profile </a-list-item-title>
         </a-list-item>
@@ -32,7 +32,7 @@
         <a-divider />
         <a-list-item link @click="logout" class="mt-2">
           <a-list-item-icon>
-            <v-icon>mdi-logout-variant</v-icon>
+            <a-icon>mdi-logout-variant</a-icon>
           </a-list-item-icon>
           <a-list-item-title> Sign Out </a-list-item-title>
         </a-list-item>
@@ -43,7 +43,7 @@
     </a-menu>
 
     <v-btn v-else :to="{ name: 'auth-login' }" text>
-      <v-icon>mdi-login-variant</v-icon>
+      <a-icon>mdi-login-variant</a-icon>
       <span class="ml-2">Login</span>
     </v-btn>
   </div>

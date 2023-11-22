@@ -32,7 +32,7 @@
           href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
           outlined
         >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Download APK
         </v-btn>
       </template>
@@ -52,7 +52,7 @@
           outlined
           @click="showAndroidInstallDialog = true"
         >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Install Android App
         </v-btn>
       </div>
@@ -64,16 +64,16 @@
         <a-chip dark> {{ meta && meta.status }}</a-chip>
         <br />
         <a-chip dark class="mt-1">
-          <v-icon small left>mdi-message-bulleted</v-icon>
-          {{ meta && meta.statusMessage }}
-        </a-chip>
+          <a-icon small left>mdi-message-bulleted</a-icon>
+          {{ meta && meta.statusMessage }}</a-chip
+        >
       </p>
     </div>
     <div v-else-if="isLoading" class="d-flex align-center justify-center">
       <v-progress-circular indeterminate color="primary" class="ma-5" />
     </div>
     <div v-else-if="loadingSourceFailed" class="text-center">
-      <v-icon color="red">mdi-close-thick</v-icon>
+      <a-icon color="red">mdi-close-thick</a-icon>
       There was an error loading the script.
     </div>
     <app-control-more-info :value="control.moreInfo" />

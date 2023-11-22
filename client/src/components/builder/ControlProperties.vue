@@ -327,7 +327,7 @@
         <a-spacer />
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
-          <v-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</v-icon>
+          <a-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</a-icon>
         </div>
 
         <div>
@@ -338,7 +338,7 @@
             color="grey darken-1"
             class="align-center align-self-start"
           />
-          <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
+          <a-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
         <div v-if="isText || isNumber || isDate || isMatrix || isOntology || isSelect">
@@ -349,9 +349,9 @@
             color="grey darken-1"
             class="align-center align-self-start"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-initialize')" size="20">
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-initialize')" size="20">
             mdi-open-in-new
-          </v-icon>
+          </a-icon>
         </div>
 
         <!-- TODO not implemented yet - decide to implement or remove-->
@@ -363,8 +363,12 @@
             color="grey darken-1"
             class="align-center align-self-start"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
             mdi-open-in-new
+          </a-icon>
+        </div>
+
+        <div>
           </v-icon>
         </div-->
         <!--div>
@@ -375,9 +379,9 @@
             color="grey darken-1"
             class="align-center align-self-start"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
             mdi-open-in-new
-          </v-icon>
+          </a-icon>
         </div-->
 
         <div>
@@ -388,9 +392,9 @@
             color="grey darken-1"
             class="align-center align-self-start"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')" size="20">
+          <a-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')" size="20">
             mdi-open-in-new
-          </v-icon>
+          </a-icon>
         </div>
       </div>
 
@@ -403,7 +407,7 @@
           <a-spacer />
           <div>
             <v-card-title class="px-0 py-0">Print Layout</v-card-title>
-            <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
+            <a-icon @click.stop="showLayout = false">mdi-close</a-icon>
           </div>
 
           <div v-if="isMatrix">
@@ -480,7 +484,7 @@
               <template #append-outer>
                 <a-tooltip max-width="400" transition="slide-x-transition" right>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+                    <a-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</a-icon>
                   </template>
                   Set the number of items in a row
                 </a-tooltip>
@@ -495,7 +499,7 @@
   </div>
 </template>
 <script>
-import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
+import { findParentByChildId, getAdvancedCodeTemplate } from '@/utils/surveys';
 import { nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 import SelectItems from '@/components/builder/SelectItems.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';

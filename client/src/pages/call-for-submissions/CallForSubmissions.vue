@@ -15,7 +15,7 @@
         <div class="mb-5 d-flex align-center">
           <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
           <span v-if="selectedSurvey" class="mx-2">{{ selectedSurvey.name }}</span>
-          <v-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</v-icon>
+          <a-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</a-icon>
         </div>
 
         <a-text-field v-model="subject" label="Subject" filled />

@@ -2,7 +2,7 @@
   <a-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" cssMinWidth0px>
     <a-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon :color="iconColor" large class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</v-icon>
+        <a-icon :color="iconColor" large class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</a-icon>
       </template>
       <span>{{ typeName }}</span>
     </a-tooltip>

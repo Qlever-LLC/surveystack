@@ -15,7 +15,7 @@
           </v-list-item-content>
           <a-list-item-icon>
             <v-btn v-if="false" :to="`/users/${e._id}/edit`" text>
-              <v-icon>mdi-pencil</v-icon>
+              <a-icon>mdi-pencil</a-icon>
             </v-btn>
           </a-list-item-icon>
         </a-list-item>

@@ -2,7 +2,7 @@
   <a-input>
     <label for="select-items-file-input" class="cursor-pointer">
       <v-btn class="pointer-events-none" color="primary" :disabled="disabled">
-        <v-icon left>mdi-upload</v-icon>
+        <a-icon left>mdi-upload</a-icon>
         Add CSV
       </v-btn>
     </label>

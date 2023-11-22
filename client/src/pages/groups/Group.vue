@@ -5,7 +5,7 @@
 
       <div v-if="editable">
         <v-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
-          <v-icon left>mdi-cog</v-icon> Admin
+          <a-icon left>mdi-cog</a-icon> Admin
         </v-btn>
       </div>
     </div>
@@ -15,7 +15,7 @@
     </div>
     <h1>
       <span>{{ entity.name }}</span>
-      <a-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </a-chip>
+      <a-chip v-if="isPremium" class="ml-2" color="success"> <a-icon small left> mdi-octagram </a-icon>Premium </a-chip>
     </h1>
     <h3 class="text--secondary">{{ entity.path }}</h3>
     <div class="text--secondary body-2">{{ entity._id }}</div>

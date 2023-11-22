@@ -4,13 +4,13 @@
     <v-list>
       <a-list-item v-for="image in value" :key="image.src">
         <v-list-item-avatar>
-          <v-icon>mdi-image</v-icon>
+          <a-icon>mdi-image</a-icon>
         </v-list-item-avatar>
         <v-list-item-content>
           {{ image.name }}
         </v-list-item-content>
         <a-list-item-action>
-          <v-icon>mdi-delete</v-icon>
+          <a-icon>mdi-delete</a-icon>
         </a-list-item-action>
       </a-list-item>
     </v-list>

@@ -38,12 +38,12 @@
             outlined
           >
             <template v-slot:append-outer>
-              <v-icon
+              <a-icon
                 style="margin-top: -8px"
                 v-if="viewModel.form.instanceNameValid === true || viewModel.form.instanceNameValid === false"
                 :color="viewModel.form.instanceNameValid === true ? 'green' : 'red'"
                 large
-                >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
+                >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</a-icon
               >
             </template>
           </a-text-field>
@@ -143,7 +143,7 @@
             <a-chip color="grey--darken-2" dark>{{ item.email }}</a-chip>
           </div>
           <div v-else>
-            <v-icon left>mdi-account-clock</v-icon>
+            <a-icon left>mdi-account-clock</a-icon>
             {{ item.email }}
           </div>
         </template>
@@ -156,13 +156,13 @@
             @click="onInvite"
             target="_blank"
           >
-            <v-icon left>mdi-account-plus</v-icon>Invite Member to Organization
+            <a-icon left>mdi-account-plus</a-icon>Invite Member to Organization
           </v-btn>
           <a-divider />
         </template>
         <template v-slot:append-outer>
           <v-btn fab color="primary" style="margin-top: -16px">
-            <v-icon>mdi-refresh</v-icon>
+            <a-icon>mdi-refresh</a-icon>
           </v-btn>
         </template>
       </a-select> -->

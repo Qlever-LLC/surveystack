@@ -61,7 +61,6 @@
 </template>
 
 <script>
-import {} from '@vue/composition-api';
 import MyButton from './common/Button.vue';
 
 export default {
