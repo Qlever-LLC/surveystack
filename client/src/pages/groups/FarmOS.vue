@@ -1,7 +1,7 @@
 <template>
   <v-container v-if="farmosEnabled" class="max-800">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
     <a-alert
       v-if="successMessage"
@@ -108,7 +108,7 @@
 
   <v-container v-else>
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
     <v-row v-if="loading">
       <v-col>
@@ -144,7 +144,6 @@ import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDiscon
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
@@ -158,7 +157,6 @@ export default {
     FarmOSDisconnectDialog,
     FarmOSRemoveNoteDialog,
     appDialog,
-    appGroupBreadcrumbs,
   },
   computed: {
     superAdmin() {
