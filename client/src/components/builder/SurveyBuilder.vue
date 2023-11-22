@@ -274,7 +274,6 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
-import AOverlay from '@/components/ui/AOverlay.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -323,7 +322,6 @@ export default {
     appCodeView,
     // ConfirmLeaveDialog,
     appExamplesView,
-    AOverlay,
   },
   props: ['survey', 'editMode', 'freshImport', 'isSaving', 'isUpdating'],
   data() {

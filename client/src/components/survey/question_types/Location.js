@@ -4,7 +4,6 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isOnline } from '@/utils/surveyStack';
-import AOverlay from '@/components/ui/AOverlay.vue';
 
 const requestWakeLock = async () => {
   try {
@@ -42,7 +41,6 @@ export default {
   mixins: [baseQuestionComponent],
   components: {
     AppGps,
-    AOverlay,
   },
   data() {
     return {
