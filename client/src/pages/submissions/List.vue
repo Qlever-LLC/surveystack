@@ -12,7 +12,7 @@
 
     <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
       <template v-slot:title>Confirm deletion</template>
-      <template> Are you sure you want to delete this submission? This can not be undone. </template>
+      <template> Are you sure you want to delete this submission? This can not be undone.</template>
     </app-dialog>
 
     <app-dialog
@@ -150,36 +150,36 @@
         <a-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
         </a-tab>
-        <v-tabs-items v-model="tab" touchless>
-          <v-tab-item>
-            <app-submissions-table-client-csv
-              :submissions="submissions"
-              v-if="submissions"
-              :selected.sync="selected"
-              :archived="filter.showArchived"
-              :dataTableProps="dateTableProps"
-              @onDataTablePropsChanged="onDataTablePropsChanged"
-              @excludeMetaChange="filter.showCsvMeta = $event"
-              :excludeMeta="!filter.showCsvMeta"
-              :loading="loading"
-              style="margin: 3px 2px"
-              :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
-              @showDeleteModal="showDeleteModal = true"
-              @archiveSubmissions="archiveSubmissions(selected, '', false)"
-              @showArchiveModal="showArchiveModal = true"
-              @reassignment="reassignment.showModal = true"
-              @resubmit="resubmit(selected[0])"
-              @showArchived="filter.showArchived = $event"
-            />
-          </v-tab-item>
-          <v-tab-item>
-            <app-submissions-tree :submissions="submissions" />
-          </v-tab-item>
-          <v-tab-item>
-            <app-submissions-code :submissions="submissions" />
-          </v-tab-item>
-        </v-tabs-items>
       </a-tabs>
+      <v-window v-model="tab" touchless>
+        <a-window-item>
+          <app-submissions-table-client-csv
+            :submissions="submissions"
+            v-if="submissions"
+            :selected.sync="selected"
+            :archived="filter.showArchived"
+            :dataTableProps="dateTableProps"
+            @onDataTablePropsChanged="onDataTablePropsChanged"
+            @excludeMetaChange="filter.showCsvMeta = $event"
+            :excludeMeta="!filter.showCsvMeta"
+            :loading="loading"
+            style="margin: 3px 2px"
+            :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
+            @showDeleteModal="showDeleteModal = true"
+            @archiveSubmissions="archiveSubmissions(selected, '', false)"
+            @showArchiveModal="showArchiveModal = true"
+            @reassignment="reassignment.showModal = true"
+            @resubmit="resubmit(selected[0])"
+            @showArchived="filter.showArchived = $event"
+          />
+        </a-window-item>
+        <a-window-item>
+          <app-submissions-tree :submissions="submissions" />
+        </a-window-item>
+        <a-window-item>
+          <app-submissions-code :submissions="submissions" />
+        </a-window-item>
+      </v-window>
 
       <v-row class="my-2">
         <v-col cols="1">
@@ -415,9 +415,17 @@ export default {
         { key: 'project', value: this.filter.project, include: this.filter.project !== '{}' },
         { key: 'skip', value: this.filter.skip, include: this.filter.skip !== 0 },
         { key: 'limit', value: this.filter.limit, include: this.filter.limit !== 0 },
-        { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
+        {
+          key: 'showIrrelevant',
+          value: this.filter.showIrrelevant,
+          include: this.filter.showIrrelevant,
+        },
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
-        { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
+        {
+          key: 'showCsvDataMeta',
+          value: this.filter.showCsvDataMeta,
+          include: this.filter.showCsvDataMeta,
+        },
         { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
         {
           key: 'expandAllMatrices',
@@ -573,12 +581,15 @@ body {
   font-family: Menlo, Consolas, monospace;
   color: #444;
 }
+
 .item {
   cursor: pointer;
 }
+
 .bold {
   font-weight: bold;
 }
+
 ul {
   padding-left: 1em;
   line-height: 1.5em;
