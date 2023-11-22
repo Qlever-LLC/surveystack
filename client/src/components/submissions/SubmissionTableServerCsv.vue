@@ -42,12 +42,8 @@
 <script>
 import papa from 'papaparse';
 import api from '@/services/api.service';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
-  components: {
-    AContainer,
-  },
   data() {
     return {
       excludeMeta: true,

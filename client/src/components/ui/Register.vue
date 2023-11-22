@@ -47,7 +47,6 @@
 
 <script>
 import api from '@/services/api.service';
-import AContainer from '@/components/ui/AContainer.vue';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
@@ -58,9 +57,6 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
-  components: {
-    AContainer,
-  },
   data() {
     return {
       status: '',

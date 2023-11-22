@@ -153,7 +153,6 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
-import AContainer from '@/components/ui/AContainer.vue';
 
 const PAGINATION_LIMIT = 10;
 
@@ -163,7 +162,6 @@ export default {
     ConfirmSubmissionDialog,
     SubmittingDialog,
     ResultDialog,
-    AContainer,
   },
   watch: {
     activeSubmissionId(id) {

@@ -35,12 +35,8 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
-  components: {
-    AContainer,
-  },
   data() {
     return {
       initialized: false,

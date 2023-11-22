@@ -230,7 +230,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 import { timezones } from './timezones';
 
@@ -240,7 +239,6 @@ export default {
     appDialog,
     appFieldCreator,
     appFieldList,
-    AContainer,
   },
   data() {
     return {

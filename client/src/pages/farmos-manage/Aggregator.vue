@@ -234,13 +234,10 @@
 
 <script>
 import _ from 'lodash';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   emits: ['addSuperAdminNote'],
-  components: {
-    AContainer,
-  },
+
   props: {
     groups: Array,
     mappings: Object,

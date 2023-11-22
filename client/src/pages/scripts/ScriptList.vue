@@ -8,12 +8,10 @@
 <script>
 import api from '@/services/api.service';
 import appEntityList from '@/components/ui/EntityList.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appEntityList,
-    AContainer,
   },
   data() {
     return {

@@ -75,12 +75,10 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
 import { pick } from 'lodash';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appFeedback,
-    AContainer,
   },
   data() {
     return {

@@ -408,12 +408,10 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appDialog,
-    AContainer,
   },
   data() {
     return {

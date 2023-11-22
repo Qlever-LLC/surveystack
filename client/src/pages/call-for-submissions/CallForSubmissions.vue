@@ -87,7 +87,6 @@ import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipBut
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import AContainer from '@/components/ui/AContainer.vue';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -104,7 +103,6 @@ export default {
     resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,
-    AContainer,
   },
   data() {
     return {

@@ -8,12 +8,10 @@
 
 <script>
 import AppForgotPassword from '@/components/ui/ForgotPassword.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     AppForgotPassword,
-    AContainer,
   },
 };
 </script>

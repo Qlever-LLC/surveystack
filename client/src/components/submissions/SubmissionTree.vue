@@ -18,13 +18,11 @@
 
 <script>
 import treeItem from '@/components/survey/TreeItem.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   props: ['submissions'],
   components: {
     treeItem,
-    AContainer,
   },
 };
 </script>

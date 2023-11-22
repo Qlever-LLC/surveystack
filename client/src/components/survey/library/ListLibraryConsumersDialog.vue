@@ -31,7 +31,6 @@
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
 import api from '@/services/api.service';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   name: 'list-library-consumers-dialog',

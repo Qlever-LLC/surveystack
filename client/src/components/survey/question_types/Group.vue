@@ -8,12 +8,8 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   mixins: [baseQuestionComponent],
-  components: {
-    AContainer,
-  },
 };
 </script>

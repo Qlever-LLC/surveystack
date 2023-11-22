@@ -134,13 +134,11 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     AuthSelector,
     AppBasicList,
-    AContainer,
   },
   name: 'home',
   data() {

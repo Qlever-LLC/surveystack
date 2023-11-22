@@ -201,7 +201,6 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
-import AContainer from '@/components/ui/AContainer.vue';
 
 const integrations = [
   {
@@ -224,7 +223,6 @@ export default {
     appDialog,
     appConfirmMembershipButton,
     appMemberHyloStatus,
-    AContainer,
   },
   data() {
     return {

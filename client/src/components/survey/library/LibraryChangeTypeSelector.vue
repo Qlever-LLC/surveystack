@@ -47,8 +47,6 @@
 </template>
 
 <script>
-import AContainer from '@/components/ui/AContainer.vue';
-
 export default {
   name: 'library-change-type-selector',
   props: ['value', 'disabled', 'label'],

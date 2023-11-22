@@ -109,12 +109,10 @@
 <script>
 import { computed, ref } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
-    AContainer,
   },
   props: {
     groupInfos: {

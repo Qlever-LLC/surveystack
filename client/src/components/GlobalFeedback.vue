@@ -11,12 +11,7 @@
 </template>
 
 <script>
-import AContainer from '@/components/ui/AContainer.vue';
-
 export default {
-  components: {
-    AContainer,
-  },
   data() {
     return {};
   },

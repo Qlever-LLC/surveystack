@@ -36,7 +36,6 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 
 import codeEditor from '@/components/ui/CodeEditor.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = () => import('@/components/ui/CodeEditor.vue');
@@ -134,7 +133,6 @@ export function render(props, state, setState) {
   components: {
     codeEditor,
     ActiveGroupSelector,
-    AContainer,
   },
   methods: {
     cancel() {

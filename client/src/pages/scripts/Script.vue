@@ -15,7 +15,6 @@
 <script>
 import api from '@/services/api.service';
 import codeEditor from '@/components/ui/CodeEditor.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = () => import('@/components/ui/CodeEditor.vue');
@@ -23,7 +22,6 @@ import AContainer from '@/components/ui/AContainer.vue';
 export default {
   components: {
     codeEditor,
-    AContainer,
   },
   data() {
     return {

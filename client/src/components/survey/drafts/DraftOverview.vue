@@ -120,7 +120,6 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
-import AContainer from '@/components/ui/AContainer.vue';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -147,9 +146,6 @@ function iconify(value, control, relevant) {
 }
 
 export default {
-  components: {
-    AContainer,
-  },
   props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {

@@ -19,12 +19,10 @@
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import appFeedback from '@/components/ui/Feedback.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appFeedback,
-    AContainer,
   },
   data() {
     return {

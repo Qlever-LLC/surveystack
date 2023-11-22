@@ -48,13 +48,9 @@
 </template>
 
 <script>
-import AContainer from '@/components/ui/AContainer.vue';
-
 export default {
   name: 'HelloWorld',
-  components: {
-    AContainer,
-  },
+
   data: () => ({
     ecosystem: [
       {

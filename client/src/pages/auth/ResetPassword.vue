@@ -45,12 +45,10 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
   components: {
     appFeedback,
-    AContainer,
   },
   data() {
     return {

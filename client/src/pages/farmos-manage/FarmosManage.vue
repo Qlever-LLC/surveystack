@@ -49,12 +49,8 @@ import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
-import AContainer from '@/components/ui/AContainer.vue';
 
 export default {
-  components: {
-    AContainer,
-  },
   data() {
     return {
       mappings: null,
