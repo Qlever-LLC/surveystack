@@ -105,14 +105,10 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
-import APagination from '@/components/ui/APagination.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
-  components: {
-    APagination,
-  },
   data() {
     return {
       selectedGroupIds: [],

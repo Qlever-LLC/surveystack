@@ -130,14 +130,12 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import APagination from '@/components/ui/APagination.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
     graphicalView,
-    APagination,
   },
   props: ['survey', 'libraryId'],
   data() {
