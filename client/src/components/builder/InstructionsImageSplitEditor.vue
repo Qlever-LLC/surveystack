@@ -52,7 +52,6 @@ import {
   resourceTypes,
   setResource,
 } from '@/utils/resources';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   data() {
@@ -62,7 +61,6 @@ export default {
     };
   },
   components: {
-    AIcon,
     ResourceSelector,
     ImageResourceEditor,
   },

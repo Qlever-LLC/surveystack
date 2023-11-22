@@ -31,7 +31,7 @@
           </v-card>
         </v-dialog>
 
-        <a-spacer/>
+        <a-spacer />
         <a-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</a-icon>
         <v-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
           <a-icon left>mdi-code-braces</a-icon>Examples
@@ -71,7 +71,6 @@
 <script>
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
-import AIcon from '@/components/ui/AIcon.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -102,7 +101,6 @@ function log(message){};
 
 export default {
   components: {
-    AIcon,
     appCodeView,
   },
   data() {

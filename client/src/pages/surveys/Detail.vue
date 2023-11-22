@@ -90,7 +90,6 @@ import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   props: {
@@ -101,7 +100,6 @@ export default {
     },
   },
   components: {
-    AIcon,
     BtnDropdown,
     MemberSelector,
   },

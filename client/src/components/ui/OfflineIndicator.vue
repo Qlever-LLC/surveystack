@@ -4,10 +4,8 @@
 
 <script>
 import { onMounted, onUnmounted, ref } from '@vue/composition-api';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
-  components: { AIcon },
   setup() {
     const isOnline = ref(window.navigator.onLine);
 

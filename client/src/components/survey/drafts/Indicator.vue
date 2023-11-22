@@ -8,10 +8,7 @@
 </template>
 
 <script>
-import AIcon from '@/components/ui/AIcon.vue';
-
 export default {
-  components: { AIcon },
   props: {
     icon: {
       type: String,

@@ -275,7 +275,6 @@ import Date from '@/components/builder/Date.vue';
 
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { getValueOrNull } from '@/utils/surveyStack';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -299,7 +298,6 @@ const createOptions = (src) => {
 
 export default {
   components: {
-    AIcon,
     AppOntologyListEditor,
     Draggable,
     Ontology,

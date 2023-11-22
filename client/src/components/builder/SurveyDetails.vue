@@ -267,7 +267,6 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -326,7 +325,6 @@ export default {
     },
   },
   components: {
-    AIcon,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,

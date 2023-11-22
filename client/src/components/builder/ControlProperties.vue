@@ -514,11 +514,9 @@ import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     SelectItems,
     SelectItemsEditor,
     OntologyProperties,

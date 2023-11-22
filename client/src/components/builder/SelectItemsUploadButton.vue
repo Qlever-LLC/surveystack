@@ -20,7 +20,6 @@
 <script>
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const columns = ['label', 'value', 'tags'];
 function columnIsValid(name) {
@@ -28,7 +27,6 @@ function columnIsValid(name) {
 }
 
 export default {
-  components: { AIcon },
   props: {
     disabled: {
       type: Boolean,

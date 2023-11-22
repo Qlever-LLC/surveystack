@@ -8,10 +8,8 @@
 <script>
 import { createResourceCsv } from '@/services/csv.service';
 import downloadExternal from '@/utils/downloadExternal';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
-  components: { AIcon },
   props: {
     resourceName: {
       type: String,

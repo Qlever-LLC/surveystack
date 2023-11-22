@@ -39,7 +39,6 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   data() {
@@ -76,7 +75,6 @@ export default {
     },
   },
   components: {
-    AIcon,
     ActiveGroupSelector,
   },
   created() {

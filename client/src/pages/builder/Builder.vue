@@ -117,13 +117,11 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
   components: {
-    AIcon,
     VersionsDialog,
     SurveyBuilder,
     appDialog,

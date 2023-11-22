@@ -130,13 +130,11 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
-    AIcon,
     graphicalView,
   },
   props: ['survey', 'libraryId'],

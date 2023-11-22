@@ -134,11 +134,9 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     AuthSelector,
     AppBasicList,
   },

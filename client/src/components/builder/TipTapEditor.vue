@@ -352,11 +352,9 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,

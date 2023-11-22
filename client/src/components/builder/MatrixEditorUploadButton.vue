@@ -22,10 +22,8 @@
 <script>
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
-  components: { AIcon },
   methods: {
     async handleFileChange({
       target: {

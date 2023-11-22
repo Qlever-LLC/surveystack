@@ -53,11 +53,9 @@
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
 
 import api from '@/services/api.service';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     ActiveGroupSelectorList,
   },
   data() {

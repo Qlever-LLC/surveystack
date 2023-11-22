@@ -68,11 +68,9 @@
 
 <script>
 import draggable from 'vuedraggable';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     draggable,
   },
   props: {

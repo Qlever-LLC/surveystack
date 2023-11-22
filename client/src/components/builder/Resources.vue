@@ -109,11 +109,9 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     appOntologyListEditor,
   },
   props: {

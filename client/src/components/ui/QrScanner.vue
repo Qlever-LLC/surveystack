@@ -47,12 +47,10 @@ import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from '@v
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
-import AIcon from '@/components/ui/AIcon.vue';
 
 QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
-  components: { AIcon },
   emits: ['codeDetected'],
   props: {
     small: {

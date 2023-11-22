@@ -139,7 +139,6 @@ import { isEqual, uniqWith } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   props: {
@@ -160,7 +159,6 @@ export default {
     },
   },
   components: {
-    AIcon,
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
   },

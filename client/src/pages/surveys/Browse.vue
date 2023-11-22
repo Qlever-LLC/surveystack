@@ -105,12 +105,10 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
-  components: { AIcon },
   data() {
     return {
       selectedGroupIds: [],

@@ -59,12 +59,10 @@
 
 <script>
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const group = availableControls.find((c) => c.type === 'group');
 
 export default {
-  components: { AIcon },
   data() {
     return {
       group,

@@ -232,12 +232,10 @@ import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 
 import { timezones } from './timezones';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   props: ['viewModel'],
   components: {
-    AIcon,
     appDialog,
     appFieldCreator,
     appFieldList,

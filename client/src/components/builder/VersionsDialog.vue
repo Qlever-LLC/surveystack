@@ -111,10 +111,9 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
-  components: { AIcon, SurveyDiffDialog },
+  components: { SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

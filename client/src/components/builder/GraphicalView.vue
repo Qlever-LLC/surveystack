@@ -196,12 +196,10 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
-    AIcon,
     draggable,
     ControlCardHeader,
   },

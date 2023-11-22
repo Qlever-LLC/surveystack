@@ -171,12 +171,10 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   mixins: [baseQuestionComponent],
   components: {
-    AIcon,
     appControlLabel,
     appControlMoreInfo,
   },

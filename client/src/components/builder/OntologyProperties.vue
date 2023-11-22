@@ -43,11 +43,9 @@ import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
 import { createResource, removeResource, resourceLocations, resourceTypes, setResource } from '@/utils/resources';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     OntologyListEditor,
     OntologyReferenceEditor,
     ResourceSelector,

@@ -23,10 +23,7 @@
 </template>
 
 <script>
-import AIcon from '@/components/ui/AIcon.vue';
-
 export default {
-  components: { AIcon },
   props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
 };
 </script>

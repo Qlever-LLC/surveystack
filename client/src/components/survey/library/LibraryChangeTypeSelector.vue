@@ -46,8 +46,6 @@
   </v-container>
 </template>
 <script>
-import AIcon from '@/components/ui/AIcon.vue';
-
 export default {
   name: 'library-change-type-selector',
   props: ['value', 'disabled', 'label'],

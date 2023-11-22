@@ -52,10 +52,8 @@
 
 <script>
 import { nameHasValidCharacters, nameHasValidLength, nameIsUnique } from '@/utils/resources';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
-  components: { AIcon },
   data() {
     return {};
   },

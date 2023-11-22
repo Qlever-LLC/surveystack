@@ -156,7 +156,6 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
-import AIcon from '@/components/ui/AIcon.vue';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -266,7 +265,6 @@ const transform = (assets) => {
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
   components: {
-    AIcon,
     appDialog,
     appMatrixCell,
     appMatrixTable,

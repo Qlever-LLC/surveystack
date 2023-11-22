@@ -87,12 +87,10 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
-    AIcon,
     appDialog,
   },
   props: {

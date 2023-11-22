@@ -88,12 +88,10 @@ import draggable from 'vuedraggable';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
-    AIcon,
     draggable,
   },
   data() {

@@ -45,12 +45,10 @@
 import { changeType, diffSurveyVersions, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { get, isNumber, remove, sortBy } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   name: 'survey-diff',
   components: {
-    AIcon,
     SurveyDiffCardTree,
   },
   props: {

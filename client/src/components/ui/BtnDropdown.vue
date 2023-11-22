@@ -11,11 +11,9 @@
 </template>
 
 <script>
-import AIcon from '@/components/ui/AIcon.vue';
-
 export default {
   name: 'BtnDropdown',
-  components: { AIcon },
+
   inheritAttrs: false,
   props: {
     label: {

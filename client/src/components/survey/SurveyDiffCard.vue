@@ -97,12 +97,10 @@
 <script>
 import ControlCardHeader from '../builder/ControlCardHeader';
 import { changeType } from '@/utils/surveyDiff';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   name: 'survey-diff-card',
   components: {
-    AIcon,
     ControlCardHeader,
   },
   data() {

@@ -201,7 +201,6 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const integrations = [
   {
@@ -218,7 +217,6 @@ const integrations = [
 
 export default {
   components: {
-    AIcon,
     appPinnedSurveys,
     appDocLinks,
     appBasicList,

@@ -24,11 +24,9 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
-import AIcon from '@/components/ui/AIcon.vue';
 
 export default {
   components: {
-    AIcon,
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,

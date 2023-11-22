@@ -65,7 +65,6 @@
 
 <script>
 import { debounce, sum } from 'lodash';
-import AIcon from '@/components/ui/AIcon.vue';
 
 function defaultColumnWidth(type) {
   switch (type) {
@@ -78,7 +77,6 @@ function defaultColumnWidth(type) {
   }
 }
 export default {
-  components: { AIcon },
   props: {
     headers: {
       type: Array,

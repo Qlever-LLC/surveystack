@@ -226,7 +226,6 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
-import AIcon from '@/components/ui/AIcon.vue';
 
 const defaultPageSize = 10;
 
@@ -258,7 +257,6 @@ const apiDownloadExpandAllMatricesOptions = [
 
 export default {
   components: {
-    AIcon,
     appSubmissionsFilterBasic,
     appSubmissionsFilterAdvanced,
     appSubmissionsTree,

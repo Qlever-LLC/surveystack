@@ -32,7 +32,6 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFeedback from '@/components/ui/Feedback.vue';
-import AIcon from '@/components/ui/AIcon.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -55,7 +54,6 @@ const integrationTypes = [
 
 export default {
   components: {
-    AIcon,
     appJsonEditor,
     appFeedback,
   },
