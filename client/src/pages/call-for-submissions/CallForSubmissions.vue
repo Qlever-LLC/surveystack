@@ -15,11 +15,11 @@
         <div class="mb-5 d-flex align-center">
           <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
           <span v-if="selectedSurvey" class="mx-2">{{ selectedSurvey.name }}</span>
-          <v-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</v-icon>
+          <a-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</a-icon>
         </div>
 
-        <v-text-field v-model="subject" label="Subject" filled />
-        <v-textarea rows="10" v-model="body" label="Message" filled hide-details />
+        <a-text-field v-model="subject" label="Subject" filled />
+        <a-textarea rows="10" v-model="body" label="Message" filled hide-details />
         <div v-if="showMissingMagicLinkWarning" class="mt-2 error--text">
           Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
         </div>
@@ -64,7 +64,7 @@
             You are about to send an E-mail to {{ selectedMembers.length }}
             {{ selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
           </p>
-          <v-checkbox label="Also send a copy to myself" v-model="copy" />
+          <a-checkbox label="Also send a copy to myself" v-model="copy" />
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
           <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>

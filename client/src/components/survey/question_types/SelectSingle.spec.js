@@ -1,5 +1,6 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import SelectSingle, { getNextValue } from './SelectSingle.vue';
+import { localVue } from '@/../tests/renderWithVuetify';
 
 const selectSource = [
   {
@@ -37,6 +38,7 @@ function getMountOpts(opts = {}) {
       value: options.value,
       index: 'data.multiple_choice_1',
     },
+    localVue,
   };
 }
 

@@ -4,10 +4,10 @@
       <span class="text--secondary overline">{{ this.entity._id }}</span>
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
 
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
+        <a-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
 
-        <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
+        <a-select :items="integrationTypes" v-model="entity.type" label="Type" outlined />
 
         <app-farmos-farm-picker
           v-if="entity.type === 'farmos-farm'"
@@ -24,12 +24,12 @@
 
         <div class="d-flex ma-2">
           <v-btn v-if="editMode" color="error" outlined @click="deleteEntity">
-            <v-icon left>mdi-trash-can-outline</v-icon> Delete
+            <a-icon left>mdi-trash-can-outline</a-icon> Delete
           </v-btn>
           <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
           <v-btn color="primary" @click="submit">Submit</v-btn>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
   </v-container>
 </template>

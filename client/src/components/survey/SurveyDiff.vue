@@ -1,34 +1,34 @@
 <template>
   <v-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
-    <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
+    <a-icon color="success" class="mr-1">mdi-check-bold</a-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </v-card-text>
-  <v-expansion-panels v-else flat multiple v-model="mainPanelState">
-    <v-expansion-panel>
-      <v-expansion-panel-header v-if="showHeader" class="pt-0">
+  <a-expansion-panels v-else flat multiple v-model="mainPanelState">
+    <a-expansion-panel>
+      <a-expansion-panel-title v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
-        <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
+        <a-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
           <template v-slot:activator="{ on, attrs }">
-            <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on"
-              ><v-badge overlap bordered left :color="color" :content="count.toString()">
-                <v-icon :color="color">{{ icon }}</v-icon>
-              </v-badge></span
-            >
+            <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on">
+              <a-badge overlap bordered left :color="color" :content="count.toString()">
+                <a-icon :color="color">{{ icon }}</a-icon>
+              </a-badge>
+            </span>
           </template>
           <span>{{ tooltip }}</span>
-        </v-tooltip>
+        </a-tooltip>
 
-        <v-spacer />
-        <v-switch
+        <a-spacer />
+        <a-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"
           @click.native.stop=""
           v-model="showChangesOnly"
           label="changes only"
-        ></v-switch>
-      </v-expansion-panel-header>
-      <v-expansion-panel-content>
+        />
+      </a-expansion-panel-title>
+      <a-expansion-panel-text>
         <survey-diff-card-tree
           :diffInfoTree="showChangesOnly ? diffInfoTreeWithoutUnchangeds : diffInfoTree"
           :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
@@ -36,14 +36,14 @@
           :version-name-remote-revision-new="versionNameRemoteRevisionNew"
           @discard-changed="discardChanged"
         />
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
+      </a-expansion-panel-text>
+    </a-expansion-panel>
+  </a-expansion-panels>
 </template>
 
 <script>
-import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
-import { isNumber, sortBy, get, remove } from 'lodash';
+import { changeType, diffSurveyVersions, diffThreeSurveyVersions } from '@/utils/surveyDiff';
+import { get, isNumber, remove, sortBy } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
 
 export default {

@@ -1,23 +1,23 @@
 <template>
-  <v-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" :style="{ minWidth: '0px' }">
-    <v-tooltip bottom>
+  <a-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" cssMinWidth0px>
+    <a-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon :color="iconColor" large class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</v-icon>
+        <a-icon :color="iconColor" large class="ml-3" v-bind="attrs" v-on="on">{{ icon }}</a-icon>
       </template>
       <span>{{ typeName }}</span>
-    </v-tooltip>
+    </a-tooltip>
     <v-col class="body-1 text-truncate">
       <div class="font-weight-light grey--text text--darken-2">
         <span class="text-truncate">{{ index }}: {{ dataName }}</span>
-        <v-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" outlined small :color="chipColor">
+        <a-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" outlined small :color="chipColor">
           {{ chipLabel }}
-        </v-chip>
+        </a-chip>
       </div>
       <div class="text-truncate">
         {{ title }}
       </div>
     </v-col>
-  </v-row>
+  </a-row>
 </template>
 <script>
 import { availableControls } from '@/utils/surveyConfig';
