@@ -227,11 +227,11 @@
           </app-draft-component>
         </div>
 
-        <v-overlay :value="enableSaveDraft">
+        <a-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
           </v-card>
-        </v-overlay>
+        </a-overlay>
       </pane>
 
       <!-- Padding pane - DO NOT DELETE -->

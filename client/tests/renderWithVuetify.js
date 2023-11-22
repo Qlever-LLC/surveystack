@@ -48,6 +48,7 @@ import AToolbarItems from '../src/components/ui/elements/AToolbarItems.vue';
 import AProgressCircular from '../src/components/ui/elements/AProgressCircular.vue';
 import AProgressLinear from '../src/components/ui/elements/AProgressLinear.vue';
 import APagination from '../src/components/ui/elements/APagination.vue';
+import AOverlay from '../src/components/ui/elements/AOverlay.vue';
 
 const localVue = createLocalVue();
 localVue.component('a-btn-toggle', ABtnToggle);
@@ -94,6 +95,7 @@ localVue.component('a-toolbar-items', AToolbarItems);
 localVue.component('a-progress-circular', AProgressCircular);
 localVue.component('a-progress-linear', AProgressLinear);
 localVue.component('a-pagination', APagination);
+localVue.component('a-overlay', AOverlay);
 
 localVue.use(Vuex);
 localVue.use(VueRouter);
