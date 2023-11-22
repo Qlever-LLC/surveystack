@@ -82,11 +82,7 @@
 </template>
 
 <script>
-import ANavigationDrawer from '@/components/ui/ANavigationDrawer.vue';
 export default {
-  components: {
-    ANavigationDrawer,
-  },
   props: {
     value: {
       type: Boolean,
