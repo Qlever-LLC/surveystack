@@ -243,13 +243,11 @@ import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
-import ADatePicker from '@/components/ui/ADatePicker.vue';
 
 export default {
   components: {
     appQrScanner,
     MatrixCellSelectionLabel,
-    ADatePicker,
   },
   props: {
     header: {

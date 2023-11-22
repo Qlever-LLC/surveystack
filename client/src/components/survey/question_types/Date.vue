@@ -68,7 +68,6 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import ADatePicker from '@/components/ui/ADatePicker.vue';
 
 export default {
   mixins: [baseQuestionComponent],
