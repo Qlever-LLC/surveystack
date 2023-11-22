@@ -16,14 +16,12 @@ import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
-import AApp from '@/components/ui/AApp.vue';
 
 export default {
   name: 'App',
   components: {
     appGlobalFeedback,
     InstallBanner,
-    AApp,
   },
   created() {
     domainHandler.install(this);

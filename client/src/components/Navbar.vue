@@ -24,16 +24,12 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
-import AAppBar from '@/components/ui/AAppBar.vue';
-import AAppBarNavIcon from '@/components/ui/AAppBarNavIcon.vue';
 
 export default {
   components: {
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,
-    AAppBar,
-    AAppBarNavIcon,
   },
   computed: {
     drawerIsVisible: {

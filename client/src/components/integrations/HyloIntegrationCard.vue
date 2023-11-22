@@ -132,12 +132,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import AAppBar from '@/components/ui/AAppBar.vue';
 
 export default {
-  components: {
-    AAppBar,
-  },
   props: {
     groupId: String,
   },

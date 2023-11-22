@@ -23,8 +23,6 @@
 import DraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
-import AAppBar from '@/components/ui/AAppBar.vue';
-import AAppBarNavIcon from '@/components/ui/AAppBarNavIcon.vue';
 
 import { queueAction } from '@/utils/surveyStack';
 
@@ -33,8 +31,6 @@ export default {
     DraftToolbar,
     NavbarDrawer,
     NavbarUserMenu,
-    AAppBar,
-    AAppBarNavIcon,
   },
   computed: {
     drawerIsVisible: {
