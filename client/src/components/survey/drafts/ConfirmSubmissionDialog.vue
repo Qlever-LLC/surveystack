@@ -1,20 +1,20 @@
 <template>
   <a-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
-    <v-card>
-      <v-card-title> Confirm Submission </v-card-title>
-      <v-card-text v-if="!groupChangeAllowed"> Submit Survey </v-card-text>
-      <v-card-text v-else>
+    <a-card>
+      <a-card-title> Confirm Submission </a-card-title>
+      <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>
+      <a-card-text v-else>
         Submit this draft <strong>{{ id }}</strong> to
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
         <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
           <active-group-selector label="Group" class="d-inline-block" :value="groupId" @input="setGroup" />
           <v-btn icon @click="handleCloseGroupEditor">
-            <v-icon>mdi-close</v-icon>
+            <a-icon>mdi-close</a-icon>
           </v-btn>
         </div>
         <v-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
-          <v-icon small>mdi-pencil</v-icon>
+          <a-icon small>mdi-pencil</a-icon>
         </v-btn>
         <div v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
@@ -26,13 +26,13 @@
         <div v-if="additionalMessage">
           {{ additionalMessage }}
         </div>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
+      </a-card-text>
+      <a-card-actions>
+        <a-spacer />
         <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
         <v-btn text color="primary" @click.stop="handleConfirm"> Submit </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </a-dialog>
 </template>
 

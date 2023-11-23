@@ -1,28 +1,28 @@
 <template>
   <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
-    <v-card class="pa-4">
-      <v-card-title class="headline"> Why is this instance being removed? </v-card-title>
-      <v-card-text>
-        <v-checkbox
+    <a-card class="pa-4">
+      <a-card-title class="headline"> Why is this instance being removed? </a-card-title>
+      <a-card-text>
+        <a-checkbox
           v-model="note"
           label="Farmer is no longer part of the projet"
           value="Farmer is no longer part of the projet"
-        ></v-checkbox>
+        ></a-checkbox>
 
-        <v-checkbox v-model="note" label="Accidentally added" value="Accidentally added"></v-checkbox>
+        <a-checkbox v-model="note" label="Accidentally added" value="Accidentally added" />
 
-        <v-checkbox v-model="note" label="To reduce costs" value="To reduce costs"></v-checkbox>
+        <a-checkbox v-model="note" label="To reduce costs" value="To reduce costs" />
 
         <div class="d-flex mb-4">
-          <v-text-field v-model.trim="noteTF" label="Other" hide-details></v-text-field>
+          <a-text-field v-model.trim="noteTF" label="Other" hide-details />
         </div>
 
         <div class="d-flex justify-space-around">
           <v-btn :disabled="loading" :loading="loading" @click="cancelNote" color="error">Don't Add Note</v-btn>
           <v-btn :disabled="btnDisabled" :loading="loading" @click="addNote" color="primary">Submit</v-btn>
         </div>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </a-dialog>
 </template>
 
@@ -31,10 +31,8 @@ import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   emits: ['addNote', 'cancelNote'],
-  components: {
-    ADialog,
-  },
   props: ['loading', 'value'],
+
   data() {
     return {
       note: [],

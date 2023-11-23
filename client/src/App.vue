@@ -1,13 +1,13 @@
 <template>
-  <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
+  <a-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
     <router-view name="navbar" />
     <div id="app-menu"></div>
-    <v-main>
+    <a-main>
       <app-global-feedback />
       <router-view />
-    </v-main>
+    </a-main>
     <install-banner />
-  </v-app>
+  </a-app>
 </template>
 
 <script>

@@ -1,11 +1,11 @@
 <template>
   <a-dialog :value="value" @input="(v) => $emit('input', v)" hide-overlay persistent width="300">
-    <v-card>
-      <v-card-text class="pa-4">
+    <a-card>
+      <a-card-text class="pa-4">
         <span>{{ message }}</span>
-        <v-progress-linear indeterminate class="mb-0" />
-      </v-card-text>
-    </v-card>
+        <a-progress-linear indeterminate class="mb-0" />
+      </a-card-text>
+    </a-card>
   </a-dialog>
 </template>
 

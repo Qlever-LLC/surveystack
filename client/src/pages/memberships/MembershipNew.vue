@@ -1,12 +1,12 @@
 <template>
-  <v-container>
+  <a-container>
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
-    <v-card class="pa-4 mb-4">
-      <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
+    <a-card class="pa-4 mb-4">
+      <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined />
 
-        <v-text-field
+        <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationEmail"
           label="Email"
@@ -16,7 +16,7 @@
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
-        <v-text-field
+        <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationName"
           outlined
@@ -25,26 +25,26 @@
           <template v-slot:label>
             <div>Name <small>(optional)</small></div>
           </template>
-        </v-text-field>
+        </a-text-field>
 
-        <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
-          <v-radio label="Send an invitation email" value="SEND_NOW">
+        <a-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
+          <a-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Send an invitation email</div>
                 <div class="font-weight-regular caption">An email invitation will be sent right now</div>
               </div>
             </template>
-          </v-radio>
-          <v-radio label="Do not send an invitation email at this moment" value="SEND_LATER">
+          </a-radio>
+          <a-radio label="Do not send an invitation email at this moment" value="SEND_LATER">
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Do not send an invitation email now</div>
                 <div class="font-weight-regular caption">You can send an email invitation later on</div>
               </div>
             </template>
-          </v-radio>
-        </v-radio-group>
+          </a-radio>
+        </a-radio-group>
 
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
@@ -60,49 +60,49 @@
             top
             left
           >
-            <v-list class="pa-0 mx-auto" max-width="280">
+            <a-list class="pa-0 mx-auto" max-width="280">
               <v-list-item-group v-model="invitationMethod">
-                <v-list-item two-line :value="INVITATION_METHODS.INVITE">
+                <a-list-item two-line :value="INVITATION_METHODS.INVITE">
                   <v-list-item-content>
-                    <v-list-item-title>Invite Member</v-list-item-title>
+                    <a-list-item-title>Invite Member</a-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
                       Send them an email to agree to join your group. They only join once they click the "Join" link in
                       the email.
                     </v-list-item-content>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
 
-                <v-list-item three-line :value="INVITATION_METHODS.ADD">
+                <a-list-item three-line :value="INVITATION_METHODS.ADD">
                   <v-list-item-content>
-                    <v-list-item-title>Add Member</v-list-item-title>
+                    <a-list-item-title>Add Member</a-list-item-title>
                     <v-list-item-content class="multiline-subtitle">
                       The member joins immediately. An email is still sent informing them they are joined. This is
                       useful when using "Call for Submissions" to send this member survey requests without waiting for
                       them to check their email.
                     </v-list-item-content>
                   </v-list-item-content>
-                </v-list-item>
+                </a-list-item>
               </v-list-item-group>
-            </v-list>
+            </a-list>
           </btn-dropdown>
         </div>
-      </v-form>
-    </v-card>
+      </a-form>
+    </a-card>
 
     <a-dialog v-model="dialogCreateUser" max-width="500">
-      <v-card class="">
-        <v-card-title> User does not exist yet </v-card-title>
-        <v-card-text class="mt-4">
+      <a-card>
+        <a-card-title> User does not exist yet </a-card-title>
+        <a-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
+        </a-card-text>
+        <a-card-actions>
+          <a-spacer />
           <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
-        </v-card-actions>
-      </v-card>
+        </a-card-actions>
+      </a-card>
     </a-dialog>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -129,7 +129,9 @@ const availableRoles = [
 ];
 
 export default {
-  components: { BtnDropdown, ADialog },
+  components: {
+    BtnDropdown,
+  },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

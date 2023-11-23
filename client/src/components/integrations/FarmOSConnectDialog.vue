@@ -1,12 +1,13 @@
 <template>
   <a-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
-    <v-card class="pa-4">
-      <v-card-title class="headline"> Connect Existing Farm </v-card-title>
-      <v-card-text>
+    <a-card class="pa-4">
+      <a-card-title class="headline"> Connect Existing Farm </a-card-title>
+      <a-card-text>
         Select Farm from this Member's profile to include in this group.
 
         <br />
-        <v-autocomplete
+        <a-select
+          engineering="autocomplete"
           label="Select Farms"
           multiple
           chips
@@ -15,6 +16,8 @@
           :item-text="(i) => `${i.instanceName}`"
           class="mt-4"
           v-model="selectedFarms"
+          prependItemSlot
+          itemSlot
         >
           <template slot="prepend-item">
             <v-btn
@@ -30,35 +33,35 @@
 
           <template v-slot:item="{ item }">
             <v-list-item-content style="width: min-content">
-              <v-list-item-title>{{ item.instanceName }}</v-list-item-title>
-              <v-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
-                >owner(s):</v-list-item-subtitle
+              <a-list-item-title>{{ item.instanceName }}</a-list-item-title>
+              <a-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
+                >owner(s):</a-list-item-subtitle
               >
-              <v-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
+              <a-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
                 {{ owner.name }}({{ owner.email }})
-              </v-list-item-subtitle>
+              </a-list-item-subtitle>
             </v-list-item-content>
           </template>
-        </v-autocomplete>
+        </a-select>
         <v-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
           Connect selected Farms
         </v-btn>
-      </v-card-text>
+      </a-card-text>
 
       <template v-if="allowCreate">
-        <v-card-title class="headline"> Connect New Farm </v-card-title>
+        <a-card-title class="headline"> Connect New Farm </a-card-title>
 
-        <v-card-text>
+        <a-card-text>
           Add a new farm to the member's profile.
           <br />
           <v-btn block class="mt-4" color="primary" @click="$emit('create')">Create Farm</v-btn>
-        </v-card-text>
+        </a-card-text>
       </template>
 
-      <v-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
+      <a-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
         or add existing farmOS instance (currently in development)
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </a-dialog>
 </template>
 
@@ -69,9 +72,6 @@ import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
-  components: {
-    ADialog,
-  },
   props: {
     value: Boolean,
     farmInstances: {

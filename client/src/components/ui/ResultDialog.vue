@@ -1,61 +1,61 @@
 <template>
   <div>
     <a-dialog v-model="show" max-width="350" :persistent="persistent">
-      <v-card>
-        <v-card-title v-if="title" class="headline mb-2">{{ title }}</v-card-title>
+      <a-card>
+        <a-card-title v-if="title" class="headline mb-2">{{ title }}</a-card-title>
 
-        <v-card-text>
+        <a-card-text>
           <div v-for="(item, idx) in messages" :key="idx">
-            <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
-              <v-card-text class="white--text">
+            <a-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
+              <a-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
-              </v-card-text>
+              </a-card-text>
               <template v-if="item.logs && item.logs.length">
-                <v-divider class="mx-4"></v-divider>
+                <a-divider class="mx-4" />
                 <a-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-card-actions>
-                      <v-spacer />
+                    <a-card-actions>
+                      <a-spacer />
                       <v-btn text v-bind="attrs" v-on="on"> Logs </v-btn>
-                    </v-card-actions>
+                    </a-card-actions>
                   </template>
 
-                  <v-card>
-                    <v-card-title>
+                  <a-card>
+                    <a-card-title>
                       Handler logs
-                      <v-spacer></v-spacer>
+                      <a-spacer />
                       <copy-to-clipboard :value="JSON.stringify(item.logs, null, 2)" />
-                    </v-card-title>
+                    </a-card-title>
 
-                    <v-card-text>
-                      <v-expansion-panels accordion>
-                        <v-expansion-panel
+                    <a-card-text>
+                      <a-expansion-panels accordion>
+                        <a-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
                           :key="i"
                           :readonly="!item.data"
                         >
-                          <v-expansion-panel-header>
-                            <template v-slot:actions v-if="!item.data"><v-spacer></v-spacer> </template>
+                          <a-expansion-panel-title>
+                            <template v-slot:actions v-if="!item.data"><a-spacer /> </template>
                             <div class="mr-4 flex-grow-0">
-                              <v-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </v-icon>
-                              <v-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </v-icon>
-                              <v-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </v-icon>
-                              <v-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </v-icon>
-                              <v-icon v-else color="primary"> $expand </v-icon>
+                              <a-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </a-icon>
+                              <a-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </a-icon>
+                              <a-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </a-icon>
+                              <a-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </a-icon>
+                              <a-icon v-else color="primary"> $expand </a-icon>
                             </div>
                             {{ item.message }}
-                          </v-expansion-panel-header>
-                          <v-expansion-panel-content>
+                          </a-expansion-panel-title>
+                          <a-expansion-panel-text>
                             <pre>{{ JSON.stringify(item.data, (k, v) => (v === undefined ? null : v), 2) }}</pre>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
-                    </v-card-text>
-                  </v-card>
+                          </a-expansion-panel-text>
+                        </a-expansion-panel>
+                      </a-expansion-panels>
+                    </a-card-text>
+                  </a-card>
                 </a-dialog>
               </template>
               <!-- <pre v-if="item.logs">{{ JSON.stringify(item.logs, null, 2) }}</pre> -->
-            </v-card>
+            </a-card>
           </div>
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
@@ -67,13 +67,13 @@
               Email Submission
             </v-btn>
           </div>
-        </v-card-text>
+        </a-card-text>
 
-        <v-card-actions>
-          <v-spacer />
+        <a-card-actions>
+          <a-spacer />
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
-        </v-card-actions>
-      </v-card>
+        </a-card-actions>
+      </a-card>
     </a-dialog>
   </div>
 </template>
@@ -83,12 +83,10 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
-import ADialog from '@/components/ui/ADialog.vue';
+import CopyToClipboard from '@/components/submissions/CopyToClipboard.vue';
 
 export default {
-  components: {
-    ADialog,
-  },
+  components: { CopyToClipboard },
   props: {
     value: {
       required: true,

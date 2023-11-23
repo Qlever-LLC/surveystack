@@ -1,20 +1,20 @@
 <template>
   <div>
     <a-dialog v-model="upgradeDialog" width="400">
-      <v-card>
-        <v-card-title> Upgrade </v-card-title>
-        <v-card-text>
+      <a-card>
+        <a-card-title> Upgrade </a-card-title>
+        <a-card-text>
           In order to change your current plan, please contact
           <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
-        </v-card-text>
-      </v-card>
+        </a-card-text>
+      </a-card>
     </a-dialog>
 
-    <v-card v-if="superAdmin" class="px-4 mb-4">
-      <v-card-title>Super Admin</v-card-title>
-      <v-card-text>
+    <a-card v-if="superAdmin" class="px-4 mb-4">
+      <a-card-title>Super Admin</a-card-title>
+      <a-card-text>
         <div class="d-flex flex-grow-1">
-          <v-text-field
+          <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
             outlined
             v-model="seats"
@@ -23,7 +23,8 @@
             @change="$emit('seatsChanged', seats)"
           />
 
-          <v-autocomplete
+          <a-select
+            engineering="autocomplete"
             outlined
             class="flex-grow-1 flex-shrink-0"
             label="Select FarmOS Plans for Group"
@@ -35,12 +36,11 @@
             :item-value="(p) => p._id"
             small-chips
             :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          >
-          </v-autocomplete>
+          />
         </div>
         <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>
@@ -48,41 +48,41 @@
 
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
-          <v-container class="pa-0" fluid>
-            <v-tooltip bottom :disabled="canAddCoffeeShop">
+          <a-container class="pa-0" fluid>
+            <a-tooltip bottom :disabled="canAddCoffeeShop">
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
-                  <v-checkbox
+                  <a-checkbox
                     class="ma-0 pa-0"
                     label="Add this group to the Coffee Shop"
                     v-model="groupInfos.groupHasCoffeeShopAccess"
                     :ripple="false"
                     :disabled="!canAddCoffeeShop"
                     hide-details
-                    @change="$emit('addGrpCoffeeShop', $event)"
+                    @input="$emit('addGrpCoffeeShop', $event)"
                   />
                 </div>
               </template>
               <span>Talk to your parent group administrator to enable this option</span>
-            </v-tooltip>
-            <v-checkbox
+            </a-tooltip>
+            <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               hide-details
               :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-              @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
+              @input="$emit('allowSbGrpsJoinCoffeeShop', $event)"
               :label="`Allow subgroups to join the Coffee Shop`"
             />
-            <v-checkbox
+            <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
-              @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
+              @input="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
             />
-          </v-container>
+          </a-container>
         </div>
       </div>
       <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">
@@ -95,7 +95,7 @@
     </div>
 
     <div class="search">
-      <v-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search"></v-text-field>
+      <a-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search" />
     </div>
     <FarmOSGroupTable
       :members="filteredMembers"
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { ref, computed } from '@vue/composition-api';
+import { computed, ref } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
 import ADialog from '@/components/ui/ADialog.vue';
 

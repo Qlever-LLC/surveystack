@@ -1,21 +1,21 @@
 <template>
-  <v-container class="wrapper">
-    <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
+  <a-container class="wrapper">
+    <a-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
         <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
       </li>
-    </v-banner>
-    <v-card>
-      <v-card-title>{{ survey.name }}</v-card-title>
-      <v-card-subtitle class="grey--text mt-n5">
+    </a-banner>
+    <a-card>
+      <a-card-title>{{ survey.name }}</a-card-title>
+      <a-card-subtitle class="grey--text mt-n5">
         {{ submission._id }}
         <br />
         <strong v-if="submission.meta.dateSubmitted">
           <kbd>{{ submitted }}</kbd> submitted
         </strong>
-      </v-card-subtitle>
-      <v-card-text>
+      </a-card-subtitle>
+      <a-card-text>
         Submitting to: {{ groupPath || '--' }}
         <br />
         <span v-if="submission.meta.submitAsUser">
@@ -26,18 +26,18 @@
         <br />
         Last modified: {{ modified }}
         <br />
-      </v-card-text>
-    </v-card>
-    <v-timeline v-if="controlDisplays" dense class="width: 100%">
+      </a-card-text>
+    </a-card>
+    <a-timeline v-if="controlDisplays" dense>
       <template v-for="(display, idx) in controlDisplays">
-        <v-timeline-item
+        <a-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :key="idx"
           :icon="display.icon"
           :color="display.color"
           :hide-dot="display.hidden"
         >
-          <v-card
+          <a-card
             v-if="display.relevant || !display.hidden"
             @click="$emit('goto', display.path)"
             :color="display.background"
@@ -49,7 +49,7 @@
             class="pb-1"
           >
             <!-- title -->
-            <v-card-title class="d-block mb-0 pb-0">
+            <a-card-title class="d-block mb-0 pb-0">
               <div class="d-flex flex-row align-baseline">
                 <span
                   class="grey--text text--darken-1 mr-1 text-no-wrap"
@@ -63,20 +63,20 @@
                   :required="display.required"
                 />
               </div>
-            </v-card-title>
+            </a-card-title>
 
             <!-- path (not shown) -->
-            <v-card-text v-if="false" class="my-0 py-0">
+            <a-card-text v-if="false" class="my-0 py-0">
               <span
                 class="font-weight-light grey--text text--darken-2 mt-n1"
                 style="font-size: 0.9rem; position: relative"
               >
                 {{ display.path }}
               </span>
-            </v-card-text>
+            </a-card-text>
 
             <!-- value -->
-            <v-card-text v-if="display.value && display.ellipsis" class="pb-7">
+            <a-card-text v-if="display.value && display.ellipsis" class="pb-7">
               <div
                 class="d-flex"
                 style="max-width: 99%; position: absolute"
@@ -86,32 +86,32 @@
                   {{ display.value }}
                 </div>
               </div>
-            </v-card-text>
+            </a-card-text>
 
-            <v-card-text v-else-if="display.value && !display.ellipsis" style="padding-bottom: 2px">
+            <a-card-text v-else-if="display.value && !display.ellipsis" cssPaddingBottom2px>
               <div class="d-flex" @click.stop="display.ellipsis = !display.ellipsis">
                 <div class="overview-value">{{ display.value }}</div>
               </div>
-            </v-card-text>
+            </a-card-text>
 
-            <v-card-text v-else> No answer </v-card-text>
+            <a-card-text v-else> No answer </a-card-text>
 
             <!-- date modified -->
-            <v-card-text class="pt-1 pb-0" v-if="display.modified">
+            <a-card-text class="pt-1 pb-0" v-if="display.modified">
               <div class="d-flex justify-space-between text--secondary" style="font-size: 0.8rem">
                 <div v-if="display.modified">{{ display.modified }}</div>
                 <div v-if="display.modifiedHumanized">{{ display.modifiedHumanized }} ago</div>
               </div>
-            </v-card-text>
-          </v-card>
+            </a-card-text>
+          </a-card>
 
-          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
+          <a-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
-          </v-chip>
-        </v-timeline-item>
+          </a-chip>
+        </a-timeline-item>
       </template>
-    </v-timeline>
-  </v-container>
+    </a-timeline>
+  </a-container>
 </template>
 
 <script>

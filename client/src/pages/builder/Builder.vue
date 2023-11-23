@@ -17,7 +17,7 @@
       @show-version-dialog="versionsDialogIsVisible = true"
     />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </div>
     <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
@@ -45,12 +45,12 @@
     </app-dialog>
 
     <a-dialog v-model="submitting" hide-overlay persistent width="300">
-      <v-card>
-        <v-card-text class="pa-4">
+      <a-card>
+        <a-card-text class="pa-4">
           <span>Submitting Builder</span>
-          <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
-        </v-card-text>
-      </v-card>
+          <a-progress-linear indeterminate class="mb-0" />
+        </a-card-text>
+      </a-card>
     </a-dialog>
 
     <result-dialog
@@ -79,29 +79,29 @@
       @reload-survey="onReloadSurvey"
     />
 
-    <v-snackbar v-model="showSnackbar" :timeout="4000">
+    <a-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
       <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
-    </v-snackbar>
+    </a-snackbar>
   </div>
   <div
     v-else
     class="d-flex justify-center align-center overlay-bg"
     style="background: rgba(0, 0, 0, 0.45); height: 100%"
   >
-    <v-card max-width="500">
-      <v-card-title>
-        <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
+    <a-card max-width="500">
+      <a-card-title>
+        <a-icon class="mr-2 error--text">mdi-close-octagon</a-icon>
         Unsupported browser
-      </v-card-title>
-      <!-- <v-alert type="error">
+      </a-card-title>
+      <!-- <a-alert type="error">
         Unsupported browser
-      </v-alert> -->
-      <v-card-text>
+      </a-alert> -->
+      <a-card-text>
         Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
         browser.
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </div>
 </template>
 

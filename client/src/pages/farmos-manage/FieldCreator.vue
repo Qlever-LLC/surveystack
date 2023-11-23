@@ -1,36 +1,36 @@
 <template>
-  <v-row class="text-center">
+  <a-row class="text-center">
     <template v-if="state === states.IDLE">
-      <v-col cols="12">
+      <a-col cols="12">
         <app-kml-importer v-model="importedField" @change="onImport"></app-kml-importer>
-      </v-col>
-      <v-col cols="12"> OR </v-col>
-      <v-col cols="12">
+      </a-col>
+      <a-col cols="12"> OR </a-col>
+      <a-col cols="12">
         <v-btn outlined color="primary" @click="draw">Draw new Field</v-btn>
-      </v-col>
+      </a-col>
     </template>
 
     <template v-if="state === states.EDITING">
-      <v-col cols="12">
+      <a-col cols="12">
         <app-farm-area
           ref="farm-area"
           :center="center"
           :value="value"
           @input="(val) => updateArea(val)"
         ></app-farm-area>
-      </v-col>
+      </a-col>
 
-      <v-col cols="6">
+      <a-col cols="6">
         <v-btn color="primary" @click="$emit('done')" :loading="loading">Add Field to FarmOS Instance</v-btn>
-      </v-col>
+      </a-col>
 
-      <v-col cols="6">
+      <a-col cols="6">
         <v-btn color="primary" outlined @click="$emit('cancel')" :loading="loading">Cancel</v-btn>
-      </v-col>
+      </a-col>
     </template>
 
     <app-dialog labelConfirm="OK" class="primary--text mx-4" v-model="dialog" width="400"> Dialog Text </app-dialog>
-  </v-row>
+  </a-row>
 </template>
 <script>
 import appDialog from '@/components/ui/Dialog.vue';

@@ -1,11 +1,11 @@
 <template>
-  <v-card v-if="!signInLinkSent" class="pa-6 card-width">
+  <a-card v-if="!signInLinkSent" class="pa-6 card-width">
     <div class="d-sm-flex justify-center">
       <div class="pl-sm-5 pr-sm-10 py-6">
         <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
         <h1 class="heading--text" v-else>Welcome Back!</h1>
-        <v-form>
-          <v-text-field
+        <a-form>
+          <a-text-field
             label="E-Mail"
             type="text"
             class="form-control"
@@ -16,7 +16,7 @@
           <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
             We'll send you an email to sign you in - no password needed! <b>Click send</b> then <b>check your email</b>.
           </div>
-          <v-text-field
+          <a-text-field
             v-if="usePassword"
             label="Password"
             :type="passwordInputType"
@@ -51,7 +51,7 @@
               usePassword ? 'Login' : 'Send Link'
             }}</v-btn>
           </div>
-        </v-form>
+        </a-form>
         <div class="text-center text-muted mt-5">
           <v-btn
             text
@@ -83,13 +83,13 @@
       </template>
     </div>
 
-    <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
-  </v-card>
-  <v-alert
+    <a-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</a-alert>
+  </a-card>
+  <a-alert
     v-else
     icon="mdi-email-fast"
     prominent
-    colored-border
+    border-color
     color="success"
     border="left"
     elevation="2"
@@ -102,7 +102,7 @@
     <div class="text-right text-muted mt-5">
       <v-btn text small @click="signInLinkSent = false"> Back to login </v-btn>
     </div>
-  </v-alert>
+  </a-alert>
 </template>
 
 <script>
@@ -133,6 +133,7 @@ export default {
       default: true,
     },
   },
+
   data() {
     return {
       status: '',

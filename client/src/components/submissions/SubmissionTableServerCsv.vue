@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
+  <a-container fluid>
     <h1>Andreas' Sandbox</h1>
-    <v-card class="pt-2">
+    <a-card class="pt-2">
       <v-data-table
         :headers="headers"
         :items="items"
@@ -11,32 +11,32 @@
         :mobile-breakpoint="0"
       >
         <template v-slot:top>
-          <v-toolbar flat>
-            <v-row>
-              <v-col>
-                <v-toolbar-title>Simple CSV</v-toolbar-title>
-              </v-col>
-              <v-col>
-                <v-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
-              </v-col>
-              <v-col :cols="2">
-                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
-              </v-col>
-            </v-row>
-          </v-toolbar>
+          <a-toolbar flat>
+            <a-row>
+              <a-col>
+                <a-toolbar-title>Simple CSV</a-toolbar-title>
+              </a-col>
+              <a-col>
+                <a-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
+              </a-col>
+              <a-col :cols="2">
+                <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
+              </a-col>
+            </a-row>
+          </a-toolbar>
         </template>
         <template v-slot:header="{ props: { headers } }">
           <thead>
             <tr>
               <th v-for="(header, i) in headers" :key="header.text">
-                <v-text-field v-if="i > 0" @input="(v) => hello(v, header.text)" />
+                <a-text-field v-if="i > 0" @input="(v) => hello(v, header.text)" />
               </th>
             </tr>
           </thead>
         </template>
       </v-data-table>
-    </v-card>
-  </v-container>
+    </a-card>
+  </a-container>
 </template>
 
 <script>
@@ -116,10 +116,4 @@ export default {
 .v-data-table >>> td {
   font-family: monospace;
 }
-
-/*
-.v-data-table >>> .v-label {
-  font-size: 12px;
-}
-*/
 </style>

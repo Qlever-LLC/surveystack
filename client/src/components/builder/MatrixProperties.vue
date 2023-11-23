@@ -1,7 +1,7 @@
 <template>
   <a-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         v-on="on"
         v-bind="attrs"
         ref="anchorRef"

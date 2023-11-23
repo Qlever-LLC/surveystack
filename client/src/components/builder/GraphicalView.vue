@@ -17,7 +17,8 @@
     draggable=".draggable-item"
     :group="draggableGroup"
   >
-    <v-card
+    <!-- TODO in Vue3 remove .native -->
+    <a-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
       :class="[
@@ -27,7 +28,7 @@
         { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
       ]"
       :key="el.id || el._id"
-      @mousedown.stop.left="$emit('control-selected', el)"
+      @mousedown.native.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
       :data-control-contains-page="descendantHasPage(el)"
@@ -49,16 +50,16 @@
         </div>
         <div class="mb-2 context-actions">
           <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
-            <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
+            <a-icon color="grey lighten-1">mdi-content-copy</a-icon>
           </v-btn>
           <v-btn
             icon
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             @mousedown.stop="toggleLibrary(el.libraryId)"
           >
-            <v-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</v-icon>
+            <a-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</a-icon>
           </v-btn>
-          <v-chip
+          <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
@@ -78,23 +79,23 @@
                 : 'newest available version'
             "
           >
-            <v-icon
+            <a-icon
               v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
               @click.stop="$emit('update-library-control', el)"
               left
             >
               mdi-refresh
-            </v-icon>
+            </a-icon>
             Version {{ el.libraryVersion }}
-          </v-chip>
+          </a-chip>
           <v-btn
             icon
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
             @click.stop="() => showDeleteModal(idx)"
           >
-            <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
+            <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
               mdi-delete
-            </v-icon>
+            </a-icon>
           </v-btn>
           <v-btn
             text
@@ -162,30 +163,30 @@
         :data-control-contains-page="descendantHasPage(el)"
         :index="createIndex(index, idx + 1)"
       />
-    </v-card>
+    </a-card>
 
     <a-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
-      <v-card class="">
-        <v-card-title> Delete Question </v-card-title>
-        <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
-        <v-card-actions>
-          <v-spacer />
+      <a-card>
+        <a-card-title> Delete Question </a-card-title>
+        <a-card-text class="mt-4"> Are you sure you want to remove this question? </a-card-text>
+        <a-card-actions>
+          <a-spacer />
           <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
-        </v-card-actions>
-      </v-card>
+        </a-card-actions>
+      </a-card>
     </a-dialog>
   </draggable>
   <div v-else>
-    <v-card class="text--secondary">
-      <v-card-title>Empty survey</v-card-title>
-      <v-card-text v-if="!readOnly">
+    <a-card class="text--secondary">
+      <a-card-title>Empty survey</a-card-title>
+      <a-card-text v-if="!readOnly">
         <div class="text--primary">
           You can add questions by clicking the <strong>plus icon</strong>
           below.
         </div>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </div>
 </template>
 

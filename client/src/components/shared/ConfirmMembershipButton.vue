@@ -4,18 +4,18 @@
       <v-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </v-btn>
     </template>
 
-    <v-card>
-      <v-card-title> Confirm Membership </v-card-title>
-      <v-card-text>
+    <a-card>
+      <a-card-title> Confirm Membership </a-card-title>
+      <a-card-text>
         This will immediately activate the membership of the user "{{ email }}". They will receive an email with login
         instructions. You'll be able to send "Call for Submission" links to this user.
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
+      </a-card-text>
+      <a-card-actions>
+        <a-spacer />
         <v-btn text @click="isVisible = false"> Cancel </v-btn>
         <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </a-dialog>
 </template>
 

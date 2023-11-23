@@ -1,12 +1,12 @@
 <template>
   <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
-    <v-card>
-      <v-card-title>
+    <a-card>
+      <a-card-title>
         Compare
-        <v-chip dark small color="green" class="mx-2"> Version {{ revisionA.version }} </v-chip>
+        <a-chip dark small color="green" class="mx-2"> Version {{ revisionA.version }} </a-chip>
         to
-        <v-chip dark small color="green" class="mx-2"> Version {{ revisionB.version }} </v-chip>
-      </v-card-title>
+        <a-chip dark small color="green" class="mx-2"> Version {{ revisionB.version }} </a-chip>
+      </a-card-title>
       <survey-diff
         :controls-remote-revision-old="revisionA.controls"
         :controls-remote-revision-new="revisionB.controls"
@@ -16,10 +16,10 @@
         :showHeader="true"
         :showNoChangesText="false"
       ></survey-diff>
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </a-dialog>
 </template>
 
@@ -28,7 +28,9 @@ import SurveyDiff from '@/components/survey/SurveyDiff';
 import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
-  components: { SurveyDiff, ADialog },
+  components: {
+    SurveyDiff,
+  },
   props: {
     value: {
       required: true,
