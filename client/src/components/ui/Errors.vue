@@ -16,12 +16,7 @@
 </template>
 
 <script>
-import ADialog from '@/components/ui/ADialog.vue';
-
 export default {
-  components: {
-    ADialog,
-  },
   props: {
     value: Boolean,
     errors: Array,

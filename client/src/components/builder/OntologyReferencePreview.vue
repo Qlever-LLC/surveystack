@@ -31,12 +31,10 @@ import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadB
 
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default defineComponent({
   components: {
     SelectItemsDownloadButton,
-    ADialog,
   },
   props: {
     value: {

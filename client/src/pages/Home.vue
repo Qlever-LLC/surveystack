@@ -134,13 +134,11 @@
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     AuthSelector,
     AppBasicList,
-    ADialog,
   },
   name: 'home',
   data() {

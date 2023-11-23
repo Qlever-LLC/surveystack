@@ -22,12 +22,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
-  components: {
-    ADialog,
-  },
   data() {
     return {
       isVisible: false,

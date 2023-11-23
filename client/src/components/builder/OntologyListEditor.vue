@@ -139,7 +139,6 @@ import { isEqual, uniqWith } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   props: {
@@ -162,7 +161,6 @@ export default {
   components: {
     SelectItemsDownloadButton,
     SelectItemsUploadButton,
-    ADialog,
   },
   data() {
     return {

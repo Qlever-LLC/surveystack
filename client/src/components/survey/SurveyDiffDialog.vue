@@ -25,7 +25,6 @@
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {

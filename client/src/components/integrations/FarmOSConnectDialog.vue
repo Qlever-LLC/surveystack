@@ -68,7 +68,6 @@
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],

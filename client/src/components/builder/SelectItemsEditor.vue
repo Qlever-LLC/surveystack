@@ -68,12 +68,10 @@
 
 <script>
 import draggable from 'vuedraggable';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     draggable,
-    ADialog,
   },
   props: {
     value: {

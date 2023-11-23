@@ -42,7 +42,6 @@
 
 <script>
 import './css/button.css';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],

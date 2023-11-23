@@ -56,6 +56,7 @@ import ACardText from '../src/components/ui/elements/ACardText.vue';
 import ACardTitle from '../src/components/ui/elements/ACardTitle.vue';
 import ACol from '../src/components/ui/elements/ACol.vue';
 import AContainer from '../src/components/ui/elements/AContainer.vue';
+import ADialog from '../src/components/ui/elements/ADialog.vue';
 
 const localVue = createLocalVue();
 localVue.component('a-btn-toggle', ABtnToggle);
@@ -110,6 +111,7 @@ localVue.component('a-card-text', ACardText);
 localVue.component('a-card-title', ACardTitle);
 localVue.component('a-col', ACol);
 localVue.component('a-container', AContainer);
+localVue.component('a-dialog', ADialog);
 
 localVue.use(Vuex);
 localVue.use(VueRouter);

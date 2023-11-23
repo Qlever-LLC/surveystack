@@ -109,12 +109,10 @@
 <script>
 import { computed, ref } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
-    ADialog,
   },
   props: {
     groupInfos: {

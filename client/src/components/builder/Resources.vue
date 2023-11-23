@@ -109,12 +109,10 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     appOntologyListEditor,
-    ADialog,
   },
   props: {
     resources: {

@@ -117,7 +117,6 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
-import ADialog from '@/components/ui/ADialog.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -127,7 +126,6 @@ export default {
     SurveyBuilder,
     appDialog,
     resultDialog,
-    ADialog,
   },
   mixins: [resultMixin],
   data() {

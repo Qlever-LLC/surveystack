@@ -65,7 +65,6 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {

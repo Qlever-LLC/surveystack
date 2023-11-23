@@ -32,12 +32,10 @@
 
 <script>
 import MatrixEditor from '@/components/builder/MatrixEditor.vue';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   components: {
     MatrixEditor,
-    ADialog,
   },
   props: {
     value: {

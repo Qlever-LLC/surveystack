@@ -52,7 +52,6 @@ import {
   resourceTypes,
   setResource,
 } from '@/utils/resources';
-import ADialog from '@/components/ui/ADialog.vue';
 
 export default {
   data() {
@@ -64,7 +63,6 @@ export default {
   components: {
     ResourceSelector,
     ImageResourceEditor,
-    ADialog,
   },
   props: {
     value: {

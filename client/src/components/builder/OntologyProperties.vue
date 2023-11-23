@@ -49,7 +49,6 @@ export default {
     OntologyListEditor,
     OntologyReferenceEditor,
     ResourceSelector,
-    ADialog,
   },
   data() {
     return {
