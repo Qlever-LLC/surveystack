@@ -68,7 +68,7 @@
                   <a-icon>mdi-code-tags</a-icon>
                 </a-btn> -->
 
-              <!-- <v-select
+              <!-- <a-select
                   :items="getParagraphStyles(isActive, commands)"
                 >
                   <template v-slot:selection="{ item, index }">
@@ -83,7 +83,7 @@
                     </a-btn>
                   </template>
 
-                </v-select> -->
+                </a-select> -->
 
               <a-btn
                 icon

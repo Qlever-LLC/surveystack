@@ -155,7 +155,7 @@
         </a-list-item>
       </template>
     </a-select>
-    <a-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading !</a-banner>
+    <a-banner v-else-if="isLoading"> <a-icon class="mr-2 mdi-spin">mdi-loading</a-icon>Loading !</a-banner>
     <a-banner v-else color="red lighten-2" dark>
       <a-icon class="mr-2">mdi-alert</a-icon>Invalid select options, please update Survey Definition
     </a-banner>

@@ -61,7 +61,7 @@
               <a-icon>mdi-dots-vertical</a-icon>
             </a-btn>
           </template>
-          <v-list>
+          <a-list>
             <a-list-item class="d-flex align-center">
               <a-list-item-title>
                 <a-input hide-details>
@@ -130,7 +130,7 @@
                 </a-btn>
               </a-list-item-title>
             </a-list-item>
-          </v-list>
+          </a-list>
         </a-menu>
         <edit-library-dialog
           v-if="editLibraryDialogIsVisible"

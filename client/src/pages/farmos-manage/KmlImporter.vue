@@ -4,7 +4,7 @@
       KML Importer
       <a-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-icon color="primary" dark v-bind="attrs" v-on="on">mdi-information</v-icon>
+          <a-icon color="primary" dark v-bind="attrs" v-on="on">mdi-information</a-icon>
         </template>
         <span>
           Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz first.

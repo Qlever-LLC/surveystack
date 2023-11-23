@@ -76,9 +76,9 @@
     </div>
   </a-container>
   <a-container fill-height v-else>
-    <v-layout column justify-center align-center>
+    <a-layout column justify-center align-center>
       <a-progress-circular :size="50" color="primary" indeterminate />
-    </v-layout>
+    </a-layout>
   </a-container>
 </template>
 

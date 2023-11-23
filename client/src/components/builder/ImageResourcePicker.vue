@@ -1,7 +1,7 @@
 <template>
   <div class="image-resource-picker">
     Image resource picker
-    <v-list>
+    <a-list>
       <a-list-item v-for="image in value" :key="image.src">
         <v-list-item-avatar>
           <a-icon>mdi-image</a-icon>
@@ -13,7 +13,7 @@
           <a-icon>mdi-delete</a-icon>
         </a-list-item-action>
       </a-list-item>
-    </v-list>
+    </a-list>
     <a-btn class="ml-auto mr-0 d-block mb-3" @click="handleAddImage"> +&nbsp; Add Image </a-btn>
   </div>
 </template>

@@ -12,7 +12,7 @@
     </a-card>
     <a-card v-if="memberships.length > 0" class="mt-3">
       <a-card-title>Memberships</a-card-title>
-      <v-list>
+      <a-list>
         <a-list-item
           v-for="membership in memberships"
           :key="membership._id"
@@ -25,7 +25,7 @@
             <a-list-item-subtitle class="text--secondary">{{ membership.role }}</a-list-item-subtitle>
           </v-list-item-content>
         </a-list-item>
-      </v-list>
+      </a-list>
     </a-card>
   </a-container>
 </template>

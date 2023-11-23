@@ -40,7 +40,7 @@
 
     <!-- Content with questions -->
     <div class="draft-content" v-else>
-      <v-fab-transition>
+      <a-fab-transition>
         <a-btn
           v-show="overflowing"
           color="primary"
@@ -56,7 +56,7 @@
         >
           <a-icon>mdi-arrow-down</a-icon>
         </a-btn>
-      </v-fab-transition>
+      </a-fab-transition>
       <app-control class="pb-1" :path="path" :control="control" :forceMobile="forceMobile" :isInBuilder="builder" />
     </div>
 

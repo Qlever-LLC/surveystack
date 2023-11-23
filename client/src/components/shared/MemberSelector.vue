@@ -11,7 +11,7 @@
           @input="setGroup"
         />
         <a-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
-        <v-list>
+        <a-list>
           <a-list-item
             v-for="member in filteredMembers"
             :key="member._id"
@@ -35,7 +35,7 @@
               <a-list-item-subtitle>{{ member.user.email }}</a-list-item-subtitle>
             </v-list-item-content>
           </a-list-item>
-        </v-list>
+        </a-list>
       </a-card-text>
     </a-card>
   </a-dialog>

@@ -3,7 +3,7 @@
     <a-btn v-bind="$attrs" @click="$emit('click', $event)" class="main-button"> {{ label }} </a-btn>
     <a-menu v-if="showDropDown" v-bind="$attrs" :offset-y="true" class="pa-0 ma-0 right">
       <template v-slot:activator="{ on, attrs }">
-        <a-btn v-bind="$attrs" v-on="on" class="dropdown-button"><v-icon>mdi-chevron-down</v-icon></a-btn>
+        <a-btn v-bind="$attrs" v-on="on" class="dropdown-button"><a-icon>mdi-chevron-down</a-icon></a-btn>
       </template>
       <slot></slot>
     </a-menu>

@@ -11,7 +11,7 @@
     </a-card-title>
     <a-card-text>
       <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
-      <v-list
+      <a-list
         v-if="entities.length > 0"
         :style="{
           'max-height': maxHeight || 'initial',
@@ -29,7 +29,7 @@
           </a-list-item>
           <a-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
         </div>
-      </v-list>
+      </a-list>
 
       <div v-else class="grey--text">No {{ title }} yet</div>
     </a-card-text>

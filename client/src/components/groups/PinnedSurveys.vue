@@ -64,7 +64,7 @@
         <a-card-title>Search surveys</a-card-title>
         <a-card-text>
           <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
-          <v-list>
+          <a-list>
             <a-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
               <v-list-item-content>
                 <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
@@ -73,7 +73,7 @@
                 </a-list-item-subtitle>
               </v-list-item-content>
             </a-list-item>
-          </v-list>
+          </a-list>
         </a-card-text>
       </a-card>
     </a-dialog>

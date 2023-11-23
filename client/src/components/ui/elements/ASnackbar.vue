@@ -6,7 +6,9 @@
     :centered="centered"
     :fixed="fixed"
     :color="color"
+    :light="light"
     :timeout="timeout"
+    :top="top"
     :value="value"
   >
     <template v-slot:action="{ attrs }">
@@ -26,7 +28,9 @@ export default {
     bottom: { type: Boolean, required: false }, //location
     centered: { type: Boolean, required: false }, //location
     fixed: { type: Boolean, required: false }, //position
+    top: { type: Boolean, required: false }, //position
     //vuetify props
+    light: { type: Boolean, required: false },
     color: { type: String, required: false },
     timeout: { type: [Number, String], required: false },
     value: { type: undefined, required: false },

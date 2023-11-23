@@ -9,10 +9,10 @@
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
-    <v-snackbar top light v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1">
+    <a-snackbar top light v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1">
       Keep this window open while tracing your area or field. If you switch applications you may lose the area you have
       traced.
-      <v-btn
+      <a-btn
         v-bind="$attrs"
         @click="keepOpenNotificationIsVisible = false"
         rounded
@@ -21,8 +21,8 @@
         class="d-block ml-auto"
       >
         Dismiss
-      </v-btn>
-    </v-snackbar>
+      </a-btn>
+    </a-snackbar>
     <div
       :id="mapId"
       :class="{
@@ -39,8 +39,8 @@
     />
 
     <div class="fields-table mt-6 d-none">
-      <v-btn class="ml-auto" color="primary" @click="handleAddField">Add field</v-btn>
-      <v-simple-table class="mt-2" height="300" fixed-header dense>
+      <a-btn class="ml-auto" color="primary" @click="handleAddField">Add field</a-btn>
+      <a-table class="mt-2" height="300" fixed-header dense>
         <thead>
           <tr>
             <th class="text-left">Visible</th>
@@ -52,16 +52,16 @@
         </thead>
         <tbody>
           <tr v-for="(field, i) in fields" :key="i">
-            <td><v-switch v-model="fields[i].visible" class="my-3 pt-0" hide-details></v-switch></td>
+            <td><a-switch v-model="fields[i].visible" class="my-3 pt-0" hide-details /></td>
             <td><img v-if="field.preview" height="48" :src="field.preview" /></td>
             <td><input v-model="fields[i].name" placeholder="Enter field name ..." /></td>
             <td><input v-model="fields[i].type" placeholder="Enter field type ..." /></td>
             <td align="right">
-              <v-btn icon outlined small><v-icon>mdi-delete</v-icon></v-btn>
+              <a-btn icon outlined small><a-icon>mdi-delete</a-icon></a-btn>
             </td>
           </tr>
         </tbody>
-      </v-simple-table>
+      </a-table>
     </div>
 
     <app-control-more-info :value="control.moreInfo" />

@@ -37,7 +37,7 @@
             Add resource
           </a-btn>
         </template>
-        <v-list>
+        <a-list>
           <a-list-item class="d-flex align-center">
             <a-list-item-title>
               <a-btn text @click="createOntology">
@@ -65,12 +65,12 @@
               </a-input>
             </a-list-item-title>
           </a-list-item>
-        </v-list>
+        </a-list>
       </a-menu>
     </div>
     <a-select :items="availableFilters" v-model="filter" label="Filter" />
     <a-text-field v-model="search" label="Search" autocomplete="off" />
-    <v-list>
+    <a-list>
       <template v-if="filteredResources.length > 0">
         <a-list-item
           v-for="resource in filteredResources"
@@ -99,7 +99,7 @@
           <a-list-item-title class="text--secondary">No resources found</a-list-item-title>
         </v-list-item-content>
       </a-list-item>
-    </v-list>
+    </a-list>
   </div>
 </template>
 

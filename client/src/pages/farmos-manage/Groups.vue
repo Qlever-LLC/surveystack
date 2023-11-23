@@ -20,8 +20,8 @@
       :items="groups"
     />
 
-    <!-- <v-row class="align-baseline">
-      <v-col>
+    <!-- <a-row class="align-baseline">
+      <a-col>
         <a-select
           engineering="autocomplete"
           v-if="!loading && !!groups"
@@ -31,11 +31,11 @@
           v-model="selectedPlan"
           :items="plans"
         />
-      </v-col>
-      <v-col>
+      </a-col>
+      <a-col>
         <a-btn color="primary" @click="$emit('save-plan', selectedPlan)">Save Plan</a-btn>
-      </v-col>
-    </v-row> -->
+      </a-col>
+    </a-row> -->
 
     <div v-if="!loading && !!selectedGroup" class="px-3">{{ amountMappedInstances }}</div>
 

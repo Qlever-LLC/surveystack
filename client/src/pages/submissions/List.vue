@@ -148,7 +148,7 @@
           {{ view.tab }}
         </a-tab>
       </a-tabs>
-      <v-window v-model="tab" touchless>
+      <a-window v-model="tab" touchless>
         <a-window-item>
           <app-submissions-table-client-csv
             :submissions="submissions"
@@ -176,7 +176,7 @@
         <a-window-item>
           <app-submissions-code :submissions="submissions" />
         </a-window-item>
-      </v-window>
+      </a-window>
 
       <a-row class="my-2">
         <a-col cols="1">

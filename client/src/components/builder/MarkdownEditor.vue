@@ -23,10 +23,10 @@
 
       <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
-          <v-btn-toggle v-model="viewMode" mandatory dense>
-            <v-btn>Edit</v-btn>
-            <v-btn>Preview</v-btn>
-          </v-btn-toggle>
+          <a-btn-toggle v-model="viewMode" mandatory dense>
+            <a-btn>Edit</a-btn>
+            <a-btn>Preview</a-btn>
+          </a-btn-toggle>
         </div>
 
         <div class="d-flex align-stretch">
@@ -48,7 +48,7 @@
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
               <a-progress-circular v-if="isLoading" indeterminate color="primary" />
-              <v-icon v-else color="gray darken-4">mdi-paperclip</v-icon>
+              <a-icon v-else color="gray darken-4">mdi-paperclip</a-icon>
             </div>
           </div>
 
@@ -65,7 +65,7 @@
               </label>
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
-            <v-list class="resource-panel">
+            <a-list class="resource-panel">
               <a-list-subheader class="px-2 py-0" cssSticky>Click to insert </a-list-subheader>
 
               <a-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
@@ -73,15 +73,15 @@
                   <a-list-item-title>{{ item.label }}</a-list-item-title>
                 </v-list-item-content>
               </a-list-item>
-            </v-list>
+            </a-list>
           </div>
         </div>
       </a-card-text>
 
       <a-card-actions>
         <a-spacer />
-        <v-btn text @click="close">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <a-btn text @click="close">Cancel</a-btn>
+        <a-btn color="primary" @click="save">Save</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>
@@ -220,7 +220,7 @@ export default {
       await this.createFileResource(file);
     },
 
-    /*<v-text-field
+    /*<a-text-field
       label="Image URL"
       hide-details
       clearable
@@ -228,7 +228,7 @@ export default {
       v-model="imageUrl"
       @click:clear="onClearImageUrl"
     />
-    <v-btn dense @click="importImageFromUrl">insert</v-btn>
+    <a-btn dense @click="importImageFromUrl">insert</a-btn>
 
     secureUrl(url) {
       const indexInterrogation = url.indexOf('?');

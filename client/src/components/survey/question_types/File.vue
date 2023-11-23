@@ -76,7 +76,7 @@
       </div>
     </div>
 
-    <v-expand-transition>
+    <a-expand-transition>
       <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0">
         <a-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
@@ -120,7 +120,7 @@
           </a-list-item-action>
         </a-list-item>
       </a-list>
-    </v-expand-transition>
+    </a-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>

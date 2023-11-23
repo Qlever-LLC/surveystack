@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
-import { createLocalVue } from '@vue/test-utils';
 import GeoJSON, { addBaseLayer, addDrawingLayer, getNextValue } from './GeoJSON.vue';
 
 import ControlProperties from '../../builder/ControlProperties.vue';
@@ -187,10 +186,8 @@ describe('GeoJSON Question', () => {
     let getByText;
     let container;
     let updateProps;
-    const localVue = createLocalVue();
     beforeEach(() => {
       const renderOptions = {
-        localVue,
         propsData: {
           control: getControlProps(),
           value: null,
@@ -272,7 +269,7 @@ describe('GeoJSON Question', () => {
       );
     });
 
-    it('does not activate geolocate control and geocoder is not expanded when value exists', () => {
+    it('does not activate geolocate control and geocoder is not expanded when value exists', async () => {
       const renderOptions = {
         propsData: {
           control: getControlProps(),
@@ -284,6 +281,7 @@ describe('GeoJSON Question', () => {
 
       const { getByTitle, getByPlaceholderText } = renderWithVuetify(GeoJSON, renderOptions);
 
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(false);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
       expect(getByPlaceholderText('Search for address...').parentElement.classList.contains('gcd-gl-expanded')).toBe(

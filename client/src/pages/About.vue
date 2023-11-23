@@ -1,7 +1,7 @@
 <template>
   <div class="about">
-    <v-layout text-center wrap>
-      <v-flex mb-4 mt-8>
+    <a-layout text-center wrap>
+      <a-flex class="mb-4 mt-8">
         <h1 class="display-2 mb-3">Welcome to SurveyStack</h1>
         <p><strong>Note:</strong> This is a work in progress</p>
 
@@ -15,8 +15,8 @@
           <a href="https://gitlab.com/our-sci/our-sci-pwa" target="_blank">Frontend</a> &
           <a href="https://gitlab.com/our-sci/our-sci-server" target="_blank">Backend</a>.
         </p>
-      </v-flex>
-    </v-layout>
+      </a-flex>
+    </a-layout>
   </div>
 </template>
 <script>

@@ -20,6 +20,9 @@
     :href="href"
     :target="target"
     :to="to"
+    :mandatory="mandatory"
+    :dense="dense"
+    :rounded="rounded"
     v-on="$listeners"
     v-bind="$attrs"
   >
@@ -108,6 +111,18 @@ export default {
     },
     color: {
       type: String,
+      required: false,
+    },
+    mandatory: {
+      type: Boolean,
+      required: false,
+    },
+    dense: {
+      type: Boolean,
+      required: false,
+    },
+    rounded: {
+      type: Boolean,
       required: false,
     },
   },
