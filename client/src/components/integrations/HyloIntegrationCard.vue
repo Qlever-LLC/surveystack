@@ -23,7 +23,7 @@
               <a-card>
                 <a-card-title class="text-h5"> Are you sure? </a-card-title>
                 <a-card-actions>
-                  <a-spacer/>
+                  <a-spacer />
                   <a-btn
                     color="green darken-1"
                     text
@@ -129,10 +129,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn },
   props: {
     groupId: String,
   },

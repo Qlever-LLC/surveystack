@@ -24,11 +24,9 @@
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     OfflineIndicator,
     NavbarUserMenu,
     NavbarDrawer,

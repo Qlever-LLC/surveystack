@@ -99,7 +99,6 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -110,7 +109,6 @@ const DEFAULT_ENTITY = {
 const LS_DEFAULT_USE_PASSWORD = 'use-password-on-login-page-by-default';
 
 export default {
-  components: { ABtn },
   props: {
     initialEmail: {
       type: String,

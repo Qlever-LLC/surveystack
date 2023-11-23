@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
   name: 'BtnDropdown',
   inheritAttrs: false,

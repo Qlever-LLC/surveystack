@@ -44,10 +44,7 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
-  components: { ABtn },
   props: ['viewModel', 'loading'],
 
   data() {

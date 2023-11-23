@@ -109,11 +109,9 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 
 import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     appOntologyListEditor,
   },
   props: {

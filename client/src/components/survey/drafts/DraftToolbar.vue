@@ -23,10 +23,7 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
-  components: { ABtn },
   props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
 };
 </script>

@@ -223,7 +223,6 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const defaultPageSize = 10;
 
@@ -255,7 +254,6 @@ const apiDownloadExpandAllMatricesOptions = [
 
 export default {
   components: {
-    ABtn,
     appSubmissionsFilterBasic,
     appSubmissionsFilterAdvanced,
     appSubmissionsTree,

@@ -408,11 +408,9 @@
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     appDialog,
   },
   data() {

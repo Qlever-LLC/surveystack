@@ -19,11 +19,9 @@
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import appFeedback from '@/components/ui/Feedback.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     appFeedback,
   },
   data() {

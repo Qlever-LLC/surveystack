@@ -125,7 +125,6 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
-import ABtn from '@/components/ui/ABtn.vue';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -139,7 +138,6 @@ function findParentAdminGroup(memberships, activeMembership) {
 
 export default {
   components: {
-    ABtn,
     appFeedback,
     ActiveGroupSelector,
   },

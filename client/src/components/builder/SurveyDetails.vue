@@ -267,7 +267,6 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -326,7 +325,6 @@ export default {
     },
   },
   components: {
-    ABtn,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,

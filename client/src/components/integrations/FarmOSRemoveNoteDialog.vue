@@ -27,10 +27,7 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
-  components: { ABtn },
   emits: ['addNote', 'cancelNote'],
   props: ['loading', 'value'],
 

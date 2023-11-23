@@ -42,10 +42,8 @@
 
 <script>
 import './css/button.css';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn },
   emits: ['updateGroups', 'cancelUpdate'],
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {

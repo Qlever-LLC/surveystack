@@ -25,7 +25,6 @@
 
 <script>
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {

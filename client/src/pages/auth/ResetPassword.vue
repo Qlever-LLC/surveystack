@@ -45,11 +45,9 @@
 import axios from 'axios';
 
 import appFeedback from '@/components/ui/Feedback.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     appFeedback,
   },
   data() {

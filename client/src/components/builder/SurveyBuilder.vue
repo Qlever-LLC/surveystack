@@ -273,7 +273,6 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -308,7 +307,6 @@ const tabMap = ['relevance', 'initialize', 'calculate', 'constraint', 'apiCompos
 export default {
   mixins: [appMixin],
   components: {
-    ABtn,
     UpdateLibraryDialog,
     Splitpanes,
     Pane,

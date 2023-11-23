@@ -20,7 +20,6 @@
 <script>
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const columns = ['label', 'value', 'tags'];
 function columnIsValid(name) {
@@ -28,7 +27,6 @@ function columnIsValid(name) {
 }
 
 export default {
-  components: { ABtn },
   props: {
     disabled: {
       type: Boolean,

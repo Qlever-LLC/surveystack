@@ -15,14 +15,12 @@
 <script>
 import api from '@/services/api.service';
 import codeEditor from '@/components/ui/CodeEditor.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
 export default {
   components: {
-    ABtn,
     codeEditor,
   },
   data() {

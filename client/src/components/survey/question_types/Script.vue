@@ -87,12 +87,10 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
   components: {
-    ABtn,
     appDialog,
   },
   props: {

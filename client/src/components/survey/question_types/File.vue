@@ -132,7 +132,6 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 import { getLabelFromKey } from '@/utils/resources';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -140,7 +139,6 @@ const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //5
 export default {
   mixins: [baseQuestionComponent],
   components: {
-    ABtn,
     appControlLabel,
     appControlMoreInfo,
     appControlHint,

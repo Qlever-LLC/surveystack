@@ -130,13 +130,11 @@
 <script>
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
-    ABtn,
     graphicalView,
   },
   props: ['survey', 'libraryId'],

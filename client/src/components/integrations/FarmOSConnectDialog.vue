@@ -68,10 +68,8 @@
 <script>
 import { ref } from '@vue/composition-api';
 import './css/button.css';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn },
   emits: ['connect', 'addExisting', 'create'],
   props: {
     value: Boolean,

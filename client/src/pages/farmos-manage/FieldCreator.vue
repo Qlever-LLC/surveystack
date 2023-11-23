@@ -36,7 +36,6 @@
 import appDialog from '@/components/ui/Dialog.vue';
 import appFarmArea from './FarmOSArea.vue';
 import appKmlImporter from './KmlImporter.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const states = {
   IDLE: 0,
@@ -48,7 +47,6 @@ Object.freeze(states);
 
 export default {
   components: {
-    ABtn,
     appDialog,
     appFarmArea,
     appKmlImporter,

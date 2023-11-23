@@ -50,14 +50,11 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 function getArrayValue(source) {
   return Array.isArray(source) ? [...source] : source ? [source] : [];
 }
 
 export default {
-  components: { ABtn },
   props: {
     value: { type: [String, Array] },
     items: { type: Array, default: () => [] },

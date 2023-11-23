@@ -29,10 +29,8 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn },
   data() {
     return {
       isConfirming: false,

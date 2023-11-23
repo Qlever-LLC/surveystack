@@ -25,10 +25,7 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
-  components: { ABtn },
   props: {
     persistent: Boolean,
     value: Boolean,

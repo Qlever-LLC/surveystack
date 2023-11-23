@@ -232,12 +232,10 @@ import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 
 import { timezones } from './timezones';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   props: ['viewModel'],
   components: {
-    ABtn,
     appDialog,
     appFieldCreator,
     appFieldList,

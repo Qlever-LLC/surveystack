@@ -26,7 +26,6 @@
 
 <script>
 import appCodeView from '@/components/builder/CodeView.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const reg = /.*\/(.*?)$/;
 
@@ -40,7 +39,6 @@ const examples = req.keys().map((key) => ({
 
 export default {
   components: {
-    ABtn,
     appCodeView,
   },
   props: ['category'],

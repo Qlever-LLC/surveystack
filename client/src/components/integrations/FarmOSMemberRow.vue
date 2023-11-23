@@ -48,10 +48,7 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
-  components: { ABtn },
   data() {
     return {
       more: [],

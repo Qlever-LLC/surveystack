@@ -39,7 +39,6 @@
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   data() {
@@ -76,7 +75,6 @@ export default {
     },
   },
   components: {
-    ABtn,
     ActiveGroupSelector,
   },
   created() {

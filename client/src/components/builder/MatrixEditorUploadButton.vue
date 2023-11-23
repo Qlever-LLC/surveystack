@@ -22,10 +22,8 @@
 <script>
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn },
   methods: {
     async handleFileChange({
       target: {

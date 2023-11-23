@@ -117,13 +117,11 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
-import ABtn from '@/components/ui/ABtn.vue';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
   components: {
-    ABtn,
     VersionsDialog,
     SurveyBuilder,
     appDialog,

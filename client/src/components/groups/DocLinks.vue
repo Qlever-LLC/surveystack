@@ -94,12 +94,10 @@
 <script>
 import draggable from 'vuedraggable';
 import api from '@/services/api.service';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'nested-draggable',
   components: {
-    ABtn,
     draggable,
   },
   data() {

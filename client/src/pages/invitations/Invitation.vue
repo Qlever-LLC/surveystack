@@ -35,10 +35,8 @@
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn },
   data() {
     return {
       initialized: false,

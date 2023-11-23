@@ -124,11 +124,9 @@ import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 import { queueAction } from '@/utils/surveyStack';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     appControl,
     appDraftFooter,
     appDraftOverview,

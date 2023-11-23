@@ -41,10 +41,7 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
-  components: { ABtn },
   props: ['showPrev', 'enableNext', 'enableSubmit', 'showSubmit', 'showNav'],
 };
 </script>

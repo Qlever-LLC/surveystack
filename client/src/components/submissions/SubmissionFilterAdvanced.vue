@@ -47,10 +47,7 @@
 </template>
 
 <script>
-import ABtn from '@/components/ui/ABtn.vue';
-
 export default {
-  components: { ABtn },
   props: {
     value: {
       type: Object,

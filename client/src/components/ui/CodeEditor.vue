@@ -71,7 +71,6 @@
 <script>
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 /*
 // TODO: make sure scripts editor still works
@@ -102,7 +101,6 @@ function log(message){};
 
 export default {
   components: {
-    ABtn,
     appCodeView,
   },
   data() {

@@ -352,11 +352,9 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,

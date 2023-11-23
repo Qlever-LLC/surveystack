@@ -52,7 +52,6 @@ import {
   resourceTypes,
   setResource,
 } from '@/utils/resources';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   data() {
@@ -62,7 +61,6 @@ export default {
     };
   },
   components: {
-    ABtn,
     ResourceSelector,
     ImageResourceEditor,
   },

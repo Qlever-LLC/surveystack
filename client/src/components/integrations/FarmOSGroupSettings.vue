@@ -109,11 +109,9 @@
 <script>
 import { computed, ref } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     FarmOSGroupTable,
   },
   props: {

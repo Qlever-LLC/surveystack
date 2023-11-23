@@ -4,11 +4,9 @@
 
 <script>
 import '../css/button.css';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'custom-button',
-  components: { ABtn },
 
   props: {
     label: {

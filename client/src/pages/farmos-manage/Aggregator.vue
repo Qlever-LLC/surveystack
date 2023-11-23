@@ -62,7 +62,7 @@
           class="mt-4 mr-4"
         />
         <a-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
-        >Map</a-btn
+          >Map</a-btn
         >
       </div>
 
@@ -234,10 +234,8 @@
 
 <script>
 import _ from 'lodash';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn },
   emits: ['addSuperAdminNote'],
   props: {
     groups: Array,

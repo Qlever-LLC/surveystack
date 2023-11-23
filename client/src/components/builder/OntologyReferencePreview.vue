@@ -31,11 +31,9 @@ import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadB
 
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default defineComponent({
   components: {
-    ABtn,
     SelectItemsDownloadButton,
   },
   props: {
