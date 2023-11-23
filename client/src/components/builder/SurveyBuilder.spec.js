@@ -223,6 +223,12 @@ describe('add control', () => {
         value: false,
         propPath: 'options.geoJSON.showCircle',
       },
+      {
+        inputLabel: 'Show geotrace control',
+        type: 'geoJSON',
+        value: true,
+        propPath: 'options.geoJSON.showGeoTrace',
+      },
       { inputLabel: 'Type', type: 'date', value: 'date-year', propPath: 'options.subtype' },
       {
         inputLabel: 'Allow hide',

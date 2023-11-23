@@ -94,6 +94,7 @@ export const createControlInstance = (control) => {
       showLine: true,
       showCircle: true,
       showPoint: true,
+      showGeoTrace: false,
     };
   } else if (control.type === 'instructionsImageSplit') {
     cloneWithDefaultOptions.options.source = {

@@ -9,6 +9,20 @@
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
+    <v-snackbar top light v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1">
+      Keep this window open while tracing your area or field. If you switch applications you may lose the area you have
+      traced.
+      <v-btn
+        v-bind="$attrs"
+        @click="keepOpenNotificationIsVisible = false"
+        rounded
+        depressed
+        color="primary"
+        class="d-block ml-auto"
+      >
+        Dismiss
+      </v-btn>
+    </v-snackbar>
     <div
       :id="mapId"
       :class="{
@@ -19,19 +33,47 @@
         'hide-circle': !control.options.geoJSON.showCircle,
         'hide-move': !hasSomeDrawControl,
         'hide-modify': !hasSomeDrawControl,
+        'hide-geotrace': !control.options.geoJSON.showGeoTrace,
       }"
       role="application"
     />
+
+    <div class="fields-table mt-6 d-none">
+      <v-btn class="ml-auto" color="primary" @click="handleAddField">Add field</v-btn>
+      <v-simple-table class="mt-2" height="300" fixed-header dense>
+        <thead>
+          <tr>
+            <th class="text-left">Visible</th>
+            <th class="text-left">Preview</th>
+            <th class="text-left">Name</th>
+            <th class="text-left">Type</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(field, i) in fields" :key="i">
+            <td><v-switch v-model="fields[i].visible" class="my-3 pt-0" hide-details></v-switch></td>
+            <td><img v-if="field.preview" height="48" :src="field.preview" /></td>
+            <td><input v-model="fields[i].name" placeholder="Enter field name ..." /></td>
+            <td><input v-model="fields[i].type" placeholder="Enter field type ..." /></td>
+            <td align="right">
+              <v-btn icon outlined small><v-icon>mdi-delete</v-icon></v-btn>
+            </td>
+          </tr>
+        </tbody>
+      </v-simple-table>
+    </div>
+
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-import createMap from '@/external/instance/instance';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
+import { MapInstanceManager } from '@our-sci/farmos-map';
 
 /**
  * Add base tile layer to map
@@ -43,6 +85,7 @@ export function addBaseLayer(map) {
     visible: true,
     base: true,
   };
+
   return map.addLayer('xyz', xyzOpts);
 }
 
@@ -52,7 +95,7 @@ export function addBaseLayer(map) {
  * @param {string|undefined|null} value: stringified geojson used to initialize drawing layer
  * @returns {ol.Layer} drawing layer created
  */
-export function addDrawingLayer(map, value) {
+export async function addDrawingLayer(map, value) {
   const opts = {
     title: 'features',
     ...(value && { geojson: JSON.stringify(value) }),
@@ -66,8 +109,10 @@ export function addDrawingLayer(map, value) {
     map.zoomToLayer(layer);
   }
 
-  map.addBehavior('edit', { layer });
-  map.addBehavior('measure', { layer });
+  await map.addBehavior('edit', { layer });
+  // TODO: fix or get rid of
+  // await map.addBehavior('measure', { layer });
+
   return layer;
 }
 
@@ -91,44 +136,42 @@ export default {
   },
   data() {
     return {
-      map: null,
       mapId: `farmos-map-${Math.floor(Math.random() * 1e4)}`,
+      mapInstance: null,
+      fields: [],
+      keepOpenNotificationIsVisible: false,
     };
   },
   computed: {
     hasSomeDrawControl() {
-      const { showPolygon, showLine, showCircle, showPoint } = this.control.options.geoJSON;
-      return showPolygon || showLine || showCircle || showPoint;
+      const { showPolygon, showLine, showCircle, showPoint, showGeoTrace } = this.control.options.geoJSON;
+      return showPolygon || showLine || showCircle || showPoint || showGeoTrace;
     },
   },
   mounted() {
     this.load();
   },
   beforeDestroy() {
-    if (this.map) {
-      this.map.map.setTarget(null);
-      this.map = null;
-    }
+    new MapInstanceManager().destroy(this.mapId);
+    this.mapInstance = null;
   },
   methods: {
-    load() {
-      this.map = createMap({
-        target: this.mapId,
-        options: {},
-      });
+    async load() {
+      this.mapInstance = new MapInstanceManager().create(this.mapId);
 
-      addBaseLayer(this.map);
-      addDrawingLayer(this.map, this.value);
+      await addBaseLayer(this.mapInstance);
+      await addDrawingLayer(this.mapInstance, this.value);
 
       const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
-      this.map.edit.geoJSONOn('drawend', mapChangeHandler);
-      this.map.edit.geoJSONOn('modifyend', mapChangeHandler);
-      this.map.edit.geoJSONOn('translateend', mapChangeHandler);
-      this.map.edit.geoJSONOn('delete', mapChangeHandler);
+      this.mapInstance.edit.geoJSONOn('featurechange', mapChangeHandler);
+      this.mapInstance.edit.controlActivateOn('geotrace', (active) => {
+        this.keepOpenNotificationIsVisible = active;
+        this.$store.dispatch('draft/setNextEnable', !active);
+      });
 
       // If no features exist in value, run automatic behaviors
       if (!this.value) {
-        this.map.attachBehavior({
+        this.mapInstance.attachBehavior({
           attach(instance) {
             const controls = instance.map.getControls().getArray();
             const geolocateControl = controls && controls.find((control) => control.constructor.name === 'Geolocate');
@@ -145,6 +188,15 @@ export default {
           document.querySelector('#gcd-input-query').focus();
         }
       }
+    },
+    handleAddField() {
+      this.fields.push({
+        visible: true,
+        preview: null,
+        name: '',
+        type: '',
+        geojson: null,
+      });
     },
   },
 };

@@ -69,7 +69,7 @@
         width: moveFooter ? 'calc(100% - 256px)' : '100%',
       }"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
-      :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
+      :enableNext="!$store.getters['draft/hasRequiredUnanswered'] && $store.getters['draft/enableNext']"
       :enableSubmit="!$store.getters['draft/errors']"
       :showSubmit="showOverview"
       :showNav="true"
