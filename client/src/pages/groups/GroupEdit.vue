@@ -217,7 +217,6 @@ const integrations = [
 
 export default {
   components: {
-    </a-btn
     appPinnedSurveys,
     appDocLinks,
     appBasicList,
