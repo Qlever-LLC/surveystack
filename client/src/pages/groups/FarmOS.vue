@@ -151,7 +151,6 @@ export default {
     id: String,
   },
   components: {
-    </a-btn
     FarmOSGroupSettings,
     FarmOSConnectDialog,
     FarmOSCreateDialog,

@@ -37,12 +37,7 @@
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
-import appTooltip from '@/components/ui/Tooltip.vue';
-
 export default {
-  components: {
-    appTooltip,
-  },
   props: ['value'],
   data() {
     return {
