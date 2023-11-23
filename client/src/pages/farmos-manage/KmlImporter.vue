@@ -28,7 +28,7 @@
         />
       </a-row>
       <a-row class="text-center">
-        <v-col><a-btn @click="$emit('change')" color="primary">Import</a-btn></v-col>
+        <a-col><a-btn @click="$emit('change')" color="primary">Import</a-btn></a-col>
       </a-row>
     </template>
   </a-sheet>

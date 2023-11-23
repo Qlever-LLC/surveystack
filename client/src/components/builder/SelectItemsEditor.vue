@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
+  <a-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         v-on="on"
@@ -17,13 +17,13 @@
       />
     </template>
 
-    <v-card>
-      <v-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
+    <a-card>
+      <a-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-        <a-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row </a-btn>
-      </v-card-title>
+        <a-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row</a-btn>
+      </a-card-title>
 
-      <v-card-text class="dialog-content">
+      <a-card-text cssDialogContent>
         <div class="row-cell pr-11">
           <div class="flex-grow-1">Label</div>
           <div class="flex-grow-1">Value</div>
@@ -53,17 +53,17 @@
             <a-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</a-icon>
           </div>
         </draggable>
-      </v-card-text>
+      </a-card-text>
 
       <a-divider />
 
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <a-btn text @click="close">Cancel</a-btn>
         <a-btn color="primary" @click="save">Save</a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
@@ -137,33 +137,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
->>> .dialog-content {
-  min-height: 400px;
-  max-height: calc(80% - 200px);
-  padding: 12px 16px;
-}
-
->>> .dialog-content > :first-child {
-  padding-right: 68px;
-}
-
->>> .dialog-content .row-cell {
-  max-width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
->>> .dialog-content .draggable {
-  display: flex;
-  flex-direction: column;
-  justify-items: start;
-  align-items: stretch;
-}
-
->>> .dialog-content .draggable .row-cell {
-  margin-top: 8px;
-}
-</style>

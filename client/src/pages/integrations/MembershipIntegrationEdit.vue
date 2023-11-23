@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-card class="pa-4 mb-4">
+  <a-container>
+    <a-card class="pa-4 mb-4">
       <span class="text--secondary overline">{{ this.entity._id }}</span>
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
 
@@ -30,8 +30,8 @@
           <a-btn color="primary" @click="submit">Submit</a-btn>
         </div>
       </a-form>
-    </v-card>
-  </v-container>
+    </a-card>
+  </a-container>
 </template>
 
 <script>

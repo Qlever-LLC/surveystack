@@ -1,14 +1,14 @@
 <template>
-  <v-card class="image-resource-editor p-relative">
-    <v-card-title class="d-flex">
+  <a-card class="image-resource-editor p-relative">
+    <a-card-title class="d-flex">
       <div>Image Resource Editor</div>
       <a-spacer />
 
       <a-btn icon @click="closeDialog">
         <a-icon>mdi-close</a-icon>
       </a-btn>
-    </v-card-title>
-    <v-card-text>
+    </a-card-title>
+    <a-card-text>
       <a-form
         v-if="
           resource &&
@@ -42,12 +42,12 @@
           outlined
         />
       </a-form>
-    </v-card-text>
-    <v-card-actions class="d-flex justify-space-between px-6 pb-4">
+    </a-card-text>
+    <a-card-actions class="d-flex justify-space-between px-6 pb-4">
       <a-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </a-btn>
       <a-btn @click="updateResource" text color="primary"> Update </a-btn>
-    </v-card-actions>
-  </v-card>
+    </a-card-actions>
+  </a-card>
 </template>
 
 <script>

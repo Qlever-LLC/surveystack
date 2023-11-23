@@ -1,21 +1,21 @@
 <template>
-  <v-dialog v-model="isVisible" persistent width="300">
-    <v-card>
-      <v-card-title>
+  <a-dialog v-model="isVisible" persistent width="300">
+    <a-card>
+      <a-card-title>
         {{ title }}
-      </v-card-title>
-      <v-card-text>
+      </a-card-title>
+      <a-card-text>
         <slot />
-      </v-card-text>
-      <v-card-actions>
+      </a-card-text>
+      <a-card-actions>
         <a-spacer />
         <a-btn text @click.stop="handleAbort"> Cancel </a-btn>
         <a-btn text color="primary" @click.stop="handleConfirm">
           {{ confirmText }}
         </a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

@@ -1,16 +1,11 @@
 <template>
-  <v-container>
+  <a-container>
     <a-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</a-alert>
 
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Groups</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
     <a-select
@@ -113,7 +108,7 @@
         </tbody>
       </template>
     </a-table>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

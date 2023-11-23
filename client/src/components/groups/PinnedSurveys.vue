@@ -1,10 +1,10 @@
 <template>
-  <v-card class="pb-2">
-    <v-card-title
+  <a-card class="pb-2">
+    <a-card-title
       >Pinned Surveys
       <a-spacer />
       <a-btn color="primary" text @click="openSearchDialog">New..</a-btn>
-    </v-card-title>
+    </a-card-title>
     <draggable
       v-if="entities.length !== 0"
       class="draggable list-group"
@@ -16,8 +16,8 @@
       @start="drag = true"
       @end="drag = false"
     >
-      <v-card v-for="(el, idx) in entities" :key="`${idx}-survey-${el._id}`" class="ma-2 mx-6" elevation="1" outlined>
-        <v-card-text>
+      <a-card v-for="(el, idx) in entities" :key="`${idx}-survey-${el._id}`" class="ma-2 mx-6" elevation="1" outlined>
+        <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
               <span class="caption grey--text text--darken-1">{{ el._id }}</span>
@@ -34,35 +34,35 @@
               </a-btn>
             </div>
           </div>
-        </v-card-text>
-      </v-card>
+        </a-card-text>
+      </a-card>
     </draggable>
-    <v-card class="ma-2" outlined elevation="1" v-else>
-      <v-card-text>
+    <a-card class="ma-2" outlined elevation="1" v-else>
+      <a-card-text>
         <span class="title text--secondary">No pinned surveys yet</span><br />
         <span class="font-weight-light grey--text text--darken-2"
           >You can add surveys from the menu in the top right</span
         >
-      </v-card-text>
-    </v-card>
-    <v-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
-      <v-card>
-        <v-card-title> Remove Pinned Survey </v-card-title>
-        <v-card-text class="mt-4">
+      </a-card-text>
+    </a-card>
+    <a-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
+      <a-card>
+        <a-card-title> Remove Pinned Survey </a-card-title>
+        <a-card-text class="mt-4">
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
-        </v-card-text>
-        <v-card-actions>
+        </a-card-text>
+        <a-card-actions>
           <a-spacer />
           <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
           <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
 
-    <v-dialog v-model="showSearchDialog" max-width="500">
-      <v-card>
-        <v-card-title>Search surveys</v-card-title>
-        <v-card-text>
+    <a-dialog v-model="showSearchDialog" max-width="500">
+      <a-card>
+        <a-card-title>Search surveys</a-card-title>
+        <a-card-text>
           <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
           <v-list>
             <a-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
@@ -74,13 +74,13 @@
               </v-list-item-content>
             </a-list-item>
           </v-list>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+        </a-card-text>
+      </a-card>
+    </a-dialog>
     <slot name="footer">
       <div></div>
     </slot>
-  </v-card>
+  </a-card>
 </template>
 
 <script>

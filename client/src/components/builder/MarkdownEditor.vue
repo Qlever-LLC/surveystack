@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
+  <a-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         ref="anchorRef"
@@ -18,12 +18,10 @@
       />
     </template>
 
-    <v-card>
-      <v-card-title class="grey--text text--darken-2">
-        <slot name="title"></slot>
-      </v-card-title>
+    <a-card>
+      <a-card-title class="grey--text text--darken-2"> <slot name="title" />!! </a-card-title>
 
-      <v-card-text>
+      <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
           <v-btn-toggle v-model="viewMode" mandatory dense>
             <v-btn>Edit</v-btn>
@@ -49,7 +47,7 @@
             />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
-              <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
+              <a-progress-circular v-if="isLoading" indeterminate color="primary" />
               <v-icon v-else color="gray darken-4">mdi-paperclip</v-icon>
             </div>
           </div>
@@ -78,15 +76,15 @@
             </v-list>
           </div>
         </div>
-      </v-card-text>
+      </a-card-text>
 
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <v-btn text @click="close">Cancel</v-btn>
         <v-btn color="primary" @click="save">Save</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <a-container>
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
-    <v-card class="pa-4 mb-4">
+    <a-card class="pa-4 mb-4">
       <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined />
 
@@ -87,22 +87,22 @@
           </btn-dropdown>
         </div>
       </a-form>
-    </v-card>
+    </a-card>
 
-    <v-dialog v-model="dialogCreateUser" max-width="500">
-      <v-card class="">
-        <v-card-title> User does not exist yet </v-card-title>
-        <v-card-text class="mt-4">
+    <a-dialog v-model="dialogCreateUser" max-width="500">
+      <a-card>
+        <a-card-title> User does not exist yet </a-card-title>
+        <a-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
-        </v-card-text>
-        <v-card-actions>
+        </a-card-text>
+        <a-card-actions>
           <a-spacer />
           <a-btn text @click.stop="dialogCreateUser = false"> Cancel </a-btn>
           <a-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </a-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
+  </a-container>
 </template>
 
 <script>
@@ -112,7 +112,6 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
-import ABtn from '@/components/ui/ABtn.vue';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -129,7 +128,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: { ABtn, BtnDropdown },
+  components: { BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

@@ -7,7 +7,7 @@
 
       <a-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</a-btn>
     </div>
-    <v-card>
+    <a-card>
       <div v-for="e in entities" :key="e._id">
         <a-list-item :to="`/${collection}/${e._id}`">
           <v-list-item-content>
@@ -17,7 +17,7 @@
         </a-list-item>
         <a-divider />
       </div>
-    </v-card>
+    </a-card>
   </div>
 </template>
 

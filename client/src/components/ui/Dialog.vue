@@ -1,19 +1,19 @@
 <template>
-  <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="modal" v-bind="$attrs">
-    <v-card>
-      <v-card-title class="headline">
+  <a-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="modal" v-bind="$attrs">
+    <a-card>
+      <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
-      </v-card-title>
-      <v-card-text>
+      </a-card-title>
+      <a-card-text>
         <slot name="default">Default slot content</slot>
-      </v-card-text>
-      <v-card-actions>
+      </a-card-text>
+      <a-card-actions>
         <a-spacer />
         <a-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</a-btn>
         <a-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

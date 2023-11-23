@@ -1,12 +1,12 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center">
       <h1>Browse Users</h1>
 
       <a-btn to="/users/new" color="primary">ADD</a-btn>
     </div>
 
-    <v-card>
+    <a-card>
       <div v-for="e in entities" :key="e._id">
         <a-list-item :to="`/users/${e._id}`">
           <v-list-item-content>
@@ -21,8 +21,8 @@
         </a-list-item>
         <a-divider />
       </div>
-    </v-card>
-  </v-container>
+    </a-card>
+  </a-container>
 </template>
 
 <script>

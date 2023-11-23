@@ -1,6 +1,6 @@
 <template>
   <div class="background wrapper">
-    <v-container>
+    <a-container>
       <a-row class="my-2">
         <a-spacer />
         <a-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
@@ -29,12 +29,12 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
           >
             <!-- -->
-            <v-card class="d-flex flex-column justify-space-between background">
+            <a-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <template v-for="(item, i) in activeTabPageContent">
                   <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <v-card :elevation="3" class="py-3 px-4">
+                      <a-card :elevation="3" class="py-3 px-4">
                         <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
                         </a-list-item-title>
@@ -45,7 +45,7 @@
                         <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </a-list-item-subtitle>
-                      </v-card>
+                      </a-card>
                     </v-list-item-content>
                     <a-list-item-action>
                       <a-tooltip bottom>
@@ -66,15 +66,15 @@
                 </template>
 
                 <a-spacer class="flex-grow-1" />
-                <v-card-actions>
-                  <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
-                </v-card-actions>
+                <a-card-actions>
+                  <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
+                </a-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
                 <a-row align="center" justify="center">
-                  <v-col>
+                  <a-col>
                     <a-alert color="primary" class="black-text" text>No Drafts</a-alert>
-                  </v-col>
+                  </a-col>
                 </a-row>
               </div>
 
@@ -82,7 +82,7 @@
                 <template v-for="(item, i) in tab.content">
                   <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <v-card :elevation="3" class="py-3 px-4">
+                      <a-card :elevation="3" class="py-3 px-4">
                         <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
                         </a-list-item-title>
@@ -93,11 +93,11 @@
                         <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </a-list-item-subtitle>
-                      </v-card>
+                      </a-card>
                     </v-list-item-content>
                   </a-list-item>
                 </template>
-                <v-pagination
+                <a-pagination
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
@@ -106,19 +106,19 @@
               </template>
               <div v-else>
                 <a-row align="center" justify="center">
-                  <v-col>
+                  <a-col>
                     <a-alert color="primary" class="black-text" text>No Submissions</a-alert>
-                  </v-col>
+                  </a-col>
                 </a-row>
               </div>
-            </v-card>
+            </a-card>
           </a-window-item>
         </a-window>
-        <v-card v-else>
-          <v-card-text class="d-flex align-center justify-center">
-            <v-progress-circular :size="50" color="primary" indeterminate />
-          </v-card-text>
-        </v-card>
+        <a-card v-else>
+          <a-card-text class="d-flex align-center justify-center">
+            <a-progress-circular :size="50" color="primary" indeterminate />
+          </a-card-text>
+        </a-card>
       </a-row>
       <confirm-submission-dialog
         ref="confirm-submission-dialog"
@@ -140,7 +140,7 @@
         title="Result of Submission"
         persistent
       />
-    </v-container>
+    </a-container>
   </div>
 </template>
 

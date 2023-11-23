@@ -1,28 +1,28 @@
 <template>
   <div>
-    <v-card>
-      <v-card-text v-if="isLoading">
-        <v-card-title> Hylo Integraton </v-card-title>
+    <a-card>
+      <a-card-text v-if="isLoading">
+        <a-card-title> Hylo Integraton </a-card-title>
         <a-spacer />
         <a-skeleton-loader type="list-item-avatar, card-heading" />
-      </v-card-text>
+      </a-card-text>
       <template v-else-if="integratedHyloGroup">
         <a-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
           height="250"
           :src="integratedHyloGroup.bannerUrl"
         >
-          <v-app-bar flat color="rgba(0, 0, 0, 0)">
+          <a-app-bar flat color="rgba(0, 0, 0, 0)">
             <a-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </a-toolbar-title>
 
             <a-spacer />
-            <v-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
+            <a-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
               <template v-slot:activator="{ on, attrs }">
                 <a-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </a-btn>
               </template>
-              <v-card>
-                <v-card-title class="text-h5"> Are you sure? </v-card-title>
-                <v-card-actions>
+              <a-card>
+                <a-card-title class="text-h5"> Are you sure? </a-card-title>
+                <a-card-actions>
                   <a-spacer/>
                   <a-btn
                     color="green darken-1"
@@ -32,49 +32,46 @@
                   >
                     Yes, remove Hylo integration
                   </a-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-app-bar>
+                </a-card-actions>
+              </a-card>
+            </a-dialog>
+          </a-app-bar>
           <a-spacer />
 
-          <v-card-title class="white--text mt-8">
+          <a-card-title class="white--text mt-8">
             <a-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
             </a-avatar>
-            <v-col class="ml-3"
+            <a-col class="ml-3"
               ><p class="text-h5 mb-1">{{ integratedHyloGroup.name }}</p>
 
-              <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p></v-col
-            >
-          </v-card-title>
+              <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p>
+            </a-col>
+          </a-card-title>
 
-          <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
-          <v-card-text class="white--text">
+          <a-card-text class="white--text">
             &nbsp;Your group is integrated with
             <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo
-          </v-card-text>
-
-          <!-- </v-col> -->
+          </a-card-text>
         </a-img>
       </template>
 
       <template v-else>
-        <v-card-title> Hylo Integraton </v-card-title>
+        <a-card-title> Hylo Integraton </a-card-title>
         <a-spacer />
-        <v-card-subtitle>This group is not integrated with Hylo yet</v-card-subtitle>
+        <a-card-subtitle>This group is not integrated with Hylo yet</a-card-subtitle>
 
-        <v-card-text>
-          <v-dialog v-model="integrateDialog" width="500">
+        <a-card-text>
+          <a-dialog v-model="integrateDialog" width="500">
             <template v-slot:activator="{ on, attrs }">
               <a-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </a-btn>
             </template>
 
-            <v-card>
-              <v-card-title>Integrate group with Hylo</v-card-title>
+            <a-card>
+              <a-card-title>Integrate group with Hylo</a-card-title>
 
-              <v-card-text>
+              <a-card-text>
                 <div class="font-italic text-body-2 mb-4">Find an existing group on Hylo</div>
                 <a-text-field
                   v-model="hyloGroupInput"
@@ -84,7 +81,7 @@
                   :error-messages="findError"
                   class="mb-2"
                 />
-                <v-col align="center">
+                <a-col align="center">
                   <a-btn
                     color="primary"
                     :disabled="!groupFound || isCreateIntegratedHyloGroupInProgress"
@@ -93,7 +90,7 @@
                   >
                     {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
                   </a-btn>
-                </v-col>
+                </a-col>
                 <a-row align="center" class="my-5">
                   <a-divider /><span class="mx-2">or</span>
                   <a-divider />
@@ -101,7 +98,7 @@
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 
-                <v-col align="center">
+                <a-col align="center">
                   <a-btn
                     color="primary"
                     :loading="isCreateIntegratedHyloGroupInProgress"
@@ -109,23 +106,23 @@
                     @click="createIntegratedHyloGroup"
                   >
                     Integrate with a new Hylo group
-                  </a-btn></v-col
+                  </a-btn></a-col
                 >
                 <div class="font-italic text-body-2 mb-4">
                   Default group settings are: anyone can find and see this group but people must apply to join this
                   group and must be approved. You can change the settings in this Group Settings page in Hylo.
                 </div>
-              </v-card-text>
+              </a-card-text>
 
-              <v-card-actions>
+              <a-card-actions>
                 <a-spacer />
                 <a-btn text @click="integrateDialog = false"> close </a-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-card-text>
+              </a-card-actions>
+            </a-card>
+          </a-dialog>
+        </a-card-text>
       </template>
-    </v-card>
+    </a-card>
   </div>
 </template>
 

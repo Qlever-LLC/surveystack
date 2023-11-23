@@ -10,7 +10,7 @@
     />
     <app-control-hint :value="control.hint" />
 
-    <v-progress-circular v-if="loading" indeterminate color="secondary" class="my-8"> </v-progress-circular>
+    <a-progress-circular v-if="loading" indeterminate color="secondary" class="my-8" />
 
     <a-list style="overflow: auto">
       <v-list-item-group
@@ -160,7 +160,6 @@ const transform = (assets) => {
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
-
   data() {
     return {
       transformed: [],

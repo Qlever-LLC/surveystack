@@ -29,25 +29,17 @@
       custom information you have entered.
     </app-dialog>
 
-    <v-dialog
-      v-model="showEditItemDialog"
-      v-bind="dialogProps"
-      v-if="showEditItemDialog"
-      title="Edit"
-      hideCancel
-      @confirm="showEditItemDialog = false"
-      max-width="800px"
-    >
+    <a-dialog v-model="showEditItemDialog" v-bind="dialogProps" v-if="showEditItemDialog" max-width="800px">
       <div style="background: #1867c0; padding: 4px 0px">
-        <v-card>
-          <v-card-title>
+        <a-card>
+          <a-card-title>
             <a-btn @click="duplicateRow(editedIndex)" text color="primary">
               <a-icon left>mdi-content-copy</a-icon>Duplicate
             </a-btn>
             <a-spacer />
             <a-btn text @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
-          </v-card-title>
-          <v-card-text>
+          </a-card-title>
+          <a-card-text>
             <a-form autocomplete="off" @submit.prevent="">
               <div v-for="(header, idx) in headers" :key="header.value">
                 <div class="d-flex align-center">
@@ -66,18 +58,18 @@
                 />
               </div>
             </a-form>
-          </v-card-text>
-          <v-card-actions class="d-flex justify-space-between">
+          </a-card-text>
+          <a-card-actions class="d-flex justify-space-between">
             <a-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
               <a-icon left>mdi-trash-can-outline</a-icon>Delete
             </a-btn>
             <a-btn text @click="showEditItemDialog = false" class="ma-2">
               Close <a-icon right>mdi-close</a-icon>
             </a-btn>
-          </v-card-actions>
-        </v-card>
+          </a-card-actions>
+        </a-card>
       </div>
-    </v-dialog>
+    </a-dialog>
     <app-control-label
       :value="control.label"
       :redacted="redacted"
@@ -141,7 +133,7 @@
     <app-control-more-info :value="control.moreInfo" />
 
     <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
-      <v-progress-circular indeterminate color="primary" size="24" />
+      <a-progress-circular indeterminate color="primary" size="24" />
       <div class="ml-2 text--secondary">Loading farmOS data</div>
     </div>
   </div>

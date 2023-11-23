@@ -1,15 +1,15 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
-    <v-card>
-      <v-card-title>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
+    <a-card>
+      <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
-      </v-card-title>
+      </a-card-title>
       <a-divider />
-      <v-card-text>
+      <a-card-text>
         <a-list dense style="max-height: 500px" class="overflow-y-auto">
-          <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
-            <v-progress-circular :size="50" color="primary" indeterminate />
-          </v-container>
+          <a-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" cssHeight100>
+            <a-progress-circular :size="50" color="primary" indeterminate />
+          </a-container>
           <template v-if="libraryConsumers !== null">
             <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
@@ -19,14 +19,14 @@
             </a-list-item>
           </template>
         </a-list>
-      </v-card-text>
+      </a-card-text>
       <a-divider />
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <a-btn @click="$emit('cancel')" color="primary" text> Close </a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 <script>
 import { reactive, toRefs } from '@vue/composition-api';

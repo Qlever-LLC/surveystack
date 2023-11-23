@@ -1,18 +1,18 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
-    <v-card>
-      <v-card-title>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
+    <a-card>
+      <a-card-title>
         Publish
         <a-chip dark small color="green" class="mx-2">
           Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
         </a-chip>
         to Library
-      </v-card-title>
-      <v-card-text class="mt-5">
+      </a-card-title>
+      <a-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-2" />
         <library-change-type-selector v-model="localLibrarySurvey.meta.libraryLastChangeType" :disabled="false" />
-      </v-card-text>
+      </a-card-text>
       <survey-diff
         :controls-remote-revision-old="
           localLibrarySurvey.revisions.find((revision) => revision.version === localLibrarySurvey.latestVersion)
@@ -25,26 +25,29 @@
           localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version
         }`"
       />
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <a-spacer />
         <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span>Publish update to library {{ value.name }}</span>
         </a-btn>
         <a-btn @click="$emit('cancel')" color="primary" text> Cancel </a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 <script>
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'publish-updated-library-dialog',
-  components: { ABtn, SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: {
+    SurveyDiff,
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+  },
   props: {
     value: {
       type: Boolean,

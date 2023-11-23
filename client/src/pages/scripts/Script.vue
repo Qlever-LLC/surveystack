@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="entity">
+  <a-container v-if="entity">
     <div class="d-flex justify-end">
       <router-link :to="{ name: 'scripts-edit', params: { id: entity._id } }">
         <a-btn color="primary"> <a-icon left>mdi-pencil</a-icon> Edit </a-btn>
@@ -9,7 +9,7 @@
     <div class="text--secondary mb-2">{{ entity._id }}</div>
 
     <code-editor title="" class="code-editor" readonly="true" :code="this.entity.content" />
-  </v-container>
+  </a-container>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" width="500" @click:outside="cancel">
+  <a-dialog v-model="open" width="500" @click:outside="cancel">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         v-on="on"
@@ -16,10 +16,10 @@
       />
     </template>
 
-    <v-card>
-      <v-card-title class="grey--text text--darken-2"> Default value </v-card-title>
+    <a-card>
+      <a-card-title class="grey--text text--darken-2"> Default value </a-card-title>
 
-      <v-card-text class="dialog-content">
+      <a-card-text cssDialogContent>
         <div v-if="multiple" class="checkbox-group">
           <a-checkbox
             v-for="(item, index) in items"
@@ -36,17 +36,17 @@
           <a-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
           <a-radio v-if="custom" label="other" value="other" />
         </a-radio-group>
-      </v-card-text>
+      </a-card-text>
 
       <a-divider />
 
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <a-btn text @click="cancel">Cancel</a-btn>
         <a-btn color="primary" @click="save">Save</a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

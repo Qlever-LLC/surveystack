@@ -1,17 +1,17 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
-    <v-card>
-      <v-card-title>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
+    <a-card>
+      <a-card-title>
         Update question set from Version
         <a-chip dark small color="green" class="mx-2"> Version {{ libraryRootGroup.libraryVersion }} </a-chip>
         to
         <a-chip dark small color="green" class="mx-2"> Version {{ toSurvey.latestVersion }} </a-chip>
-      </v-card-title>
-      <v-card-text class="mt-5">
+      </a-card-title>
+      <a-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
         <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mb-2" />
         <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
-      </v-card-text>
+      </a-card-text>
       <survey-diff
         :controls-local-revision="localRevisionControls"
         :controls-remote-revision-old="remoteOldRevisionControls"
@@ -23,7 +23,7 @@
         :showNoChangesText="false"
         @discard-local-changes-changed="discardLocalChangesChanged"
       ></survey-diff>
-      <v-card-actions class="mr-3">
+      <a-card-actions class="mr-3">
         <a-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
           >Learn more...
         </a-btn>
@@ -37,26 +37,26 @@
           <span>update</span>
         </a-btn>
         <a-btn @click="$emit('cancel')" color="primary" text> Cancel</a-btn>
-      </v-card-actions>
-    </v-card>
-    <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
-      <v-card class="">
-        <v-card-title>Confirm Update</v-card-title>
-        <v-card-text class="mt-4">
+      </a-card-actions>
+    </a-card>
+    <a-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
+      <a-card>
+        <a-card-title>Confirm Update</a-card-title>
+        <a-card-text class="mt-4">
           <b
             >You have modified this question set compared to Version
             {{ libraryRootGroup.libraryVersion }}.<br /><br />You have chosen to override
             {{ discardLocalChanges.length }} of your modified questions.<br /><br />Click update to continue.</b
           >
-        </v-card-text>
-        <v-card-actions>
+        </a-card-text>
+        <a-card-actions>
           <a-spacer />
           <a-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</a-btn>
           <a-btn text color="red" @click.stop="updateConfirmed"> Update</a-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-dialog>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -65,10 +65,13 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn, SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: {
+    SurveyDiff,
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+  },
   props: {
     value: {
       required: true,

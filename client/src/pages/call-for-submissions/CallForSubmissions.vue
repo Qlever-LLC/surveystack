@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>Call for Submissions</h1>
 
     <app-survey-selector
@@ -9,8 +9,8 @@
       @search="searchSurveys"
       @selected="selectSurvey"
     />
-    <v-card class="my-2">
-      <v-card-text>
+    <a-card class="my-2">
+      <a-card-text>
         <label>Survey</label>
         <div class="mb-5 d-flex align-center">
           <a-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</a-btn>
@@ -28,12 +28,12 @@
           <a-btn text @click="cancel">Cancel</a-btn>
           <a-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</a-btn>
         </div>
-      </v-card-text>
-    </v-card>
-    <v-card>
-      <v-card-title>Select members</v-card-title>
-      <v-card-subtitle>{{ selectedMembers.length }} selected</v-card-subtitle>
-      <v-card-text>
+      </a-card-text>
+    </a-card>
+    <a-card>
+      <a-card-title>Select members</a-card-title>
+      <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
+      <a-card-text>
         <v-data-table
           v-model="selectedMembers"
           :items="activeMembers"
@@ -53,32 +53,32 @@
             />
           </template>
         </v-data-table>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
 
-    <v-dialog v-model="showConfirmDialog" max-width="500">
-      <v-card>
-        <v-card-title class="headline">Confirmation</v-card-title>
-        <v-card-text>
+    <a-dialog v-model="showConfirmDialog" max-width="500">
+      <a-card>
+        <a-card-title class="headline">Confirmation</a-card-title>
+        <a-card-text>
           <p class="body-1">
             You are about to send an E-mail to {{ selectedMembers.length }}
             {{ selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
           </p>
           <a-checkbox label="Also send a copy to myself" v-model="copy" />
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
+        </a-card-text>
+        <a-card-actions class="d-flex justify-end">
           <a-btn @click="showConfirmDialog = false" text>Cancel</a-btn>
           <a-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</a-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
     <result-dialog
       v-model="showSubmitResult"
       :items="submitResults"
       title="Call for Submissions"
       @close="showSubmitResult = false"
     />
-  </v-container>
+  </a-container>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
       successMessage
     }}</a-alert>
@@ -38,7 +38,7 @@
     </a-window>
 
     <a-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</a-alert>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

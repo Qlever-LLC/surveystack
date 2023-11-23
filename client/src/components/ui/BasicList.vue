@@ -1,6 +1,6 @@
 <template>
-  <v-card :loading="loading">
-    <v-card-title class="heading--text">
+  <a-card :loading="loading">
+    <a-card-title class="heading--text">
       <slot name="title">
         {{ title }}
       </slot>
@@ -8,8 +8,8 @@
       <slot name="actions" v-if="editable">
         <a-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</a-btn>
       </slot>
-    </v-card-title>
-    <v-card-text>
+    </a-card-title>
+    <a-card-text>
       <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <v-list
         v-if="entities.length > 0"
@@ -32,8 +32,8 @@
       </v-list>
 
       <div v-else class="grey--text">No {{ title }} yet</div>
-    </v-card-text>
-  </v-card>
+    </a-card-text>
+  </a-card>
 </template>
 
 <script>

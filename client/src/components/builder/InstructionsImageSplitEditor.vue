@@ -29,7 +29,7 @@
       hide-details
     />
 
-    <v-dialog v-model="imageDialogIsVisible" width="500">
+    <a-dialog v-model="imageDialogIsVisible" width="500">
       <image-resource-editor
         :resources="filteredResources"
         :resource="resource"
@@ -37,7 +37,7 @@
         @delete="removeResource"
         @close-dialog="closeDialog"
       />
-    </v-dialog>
+    </a-dialog>
   </div>
 </template>
 

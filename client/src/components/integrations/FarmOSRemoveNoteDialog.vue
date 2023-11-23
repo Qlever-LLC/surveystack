@@ -1,8 +1,8 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
-    <v-card class="pa-4">
-      <v-card-title class="headline"> Why is this instance being removed? </v-card-title>
-      <v-card-text>
+  <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
+    <a-card class="pa-4">
+      <a-card-title class="headline"> Why is this instance being removed? </a-card-title>
+      <a-card-text>
         <a-checkbox
           v-model="note"
           label="Farmer is no longer part of the projet"
@@ -21,9 +21,9 @@
           <a-btn :disabled="loading" :loading="loading" @click="cancelNote" color="error">Don't Add Note</a-btn>
           <a-btn :disabled="btnDisabled" :loading="loading" @click="addNote" color="primary">Submit</a-btn>
         </div>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+      </a-card-text>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

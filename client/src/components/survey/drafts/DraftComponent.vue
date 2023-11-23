@@ -105,13 +105,13 @@
   </div>
   <a-alert v-else border="left" prominent text type="error">
     <a-row align="center">
-      <v-col class="grow">
+      <a-col class="grow">
         This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
         editor.
-      </v-col>
-      <v-col class="shrink">
+      </a-col>
+      <a-col class="shrink">
         <a-btn :to="`/surveys/${survey._id}`">back</a-btn>
-      </v-col>
+      </a-col>
     </a-row>
   </a-alert>
 </template>

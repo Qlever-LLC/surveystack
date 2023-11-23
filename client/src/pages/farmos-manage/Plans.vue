@@ -1,26 +1,21 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Plans</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
     <a-row class="align-baseline">
-      <v-col>
+      <a-col>
         <a-text-field outlined primary label="New Plan Name" v-model.trim="planName" />
-      </v-col>
-      <v-col>
+      </a-col>
+      <a-col>
         <a-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl" />
-      </v-col>
-      <v-col>
+      </a-col>
+      <a-col>
         <a-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</a-btn>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-divider class="my-4" />
@@ -45,7 +40,7 @@
         </tbody>
       </template>
     </a-table>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

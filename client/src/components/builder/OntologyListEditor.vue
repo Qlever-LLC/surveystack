@@ -1,6 +1,6 @@
 <template>
-  <v-card min-height="70vh" class="d-flex flex-column">
-    <v-card-title class="d-block">
+  <a-card min-height="70vh" class="d-flex flex-column">
+    <a-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">Ontology List Editor</div>
         <div class="d-flex align-center ml-auto mr-2">
@@ -26,31 +26,31 @@
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </a-tooltip>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
-          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
+          <a-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
               <a-btn icon v-on="on" class="ml-2" :disabled="disabled">
                 <a-icon>mdi-delete</a-icon>
                 <!-- Delete List -->
               </a-btn>
             </template>
-            <v-card>
-              <v-card-title>Delete List</v-card-title>
-              <v-card-text>
+            <a-card>
+              <a-card-title>Delete List</a-card-title>
+              <a-card-text>
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
-              </v-card-text>
-              <v-card-actions>
+              </a-card-text>
+              <a-card-actions>
                 <a-spacer />
                 <a-btn text color="red" @click="deleteResult">Delete</a-btn>
                 <a-btn text @click="closeDeleteDialog">Cancel</a-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+              </a-card-actions>
+            </a-card>
+          </a-dialog>
         </div>
       </div>
       <a-divider />
-    </v-card-title>
+    </a-card-title>
 
-    <v-card-text class="pt-4">
+    <a-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
         <a-text-field
@@ -110,28 +110,28 @@
           </div>
         </template>
       </v-data-table>
-    </v-card-text>
+    </a-card-text>
     <a-spacer />
-    <v-card-actions class="d-flex justify-end mr-3 align-start">
+    <a-card-actions class="d-flex justify-end mr-3 align-start">
       <a-btn text class="ml-4" @click="close">Close</a-btn>
-    </v-card-actions>
+    </a-card-actions>
 
-    <v-dialog v-model="editItemDialogIsVisible" max-width="350">
-      <v-card>
-        <v-card-title>Edit Item</v-card-title>
-        <v-card-text>
+    <a-dialog v-model="editItemDialogIsVisible" max-width="350">
+      <a-card>
+        <a-card-title>Edit Item</a-card-title>
+        <a-card-text>
           <a-text-field v-model="editedItem.label" label="Label" />
           <a-text-field v-model="editedItem.value" label="Value" />
           <a-text-field v-model="editedItem.tags" label="Tags" />
-        </v-card-text>
-        <v-card-actions>
+        </a-card-text>
+        <a-card-actions>
           <a-spacer />
           <a-btn text @click="editItemDialogIsVisible = false">Cancel</a-btn>
           <a-btn text color="primary" @click="saveItem">Save</a-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
+  </a-card>
 </template>
 
 <script>

@@ -217,7 +217,7 @@
           readonly
         />
       </template>
-      <v-date-picker
+      <a-date-picker
         :value="value"
         ref="datepickerRef"
         @input="

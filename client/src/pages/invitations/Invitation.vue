@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <a-alert v-if="errorMsg" class="mt-4" mode="fade" text type="error">{{ errorMsg }}</a-alert>
     <template v-if="initialized && membership">
       <h1>Invitation</h1>
@@ -27,8 +27,8 @@
         <a-btn class="primary" @click="fetchData">Try code</a-btn>
       </div>
     </template>
-    <v-progress-circular v-else :size="50" color="primary" indeterminate></v-progress-circular>
-  </v-container>
+    <a-progress-circular v-else :size="50" color="primary" indeterminate />
+  </a-container>
 </template>
 
 <script>

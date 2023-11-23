@@ -1,5 +1,5 @@
 <template>
-  <v-card
+  <a-card
     class="control-item d-flex flex-column"
     :data-testid="`diff-card-${diffInfo.indexPath}-${diffInfo.changeType}`"
   >
@@ -91,7 +91,7 @@
         <a-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </a-btn>
       </template>
     </a-snackbar>
-  </v-card>
+  </a-card>
 </template>
 
 <script>

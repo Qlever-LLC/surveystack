@@ -12,8 +12,8 @@
       <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
     </a-btn>
 
-    <v-dialog v-model="isScannerOpen" fullscreen>
-      <v-card>
+    <a-dialog v-model="isScannerOpen" fullscreen>
+      <a-card>
         <a-toolbar dark color="primary">
           <a-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <a-icon>mdi-close</a-icon>
@@ -24,21 +24,15 @@
         <a-alert v-if="hasCameraError" border="left" border-color type="error" elevation="2">
           No camera detected.
         </a-alert>
-        <v-container class="pa-0" v-if="!hasCameraError">
+        <a-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />
-            <v-progress-circular
-              v-if="isLoading"
-              indeterminate
-              :width="7"
-              :size="80"
-              color="primary"
-            ></v-progress-circular>
+            <a-progress-circular v-if="isLoading" indeterminate :width="7" :size="80" color="primary" />
             <div v-if="!isLoading" class="scan-region-outline" />
           </div>
-        </v-container>
-      </v-card>
-    </v-dialog>
+        </a-container>
+      </a-card>
+    </a-dialog>
   </div>
 </template>
 

@@ -37,9 +37,6 @@
           <a-list-item-title> Sign Out </a-list-item-title>
         </a-list-item>
       </a-list>
-
-      <!-- </v-card-text> -->
-      <!-- </v-card> -->
     </a-menu>
 
     <a-btn v-else :to="{ name: 'auth-login' }" text>

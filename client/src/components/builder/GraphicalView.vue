@@ -17,7 +17,8 @@
     draggable=".draggable-item"
     :group="draggableGroup"
   >
-    <v-card
+    <!-- TODO in Vue3 remove .native -->
+    <a-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
       :class="[
@@ -27,7 +28,7 @@
         { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
       ]"
       :key="el.id || el._id"
-      @mousedown.stop.left="$emit('control-selected', el)"
+      @mousedown.native.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
       :data-control-contains-page="descendantHasPage(el)"
@@ -162,30 +163,30 @@
         :data-control-contains-page="descendantHasPage(el)"
         :index="createIndex(index, idx + 1)"
       />
-    </v-card>
+    </a-card>
 
-    <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
-      <v-card class="">
-        <v-card-title> Delete Question </v-card-title>
-        <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
-        <v-card-actions>
+    <a-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
+      <a-card>
+        <a-card-title> Delete Question </a-card-title>
+        <a-card-text class="mt-4"> Are you sure you want to remove this question? </a-card-text>
+        <a-card-actions>
           <a-spacer />
           <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
           <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
   </draggable>
   <div v-else>
-    <v-card class="text--secondary">
-      <v-card-title>Empty survey</v-card-title>
-      <v-card-text v-if="!readOnly">
+    <a-card class="text--secondary">
+      <a-card-title>Empty survey</a-card-title>
+      <a-card-text v-if="!readOnly">
         <div class="text--primary">
           You can add questions by clicking the <strong>plus icon</strong>
           below.
         </div>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </div>
 </template>
 

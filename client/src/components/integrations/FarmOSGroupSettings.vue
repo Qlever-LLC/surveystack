@@ -1,18 +1,18 @@
 <template>
   <div>
-    <v-dialog v-model="upgradeDialog" width="400">
-      <v-card>
-        <v-card-title> Upgrade </v-card-title>
-        <v-card-text>
+    <a-dialog v-model="upgradeDialog" width="400">
+      <a-card>
+        <a-card-title> Upgrade </a-card-title>
+        <a-card-text>
           In order to change your current plan, please contact
           <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+        </a-card-text>
+      </a-card>
+    </a-dialog>
 
-    <v-card v-if="superAdmin" class="px-4 mb-4">
-      <v-card-title>Super Admin</v-card-title>
-      <v-card-text>
+    <a-card v-if="superAdmin" class="px-4 mb-4">
+      <a-card-title>Super Admin</a-card-title>
+      <a-card-text>
         <div class="d-flex flex-grow-1">
           <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
@@ -39,8 +39,8 @@
           />
         </div>
         <a-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</a-btn>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>
@@ -48,7 +48,7 @@
 
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
-          <v-container class="pa-0" fluid>
+          <a-container class="pa-0" fluid>
             <a-tooltip bottom :disabled="canAddCoffeeShop">
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
@@ -82,7 +82,7 @@
               @input="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
             />
-          </v-container>
+          </a-container>
         </div>
       </div>
       <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">

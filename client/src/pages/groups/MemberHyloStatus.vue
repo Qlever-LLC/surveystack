@@ -10,20 +10,20 @@
     >See on Hylo</a-btn
   >
 
-  <v-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
+  <a-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
     <template v-slot:activator="{ on, attrs }">
       <a-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</a-btn>
     </template>
-    <v-card>
-      <v-card-title> Confirm Invitation </v-card-title>
-      <v-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </v-card-text>
-      <v-card-actions>
+    <a-card>
+      <a-card-title> Confirm Invitation </a-card-title>
+      <a-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </a-card-text>
+      <a-card-actions>
         <a-spacer />
         <a-btn text @click="isConfirming = false"> Cancel </a-btn>
         <a-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

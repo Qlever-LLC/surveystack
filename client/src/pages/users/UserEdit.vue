@@ -1,31 +1,32 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>{{ editMode ? 'Edit user' : 'Create user' }}</h1>
     <div v-if="hasMembership && groupEntity" class="subtitle-1">
       ... with role <span class="font-weight-bold">{{ $route.query.role }}</span> @
       <span class="font-weight-bold">{{ groupEntity.name }}</span>
     </div>
-    <v-card class="pa-4 mb-4 mt-2">
-      <v-card-title v-if="editMode"
-        >{{ currentEmail }} <a-spacer /><v-dialog v-model="isEmailDialogOpen">
+    <a-card class="pa-4 mb-4 mt-2">
+      <a-card-title v-if="editMode">
+        {{ currentEmail }} <a-spacer />
+        <a-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
             <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
           </template>
-          <v-card>
-            <v-card-title class="text-h5"> Change Email </v-card-title>
-            <v-card-text>
+          <a-card>
+            <a-card-title class="text-h5"> Change Email </a-card-title>
+            <a-card-text>
               <a-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
               Integrations which use your email will no longer work and will need to be updated. These integrations will
               not work properly until you have re-mapped or updated them. Are you sure?
-            </v-card-text>
-            <v-card-actions>
+            </a-card-text>
+            <a-card-actions>
               <a-spacer />
               <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </a-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog></v-card-title
-      >
-      <v-card-text>
+            </a-card-actions>
+          </a-card>
+        </a-dialog>
+      </a-card-title>
+      <a-card-text>
         <a-form>
           <a-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
           <a-text-field tabindex="2" v-model="entity.name" label="Name" />
@@ -58,15 +59,15 @@
             <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</a-btn>
           </div>
         </a-form>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
     <!-- <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert> -->
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
         status.message
       }}</app-feedback>
     </transition>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

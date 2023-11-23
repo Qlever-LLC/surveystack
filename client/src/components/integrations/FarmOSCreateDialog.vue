@@ -1,13 +1,13 @@
 <template>
-  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
-    <v-card class="pa-4">
+  <a-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
+    <a-card class="pa-4">
       <FarmOSRegister
         :viewModel="viewModel"
         @check-url="(f) => $emit('check-url', f)"
         @create-instance="(f) => $emit('create-instance', f)"
       ></FarmOSRegister>
-    </v-card>
-  </v-dialog>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

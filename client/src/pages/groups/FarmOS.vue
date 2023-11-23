@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="farmosEnabled" class="max-800">
+  <a-container v-if="farmosEnabled" class="max-800">
     <div class="d-flex justify-space-between align-center">
       <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
@@ -104,35 +104,35 @@
       :superAdmin="superAdmin"
     >
     </FarmOSGroupSettings>
-  </v-container>
+  </a-container>
 
-  <v-container v-else>
+  <a-container v-else>
     <div class="d-flex justify-space-between align-center">
       <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
     <a-row v-if="loading">
-      <v-col>
-        <v-progress-linear indeterminate class="mb-0" />
-      </v-col>
+      <a-col>
+        <a-progress-linear indeterminate class="mb-0" />
+      </a-col>
     </a-row>
     <a-row v-else>
-      <v-col lg="4" class="mx-auto">
-        <v-card class="pa-8 text-center" v-if="superAdmin">
+      <a-col lg="4" class="mx-auto">
+        <a-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
           <a-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</a-btn>
           <a-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
             Contact Our-Sci</a-btn
           >
-        </v-card>
-        <v-card class="pa-8 text-center" v-else>
+        </a-card>
+        <a-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
           <a-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
             >Contact Our-Sci</a-btn
           >
-        </v-card>
-      </v-col>
+        </a-card>
+      </a-col>
     </a-row>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

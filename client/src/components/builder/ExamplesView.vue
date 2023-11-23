@@ -1,6 +1,6 @@
 <template>
-  <v-card style="height: 90vh" color="grey darken-3">
-    <v-container>
+  <a-card cssHeight90vh color="grey darken-3">
+    <a-container>
       <a-row>
         <a-spacer />
         <a-select
@@ -20,8 +20,8 @@
       <div style="width: 100%; height: 80vh">
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>
       </div>
-    </v-container>
-  </v-card>
+    </a-container>
+  </a-card>
 </template>
 
 <script>

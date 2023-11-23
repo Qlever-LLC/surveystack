@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <app-dialog
       v-model="learnMoreDialog"
       title="Premium Features"
@@ -48,8 +48,8 @@
         <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
       </a-btn>
     </div>
-    <v-card :loading="isLoadingGroup" class="mb-4">
-      <v-card-text>
+    <a-card :loading="isLoadingGroup" class="mb-4">
+      <a-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
           <a-text-field
             label="Name"
@@ -96,11 +96,11 @@
             <a-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</a-btn>
           </div>
         </form>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
 
     <a-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-basic-list
           maxHeight="500px"
           :loading="isLoadingMembers || isLoadingHyloGroup"
@@ -151,11 +151,11 @@
             </a-list-item-action>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-basic-list
           class="mb-4"
           v-if="editMode"
@@ -170,11 +170,11 @@
             </v-list-item-content>
           </template>
         </app-basic-list>
-      </v-col>
+      </a-col>
     </a-row>
 
     <a-row>
-      <v-col cols="12" lg="12">
+      <a-col cols="12" lg="12">
         <app-pinned-surveys
           class="mb-4"
           v-if="editMode"
@@ -183,11 +183,11 @@
           @search="searchSurveys"
         >
         </app-pinned-surveys>
-      </v-col>
+      </a-col>
     </a-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

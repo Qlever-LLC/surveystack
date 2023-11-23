@@ -1,6 +1,6 @@
 <template>
   <div class="property-panel">
-    <v-card-title class="pl-0">Properties</v-card-title>
+    <a-card-title class="pl-0">Properties</a-card-title>
     <a-form v-if="control">
       <!-- Default properties -->
       <a-text-field v-model="control.label" label="Label" hide-details />
@@ -326,7 +326,7 @@
       <div v-else class="extra-options">
         <a-spacer />
         <div>
-          <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
+          <a-card-title class="px-0 py-0">Advanced Options</a-card-title>
           <a-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</a-icon>
         </div>
 
@@ -406,7 +406,7 @@
         <div v-else class="extra-options">
           <a-spacer />
           <div>
-            <v-card-title class="px-0 py-0">Print Layout</v-card-title>
+            <a-card-title class="px-0 py-0">Print Layout</a-card-title>
             <a-icon @click.stop="showLayout = false">mdi-close</a-icon>
           </div>
 

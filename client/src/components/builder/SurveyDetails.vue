@@ -1,18 +1,18 @@
 <template>
-  <v-card>
-    <v-card-title class="d-block pb-0">
+  <a-card>
+    <a-card-title class="d-block pb-0">
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
         <a-spacer />
-        <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
+        <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
             <a-btn icon v-on="on">
               <a-icon>mdi-pencil</a-icon>
             </a-btn>
           </template>
-          <v-card>
-            <v-card-title> Edit Survey Details</v-card-title>
-            <v-card-text>
+          <a-card>
+            <a-card-title> Edit Survey Details</a-card-title>
+            <a-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <a-select
                 outlined
@@ -21,33 +21,33 @@
                 :items="availableSubmissions"
               />
               <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
-            </v-card-text>
-            <v-card-actions class="mr-3">
+            </a-card-text>
+            <a-card-actions class="mr-3">
               <a-spacer />
               <a-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</a-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
+            </a-card-actions>
+          </a-card>
+        </a-dialog>
+        <a-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
             <a-btn icon v-on="on">
               <a-icon>mdi-dresser</a-icon>
             </a-btn>
           </template>
-          <v-card>
-            <v-card-title> Survey Resources</v-card-title>
-            <v-card-text>
+          <a-card>
+            <a-card-title> Survey Resources</a-card-title>
+            <a-card-text>
               <app-resources
                 :resources="survey.resources"
                 @set-survey-resources="(val) => $emit('set-survey-resources', val)"
               />
-            </v-card-text>
-            <v-card-actions class="mr-3">
+            </a-card-text>
+            <a-card-actions class="mr-3">
               <a-spacer />
               <a-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</a-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+            </a-card-actions>
+          </a-card>
+        </a-dialog>
         <publish-updated-library-dialog
           v-if="updateLibraryDialogIsVisible"
           v-model="updateLibraryDialogIsVisible"
@@ -165,8 +165,8 @@
           <a-chip dark small outlined color="grey"> Version {{ version }}</a-chip>
         </div>
       </div>
-    </v-card-title>
-    <v-card-text>
+    </a-card-title>
+    <a-card-text>
       <div class="mt-4">
         <a-text-field
           :value="surveyGroupName"
@@ -251,8 +251,8 @@
           {{ error }}
         </div>
       </a-tooltip>
-    </v-card-text>
-  </v-card>
+    </a-card-text>
+  </a-card>
 </template>
 
 <script>

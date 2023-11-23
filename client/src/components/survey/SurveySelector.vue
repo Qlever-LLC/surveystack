@@ -1,8 +1,8 @@
 <template>
-  <v-dialog max-width="500" v-model="dialog">
-    <v-card>
-      <v-card-title>Search surveys</v-card-title>
-      <v-card-text>
+  <a-dialog max-width="500" v-model="dialog">
+    <a-card>
+      <a-card-title>Search surveys</a-card-title>
+      <a-card-text>
         <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
         <v-list>
           <a-list-item
@@ -24,9 +24,9 @@
             </v-list-item-content>
           </a-list-item>
         </v-list>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+      </a-card-text>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

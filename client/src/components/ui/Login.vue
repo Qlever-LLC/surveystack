@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="!signInLinkSent" class="pa-6 card-width">
+  <a-card v-if="!signInLinkSent" class="pa-6 card-width">
     <div class="d-sm-flex justify-center">
       <div class="pl-sm-5 pr-sm-10 py-6">
         <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
@@ -75,7 +75,7 @@
     </div>
 
     <a-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</a-alert>
-  </v-card>
+  </a-card>
   <a-alert
     v-else
     icon="mdi-email-fast"

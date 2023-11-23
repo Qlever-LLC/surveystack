@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <a-card>
     <v-data-table
       ref="table"
       v-model="tableSelected"
@@ -24,7 +24,7 @@
       <template v-slot:top>
         <a-toolbar flat class="my-5" cssBackgroundCream>
           <a-row>
-            <v-col>
+            <a-col>
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
                   <a-switch
@@ -92,7 +92,7 @@
                   </div>
                 </div>
               </div>
-            </v-col>
+            </a-col>
           </a-row>
         </a-toolbar>
       </template>
@@ -187,19 +187,19 @@
       @close="closeModal"
     />
 
-    <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
-      <v-card>
-        <v-card-text class="pa-4">
+    <a-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
+      <a-card>
+        <a-card-text class="pa-4">
           <span>Downloading file resource</span>
-          <v-progress-linear indeterminate class="mb-0" />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+          <a-progress-linear indeterminate class="mb-0" />
+        </a-card-text>
+      </a-card>
+    </a-dialog>
 
     <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
     </a-alert>
-  </v-card>
+  </a-card>
 </template>
 <script>
 import papa from 'papaparse';

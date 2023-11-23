@@ -1,14 +1,9 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage FarmOS Instances</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
     </div>
 
     <a-select
@@ -40,7 +35,7 @@
     </div>
 
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
-      <v-label>Tags for instance on FarmOS Aggregator</v-label>
+      <a-label>Tags for instance on FarmOS Aggregator</a-label>
       <div class="d-flex mt-4">
         <a-chip v-for="(tag, idx) in tags" :key="`tag-${idx}`">{{ tag }}</a-chip>
         <a-chip v-if="tags.length === 0" color="secondary">No Tags associated with instance</a-chip>
@@ -71,7 +66,7 @@
         >
       </div>
 
-      <v-label class="vy-4">Current Group Mappings</v-label>
+      <a-label class="vy-4">Current Group Mappings</a-label>
 
       <a-table v-if="mappedGroups.length > 0">
         <template v-slot:default>
@@ -122,7 +117,7 @@
         <a-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</a-btn>
       </div>
 
-      <v-label class="vy-4">Current User Mappings</v-label>
+      <a-label class="vy-4">Current User Mappings</a-label>
       <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
@@ -234,7 +229,7 @@
         </template>
       </a-table>
     </div>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -244,7 +239,6 @@ import ABtn from '@/components/ui/ABtn.vue';
 export default {
   components: { ABtn },
   emits: ['addSuperAdminNote'],
-
   props: {
     groups: Array,
     mappings: Object,

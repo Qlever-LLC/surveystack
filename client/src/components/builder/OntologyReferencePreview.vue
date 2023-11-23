@@ -1,12 +1,12 @@
 <template>
-  <v-dialog v-model="open" max-width="50%" hide-overlay>
-    <v-card min-height="50vh" class="d-flex flex-column">
-      <v-card-title class="justify-space-between align-center">
+  <a-dialog v-model="open" max-width="50%" hide-overlay>
+    <a-card min-height="50vh" class="d-flex flex-column">
+      <a-card-title class="justify-space-between align-center">
         <p>Survey Reference Preview</p>
         <select-items-download-button :resourceName="resource.name" :items="items" />
-      </v-card-title>
+      </a-card-title>
 
-      <v-card-text class="mt-4">
+      <a-card-text class="mt-4">
         <v-data-table
           :headers="tableHeaders"
           :items="items"
@@ -14,15 +14,15 @@
           item-key="id"
           :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
         />
-      </v-card-text>
+      </a-card-text>
 
       <a-spacer />
 
-      <v-card-actions class="mr-3 d-flex justify-end">
+      <a-card-actions class="mr-3 d-flex justify-end">
         <a-btn text @click="open = false">Close</a-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>

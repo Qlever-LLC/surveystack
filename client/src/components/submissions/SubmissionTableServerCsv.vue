@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
+  <a-container fluid>
     <h1>Andreas' Sandbox</h1>
-    <v-card class="pt-2">
+    <a-card class="pt-2">
       <v-data-table
         :headers="headers"
         :items="items"
@@ -13,15 +13,15 @@
         <template v-slot:top>
           <a-toolbar flat>
             <a-row>
-              <v-col>
+              <a-col>
                 <a-toolbar-title>Simple CSV</a-toolbar-title>
-              </v-col>
-              <v-col>
+              </a-col>
+              <a-col>
                 <a-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
-              </v-col>
-              <v-col :cols="2">
+              </a-col>
+              <a-col :cols="2">
                 <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
-              </v-col>
+              </a-col>
             </a-row>
           </a-toolbar>
         </template>
@@ -35,8 +35,8 @@
           </thead>
         </template>
       </v-data-table>
-    </v-card>
-  </v-container>
+    </a-card>
+  </a-container>
 </template>
 
 <script>
@@ -116,10 +116,4 @@ export default {
 .v-data-table >>> td {
   font-family: monospace;
 }
-
-/*
-.v-data-table >>> .v-label {
-  font-size: 12px;
-}
-*/
 </style>

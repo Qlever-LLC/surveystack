@@ -17,7 +17,7 @@
       @show-version-dialog="versionsDialogIsVisible = true"
     />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </div>
     <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
@@ -44,14 +44,14 @@
       You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
 
-    <v-dialog v-model="submitting" hide-overlay persistent width="300">
-      <v-card>
-        <v-card-text class="pa-4">
+    <a-dialog v-model="submitting" hide-overlay persistent width="300">
+      <a-card>
+        <a-card-text class="pa-4">
           <span>Submitting Builder</span>
-          <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+          <a-progress-linear indeterminate class="mb-0" />
+        </a-card-text>
+      </a-card>
+    </a-dialog>
 
     <result-dialog
       v-model="showResult"
@@ -89,19 +89,19 @@
     class="d-flex justify-center align-center overlay-bg"
     style="background: rgba(0, 0, 0, 0.45); height: 100%"
   >
-    <v-card max-width="500">
-      <v-card-title>
+    <a-card max-width="500">
+      <a-card-title>
         <a-icon class="mr-2 error--text">mdi-close-octagon</a-icon>
         Unsupported browser
-      </v-card-title>
+      </a-card-title>
       <!-- <a-alert type="error">
         Unsupported browser
       </a-alert> -->
-      <v-card-text>
+      <a-card-text>
         Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
         browser.
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </div>
 </template>
 

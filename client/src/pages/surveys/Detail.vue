@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="entity && show" class="survey-detail">
+  <a-container v-if="entity && show" class="survey-detail">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
       <a-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <a-icon>mdi-pencil</a-icon>
@@ -74,12 +74,12 @@
         />
       </div>
     </div>
-  </v-container>
-  <v-container fill-height v-else>
+  </a-container>
+  <a-container fill-height v-else>
     <v-layout column justify-center align-center>
-      <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
+      <a-progress-circular :size="50" color="primary" indeterminate />
     </v-layout>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

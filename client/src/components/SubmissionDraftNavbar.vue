@@ -1,8 +1,8 @@
 <template>
   <nav class="app-navbar">
     <navbar-drawer v-model="drawerIsVisible" />
-    <v-app-bar app clipped-left color="appbar" absolute>
-      <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
+    <a-app-bar app clipped-left color="appbar" absolute>
+      <a-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <a-toolbar-title class="flex-column flex-grow-1">
         <draft-toolbar
           :groupPath="groupPath"
@@ -15,7 +15,7 @@
       </a-toolbar-title>
 
       <navbar-user-menu />
-    </v-app-bar>
+    </a-app-bar>
   </nav>
 </template>
 

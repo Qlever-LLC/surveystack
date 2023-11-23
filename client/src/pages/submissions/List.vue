@@ -48,7 +48,7 @@
       </template>
     </app-dialog>
 
-    <v-container>
+    <a-container>
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
@@ -92,19 +92,19 @@
           </a-expansion-panel-text>
         </a-expansion-panel>
       </a-expansion-panels>
-      <v-card class="my-5 px-2">
-        <v-card-title class="d-flex justify-space-between align-center">
+      <a-card class="my-5 px-2">
+        <a-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>
-        </v-card-title>
-        <v-card-text>
+        </a-card-title>
+        <a-card-text>
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
-        </v-card-text>
-        <v-card-text>
+        </a-card-text>
+        <a-card-text>
           <a-row>
-            <v-col md="2" sm="6">
+            <a-col md="2" sm="6">
               <a-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
-            </v-col>
-            <v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
+            </a-col>
+            <a-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
               <a-select
                 label="Matrix answers"
                 dense
@@ -112,14 +112,14 @@
                 hide-details
                 v-model="apiDownloadExpandAllMatrices"
               />
-            </v-col>
-            <v-col md="2" sm="6">
+            </a-col>
+            <a-col md="2" sm="6">
               <a-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </a-btn>
-            </v-col>
+            </a-col>
           </a-row>
 
           <a-row class="mt-5" v-if="apiDownloadRange === 'page'">
-            <v-col sm="2">
+            <a-col sm="2">
               <a-select
                 label="Page Size"
                 dense
@@ -128,21 +128,21 @@
                 v-model="pageSize"
                 @change="changedPaginationSize"
               />
-            </v-col>
-            <v-col cols="10">
-              <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-            </v-col>
-            <v-col cols="1">
+            </a-col>
+            <a-col cols="10">
+              <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
+            </a-col>
+            <a-col cols="1">
               <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
                 {{ submissions.pagination.total }} total
               </div>
-            </v-col>
+            </a-col>
           </a-row>
-        </v-card-text>
-      </v-card>
-    </v-container>
+        </a-card-text>
+      </a-card>
+    </a-container>
 
-    <v-container>
+    <a-container>
       <a-tabs v-model="tab">
         <a-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -179,7 +179,7 @@
       </v-window>
 
       <a-row class="my-2">
-        <v-col cols="1">
+        <a-col cols="1">
           <a-select
             style="max-width: 5rem; display: inline-block"
             label="Page Size"
@@ -189,17 +189,17 @@
             v-model="pageSize"
             @change="changedPaginationSize"
           />
-        </v-col>
-        <v-col cols="10">
-          <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-        </v-col>
-        <v-col cols="1">
+        </a-col>
+        <a-col cols="10">
+          <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
+        </a-col>
+        <a-col cols="1">
           <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
             {{ submissions.pagination.total }} total
           </div>
-        </v-col>
+        </a-col>
       </a-row>
-    </v-container>
+    </a-container>
   </div>
 </template>
 

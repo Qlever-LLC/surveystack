@@ -1,8 +1,8 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
-    <v-card>
-      <v-card-title>Survey Versions</v-card-title>
-      <v-card-text style="max-height: 500px">
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
+    <a-card>
+      <a-card-title>Survey Versions</a-card-title>
+      <a-card-text cssMaxHeight500px>
         <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
@@ -70,9 +70,9 @@
         <a-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" closable>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
         </a-alert>
-      </v-card-text>
+      </a-card-text>
       <a-divider />
-      <v-card-actions>
+      <a-card-actions>
         <a-spacer />
         <a-btn
           v-if="compareRevisions.length > 0"
@@ -94,8 +94,8 @@
           Delete {{ selectedVersionsToDelete.length }} versions
         </a-btn>
         <a-btn @click="$emit('cancel')" color="primary" text> Close </a-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
     <survey-diff-dialog
       v-if="surveyDiffDialogVisible"
       :value="surveyDiffDialogVisible"
@@ -103,7 +103,7 @@
       :revision-b="survey.revisions.find((r) => r.version === compareRevisions[1])"
       @cancel="surveyDiffDialogVisible = false"
     />
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -111,10 +111,9 @@ import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
-  components: { ABtn, SurveyDiffDialog },
+  components: { SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

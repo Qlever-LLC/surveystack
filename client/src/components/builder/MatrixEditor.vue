@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="editorDialog">
+    <a-dialog v-model="editorDialog">
       <app-ontology-list-editor
         :resources="resources"
         :resource="ontology"
@@ -9,10 +9,10 @@
         @delete="removeResource"
         @close-dialog="editorDialog = false"
       />
-    </v-dialog>
+    </a-dialog>
 
-    <v-card class="d-flex flex-column">
-      <v-card-title class="d-block">
+    <a-card class="d-flex flex-column">
+      <a-card-title class="d-block">
         <div class="d-flex justify-space-between align-center">
           <div class="grey--text text--darken-2">Matrix Column Editor</div>
           <div class="d-flex align-center ml-auto mr-2">
@@ -20,9 +20,9 @@
           </div>
           <div class="d-flex align-center"></div>
         </div>
-      </v-card-title>
+      </a-card-title>
 
-      <v-card-text class="pt-0">
+      <a-card-text class="pt-0">
         <div class="d-flex justify-start"></div>
         <div>
           <draggable
@@ -39,7 +39,7 @@
               <!-- vertical bar indicating which columns are locked to the left -->
               <a-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-card
+                  <a-card
                     width="26px"
                     height="100%"
                     class="draggable-handle mx-1 py-3 d-flex flex-column justify-space-around align-center"
@@ -50,13 +50,13 @@
                     <a-divider vertical class="lock-line-decor" />
                     <a-icon class="my-1">mdi-arrow-horizontal-lock</a-icon>
                     <a-divider vertical class="lock-line-decor" />
-                  </v-card>
+                  </a-card>
                 </template>
                 <span>Columns to the left of this line will always be visible</span>
               </a-tooltip>
 
               <div v-else>
-                <v-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
+                <a-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
                   <div class="draggable-handle d-flex pa-2">
                     <a-btn icon small @click="moveItemLeft(i)" :disabled="i === 0" tabindex="-1">
                       <a-icon>mdi-arrow-left</a-icon>
@@ -76,7 +76,7 @@
                       <a-icon>mdi-trash-can-outline</a-icon>
                     </a-btn>
                   </div>
-                  <v-card-text>
+                  <a-card-text>
                     <a-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <a-text-field v-model="item.value" label="Value" dense />
                     <a-select
@@ -247,8 +247,8 @@
                       hint="Default 100"
                       persistent-hint
                     />
-                  </v-card-text>
-                </v-card>
+                  </a-card-text>
+                </a-card>
               </div>
             </div>
 
@@ -257,12 +257,12 @@
             </a-btn>
           </draggable>
         </div>
-      </v-card-text>
+      </a-card-text>
       <a-spacer />
-      <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
+      <a-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
         <a-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</a-btn>
-      </v-card-actions>
-    </v-card>
+      </a-card-actions>
+    </a-card>
   </div>
 </template>
 
