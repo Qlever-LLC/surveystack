@@ -6,19 +6,19 @@
     <v-card class="pa-4 mb-4">
       <div class="d-flex">
         <a-btn class="ml-auto" color="error" outlined @click="dialogRemoval = true">
-          <v-icon left>mdi-trash-can-outline</v-icon> Delete
+          <a-icon left>mdi-trash-can-outline</a-icon> Delete
         </a-btn>
       </div>
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
+        <a-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
 
-        <v-text-field v-model="entity.group" label="Group" disabled />
+        <a-text-field v-model="entity.group" label="Group" disabled />
 
-        <v-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
+        <a-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
 
-        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
+        <a-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
 
-        <v-text-field
+        <a-text-field
           v-if="entity.meta.status === 'pending'"
           class="mt-3"
           v-model="entity.meta.invitationName"
@@ -26,17 +26,17 @@
           hint="Default name for newly registered users"
         />
 
-        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
+        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" />
 
         <div class="d-flex mt-2">
           <a-btn class="ml-auto" text @click="cancel">Cancel</a-btn>
           <a-btn color="primary" @click="submit">Save</a-btn>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
 
     <v-card class="my-3 pa-2" v-if="resendEnabled">
-      <v-card-title> <v-icon left>mdi-account-clock</v-icon>Pending </v-card-title>
+      <v-card-title> <a-icon left>mdi-account-clock</a-icon>Pending </v-card-title>
       <v-card-subtitle>Membership has not been claimed</v-card-subtitle>
       <v-card-text>
         You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by
@@ -44,14 +44,14 @@
       </v-card-text>
       <v-card-actions class="d-flex justify-space-between align-center">
         <div>
-          <a-btn color="primary" @click="resend"> <v-icon left>mdi-email-send-outline</v-icon> Resend </a-btn>
+          <a-btn color="primary" @click="resend"> <a-icon left>mdi-email-send-outline</a-icon> Resend </a-btn>
           <span class="ml-1 caption text--secondary">{{
             entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'
           }}</span>
         </div>
         <div>
           <a-btn @click="dialogInvitationLink = true" color="primary">
-            <v-icon left>mdi-eye-outline</v-icon>View
+            <a-icon left>mdi-eye-outline</a-icon>View
           </a-btn>
         </div>
       </v-card-actions>
@@ -62,7 +62,7 @@
         <v-card-title> Delete Membership </v-card-title>
         <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <a-btn text @click.stop="dialogRemoval = false"> Cancel </a-btn>
           <a-btn text color="red" @click.stop="remove"> Delete </a-btn>
         </v-card-actions>
@@ -76,7 +76,7 @@
           An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <a-btn text @click.stop="dialogSent = false"> OK </a-btn>
         </v-card-actions>
       </v-card>

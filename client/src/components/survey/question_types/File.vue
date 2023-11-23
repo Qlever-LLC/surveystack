@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
       {{ alertMessage }}
-    </v-snackbar>
+    </a-snackbar>
     <app-control-label
       :value="control.label"
       :redacted="redacted"
@@ -47,7 +47,7 @@
         @click.stop="showFileChooser"
       >
         <div class="col-12 pb-0">
-          <v-icon color="primary" x-large>mdi-cloud-upload-outline</v-icon>
+          <a-icon color="primary" x-large>mdi-cloud-upload-outline</a-icon>
         </div>
         <div class="col-12 font-weight-bold">
           {{ $vuetify.breakpoint.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
@@ -69,7 +69,7 @@
               @click.stop="captureImage"
             >
               take a picture
-              <v-icon right> mdi-camera-outline</v-icon>
+              <a-icon right> mdi-camera-outline</a-icon>
             </a-btn>
           </div>
         </div>
@@ -77,49 +77,49 @@
     </div>
 
     <v-expand-transition>
-      <v-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
-        <v-list-item
+      <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0">
+        <a-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
           class="file-list-item my-2"
         >
           <v-list-item-avatar>
-            <v-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" large>mdi-image</v-icon>
-            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</v-icon>
-            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</v-icon>
-            <v-icon v-else large>mdi-file-outline</v-icon>
+            <a-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" large>mdi-image</a-icon>
+            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</a-icon>
+            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</a-icon>
+            <a-icon v-else large>mdi-file-outline</a-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title
+            <a-list-item-title
               v-if="editIndex !== index"
               :data-test-id="'file_' + index"
               class="text-wrap font-bold"
               v-text="getLabelFromKey(fileResourceKey)"
-            ></v-list-item-title>
-            <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
-              <v-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
-            </v-list-item-title>
-            <v-list-item-subtitle v-if="showUploadProgressIndex === index"
+            ></a-list-item-title>
+            <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
+              <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
+            </a-list-item-title>
+            <a-list-item-subtitle v-if="showUploadProgressIndex === index"
               ><v-progress-linear indeterminate class="mb-0"
-            /></v-list-item-subtitle>
+            /></a-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
+          <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
             <a-btn icon @click="editResourceName(fileResourceKey, index)">
-              <v-icon color="grey lighten-1">mdi-pencil</v-icon>
+              <a-icon color="grey lighten-1">mdi-pencil</a-icon>
             </a-btn>
-          </v-list-item-action>
-          <v-list-item-action v-if="editIndex === index">
+          </a-list-item-action>
+          <a-list-item-action v-if="editIndex === index">
             <a-btn icon @click="commitResourceName(fileResourceKey, index)">
-              <v-icon color="success">mdi-check</v-icon>
+              <a-icon color="success">mdi-check</a-icon>
             </a-btn>
-          </v-list-item-action>
-          <v-list-item-action>
+          </a-list-item-action>
+          <a-list-item-action>
             <a-btn icon @click="remove(index)">
-              <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
+              <a-icon color="grey lighten-1">mdi-close-circle</a-icon>
             </a-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
+          </a-list-item-action>
+        </a-list-item>
+      </a-list>
     </v-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
   </div>

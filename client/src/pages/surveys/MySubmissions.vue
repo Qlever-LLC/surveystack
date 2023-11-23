@@ -1,28 +1,28 @@
 <template>
   <div class="background wrapper">
     <v-container>
-      <v-row class="my-2">
-        <v-spacer />
+      <a-row class="my-2">
+        <a-spacer />
         <a-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
-          <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
+          <a-icon class="ml-2">mdi-cloud-upload-outline</a-icon>
         </a-btn>
-      </v-row>
-      <v-row class="d-flex flex-grow-1">
-        <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
-          <v-tab href="#drafts" class="background">
+      </a-row>
+      <a-row class="d-flex flex-grow-1">
+        <a-tabs v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
+          <a-tab href="#drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
-              <v-icon class="mr-2">mdi-file-document-edit</v-icon>Drafts
+              <a-icon class="mr-2">mdi-file-document-edit</a-icon>Drafts
             </span>
-          </v-tab>
-          <v-tab href="#sent" class="background">
+          </a-tab>
+          <a-tab href="#sent" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
-              <v-icon class="mr-2">mdi-email-check</v-icon>Sent
+              <a-icon class="mr-2">mdi-email-check</a-icon>Sent
             </span>
-          </v-tab>
-        </v-tabs>
-        <v-tabs-items v-model="activeTab" class="flex-grow-1" v-if="!isLoading">
-          <v-tab-item
+          </a-tab>
+        </a-tabs>
+        <a-window v-model="activeTab" class="flex-grow-1" v-if="!isLoading">
+          <a-window-item
             v-for="tab in tabs"
             :key="tab.name"
             :value="tab.name"
@@ -32,23 +32,23 @@
             <v-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <template v-for="(item, i) in activeTabPageContent">
-                  <v-list-item :key="i">
+                  <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
-                        </v-list-item-title>
-                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-title>
+                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
-                        </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-subtitle>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </v-list-item-subtitle>
+                        </a-list-item-subtitle>
                       </v-card>
                     </v-list-item-content>
-                    <v-list-item-action>
-                      <v-tooltip bottom>
+                    <a-list-item-action>
+                      <a-tooltip bottom>
                         <template v-slot:activator="{ on }">
                           <a-btn
                             v-if="readyToSubmitHas(item._id)"
@@ -56,46 +56,46 @@
                             @click="() => handleSubmitClick(item._id)"
                             v-on="on"
                           >
-                            <v-icon> mdi-cloud-upload-outline </v-icon>
+                            <a-icon> mdi-cloud-upload-outline </a-icon>
                           </a-btn>
                         </template>
                         <span>Upload Submission</span>
-                      </v-tooltip>
-                    </v-list-item-action>
-                  </v-list-item>
+                      </a-tooltip>
+                    </a-list-item-action>
+                  </a-list-item>
                 </template>
 
-                <v-spacer class="flex-grow-1" />
+                <a-spacer class="flex-grow-1" />
                 <v-card-actions>
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
-                <v-row align="center" justify="center">
+                <a-row align="center" justify="center">
                   <v-col>
-                    <v-alert color="primary" class="black-text" text>No Drafts</v-alert>
+                    <a-alert color="primary" class="black-text" text>No Drafts</a-alert>
                   </v-col>
-                </v-row>
+                </a-row>
               </div>
 
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <template v-for="(item, i) in tab.content">
-                  <v-list-item :key="i">
+                  <a-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                           {{ item.meta.survey.name }}
-                        </v-list-item-title>
-                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-title>
+                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
-                        </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mt-2">
+                        </a-list-item-subtitle>
+                        <a-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </v-list-item-subtitle>
+                        </a-list-item-subtitle>
                       </v-card>
                     </v-list-item-content>
-                  </v-list-item>
+                  </a-list-item>
                 </template>
                 <v-pagination
                   v-model="remotePage"
@@ -105,21 +105,21 @@
                 />
               </template>
               <div v-else>
-                <v-row align="center" justify="center">
+                <a-row align="center" justify="center">
                   <v-col>
-                    <v-alert color="primary" class="black-text" text>No Submissions</v-alert>
+                    <a-alert color="primary" class="black-text" text>No Submissions</a-alert>
                   </v-col>
-                </v-row>
+                </a-row>
               </div>
             </v-card>
-          </v-tab-item>
-        </v-tabs-items>
+          </a-window-item>
+        </a-window>
         <v-card v-else>
           <v-card-text class="d-flex align-center justify-center">
             <v-progress-circular :size="50" color="primary" indeterminate />
           </v-card-text>
         </v-card>
-      </v-row>
+      </a-row>
       <confirm-submission-dialog
         ref="confirm-submission-dialog"
         v-if="confirmSubmissionIsVisible"

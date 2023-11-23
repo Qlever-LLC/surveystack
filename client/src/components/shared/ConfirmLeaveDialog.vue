@@ -8,7 +8,7 @@
         <slot />
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <a-btn text @click.stop="handleAbort"> Cancel </a-btn>
         <a-btn text color="primary" @click.stop="handleConfirm">
           {{ confirmText }}

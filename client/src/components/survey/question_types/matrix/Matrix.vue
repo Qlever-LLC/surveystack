@@ -42,13 +42,13 @@
         <v-card>
           <v-card-title>
             <a-btn @click="duplicateRow(editedIndex)" text color="primary">
-              <v-icon left>mdi-content-copy</v-icon>Duplicate
+              <a-icon left>mdi-content-copy</a-icon>Duplicate
             </a-btn>
-            <v-spacer />
-            <a-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </a-btn>
+            <a-spacer />
+            <a-btn text @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
           </v-card-title>
           <v-card-text>
-            <v-form autocomplete="off" @submit.prevent="">
+            <a-form autocomplete="off" @submit.prevent="">
               <div v-for="(header, idx) in headers" :key="header.value">
                 <div class="d-flex align-center">
                   <h4>{{ header.label }}</h4>
@@ -65,14 +65,14 @@
                   class="my-2"
                 />
               </div>
-            </v-form>
+            </a-form>
           </v-card-text>
           <v-card-actions class="d-flex justify-space-between">
             <a-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
-              <v-icon left>mdi-trash-can-outline</v-icon>Delete
+              <a-icon left>mdi-trash-can-outline</a-icon>Delete
             </a-btn>
             <a-btn text @click="showEditItemDialog = false" class="ma-2">
-              Close <v-icon right>mdi-close</v-icon>
+              Close <a-icon right>mdi-close</a-icon>
             </a-btn>
           </v-card-actions>
         </v-card>
@@ -101,17 +101,17 @@
       @addRow="add"
     >
       <template v-slot:header-cell="{ header }">
-        <v-tooltip top>
+        <a-tooltip top>
           <template v-slot:activator="{ on }">
             <span class="flex-grow-1 text-truncate" v-on="on">{{ header.label }}</span>
           </template>
           <span>{{ header.type }}: {{ header.label }}</span>
-        </v-tooltip>
+        </a-tooltip>
         <app-redacted v-if="header.redacted" />
         <app-required v-if="header.required" />
       </template>
       <template v-slot:row-cell="{ header, row, colIdx }">
-        <v-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
+        <a-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
           <app-matrix-cell
             :header="header"
             :item="row"
@@ -123,16 +123,16 @@
             class="mt-2"
             :loading="isFarmOsLoading"
           />
-        </v-form>
+        </a-form>
       </template>
       <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
         <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
           <div class="d-flex">
             <a-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
-              <v-icon>mdi-trash-can-outline</v-icon>
+              <a-icon>mdi-trash-can-outline</a-icon>
             </a-btn>
             <a-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
-              <v-icon>mdi-content-copy</v-icon>
+              <a-icon>mdi-content-copy</a-icon>
             </a-btn>
           </div>
         </div>

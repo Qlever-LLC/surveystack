@@ -4,10 +4,10 @@
       <span class="text--secondary overline">{{ this.entity._id }}</span>
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
 
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
+        <a-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
 
-        <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
+        <a-select :items="integrationTypes" v-model="entity.type" label="Type" outlined />
 
         <app-farmos-farm-picker
           v-if="entity.type === 'farmos-farm'"
@@ -24,12 +24,12 @@
 
         <div class="d-flex ma-2">
           <a-btn v-if="editMode" color="error" outlined @click="deleteEntity">
-            <v-icon left>mdi-trash-can-outline</v-icon> Delete
+            <a-icon left>mdi-trash-can-outline</a-icon> Delete
           </a-btn>
           <a-btn class="ml-auto" text @click="cancel">Cancel</a-btn>
           <a-btn color="primary" @click="submit">Submit</a-btn>
         </div>
-      </v-form>
+      </a-form>
     </v-card>
   </v-container>
 </template>
@@ -40,7 +40,6 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFarmosFarmPicker from '@/components/integrations/FarmosFarmPicker.vue';
-import ABtn from '@/components/ui/ABtn.vue';
 
 // const exampleIntegration = {
 //   type: 'farmos-aggregator',
@@ -63,7 +62,6 @@ const integrationTypes = [
 
 export default {
   components: {
-    ABtn,
     appJsonEditor,
     appFarmosFarmPicker,
   },

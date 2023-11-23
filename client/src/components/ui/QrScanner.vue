@@ -9,21 +9,21 @@
       color="primary"
       @click="isScannerOpen = true"
     >
-      <v-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</v-icon>
+      <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
     </a-btn>
 
     <v-dialog v-model="isScannerOpen" fullscreen>
       <v-card>
-        <v-toolbar dark color="primary">
+        <a-toolbar dark color="primary">
           <a-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
-            <v-icon>mdi-close</v-icon>
+            <a-icon>mdi-close</a-icon>
           </a-btn>
-          <v-toolbar-title>QR Code Scanner</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-        <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
+          <a-toolbar-title>QR Code Scanner</a-toolbar-title>
+          <a-spacer />
+        </a-toolbar>
+        <a-alert v-if="hasCameraError" border="left" border-color type="error" elevation="2">
           No camera detected.
-        </v-alert>
+        </a-alert>
         <v-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />

@@ -1,12 +1,12 @@
 <template>
   <div class="text-center">
     <a-btn v-bind="$attrs" @click="$emit('click', $event)" class="main-button"> {{ label }} </a-btn>
-    <v-menu v-if="showDropDown" v-bind="$attrs" :offset-y="true" class="pa-0 ma-0 right">
+    <a-menu v-if="showDropDown" v-bind="$attrs" :offset-y="true" class="pa-0 ma-0 right">
       <template v-slot:activator="{ on, attrs }">
         <a-btn v-bind="$attrs" v-on="on" class="dropdown-button"><v-icon>mdi-chevron-down</v-icon></a-btn>
       </template>
       <slot></slot>
-    </v-menu>
+    </a-menu>
   </div>
 </template>
 
@@ -15,7 +15,6 @@ import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   name: 'BtnDropdown',
-  components: { ABtn },
   inheritAttrs: false,
   props: {
     label: {

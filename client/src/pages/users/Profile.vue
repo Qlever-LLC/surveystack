@@ -22,33 +22,33 @@
       <v-card outlined>
         <v-card-text> <div>User Details</div></v-card-text>
         <v-card-text>
-          <v-form>
+          <a-form>
             <v-card-text>
-              <v-row>
+              <a-row>
                 <div class="text-h6">{{ email }}</div>
-                <v-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
+                <a-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
                     <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
                   </template>
                   <v-card>
                     <v-card-title class="text-h5"> Change Email </v-card-title>
                     <v-card-text>
-                      <v-text-field tabindex="1" v-model="email" label="E-Mail" />
+                      <a-text-field tabindex="1" v-model="email" label="E-Mail" />
                       Integrations which use your email will no longer work and will need to be updated. These
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
                     </v-card-text>
                     <v-card-actions>
-                      <v-spacer></v-spacer>
+                      <a-spacer />
                       <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
                       </a-btn>
                     </v-card-actions>
                   </v-card>
-                </v-dialog></v-row
-              ></v-card-text
-            >
-            <v-text-field tabindex="2" v-model="name" label="Name" />
-            <v-text-field
+                </v-dialog>
+              </a-row>
+            </v-card-text>
+            <a-text-field tabindex="2" v-model="name" label="Name" />
+            <a-text-field
               tabindex="3"
               v-model="password"
               :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -59,7 +59,7 @@
               persistent-hint
             />
 
-            <v-text-field
+            <a-text-field
               tabindex="4"
               v-model="passwordConfirmation"
               :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -73,7 +73,7 @@
             <div class="d-flex mt-2 justify-end">
               <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</a-btn>
             </div>
-          </v-form></v-card-text
+          </a-form></v-card-text
         >
       </v-card>
 
@@ -102,7 +102,7 @@
             >?
           </v-card-text>
           <v-card-actions>
-            <v-spacer />
+            <a-spacer />
             <a-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </a-btn>
             <a-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </a-btn>
           </v-card-actions>
@@ -113,9 +113,9 @@
       <h1>Profile</h1>
       You are not logged in... <router-link to="/auth/login">Go to Login</router-link></template
     >
-    <v-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
+    <a-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
       status.message
-    }}</v-alert>
+    }}</a-alert>
   </v-container>
 </template>
 

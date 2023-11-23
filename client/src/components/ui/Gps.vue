@@ -1,9 +1,9 @@
 <template>
   <div>
-    <v-menu offset-y>
+    <a-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
         <a-btn v-bind="attrs" v-on="on" class="button">
-          <v-icon>mdi-dots-vertical</v-icon>
+          <a-icon>mdi-dots-vertical</a-icon>
         </a-btn>
       </template>
       <div class="menu">
@@ -19,14 +19,14 @@
             <span v-if="location.properties.accuracy"> acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }} </span>
           </samp>
         </div>
-        <a-btn @click="clipboard" outlined class="mt-1"> <v-icon left>mdi-content-copy</v-icon>Copy </a-btn>
+        <a-btn @click="clipboard" outlined class="mt-1"> <a-icon left>mdi-content-copy</a-icon>Copy </a-btn>
       </div>
-    </v-menu>
+    </a-menu>
     <!-- TODO: fix copied snack notification -->
-    <v-snackbar v-model="snackbar">
+    <a-snackbar v-model="snackbar">
       {{ snackbarText }}
       <a-btn color="pink" text @click="snackbar = false"> Close </a-btn>
-    </v-snackbar>
+    </a-snackbar>
   </div>
 </template>
 

@@ -13,23 +13,23 @@
             "
             :disabled="disabled"
           >
-            <v-icon left>mdi-plus</v-icon>Add Row
+            <a-icon left>mdi-plus</a-icon>Add Row
           </a-btn>
         </div>
         <div class="d-flex align-center">
-          <v-tooltip bottom>
+          <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled" />
               </div>
             </template>
             CSV must have column headers 'label', 'value', and optionally 'tags'
-          </v-tooltip>
+          </a-tooltip>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
           <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
               <a-btn icon v-on="on" class="ml-2" :disabled="disabled">
-                <v-icon>mdi-delete</v-icon>
+                <a-icon>mdi-delete</a-icon>
                 <!-- Delete List -->
               </a-btn>
             </template>
@@ -39,7 +39,7 @@
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
               </v-card-text>
               <v-card-actions>
-                <v-spacer />
+                <a-spacer />
                 <a-btn text color="red" @click="deleteResult">Delete</a-btn>
                 <a-btn text @click="closeDeleteDialog">Cancel</a-btn>
               </v-card-actions>
@@ -47,13 +47,13 @@
           </v-dialog>
         </div>
       </div>
-      <v-divider />
+      <a-divider />
     </v-card-title>
 
     <v-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
-        <v-text-field
+        <a-text-field
           :value="resource.label"
           :disabled="disabled"
           @input="handleUpdateLabel"
@@ -62,7 +62,7 @@
           class="mx-2"
         />
         <!-- TODO: validate unique data name -->
-        <v-text-field
+        <a-text-field
           :value="resource.name"
           :disabled="disabled"
           @input="handleUpdateName"
@@ -72,10 +72,10 @@
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
 
-        <v-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
+        <a-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
           <a-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
-            <v-icon>mdi-delete</v-icon>
+            <a-icon>mdi-delete</a-icon>
           </a-btn>
         </div>
       </div>
@@ -91,27 +91,27 @@
         :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
       >
         <template v-slot:item.label="{ item }">
-          <v-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.value="{ item }">
-          <v-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.tags="{ item }">
-          <v-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
-            <v-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</v-icon>
-            <v-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</v-icon>
-            <v-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</v-icon>
-            <v-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled">
+            <a-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</a-icon>
+            <a-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</a-icon>
+            <a-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</a-icon>
+            <a-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled">
               mdi-trash-can-outline
-            </v-icon>
+            </a-icon>
           </div>
         </template>
       </v-data-table>
     </v-card-text>
-    <v-spacer />
+    <a-spacer />
     <v-card-actions class="d-flex justify-end mr-3 align-start">
       <a-btn text class="ml-4" @click="close">Close</a-btn>
     </v-card-actions>
@@ -120,12 +120,12 @@
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
-          <v-text-field v-model="editedItem.label" label="Label" />
-          <v-text-field v-model="editedItem.value" label="Value" />
-          <v-text-field v-model="editedItem.tags" label="Tags" />
+          <a-text-field v-model="editedItem.label" label="Label" />
+          <a-text-field v-model="editedItem.value" label="Value" />
+          <a-text-field v-model="editedItem.tags" label="Tags" />
         </v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <a-btn text @click="editItemDialogIsVisible = false">Cancel</a-btn>
           <a-btn text color="primary" @click="saveItem">Save</a-btn>
         </v-card-actions>
@@ -135,7 +135,7 @@
 </template>
 
 <script>
-import { uniqWith, isEqual } from 'lodash';
+import { isEqual, uniqWith } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';

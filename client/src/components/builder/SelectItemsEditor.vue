@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field
+      <a-text-field
         v-on="on"
         v-bind="attrs"
         ref="anchorRef"
@@ -20,7 +20,7 @@
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-        <a-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </a-btn>
+        <a-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row </a-btn>
       </v-card-title>
 
       <v-card-text class="dialog-content">
@@ -28,13 +28,13 @@
           <div class="flex-grow-1">Label</div>
           <div class="flex-grow-1">Value</div>
         </div>
-        <v-divider></v-divider>
+        <a-divider />
         <div v-if="items.length === 0" class="mt-8 text-center">
           Please click <strong>Add row</strong> button to add new item.
         </div>
         <draggable v-else :list="items" class="draggable">
           <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.label"
               @input="(value) => onInput(index, 'label', value)"
@@ -42,7 +42,7 @@
               :hide-details="false"
               dense
             />
-            <v-text-field
+            <a-text-field
               class="flex-grow-1"
               :value="item.value"
               @input="(value) => onInput(index, 'value', value)"
@@ -50,15 +50,15 @@
               :hide-details="false"
               dense
             />
-            <v-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</v-icon>
+            <a-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</a-icon>
           </div>
         </draggable>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <a-divider />
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <a-spacer />
         <a-btn text @click="close">Cancel</a-btn>
         <a-btn color="primary" @click="save">Save</a-btn>
       </v-card-actions>
@@ -68,11 +68,9 @@
 
 <script>
 import draggable from 'vuedraggable';
-import ABtn from '@/components/ui/ABtn.vue';
 
 export default {
   components: {
-    ABtn,
     draggable,
   },
   props: {

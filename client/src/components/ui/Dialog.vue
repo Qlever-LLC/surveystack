@@ -8,7 +8,7 @@
         <slot name="default">Default slot content</slot>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <a-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</a-btn>
         <a-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
       </v-card-actions>

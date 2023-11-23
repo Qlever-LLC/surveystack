@@ -7,29 +7,29 @@
     </div>
     <v-card class="pa-4 mb-4 mt-2">
       <v-card-title v-if="editMode"
-        >{{ currentEmail }} <v-spacer /><v-dialog v-model="isEmailDialogOpen">
+        >{{ currentEmail }} <a-spacer /><v-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
             <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
           </template>
           <v-card>
             <v-card-title class="text-h5"> Change Email </v-card-title>
             <v-card-text>
-              <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
+              <a-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
               Integrations which use your email will no longer work and will need to be updated. These integrations will
               not work properly until you have re-mapped or updated them. Are you sure?
             </v-card-text>
             <v-card-actions>
-              <v-spacer></v-spacer>
+              <a-spacer />
               <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </a-btn>
             </v-card-actions>
           </v-card>
         </v-dialog></v-card-title
       >
-      <v-card-text
-        ><v-form>
-          <v-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
-          <v-text-field tabindex="2" v-model="entity.name" label="Name" />
-          <v-text-field
+      <v-card-text>
+        <a-form>
+          <a-text-field v-if="!editMode" tabindex="1" v-model="entity.email" label="E-Mail" />
+          <a-text-field tabindex="2" v-model="entity.name" label="Name" />
+          <a-text-field
             tabindex="3"
             v-model="entity.password"
             :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -40,7 +40,7 @@
             persistent-hint
           />
 
-          <v-text-field
+          <a-text-field
             tabindex="4"
             v-model="passwordConfirmation"
             :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -51,14 +51,14 @@
             persistent-hint
           />
 
-          <v-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
+          <a-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
 
           <div class="d-flex mt-2 justify-end">
             <a-btn text @click="cancel">Cancel</a-btn>
             <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</a-btn>
           </div>
-        </v-form></v-card-text
-      >
+        </a-form>
+      </v-card-text>
     </v-card>
     <!-- <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert> -->
     <transition name="fade">

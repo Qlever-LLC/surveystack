@@ -16,7 +16,7 @@
         />
       </v-card-text>
 
-      <v-spacer />
+      <a-spacer />
 
       <v-card-actions class="mr-3 d-flex justify-end">
         <a-btn text @click="open = false">Close</a-btn>
@@ -28,6 +28,7 @@
 <script>
 import { computed, defineComponent, ref, watchEffect } from '@vue/composition-api';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
 import ABtn from '@/components/ui/ABtn.vue';

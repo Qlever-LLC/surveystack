@@ -2,8 +2,8 @@
   <v-container>
     <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
     <span class="text--secondary">{{ this.entity._id }}</span>
-    <v-form class="mt-3" @keydown.enter.prevent="submit">
-      <v-text-field v-model="entity.name" label="Name" outlined hide-details />
+    <a-form class="mt-3" @keydown.enter.prevent="submit">
+      <a-text-field v-model="entity.name" label="Name" outlined hide-details />
       <active-group-selector
         class="my-4"
         label="Group"
@@ -23,7 +23,7 @@
         <a-btn text @click="cancel">Cancel</a-btn>
         <a-btn color="primary" @click="submit">Save</a-btn>
       </div>
-    </v-form>
+    </a-form>
   </v-container>
 </template>
 

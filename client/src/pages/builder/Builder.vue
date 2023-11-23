@@ -79,10 +79,10 @@
       @reload-survey="onReloadSurvey"
     />
 
-    <v-snackbar v-model="showSnackbar" :timeout="4000">
+    <a-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
       <a-btn color="grey" text @click="showSnackbar = false">Close</a-btn>
-    </v-snackbar>
+    </a-snackbar>
   </div>
   <div
     v-else
@@ -91,12 +91,12 @@
   >
     <v-card max-width="500">
       <v-card-title>
-        <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
+        <a-icon class="mr-2 error--text">mdi-close-octagon</a-icon>
         Unsupported browser
       </v-card-title>
-      <!-- <v-alert type="error">
+      <!-- <a-alert type="error">
         Unsupported browser
-      </v-alert> -->
+      </a-alert> -->
       <v-card-text>
         Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
         browser.
@@ -358,6 +358,10 @@ export default {
         this.survey._id = id;
         const { data } = await api.get(`/surveys/${this.survey._id}?version=latestPublishedOrDraft`);
         this.survey = { ...this.survey, ...data };
+        // Fetch all resources into local storage
+        if (this.survey.resources) {
+          await this.$store.dispatch('resources/fetchResources', this.survey.resources, { root: true });
+        }
       } catch (e) {
         console.log('something went wrong:', e);
       }

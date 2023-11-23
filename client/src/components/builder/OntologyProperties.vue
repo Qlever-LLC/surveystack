@@ -11,7 +11,7 @@
       outlined
     />
     <a-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
-      <v-icon>mdi-pencil</v-icon>
+      <a-icon>mdi-pencil</a-icon>
     </a-btn>
 
     <v-dialog v-model="tableDialogIsVisible">
@@ -42,12 +42,10 @@
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
-import { createResource, resourceTypes, resourceLocations, setResource, removeResource } from '@/utils/resources';
-import ABtn from '@/components/ui/ABtn.vue';
+import { createResource, removeResource, resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 
 export default {
   components: {
-    ABtn,
     OntologyListEditor,
     OntologyReferenceEditor,
     ResourceSelector,

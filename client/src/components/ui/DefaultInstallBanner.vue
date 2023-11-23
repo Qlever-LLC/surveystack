@@ -1,18 +1,18 @@
 <template>
-  <v-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
+  <a-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" fixed bottom>
     <a-btn @click="handleClose" icon class="close-button">
-      <v-icon>mdi-close</v-icon>
+      <a-icon>mdi-close</a-icon>
     </a-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center pt-2">
         <a-btn outlined @click="install" large>
-          <v-icon class="ml-n2 mr-1" small>mdi-plus</v-icon>
+          <a-icon class="ml-n2 mr-1" small>mdi-plus</a-icon>
           Add to Homescreen
         </a-btn>
       </div>
     </div>
-  </v-snackbar>
+  </a-snackbar>
 </template>
 
 <script>

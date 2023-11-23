@@ -7,8 +7,8 @@
       <v-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
-        <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
-        <v-text-field
+        <a-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
+        <a-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
           v-model="archiveReasonOther"
@@ -16,7 +16,7 @@
         />
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <a-btn text @click="$emit('cancel')">Cancel</a-btn>
         <a-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
       </v-card-actions>
@@ -47,6 +47,7 @@ export default {
       default: 'TEST_DATA',
     },
   },
+
   data() {
     return {
       archiveReason: this.reason,

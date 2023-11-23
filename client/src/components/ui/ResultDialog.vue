@@ -11,11 +11,11 @@
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>
               <template v-if="item.logs && item.logs.length">
-                <v-divider class="mx-4"></v-divider>
+                <a-divider class="mx-4" />
                 <v-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
                     <v-card-actions>
-                      <v-spacer />
+                      <a-spacer />
                       <a-btn text v-bind="attrs" v-on="on"> Logs </a-btn>
                     </v-card-actions>
                   </template>
@@ -23,33 +23,33 @@
                   <v-card>
                     <v-card-title>
                       Handler logs
-                      <v-spacer></v-spacer>
+                      <a-spacer />
                       <copy-to-clipboard :value="JSON.stringify(item.logs, null, 2)" />
                     </v-card-title>
 
                     <v-card-text>
-                      <v-expansion-panels accordion>
-                        <v-expansion-panel
+                      <a-expansion-panels accordion>
+                        <a-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
                           :key="i"
                           :readonly="!item.data"
                         >
-                          <v-expansion-panel-header>
-                            <template v-slot:actions v-if="!item.data"><v-spacer></v-spacer> </template>
+                          <a-expansion-panel-title>
+                            <template v-slot:actions v-if="!item.data"><a-spacer /> </template>
                             <div class="mr-4 flex-grow-0">
-                              <v-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </v-icon>
-                              <v-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </v-icon>
-                              <v-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </v-icon>
-                              <v-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </v-icon>
-                              <v-icon v-else color="primary"> $expand </v-icon>
+                              <a-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </a-icon>
+                              <a-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </a-icon>
+                              <a-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </a-icon>
+                              <a-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </a-icon>
+                              <a-icon v-else color="primary"> $expand </a-icon>
                             </div>
                             {{ item.message }}
-                          </v-expansion-panel-header>
-                          <v-expansion-panel-content>
+                          </a-expansion-panel-title>
+                          <a-expansion-panel-text>
                             <pre>{{ JSON.stringify(item.data, (k, v) => (v === undefined ? null : v), 2) }}</pre>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
+                          </a-expansion-panel-text>
+                        </a-expansion-panel>
+                      </a-expansion-panels>
                     </v-card-text>
                   </v-card>
                 </v-dialog>
@@ -70,7 +70,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-spacer />
+          <a-spacer />
           <a-btn text color="primary" @click="onClose"> Ok </a-btn>
         </v-card-actions>
       </v-card>
@@ -83,10 +83,10 @@ import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { isOnline } from '@/utils/surveyStack';
-import ABtn from '@/components/ui/ABtn.vue';
+import CopyToClipboard from '@/components/submissions/CopyToClipboard.vue';
 
 export default {
-  components: { ABtn },
+  components: { CopyToClipboard },
   props: {
     value: {
       required: true,

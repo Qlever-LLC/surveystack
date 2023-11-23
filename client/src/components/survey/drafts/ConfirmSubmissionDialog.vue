@@ -10,11 +10,11 @@
         <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
           <active-group-selector label="Group" class="d-inline-block" :value="groupId" @input="setGroup" />
           <a-btn icon @click="handleCloseGroupEditor">
-            <v-icon>mdi-close</v-icon>
+            <a-icon>mdi-close</a-icon>
           </a-btn>
         </div>
         <a-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
-          <v-icon small>mdi-pencil</v-icon>
+          <a-icon small>mdi-pencil</a-icon>
         </a-btn>
         <div v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
@@ -28,7 +28,7 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
+        <a-spacer />
         <a-btn text @click.stop="handleAbort"> Cancel </a-btn>
         <a-btn text color="primary" @click.stop="handleConfirm"> Submit </a-btn>
       </v-card-actions>

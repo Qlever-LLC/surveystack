@@ -21,9 +21,9 @@
           When installing you will be asked to allow installing applications from unknown sources.
         </p>
 
-        <v-alert outlined class="pa-4" type="success" color="blue">
+        <a-alert outlined class="pa-4" type="success" color="blue">
           If you have already installed the Android App once, you don't need install the App again.
-        </v-alert>
+        </a-alert>
 
         <br />
         <a-btn
@@ -32,7 +32,7 @@
           href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
           outlined
         >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Download APK
         </a-btn>
       </template>
@@ -52,7 +52,7 @@
           outlined
           @click="showAndroidInstallDialog = true"
         >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Install Android App
         </a-btn>
       </div>
@@ -61,11 +61,11 @@
         {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
       </a-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">
-        <v-chip dark> {{ meta && meta.status }}</v-chip>
+        <a-chip dark> {{ meta && meta.status }}</a-chip>
         <br />
-        <v-chip dark class="mt-1">
-          <v-icon small left>mdi-message-bulleted</v-icon>
-          {{ meta && meta.statusMessage }}</v-chip
+        <a-chip dark class="mt-1">
+          <a-icon small left>mdi-message-bulleted</a-icon>
+          {{ meta && meta.statusMessage }}</a-chip
         >
       </p>
     </div>
@@ -73,7 +73,7 @@
       <v-progress-circular indeterminate color="primary" class="ma-5" />
     </div>
     <div v-else-if="loadingSourceFailed" class="text-center">
-      <v-icon color="red">mdi-close-thick</v-icon>
+      <a-icon color="red">mdi-close-thick</a-icon>
       There was an error loading the script.
     </div>
     <app-control-more-info :value="control.moreInfo" />
