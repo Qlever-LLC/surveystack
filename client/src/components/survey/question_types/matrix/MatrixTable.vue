@@ -77,7 +77,6 @@ function defaultColumnWidth(type) {
   }
 }
 export default {
-  components: { ABtn },
   props: {
     headers: {
       type: Array,
