@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
+  <a-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
     <a-card class="pa-4">
       <a-card-title class="headline"> Connect Existing Farm </a-card-title>
       <a-card-text>
@@ -62,7 +62,7 @@
         or add existing farmOS instance (currently in development)
       </a-card-text>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -71,7 +71,6 @@ import './css/button.css';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
-
   props: {
     value: Boolean,
     farmInstances: {

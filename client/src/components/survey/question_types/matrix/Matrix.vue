@@ -29,15 +29,7 @@
       custom information you have entered.
     </app-dialog>
 
-    <v-dialog
-      v-model="showEditItemDialog"
-      v-bind="dialogProps"
-      v-if="showEditItemDialog"
-      title="Edit"
-      hideCancel
-      @confirm="showEditItemDialog = false"
-      max-width="800px"
-    >
+    <a-dialog v-model="showEditItemDialog" v-bind="dialogProps" v-if="showEditItemDialog" max-width="800px">
       <div style="background: #1867c0; padding: 4px 0px">
         <a-card>
           <a-card-title>
@@ -77,7 +69,7 @@
           </a-card-actions>
         </a-card>
       </div>
-    </v-dialog>
+    </a-dialog>
     <app-control-label
       :value="control.label"
       :redacted="redacted"

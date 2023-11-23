@@ -14,7 +14,7 @@
       <a-icon>mdi-pencil</a-icon>
     </v-btn>
 
-    <v-dialog v-model="tableDialogIsVisible">
+    <a-dialog v-model="tableDialogIsVisible">
       <ontology-list-editor
         v-if="tableDialogIsVisible && resource && resource.type === resourceTypes.ONTOLOGY_LIST"
         :resources="resources"
@@ -24,8 +24,8 @@
         @delete="removeResource"
         @close-dialog="closeTableDialog"
       />
-    </v-dialog>
-    <v-dialog v-model="referenceDialogIsVisible" max-width="50%">
+    </a-dialog>
+    <a-dialog v-model="referenceDialogIsVisible" max-width="50%">
       <ontology-reference-editor
         v-if="referenceDialogIsVisible && resource && resource.type === resourceTypes.SURVEY_REFERENCE"
         :resources="resources"
@@ -34,7 +34,7 @@
         @delete="removeResource"
         @close-dialog="closeReferenceDialog"
       />
-    </v-dialog>
+    </a-dialog>
   </div>
 </template>
 

@@ -16,7 +16,7 @@
             <a-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </a-toolbar-title>
 
             <a-spacer />
-            <v-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
+            <a-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
               </template>
@@ -34,7 +34,7 @@
                   </v-btn>
                 </a-card-actions>
               </a-card>
-            </v-dialog>
+            </a-dialog>
           </a-app-bar>
           <a-spacer />
 
@@ -63,7 +63,7 @@
         <a-card-subtitle>This group is not integrated with Hylo yet</a-card-subtitle>
 
         <a-card-text>
-          <v-dialog v-model="integrateDialog" width="500">
+          <a-dialog v-model="integrateDialog" width="500">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </v-btn>
             </template>
@@ -119,7 +119,7 @@
                 <v-btn text @click="integrateDialog = false"> close </v-btn>
               </a-card-actions>
             </a-card>
-          </v-dialog>
+          </a-dialog>
         </a-card-text>
       </template>
     </a-card>

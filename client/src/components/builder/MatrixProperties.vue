@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
+  <a-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         v-on="on"
@@ -27,7 +27,7 @@
       @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       @set-control-required="(val) => $emit('set-control-required')"
     />
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

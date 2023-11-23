@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
+  <a-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         ref="anchorRef"
@@ -84,7 +84,7 @@
         <v-btn color="primary" @click="save">Save</v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

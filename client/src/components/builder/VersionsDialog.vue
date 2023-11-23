@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
     <a-card>
       <a-card-title>Survey Versions</a-card-title>
       <a-card-text cssMaxHeight500px>
@@ -103,7 +103,7 @@
       :revision-b="survey.revisions.find((r) => r.version === compareRevisions[1])"
       @cancel="surveyDiffDialogVisible = false"
     />
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

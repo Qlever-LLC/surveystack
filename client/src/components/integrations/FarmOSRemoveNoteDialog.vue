@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
+  <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
     <a-card class="pa-4">
       <a-card-title class="headline"> Why is this instance being removed? </a-card-title>
       <a-card-text>
@@ -23,13 +23,12 @@
         </div>
       </a-card-text>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 export default {
   emits: ['addNote', 'cancelNote'],
-
   props: ['loading', 'value'],
 
   data() {

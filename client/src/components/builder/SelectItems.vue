@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" width="500" @click:outside="cancel">
+  <a-dialog v-model="open" width="500" @click:outside="cancel">
     <template v-slot:activator="{ on, attrs }">
       <a-text-field
         v-on="on"
@@ -46,7 +46,7 @@
         <v-btn color="primary" @click="save">Save</v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

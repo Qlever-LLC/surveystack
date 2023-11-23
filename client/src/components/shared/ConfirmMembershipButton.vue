@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isVisible" width="300">
+  <a-dialog v-model="isVisible" width="300">
     <template v-slot:activator="{ on, attrs }">
       <v-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </v-btn>
     </template>
@@ -16,7 +16,7 @@
         <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

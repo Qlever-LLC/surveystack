@@ -42,7 +42,7 @@
         >
       </a-card-text>
     </a-card>
-    <v-dialog v-model="deleteModalIsVisible" max-width="290">
+    <a-dialog v-model="deleteModalIsVisible" max-width="290">
       <a-card>
         <a-card-title> Remove Documentation </a-card-title>
         <a-card-text class="mt-4">
@@ -59,9 +59,9 @@
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
 
-    <v-dialog v-model="showAddDialog" max-width="500">
+    <a-dialog v-model="showAddDialog" max-width="500">
       <a-card>
         <a-card-title>Add documentation link</a-card-title>
         <a-card-text>
@@ -83,7 +83,7 @@
           <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
 
     <slot name="footer">
       <div></div>

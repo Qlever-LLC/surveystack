@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="upgradeDialog" width="400">
+    <a-dialog v-model="upgradeDialog" width="400">
       <a-card>
         <a-card-title> Upgrade </a-card-title>
         <a-card-text>
@@ -8,7 +8,7 @@
           <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
         </a-card-text>
       </a-card>
-    </v-dialog>
+    </a-dialog>
 
     <a-card v-if="superAdmin" class="px-4 mb-4">
       <a-card-title>Super Admin</a-card-title>

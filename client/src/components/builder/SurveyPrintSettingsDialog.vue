@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="$emit('input', $event)" width="350" max-width="75%">
+  <a-dialog :value="value" @input="$emit('input', $event)" width="350" max-width="75%">
     <a-card>
       <a-card-title> Print settings </a-card-title>
 
@@ -29,13 +29,12 @@
         <v-btn @click="$emit('input', false)" color="primary" text> Close </v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
 export default {
   name: 'survey-print-settings-dialog',
-
   props: {
     value: {
       type: Boolean,

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
     <a-card>
       <a-card-title>
         Compare
@@ -20,7 +20,7 @@
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

@@ -187,14 +187,14 @@
       @close="closeModal"
     />
 
-    <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
+    <a-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
       <a-card>
         <a-card-text class="pa-4">
           <span>Downloading file resource</span>
           <a-progress-linear indeterminate class="mb-0" />
         </a-card-text>
       </a-card>
-    </v-dialog>
+    </a-dialog>
 
     <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}

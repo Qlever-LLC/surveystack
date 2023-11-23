@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
+  <a-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
     <a-card class="pa-4">
       <FarmOSRegister
         :viewModel="viewModel"
@@ -7,7 +7,7 @@
         @create-instance="(f) => $emit('create-instance', f)"
       ></FarmOSRegister>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

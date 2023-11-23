@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
     <a-card>
       <a-card-title> Confirm Submission </a-card-title>
       <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>
@@ -33,7 +33,7 @@
         <v-btn text color="primary" @click.stop="handleConfirm"> Submit </v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

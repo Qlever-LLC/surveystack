@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="show" max-width="350" :persistent="persistent">
+    <a-dialog v-model="show" max-width="350" :persistent="persistent">
       <a-card>
         <a-card-title v-if="title" class="headline mb-2">{{ title }}</a-card-title>
 
@@ -12,7 +12,7 @@
               </a-card-text>
               <template v-if="item.logs && item.logs.length">
                 <a-divider class="mx-4" />
-                <v-dialog width="500">
+                <a-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
                     <a-card-actions>
                       <a-spacer />
@@ -52,7 +52,7 @@
                       </a-expansion-panels>
                     </a-card-text>
                   </a-card>
-                </v-dialog>
+                </a-dialog>
               </template>
               <!-- <pre v-if="item.logs">{{ JSON.stringify(item.logs, null, 2) }}</pre> -->
             </a-card>
@@ -74,7 +74,7 @@
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
   </div>
 </template>
 

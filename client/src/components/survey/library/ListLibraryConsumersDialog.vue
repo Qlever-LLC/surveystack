@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
     <a-card>
       <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
@@ -26,7 +26,7 @@
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 <script>
 import { reactive, toRefs } from '@vue/composition-api';

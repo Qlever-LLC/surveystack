@@ -17,7 +17,7 @@
           Result Object (click to expand)
         </a-chip>
 
-        <v-dialog v-model="dialog" width="800">
+        <a-dialog v-model="dialog" width="800">
           <a-card>
             <a-card-title class="headline">Object Created</a-card-title>
             <div style="width: 100%; height: 60vh">
@@ -29,7 +29,7 @@
               <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
             </a-card-actions>
           </a-card>
-        </v-dialog>
+        </a-dialog>
 
         <a-spacer />
         <a-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</a-icon>

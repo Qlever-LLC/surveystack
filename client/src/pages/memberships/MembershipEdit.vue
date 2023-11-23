@@ -57,7 +57,7 @@
       </a-card-actions>
     </a-card>
 
-    <v-dialog v-model="dialogRemoval" max-width="290">
+    <a-dialog v-model="dialogRemoval" max-width="290">
       <a-card>
         <a-card-title> Delete Membership </a-card-title>
         <a-card-text class="mt-4"> Are you sure you want to delete this membership? </a-card-text>
@@ -67,9 +67,9 @@
           <v-btn text color="red" @click.stop="remove"> Delete </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
 
-    <v-dialog v-model="dialogSent" max-width="400">
+    <a-dialog v-model="dialogSent" max-width="400">
       <a-card>
         <a-card-title> Sent </a-card-title>
         <a-card-text class="mt-4">
@@ -80,7 +80,7 @@
           <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
 
     <app-dialog
       v-model="dialogInvitationLink"

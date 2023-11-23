@@ -4,7 +4,7 @@
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
         <a-spacer />
-        <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
+        <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
               <a-icon>mdi-pencil</a-icon>
@@ -27,8 +27,8 @@
               <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
             </a-card-actions>
           </a-card>
-        </v-dialog>
-        <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
+        </a-dialog>
+        <a-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
               <a-icon>mdi-dresser</a-icon>
@@ -47,7 +47,7 @@
               <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
             </a-card-actions>
           </a-card>
-        </v-dialog>
+        </a-dialog>
         <publish-updated-library-dialog
           v-if="updateLibraryDialogIsVisible"
           v-model="updateLibraryDialogIsVisible"

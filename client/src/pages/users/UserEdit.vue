@@ -8,7 +8,7 @@
     <a-card class="pa-4 mb-4 mt-2">
       <a-card-title v-if="editMode">
         {{ currentEmail }} <a-spacer />
-        <v-dialog v-model="isEmailDialogOpen">
+        <a-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
             <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
           </template>
@@ -24,7 +24,7 @@
               <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
             </a-card-actions>
           </a-card>
-        </v-dialog>
+        </a-dialog>
       </a-card-title>
       <a-card-text>
         <a-form>

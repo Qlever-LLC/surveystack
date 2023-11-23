@@ -89,7 +89,7 @@
       </a-form>
     </a-card>
 
-    <v-dialog v-model="dialogCreateUser" max-width="500">
+    <a-dialog v-model="dialogCreateUser" max-width="500">
       <a-card>
         <a-card-title> User does not exist yet </a-card-title>
         <a-card-text class="mt-4">
@@ -101,7 +101,7 @@
           <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
   </a-container>
 </template>
 

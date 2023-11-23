@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="persistent">
+  <a-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="persistent">
     <a-card>
       <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
@@ -21,7 +21,7 @@
         <v-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

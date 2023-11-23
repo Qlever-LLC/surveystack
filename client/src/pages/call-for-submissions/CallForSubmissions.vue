@@ -56,7 +56,7 @@
       </a-card-text>
     </a-card>
 
-    <v-dialog v-model="showConfirmDialog" max-width="500">
+    <a-dialog v-model="showConfirmDialog" max-width="500">
       <a-card>
         <a-card-title class="headline">Confirmation</a-card-title>
         <a-card-text>
@@ -71,7 +71,7 @@
           <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
     <result-dialog
       v-model="showSubmitResult"
       :items="submitResults"

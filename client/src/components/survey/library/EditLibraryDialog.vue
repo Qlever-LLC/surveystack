@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <a-card>
       <a-card-title> Add Survey To Library </a-card-title>
       <a-card-text>
@@ -28,7 +28,7 @@
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 <script>
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';

@@ -10,7 +10,7 @@
     >See on Hylo</v-btn
   >
 
-  <v-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
+  <a-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
     <template v-slot:activator="{ on, attrs }">
       <v-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</v-btn>
     </template>
@@ -23,7 +23,7 @@
         <v-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

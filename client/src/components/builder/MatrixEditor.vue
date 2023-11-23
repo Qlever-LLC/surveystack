@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="editorDialog">
+    <a-dialog v-model="editorDialog">
       <app-ontology-list-editor
         :resources="resources"
         :resource="ontology"
@@ -9,7 +9,7 @@
         @delete="removeResource"
         @close-dialog="editorDialog = false"
       />
-    </v-dialog>
+    </a-dialog>
 
     <a-card class="d-flex flex-column">
       <a-card-title class="d-block">

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
+  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
     <a-card>
       <a-card-title>
         Update question set from Version
@@ -39,7 +39,7 @@
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
       </a-card-actions>
     </a-card>
-    <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
+    <a-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
       <a-card>
         <a-card-title>Confirm Update</a-card-title>
         <a-card-text class="mt-4">
@@ -55,8 +55,8 @@
           <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
-  </v-dialog>
+    </a-dialog>
+  </a-dialog>
 </template>
 
 <script>

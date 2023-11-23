@@ -1,16 +1,16 @@
 <template>
   <div class="screen-root">
-    <v-dialog v-model="viewCode">
+    <a-dialog v-model="viewCode">
       <app-code-view v-model="survey" style="height: 80vh" />
-    </v-dialog>
+    </a-dialog>
 
-    <v-dialog v-model="viewSubmission">
+    <a-dialog v-model="viewSubmission">
       <app-code-view v-model="instance" style="height: 80vh" />
-    </v-dialog>
+    </a-dialog>
 
-    <v-dialog v-model="showExamples">
+    <a-dialog v-model="showExamples">
       <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
-    </v-dialog>
+    </a-dialog>
 
     <update-library-dialog
       v-if="updateLibraryDialogIsVisible"

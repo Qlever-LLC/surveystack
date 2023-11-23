@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isVisible" persistent width="300">
+  <a-dialog v-model="isVisible" persistent width="300">
     <a-card>
       <a-card-title>
         {{ title }}
@@ -15,7 +15,7 @@
         </v-btn>
       </a-card-actions>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

@@ -26,7 +26,7 @@
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </a-tooltip>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
-          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
+          <a-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
               <v-btn icon v-on="on" class="ml-2" :disabled="disabled">
                 <a-icon>mdi-delete</a-icon>
@@ -44,7 +44,7 @@
                 <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </a-card-actions>
             </a-card>
-          </v-dialog>
+          </a-dialog>
         </div>
       </div>
       <a-divider />
@@ -116,7 +116,7 @@
       <v-btn text class="ml-4" @click="close">Close</v-btn>
     </a-card-actions>
 
-    <v-dialog v-model="editItemDialogIsVisible" max-width="350">
+    <a-dialog v-model="editItemDialogIsVisible" max-width="350">
       <a-card>
         <a-card-title>Edit Item</a-card-title>
         <a-card-text>
@@ -130,7 +130,7 @@
           <v-btn text color="primary" @click="saveItem">Save</v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
   </a-card>
 </template>
 

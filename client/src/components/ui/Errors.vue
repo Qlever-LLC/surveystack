@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="show" max-width="350">
+    <a-dialog v-model="show" max-width="350">
       <a-card class="pa-4" dark color="red">
         <a-card-title class="headline">{{ title }}</a-card-title>
         <template v-for="(error, idx) in errors">
@@ -11,7 +11,7 @@
           </div>
         </template>
       </a-card>
-    </v-dialog>
+    </a-dialog>
   </div>
 </template>
 

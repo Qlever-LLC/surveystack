@@ -45,7 +45,7 @@
         >
       </a-card-text>
     </a-card>
-    <v-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
+    <a-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
       <a-card>
         <a-card-title> Remove Pinned Survey </a-card-title>
         <a-card-text class="mt-4">
@@ -57,9 +57,9 @@
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
 
-    <v-dialog v-model="showSearchDialog" max-width="500">
+    <a-dialog v-model="showSearchDialog" max-width="500">
       <a-card>
         <a-card-title>Search surveys</a-card-title>
         <a-card-text>
@@ -76,7 +76,7 @@
           </v-list>
         </a-card-text>
       </a-card>
-    </v-dialog>
+    </a-dialog>
     <slot name="footer">
       <div></div>
     </slot>

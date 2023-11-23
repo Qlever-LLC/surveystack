@@ -26,7 +26,8 @@
             <a-card-text>
               <a-row>
                 <div class="text-h6">{{ email }}</div>
-                <a-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
+                <a-spacer />
+                <a-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
                   </template>
@@ -44,7 +45,7 @@
                       </v-btn>
                     </a-card-actions>
                   </a-card>
-                </v-dialog>
+                </a-dialog>
               </a-row>
             </a-card-text>
             <a-text-field tabindex="2" v-model="name" label="Name" />
@@ -88,7 +89,7 @@
         </div>
       </div>
 
-      <v-dialog v-model="isLeaveDialogOpen" max-width="290">
+      <a-dialog v-model="isLeaveDialogOpen" max-width="290">
         <a-card>
           <a-card-title> Leave Group </a-card-title>
           <a-card-text v-if="parentAdminGroup" class="mt-4">
@@ -107,7 +108,7 @@
             <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
           </a-card-actions>
         </a-card>
-      </v-dialog>
+      </a-dialog>
     </template>
     <template v-else>
       <h1>Profile</h1>

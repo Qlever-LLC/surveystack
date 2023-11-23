@@ -165,7 +165,7 @@
       />
     </a-card>
 
-    <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
+    <a-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
       <a-card>
         <a-card-title> Delete Question </a-card-title>
         <a-card-text class="mt-4"> Are you sure you want to remove this question? </a-card-text>
@@ -175,7 +175,7 @@
           <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </a-card-actions>
       </a-card>
-    </v-dialog>
+    </a-dialog>
   </draggable>
   <div v-else>
     <a-card class="text--secondary">

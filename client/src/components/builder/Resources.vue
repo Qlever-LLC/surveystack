@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="ontologyEditorDialog">
+    <a-dialog v-model="ontologyEditorDialog">
       <app-ontology-list-editor
         :resources="resources"
         :resource="resource"
@@ -9,23 +9,23 @@
         @delete="removeResource"
         @close-dialog="ontologyEditorDialog = false"
       />
-    </v-dialog>
-    <v-dialog :value="uploadingResource" hide-overlay persistent width="300">
+    </a-dialog>
+    <a-dialog :value="uploadingResource" hide-overlay persistent width="300">
       <a-card>
         <a-card-text class="pa-4">
           <span>Uploading file resource</span>
           <a-progress-linear indeterminate class="mb-0" />
         </a-card-text>
       </a-card>
-    </v-dialog>
-    <v-dialog :value="downloadingResource" hide-overlay persistent width="300">
+    </a-dialog>
+    <a-dialog :value="downloadingResource" hide-overlay persistent width="300">
       <a-card>
         <a-card-text class="pa-4">
           <span>Downloading file resource</span>
           <a-progress-linear indeterminate class="mb-0" />
         </a-card-text>
       </a-card>
-    </v-dialog>
+    </a-dialog>
     <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
     </a-alert>

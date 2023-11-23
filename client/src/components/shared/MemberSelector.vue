@@ -1,5 +1,5 @@
 <template>
-  <v-dialog max-width="500" max-height="100" v-model="dialog">
+  <a-dialog max-width="500" max-height="100" v-model="dialog">
     <a-card>
       <a-card-title>Search members</a-card-title>
       <a-card-text>
@@ -38,7 +38,7 @@
         </v-list>
       </a-card-text>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>

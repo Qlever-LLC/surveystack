@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
+  <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <a-card class="pa-4">
       <a-card-title class="headline"> Manage Groups </a-card-title>
       <a-card-text>
@@ -37,7 +37,7 @@
         </div>
       </a-card-text>
     </a-card>
-  </v-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -45,7 +45,6 @@ import './css/button.css';
 
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
-
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {
