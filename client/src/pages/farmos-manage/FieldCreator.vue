@@ -6,7 +6,7 @@
       </a-col>
       <a-col cols="12"> OR </a-col>
       <a-col cols="12">
-        <v-btn outlined color="primary" @click="draw">Draw new Field</v-btn>
+        <a-btn outlined color="primary" @click="draw">Draw new Field</a-btn>
       </a-col>
     </template>
 
@@ -21,11 +21,11 @@
       </a-col>
 
       <a-col cols="6">
-        <v-btn color="primary" @click="$emit('done')" :loading="loading">Add Field to FarmOS Instance</v-btn>
+        <a-btn color="primary" @click="$emit('done')" :loading="loading">Add Field to FarmOS Instance</a-btn>
       </a-col>
 
       <a-col cols="6">
-        <v-btn color="primary" outlined @click="$emit('cancel')" :loading="loading">Cancel</v-btn>
+        <a-btn color="primary" outlined @click="$emit('cancel')" :loading="loading">Cancel</a-btn>
       </a-col>
     </template>
 

@@ -4,9 +4,9 @@
       <a-icon class="mr-1">mdi-library</a-icon>
       Question Library
       <a-spacer />
-      <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
+      <a-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <a-icon> mdi-close </a-icon>
-      </v-btn>
+      </a-btn>
     </a-card-title>
 
     <a-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
@@ -41,7 +41,7 @@
                 </a-chip>
               </a-col>
               <a-col align="right" md="auto">
-                <v-btn
+                <a-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="grey"
@@ -52,8 +52,8 @@
                   small
                 >
                   back
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="white"
@@ -64,7 +64,7 @@
                   small
                 >
                   add to survey
-                </v-btn>
+                </a-btn>
                 <!--TODO Resolve #48, then uncomment this
                 div>
                   <a-tooltip bottom>

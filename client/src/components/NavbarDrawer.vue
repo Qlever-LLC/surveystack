@@ -1,9 +1,9 @@
 <template>
   <a-navigation-drawer :value="value" app>
     <div class="d-flex justify-end mt-3 mr-3">
-      <v-btn large icon @click="$emit('input', !value)">
+      <a-btn large icon @click="$emit('input', !value)">
         <a-icon>mdi-close</a-icon>
-      </v-btn>
+      </a-btn>
     </div>
     <a-list>
       <template v-for="(item, i) in items">

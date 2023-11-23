@@ -29,7 +29,7 @@
                 <a-spacer />
                 <a-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
+                    <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
                   </template>
                   <a-card>
                     <a-card-title class="text-h5"> Change Email </a-card-title>
@@ -40,9 +40,9 @@
                     </a-card-text>
                     <a-card-actions>
                       <a-spacer />
-                      <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
+                      <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
-                      </v-btn>
+                      </a-btn>
                     </a-card-actions>
                   </a-card>
                 </a-dialog>
@@ -72,7 +72,7 @@
             />
 
             <div class="d-flex mt-2 justify-end">
-              <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</v-btn>
+              <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</a-btn>
             </div>
           </a-form>
         </a-card-text>
@@ -83,8 +83,8 @@
         <p class="mt-1 mb-5 grey--text text-body-2">These are your group memberships. You can select one to leave.</p>
         <div class="d-flex align-center">
           <active-group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
-          <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
-            >Leave</v-btn
+          <a-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
+            >Leave</a-btn
           >
         </div>
       </div>
@@ -104,8 +104,8 @@
           </a-card-text>
           <a-card-actions>
             <a-spacer />
-            <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
-            <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
+            <a-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </a-btn>
+            <a-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </a-btn>
           </a-card-actions>
         </a-card>
       </a-dialog>

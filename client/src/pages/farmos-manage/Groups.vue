@@ -33,7 +33,7 @@
         />
       </v-col>
       <v-col>
-        <v-btn color="primary" @click="$emit('save-plan', selectedPlan)">Save Plan</v-btn>
+        <a-btn color="primary" @click="$emit('save-plan', selectedPlan)">Save Plan</a-btn>
       </v-col>
     </v-row> -->
 
@@ -68,7 +68,7 @@
             </td>
             <td></td>
             <td>
-              <v-btn color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)">Map</v-btn>
+              <a-btn color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)">Map</a-btn>
             </td>
           </tr>
 
@@ -102,7 +102,7 @@
               </div>
             </td>
             <td>
-              <v-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</v-btn>
+              <a-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</a-btn>
             </td>
           </tr>
         </tbody>

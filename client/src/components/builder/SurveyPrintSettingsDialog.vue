@@ -26,13 +26,14 @@
 
       <a-card-actions class="mr-3">
         <a-spacer />
-        <v-btn @click="$emit('input', false)" color="primary" text> Close </v-btn>
+        <a-btn @click="$emit('input', false)" color="primary" text> Close </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>
 </template>
 
 <script>
+
 export default {
   name: 'survey-print-settings-dialog',
   props: {

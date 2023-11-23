@@ -38,17 +38,17 @@
     <a-spacer />
     <a-card-actions>
       <a-spacer />
-      <v-btn text @click="closeHandler"> Close </v-btn>
+      <a-btn text @click="closeHandler"> Close </a-btn>
       <a-tooltip top :disabled="!!path">
         <template v-slot:activator="{ on }">
           <div v-on="on">
-            <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
+            <a-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </a-btn>
           </div>
         </template>
         <span>No Submitted Surveys Available</span>
       </a-tooltip>
-      <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
-      <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
+      <a-btn text color="error" @click="deleteResource"> Delete </a-btn>
+      <a-btn text color="primary" @click="updateAndClose"> Save </a-btn>
     </a-card-actions>
 
     <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />

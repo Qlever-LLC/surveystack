@@ -3,7 +3,7 @@
     <a-card-title
       >Documentation Links
       <a-spacer />
-      <v-btn color="primary" text @click="showAddDialog = true">New.. </v-btn>
+      <a-btn color="primary" text @click="showAddDialog = true">New.. </a-btn>
     </a-card-title>
     <a-card-subtitle>Custom links which appear in the side menu when logged into your group</a-card-subtitle>
     <draggable
@@ -26,9 +26,9 @@
               <a :href="el.link" target="_blank">{{ el.link }}</a>
             </div>
             <div class="d-flex">
-              <v-btn icon @click.stop="() => showDeleteModal(idx)">
+              <a-btn icon @click.stop="() => showDeleteModal(idx)">
                 <a-icon color="grey lighten-1">mdi-delete</a-icon>
-              </v-btn>
+              </a-btn>
             </div>
           </div>
         </a-card-text>
@@ -55,8 +55,8 @@
         <a-card-text class="mt-4"> Are you sure you want to remove this documentation link? </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+          <a-btn text @click.stop="cancelDeleteEntry"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>
@@ -79,8 +79,8 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
-          <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
+          <a-btn text @click.stop="cancelAddEntry"> Cancel </a-btn>
+          <a-btn text color="primary" @click.stop="addEntry"> Submit </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

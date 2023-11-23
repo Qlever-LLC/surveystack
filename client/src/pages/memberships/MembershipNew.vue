@@ -47,7 +47,7 @@
         </a-radio-group>
 
         <div class="d-flex mt-2 justify-end">
-          <v-btn text @click="cancel">Cancel</v-btn>
+          <a-btn text @click="cancel">Cancel</a-btn>
 
           <btn-dropdown
             :label="invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'"
@@ -97,8 +97,8 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
+          <a-btn text @click.stop="dialogCreateUser = false"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>
@@ -128,9 +128,7 @@ const availableRoles = [
 ];
 
 export default {
-  components: {
-    BtnDropdown,
-  },
+  components: { BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',

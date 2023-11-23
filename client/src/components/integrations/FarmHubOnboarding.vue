@@ -7,7 +7,7 @@
       </a-card-title>
       <a-card-text class="d-flex justify-center">
         <div class="pa-8">
-          <v-btn class="center-text" color="primary" priominent x-large :to="newRoute">Manage FarmOS Farms</v-btn>
+          <a-btn class="center-text" color="primary" priominent x-large :to="newRoute">Manage FarmOS Farms</a-btn>
         </div>
       </a-card-text>
     </a-card>

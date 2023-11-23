@@ -32,28 +32,28 @@
     <div class="d-flex justify-end">
       <a-menu offset-y left>
         <template v-slot:activator="{ on }">
-          <v-btn color="primary" v-on="on">
+          <a-btn color="primary" v-on="on">
             <a-icon left>mdi-plus</a-icon>
             Add resource
-          </v-btn>
+          </a-btn>
         </template>
         <v-list>
           <a-list-item class="d-flex align-center">
             <a-list-item-title>
-              <v-btn text @click="createOntology">
+              <a-btn text @click="createOntology">
                 <a-icon color="grey">mdi-plus</a-icon>
                 <div class="ml-1">Create Ontology</div>
-              </v-btn>
+              </a-btn>
             </a-list-item-title>
           </a-list-item>
           <a-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <a-list-item-title>
               <a-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
-                  <v-btn class="pointer-events-none" text>
+                  <a-btn class="pointer-events-none" text>
                     <a-icon color="grey">mdi-upload</a-icon>
                     <div class="ml-1">Add File Resource</div>
-                  </v-btn>
+                  </a-btn>
                 </label>
                 <input
                   type="file"
@@ -88,9 +88,9 @@
           </v-list-item-content>
           <a-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</a-icon>
           <a-list-item-action v-if="resource.type === resourceTypes.FILE">
-            <v-btn icon>
+            <a-btn icon>
               <a-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </a-icon>
-            </v-btn>
+            </a-btn>
           </a-list-item-action>
         </a-list-item>
       </template>

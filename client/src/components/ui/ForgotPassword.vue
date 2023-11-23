@@ -7,7 +7,7 @@
       <a-form @submit.prevent="submit">
         <a-text-field v-model="email" label="Email" />
         <div class="d-flex justify-end">
-          <v-btn type="submit" color="primary" class="px-8">Submit</v-btn>
+          <a-btn type="submit" color="primary" class="px-8">Submit</a-btn>
         </div>
       </a-form>
       <div class="text-center text-muted mt-5">

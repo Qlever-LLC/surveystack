@@ -20,7 +20,7 @@
           prependItemSlot
         >
           <template slot="prepend-item">
-            <v-btn
+            <a-btn
               :disabled="loading"
               :loading="loading"
               @click="updateGroups"
@@ -28,12 +28,12 @@
               class="button--autocomplete"
             >
               Update Groups
-            </v-btn>
+            </a-btn>
           </template>
         </a-select>
         <div class="d-flex justify-space-around">
-          <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
-          <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
+          <a-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</a-btn>
+          <a-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </a-btn>
         </div>
       </a-card-text>
     </a-card>

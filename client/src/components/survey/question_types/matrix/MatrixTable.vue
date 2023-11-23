@@ -56,9 +56,9 @@
       </div>
     </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
-      <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
+      <a-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
         <a-icon left>mdi-plus</a-icon>{{ addRowLabel }}
-      </v-btn>
+      </a-btn>
     </div>
   </div>
 </template>

@@ -11,9 +11,9 @@
 
       <a-spacer />
       <offline-indicator />
-      <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
+      <a-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
         <a-icon size="22">mdi-help-circle-outline</a-icon>
-      </v-btn>
+      </a-btn>
       <navbar-user-menu />
     </a-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />

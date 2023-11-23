@@ -3,7 +3,7 @@
     <a-card-title
       >Pinned Surveys
       <a-spacer />
-      <v-btn color="primary" text @click="openSearchDialog">New..</v-btn>
+      <a-btn color="primary" text @click="openSearchDialog">New..</a-btn>
     </a-card-title>
     <draggable
       v-if="entities.length !== 0"
@@ -29,9 +29,9 @@
               </span>
             </div>
             <div class="d-flex">
-              <v-btn icon @click.stop="() => showDeleteModal(idx)">
+              <a-btn icon @click.stop="() => showDeleteModal(idx)">
                 <a-icon color="grey lighten-1">mdi-delete</a-icon>
-              </v-btn>
+              </a-btn>
             </div>
           </div>
         </a-card-text>
@@ -53,8 +53,8 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+          <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
+          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

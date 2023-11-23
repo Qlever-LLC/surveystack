@@ -47,7 +47,7 @@
             type="error"
             >{{ errorDialogMessage }}</a-alert
           >
-          <v-btn block @click="addUser" color="primary" target="_blank"> Add </v-btn>
+          <a-btn block @click="addUser" color="primary" target="_blank"> Add </a-btn>
         </div>
       </app-dialog>
       <!-- add confirmation Dialog -->
@@ -63,7 +63,7 @@
       >
         <div class="my-8" style="color: black">
           <p class="mb-4">Are you sure you want to add this user {{ newAddedUserEmail }} to your instance?<br /></p>
-          <v-btn block @click="confirmaddUser" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmaddUser" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -92,7 +92,7 @@
             type="error"
             >{{ errorDialogMessage }}</a-alert
           >
-          <v-btn block @click="changeOwner" color="primary" target="_blank"> Update</v-btn>
+          <a-btn block @click="changeOwner" color="primary" target="_blank"> Update</a-btn>
         </div>
       </app-dialog>
       <!-- move confirmation Dialog -->
@@ -119,7 +119,7 @@
             You will still be able to see fields, plantings and logs in your Survey Stack surveys and push surveys to
             that farm.
           </p>
-          <v-btn block @click="confirmChangeOwner" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmChangeOwner" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -144,7 +144,7 @@
             <li>See this farm's fields or plantings when filling out surveys.</li>
             <li>Push data from Survey Stack surveys into this farmOS farm.</li>
           </ol>
-          <v-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -179,7 +179,7 @@
             wish to continue access your farmOS farm you should sign up with hosting through Farmier at that point.
           </p>
           <p>If you want to transfer ownership of this farm to someone else, press the 'move' button instead.</p>
-          <v-btn block @click="confirmDeleteInstance" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmDeleteInstance" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -205,7 +205,7 @@
             member of this group.
           </p>
           <p>This will also affect anyone else linked to this farm through Survey Stack.</p>
-          <v-btn block @click="confirmRemoveInstFromGrpDialog" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmRemoveInstFromGrpDialog" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -225,7 +225,7 @@
             Are you sure? Removing this users access means they can no longer see your farmOS instance or access your
             fields, plantings or logs through in their surveys.
           </p>
-          <v-btn block @click="confirmRemoveInstFromOthUsrDialog" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmRemoveInstFromOthUsrDialog" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -250,7 +250,7 @@
                   <span v-if="instance.isOwner">
                     <a-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <v-btn
+                        <a-btn
                           v-on="on"
                           text
                           x-small
@@ -261,14 +261,14 @@
                           target="_blank"
                         >
                           access
-                        </v-btn>
+                        </a-btn>
                       </template>
                       <span>Access FarmOS instance</span>
                     </a-tooltip>
 
                     <a-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <v-btn
+                        <a-btn
                           v-on="on"
                           text
                           x-small
@@ -278,14 +278,14 @@
                           @click="addUserToInstance(instance.instanceName)"
                         >
                           add
-                        </v-btn>
+                        </a-btn>
                       </template>
                       <span>Add a user to your instance</span>
                     </a-tooltip>
 
                     <a-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <v-btn
+                        <a-btn
                           v-on="on"
                           text
                           x-small
@@ -295,14 +295,14 @@
                           @click="moveInstance(instance.instanceName)"
                         >
                           re-assign
-                        </v-btn>
+                        </a-btn>
                       </template>
                       <span>Re-assign the instance's ownership</span>
                     </a-tooltip>
 
                     <a-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <v-btn
+                        <a-btn
                           v-on="on"
                           text
                           x-small
@@ -312,7 +312,7 @@
                           @click="deleteInstance(instance.instanceName)"
                         >
                           delete
-                        </v-btn>
+                        </a-btn>
                       </template>
                       <span>Delete this instance</span>
                     </a-tooltip>
@@ -320,7 +320,7 @@
                   <span v-else>
                     <a-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <v-btn
+                        <a-btn
                           v-on="on"
                           text
                           x-small
@@ -331,14 +331,14 @@
                           target="_blank"
                         >
                           access
-                        </v-btn>
+                        </a-btn>
                       </template>
                       <span>Access FarmOS instance</span>
                     </a-tooltip>
 
                     <a-tooltip top>
                       <template v-slot:activator="{ on }">
-                        <v-btn
+                        <a-btn
                           v-on="on"
                           text
                           x-small
@@ -348,7 +348,7 @@
                           @click="removeInstance(instance.instanceName)"
                         >
                           remove
-                        </v-btn>
+                        </a-btn>
                       </template>
                       <span>Remove this instance</span>
                     </a-tooltip>

@@ -13,7 +13,7 @@
       <a-card-text>
         <label>Survey</label>
         <div class="mb-5 d-flex align-center">
-          <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
+          <a-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</a-btn>
           <span v-if="selectedSurvey" class="mx-2">{{ selectedSurvey.name }}</span>
           <a-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</a-icon>
         </div>
@@ -25,8 +25,8 @@
         </div>
         <div class="d-flex justify-end align-center mt-3">
           <span v-if="!submittable" class="mr-2">Select a survey and at least one member below</span>
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</v-btn>
+          <a-btn text @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</a-btn>
         </div>
       </a-card-text>
     </a-card>
@@ -67,8 +67,8 @@
           <a-checkbox label="Also send a copy to myself" v-model="copy" />
         </a-card-text>
         <a-card-actions class="d-flex justify-end">
-          <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
-          <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
+          <a-btn @click="showConfirmDialog = false" text>Cancel</a-btn>
+          <a-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

@@ -9,9 +9,9 @@
       max-height="calc(100% - 100px)"
     >
       <template v-slot:activator="{ on }">
-        <v-btn text v-on="on" @click="checkIsOwner">
+        <a-btn text v-on="on" @click="checkIsOwner">
           <a-icon>mdi-account</a-icon>
-        </v-btn>
+        </a-btn>
       </template>
       <a-list flat>
         <a-list-item link :to="{ name: 'auth-profile' }">
@@ -39,10 +39,10 @@
       </a-list>
     </a-menu>
 
-    <v-btn v-else :to="{ name: 'auth-login' }" text>
+    <a-btn v-else :to="{ name: 'auth-login' }" text>
       <a-icon>mdi-login-variant</a-icon>
       <span class="ml-2">Login</span>
-    </v-btn>
+    </a-btn>
   </div>
 </template>
 

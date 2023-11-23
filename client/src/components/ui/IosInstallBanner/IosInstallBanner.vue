@@ -1,8 +1,8 @@
 <template>
   <a-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary lighten-1" fixed bottom cssIosSnackbar>
-    <v-btn @click="handleClose" icon class="close-button">
+    <a-btn @click="handleClose" icon class="close-button">
       <a-icon>mdi-close</a-icon>
-    </v-btn>
+    </a-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center">

@@ -3,10 +3,10 @@
     <a-container>
       <a-row class="my-2">
         <a-spacer />
-        <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
+        <a-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
           <a-icon class="ml-2">mdi-cloud-upload-outline</a-icon>
-        </v-btn>
+        </a-btn>
       </a-row>
       <a-row class="d-flex flex-grow-1">
         <a-tabs v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
@@ -50,14 +50,14 @@
                     <a-list-item-action>
                       <a-tooltip bottom>
                         <template v-slot:activator="{ on }">
-                          <v-btn
+                          <a-btn
                             v-if="readyToSubmitHas(item._id)"
                             icon
                             @click="() => handleSubmitClick(item._id)"
                             v-on="on"
                           >
                             <a-icon> mdi-cloud-upload-outline </a-icon>
-                          </v-btn>
+                          </a-btn>
                         </template>
                         <span>Upload Submission</span>
                       </a-tooltip>

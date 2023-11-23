@@ -6,9 +6,9 @@
         <a-spacer />
         <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <a-btn icon v-on="on">
               <a-icon>mdi-pencil</a-icon>
-            </v-btn>
+            </a-btn>
           </template>
           <a-card>
             <a-card-title> Edit Survey Details</a-card-title>
@@ -24,15 +24,15 @@
             </a-card-text>
             <a-card-actions class="mr-3">
               <a-spacer />
-              <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
+              <a-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
         <a-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <a-btn icon v-on="on">
               <a-icon>mdi-dresser</a-icon>
-            </v-btn>
+            </a-btn>
           </template>
           <a-card>
             <a-card-title> Survey Resources</a-card-title>
@@ -44,7 +44,7 @@
             </a-card-text>
             <a-card-actions class="mr-3">
               <a-spacer />
-              <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
+              <a-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
@@ -57,19 +57,19 @@
         />
         <a-menu offset-y left>
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <a-btn icon v-on="on">
               <a-icon>mdi-dots-vertical</a-icon>
-            </v-btn>
+            </a-btn>
           </template>
           <v-list>
             <a-list-item class="d-flex align-center">
               <a-list-item-title>
                 <a-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
-                    <v-btn class="pointer-events-none" text>
+                    <a-btn class="pointer-events-none" text>
                       <a-icon color="grey">mdi-file-upload</a-icon>
                       <div class="ml-1">Import</div>
-                    </v-btn>
+                    </a-btn>
                   </label>
                   <input
                     type="file"
@@ -84,50 +84,50 @@
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <v-btn @click="$emit('export-survey')" text>
+                <a-btn @click="$emit('export-survey')" text>
                   <a-icon color="grey">mdi-file-download</a-icon>
                   <div class="ml-1">Export</div>
-                </v-btn>
+                </a-btn>
               </a-list-item-title>
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <v-btn @click="$emit('show-version-dialog')" text>
+                <a-btn @click="$emit('show-version-dialog')" text>
                   <a-icon color="grey">mdi-sitemap</a-icon>
                   <div class="ml-1">Manage Survey Versions</div>
-                </v-btn>
+                </a-btn>
               </a-list-item-title>
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <v-btn @click="editLibraryDialogIsVisible = true" text>
+                <a-btn @click="editLibraryDialogIsVisible = true" text>
                   <a-icon color="grey">mdi-library</a-icon>
                   <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
-                </v-btn>
+                </a-btn>
               </a-list-item-title>
             </a-list-item>
             <a-list-item v-if="value.meta.isLibrary">
               <a-list-item-title>
-                <v-btn @click="libraryConsumersDialogIsVisible = true" text>
+                <a-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <a-icon color="grey">mdi-layers-search</a-icon>
                   <div class="ml-1">List library consumers</div>
-                </v-btn>
+                </a-btn>
               </a-list-item-title>
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <v-btn text @click="printSettingDialogIsVisible = true">
+                <a-btn text @click="printSettingDialogIsVisible = true">
                   <a-icon color="grey">mdi-printer-settings</a-icon>
                   <div class="ml-1">Print settings</div>
-                </v-btn>
+                </a-btn>
               </a-list-item-title>
             </a-list-item>
             <a-list-item v-if="!isNew">
               <a-list-item-title>
-                <v-btn text @click="$emit('delete')">
+                <a-btn text @click="$emit('delete')">
                   <a-icon color="grey">mdi-delete</a-icon>
                   <div class="ml-1">Delete</div>
-                </v-btn>
+                </a-btn>
               </a-list-item-title>
             </a-list-item>
           </v-list>
@@ -150,7 +150,7 @@
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
           Size: {{ surveySize }} MB
-          <v-btn
+          <a-btn
             v-if="surveySize > 1"
             @click="$emit('show-version-dialog')"
             x-small
@@ -159,7 +159,7 @@
             class="mb-1"
           >
             <a-icon x-small color="warning">mdi-alert</a-icon>try to clean up
-          </v-btn>
+          </a-btn>
         </div>
         <div class="text-left">
           <a-chip dark small outlined color="grey"> Version {{ version }}</a-chip>
@@ -181,7 +181,7 @@
           <a-tooltip bottom v-if="!isNew">
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <v-btn
+                <a-btn
                   v-if="!isNew"
                   :dark="enableUpdate"
                   :disabled="!enableUpdate || isSaving"
@@ -192,7 +192,7 @@
                 >
                   <a-icon class="mr-1">mdi-update</a-icon>
                   Update
-                </v-btn>
+                </a-btn>
               </div>
             </template>
             <span
@@ -204,7 +204,7 @@
           <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <v-btn
+                <a-btn
                   :dark="enablePublish"
                   class="my-1 mr-1"
                   @click="publish"
@@ -213,7 +213,7 @@
                 >
                   <a-icon class="mr-1">mdi-cloud-upload</a-icon>
                   Publish
-                </v-btn>
+                </a-btn>
               </div>
             </template>
 
@@ -223,7 +223,7 @@
           <a-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <v-btn
+                <a-btn
                   :dark="enableSaveDraft"
                   @click="$emit('saveDraft')"
                   color="primary"
@@ -233,7 +233,7 @@
                 >
                   <a-icon class="mr-1">mdi-content-save</a-icon>
                   Save
-                </v-btn>
+                </a-btn>
               </div>
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>

@@ -9,8 +9,8 @@
       </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <v-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</v-btn>
-        <v-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
+        <a-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</a-btn>
+        <a-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

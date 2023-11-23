@@ -2,14 +2,14 @@
   <div class="control-adder">
     <a-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
-        <v-btn v-model="fabIsOpen" fab color="blue darken-2" dark data-testid="control-adder-open">
+        <a-btn fab color="blue darken-2" dark data-testid="control-adder-open">
           <a-icon v-if="fabIsOpen">mdi-close</a-icon>
           <a-icon v-else>mdi-plus</a-icon>
-        </v-btn>
+        </a-btn>
       </template>
       <template v-slot:default>
         <div class="button-grid">
-          <v-btn
+          <a-btn
             dark
             color="white"
             key="library"
@@ -20,8 +20,8 @@
             data-testid="add-control-library"
           >
             search question library
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             dark
             color="white"
             key="group"
@@ -35,8 +35,8 @@
               {{ group.icon }}
             </a-icon>
             Group
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             small
             dark
             color="indigo"
@@ -50,7 +50,7 @@
               {{ el.icon }}
             </a-icon>
             {{ el.name.replace('_', ' ') }}
-          </v-btn>
+          </a-btn>
         </div>
       </template>
     </a-speed-dial>
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { availableControls, createControlInstance } from '@/utils/surveyConfig';
+import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 const group = availableControls.find((c) => c.type === 'group');
 

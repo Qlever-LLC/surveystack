@@ -16,7 +16,7 @@
         <div class="d-flex justify-space-between align-center">
           <div class="grey--text text--darken-2">Matrix Column Editor</div>
           <div class="d-flex align-center ml-auto mr-2">
-            <v-btn color="primary" @click="addColumn"> <a-icon left>mdi-plus</a-icon>Add Column </v-btn>
+            <a-btn color="primary" @click="addColumn"> <a-icon left>mdi-plus</a-icon>Add Column </a-btn>
           </div>
           <div class="d-flex align-center"></div>
         </div>
@@ -58,10 +58,10 @@
               <div v-else>
                 <a-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
                   <div class="draggable-handle d-flex pa-2">
-                    <v-btn icon small @click="moveItemLeft(i)" :disabled="i === 0" tabindex="-1">
+                    <a-btn icon small @click="moveItemLeft(i)" :disabled="i === 0" tabindex="-1">
                       <a-icon>mdi-arrow-left</a-icon>
-                    </v-btn>
-                    <v-btn
+                    </a-btn>
+                    <a-btn
                       icon
                       class="ml-1"
                       small
@@ -70,11 +70,11 @@
                       tabindex="-1"
                     >
                       <a-icon>mdi-arrow-right</a-icon>
-                    </v-btn>
+                    </a-btn>
                     <a-spacer />
-                    <v-btn icon @click="deleteColumn(i)" tabindex="-1" small>
+                    <a-btn icon @click="deleteColumn(i)" tabindex="-1" small>
                       <a-icon>mdi-trash-can-outline</a-icon>
-                    </v-btn>
+                    </a-btn>
                   </div>
                   <a-card-text>
                     <a-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
@@ -98,7 +98,7 @@
                           dense
                           style="max-width: 10rem"
                         />
-                        <v-btn
+                        <a-btn
                           @click="createOntology(i)"
                           small
                           icon
@@ -106,10 +106,10 @@
                           class="ml-auto"
                         >
                           <a-icon>mdi-plus</a-icon>
-                        </v-btn>
-                        <v-btn @click="openOntologyEditor(item.resource)" small :disabled="!item.resource" icon>
+                        </a-btn>
+                        <a-btn @click="openOntologyEditor(item.resource)" small :disabled="!item.resource" icon>
                           <a-icon>mdi-pencil</a-icon>
-                        </v-btn>
+                        </a-btn>
                       </div>
                       <a-checkbox
                         v-model="item.multiple"
@@ -252,15 +252,15 @@
               </div>
             </div>
 
-            <v-btn slot="footer" @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
+            <a-btn slot="footer" @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
               <a-icon dark>mdi-plus</a-icon>
-            </v-btn>
+            </a-btn>
           </draggable>
         </div>
       </a-card-text>
       <a-spacer />
       <a-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
-        <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
+        <a-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</a-btn>
       </a-card-actions>
     </a-card>
   </div>

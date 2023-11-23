@@ -6,9 +6,9 @@
     <a-text-field label="Value" v-model="selectedValue" @keyup.native.enter="add" />
 
     <div class="d-flex justify-end">
-      <v-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</v-btn>
-      <v-btn class="ma-2" outlined @click="reset">Reset</v-btn>
-      <v-btn class="ma-2" @click="add" color="primary">Apply</v-btn>
+      <a-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</a-btn>
+      <a-btn class="ma-2" outlined @click="reset">Reset</a-btn>
+      <a-btn class="ma-2" @click="add" color="primary">Apply</a-btn>
     </div>
 
     <a-card outlined v-if="filters.length > 0">
@@ -22,9 +22,9 @@
             </div>
           </v-list-item-content>
           <a-list-item-action @click="remove(i)">
-            <v-btn icon small>
+            <a-btn icon small>
               <a-icon>mdi-trash-can-outline</a-icon>
-            </v-btn>
+            </a-btn>
           </a-list-item-action>
         </a-list-item>
       </a-list>

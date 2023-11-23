@@ -38,7 +38,7 @@
             :item-text="(p) => `${p.planName} (${p.planUrl})`"
           />
         </div>
-        <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
+        <a-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</a-btn>
       </a-card-text>
     </a-card>
     <div class="d-flex justify-space-between">
@@ -88,8 +88,8 @@
       <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">
         <div class="d-flex justify-end">{{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts</div>
         <div class="d-flex justify-end align-center my-4">
-          <v-btn outlined @click="upgradeDialog = true">Upgrade</v-btn>
-          <!-- <v-btn outlined class="ml-2">Learn More</v-btn> -->
+          <a-btn outlined @click="upgradeDialog = true">Upgrade</a-btn>
+          <!-- <a-btn outlined class="ml-2">Learn More</a-btn> -->
         </div>
       </div>
     </div>

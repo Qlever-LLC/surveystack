@@ -17,7 +17,7 @@
         :showNoChangesText="false"
       ></survey-diff>
       <a-card-actions class="mr-3">
-        <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
+        <a-btn @click="$emit('cancel')" color="primary" text> Cancel</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

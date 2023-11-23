@@ -202,26 +202,26 @@
           >
             <template v-slot:toolbar-actions>
               <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
-                <v-btn :value="false" dense>
+                <a-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
                   <a-icon right> mdi-monitor</a-icon>
-                </v-btn>
+                </a-btn>
 
-                <v-btn :value="true">
+                <a-btn :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
                   <a-icon right> mdi-cellphone</a-icon>
-                </v-btn>
+                </a-btn>
               </a-btn-toggle>
 
-              <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewCode = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">survey</span>
                 <a-icon right>mdi-code-tags</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
                 <span class="hidden-sm-and-down">submission</span>
                 <a-icon right>mdi-code-tags</a-icon>
-              </v-btn>
+              </a-btn>
             </template>
           </app-draft-component>
         </div>

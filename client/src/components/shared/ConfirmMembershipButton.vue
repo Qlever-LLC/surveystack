@@ -1,7 +1,7 @@
 <template>
   <a-dialog v-model="isVisible" width="300">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </v-btn>
+      <a-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </a-btn>
     </template>
 
     <a-card>
@@ -12,8 +12,8 @@
       </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <v-btn text @click="isVisible = false"> Cancel </v-btn>
-        <v-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </v-btn>
+        <a-btn text @click="isVisible = false"> Cancel </a-btn>
+        <a-btn text color="primary" @click="send" :loading="isInProgress"> Confirm </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

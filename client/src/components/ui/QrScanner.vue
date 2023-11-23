@@ -1,6 +1,6 @@
 <template>
   <div class="qr-scanner">
-    <v-btn
+    <a-btn
       ref="scannerButton"
       aria-label="Open QR Scanner"
       :x-large="!small"
@@ -10,14 +10,14 @@
       @click="isScannerOpen = true"
     >
       <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
-    </v-btn>
+    </a-btn>
 
     <a-dialog v-model="isScannerOpen" fullscreen>
       <a-card>
         <a-toolbar dark color="primary">
-          <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
+          <a-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <a-icon>mdi-close</a-icon>
-          </v-btn>
+          </a-btn>
           <a-toolbar-title>QR Code Scanner</a-toolbar-title>
           <a-spacer />
         </a-toolbar>

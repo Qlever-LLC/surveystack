@@ -4,7 +4,7 @@
     Add Feedback to store
     <!-- TODO in Vue3 remove .native -->
     <a-text-field v-model="message" @keyup.native.enter="addFeedback(message)" placeholder="Feedback..." />
-    <v-btn @click="addFeedback(message)">ADD</v-btn>
+    <a-btn @click="addFeedback(message)">ADD</a-btn>
   </div>
 </template>
 

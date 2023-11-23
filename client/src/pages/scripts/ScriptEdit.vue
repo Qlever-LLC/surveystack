@@ -20,8 +20,8 @@
         @change="updateCode"
       />
       <div class="d-flex mt-2 justify-end">
-        <v-btn text @click="cancel">Cancel</v-btn>
-        <v-btn color="primary" @click="submit">Save</v-btn>
+        <a-btn text @click="cancel">Cancel</a-btn>
+        <a-btn color="primary" @click="submit">Save</a-btn>
       </div>
     </a-form>
   </a-container>

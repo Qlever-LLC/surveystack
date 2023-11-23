@@ -14,9 +14,9 @@
 
         <slot name="toolbar-actions"></slot>
 
-        <v-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
+        <a-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
           <a-icon>mdi-format-list-numbered</a-icon>
-        </v-btn>
+        </a-btn>
       </div>
     </a-toolbar>
   </div>

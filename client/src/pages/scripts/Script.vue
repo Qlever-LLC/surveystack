@@ -2,7 +2,7 @@
   <a-container v-if="entity">
     <div class="d-flex justify-end">
       <router-link :to="{ name: 'scripts-edit', params: { id: entity._id } }">
-        <v-btn color="primary"> <a-icon left>mdi-pencil</a-icon> Edit </v-btn>
+        <a-btn color="primary"> <a-icon left>mdi-pencil</a-icon> Edit </a-btn>
       </router-link>
     </div>
     <h1>{{ entity.name }}</h1>

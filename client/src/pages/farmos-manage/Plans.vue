@@ -14,7 +14,7 @@
         <a-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl" />
       </a-col>
       <a-col>
-        <v-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</v-btn>
+        <a-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</a-btn>
       </a-col>
     </a-row>
 
@@ -34,7 +34,7 @@
             <td>{{ plan.planName }}</td>
             <td>{{ plan.planUrl }}</td>
             <td>
-              <v-btn color="red" @click="$emit('delete-plan', plan._id)" dark>Delete</v-btn>
+              <a-btn color="red" @click="$emit('delete-plan', plan._id)" dark>Delete</a-btn>
             </td>
           </tr>
         </tbody>

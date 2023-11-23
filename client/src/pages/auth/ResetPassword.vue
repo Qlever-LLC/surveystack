@@ -20,7 +20,7 @@
             @click:append="showPasswords = !showPasswords"
           />
           <div class="d-flex justify-end">
-            <v-btn type="submit" color="primary">Set password</v-btn>
+            <a-btn type="submit" color="primary">Set password</a-btn>
           </div>
         </a-form>
       </a-card>

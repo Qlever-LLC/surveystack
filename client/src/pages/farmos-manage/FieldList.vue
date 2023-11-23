@@ -13,9 +13,9 @@
         </v-list-item-content>
 
         <a-list-item-action>
-          <v-btn icon>
+          <a-btn icon>
             <a-icon color="grey lighten-1" @click="remove(field)">mdi-delete</a-icon>
-          </v-btn>
+          </a-btn>
         </a-list-item-action>
       </a-list-item>
     </a-list>

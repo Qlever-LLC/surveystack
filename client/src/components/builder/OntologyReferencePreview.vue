@@ -19,7 +19,7 @@
       <a-spacer />
 
       <a-card-actions class="mr-3 d-flex justify-end">
-        <v-btn text @click="open = false">Close</v-btn>
+        <a-btn text @click="open = false">Close</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

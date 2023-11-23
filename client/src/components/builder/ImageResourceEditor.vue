@@ -4,9 +4,9 @@
       <div>Image Resource Editor</div>
       <a-spacer />
 
-      <v-btn icon @click="closeDialog">
+      <a-btn icon @click="closeDialog">
         <a-icon>mdi-close</a-icon>
-      </v-btn>
+      </a-btn>
     </a-card-title>
     <a-card-text>
       <a-form
@@ -44,8 +44,8 @@
       </a-form>
     </a-card-text>
     <a-card-actions class="d-flex justify-space-between px-6 pb-4">
-      <v-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </v-btn>
-      <v-btn @click="updateResource" text color="primary"> Update </v-btn>
+      <a-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </a-btn>
+      <a-btn @click="updateResource" text color="primary"> Update </a-btn>
     </a-card-actions>
   </a-card>
 </template>

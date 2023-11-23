@@ -9,7 +9,7 @@
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
-      <v-btn
+      <a-btn
         icon
         @click.stop="openDialog"
         :disabled="disabled"
@@ -18,7 +18,7 @@
         v-if="resource"
       >
         <a-icon>mdi-pencil</a-icon>
-      </v-btn>
+      </a-btn>
     </div>
     <a-textarea
       class="mt-3"

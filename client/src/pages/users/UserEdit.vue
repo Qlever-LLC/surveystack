@@ -10,7 +10,7 @@
         {{ currentEmail }} <a-spacer />
         <a-dialog v-model="isEmailDialogOpen">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
+            <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
           </template>
           <a-card>
             <a-card-title class="text-h5"> Change Email </a-card-title>
@@ -21,7 +21,7 @@
             </a-card-text>
             <a-card-actions>
               <a-spacer />
-              <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </v-btn>
+              <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail"> Update email </a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
@@ -55,8 +55,8 @@
           <a-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
 
           <div class="d-flex mt-2 justify-end">
-            <v-btn text @click="cancel">Cancel</v-btn>
-            <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</v-btn>
+            <a-btn text @click="cancel">Cancel</a-btn>
+            <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Submit</a-btn>
           </div>
         </a-form>
       </a-card-text>

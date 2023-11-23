@@ -18,8 +18,8 @@
         </div>
 
         <div class="d-flex justify-space-around">
-          <v-btn :disabled="loading" :loading="loading" @click="cancelNote" color="error">Don't Add Note</v-btn>
-          <v-btn :disabled="btnDisabled" :loading="loading" @click="addNote" color="primary">Submit</v-btn>
+          <a-btn :disabled="loading" :loading="loading" @click="cancelNote" color="error">Don't Add Note</a-btn>
+          <a-btn :disabled="btnDisabled" :loading="loading" @click="addNote" color="primary">Submit</a-btn>
         </div>
       </a-card-text>
     </a-card>

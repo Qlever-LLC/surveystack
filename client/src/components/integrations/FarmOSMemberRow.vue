@@ -7,9 +7,9 @@
     </div>
     <div class="instance-map mt-1 pb-1" v-for="instance in instanceMap" :key="`instance-${instance.name}`">
       <div class="instance-name ml-4">
-        <v-btn @click="$emit('open', { instanceName: instance.name, userId: user.id })" small icon>
+        <a-btn @click="$emit('open', { instanceName: instance.name, userId: user.id })" small icon>
           <a-icon small>mdi-open-in-new</a-icon>
-        </v-btn>
+        </a-btn>
         {{ instance.name }}
       </div>
       <div class="instance-groups">
@@ -28,21 +28,21 @@
           </div>
         </div>
         <div v-if="instance.groups.length >= 4 && !more.includes(`${user.id}-${instance.name}`)">
-          <v-btn text x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 3}` }} more</v-btn>
+          <a-btn text x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 3}` }} more</a-btn>
         </div>
-        <v-btn
+        <a-btn
           text
           small
           dense
           @click="$emit('disconnect', { groupId: null, userId: user.id, instanceName: instance.name })"
         >
           manage
-        </v-btn>
+        </a-btn>
       </div>
     </div>
 
     <div class="create-button mt-2">
-      <v-btn text color="green" x-small @click="$emit('connect', user.id)">+ connect farm</v-btn>
+      <a-btn text color="green" x-small @click="$emit('connect', user.id)">+ connect farm</a-btn>
     </div>
   </div>
 </template>

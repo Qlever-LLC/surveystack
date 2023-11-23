@@ -36,10 +36,10 @@
       </a-row>
 
       <div class="d-flex justify-end">
-        <v-btn class="ma-2" @click="$emit('show-advanced', false)" text>Basic</v-btn>
-        <v-btn class="ma-2" outlined @click="$emit('reset')">Reset</v-btn>
-        <v-btn class="ma-2" color="primary" @click="$emit('apply-advanced-filters')" :disabled="!validQuery"
-          >Apply</v-btn
+        <a-btn class="ma-2" @click="$emit('show-advanced', false)" text>Basic</a-btn>
+        <a-btn class="ma-2" outlined @click="$emit('reset')">Reset</a-btn>
+        <a-btn class="ma-2" color="primary" @click="$emit('apply-advanced-filters')" :disabled="!validQuery"
+          >Apply</a-btn
         >
       </div>
     </a-form>

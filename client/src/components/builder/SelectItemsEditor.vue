@@ -20,7 +20,7 @@
     <a-card>
       <a-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-        <v-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row</v-btn>
+        <a-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row</a-btn>
       </a-card-title>
 
       <a-card-text cssDialogContent>
@@ -59,8 +59,8 @@
 
       <a-card-actions>
         <a-spacer />
-        <v-btn text @click="close">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <a-btn text @click="close">Cancel</a-btn>
+        <a-btn color="primary" @click="save">Save</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

@@ -18,20 +18,20 @@
             <a-spacer />
             <a-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
               <template v-slot:activator="{ on, attrs }">
-                <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
+                <a-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </a-btn>
               </template>
               <a-card>
                 <a-card-title class="text-h5"> Are you sure? </a-card-title>
                 <a-card-actions>
                   <a-spacer />
-                  <v-btn
+                  <a-btn
                     color="green darken-1"
                     text
                     @click="removeGroupIntegration"
                     :loading="isRemoveGroupIntegrationInProgress"
                   >
                     Yes, remove Hylo integration
-                  </v-btn>
+                  </a-btn>
                 </a-card-actions>
               </a-card>
             </a-dialog>
@@ -65,7 +65,7 @@
         <a-card-text>
           <a-dialog v-model="integrateDialog" width="500">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </v-btn>
+              <a-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </a-btn>
             </template>
 
             <a-card>
@@ -82,14 +82,14 @@
                   class="mb-2"
                 />
                 <a-col align="center">
-                  <v-btn
+                  <a-btn
                     color="primary"
                     :disabled="!groupFound || isCreateIntegratedHyloGroupInProgress"
                     :loading="isSetIntegratedInProgress"
                     @click="setIntegratedGroup"
                   >
                     {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
-                  </v-btn>
+                  </a-btn>
                 </a-col>
                 <a-row align="center" class="my-5">
                   <a-divider /><span class="mx-2">or</span>
@@ -99,14 +99,14 @@
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
 
                 <a-col align="center">
-                  <v-btn
+                  <a-btn
                     color="primary"
                     :loading="isCreateIntegratedHyloGroupInProgress"
                     :disabled="isSetIntegratedInProgress"
                     @click="createIntegratedHyloGroup"
                   >
                     Integrate with a new Hylo group
-                  </v-btn></a-col
+                  </a-btn></a-col
                 >
                 <div class="font-italic text-body-2 mb-4">
                   Default group settings are: anyone can find and see this group but people must apply to join this
@@ -116,7 +116,7 @@
 
               <a-card-actions>
                 <a-spacer />
-                <v-btn text @click="integrateDialog = false"> close </v-btn>
+                <a-btn text @click="integrateDialog = false"> close </a-btn>
               </a-card-actions>
             </a-card>
           </a-dialog>

@@ -41,7 +41,7 @@
       title="Access FarmOS Instance"
     >
       <div class="d-flex justify-center my-8">
-        <v-btn
+        <a-btn
           :loading="!linkReady"
           :disabled="!linkReady"
           :href="adminLink"
@@ -49,7 +49,7 @@
           color="primary"
           target="_blank"
         >
-          {{ linkReady ? 'Access' : 'Loading' }}</v-btn
+          {{ linkReady ? 'Access' : 'Loading' }}</a-btn
         >
       </div>
     </app-dialog>
@@ -119,15 +119,15 @@
       <a-col lg="4" class="mx-auto">
         <a-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
-            Contact Our-Sci</v-btn
+          <a-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</a-btn>
+          <a-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
+            Contact Our-Sci</a-btn
           >
         </a-card>
         <a-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
-            >Contact Our-Sci</v-btn
+          <a-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
+            >Contact Our-Sci</a-btn
           >
         </a-card>
       </a-col>

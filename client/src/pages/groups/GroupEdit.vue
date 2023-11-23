@@ -38,7 +38,7 @@
           <a-icon small left> mdi-octagram </a-icon>Premium
         </a-chip>
       </h1>
-      <v-btn
+      <a-btn
         v-if="editMode"
         :disabled="!entity._id"
         class="ma-2"
@@ -46,7 +46,7 @@
         color="secondary"
       >
         <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
-      </v-btn>
+      </a-btn>
     </div>
     <a-card :loading="isLoadingGroup" class="mb-4">
       <a-card-text>
@@ -85,15 +85,15 @@
               class="d-inline mt-0"
             />
             <div class="ml-auto ml-sm-6">
-              <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
+              <a-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
                 >Learn more...
-              </v-btn>
+              </a-btn>
             </div>
           </div>
           <a-checkbox label="Archived" v-model="entity.meta.archived" />
           <div class="d-flex justify-end pa-2">
-            <v-btn text @click="cancel">Cancel</v-btn>
-            <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
+            <a-btn text @click="cancel">Cancel</a-btn>
+            <a-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</a-btn>
           </div>
         </form>
       </a-card-text>

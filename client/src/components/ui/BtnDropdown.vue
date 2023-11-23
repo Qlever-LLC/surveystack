@@ -1,9 +1,9 @@
 <template>
   <div class="text-center">
-    <v-btn v-bind="$attrs" @click="$emit('click', $event)" class="main-button"> {{ label }} </v-btn>
+    <a-btn v-bind="$attrs" @click="$emit('click', $event)" class="main-button"> {{ label }} </a-btn>
     <a-menu v-if="showDropDown" v-bind="$attrs" :offset-y="true" class="pa-0 ma-0 right">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="$attrs" v-on="on" class="dropdown-button"><a-icon>mdi-chevron-down</a-icon></v-btn>
+        <a-btn v-bind="$attrs" v-on="on" class="dropdown-button"><v-icon>mdi-chevron-down</v-icon></a-btn>
       </template>
       <slot></slot>
     </a-menu>
@@ -13,7 +13,6 @@
 <script>
 export default {
   name: 'BtnDropdown',
-
   inheritAttrs: false,
   props: {
     label: {

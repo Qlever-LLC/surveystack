@@ -25,37 +25,37 @@
         >
           <template v-slot:entity="{ entity }">
             <a-list-item-icon class="mr-2 d-flex align-center mb-2">
-              <v-btn
+              <a-btn
                 v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
                 :to="`/surveys/${entity.id}`"
                 title="Everyone can submit"
                 icon
               >
                 <a-icon>mdi-earth</a-icon>
-              </v-btn>
-              <v-btn
+              </a-btn>
+              <a-btn
                 v-if="entity.meta.submissions === 'user'"
                 :to="`/surveys/${entity.id}`"
                 title="Only signed-in users can submit"
                 icon
               >
                 <a-icon>mdi-account</a-icon>
-              </v-btn>
-              <v-btn
+              </a-btn>
+              <a-btn
                 v-if="entity.meta.submissions === 'group'"
                 :to="`/surveys/${entity.id}`"
                 title="Everyone group members can submit"
                 icon
               >
                 <a-icon>mdi-account-group</a-icon>
-              </v-btn>
+              </a-btn>
             </a-list-item-icon>
             <v-list-item-content>
               <a-list-item-title>{{ entity.name }}</a-list-item-title>
               <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
             </v-list-item-content>
             <div class="d-flex align-center ml-3">
-              <v-btn color="primary" small>Take Survey</v-btn>
+              <a-btn color="primary" small>Take Survey</a-btn>
             </div>
           </template>
         </app-basic-list>
@@ -75,30 +75,30 @@
             <v-list-item-content>
               <div class="d-flex">
                 <div class="mr-2">
-                  <v-btn
+                  <a-btn
                     v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
                     :to="`/surveys/${entity.id}`"
                     title="Everyone can submit"
                     icon
                   >
                     <a-icon>mdi-earth</a-icon>
-                  </v-btn>
-                  <v-btn
+                  </a-btn>
+                  <a-btn
                     v-if="entity.meta.submissions === 'user'"
                     :to="`/surveys/${entity.id}`"
                     title="Only signed-in users can submit"
                     icon
                   >
                     <a-icon>mdi-account</a-icon>
-                  </v-btn>
-                  <v-btn
+                  </a-btn>
+                  <a-btn
                     v-if="entity.meta.submissions === 'group'"
                     :to="`/surveys/${entity.id}`"
                     title="Everyone group members can submit"
                     icon
                   >
                     <a-icon>mdi-account-group</a-icon>
-                  </v-btn>
+                  </a-btn>
                 </div>
                 <div>
                   <a-list-item-title>{{ entity.name }}</a-list-item-title>
@@ -117,15 +117,15 @@
 
     <a-row>
       <a-col align="center">
-        <v-btn x-large text :to="`/surveys/browse`">
+        <a-btn x-large text :to="`/surveys/browse`">
           <a-icon left>mdi-text-box-search-outline</a-icon>Browse All Surveys
-        </v-btn>
+        </a-btn>
       </a-col>
     </a-row>
 
     <a-row v-if="false">
       <a-col align="center">
-        <v-btn color="primary" x-large href="surveystack://measurement">Run Measurement</v-btn>
+        <a-btn color="primary" x-large href="surveystack://measurement">Run Measurement</a-btn>
       </a-col>
     </a-row>
   </a-container>

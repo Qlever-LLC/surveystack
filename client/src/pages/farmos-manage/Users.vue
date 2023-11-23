@@ -53,7 +53,7 @@
               <a-checkbox v-model="owner" label="owner" />
             </td>
             <td>
-              <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
+              <a-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</a-btn>
             </td>
           </tr>
 
@@ -88,7 +88,7 @@
             </td>
             <td>{{ instance.owner }}</td>
             <td>
-              <v-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)" dark>Unmap</v-btn>
+              <a-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)" dark>Unmap</a-btn>
             </td>
           </tr>
         </tbody>

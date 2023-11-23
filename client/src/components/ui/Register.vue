@@ -33,7 +33,7 @@
           <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
             Already have an account?
           </a>
-          <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </v-btn>
+          <a-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </a-btn>
         </div>
       </a-form>
       <a-alert class="mt-4" outlined v-if="membership" type="info"

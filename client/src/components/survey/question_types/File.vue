@@ -62,7 +62,7 @@
         >
           <div class="col-12 pa-0 caption">--- or ----</div>
           <div class="col-12">
-            <v-btn
+            <a-btn
               for="captureImage"
               class="text-center align-center justify-center"
               color="default"
@@ -70,7 +70,7 @@
             >
               take a picture
               <a-icon right> mdi-camera-outline</a-icon>
-            </v-btn>
+            </a-btn>
           </div>
         </div>
       </div>
@@ -104,19 +104,19 @@
             /></a-list-item-subtitle>
           </v-list-item-content>
           <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
-            <v-btn icon @click="editResourceName(fileResourceKey, index)">
+            <a-btn icon @click="editResourceName(fileResourceKey, index)">
               <a-icon color="grey lighten-1">mdi-pencil</a-icon>
-            </v-btn>
+            </a-btn>
           </a-list-item-action>
           <a-list-item-action v-if="editIndex === index">
-            <v-btn icon @click="commitResourceName(fileResourceKey, index)">
+            <a-btn icon @click="commitResourceName(fileResourceKey, index)">
               <a-icon color="success">mdi-check</a-icon>
-            </v-btn>
+            </a-btn>
           </a-list-item-action>
           <a-list-item-action>
-            <v-btn icon @click="remove(index)">
+            <a-btn icon @click="remove(index)">
               <a-icon color="grey lighten-1">mdi-close-circle</a-icon>
-            </v-btn>
+            </a-btn>
           </a-list-item-action>
         </a-list-item>
       </a-list>

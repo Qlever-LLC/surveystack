@@ -7,7 +7,7 @@
     </p>
     <a-checkbox label="Activate" v-model="activate" />
 
-    <v-btn color="primary" @click="submit" :disabled="!activate">{{ activate ? 'CONFIRM!' : 'Activate first' }}</v-btn>
+    <a-btn color="primary" @click="submit" :disabled="!activate">{{ activate ? 'CONFIRM!' : 'Activate first' }}</a-btn>
 
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>

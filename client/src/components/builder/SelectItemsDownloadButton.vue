@@ -1,8 +1,8 @@
 <template>
-  <v-btn outlined color="primary" @click="download" style="margin-bottom: 1px">
+  <a-btn outlined color="primary" @click="download" style="margin-bottom: 1px">
     <a-icon left>mdi-download</a-icon>
     Export CSV
-  </v-btn>
+  </a-btn>
 </template>
 
 <script>

@@ -15,7 +15,7 @@
           single-line
           filled
         />
-        <v-btn outlined class="ma-2" dark color="white" text @click="close"> Close </v-btn>
+        <a-btn outlined class="ma-2" dark color="white" text @click="close"> Close </a-btn>
       </a-row>
       <div style="width: 100%; height: 80vh">
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>

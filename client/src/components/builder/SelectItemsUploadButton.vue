@@ -1,10 +1,10 @@
 <template>
   <a-input>
     <label for="select-items-file-input" class="cursor-pointer">
-      <v-btn class="pointer-events-none" color="primary" :disabled="disabled">
+      <a-btn class="pointer-events-none" color="primary" :disabled="disabled">
         <a-icon left>mdi-upload</a-icon>
         Add CSV
-      </v-btn>
+      </a-btn>
     </label>
     <input
       type="file"

@@ -5,7 +5,7 @@
         <a-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
           <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
             <div>
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -14,9 +14,9 @@
                 :disabled="disabled"
               >
                 <a-icon>mdi-format-pilcrow</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -24,9 +24,9 @@
                 @click="commands.heading({ level: 1 })"
               >
                 <a-icon>mdi-format-header-1</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -34,9 +34,9 @@
                 @click="commands.heading({ level: 2 })"
               >
                 <a-icon>mdi-format-header-2</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -44,11 +44,11 @@
                 @click="commands.heading({ level: 3 })"
               >
                 <a-icon>mdi-format-header-3</a-icon>
-              </v-btn>
+              </a-btn>
             </div>
 
             <div class="ml-2">
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -56,9 +56,9 @@
                 @click="commands.blockquote"
               >
                 <a-icon>mdi-format-quote-close</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <!-- <v-btn
+              <!-- <a-btn
                   icon
                   small
                   class="menubar__button"
@@ -66,13 +66,13 @@
                   @click="commands.code"
                 >
                   <a-icon>mdi-code-tags</a-icon>
-                </v-btn> -->
+                </a-btn> -->
 
               <!-- <v-select
                   :items="getParagraphStyles(isActive, commands)"
                 >
                   <template v-slot:selection="{ item, index }">
-                    <v-btn
+                    <a-btn
                       icon
                       small
                       class="menubar__button"
@@ -80,12 +80,12 @@
                       @click="item.action"
                     >
                       <a-icon>{{ item.icon }}</a-icon>
-                    </v-btn>
+                    </a-btn>
                   </template>
 
                 </v-select> -->
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -93,9 +93,9 @@
                 @click="commands.bullet_list"
               >
                 <a-icon>mdi-format-list-bulleted</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -103,29 +103,29 @@
                 @click="commands.ordered_list"
               >
                 <a-icon>mdi-format-list-numbered</a-icon>
-              </v-btn>
+              </a-btn>
             </div>
 
-            <!-- <v-btn
+            <!-- <a-btn
                 icon
                 small
                 class="menubar__button"
                 @click="commands.undo"
               >
                 <a-icon>mdi-undo</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
                 @click="commands.redo"
               >
                 <a-icon>mdi-redo</a-icon>
-              </v-btn> -->
+              </a-btn> -->
 
             <div>
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -133,9 +133,9 @@
                 @click="commands.bold"
               >
                 <a-icon>mdi-format-bold</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -143,9 +143,9 @@
                 @click="commands.italic"
               >
                 <a-icon>mdi-format-italic</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -153,9 +153,9 @@
                 @click="commands.strike"
               >
                 <a-icon>mdi-format-strikethrough</a-icon>
-              </v-btn>
+              </a-btn>
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -163,10 +163,10 @@
                 @click="commands.underline"
               >
                 <a-icon>mdi-format-underline</a-icon>
-              </v-btn>
+              </a-btn>
             </div>
 
-            <!-- <v-btn
+            <!-- <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -174,16 +174,16 @@
                 @click="commands.code_block"
               >
                 <a-icon>mdi-code-braces</a-icon>
-              </v-btn> -->
+              </a-btn> -->
 
-            <!-- <v-btn
+            <!-- <a-btn
                 icon
                 small
                 class="menubar__button"
                 @click="commands.horizontal_rule"
               >
                 <a-icon>mdi-minus</a-icon>
-              </v-btn> -->
+              </a-btn> -->
           </a-toolbar-items>
         </a-toolbar>
         <!--
@@ -191,80 +191,80 @@
             <a-toolbar-items class="pa-0">
 
 
-              <v-btn
+              <a-btn
                 icon
                 small
                 class="menubar__button"
                 @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })"
               >
                 <a-icon>mdi-table</a-icon>
-              </v-btn>
+              </a-btn>
 
               <span v-if="isActive.table()">
-                <v-btn
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.deleteTable"
                 >
                   <a-icon>mdi-delete_table</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.addColumnBefore"
                 >
                   <a-icon>mdi-add_col_before</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.addColumnAfter"
                 >
                   <a-icon>mdi-add_col_after</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.deleteColumn"
                 >
                   <a-icon>mdi-delete_col</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.addRowBefore"
                 >
                   <a-icon>mdi-add_row_before</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.addRowAfter"
                 >
                   <a-icon>mdi-add_row_after</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.deleteRow"
                 >
                   <a-icon>mdi-delete_row</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   icon
                   small
                   class="menubar__button"
                   @click="commands.toggleCellMerge"
                 >
                   <a-icon>mdi-combine_cells</a-icon>
-                </v-btn>
+                </a-btn>
               </span>
             </a-toolbar-items>
           </a-toolbar> -->
@@ -298,16 +298,16 @@
                   ref="linkInput"
                   @keydown.native.esc="hideLinkMenu"
                 />
-                <v-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
+                <a-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
                   <a-icon>mdi-check</a-icon>
-                </v-btn>
-                <v-btn small class="menububble__button mr-1" @click="setLinkUrl(commands.link, null)" icon>
+                </a-btn>
+                <a-btn small class="menububble__button mr-1" @click="setLinkUrl(commands.link, null)" icon>
                   <a-icon>mdi-close</a-icon>
-                </v-btn>
+                </a-btn>
               </form>
 
               <template v-else>
-                <v-btn
+                <a-btn
                   class="menububble__button"
                   @click="showLinkMenu(getMarkAttrs('link'))"
                   :class="{ 'is-active': isActive.link() }"
@@ -315,7 +315,7 @@
                 >
                   <span>{{ isActive.link() ? 'Update Link' : 'Add Link' }}</span>
                   <a-icon>mdi-link</a-icon>
-                </v-btn>
+                </a-btn>
               </template>
             </a-card-text>
           </a-card>

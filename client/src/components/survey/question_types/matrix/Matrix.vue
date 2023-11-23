@@ -33,11 +33,11 @@
       <div style="background: #1867c0; padding: 4px 0px">
         <a-card>
           <a-card-title>
-            <v-btn @click="duplicateRow(editedIndex)" text color="primary">
+            <a-btn @click="duplicateRow(editedIndex)" text color="primary">
               <a-icon left>mdi-content-copy</a-icon>Duplicate
-            </v-btn>
+            </a-btn>
             <a-spacer />
-            <v-btn text @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </v-btn>
+            <a-btn text @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
           </a-card-title>
           <a-card-text>
             <a-form autocomplete="off" @submit.prevent="">
@@ -60,12 +60,12 @@
             </a-form>
           </a-card-text>
           <a-card-actions class="d-flex justify-space-between">
-            <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
+            <a-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
               <a-icon left>mdi-trash-can-outline</a-icon>Delete
-            </v-btn>
-            <v-btn text @click="showEditItemDialog = false" class="ma-2">
+            </a-btn>
+            <a-btn text @click="showEditItemDialog = false" class="ma-2">
               Close <a-icon right>mdi-close</a-icon>
-            </v-btn>
+            </a-btn>
           </a-card-actions>
         </a-card>
       </div>
@@ -120,12 +120,12 @@
       <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
         <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
           <div class="d-flex">
-            <v-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
+            <a-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
               <a-icon>mdi-trash-can-outline</a-icon>
-            </v-btn>
-            <v-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
+            </a-btn>
+            <a-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
               <a-icon>mdi-content-copy</a-icon>
-            </v-btn>
+            </a-btn>
           </div>
         </div>
       </template>

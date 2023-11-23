@@ -50,11 +50,11 @@
         </a-col>
 
         <a-col>
-          <v-btn
+          <a-btn
             @click="$emit('check-url', localViewModel)"
             color="primary"
             :disabled="!localViewModel.form.plan || localViewModel.loading"
-            >Check URL</v-btn
+            >Check URL</a-btn
           >
         </a-col>
       </a-row>
@@ -148,7 +148,7 @@
           </div>
         </template>
         <template v-slot:prepend-item>
-          <v-btn
+          <a-btn
             color="primary"
             class="ma-4"
             outlined
@@ -157,13 +157,13 @@
             target="_blank"
           >
             <a-icon left>mdi-account-plus</a-icon>Invite Member to Organization
-          </v-btn>
+          </a-btn>
           <a-divider />
         </template>
         <template v-slot:append-outer>
-          <v-btn fab color="primary" style="margin-top: -16px">
+          <a-btn fab color="primary" style="margin-top: -16px">
             <a-icon>mdi-refresh</a-icon>
-          </v-btn>
+          </a-btn>
         </template>
       </a-select> -->
 
@@ -174,7 +174,7 @@
         v-model="localViewModel.form.fields"
       ></app-field-list>
 
-      <v-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</v-btn>
+      <a-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</a-btn>
 
       <app-field-creator
         v-show="importFields"
@@ -208,8 +208,8 @@
         <a href="https://farmier.com/privacy" target="blank">Privacy Policy</a>.
       </div>
 
-      <v-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
-        >Register FarmOS Instance</v-btn
+      <a-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
+        >Register FarmOS Instance</a-btn
       >
     </a-form>
     <app-dialog

@@ -46,30 +46,30 @@
             <a-list-item :to="`/surveys/${e._id}`">
               <a-list-item-icon>
                 <a-icon v-if="e.pinned">mdi-pin</a-icon>
-                <v-btn
+                <a-btn
                   v-if="e.meta.submissions === 'public' || !e.meta.submissions"
                   :to="`/surveys/${e._id}`"
                   title="Everyone can submit"
                   icon
                 >
                   <a-icon>mdi-earth</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   v-if="e.meta.submissions === 'user'"
                   :to="`/surveys/${e._id}`"
                   title="Only signed-in users can submit"
                   icon
                 >
                   <a-icon>mdi-account</a-icon>
-                </v-btn>
-                <v-btn
+                </a-btn>
+                <a-btn
                   v-if="e.meta.submissions === 'group'"
                   :to="`/surveys/${e._id}`"
                   title="Everyone group members can submit"
                   icon
                 >
                   <a-icon>mdi-account-group</a-icon>
-                </v-btn>
+                </a-btn>
               </a-list-item-icon>
               <v-list-item-content>
                 <div>

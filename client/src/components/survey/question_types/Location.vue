@@ -17,15 +17,15 @@
         {{ currentLocation.label }}
       </app-gps>
 
-      <v-btn class="layer-switch" @click="switchMapStyle">
+      <a-btn class="layer-switch" @click="switchMapStyle">
         <a-icon>mdi-layers-outline</a-icon>
-      </v-btn>
+      </a-btn>
 
       <div style="background-color: #000" :id="`map-question-${index}`" class="map-question" v-if="!mapError">
         <img v-if="!value" id="map-marker" src="@/assets/marker.svg" alt="marker" />
         <div class="selection-controls d-flex justify-center">
           <div v-if="!location">
-            <v-btn
+            <a-btn
               large
               :disabled="disablePick"
               :dark="!disablePick"
@@ -34,10 +34,10 @@
               @click="pickLocation"
             >
               Pick
-            </v-btn>
+            </a-btn>
           </div>
           <div v-else>
-            <v-btn large class="mx-4 full" color="gray" @click="retake"> Retake </v-btn>
+            <a-btn large class="mx-4 full" color="gray" @click="retake"> Retake </a-btn>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@
             acc:&nbsp;{{ currentLocation.location.properties.accuracy.toFixed(2) }}
           </span>
           <br />
-          <v-btn @click="loadCurrentPositionOffline()">Refresh Location</v-btn>
+          <a-btn @click="loadCurrentPositionOffline()">Refresh Location</a-btn>
         </samp>
         <samp v-else>unavailable</samp>
       </div>

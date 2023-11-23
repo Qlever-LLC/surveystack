@@ -20,7 +20,7 @@
           itemSlot
         >
           <template slot="prepend-item">
-            <v-btn
+            <a-btn
               @click="connect"
               :loading="loadingOwners"
               :disabled="selectedFarms.length <= 0"
@@ -28,7 +28,7 @@
               class="button--autocomplete"
             >
               Connect selected Farms
-            </v-btn>
+            </a-btn>
           </template>
 
           <template v-slot:item="{ item }">
@@ -43,9 +43,9 @@
             </v-list-item-content>
           </template>
         </a-select>
-        <v-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
+        <a-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
           Connect selected Farms
-        </v-btn>
+        </a-btn>
       </a-card-text>
 
       <template v-if="allowCreate">
@@ -54,7 +54,7 @@
         <a-card-text>
           Add a new farm to the member's profile.
           <br />
-          <v-btn block class="mt-4" color="primary" @click="$emit('create')">Create Farm</v-btn>
+          <a-btn block class="mt-4" color="primary" @click="$emit('create')">Create Farm</a-btn>
         </a-card-text>
       </template>
 

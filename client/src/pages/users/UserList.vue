@@ -3,7 +3,7 @@
     <div class="d-flex justify-space-between align-center">
       <h1>Browse Users</h1>
 
-      <v-btn to="/users/new" color="primary">ADD</v-btn>
+      <a-btn to="/users/new" color="primary">ADD</a-btn>
     </div>
 
     <a-card>
@@ -14,9 +14,9 @@
             <a-list-item-subtitle>{{ e.name }}</a-list-item-subtitle>
           </v-list-item-content>
           <a-list-item-icon>
-            <v-btn v-if="false" :to="`/users/${e._id}/edit`" text>
+            <a-btn v-if="false" :to="`/users/${e._id}/edit`" text>
               <a-icon>mdi-pencil</a-icon>
-            </v-btn>
+            </a-btn>
           </a-list-item-icon>
         </a-list-item>
         <a-divider />

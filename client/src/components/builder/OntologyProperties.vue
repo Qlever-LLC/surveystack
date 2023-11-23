@@ -10,9 +10,9 @@
       :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
       outlined
     />
-    <v-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
+    <a-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
       <a-icon>mdi-pencil</a-icon>
-    </v-btn>
+    </a-btn>
 
     <a-dialog v-model="tableDialogIsVisible">
       <ontology-list-editor

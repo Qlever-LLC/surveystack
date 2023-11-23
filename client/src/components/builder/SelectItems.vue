@@ -42,8 +42,8 @@
 
       <a-card-actions>
         <a-spacer />
-        <v-btn text @click="cancel">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <a-btn text @click="cancel">Cancel</a-btn>
+        <a-btn color="primary" @click="save">Save</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

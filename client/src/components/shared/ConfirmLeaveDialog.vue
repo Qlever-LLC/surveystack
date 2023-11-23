@@ -9,10 +9,10 @@
       </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <v-btn text @click.stop="handleAbort"> Cancel </v-btn>
-        <v-btn text color="primary" @click.stop="handleConfirm">
+        <a-btn text @click.stop="handleAbort"> Cancel </a-btn>
+        <a-btn text color="primary" @click.stop="handleConfirm">
           {{ confirmText }}
-        </v-btn>
+        </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

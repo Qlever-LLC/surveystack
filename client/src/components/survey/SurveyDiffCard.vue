@@ -88,7 +88,7 @@
       Selecting your Version of this question is not possible because the new
       {{ versionNameRemoteRevisionNew }} contains a required change.
       <template v-slot:action="{ attrs }">
-        <v-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </v-btn>
+        <a-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </a-btn>
       </template>
     </a-snackbar>
   </a-card>

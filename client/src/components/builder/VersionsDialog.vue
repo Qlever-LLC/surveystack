@@ -74,7 +74,7 @@
       <a-divider />
       <a-card-actions>
         <a-spacer />
-        <v-btn
+        <a-btn
           v-if="compareRevisions.length > 0"
           :disabled="compareRevisions.length === 1"
           @click="surveyDiffDialogVisible = true"
@@ -83,8 +83,8 @@
         >
           Compare {{ compareRevisions[0] }}
           {{ compareRevisions.length === 2 ? 'with ' + compareRevisions[1] : '' }}
-        </v-btn>
-        <v-btn
+        </a-btn>
+        <a-btn
           @click="deleteVersions"
           :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
           :loading="deleteVersionsIsLoading"
@@ -92,8 +92,8 @@
           outlined
         >
           Delete {{ selectedVersionsToDelete.length }} versions
-        </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
+        </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" text> Close </a-btn>
       </a-card-actions>
     </a-card>
     <survey-diff-dialog
@@ -113,9 +113,7 @@ import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 
 export default {
-  components: {
-    SurveyDiffDialog,
-  },
+  components: { SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,

@@ -1,7 +1,7 @@
 <template>
-  <v-btn @click.stop="copyText" icon class="button">
+  <a-btn @click.stop="copyText" icon class="button">
     <a-icon>mdi-content-copy</a-icon>
-  </v-btn>
+  </a-btn>
 </template>
 
 <script>

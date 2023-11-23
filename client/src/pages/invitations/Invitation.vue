@@ -11,8 +11,8 @@
         </a-alert>
 
         <div class="d-flex justify-end">
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="join">Join {{ membership.group.name }}</v-btn>
+          <a-btn text @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" @click="join">Join {{ membership.group.name }}</a-btn>
         </div>
       </div>
       <div v-else>
@@ -24,7 +24,7 @@
     <template v-else-if="initialized && !membership">
       <a-text-field v-model="code" label="Invitation" />
       <div class="d-flex justify-end">
-        <v-btn class="primary" @click="fetchData">Try code</v-btn>
+        <a-btn class="primary" @click="fetchData">Try code</a-btn>
       </div>
     </template>
     <a-progress-circular v-else :size="50" color="primary" indeterminate />

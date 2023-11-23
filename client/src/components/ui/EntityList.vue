@@ -5,7 +5,7 @@
         <h1>Browse {{ collection | capitalize }}</h1>
       </slot>
 
-      <v-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</v-btn>
+      <a-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</a-btn>
     </div>
     <a-card>
       <div v-for="e in entities" :key="e._id">

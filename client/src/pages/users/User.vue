@@ -3,9 +3,9 @@
     <a-card>
       <a-card-text>
         <div class="overline">{{ user._id }}</div>
-        <v-btn v-if="$store.getters['auth/isSuperAdmin']" outlined small :href="`/users/${user._id}/edit`">
+        <a-btn v-if="$store.getters['auth/isSuperAdmin']" outlined small :href="`/users/${user._id}/edit`">
           <a-icon small>mdi-pencil</a-icon>Edit
-        </v-btn>
+        </a-btn>
         <p class="display-1 text--primary mt-2 mb-1">{{ user.name }}</p>
         <p class="subtitle-1">{{ user.email }}</p>
       </a-card-text>

@@ -52,11 +52,11 @@
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
-          <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
+          <a-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
             <a-icon left>mdi-note-text-outline</a-icon>
             View Survey
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             outlined
             color="secondary"
             class="ml-2"
@@ -65,7 +65,7 @@
           >
             <a-icon left>mdi-plus</a-icon>
             New submission
-          </v-btn>
+          </a-btn>
         </div>
       </div>
       <a-expansion-panels class="mb-6">
@@ -114,7 +114,7 @@
               />
             </a-col>
             <a-col md="2" sm="6">
-              <v-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </v-btn>
+              <a-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </a-btn>
             </a-col>
           </a-row>
 

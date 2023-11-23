@@ -3,7 +3,7 @@
     <a-card-title>
       {{ title }}
       <a-spacer />
-      <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
+      <a-btn color="primary" class="ml-4" :to="newRoute" text>New...</a-btn>
     </a-card-title>
     <a-card-text>
       <a-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+
 export default {
   props: {
     entities: {

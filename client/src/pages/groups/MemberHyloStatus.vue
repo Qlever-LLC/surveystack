@@ -1,5 +1,5 @@
 <template>
-  <v-btn
+  <a-btn
     v-if="member"
     :disabled="loading"
     :href="member.hyloUrl"
@@ -7,20 +7,20 @@
     small
     color="#00AD87"
     v-on:click.prevent="openProfile"
-    >See on Hylo</v-btn
+    >See on Hylo</a-btn
   >
 
   <a-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</v-btn>
+      <a-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</a-btn>
     </template>
     <a-card>
       <a-card-title> Confirm Invitation </a-card-title>
       <a-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <v-btn text @click="isConfirming = false"> Cancel </v-btn>
-        <v-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </v-btn>
+        <a-btn text @click="isConfirming = false"> Cancel </a-btn>
+        <a-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>
