@@ -44,7 +44,6 @@ requireComponent.keys().forEach((fileName) => {
     .split('/')
     .pop()
     .replace(/\.\w+$/, '');
-  console.log('import', fileName, componentName);
   // Register component globally
   Vue.component(
     componentName,
