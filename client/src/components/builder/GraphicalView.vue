@@ -59,7 +59,7 @@
           >
             <a-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</a-icon>
           </a-btn>
-          <v-chip
+          <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
@@ -87,7 +87,7 @@
               mdi-refresh
             </a-icon>
             Version {{ el.libraryVersion }}
-            </a-chip>
+          </a-chip>
           <a-btn
             icon
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
@@ -167,12 +167,12 @@
 
     <a-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
       <a-card>
-        <a-card-title> Delete Question </a-card-title>
-        <a-card-text class="mt-4"> Are you sure you want to remove this question? </a-card-text>
+        <a-card-title> Delete Question</a-card-title>
+        <a-card-text class="mt-4"> Are you sure you want to remove this question?</a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
-          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
+          <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel</a-btn>
+          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove</a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>
@@ -198,11 +198,9 @@ import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
 
-
 export default {
   name: 'nested-draggable',
   components: {
-
     draggable,
     ControlCardHeader,
   },
