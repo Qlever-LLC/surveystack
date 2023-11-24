@@ -62,6 +62,7 @@ export async function getSignedDownloadUrl(key) {
 }
 
 export function getPublicDownloadUrl(resourceKey) {
+  // TODO: update to use environment variable instead of '.s3.amazonaws.com/' to support local development
   return 'https://' + AWS_S3_BUCKET_NAME + '.s3.amazonaws.com/' + resourceKey;
 }
 

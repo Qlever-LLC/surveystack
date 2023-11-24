@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// TODO: what is this file used for?
 
 import { register } from 'register-service-worker';
 

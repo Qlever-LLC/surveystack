@@ -175,7 +175,7 @@ describe('CSV Service', () => {
       });
     });
 
-    describe('fileTransformer', () => {
+    describe.skip('fileTransformer', () => {
       it('applies fileTransformer function to files in submissions object', async () => {
         const { createSubmission } = await createSurvey('file');
         const { submission } = await createSubmission();

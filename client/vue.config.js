@@ -91,6 +91,7 @@ module.exports = {
         //   handler: 'CacheFirst',
         // },
       ],
+      importScripts: ['sw-resources-listener.js'],
     },
   },
   pluginOptions: {},

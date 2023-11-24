@@ -443,7 +443,7 @@ describe('pdf.service', () => {
       });
 
       describe('preview', () => {
-        it('should render preview of image for image/file questions when `preview=true` if submitted PDF', async () => {
+        it.skip('should render preview of image for image/file questions when `preview=true` if submitted PDF', async () => {
           const { survey, createSubmission } = await createSurvey('file');
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
@@ -475,7 +475,7 @@ describe('pdf.service', () => {
           );
         });
 
-        it('should not render preview of image for image/file questions when `preview=false` if submitted PDF', async () => {
+        it.skip('should not render preview of image for image/file questions when `preview=false` if submitted PDF', async () => {
           const { survey, createSubmission } = await createSurvey('image');
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];

@@ -140,13 +140,16 @@ const actions = {
   async fetchResource({ commit, getters, dispatch }, resourceId) {
     let resource = getters['getResource'](resourceId);
     if (resource) {
+      console.log('fetchResource: Resource found locally', resource);
       return resource;
     }
 
     try {
       // fetch resource
       ({ data: resource } = await api.get(`/resources/${resourceId}`));
+      console.log('fetchResource: fetched resource metadata from API', resource);
     } catch (error) {
+      console.log(`fetchResource: failed to fetch resource ${resourceId}`);
       dispatch('feedback/add', `Could not fetch resource ${resourceId}. This problem is reported automatically.`, {
         root: true,
       });
@@ -159,12 +162,14 @@ const actions = {
     try {
       // get download url
       const url = getPublicDownloadUrl(resource.key);
+      console.log(`fetchResource: public download url: ${url}`);
       // download data
       const { data: binaryResult } = await axios.get(url, {
         responseType: 'arraybuffer',
         validateStatus: false,
       });
       resource.fileData = new Blob([binaryResult], { type: resource.contentType });
+      console.log('fetchResource: final resource', resource);
     } catch (error) {
       console.error('Could not fetch the remote file data', error);
     }

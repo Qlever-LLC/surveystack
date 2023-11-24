@@ -1,3 +1,5 @@
+// TODO: what is this file used for?
+
 // eslint-disable-next-line no-undef
 workbox.core.setCacheNameDetails({ prefix: 'survey-stack' });
 

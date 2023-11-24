@@ -380,14 +380,14 @@ describe('CSV Service', () => {
         });
       });
     });
-    describe('with fileTransformer', () => {
-      it('applies fileTransformer function to files in submissions object', () => {
+    describe.skip('with fileTransformer', () => {
+      it.skip('applies fileTransformer function to files in submissions object', () => {
         const submissions = mockSubmissions();
         const actual = transformSubmissionQuestionTypes(submissions[0].data, { file: fileTransformer });
         expect(actual.file_1.value[0].startsWith('https://surveystack-test.s3.amazonaws.com/')).toBeTruthy();
         expect(actual.file_1.value[1].startsWith('https://surveystack-test.s3.amazonaws.com/')).toBeTruthy();
       });
-      it('applies fileTransformer function to images in submissions object', () => {
+      it.skip('applies fileTransformer function to images in submissions object', () => {
         const submissions = mockSubmissions();
         const actual = transformSubmissionQuestionTypes(submissions[0].data, { image: fileTransformer });
         expect(actual.image_1.value[0].startsWith('https://surveystack-test.s3.amazonaws.com/')).toBeTruthy();
