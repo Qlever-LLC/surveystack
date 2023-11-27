@@ -14,7 +14,7 @@
         item-text="name"
         appendOuterSlot
       >
-        <template slot="append-outer">
+        <template v-slot:append-outer>
           <a-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
           </a-chip>

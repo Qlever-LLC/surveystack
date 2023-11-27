@@ -128,7 +128,7 @@
                         color="grey darken-1"
                         class="mt-0 ml-2 align-center align-self-start"
                       >
-                        <template slot="helper-text">
+                        <template v-slot:helper-text>
                           Allows the user to input answers that do not exist within the provided items. This will also
                           require <strong>Autocomplete</strong> is on
                         </template>
@@ -252,7 +252,7 @@
               </div>
             </div>
 
-            <a-btn slot="footer" @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
+            <a-btn @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
               <a-icon dark>mdi-plus</a-icon>
             </a-btn>
           </draggable>

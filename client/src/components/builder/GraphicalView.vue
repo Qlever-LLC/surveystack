@@ -262,9 +262,9 @@ export default {
       default: null,
     },
   },
-  filters: {
+  computed: {
     displayIndex(value) {
-      return value.join('.');
+      return this.value.join('.');
     },
   },
   methods: {

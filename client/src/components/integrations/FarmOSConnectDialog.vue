@@ -19,7 +19,7 @@
           prependItemSlot
           itemSlot
         >
-          <template slot="prepend-item">
+          <template v-slot:prepend-item>
             <a-btn
               @click="connect"
               :loading="loadingOwners"

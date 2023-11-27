@@ -19,7 +19,7 @@
           open-on-clear
           prependItemSlot
         >
-          <template slot="prepend-item">
+          <template v-slot:prepend-item>
             <a-btn
               :disabled="loading"
               :loading="loading"

@@ -172,7 +172,7 @@
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         dense
       >
-        <template slot="helper-text">
+        <template v-slot:helper-text>
           Allows the user to input answers that do not exist within the provided items.
           <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
         </template>
