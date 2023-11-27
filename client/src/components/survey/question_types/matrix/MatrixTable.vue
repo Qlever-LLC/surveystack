@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-dollar-scopedslots-api -->
 <template>
   <div class="mt-wrap mt-vars" :style="cssVariables">
     <div ref="header" class="mt-heading mt-divider" :class="{ 'mt-elevation-shadow': isHeaderFloating }">
@@ -17,6 +18,7 @@
           </slot>
         </div>
       </div>
+      <!-- TODO The `$scopedSlots` is deprecated  vue/no-deprecated-dollar-scopedslots-api -->
       <div v-if="$scopedSlots['row-actions']" class="mt-header-left-spacer" />
     </div>
     <div ref="body" class="mt-body pb-1" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
@@ -44,6 +46,7 @@
             </slot>
           </div>
         </div>
+        <!-- TODO The `$scopedSlots` is deprecated  vue/no-deprecated-dollar-scopedslots-api -->
         <div
           v-if="$scopedSlots['row-actions']"
           class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 white"
