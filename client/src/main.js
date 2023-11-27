@@ -18,16 +18,18 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
-import { createApp } from "@vue/compat";
+import { createApp } from '@vue/compat';
 
 startToggle(store);
 
 startSentry(Vue, store, router);
 
-Vue.component('app-control-label', appControlLabel);
-Vue.component('app-control-hint', appControlHint);
-Vue.component('app-control-more-info', appControlMoreInfo);
-Vue.component('app-control-error', appControlError);
+const app = createApp(App).use(router).use(store).use(vuetify).mount('#app');
+
+app.component('app-control-label', appControlLabel);
+app.component('app-control-hint', appControlHint);
+app.component('app-control-more-info', appControlMoreInfo);
+app.component('app-control-error', appControlError);
 
 const requireComponent = require.context(
   // The relative path of the components folder
@@ -45,7 +47,7 @@ requireComponent.keys().forEach((fileName) => {
     .pop()
     .replace(/\.\w+$/, '');
   // Register component globally
-  Vue.component(
+  app.component(
     componentName,
     // Look for the component options on `.default`, which will
     // exist if the component was exported with `export default`,
@@ -56,25 +58,19 @@ requireComponent.keys().forEach((fileName) => {
 
 api.init(process.env.VUE_APP_API_URL);
 
-Vue.filter('capitalize', (value) => {
+app.filter('capitalize', (value) => {
   if (!value) return '';
   const v = value.toString();
   return v.charAt(0).toUpperCase() + v.slice(1);
 });
 
-Vue.filter('showNull', (value) => {
+app.filter('showNull', (value) => {
   if (value === null) return 'null';
   if (!value) return '';
   return value;
 });
 
-Vue.config.productionTip = false;
-
-createApp(App)
-  .use(router)
-  .use(store)
-  .use(vuetify)
-  .mount("#app");
+app.config.productionTip = false;
 
 // remove initial loading screen (added in the index.html)
 try {
