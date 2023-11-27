@@ -309,16 +309,16 @@ const unstable = {
    */
   getCleanNumber(num, sigFigs) {
     //    prettyLog('in getCleanNumeber', 'success');
-    let val = utils.getClean(num);
+    let val = getClean(num);
     // return "" if getClean returns "", removes this edge case from the if/then list
-    if (utils.getClean(num) === '') {
+    if (getClean(num) === '') {
       val = '';
       // now Number() needs to return a valid number OR it needs to return 0 (which shows up as falsey but we want to pass it anyway since it's a numnber)
-    } else if (Number(utils.getClean(num)) || Number(utils.getClean(num)) === 0) {
+    } else if (Number(getClean(num)) || Number(getClean(num)) === 0) {
       if (sigFigs !== undefined) {
         val = Number(Number(val).toFixed(sigFigs)); // converts to string w/ sig figs, then back to number which removes trailing zeros
       } else {
-        val = Number(utils.getClean(num));
+        val = Number(getClean(num));
       }
     } else {
       val = '';
