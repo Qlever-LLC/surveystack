@@ -44,6 +44,7 @@
     "markdown-it-container": "^3.0.0",
     "monaco-editor": "^0.44.0",
     "monaco-editor-webpack-plugin": "^7.1.0",
+    "node-polyfill-webpack-plugin": "^2.0.1",
     "papaparse": "^5.4.1",
     "qr-scanner": "^1.4.2",
     "register-service-worker": "^1.7.2",

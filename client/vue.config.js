@@ -5,6 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const LCL = require('last-commit-log');
 
 const fs = require('fs');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 const lcl = new LCL('../');
 const commit = lcl.getLastCommitSync();
@@ -19,7 +20,7 @@ process.env.VUE_APP_VERSION = version;
 
 module.exports = {
   chainWebpack: (config) => {
-    config.resolve.alias.set('vue', '@vue/compat')
+    config.resolve.alias.set('vue', '@vue/compat');
     config.module
       .rule('vue')
       .use('vue-loader')
@@ -28,11 +29,11 @@ module.exports = {
           ...options,
           compilerOptions: {
             compatConfig: {
-              MODE: 2
-            }
-          }
-        }
-      })
+              MODE: 2,
+            },
+          },
+        };
+      });
     config.plugins.delete('pwa');
   },
   configureWebpack: {
@@ -42,6 +43,7 @@ module.exports = {
       },
     },
     plugins: [
+      new NodePolyfillPlugin(),
       new MonacoWebpackPlugin({
         languages: ['javascript', 'typescript'],
         features: [],
@@ -55,7 +57,7 @@ module.exports = {
   transpileDependencies: ['vuetify'],
   devServer: {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
-    allowedHosts: "all",
+    allowedHosts: 'all',
     compress: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
