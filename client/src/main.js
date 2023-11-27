@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
@@ -18,11 +18,10 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
-import { createApp } from '@vue/compat';
 
 startToggle(store);
 
-startSentry(Vue, store, router);
+startSentry(app, store, router);
 
 const app = createApp(App).use(router).use(store).use(vuetify).mount('#app');
 

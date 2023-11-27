@@ -23,6 +23,6 @@ function createStoreObject() {
   };
 }
 
-export const store = createStore(createStoreObject());
+export default createStore(createStoreObject());
 
 export { createStoreObject };
