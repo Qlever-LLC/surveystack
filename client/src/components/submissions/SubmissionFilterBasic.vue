@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <div>
     <a-select engineering="autocomplete" :items="fieldItems" label="Field" v-model="selectedField" hide-details />
