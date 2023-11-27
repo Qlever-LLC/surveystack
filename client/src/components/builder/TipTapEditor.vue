@@ -404,7 +404,7 @@ export default {
       },
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.editor.destroy();
   },
   data() {
@@ -508,7 +508,9 @@ export default {
   transform: translateX(-50%);
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.2s, visibility 0.2s;
+  transition:
+    opacity 0.2s,
+    visibility 0.2s;
 }
 .menububble.is-active {
   opacity: 1;

@@ -151,7 +151,7 @@ export default {
   mounted() {
     this.load();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     new MapInstanceManager().destroy(this.mapId);
     this.mapInstance = null;
   },

@@ -196,7 +196,7 @@ export default {
     submissions = this.sortSubmissions(submissions);
     this.localSubmissions = await this.setSurveyNames(submissions);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$store.dispatch('appui/reset');
   },
   computed: {

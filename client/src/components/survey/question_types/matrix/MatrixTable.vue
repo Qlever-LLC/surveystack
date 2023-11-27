@@ -273,7 +273,7 @@ export default {
     this.onScrollY();
     document.addEventListener('scroll', this.onScrollY);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('scroll', this.onScrollY);
   },
 };

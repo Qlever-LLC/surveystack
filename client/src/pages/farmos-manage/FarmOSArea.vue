@@ -19,7 +19,7 @@ export default {
       map: null,
     };
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.map) {
       this.map.map.setTarget(null);
       this.map = null;

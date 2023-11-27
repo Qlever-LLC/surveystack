@@ -238,7 +238,7 @@ export default {
 
     // TODO: this will now trigger a map error
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.stopGpsTimer();
     this.map.remove();
   },
