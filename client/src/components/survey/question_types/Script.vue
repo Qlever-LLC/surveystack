@@ -321,7 +321,7 @@ export default {
       this.loadingSourceFailed = true;
     }
   },
-  destroyed() {
+  unmounted() {
     this.messageEventListeners.forEach((handler) => window.removeEventListener('message', handler));
   },
 };
