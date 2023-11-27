@@ -20,8 +20,8 @@
                   (revision.version > survey.latestVersion
                     ? ' (draft)'
                     : revision.version === survey.latestVersion
-                    ? ' (published) '
-                    : '')
+                      ? ' (published) '
+                      : '')
                 }}
               </a-chip>
               <span class="ml-2"
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { ref } from '@vue/composition-api';
+import { ref } from 'vue';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';

@@ -33,7 +33,7 @@
 <script>
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
-import { ref } from '@vue/composition-api';
+import { ref } from 'vue';
 
 export default {
   name: 'edit-library-dialog',

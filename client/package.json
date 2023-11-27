@@ -24,7 +24,6 @@
     "@sentry/integrations": "^7.81.1",
     "@sentry/vue": "^7.81.1",
     "@vue/compat": "^3.3.9",
-    "@vue/composition-api": "^1.7.2",
     "axios": "^1.6.2",
     "babel-plugin-transform-require-context": "^0.1.1",
     "bson-objectid": "^2.0.4",

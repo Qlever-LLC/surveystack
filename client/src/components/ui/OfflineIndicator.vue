@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { onMounted, onUnmounted, ref } from '@vue/composition-api';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 export default {
   setup() {

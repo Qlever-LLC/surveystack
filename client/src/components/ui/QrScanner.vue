@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from '@vue/composition-api';
+import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from 'vue';
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';

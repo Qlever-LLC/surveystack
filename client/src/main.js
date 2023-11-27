@@ -19,11 +19,11 @@ import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 
+const app = createApp(App).use(router).use(store).use(vuetify);
+
 startToggle(store);
 
 startSentry(app, store, router);
-
-const app = createApp(App).use(router).use(store).use(vuetify).mount('#app');
 
 app.component('app-control-label', appControlLabel);
 app.component('app-control-hint', appControlHint);
@@ -77,3 +77,5 @@ try {
 } catch (e) {
   console.error('Failed to remove loading screen', e);
 }
+
+app.mount('#app');

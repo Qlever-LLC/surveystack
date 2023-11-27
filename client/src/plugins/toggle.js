@@ -15,7 +15,7 @@ export const startToggle = (store) => {
   });
   unleash.on('update', updateStore);
 
-  store.addModule('toggle', {
+  store.registerModule('toggle', {
     namespaced: true,
     state: {
       // true if the toggle states are loaded from the server or from localStorage

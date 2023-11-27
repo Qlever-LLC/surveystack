@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref, watchEffect } from '@vue/composition-api';
+import { computed, defineComponent, ref, watchEffect } from 'vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 
 import { get, groupBy } from 'lodash';

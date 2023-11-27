@@ -64,7 +64,7 @@ import TipTapEditor from '@/components/builder/TipTapEditor';
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 
 export default {
   components: {
