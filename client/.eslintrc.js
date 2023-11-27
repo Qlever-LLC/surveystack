@@ -23,6 +23,7 @@ module.exports = {
     'vue/no-mutating-props': 'warn', //TODO fix them and set to error again
     'vue/no-unused-vars': 'warn', //TODO fix them and set to error again
     'vue/valid-v-slot': 'warn', //TODO fix them and set to error again
+    'vue/no-v-for-template-key-on-child': 'warn', //TODO SEE https://stackoverflow.com/questions/71290457/how-to-get-rid-of-eslint-error-template-v-for-key-should-be-placed-on-the-tem
   },
   globals: {},
   parserOptions: {

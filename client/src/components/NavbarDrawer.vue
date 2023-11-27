@@ -6,10 +6,10 @@
       </a-btn>
     </div>
     <a-list>
-      <template v-for="(item, i) in items">
-        <a-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
-        <a-list-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</a-list-subheader>
-        <a-list-item v-else :key="i" :to="item.to">
+      <div v-for="(item, i) in items" :key="i">
+        <a-divider v-if="item.type === 'divider'" dark class="my-1" />
+        <a-list-subheader v-else-if="item.type === 'subheader'">{{ item.label }}</a-list-subheader>
+        <a-list-item v-else :to="item.to">
           <a-list-item-icon v-if="item.icon" :class="item.class">
             <a-icon>{{ item.icon }}</a-icon>
           </a-list-item-icon>
@@ -26,7 +26,7 @@
             </a-list-item-title>
           </v-list-item-content>
         </a-list-item>
-      </template>
+      </div>
 
       <a-divider dark class="my-1" />
 
