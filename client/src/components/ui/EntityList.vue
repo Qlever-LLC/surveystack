@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-space-between align-center">
       <slot v-if="!disableHeader" name="header">
-        <h1>Browse {{ collection | capitalize }}</h1>
+        <h1>Browse {{ capitalizedCollection }}</h1>
       </slot>
 
       <a-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</a-btn>
@@ -39,6 +39,10 @@ export default {
       type: Boolean,
       default: true,
     },
+  },
+  capitalizedCollection() {
+    if (!this.collection) return '';
+    return this.collection.charAt(0).toUpperCase() + this.collection.slice(1);
   },
 };
 </script>
