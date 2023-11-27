@@ -20,7 +20,8 @@
     <matrix-editor
       :resources="resources"
       :allowSetAllowHide="allowSetAllowHide"
-      v-model="value"
+      :modelValue="value"
+      @update:modelValue="value"
       @change="setResource"
       @delete="removeResource"
       @close-dialog="open = false"

@@ -1,7 +1,7 @@
 <template>
   <div class="screen-root">
     <a-dialog v-model="viewCode">
-      <app-code-view v-model="survey" style="height: 80vh" />
+      <app-code-view :value="survey" @update:value="survey" style="height: 80vh" />
     </a-dialog>
 
     <a-dialog v-model="viewSubmission">
@@ -39,7 +39,8 @@
           <survey-details
             :version="version"
             :draft="isDraft"
-            v-model="survey"
+            :modelValue="survey"
+            @update:modelValue="survey"
             :survey="survey"
             :isNew="!editMode"
             :isSaving="isSaving"
@@ -539,8 +540,8 @@ export default {
         subtitle: `
           <span class="question-title-chip">Version ${version}</span>
           <!--<span class="ml-2">${amountQuestions.length} Question${
-          amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''
-        }</span>-->
+            amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''
+          }</span>-->
           <!--<span class="question-title-chip">${this.groupPath}</span>-->
         `,
       });
@@ -1220,8 +1221,12 @@ export default {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  -webkit-transition: width 0.2s ease-out, height 0.2s ease-out;
-  transition: width 0.2s ease-out, height 0.2s ease-out;
+  -webkit-transition:
+    width 0.2s ease-out,
+    height 0.2s ease-out;
+  transition:
+    width 0.2s ease-out,
+    height 0.2s ease-out;
 }
 
 .splitpanes--dragging .splitpanes__pane {

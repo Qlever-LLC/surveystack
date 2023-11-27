@@ -304,7 +304,7 @@ export default {
     Date,
   },
   props: {
-    value: {
+    modelValue: {
       type: Object,
       required: true,
       default: () => ({ content: [], config: { addRowLabel: 'Add row', fixedColumns: 1 } }),
@@ -338,17 +338,17 @@ export default {
     // get/set the position of the columns and the "lock-to-left" marker
     columns: {
       get() {
-        const columns = [...this.value.content];
-        const fixedColumns = this.value.config.fixedColumns || 0;
+        const columns = [...this.modelValue.content];
+        const fixedColumns = this.modelValue.config.fixedColumns || 0;
         columns.splice(fixedColumns, 0, { isFixedUntilMarker: true });
         return columns;
       },
       set(columns) {
-        this.value.config.fixedColumns = Math.max(
+        this.modelValue.config.fixedColumns = Math.max(
           0,
           columns.findIndex((c) => c.isFixedUntilMarker === true)
         );
-        this.value.content = columns.filter((c) => c.isFixedUntilMarker !== true);
+        this.modelValue.content = columns.filter((c) => c.isFixedUntilMarker !== true);
       },
     },
   },
@@ -423,7 +423,7 @@ export default {
       this.columns = columns;
     },
     addColumn() {
-      this.value.content = [...this.value.content, this.createEmptyColumn()];
+      this.modelValue.content = [...this.modelValue.content, this.createEmptyColumn()];
     },
     onChanged(item, value) {
       Object.assign(item, value);
