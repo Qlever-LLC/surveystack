@@ -3,7 +3,7 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ['plugin:vue/essential', 'eslint:recommended', '@vue/prettier', 'plugin:storybook/recommended'],
+  extends: ['plugin:vue/vue3-essential', 'eslint:recommended', '@vue/prettier', 'plugin:storybook/recommended'],
   plugins: ['import'],
   ignorePatterns: ['marked.esm.js'],
   rules: {
