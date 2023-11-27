@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <a-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
     <a-icon color="success" class="mr-1">mdi-check-bold</a-icon>
@@ -20,6 +21,7 @@
         </a-tooltip>
 
         <a-spacer />
+        <!-- TODO in Vue3 remove .native -->
         <a-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"

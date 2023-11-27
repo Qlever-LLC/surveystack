@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <a-card outlined class="tiptap-editor">
     <a-card-title class="pa-0">
