@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-bind-sync -->
 <template>
   <div>
     <app-submission-archive-dialog
@@ -150,6 +151,7 @@
       </a-tabs>
       <a-window v-model="tab" touchless>
         <a-window-item>
+          <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
           <app-submissions-table-client-csv
             :submissions="submissions"
             v-if="submissions"

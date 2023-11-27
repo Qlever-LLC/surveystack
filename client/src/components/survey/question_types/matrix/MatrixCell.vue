@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-bind-sync -->
 <template>
   <a-text-field
     v-if="header.type === 'text'"
@@ -87,6 +88,7 @@
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </a-select>
+  <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
   <a-select
     engineering="combobox"
     v-else-if="header.type === 'dropdown' && header.custom"

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-bind-sync -->
 <template>
   <a-select
     v-if="!customAnswer && !autocomplete"
@@ -65,6 +66,7 @@
       </v-list-item-content>
     </template>
   </a-select>
+  <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
   <a-select
     engineering="combobox"
     v-else-if="customAnswer"
