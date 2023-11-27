@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
@@ -55,8 +54,6 @@ const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
 const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
 const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
-
-Vue.use(VueRouter);
 
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -366,14 +363,13 @@ const routes = [
   },
 ];
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
     return {
-      x: 0,
-      y: 0,
+      left: 0,
+      top: 0,
     };
   },
 });

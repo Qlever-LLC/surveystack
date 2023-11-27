@@ -19,6 +19,20 @@ process.env.VUE_APP_VERSION = version;
 
 module.exports = {
   chainWebpack: (config) => {
+    config.resolve.alias.set('vue', '@vue/compat')
+    config.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap((options) => {
+        return {
+          ...options,
+          compilerOptions: {
+            compatConfig: {
+              MODE: 2
+            }
+          }
+        }
+      })
     config.plugins.delete('pwa');
   },
   configureWebpack: {
@@ -41,7 +55,7 @@ module.exports = {
   transpileDependencies: ['vuetify'],
   devServer: {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
-    disableHostCheck: true,
+    allowedHosts: "all",
     compress: true,
     headers: {
       'Access-Control-Allow-Origin': '*',

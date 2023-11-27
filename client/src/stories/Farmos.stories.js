@@ -1,8 +1,5 @@
 import Vue from 'vue';
-import VueCompositionApi from '@vue/composition-api';
 import FarmosRegister from '../pages/farmos-manage/FarmOSRegister.vue';
-
-Vue.use(VueCompositionApi);
 
 export default {
   title: 'FarmOS Register Page',

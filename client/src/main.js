@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import CompositionApi from '@vue/composition-api';
 import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
@@ -19,6 +18,7 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
+import { createApp } from "@vue/compat";
 
 startToggle(store);
 
@@ -69,13 +69,12 @@ Vue.filter('showNull', (value) => {
 });
 
 Vue.config.productionTip = false;
-Vue.use(CompositionApi);
-new Vue({
-  router,
-  store,
-  vuetify,
-  render: (h) => h(App),
-}).$mount('#app');
+
+createApp(App)
+  .use(router)
+  .use(store)
+  .use(vuetify)
+  .mount("#app");
 
 // remove initial loading screen (added in the index.html)
 try {
