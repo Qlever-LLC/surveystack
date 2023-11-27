@@ -40,13 +40,13 @@
       >
         <control-card-header
           v-if="!el.options.hidden"
-          :index="createIndex(index, idx + 1) | displayIndex"
+          :index="displayIndex(createIndex(index, idx + 1))"
           :title="getDisplay(el)"
           :type="el.type"
           :dataName="el.name"
         />
         <div class="grey--text text--darken-1" v-if="el.options.hidden">
-          {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
+          {{ displayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="mb-2 context-actions">
           <a-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
@@ -68,15 +68,15 @@
               availableLibraryUpdates[el.libraryId] === null
                 ? 'error'
                 : availableLibraryUpdates[el.libraryId] > el.libraryVersion
-                ? 'warning'
-                : 'grey'
+                  ? 'warning'
+                  : 'grey'
             "
             :title="
               availableLibraryUpdates[el.libraryId] === null
                 ? 'question set has been deleted in the library'
                 : availableLibraryUpdates[el.libraryId]
-                ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
-                : 'newest available version'
+                  ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
+                  : 'newest available version'
             "
           >
             <a-icon
@@ -263,8 +263,8 @@ export default {
     },
   },
   computed: {
-    displayIndex(value) {
-      return this.value.join('.');
+    displayIndex() {
+      return (value) => value.join('.');
     },
   },
   methods: {

@@ -40,9 +40,11 @@ export default {
       default: true,
     },
   },
-  capitalizedCollection() {
-    if (!this.collection) return '';
-    return this.collection.charAt(0).toUpperCase() + this.collection.slice(1);
+  computed: {
+    capitalizedCollection() {
+      if (!this.collection) return '';
+      return this.collection.charAt(0).toUpperCase() + this.collection.slice(1);
+    },
   },
 };
 </script>

@@ -448,7 +448,7 @@ export default {
   align-self: center;
 }
 
->>> .v-input--checkbox {
+:deep(.v-input--checkbox) {
   width: fit-content;
 }
 </style>

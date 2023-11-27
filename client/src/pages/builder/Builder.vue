@@ -80,7 +80,7 @@
     />
 
     <a-snackbar v-model="showSnackbar" :timeout="4000">
-      {{ snackbarMessage | capitalize }}
+      {{ capitalizeSnackbarMessage }}
       <a-btn color="grey" text @click="showSnackbar = false">Close</a-btn>
     </a-snackbar>
   </div>
@@ -162,6 +162,12 @@ export default {
     if (isIos() || isSafari()) {
       this.showInvalidPlatformModal = true;
     }
+  },
+  computed: {
+    capitalizeSnackbarMessage() {
+      if (!this.snackbarMessage) return '';
+      return this.snackbarMessage.charAt(0).toUpperCase() + this.snackbarMessage.slice(1);
+    },
   },
   methods: {
     getActiveGroupSimpleObject() {
