@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/no-deprecated-dollar-listeners-api -->
+<!-- TODO The `$listeners` is deprecated  vue/no-deprecated-dollar-listeners-api -->
 <template>
   <v-alert
     :border="border"

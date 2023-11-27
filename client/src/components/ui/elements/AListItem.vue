@@ -34,6 +34,8 @@ export default {
     hasClickListener() {
       // we should only register the @click handler on v-list-item if we need to
       // otherwise v-list-item would show hover effects even if our consumer does not want it to be clickable
+      // TODO The `$listeners` is deprecated  vue/no-deprecated-dollar-listeners-api
+      // eslint-disable-next-line vue/no-deprecated-dollar-listeners-api
       return this.$listeners && this.$listeners.click;
     },
   },
