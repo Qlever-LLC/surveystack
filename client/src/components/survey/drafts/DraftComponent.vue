@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-slot-attribute -->
 <template>
   <div class="draft-component-wrapper draft wrapper" :class="{ builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
@@ -22,6 +23,7 @@
       v-if="builder"
     >
       <!-- forward all the slots -->
+      <!-- TODO `slot` attributes are deprecated  vue/no-deprecated-slot-attribute -->
       <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
     </app-draft-toolbar>
 
