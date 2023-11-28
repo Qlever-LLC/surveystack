@@ -308,7 +308,6 @@ export const unstable = {
    * @number {precision} desired precision of output (if not specificied, no precision applied)
    */
   getCleanNumber(num, sigFigs) {
-    //    prettyLog('in getCleanNumeber', 'success');
     let val = getClean(num);
     // return "" if getClean returns "", removes this edge case from the if/then list
     if (getClean(num) === '') {
@@ -323,8 +322,6 @@ export const unstable = {
     } else {
       val = '';
     }
-    // prettyLog(val);
-    // prettyLog('leaving getCleanNumeber', 'success');
     return val;
   },
 
@@ -747,7 +744,6 @@ export const unstable = {
       });
       this.prettyLog(`Added: ${quantity.entity.type}, ${quantity.entity.id}`, 'success');
     });
-    // prettyLog(log);
     return log;
   },
 
@@ -845,10 +841,9 @@ export const unstable = {
     }
     // 3. find a url somewhere in the submission (stop at the 1st one)
     if (!url) {
-      let all = Object.flattenAll(submission);
+      let all = this.flattenAll(submission);
       let objectKeys = Object.keys(all);
       for (let i = 0; i < objectKeys.length; i++) {
-        //    console.log(`${objectKeys[i]}: ${all[objectKeys[i]]} ${isValidURL(all[objectKeys[i]])}`)
         if (
           objectKeys[i].includes('url') &&
           typeof all[objectKeys[i]] === 'string' &&
@@ -948,6 +943,7 @@ export const utils = {
   checkIfAny,
   checkIfNone,
   getCleanArray,
+  getCleanNumber,
   getClean,
   getResourceAsText,
   getResourceAsArrayBuffer,
