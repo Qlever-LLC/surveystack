@@ -166,7 +166,8 @@ export default {
   computed: {
     capitalizeSnackbarMessage() {
       if (!this.snackbarMessage) return '';
-      return this.snackbarMessage.charAt(0).toUpperCase() + this.snackbarMessage.slice(1);
+      const v = this.snackbarMessage.toString();
+      return v.charAt(0).toUpperCase() + v.slice(1);
     },
   },
   methods: {

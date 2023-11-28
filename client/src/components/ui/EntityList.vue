@@ -43,7 +43,8 @@ export default {
   computed: {
     capitalizedCollection() {
       if (!this.collection) return '';
-      return this.collection.charAt(0).toUpperCase() + this.collection.slice(1);
+      const v = this.collection.toString();
+      return v.charAt(0).toUpperCase() + v.slice(1);
     },
   },
 };

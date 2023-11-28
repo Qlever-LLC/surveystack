@@ -57,18 +57,6 @@ requireComponent.keys().forEach((fileName) => {
 
 api.init(process.env.VUE_APP_API_URL);
 
-app.filter('capitalize', (value) => {
-  if (!value) return '';
-  const v = value.toString();
-  return v.charAt(0).toUpperCase() + v.slice(1);
-});
-
-app.filter('showNull', (value) => {
-  if (value === null) return 'null';
-  if (!value) return '';
-  return value;
-});
-
 app.config.productionTip = false;
 
 // remove initial loading screen (added in the index.html)
