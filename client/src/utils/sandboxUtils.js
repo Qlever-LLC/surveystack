@@ -252,7 +252,7 @@ async function parseArrayBuffer(file) {
   return result;
 }
 
-const unstable = {
+export const unstable = {
   /*
    * Find a nested item inside a JSON object.
    * Pass the object and the string referencing the location.
@@ -556,44 +556,105 @@ flattenAll(data, tagArrays = false) {
   recurse(data, "");
   return result;
 },
+
 /**
 * unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
+* designed to be used wtih flattenAll
 * @data {object} data - the flattened object you pass.
 * 
 * Caveats:
 * 1. Assumes no property keys in the original data contain periods (`.`).
 * 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
 * 3. Does not recreate circular structures from the "[Circular]" marker.
+* 4. If it finds markers __isArray it converts them back to proper arrays from objects
 */
 unflattenAll(data) {
   var result = {};
 
   for (var key in data) {
-      var keys = key.split('.');
-      var last = keys.pop();
-      var nested = result;
+    var keys = key.split('.');
+    var last = keys.pop();
+    var nested = result;
 
-      for (var i = 0; i < keys.length; i++) {
-          var k = keys[i];
-          var nextKey = keys[i + 1];
-
-          if (nextKey !== undefined && /^\d+$/.test(nextKey)) {
-              nested[k] = nested[k] || [];
-          } else {
-              nested[k] = nested[k] || {};
-          }
-          nested = nested[k];
-      }
-
-      if (/^\d+$/.test(last)) {
-          var index = parseInt(last, 10);
-          nested[index] = data[key];
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var nextKey = keys[i + 1];
+      if (nextKey !== undefined && /^\d+$/.test(nextKey)) {
+        nested[k] = nested[k] || [];
       } else {
-          nested[last] = data[key];
+        nested[k] = nested[k] || {};
       }
+      nested = nested[k];
+    }
+
+    if (/^\d+$/.test(last)) {
+      var index = parseInt(last, 10);
+      nested[index] = data[key];
+    } else {
+      nested[last] = data[key];
+    }
+  }
+  result = result[""] || result;
+
+  /**
+  * Sort the keys and return as array of numbers
+  */
+  function sortNumbersAndOutputAsStrings(arr) {
+    const val = arr.sort((a, b) => parseFloat(a) - parseFloat(b))
+      .map(item => item.toString());
+    return val
   }
 
-  return result[""] || result;
+  /**
+  * Return corrected array
+  */
+  function isArray(value) {
+    delete value.__isArray;
+    let newArray = [];
+    sortNumbersAndOutputAsStrings(Object.keys(value)).forEach((item) => {
+      newArray.push(value[item]);
+    })
+    return newArray
+  }
+
+  /**
+  * Check if we need to replace this with an array.
+  * Replace if needed, or return what was given
+  */
+  function returnArray(value) {
+    if (value !== null
+      && Object.keys(value).includes('__isArray')
+      && value.__isArray === true) {
+      return isArray(value)
+    }
+    return value
+  }
+
+  /** 
+   * Iterate through object, apply a function
+   * recursive - passes parent to itself.
+   */
+  function iterateObject(obj, func, parent = null) {
+    if (Array.isArray(obj)) {
+      obj.forEach(item => {
+        if (typeof item === 'object') {
+          iterateObject(item, func, obj);  // Set current obj as parent
+        }
+      });
+    } else if (typeof obj === 'object' && obj !== null) {
+      Object.entries(obj).forEach(([key, value]) => {
+        if (typeof value === 'object') {
+          // console.log(key);
+          // console.log(value);
+          // console.log(obj);
+          obj[key] = func(value);
+          iterateObject(value, func, obj);  // Set current obj as parent
+        }
+      });
+    }
+    return obj
+  }
+  return iterateObject(result, returnArray)
 },
 
   /**
