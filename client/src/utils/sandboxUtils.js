@@ -513,149 +513,149 @@ export const unstable = {
     recurse(data, '');
     return result;
   },
-/**
- * Flattens a nested data structure (arrays and objects) into a single-level object with dot-separated keys.
- * Handles circular references by tagging them as '[Circular]'. Optionally tags arrays with '__isArray'.
- * 
- * @param {Object|Array} data - The nested data structure to flatten.
- * @param {boolean} tagArrays - If true, adds a special '__isArray' key to denote arrays. Default is false.
- * @returns {Object} A flattened version of the input data.
- */
-flattenAll(data, tagArrays = false) {
-  var result = {};
-  var seenObjects = new Set();
-
-  function recurse(cur, prop) {
-    if (Object(cur) !== cur) {
-      result[prop] = cur;
-    } else if (seenObjects.has(cur)) {
-      // Circular reference detected
-      result[prop] = '[Circular]';
-      return;
-    } else if (Array.isArray(cur)) {
-      seenObjects.add(cur);
-      for (var i = 0, l = cur.length; i < l; i++)
-        recurse(cur[i], prop + "." + i);
-      if (l == 0)
-        result[prop] = [];
-      else
-        if (tagArrays) result[prop + ".__isArray"] = true; // Tagging the array
-      seenObjects.delete(cur);
-    } else {
-      seenObjects.add(cur);
-      var isEmpty = true;
-      for (var p in cur) {
-        isEmpty = false;
-        recurse(cur[p], prop ? prop + "." + p : p);
-      }
-      if (isEmpty && prop)
-        result[prop] = {};
-      seenObjects.delete(cur);
-    }
-  }
-  recurse(data, "");
-  return result;
-},
-
-/**
-* unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
-* designed to be used wtih flattenAll
-* @data {object} data - the flattened object you pass.
-* 
-* Caveats:
-* 1. Assumes no property keys in the original data contain periods (`.`).
-* 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
-* 3. Does not recreate circular structures from the "[Circular]" marker.
-* 4. If it finds markers __isArray it converts them back to proper arrays from objects
-*/
-unflattenAll(data) {
-  var result = {};
-
-  for (var key in data) {
-    var keys = key.split('.');
-    var last = keys.pop();
-    var nested = result;
-
-    for (var i = 0; i < keys.length; i++) {
-      var k = keys[i];
-      var nextKey = keys[i + 1];
-      if (nextKey !== undefined && /^\d+$/.test(nextKey)) {
-        nested[k] = nested[k] || [];
-      } else {
-        nested[k] = nested[k] || {};
-      }
-      nested = nested[k];
-    }
-
-    if (/^\d+$/.test(last)) {
-      var index = parseInt(last, 10);
-      nested[index] = data[key];
-    } else {
-      nested[last] = data[key];
-    }
-  }
-  result = result[""] || result;
-
   /**
-  * Sort the keys and return as array of numbers
-  */
-  function sortNumbersAndOutputAsStrings(arr) {
-    const val = arr.sort((a, b) => parseFloat(a) - parseFloat(b))
-      .map(item => item.toString());
-    return val
-  }
-
-  /**
-  * Return corrected array
-  */
-  function isArray(value) {
-    delete value.__isArray;
-    let newArray = [];
-    sortNumbersAndOutputAsStrings(Object.keys(value)).forEach((item) => {
-      newArray.push(value[item]);
-    })
-    return newArray
-  }
-
-  /**
-  * Check if we need to replace this with an array.
-  * Replace if needed, or return what was given
-  */
-  function returnArray(value) {
-    if (value !== null
-      && Object.keys(value).includes('__isArray')
-      && value.__isArray === true) {
-      return isArray(value)
-    }
-    return value
-  }
-
-  /** 
-   * Iterate through object, apply a function
-   * recursive - passes parent to itself.
+   * Flattens a nested data structure (arrays and objects) into a single-level object with dot-separated keys.
+   * Handles circular references by tagging them as '[Circular]'. Optionally tags arrays with '__isArray'.
+   * 
+   * @param {Object|Array} data - The nested data structure to flatten.
+   * @param {boolean} tagArrays - If true, adds a special '__isArray' key to denote arrays. Default is false.
+   * @returns {Object} A flattened version of the input data.
    */
-  function iterateObject(obj, func, parent = null) {
-    if (Array.isArray(obj)) {
-      obj.forEach(item => {
-        if (typeof item === 'object') {
-          iterateObject(item, func, obj);  // Set current obj as parent
+  flattenAll(data, tagArrays = false) {
+    var result = {};
+    var seenObjects = new Set();
+
+    function recurse(cur, prop) {
+      if (Object(cur) !== cur) {
+        result[prop] = cur;
+      } else if (seenObjects.has(cur)) {
+        // Circular reference detected
+        result[prop] = '[Circular]';
+        return;
+      } else if (Array.isArray(cur)) {
+        seenObjects.add(cur);
+        for (var i = 0, l = cur.length; i < l; i++)
+          recurse(cur[i], prop + "." + i);
+        if (l == 0)
+          result[prop] = [];
+        else
+          if (tagArrays) result[prop + ".__isArray"] = true; // Tagging the array
+        seenObjects.delete(cur);
+      } else {
+        seenObjects.add(cur);
+        var isEmpty = true;
+        for (var p in cur) {
+          isEmpty = false;
+          recurse(cur[p], prop ? prop + "." + p : p);
         }
-      });
-    } else if (typeof obj === 'object' && obj !== null) {
-      Object.entries(obj).forEach(([key, value]) => {
-        if (typeof value === 'object') {
-          // console.log(key);
-          // console.log(value);
-          // console.log(obj);
-          obj[key] = func(value);
-          iterateObject(value, func, obj);  // Set current obj as parent
-        }
-      });
+        if (isEmpty && prop)
+          result[prop] = {};
+        seenObjects.delete(cur);
+      }
     }
-    return obj
-  }
-  return iterateObject(result, returnArray)
-},
+    recurse(data, "");
+    return result;
+  },
+
+  /**
+  * unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
+  * designed to be used wtih flattenAll
+  * @data {object} data - the flattened object you pass.
+  * 
+  * Caveats:
+  * 1. Assumes no property keys in the original data contain periods (`.`).
+  * 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
+  * 3. Does not recreate circular structures from the "[Circular]" marker.
+  * 4. If it finds markers __isArray it converts them back to proper arrays from objects
+  */
+  unflattenAll(data) {
+    var result = {};
+
+    for (var key in data) {
+      var keys = key.split('.');
+      var last = keys.pop();
+      var nested = result;
+
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var nextKey = keys[i + 1];
+        if (nextKey !== undefined && /^\d+$/.test(nextKey)) {
+          nested[k] = nested[k] || [];
+        } else {
+          nested[k] = nested[k] || {};
+        }
+        nested = nested[k];
+      }
+
+      if (/^\d+$/.test(last)) {
+        var index = parseInt(last, 10);
+        nested[index] = data[key];
+      } else {
+        nested[last] = data[key];
+      }
+    }
+    result = result[""] || result;
+
+    /**
+    * Sort the keys and return as array of numbers
+    */
+    function sortNumbersAndOutputAsStrings(arr) {
+      const val = arr.sort((a, b) => parseFloat(a) - parseFloat(b))
+        .map(item => item.toString());
+      return val
+    }
+
+    /**
+    * Return corrected array
+    */
+    function isArray(value) {
+      delete value.__isArray;
+      let newArray = [];
+      sortNumbersAndOutputAsStrings(Object.keys(value)).forEach((item) => {
+        newArray.push(value[item]);
+      })
+      return newArray
+    }
+
+    /**
+    * Check if we need to replace this with an array.
+    * Replace if needed, or return what was given
+    */
+    function returnArray(value) {
+      if (value !== null
+        && Object.keys(value).includes('__isArray')
+        && value.__isArray === true) {
+        return isArray(value)
+      }
+      return value
+    }
+
+    /** 
+     * Iterate through object, apply a function
+     * recursive - passes parent to itself.
+     */
+    function iterateObject(obj, func, parent = null) {
+      if (Array.isArray(obj)) {
+        obj.forEach(item => {
+          if (typeof item === 'object') {
+            iterateObject(item, func, obj);  // Set current obj as parent
+          }
+        });
+      } else if (typeof obj === 'object' && obj !== null) {
+        Object.entries(obj).forEach(([key, value]) => {
+          if (typeof value === 'object') {
+            // console.log(key);
+            // console.log(value);
+            // console.log(obj);
+            obj[key] = func(value);
+            iterateObject(value, func, obj);  // Set current obj as parent
+          }
+        });
+      }
+      return obj
+    }
+    return iterateObject(result, returnArray)
+  },
 
   /**
    * apply this to a flattened version of the survey.resources survey.revisions (most recent revision only)
