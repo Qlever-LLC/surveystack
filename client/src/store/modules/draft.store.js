@@ -134,7 +134,7 @@ const getters = {
           }
         });
       }
-      if (state.submission.data[matrixName].value) {
+      if (state.submission.data[matrixName] && state.submission.data[matrixName].value) {
         for (const row of state.submission.data[matrixName].value) {
           for (const requiredC of requiredColumnNames) {
             if (
