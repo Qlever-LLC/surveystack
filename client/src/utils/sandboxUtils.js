@@ -513,80 +513,88 @@ const unstable = {
     recurse(data, '');
     return result;
   },
-  /**
-   * flatten works for objects AND arrays.  Uses Set() to handle circular references which can throw errors in browser (more in chrome than firefox)
-   * @data {object} data the object you pass
-   */
-  flattenAll(data) {
-    var result = {};
-    var seenObjects = new Set();
+/**
+ * Flattens a nested data structure (arrays and objects) into a single-level object with dot-separated keys.
+ * Handles circular references by tagging them as '[Circular]'. Optionally tags arrays with '__isArray'.
+ * 
+ * @param {Object|Array} data - The nested data structure to flatten.
+ * @param {boolean} tagArrays - If true, adds a special '__isArray' key to denote arrays. Default is false.
+ * @returns {Object} A flattened version of the input data.
+ */
+flattenAll(data, tagArrays = false) {
+  var result = {};
+  var seenObjects = new Set();
 
-    function recurse(cur, prop) {
-      if (Object(cur) !== cur) {
-        result[prop] = cur;
-      } else if (seenObjects.has(cur)) {
-        // Circular reference detected
-        result[prop] = '[Circular]';
-        return;
-      } else if (Array.isArray(cur)) {
-        seenObjects.add(cur);
-        for (var i = 0, l = cur.length; i < l; i++) recurse(cur[i], prop + '.' + i);
-        if (l == 0) result[prop] = [];
-        seenObjects.delete(cur);
-      } else {
-        seenObjects.add(cur);
-        var isEmpty = true;
-        for (var p in cur) {
-          isEmpty = false;
-          recurse(cur[p], prop ? prop + '.' + p : p);
-        }
-        if (isEmpty && prop) result[prop] = {};
-        seenObjects.delete(cur);
+  function recurse(cur, prop) {
+    if (Object(cur) !== cur) {
+      result[prop] = cur;
+    } else if (seenObjects.has(cur)) {
+      // Circular reference detected
+      result[prop] = '[Circular]';
+      return;
+    } else if (Array.isArray(cur)) {
+      seenObjects.add(cur);
+      for (var i = 0, l = cur.length; i < l; i++)
+        recurse(cur[i], prop + "." + i);
+      if (l == 0)
+        result[prop] = [];
+      else
+        if (tagArrays) result[prop + ".__isArray"] = true; // Tagging the array
+      seenObjects.delete(cur);
+    } else {
+      seenObjects.add(cur);
+      var isEmpty = true;
+      for (var p in cur) {
+        isEmpty = false;
+        recurse(cur[p], prop ? prop + "." + p : p);
       }
+      if (isEmpty && prop)
+        result[prop] = {};
+      seenObjects.delete(cur);
     }
+  }
+  recurse(data, "");
+  return result;
+},
+/**
+* unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
+* @data {object} data - the flattened object you pass.
+* 
+* Caveats:
+* 1. Assumes no property keys in the original data contain periods (`.`).
+* 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
+* 3. Does not recreate circular structures from the "[Circular]" marker.
+*/
+unflattenAll(data) {
+  var result = {};
 
-    recurse(data, '');
-    return result;
-  },
-  /**
-  * unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
-  * @data {object} data - the flattened object you pass.
-  * 
-  * Caveats:
-  * 1. Assumes no property keys in the original data contain periods (`.`).
-  * 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
-  * 3. Does not recreate circular structures from the "[Circular]" marker.
-  */
-  unflattenAll(data) {
-    var result = {};
-
-    for (var key in data) {
+  for (var key in data) {
       var keys = key.split('.');
       var last = keys.pop();
       var nested = result;
 
       for (var i = 0; i < keys.length; i++) {
-        var k = keys[i];
-        var nextKey = keys[i + 1];
+          var k = keys[i];
+          var nextKey = keys[i + 1];
 
-        if (nextKey !== undefined && /^\d+$/.test(nextKey)) {
-          nested[k] = nested[k] || [];
-        } else {
-          nested[k] = nested[k] || {};
-        }
-        nested = nested[k];
+          if (nextKey !== undefined && /^\d+$/.test(nextKey)) {
+              nested[k] = nested[k] || [];
+          } else {
+              nested[k] = nested[k] || {};
+          }
+          nested = nested[k];
       }
 
       if (/^\d+$/.test(last)) {
-        var index = parseInt(last, 10);
-        nested[index] = data[key];
+          var index = parseInt(last, 10);
+          nested[index] = data[key];
       } else {
-        nested[last] = data[key];
+          nested[last] = data[key];
       }
-    }
+  }
 
-    return result[""] || result;
-  },
+  return result[""] || result;
+},
 
   /**
    * apply this to a flattened version of the survey.resources survey.revisions (most recent revision only)
