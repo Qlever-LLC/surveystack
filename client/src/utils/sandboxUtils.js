@@ -252,7 +252,7 @@ async function parseArrayBuffer(file) {
   return result;
 }
 
-const unstable = {
+export const unstable = {
   /*
    * Find a nested item inside a JSON object.
    * Pass the object and the string referencing the location.
