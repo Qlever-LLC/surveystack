@@ -86,6 +86,10 @@ module.exports = {
           urlPattern: /\/api\/.*$/,
           handler: 'NetworkFirst',
         },
+        {
+          urlPattern: new RegExp(`${process.env.VUE_APP_S3_BASE_URL}resources/.*`),
+          handler: 'NetworkFirst',
+        },
         // {
         //   urlPattern: /https:\/\/api\.mapbox\.com.*$/,
         //   handler: 'CacheFirst',

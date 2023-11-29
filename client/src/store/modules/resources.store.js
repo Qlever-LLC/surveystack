@@ -164,6 +164,7 @@ const actions = {
         responseType: 'arraybuffer',
         validateStatus: false,
       });
+      console.log('fetched resource', resource, binaryResult);
       resource.fileData = new Blob([binaryResult], { type: resource.contentType });
     } catch (error) {
       console.error('Could not fetch the remote file data', error);
