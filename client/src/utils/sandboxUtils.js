@@ -197,6 +197,34 @@ export function getClean(chooseOne) {
   }
 }
 
+/**
+ * getCleanNumber
+ *
+ * Output a number or a "" if it's not relevant or not a number, you may also specify precision
+ * Useful to put directly in text objects by avoiding 'null', but also counts as falsey by using ''.
+ * Removes any annoying trailing zeroes if the value is more precise than precision specified
+ * @object {num} single choice select answer root (not .value!)
+ * @number {precision} desired precision of output (if not specificied, no precision applied)
+ */
+export function getCleanNumber(num, sigFigs) {
+  let val = getClean(num);
+  // return "" if getClean returns "", removes this edge case from the if/then list
+  if (getClean(num) === '') {
+    val = '';
+    // now Number() needs to return a valid number OR it needs to return 0 (which shows up as falsey but we want to pass it anyway since it's a numnber)
+  } else if (Number(getClean(num)) || Number(getClean(num)) === 0) {
+    if (sigFigs !== undefined) {
+      val = Number(Number(val).toFixed(sigFigs)); // converts to string w/ sig figs, then back to number which removes trailing zeros
+    } else {
+      val = Number(getClean(num));
+    }
+  } else {
+    val = '';
+  }
+  return val;
+}
+
+
 export async function getResourceAsText(resourceKey) {
   return parseText(await getResource(resourceKey));
 }
@@ -297,32 +325,6 @@ export const unstable = {
     } catch (e) {
       return defaultValue;
     }
-  },
-
-  /**
-   * getCleanNumber
-   *
-   * Output a number or a "" if it's not relevant or not a number, you may also specify precision
-   * Helpfully also removes any annoying trailing zeroes if the value is more precise than precision specified
-   * @object {num} single choice select answer root (not .value!)
-   * @number {precision} desired precision of output (if not specificied, no precision applied)
-   */
-  getCleanNumber(num, sigFigs) {
-    let val = getClean(num);
-    // return "" if getClean returns "", removes this edge case from the if/then list
-    if (getClean(num) === '') {
-      val = '';
-      // now Number() needs to return a valid number OR it needs to return 0 (which shows up as falsey but we want to pass it anyway since it's a numnber)
-    } else if (Number(getClean(num)) || Number(getClean(num)) === 0) {
-      if (sigFigs !== undefined) {
-        val = Number(Number(val).toFixed(sigFigs)); // converts to string w/ sig figs, then back to number which removes trailing zeros
-      } else {
-        val = Number(getClean(num));
-      }
-    } else {
-      val = '';
-    }
-    return val;
   },
 
   /*
