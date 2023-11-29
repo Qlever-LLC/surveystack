@@ -1,5 +1,6 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
+import { getCurrentInstance } from 'vue';
 
 const partners = [];
 
@@ -13,7 +14,11 @@ function importAll(r) {
 importAll(require.context('@/partners/', false, /\.js$/));
 
 export default {
-  install(vue) {
+  install(store) {
+    const currentInstance = getCurrentInstance();
+    // TODO check if the variable vue is correctly defined for its use
+    const vue = currentInstance.appContext.config.globalProperties;
+
     const appBarThemeColor = document.createElement('meta');
     appBarThemeColor.setAttribute('name', 'theme-color');
     appBarThemeColor.setAttribute('content', '#444444');
@@ -60,7 +65,7 @@ export default {
         document.title = activePartner.name;
 
         // set whitelabel
-        vue.$store.dispatch('whitelabel/setPartner', activePartner);
+        store.dispatch('whitelabel/setPartner', activePartner);
       }
     }
 
@@ -69,6 +74,6 @@ export default {
     document.head.appendChild(appleTouch);
     document.head.appendChild(appBarThemeColor);
 
-    vue.$store.dispatch('memberships/tryAutoJoinAndSelectGroup');
+    store.dispatch('memberships/tryAutoJoinAndSelectGroup');
   },
 };

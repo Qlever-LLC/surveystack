@@ -1,5 +1,5 @@
 <template>
-  <a-navigation-drawer :value="value" app>
+  <a-navigation-drawer :value="visible" app>
     <div class="d-flex justify-end mt-3 mr-3">
       <a-btn large icon @click="$emit('input', !value)">
         <a-icon>mdi-close</a-icon>
@@ -16,11 +16,8 @@
           <v-list-item-content>
             <a-list-item-title>
               {{ item.label }}
-              <a-chip
-                v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
-                color="accent"
-                small
-              >
+              <a-chip v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+                color="accent" small>
                 {{ readyToSubmitCount }}
               </a-chip>
             </a-list-item-title>
@@ -84,13 +81,13 @@
 <script>
 export default {
   props: {
-    value: {
+    visible: {
       type: Boolean,
       required: true,
     },
   },
 
-  data() {
+  data () {
     let groupsLink = { name: 'groups-list' };
     if (this.$store.getters['whitelabel/isWhitelabel']) {
       groupsLink = `/g${this.$store.getters['whitelabel/partner'].path}`;
@@ -169,17 +166,17 @@ export default {
   },
   computed: {
     drawer: {
-      get() {
+      get () {
         return this.$store.getters['appui/menu'];
       },
-      set(value) {
+      set (value) {
         this.$store.dispatch('appui/setMenu', value);
       },
     },
-    readyToSubmitCount() {
+    readyToSubmitCount () {
       return this.$store.getters['submissions/readyToSubmit'].length;
     },
-    items() {
+    items () {
       const items = [];
       const divider = { type: 'divider' };
       items.push(...this.sidenav.collect);
@@ -193,7 +190,7 @@ export default {
       }
       return items;
     },
-    docs() {
+    docs () {
       const groups = this.$store.getters['memberships/groups'];
       const activeGroupId = this.$store.getters['memberships/activeGroup'];
 

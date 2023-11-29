@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 import _File from './File.vue';
 import _Date from './Date.vue';
 import FarmOsFarm from './FarmOsFarm.vue';
@@ -18,46 +16,50 @@ import SelectSingle from './SelectSingle.vue';
 import String from './String.vue';
 import FarmosUuid from './FarmOsCreateUUID.vue';
 
-Vue.component('AppControlFile', _File);
-Vue.component('AppControlImage', _File);
-
-Vue.component('AppControlDate', _Date);
-
-Vue.component('AppControlFarmOsFarm', FarmOsFarm);
-
-Vue.component('AppControlFarmOsField', FarmOsField);
-
-Vue.component('AppControlFarmOsPlanting', FarmOsPlanting);
-
 const GeoJSON = () => import('./GeoJSON.vue');
-Vue.component('AppControlGeoJSON', GeoJSON);
-
-Vue.component('AppControlGroup', Group);
-
-Vue.component('AppControlInstructions', Instructions);
-
 const InstructionsImageSplit = () => import('./InstructionsImageSplit.vue');
-Vue.component('AppControlInstructionsImageSplit', InstructionsImageSplit);
-
 const Location = () => import('./Location.vue');
-Vue.component('AppControlLocation', Location);
 
-Vue.component('AppControlMatrix', Matrix);
+export default function addQuestionTypesComponents(app) {
+  app.component('AppControlFile', _File);
 
-Vue.component('AppControlMatrixCell', MatrixCell);
+  app.component('AppControlImage', _File);
 
-Vue.component('AppControlNumber', _Number);
+  app.component('AppControlDate', _Date);
 
-Vue.component('AppControlOntology', Ontology);
+  app.component('AppControlFarmOsFarm', FarmOsFarm);
 
-Vue.component('AppControlPage', Page);
+  app.component('AppControlFarmOsField', FarmOsField);
 
-Vue.component('AppControlScript', Script);
+  app.component('AppControlFarmOsPlanting', FarmOsPlanting);
 
-Vue.component('AppControlSelectMultiple', SelectMultiple);
+  app.component('AppControlGeoJSON', GeoJSON);
 
-Vue.component('AppControlSelectSingle', SelectSingle);
+  app.component('AppControlGroup', Group);
 
-Vue.component('AppControlString', String);
+  app.component('AppControlInstructions', Instructions);
 
-Vue.component('AppControlFarmOsUuid', FarmosUuid);
+  app.component('AppControlInstructionsImageSplit', InstructionsImageSplit);
+
+  app.component('AppControlLocation', Location);
+
+  app.component('AppControlMatrix', Matrix);
+
+  app.component('AppControlMatrixCell', MatrixCell);
+
+  app.component('AppControlNumber', _Number);
+
+  app.component('AppControlOntology', Ontology);
+
+  app.component('AppControlPage', Page);
+
+  app.component('AppControlScript', Script);
+
+  app.component('AppControlSelectMultiple', SelectMultiple);
+
+  app.component('AppControlSelectSingle', SelectSingle);
+
+  app.component('AppControlString', String);
+
+  app.component('AppControlFarmOsUuid', FarmosUuid);
+}

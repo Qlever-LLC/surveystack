@@ -1,7 +1,7 @@
 <template>
   <nav class="app-navbar">
     <a-app-bar app clipped-left color="appbar" absolute>
-      <a-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
+      <a-app-bar-nav-icon @click="toggleDrawer" />
       <a-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
@@ -11,16 +11,20 @@
 
       <a-spacer />
       <offline-indicator />
-      <a-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
+      <a-btn class="help-btn" variant="text" href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
+        target="_blank">
         <a-icon size="22">mdi-help-circle-outline</a-icon>
       </a-btn>
       <navbar-user-menu />
     </a-app-bar>
-    <navbar-drawer v-model="drawerIsVisible" />
+    <navbar-drawer :visible="drawerIsVisible" @update:visible="updateDrawerVisibility" />
   </nav>
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
@@ -31,22 +35,63 @@ export default {
     NavbarUserMenu,
     NavbarDrawer,
   },
-  computed: {
-    drawerIsVisible: {
-      get() {
-        return this.$store.getters['appui/menu'];
-      },
-      set(value) {
-        this.$store.dispatch('appui/setMenu', value);
-      },
-    },
-    appTitle() {
-      return this.$store.getters['appui/title'];
-    },
-    appSubtitle() {
-      return this.$store.getters['appui/subtitle'];
-    },
+  setup () {
+    const store = useStore();
+
+    const drawerIsVisible = computed(
+      {
+        get () {
+          console.log("drawerIsVisible", store.getters['appui/menu'])
+          return store.getters['appui/menu'];
+        },
+        set (value) {
+          console.log("set drawerIsVisible", store.getters['appui/menu'])
+          store.dispatch('appui/setMenu', value);
+        },
+      }
+    )
+
+    const appTitle = computed(() => {
+      return store.getters['appui/title'];
+    });
+
+    const appSubtitle = computed(() => {
+      return store.getters['appui/subtitle'];
+    });
+
+    const toggleDrawer = () => {
+      console.log("toggleDrawer", drawerIsVisible.value)
+      drawerIsVisible.value = !drawerIsVisible.value;
+    };
+
+    const updateDrawerVisibility = (value) => {
+      drawerIsVisible.value = value;
+    };
+
+    return {
+      drawerIsVisible,
+      appTitle,
+      appSubtitle,
+      toggleDrawer,
+      updateDrawerVisibility,
+    };
   },
+  // computed: {
+  //   drawerIsVisible: {
+  //     get () {
+  //       return this.$store.getters['appui/menu'];
+  //     },
+  //     set (value) {
+  //       this.$store.dispatch('appui/setMenu', value);
+  //     },
+  //   },
+  //   appTitle () {
+  //     return this.$store.getters['appui/title'];
+  //   },
+  //   appSubtitle () {
+  //     return this.$store.getters['appui/subtitle'];
+  //   },
+  // },
 };
 </script>
 <style scoped>

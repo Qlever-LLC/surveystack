@@ -1,14 +1,7 @@
 <template>
   <div class="qr-scanner">
-    <a-btn
-      ref="scannerButton"
-      aria-label="Open QR Scanner"
-      :x-large="!small"
-      :small="!!small"
-      dark
-      color="primary"
-      @click="isScannerOpen = true"
-    >
+    <a-btn ref="scannerButton" aria-label="Open QR Scanner" :x-large="!small" :small="!!small" dark color="primary"
+      @click="isScannerOpen = true">
       <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
     </a-btn>
 
@@ -40,9 +33,9 @@
 import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from 'vue';
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
-import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
+// import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
 
-QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
+// QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
   emits: ['codeDetected'],
@@ -53,7 +46,7 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(props, { emit }) {
+  setup (props, { emit }) {
     const videoContainerElement = ref(null);
     const videoElement = ref(null);
     const isScannerOpen = ref(false);
@@ -61,19 +54,19 @@ export default defineComponent({
     const hasCameraError = ref(false);
     let qrScanner = null;
 
-    function setScanRegionSizeCSSVar() {
+    function setScanRegionSizeCSSVar () {
       const scanRegionSize = Math.round(
         (2 / 3) * Math.min(videoElement.value.clientWidth, videoElement.value.clientHeight)
       );
       videoContainerElement.value.style.setProperty('--scan-region-size', `${scanRegionSize}px`);
     }
 
-    function handleScanSuccess(result) {
+    function handleScanSuccess (result) {
       emit('codeDetected', result);
       isScannerOpen.value = false;
     }
 
-    function destroyScanner() {
+    function destroyScanner () {
       if (qrScanner) {
         qrScanner.destroy();
       }
@@ -81,7 +74,7 @@ export default defineComponent({
       qrScanner = null;
     }
 
-    async function startScanner() {
+    async function startScanner () {
       if (!videoElement.value) {
         return;
       }
@@ -109,7 +102,7 @@ export default defineComponent({
       }
     }
 
-    function stopScanner() {
+    function stopScanner () {
       if (qrScanner) {
         qrScanner.stop();
       }
@@ -117,7 +110,7 @@ export default defineComponent({
       isLoading.value = true;
     }
 
-    function click() {
+    function click () {
       isScannerOpen.value = true;
     }
 
@@ -180,7 +173,7 @@ export default defineComponent({
   transform: translate(-50%, -50%);
 }
 
-.v-dialog > .v-card {
+.v-dialog>.v-card {
   background: #222;
 }
 </style>
