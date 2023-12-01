@@ -3,7 +3,7 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
-const lightTheme = {
+const light = {
   dark: false,
   colors: {
     primary: '#0E87CC',
@@ -27,9 +27,9 @@ const vuetify = createVuetify({
     options: {
       customProperties: true,
     },
-    defaultTheme: 'lightTheme',
+    defaultTheme: 'light',
     themes: {
-      lightTheme,
+      light,
     },
   },
 });
