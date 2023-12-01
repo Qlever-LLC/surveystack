@@ -11,31 +11,40 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
 export default {
-  data() {
-    return {};
-  },
-  methods: {
-    removeFeedback(idx) {
-      this.$store.dispatch('feedback/remove', idx);
-    },
-    clearAllFeedback() {
-      this.$store.dispatch('feedback/reset');
-    },
-  },
-  computed: {
-    items() {
-      return this.$store.state.feedback.items;
-    },
-    hasFeedback() {
-      return this.$store.getters['feedback/hasFeedback'];
-    },
-    clearAllText() {
-      if (this.$store.state.feedback.items.length > 1) {
-        return 'Clear all';
-      }
-      return 'Clear';
-    },
-  },
+  setup () {
+    const store = useStore();
+
+    const items = computed(() => {
+      return store.state.feedback.items;
+    });
+
+    const hasFeedback = computed(() => {
+      return store.getters['feedback/hasFeedback'];
+    });
+
+    const clearAllText = computed(() => {
+      return items.value.length > 1 ? 'Clear all' : 'Clear';
+    });
+
+    const removeFeedback = (idx) => {
+      store.dispatch('feedback/remove', idx);
+    };
+
+    const clearAllFeedback = () => {
+      store.dispatch('feedback/reset');
+    };
+
+    return {
+      items,
+      hasFeedback,
+      clearAllText,
+      removeFeedback,
+      clearAllFeedback,
+    };
+  }
 };
 </script>

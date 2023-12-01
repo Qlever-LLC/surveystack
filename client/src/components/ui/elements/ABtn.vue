@@ -1,33 +1,10 @@
 <!-- eslint-disable vue/no-deprecated-dollar-listeners-api -->
 <!-- TODO The `$listeners` is deprecated  vue/no-deprecated-dollar-listeners-api -->
 <template>
-  <v-btn
-    :type="type"
-    :value="value"
-    :disabled="disabled"
-    :depressed="depressed"
-    :fixed="fixed"
-    :loading="loading"
-    :text="text"
-    :icon="icon"
-    :fab="fab"
-    :outlined="outlined"
-    :x-large="xLarge"
-    :large="large"
-    :x-small="xSmall"
-    :small="small"
-    :dark="dark"
-    :elevation="elevation"
-    :color="color"
-    :href="href"
-    :target="target"
-    :to="to"
-    :mandatory="mandatory"
-    :dense="dense"
-    :rounded="rounded"
-    v-on="$listeners"
-    v-bind="$attrs"
-  >
+  <v-btn :type="type" :value="value" :disabled="disabled" :depressed="depressed" :fixed="fixed" :loading="loading"
+    :icon="icon" :fab="fab" :x-large="xLarge" :large="large" :x-small="xSmall" :small="small" :dark="dark"
+    :elevation="elevation" :color="color" :href="href" :target="target" :to="to" :mandatory="mandatory" :dense="dense"
+    :rounded="rounded" :variant="variant" v-on="$listeners" v-bind="$attrs">
     <slot />
   </v-btn>
 </template>
@@ -59,10 +36,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    text: {
-      type: Boolean,
-      default: false,
-    },
     icon: {
       type: Boolean,
       default: false,
@@ -71,10 +44,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    outlined: {
-      type: Boolean,
-      default: false,
-    },
+
     xSmall: {
       type: Boolean,
       default: false,
@@ -127,9 +97,13 @@ export default {
       type: Boolean,
       required: false,
     },
+    variant: {
+      type: [String],
+      required: false,
+    },
   },
   emits: ['click'],
-  setup() {
+  setup () {
     return {};
   },
 };

@@ -13,18 +13,22 @@ import './css/transitions.css';
 import api from './services/api.service';
 
 // Auto include components for questions types
-import '@/components/survey/question_types';
+import addQuestionTypesComponents from '@/components/survey/question_types/index.js';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 
-const app = createApp(App).use(router).use(store).use(vuetify);
+const app = createApp(App);
+app.use(router);
+app.use(store);
+app.use(vuetify);
 
 startToggle(store);
 
 startSentry(app, store, router);
 
+addQuestionTypesComponents(app);
 app.component('app-control-label', appControlLabel);
 app.component('app-control-hint', appControlHint);
 app.component('app-control-more-info', appControlMoreInfo);
@@ -56,8 +60,6 @@ requireComponent.keys().forEach((fileName) => {
 });
 
 api.init(process.env.VUE_APP_API_URL);
-
-app.config.productionTip = false;
 
 // remove initial loading screen (added in the index.html)
 try {
