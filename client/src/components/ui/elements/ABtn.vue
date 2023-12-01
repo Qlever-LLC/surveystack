@@ -4,13 +4,14 @@
   <v-btn :type="type" :value="value" :disabled="disabled" :depressed="depressed" :fixed="fixed" :loading="loading"
     :icon="icon" :fab="fab" :x-large="xLarge" :large="large" :x-small="xSmall" :small="small" :dark="dark"
     :elevation="elevation" :color="color" :href="href" :target="target" :to="to" :mandatory="mandatory" :dense="dense"
-    :rounded="rounded" :variant="variant" v-on="$listeners" v-bind="$attrs">
+    :rounded="rounded" :variant="variant" v-bind="$attrs" @click="emitClick">
     <slot />
   </v-btn>
 </template>
 
 <script>
 export default {
+  emits: ['click'],
   props: {
     type: {
       type: String,
@@ -102,9 +103,12 @@ export default {
       required: false,
     },
   },
-  emits: ['click'],
-  setup () {
-    return {};
+  setup (_, { emit }) {
+
+    const emitClick = (e) => {
+      emit('click', e);
+    }
+    return { emitClick };
   },
 };
 </script>

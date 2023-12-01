@@ -17,7 +17,7 @@
       </a-btn>
       <navbar-user-menu />
     </a-app-bar>
-    <navbar-drawer :visible="drawerIsVisible" @update:visible="updateDrawerVisibility" />
+    <navbar-drawer :modelValue="drawerIsVisible" @update:modelValue="updateDrawerVisibility" />
   </nav>
 </template>
 
@@ -41,11 +41,9 @@ export default {
     const drawerIsVisible = computed(
       {
         get () {
-          console.log("drawerIsVisible", store.getters['appui/menu'])
           return store.getters['appui/menu'];
         },
         set (value) {
-          console.log("set drawerIsVisible", store.getters['appui/menu'])
           store.dispatch('appui/setMenu', value);
         },
       }
@@ -60,7 +58,6 @@ export default {
     });
 
     const toggleDrawer = () => {
-      console.log("toggleDrawer", drawerIsVisible.value)
       drawerIsVisible.value = !drawerIsVisible.value;
     };
 

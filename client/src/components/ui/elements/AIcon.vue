@@ -1,20 +1,8 @@
 <!-- eslint-disable vue/no-deprecated-dollar-listeners-api -->
 <!-- TODO The `$listeners` is deprecated  vue/no-deprecated-dollar-listeners-api -->
 <template>
-  <v-icon
-    :color="color"
-    :left="left"
-    :right="right"
-    :small="small"
-    :x-small="xSmall"
-    :large="large"
-    :x-large="xLarge"
-    :size="size"
-    :dark="dark"
-    :disabled="disabled"
-    v-on="$listeners"
-    v-bind="$attrs"
-  >
+  <v-icon :color="color" :left="left" :right="right" :small="small" :x-small="xSmall" :large="large" :x-large="xLarge"
+    :size="size" :dark="dark" :disabled="disabled" v-bind="$attrs">
     <slot />
   </v-icon>
 </template>
