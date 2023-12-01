@@ -17,7 +17,7 @@
       </a-btn>
       <navbar-user-menu />
     </a-app-bar>
-    <navbar-drawer :modelValue="drawerIsVisible" @update:modelValue="updateDrawerVisibility" />
+    <navbar-drawer v-model="drawerIsVisible" />
   </nav>
 </template>
 
@@ -61,16 +61,11 @@ export default {
       drawerIsVisible.value = !drawerIsVisible.value;
     };
 
-    const updateDrawerVisibility = (value) => {
-      drawerIsVisible.value = value;
-    };
-
     return {
       drawerIsVisible,
       appTitle,
       appSubtitle,
       toggleDrawer,
-      updateDrawerVisibility,
     };
   },
   // computed: {
