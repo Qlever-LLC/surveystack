@@ -17,7 +17,8 @@ export default {
   install(store) {
     const currentInstance = getCurrentInstance();
     // TODO check if the variable vue is correctly defined for its use
-    const vue = currentInstance.appContext.config.globalProperties;
+    const vue = currentInstance.appContext.app;
+    // const vue = currentInstance.appContext.config.globalProperties;
 
     const appBarThemeColor = document.createElement('meta');
     appBarThemeColor.setAttribute('name', 'theme-color');

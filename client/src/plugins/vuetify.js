@@ -1,7 +1,7 @@
-import 'vuetify/styles' // Global CSS has to be imported
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+import 'vuetify/styles'; // Global CSS has to be imported
+import { createVuetify } from 'vuetify';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
 
 const lightTheme = {
   dark: false,
@@ -17,10 +17,10 @@ const lightTheme = {
     background: '#d9d9d9',
     heading: '#212121',
     focus: '#0E87CC',
-  }
-}
+  },
+};
 
-export default createVuetify({
+const vuetify = createVuetify({
   components,
   directives,
   theme: {
@@ -32,4 +32,6 @@ export default createVuetify({
       lightTheme,
     },
   },
-})
+});
+
+export default vuetify;

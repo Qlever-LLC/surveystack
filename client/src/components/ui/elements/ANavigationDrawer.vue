@@ -1,6 +1,9 @@
 <template>
-  <v-navigation-drawer :app="app" :value="value">
+  <v-navigation-drawer :modelValue="modelValue">
     <slot />
+    <template v-slot:append>
+      <slot name="append" />
+    </template>
   </v-navigation-drawer>
 </template>
 
@@ -8,8 +11,7 @@
 export default {
   props: {
     //vuetify props
-    app: { type: Boolean, required: false },
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
   },
 };
 </script>

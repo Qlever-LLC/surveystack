@@ -1,7 +1,7 @@
 <template>
-  <a-navigation-drawer :value="visible" app>
+  <a-navigation-drawer :modelValue="modelValue">
     <div class="d-flex justify-end mt-3 mr-3">
-      <a-btn large icon @click="$emit('input', !value)">
+      <a-btn large icon @click="closeNavBar">
         <a-icon>mdi-close</a-icon>
       </a-btn>
     </div>
@@ -79,132 +79,147 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+
 export default {
+  emits: ['update:modelValue'],
   props: {
-    visible: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
   },
 
-  data () {
+  setup (props, { emit }) {
+    const store = useStore();
+
     let groupsLink = { name: 'groups-list' };
-    if (this.$store.getters['whitelabel/isWhitelabel']) {
-      groupsLink = `/g${this.$store.getters['whitelabel/partner'].path}`;
+    if (store.getters['whitelabel/isWhitelabel']) {
+      groupsLink = `/g${store.getters['whitelabel/partner'].path}`;
     }
 
-    return {
-      drawerIsVisible: false,
-      lcl: JSON.parse(process.env.VUE_APP_LCL),
-      sidenav: {
-        collect: [
-          {
-            type: 'subheader',
-            label: 'COLLECT',
+    const lcl = JSON.parse(process.env.VUE_APP_LCL);
+    const sidenav = {
+      collect: [
+        {
+          type: 'subheader',
+          label: 'COLLECT',
+        },
+        {
+          type: 'link',
+          label: 'My Submissions',
+          to: { name: 'my-submissions' },
+          icon: 'mdi-clipboard',
+        },
+        {
+          type: 'link',
+          label: 'Browse',
+          to: { name: 'surveys-browse' },
+          icon: 'mdi-magnify',
+        },
+      ],
+      admin: [
+        {
+          type: 'subheader',
+          label: 'ADMIN',
+        },
+        {
+          type: 'link',
+          label: 'Builder',
+          to: { name: 'surveys-new' },
+          icon: 'mdi-newspaper-plus',
+        },
+        {
+          type: 'link',
+          label: 'Scripts',
+          to: { name: 'scripts-list' },
+          icon: 'mdi-language-javascript',
+        },
+        {
+          type: 'link',
+          label: 'Groups',
+          to: groupsLink,
+          icon: 'mdi-domain',
+        },
+      ],
+      superAdmin: [
+        {
+          type: 'subheader',
+          label: 'SUPER-ADMIN',
+        },
+        {
+          type: 'link',
+          label: 'Users',
+          to: {
+            name: 'users-list',
           },
-          {
-            type: 'link',
-            label: 'My Submissions',
-            to: { name: 'my-submissions' },
-            icon: 'mdi-clipboard',
+          icon: 'mdi-account-search',
+        },
+        {
+          type: 'link',
+          label: 'FarmOS',
+          to: {
+            name: 'farmos-manage',
           },
-          {
-            type: 'link',
-            label: 'Browse',
-            to: { name: 'surveys-browse' },
-            icon: 'mdi-magnify',
-          },
-        ],
-        admin: [
-          {
-            type: 'subheader',
-            label: 'ADMIN',
-          },
-          {
-            type: 'link',
-            label: 'Builder',
-            to: { name: 'surveys-new' },
-            icon: 'mdi-newspaper-plus',
-          },
-          {
-            type: 'link',
-            label: 'Scripts',
-            to: { name: 'scripts-list' },
-            icon: 'mdi-language-javascript',
-          },
-          {
-            type: 'link',
-            label: 'Groups',
-            to: groupsLink,
-            icon: 'mdi-domain',
-          },
-        ],
-        superAdmin: [
-          {
-            type: 'subheader',
-            label: 'SUPER-ADMIN',
-          },
-          {
-            type: 'link',
-            label: 'Users',
-            to: {
-              name: 'users-list',
-            },
-            icon: 'mdi-account-search',
-          },
-          {
-            type: 'link',
-            label: 'FarmOS',
-            to: {
-              name: 'farmos-manage',
-            },
-            icon: 'mdi-leaf-circle-outline',
-          },
-        ],
-      },
+          icon: 'mdi-leaf-circle-outline',
+        },
+      ],
     };
-  },
-  computed: {
-    drawer: {
-      get () {
-        return this.$store.getters['appui/menu'];
-      },
-      set (value) {
-        this.$store.dispatch('appui/setMenu', value);
-      },
-    },
-    readyToSubmitCount () {
-      return this.$store.getters['submissions/readyToSubmit'].length;
-    },
-    items () {
+
+    const readyToSubmitCount = computed(() => {
+      return store.getters['submissions/readyToSubmit'].length;
+    });
+
+    const items = computed(() => {
       const items = [];
       const divider = { type: 'divider' };
-      items.push(...this.sidenav.collect);
-      if (this.$store.getters['auth/isLoggedIn']) {
+      items.push(...sidenav.collect);
+      if (store.getters['auth/isLoggedIn']) {
         items.push(divider);
-        items.push(...this.sidenav.admin);
+        items.push(...sidenav.admin);
       }
-      if (this.$store.getters['auth/isSuperAdmin']) {
+      if (store.getters['auth/isSuperAdmin']) {
         items.push(divider);
-        items.push(...this.sidenav.superAdmin);
+        items.push(...sidenav.superAdmin);
       }
       return items;
-    },
-    docs () {
-      const groups = this.$store.getters['memberships/groups'];
-      const activeGroupId = this.$store.getters['memberships/activeGroup'];
+    });
 
+    const groups = computed(() => {
+      return store.getters['memberships/groups'];
+    });
+
+    const activeGroupId = computed(() => {
+      return store.getters['memberships/activeGroup'];
+    });
+
+    const docs = computed(() => {
       const docs = new Map();
       // add all docs of all groups to a map to make them distinct
-      groups.forEach((group) => {
-        if (group._id === activeGroupId && group.docs) {
+      groups.value.forEach((group) => {
+        if (group._id === activeGroupId.value && group.docs) {
           group.docs.forEach((doc) => {
             docs.set(doc.label + doc.link, doc);
           });
         }
       });
       return Array.from(docs.values());
-    },
+    });
+
+    // Methods
+    const closeNavBar = () => {
+      console.log("closeNavBar")
+      emit('update:modelValue', !props.modelValue);
+    };
+
+    return {
+      lcl,
+      readyToSubmitCount,
+      items,
+      docs,
+      closeNavBar,
+    };
   },
 };
 </script>
