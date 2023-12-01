@@ -117,14 +117,13 @@ const getters = {
     (state) =>
     (path, fallback = true) =>
       surveyStackUtils.getRelevance(state.submission, path, fallback),
-  hasRequiredUnanswered: (state) => {
+  hasRequiredUnanswered: (state, getters) => {
     if (state.node.model.type === 'matrix') {
       /*
-      When the columns of a matrix are required, but the matrix question itself is not, 
+      When the columns of a matrix are required, but the matrix question itself is not,
       the user can proceed with the survey without filling in the matrix.
       But if a row is added, then a value must be placed in the required column
     */
-      const matrixName = state.node.model.name;
       //detect required columns
       let requiredColumnNames = [];
       if (state.node.model.options.source.content) {
@@ -134,8 +133,10 @@ const getters = {
           }
         });
       }
-      if (state.submission.data[matrixName].value) {
-        for (const row of state.submission.data[matrixName].value) {
+
+      const questionValue = get(state.submission, getters.path).value;
+      if (questionValue) {
+        for (const row of questionValue) {
           for (const requiredC of requiredColumnNames) {
             if (
               row[requiredC].value === null ||
