@@ -2,7 +2,7 @@
   <a-container v-if="hasFeedback">
     <a-spacer />
     <div class="d-flex justify-end">
-      <a-btn text @click="clearAllFeedback"> <a-icon left>mdi-close</a-icon>{{ clearAllText }} </a-btn>
+      <a-btn variant="text" @click="clearAllFeedback"> <a-icon left>mdi-close</a-icon>{{ clearAllText }} </a-btn>
     </div>
     <a-alert v-for="(feedback, idx) in items" :key="idx" border="left" :type="feedback.type" elevation="2">
       {{ feedback.message }}

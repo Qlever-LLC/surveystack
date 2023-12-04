@@ -260,7 +260,7 @@
       </a-card-text>
       <a-spacer />
       <a-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
-        <a-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</a-btn>
+        <a-btn variant="text" class="ml-4" @click="() => $emit('close-dialog')">Close</a-btn>
       </a-card-actions>
     </a-card>
   </div>

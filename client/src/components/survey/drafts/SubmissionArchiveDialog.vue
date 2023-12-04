@@ -17,8 +17,8 @@
       </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <a-btn text @click="$emit('cancel')">Cancel</a-btn>
-        <a-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
+        <a-btn variant="text" @click="$emit('cancel')">Cancel</a-btn>
+        <a-btn variant="text" @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

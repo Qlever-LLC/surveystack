@@ -19,13 +19,13 @@
             <span v-if="location.properties.accuracy"> acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }} </span>
           </samp>
         </div>
-        <a-btn @click="clipboard" outlined class="mt-1"> <a-icon left>mdi-content-copy</a-icon>Copy </a-btn>
+        <a-btn @click="clipboard" variant="outlined" class="mt-1"> <a-icon left>mdi-content-copy</a-icon>Copy </a-btn>
       </div>
     </a-menu>
     <!-- TODO: fix copied snack notification -->
     <a-snackbar v-model="snackbar">
       {{ snackbarText }}
-      <a-btn color="pink" text @click="snackbar = false"> Close </a-btn>
+      <a-btn color="pink" variant="text" @click="snackbar = false"> Close </a-btn>
     </a-snackbar>
   </div>
 </template>

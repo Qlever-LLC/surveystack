@@ -19,8 +19,8 @@
       <a-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <a-btn text @click="isConfirming = false"> Cancel </a-btn>
-        <a-btn text color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </a-btn>
+        <a-btn variant="text" @click="isConfirming = false"> Cancel </a-btn>
+        <a-btn variant="text" color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

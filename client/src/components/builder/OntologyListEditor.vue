@@ -40,8 +40,8 @@
               </a-card-text>
               <a-card-actions>
                 <a-spacer />
-                <a-btn text color="red" @click="deleteResult">Delete</a-btn>
-                <a-btn text @click="closeDeleteDialog">Cancel</a-btn>
+                <a-btn variant="text" color="red" @click="deleteResult">Delete</a-btn>
+                <a-btn variant="text" @click="closeDeleteDialog">Cancel</a-btn>
               </a-card-actions>
             </a-card>
           </a-dialog>
@@ -113,7 +113,7 @@
     </a-card-text>
     <a-spacer />
     <a-card-actions class="d-flex justify-end mr-3 align-start">
-      <a-btn text class="ml-4" @click="close">Close</a-btn>
+      <a-btn variant="text" class="ml-4" @click="close">Close</a-btn>
     </a-card-actions>
 
     <a-dialog v-model="editItemDialogIsVisible" max-width="350">
@@ -126,8 +126,8 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click="editItemDialogIsVisible = false">Cancel</a-btn>
-          <a-btn text color="primary" @click="saveItem">Save</a-btn>
+          <a-btn variant="text" @click="editItemDialogIsVisible = false">Cancel</a-btn>
+          <a-btn variant="text" color="primary" @click="saveItem">Save</a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

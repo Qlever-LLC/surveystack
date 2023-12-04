@@ -400,7 +400,7 @@
 
       <!-- Print layout -->
       <template v-if="hasLayoutOptions">
-        <a-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
+        <a-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small variant="text">
           Print Layout
         </a-btn>
         <div v-else class="extra-options">

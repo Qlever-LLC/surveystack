@@ -3,7 +3,7 @@
     <a-card-title
       >Documentation Links
       <a-spacer />
-      <a-btn color="primary" text @click="showAddDialog = true">New.. </a-btn>
+      <a-btn color="primary" variant="text" @click="showAddDialog = true">New.. </a-btn>
     </a-card-title>
     <a-card-subtitle>Custom links which appear in the side menu when logged into your group</a-card-subtitle>
     <draggable
@@ -55,8 +55,8 @@
         <a-card-text class="mt-4"> Are you sure you want to remove this documentation link? </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="cancelDeleteEntry"> Cancel </a-btn>
-          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
+          <a-btn variant="text" @click.stop="cancelDeleteEntry"> Cancel </a-btn>
+          <a-btn variant="text" color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>
@@ -79,8 +79,8 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="cancelAddEntry"> Cancel </a-btn>
-          <a-btn text color="primary" @click.stop="addEntry"> Submit </a-btn>
+          <a-btn variant="text" @click.stop="cancelAddEntry"> Cancel </a-btn>
+          <a-btn variant="text" color="primary" @click.stop="addEntry"> Submit </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

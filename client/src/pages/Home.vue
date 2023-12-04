@@ -117,7 +117,7 @@
 
     <a-row>
       <a-col align="center">
-        <a-btn x-large text :to="`/surveys/browse`">
+        <a-btn x-large variant="text" :to="`/surveys/browse`">
           <a-icon left>mdi-text-box-search-outline</a-icon>Browse All Surveys
         </a-btn>
       </a-col>

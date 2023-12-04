@@ -214,12 +214,12 @@
                 </a-btn>
               </a-btn-toggle>
 
-              <a-btn @click="viewCode = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewCode = true" class="ma-2" variant="text">
                 <span class="hidden-sm-and-down">survey</span>
                 <a-icon right>mdi-code-tags</a-icon>
               </a-btn>
 
-              <a-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewSubmission = true" class="ma-2" variant="outlined">
                 <span class="hidden-sm-and-down">submission</span>
                 <a-icon right>mdi-code-tags</a-icon>
               </a-btn>

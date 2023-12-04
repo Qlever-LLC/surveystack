@@ -29,7 +29,7 @@
                 <a-spacer />
                 <a-dialog v-model="isEmailDialogOpen" max-width="500px">
                   <template v-slot:activator="{ on, attrs }">
-                    <a-btn small text v-bind="attrs" v-on="on"> Change Email </a-btn>
+                    <a-btn small variant="text" v-bind="attrs" v-on="on"> Change Email </a-btn>
                   </template>
                   <a-card>
                     <a-card-title class="text-h5"> Change Email </a-card-title>
@@ -40,7 +40,7 @@
                     </a-card-text>
                     <a-card-actions>
                       <a-spacer />
-                      <a-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
+                      <a-btn color="primary" variant="text" @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
                       </a-btn>
                     </a-card-actions>
@@ -104,8 +104,8 @@
           </a-card-text>
           <a-card-actions>
             <a-spacer />
-            <a-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </a-btn>
-            <a-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </a-btn>
+            <a-btn variant="text" @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </a-btn>
+            <a-btn v-if="!parentAdminGroup" variant="text" color="red" @click.stop="leaveGroup"> Leave </a-btn>
           </a-card-actions>
         </a-card>
       </a-dialog>

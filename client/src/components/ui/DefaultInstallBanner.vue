@@ -6,7 +6,7 @@
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center pt-2">
-        <a-btn outlined @click="install" large>
+        <a-btn variant="outlined" @click="install" large>
           <a-icon class="ml-n2 mr-1" small>mdi-plus</a-icon>
           Add to Homescreen
         </a-btn>

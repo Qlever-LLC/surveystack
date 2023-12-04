@@ -26,17 +26,17 @@
 
             <a-card-actions>
               <a-spacer />
-              <a-btn color="green darken-1" text @click="dialog = false"> Close </a-btn>
+              <a-btn color="green darken-1" variant="text" @click="dialog = false"> Close </a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
 
         <a-spacer />
         <a-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</a-icon>
-        <a-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
+        <a-btn class="mr-2" variant="outlined" color="white" v-if="examples" @click="$emit('examples')">
           <a-icon left>mdi-code-braces</a-icon>Examples
         </a-btn>
-        <a-btn class="mr-2" outlined color="white" v-if="runnable" @click="$emit('run', model.getValue())">
+        <a-btn class="mr-2" variant="outlined" color="white" v-if="runnable" @click="$emit('run', model.getValue())">
           <a-icon left>mdi-play</a-icon> Run
         </a-btn>
         <a-icon @click="$emit('close')">mdi-close-circle-outline</a-icon>

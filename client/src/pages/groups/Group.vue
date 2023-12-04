@@ -4,7 +4,7 @@
       <a-breadcrumbs :path="entity.path" />
 
       <div v-if="editable">
-        <a-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
+        <a-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" variant="text">
           <a-icon left>mdi-cog</a-icon> Admin
         </a-btn>
       </div>

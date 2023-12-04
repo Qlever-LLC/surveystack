@@ -6,7 +6,7 @@
       </slot>
       <a-spacer />
       <slot name="actions" v-if="editable">
-        <a-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</a-btn>
+        <a-btn color="primary" class="ml-4" :to="linkNew" variant="text">{{ labelNew }}</a-btn>
       </slot>
     </a-card-title>
     <a-card-text>

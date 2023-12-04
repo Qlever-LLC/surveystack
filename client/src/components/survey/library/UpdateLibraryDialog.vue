@@ -24,7 +24,7 @@
         @discard-local-changes-changed="discardLocalChangesChanged"
       ></survey-diff>
       <a-card-actions class="mr-3">
-        <a-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
+        <a-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" variant="text"
           >Learn more...
         </a-btn>
         <a-spacer />
@@ -36,7 +36,7 @@
         >
           <span>update</span>
         </a-btn>
-        <a-btn @click="$emit('cancel')" color="primary" text> Cancel</a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel</a-btn>
       </a-card-actions>
     </a-card>
     <a-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
@@ -51,8 +51,8 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</a-btn>
-          <a-btn text color="red" @click.stop="updateConfirmed"> Update</a-btn>
+          <a-btn variant="text" @click.stop="conflictConfirmModalIsVisible = false"> Cancel</a-btn>
+          <a-btn variant="text" color="red" @click.stop="updateConfirmed"> Update</a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

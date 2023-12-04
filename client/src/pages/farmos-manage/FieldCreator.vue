@@ -6,7 +6,7 @@
       </a-col>
       <a-col cols="12"> OR </a-col>
       <a-col cols="12">
-        <a-btn outlined color="primary" @click="draw">Draw new Field</a-btn>
+        <a-btn variant="outlined" color="primary" @click="draw">Draw new Field</a-btn>
       </a-col>
     </template>
 
@@ -25,7 +25,7 @@
       </a-col>
 
       <a-col cols="6">
-        <a-btn color="primary" outlined @click="$emit('cancel')" :loading="loading">Cancel</a-btn>
+        <a-btn color="primary" variant="outlined" @click="$emit('cancel')" :loading="loading">Cancel</a-btn>
       </a-col>
     </template>
 

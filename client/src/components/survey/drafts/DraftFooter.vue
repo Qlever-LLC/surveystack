@@ -6,7 +6,7 @@
           <a-btn
             @click="$store.dispatch('draft/showOverview', false)"
             outlined
-            depressed
+            variant="flat"
             large
             color="primary"
             class="full"
@@ -16,7 +16,7 @@
         </div>
 
         <div class="half px-1">
-          <a-btn :disabled="!enableSubmit" @click="$emit('submit')" depressed large color="primary" class="full">
+          <a-btn :disabled="!enableSubmit" @click="$emit('submit')" variant="flat" large color="primary" class="full">
             Submit
             <span v-if="$store.getters['draft/submission'].meta.submitAsUser"
               >as {{ $store.getters['draft/submission'].meta.submitAsUser.name }} <br
@@ -26,12 +26,12 @@
       </div>
       <div v-else class="d-flex flex-row">
         <div class="half px-1">
-          <a-btn v-show="showPrev" @click="$emit('prev')" outlined depressed large color="primary" class="full">
+          <a-btn v-show="showPrev" @click="$emit('prev')" variant="flat" large color="primary" class="full">
             Previous
           </a-btn>
         </div>
         <div class="half px-1">
-          <a-btn :disabled="!enableNext" @click="$emit('next')" depressed large color="primary" class="full">
+          <a-btn :disabled="!enableNext" @click="$emit('next')" variant="flat" large color="primary" class="full">
             Next
           </a-btn>
         </div>

@@ -3,7 +3,7 @@
     <a-card-title>
       {{ title }}
       <a-spacer />
-      <a-btn color="primary" class="ml-4" :to="newRoute" text>New...</a-btn>
+      <a-btn color="primary" class="ml-4" :to="newRoute" variant="text">New...</a-btn>
     </a-card-title>
     <a-card-text>
       <a-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />

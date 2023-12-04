@@ -53,7 +53,7 @@
           </div>
         </a-form>
         <div class="text-center text-muted mt-5">
-          <a-btn text small color="primary" @click="switchSignInMode" data-testid="toggle-method">
+          <a-btn variant="text" small color="primary" @click="switchSignInMode" data-testid="toggle-method">
             {{ usePassword ? 'email me a sign in link instead' : 'sign in with password instead' }}
           </a-btn>
         </div>
@@ -91,7 +91,7 @@
       Follow the link we sent you at <span class="font-weight-medium">{{ entity.email }}</span> to finish logging in!
     </p>
     <div class="text-right text-muted mt-5">
-      <a-btn text small @click="signInLinkSent = false"> Back to login </a-btn>
+      <a-btn variant="text" small @click="signInLinkSent = false"> Back to login </a-btn>
     </div>
   </a-alert>
 </template>

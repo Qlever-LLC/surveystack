@@ -81,7 +81,7 @@
 
     <a-snackbar v-model="showSnackbar" :timeout="4000">
       {{ capitalizeSnackbarMessage }}
-      <a-btn color="grey" text @click="showSnackbar = false">Close</a-btn>
+      <a-btn color="grey" variant="text" @click="showSnackbar = false">Close</a-btn>
     </a-snackbar>
   </div>
   <div

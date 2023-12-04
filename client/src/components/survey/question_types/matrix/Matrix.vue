@@ -33,11 +33,11 @@
       <div style="background: #1867c0; padding: 4px 0px">
         <a-card>
           <a-card-title>
-            <a-btn @click="duplicateRow(editedIndex)" text color="primary">
+            <a-btn @click="duplicateRow(editedIndex)" variant="text" color="primary">
               <a-icon left>mdi-content-copy</a-icon>Duplicate
             </a-btn>
             <a-spacer />
-            <a-btn text @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
+            <a-btn variant="text" @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
           </a-card-title>
           <a-card-text>
             <a-form autocomplete="off" @submit.prevent="">
@@ -60,10 +60,10 @@
             </a-form>
           </a-card-text>
           <a-card-actions class="d-flex justify-space-between">
-            <a-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
+            <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
               <a-icon left>mdi-trash-can-outline</a-icon>Delete
             </a-btn>
-            <a-btn text @click="showEditItemDialog = false" class="ma-2">
+            <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2">
               Close <a-icon right>mdi-close</a-icon>
             </a-btn>
           </a-card-actions>

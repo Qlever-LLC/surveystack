@@ -3,7 +3,6 @@
     :type="type"
     :value="value"
     :disabled="disabled"
-    :depressed="depressed"
     :fixed="fixed"
     :loading="loading"
     :icon="icon"
@@ -18,13 +17,14 @@
     :href="href"
     :target="target"
     :to="to"
-    :mandatory="mandatory"
     :dense="dense"
     :rounded="rounded"
     :variant="variant"
+    :class="fab ? 'rounded-circle' : ''"
     v-bind="$attrs"
-    @click="emitClick">
-    <slot/>
+    @click="emitClick"
+  >
+    <slot />
   </v-btn>
 </template>
 
@@ -44,10 +44,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    depressed: {
-      type: Boolean,
-      default: false,
-    },
     fixed: {
       type: Boolean,
       default: false,
@@ -61,10 +57,10 @@ export default {
       default: false,
     },
     fab: {
+      //TODO REMOVE
       type: Boolean,
       default: false,
     },
-
     xSmall: {
       type: Boolean,
       default: false,
@@ -105,10 +101,6 @@ export default {
       type: String,
       required: false,
     },
-    mandatory: {
-      type: Boolean,
-      required: false,
-    },
     dense: {
       type: Boolean,
       required: false,
@@ -118,14 +110,17 @@ export default {
       required: false,
     },
     variant: {
-      type: [String],
+      type: String,
+      validator: function (value) {
+        return ['flat', 'text', 'elevated', 'tonal', 'outlined', 'plain'].includes(value);
+      },
       required: false,
     },
   },
   setup(_, { emit }) {
     const emitClick = (e) => {
       emit('click', e);
-    }
+    };
     return { emitClick };
   },
 };

@@ -23,10 +23,10 @@
         <app-json-editor v-model="entity.data" class="mt-3" />
 
         <div class="d-flex ma-2">
-          <a-btn v-if="editMode" color="error" outlined @click="deleteEntity">
+          <a-btn v-if="editMode" color="error" variant="outlined" @click="deleteEntity">
             <a-icon left>mdi-trash-can-outline</a-icon> Delete
           </a-btn>
-          <a-btn class="ml-auto" text @click="cancel">Cancel</a-btn>
+          <a-btn class="ml-auto" variant="text" @click="cancel">Cancel</a-btn>
           <a-btn color="primary" @click="submit">Submit</a-btn>
         </div>
       </a-form>

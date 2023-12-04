@@ -44,8 +44,8 @@
       </a-form>
     </a-card-text>
     <a-card-actions class="d-flex justify-space-between px-6 pb-4">
-      <a-btn @click="deleteResource" color="error" text tabindex="-1"> Delete </a-btn>
-      <a-btn @click="updateResource" text color="primary"> Update </a-btn>
+      <a-btn @click="deleteResource" color="error" variant="text" tabindex="-1"> Delete </a-btn>
+      <a-btn @click="updateResource" variant="text" color="primary"> Update </a-btn>
     </a-card-actions>
   </a-card>
 </template>

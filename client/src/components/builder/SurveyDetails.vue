@@ -24,7 +24,7 @@
             </a-card-text>
             <a-card-actions class="mr-3">
               <a-spacer />
-              <a-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</a-btn>
+              <a-btn @click="editDetailsDialogIsVisible = false" color="primary" variant="text"> Close</a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
@@ -44,7 +44,7 @@
             </a-card-text>
             <a-card-actions class="mr-3">
               <a-spacer />
-              <a-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</a-btn>
+              <a-btn @click="resourcesDialogIsVisible = false" color="primary" variant="text"> Close</a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
@@ -66,7 +66,7 @@
               <a-list-item-title>
                 <a-input hide-details>
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
-                    <a-btn class="pointer-events-none" text>
+                    <a-btn class="pointer-events-none" variant="text">
                       <a-icon color="grey">mdi-file-upload</a-icon>
                       <div class="ml-1">Import</div>
                     </a-btn>
@@ -84,7 +84,7 @@
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <a-btn @click="$emit('export-survey')" text>
+                <a-btn @click="$emit('export-survey')" variant="text">
                   <a-icon color="grey">mdi-file-download</a-icon>
                   <div class="ml-1">Export</div>
                 </a-btn>
@@ -92,7 +92,7 @@
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <a-btn @click="$emit('show-version-dialog')" text>
+                <a-btn @click="$emit('show-version-dialog')" variant="text">
                   <a-icon color="grey">mdi-sitemap</a-icon>
                   <div class="ml-1">Manage Survey Versions</div>
                 </a-btn>
@@ -100,7 +100,7 @@
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <a-btn @click="editLibraryDialogIsVisible = true" text>
+                <a-btn @click="editLibraryDialogIsVisible = true" variant="text">
                   <a-icon color="grey">mdi-library</a-icon>
                   <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
                 </a-btn>
@@ -108,7 +108,7 @@
             </a-list-item>
             <a-list-item v-if="value.meta.isLibrary">
               <a-list-item-title>
-                <a-btn @click="libraryConsumersDialogIsVisible = true" text>
+                <a-btn @click="libraryConsumersDialogIsVisible = true" variant="text">
                   <a-icon color="grey">mdi-layers-search</a-icon>
                   <div class="ml-1">List library consumers</div>
                 </a-btn>
@@ -116,7 +116,7 @@
             </a-list-item>
             <a-list-item>
               <a-list-item-title>
-                <a-btn text @click="printSettingDialogIsVisible = true">
+                <a-btn variant="text" @click="printSettingDialogIsVisible = true">
                   <a-icon color="grey">mdi-printer-settings</a-icon>
                   <div class="ml-1">Print settings</div>
                 </a-btn>
@@ -124,7 +124,7 @@
             </a-list-item>
             <a-list-item v-if="!isNew">
               <a-list-item-title>
-                <a-btn text @click="$emit('delete')">
+                <a-btn variant="text" @click="$emit('delete')">
                   <a-icon color="grey">mdi-delete</a-icon>
                   <div class="ml-1">Delete</div>
                 </a-btn>

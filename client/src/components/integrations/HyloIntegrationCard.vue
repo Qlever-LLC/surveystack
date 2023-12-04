@@ -18,7 +18,7 @@
             <a-spacer />
             <a-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
               <template v-slot:activator="{ on, attrs }">
-                <a-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </a-btn>
+                <a-btn variant="text" v-bind="attrs" v-on="on" color="white"> Remove integration </a-btn>
               </template>
               <a-card>
                 <a-card-title class="text-h5"> Are you sure? </a-card-title>
@@ -116,7 +116,7 @@
 
               <a-card-actions>
                 <a-spacer />
-                <a-btn text @click="integrateDialog = false"> close </a-btn>
+                <a-btn variant="text" @click="integrateDialog = false"> close </a-btn>
               </a-card-actions>
             </a-card>
           </a-dialog>

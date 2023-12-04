@@ -28,7 +28,7 @@
           </div>
         </div>
         <div v-if="instance.groups.length >= 4 && !more.includes(`${user.id}-${instance.name}`)">
-          <a-btn text x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 3}` }} more</a-btn>
+          <a-btn variant="text" x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 3}` }} more</a-btn>
         </div>
         <a-btn
           text
@@ -42,7 +42,7 @@
     </div>
 
     <div class="create-button mt-2">
-      <a-btn text color="green" x-small @click="$emit('connect', user.id)">+ connect farm</a-btn>
+      <a-btn variant="text" color="green" x-small @click="$emit('connect', user.id)">+ connect farm</a-btn>
     </div>
   </div>
 </template>

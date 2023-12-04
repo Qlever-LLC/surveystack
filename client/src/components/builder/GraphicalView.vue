@@ -172,8 +172,8 @@
         <a-card-text class="mt-4"> Are you sure you want to remove this question?</a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel</a-btn>
-          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove</a-btn>
+          <a-btn variant="text" @click.stop="deleteQuestionModalIsVisible = false"> Cancel</a-btn>
+          <a-btn variant="text" color="red" @click.stop="handleConfirmDelete"> Remove</a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

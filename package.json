@@ -14,7 +14,8 @@
     "cross-env": "^7.0.3",
     "husky": "^7.0.0",
     "lerna": "^4.0.0",
-    "lint-staged": "^11.1.2"
+    "lint-staged": "^11.1.2",
+    "sass": "^1.69.5"
   },
   "scripts": {
     "prepare": "husky install; git config --local include.path ../.gitconfig",
@@ -30,6 +31,6 @@
     "server:test-watch": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run test-watch --no-prefix --stream",
     "server:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run lint-all --no-prefix --stream",
     "client:scaffold-partner": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run scaffold-partner --no-prefix --stream",
-    "client:chromatic" : "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run chromatic --no-prefix --stream"
+    "client:chromatic": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run chromatic --no-prefix --stream"
   }
 }

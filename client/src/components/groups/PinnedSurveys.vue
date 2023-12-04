@@ -3,7 +3,7 @@
     <a-card-title
       >Pinned Surveys
       <a-spacer />
-      <a-btn color="primary" text @click="openSearchDialog">New..</a-btn>
+      <a-btn color="primary" variant="text" @click="openSearchDialog">New..</a-btn>
     </a-card-title>
     <draggable
       v-if="entities.length !== 0"
@@ -53,8 +53,8 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
-          <a-btn text color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
+          <a-btn variant="text" @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
+          <a-btn variant="text" color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

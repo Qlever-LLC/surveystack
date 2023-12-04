@@ -27,10 +27,10 @@
       />
       <a-card-actions class="mr-3">
         <a-spacer />
-        <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
+        <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" variant="text">
           <span>Publish update to library {{ value.name }}</span>
         </a-btn>
-        <a-btn @click="$emit('cancel')" color="primary" text> Cancel </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

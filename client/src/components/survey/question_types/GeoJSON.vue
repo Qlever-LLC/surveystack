@@ -16,7 +16,7 @@
         v-bind="$attrs"
         @click="keepOpenNotificationIsVisible = false"
         rounded
-        depressed
+        variant="flat"
         color="primary"
         class="d-block ml-auto"
       >
@@ -57,7 +57,7 @@
             <td><input v-model="fields[i].name" placeholder="Enter field name ..." /></td>
             <td><input v-model="fields[i].type" placeholder="Enter field type ..." /></td>
             <td align="right">
-              <a-btn icon outlined small><a-icon>mdi-delete</a-icon></a-btn>
+              <a-btn icon variant="outlined" small><a-icon>mdi-delete</a-icon></a-btn>
             </td>
           </tr>
         </tbody>

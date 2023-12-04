@@ -1,5 +1,5 @@
 <template>
-  <a-btn outlined color="primary" @click="download" style="margin-bottom: 1px">
+  <a-btn variant="outlined" color="primary" @click="download" style="margin-bottom: 1px">
     <a-icon left>mdi-download</a-icon>
     Export CSV
   </a-btn>

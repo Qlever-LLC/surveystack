@@ -7,8 +7,8 @@
     <a-text-field label="Value" v-model="selectedValue" @keyup.native.enter="add" />
 
     <div class="d-flex justify-end">
-      <a-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</a-btn>
-      <a-btn class="ma-2" outlined @click="reset">Reset</a-btn>
+      <a-btn class="ma-2" @click="$emit('show-advanced', true)" variant="text">Advanced</a-btn>
+      <a-btn class="ma-2" variant="outlined" @click="reset">Reset</a-btn>
       <a-btn class="ma-2" @click="add" color="primary">Apply</a-btn>
     </div>
 

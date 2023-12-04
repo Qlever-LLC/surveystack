@@ -1,5 +1,8 @@
 <template>
-  <v-btn-toggle :value="value" @change="$emit('input', $event)" :dense="dense">
+  <v-btn-toggle
+    :dense="dense"
+    :mandatory="mandatory"
+    :value="value" @change="$emit('input', $event)" >
     <slot />
   </v-btn-toggle>
 </template>
@@ -10,6 +13,7 @@ export default {
   props: {
     dense: { type: Boolean, required: false },
     value: { type: undefined, required: false },
+    mandatory: { type: [Boolean, String], required: false },
   },
   emits: ['input'],
 };

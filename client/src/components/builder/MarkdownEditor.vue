@@ -23,7 +23,7 @@
 
       <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
-          <a-btn-toggle v-model="viewMode" mandatory dense>
+          <a-btn-toggle v-model="viewMode" mandatory="force" dense>
             <a-btn>Edit</a-btn>
             <a-btn>Preview</a-btn>
           </a-btn-toggle>
@@ -80,7 +80,7 @@
 
       <a-card-actions>
         <a-spacer />
-        <a-btn text @click="close">Cancel</a-btn>
+        <a-btn variant="text" @click="close">Cancel</a-btn>
         <a-btn color="primary" @click="save">Save</a-btn>
       </a-card-actions>
     </a-card>

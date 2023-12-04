@@ -11,7 +11,7 @@
         </a-alert>
 
         <div class="d-flex justify-end">
-          <a-btn text @click="cancel">Cancel</a-btn>
+          <a-btn variant="text" @click="cancel">Cancel</a-btn>
           <a-btn color="primary" @click="join">Join {{ membership.group.name }}</a-btn>
         </div>
       </div>

@@ -26,7 +26,7 @@
 
       <a-card-actions class="mr-3">
         <a-spacer />
-        <a-btn @click="$emit('input', false)" color="primary" text> Close </a-btn>
+        <a-btn @click="$emit('input', false)" color="primary" variant="text"> Close </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

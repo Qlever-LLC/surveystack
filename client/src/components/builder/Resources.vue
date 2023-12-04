@@ -40,7 +40,7 @@
         <a-list>
           <a-list-item class="d-flex align-center">
             <a-list-item-title>
-              <a-btn text @click="createOntology">
+              <a-btn variant="text" @click="createOntology">
                 <a-icon color="grey">mdi-plus</a-icon>
                 <div class="ml-1">Create Ontology</div>
               </a-btn>
@@ -50,7 +50,7 @@
             <a-list-item-title>
               <a-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
-                  <a-btn class="pointer-events-none" text>
+                  <a-btn class="pointer-events-none" variant="text">
                     <a-icon color="grey">mdi-upload</a-icon>
                     <div class="ml-1">Add File Resource</div>
                   </a-btn>

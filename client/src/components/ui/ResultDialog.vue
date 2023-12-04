@@ -16,7 +16,7 @@
                   <template v-slot:activator="{ on, attrs }">
                     <a-card-actions>
                       <a-spacer />
-                      <a-btn text v-bind="attrs" v-on="on"> Logs </a-btn>
+                      <a-btn variant="text" v-bind="attrs" v-on="on"> Logs </a-btn>
                     </a-card-actions>
                   </template>
 
@@ -60,10 +60,10 @@
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
           <div v-if="survey && submission && isOnline()" class="mt-6 d-flex flex-column align-stretch">
-            <a-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
+            <a-btn color="primary" variant="flat" dense :loading="download.loading" @click="downloadSubmission">
               Download Submission
             </a-btn>
-            <a-btn class="mt-3" color="primary" depressed dense :loading="emailing.loading" @click="emailMe">
+            <a-btn class="mt-3" color="primary" variant="flat" dense :loading="emailing.loading" @click="emailMe">
               Email Submission
             </a-btn>
           </div>
@@ -71,7 +71,7 @@
 
         <a-card-actions>
           <a-spacer />
-          <a-btn text color="primary" @click="onClose"> Ok </a-btn>
+          <a-btn variant="text" color="primary" @click="onClose"> Ok </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

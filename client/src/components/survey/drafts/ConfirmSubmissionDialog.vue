@@ -29,8 +29,8 @@
       </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <a-btn text @click.stop="handleAbort"> Cancel </a-btn>
-        <a-btn text color="primary" @click.stop="handleConfirm"> Submit </a-btn>
+        <a-btn variant="text" @click.stop="handleAbort"> Cancel </a-btn>
+        <a-btn variant="text" color="primary" @click.stop="handleConfirm"> Submit </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>

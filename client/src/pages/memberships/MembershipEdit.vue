@@ -5,7 +5,7 @@
 
     <a-card class="pa-4 mb-4">
       <div class="d-flex">
-        <a-btn class="ml-auto" color="error" outlined @click="dialogRemoval = true">
+        <a-btn class="ml-auto" color="error" variant="outlined" @click="dialogRemoval = true">
           <a-icon left>mdi-trash-can-outline</a-icon> Delete
         </a-btn>
       </div>
@@ -29,7 +29,7 @@
         <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" />
 
         <div class="d-flex mt-2">
-          <a-btn class="ml-auto" text @click="cancel">Cancel</a-btn>
+          <a-btn class="ml-auto" variant="text" @click="cancel">Cancel</a-btn>
           <a-btn color="primary" @click="submit">Save</a-btn>
         </div>
       </a-form>
@@ -63,8 +63,8 @@
         <a-card-text class="mt-4"> Are you sure you want to delete this membership? </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="dialogRemoval = false"> Cancel </a-btn>
-          <a-btn text color="red" @click.stop="remove"> Delete </a-btn>
+          <a-btn variant="text" @click.stop="dialogRemoval = false"> Cancel </a-btn>
+          <a-btn variant="text" color="red" @click.stop="remove"> Delete </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>
@@ -77,7 +77,7 @@
         </a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn text @click.stop="dialogSent = false"> OK </a-btn>
+          <a-btn variant="text" @click.stop="dialogSent = false"> OK </a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>

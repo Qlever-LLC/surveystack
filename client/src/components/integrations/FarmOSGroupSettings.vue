@@ -88,8 +88,8 @@
       <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">
         <div class="d-flex justify-end">{{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts</div>
         <div class="d-flex justify-end align-center my-4">
-          <a-btn outlined @click="upgradeDialog = true">Upgrade</a-btn>
-          <!-- <a-btn outlined class="ml-2">Learn More</a-btn> -->
+          <a-btn variant="outlined" @click="upgradeDialog = true">Upgrade</a-btn>
+          <!-- <a-btn variant="outlined" class="ml-2">Learn More</a-btn> -->
         </div>
       </div>
     </div>

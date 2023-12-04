@@ -53,7 +53,7 @@
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
-          <a-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
+          <a-btn v-if="survey" variant="outlined" color="secondary" :to="`/surveys/${survey}`">
             <a-icon left>mdi-note-text-outline</a-icon>
             View Survey
           </a-btn>

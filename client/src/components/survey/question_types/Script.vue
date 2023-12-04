@@ -57,7 +57,7 @@
         </a-btn>
       </div>
 
-      <a-btn @click="requestRunScript" class="full center-button mt-4" depressed large color="primary">
+      <a-btn @click="requestRunScript" class="full center-button mt-4" variant="flat" large color="primary">
         {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
       </a-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">

@@ -85,14 +85,14 @@
               class="d-inline mt-0"
             />
             <div class="ml-auto ml-sm-6">
-              <a-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
+              <a-btn small v-if="!isPremium" @click="learnMoreDialog = true" variant="outlined" color="primary"
                 >Learn more...
               </a-btn>
             </div>
           </div>
           <a-checkbox label="Archived" v-model="entity.meta.archived" />
           <div class="d-flex justify-end pa-2">
-            <a-btn text @click="cancel">Cancel</a-btn>
+            <a-btn variant="text" @click="cancel">Cancel</a-btn>
             <a-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</a-btn>
           </div>
         </form>

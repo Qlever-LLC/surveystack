@@ -77,7 +77,7 @@
                     >
                       ARCHIVE
                     </a-btn>
-                    <a-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
+                    <a-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" variant="text" color="secondary"
                       >REASSIGN</a-btn
                     >
                     <a-btn

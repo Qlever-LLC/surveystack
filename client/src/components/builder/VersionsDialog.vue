@@ -93,7 +93,7 @@
         >
           Delete {{ selectedVersionsToDelete.length }} versions
         </a-btn>
-        <a-btn @click="$emit('cancel')" color="primary" text> Close </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Close </a-btn>
       </a-card-actions>
     </a-card>
     <survey-diff-dialog
