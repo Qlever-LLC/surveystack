@@ -3,8 +3,8 @@
   <a-card outlined class="tiptap-editor">
     <a-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-        <a-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
-          <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
+        <a-toolbar color="grey-lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
+          <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey-lighten-3">
             <div>
               <a-btn
                 icon
@@ -513,6 +513,7 @@ export default {
     opacity 0.2s,
     visibility 0.2s;
 }
+
 .menububble.is-active {
   opacity: 1;
   visibility: visible;
@@ -528,6 +529,7 @@ export default {
   border-radius: 3px;
   cursor: pointer;
 }
+
 .menububble__button:last-child {
   margin-right: 0;
 }

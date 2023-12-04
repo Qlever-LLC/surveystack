@@ -430,8 +430,8 @@ export default {
 >>> .orange-chip,
 >>> .green-chip {
   display: inline-flex;
-  border: 1px var(--v-focus-base) solid;
-  color: var(--v-focus-base);
+  border: 1px rgb(var(--v-theme-focus)) solid;
+  color: rgb(var(--v-theme-focus));
   border-radius: 0.6rem;
   font-weight: bold;
   font-size: 80%;
@@ -455,6 +455,6 @@ div >>> .orange-chip {
 }
 
 >>> .v-list-item.v-list-item--active {
-  color: var(--v-focus-base) !important;
+  color: rgb(var(--v-theme-focus)) !important;
 }
 </style>

@@ -22,7 +22,7 @@
             "
           >
             <v-list-item-content v-if="member.meta && member.meta.status === 'pending'">
-              <a-list-item-title class="text--secondary"
+              <a-list-item-title class="text-secondary"
                 >[Pending] {{ member.meta.invitationEmail
                 }}{{ member.meta.invitationName ? ` - ${member.meta.invitationName}` : '' }}</a-list-item-title
               >

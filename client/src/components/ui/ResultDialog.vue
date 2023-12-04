@@ -6,8 +6,8 @@
 
         <a-card-text>
           <div v-for="(item, idx) in messages" :key="idx">
-            <a-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
-              <a-card-text class="white--text">
+            <a-card flat dark outlined class="mb-2" :color="item.error ? 'red-darken-4' : 'green'">
+              <a-card-text class="text-white">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </a-card-text>
               <template v-if="item.logs && item.logs.length">

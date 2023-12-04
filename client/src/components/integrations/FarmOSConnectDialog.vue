@@ -58,7 +58,7 @@
         </a-card-text>
       </template>
 
-      <a-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
+      <a-card-text class="text-center text-grey" @click="$emit('addExisting')" disabled>
         or add existing farmOS instance (currently in development)
       </a-card-text>
     </a-card>

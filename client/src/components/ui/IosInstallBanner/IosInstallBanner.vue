@@ -1,5 +1,5 @@
 <template>
-  <a-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary lighten-1" fixed bottom cssIosSnackbar>
+  <a-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary-lighten-1" fixed bottom cssIosSnackbar>
     <a-btn @click="handleClose" icon class="close-button">
       <a-icon>mdi-close</a-icon>
     </a-btn>

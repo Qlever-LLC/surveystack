@@ -1,8 +1,8 @@
 <template>
   <a-container>
     <a-card class="pa-6 pa-sm-12">
-      <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
-      <h1 class="heading--text" v-else>Join SurveyStack</h1>
+      <h1 class="text-heading" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
+      <h1 class="text-heading" v-else>Join SurveyStack</h1>
       <a-form>
         <a-text-field
           label="E-Mail"

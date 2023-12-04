@@ -138,7 +138,7 @@
         <splitpanes horizontal class="code-resizer">
           <pane size="80">
             <div style="height: 100%">
-              <a-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
+              <a-tabs v-if="control.options" v-model="selectedTab" background-color="bg-blue-grey-darken-4" dark>
                 <a-tab :disabled="!control.options.relevance.enabled"> Relevance</a-tab>
                 <a-tab :disabled="!control.options.initialize.enabled"> Initialize</a-tab>
                 <a-tab :disabled="!control.options.calculate.enabled"> Calculate</a-tab>

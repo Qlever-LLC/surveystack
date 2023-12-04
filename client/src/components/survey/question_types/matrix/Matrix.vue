@@ -134,7 +134,7 @@
 
     <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
       <a-progress-circular indeterminate color="primary" size="24" />
-      <div class="ml-2 text--secondary">Loading farmOS data</div>
+      <div class="ml-2 text-secondary">Loading farmOS data</div>
     </div>
   </div>
 </template>

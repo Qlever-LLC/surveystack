@@ -7,7 +7,7 @@
       <span>{{ typeName }}</span>
     </a-tooltip>
     <a-col class="body-1 text-truncate">
-      <div class="font-weight-light grey--text text--darken-2">
+      <div class="font-weight-light text-grey-darken-2">
         <span class="text-truncate">{{ index }}: {{ dataName }}</span>
         <a-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" outlined small :color="chipColor">
           {{ chipLabel }}
@@ -28,7 +28,7 @@ export default {
     title: { type: String, required: true },
     type: { type: String, required: true },
     dataName: { type: String, required: true },
-    iconColor: { type: String, default: 'grey lighten-1' },
+    iconColor: { type: String, default: 'grey-lighten-1' },
     chipLabel: { type: String, required: false },
     chipColor: { type: String, required: false },
   },

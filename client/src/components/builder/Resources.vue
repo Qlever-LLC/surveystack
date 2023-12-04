@@ -86,17 +86,17 @@
             </a-list-item-subtitle>
             <a-list-item-subtitle v-else> {{ resource.name }}</a-list-item-subtitle>
           </v-list-item-content>
-          <a-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</a-icon>
+          <a-icon v-if="resource.libraryId" color="grey-lighten-1">mdi-library</a-icon>
           <a-list-item-action v-if="resource.type === resourceTypes.FILE">
             <a-btn icon>
-              <a-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </a-icon>
+              <a-icon color="grey-lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </a-icon>
             </a-btn>
           </a-list-item-action>
         </a-list-item>
       </template>
       <a-list-item v-else>
         <v-list-item-content>
-          <a-list-item-title class="text--secondary">No resources found</a-list-item-title>
+          <a-list-item-title class="text-secondary">No resources found</a-list-item-title>
         </v-list-item-content>
       </a-list-item>
     </a-list>

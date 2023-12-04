@@ -1,6 +1,6 @@
 <template>
   <div class="full">
-    <a-card dark color="dark-blue--lighten-2" class="card-height" v-slot:panel>
+    <a-card dark color="dark-blue-lighten-2" class="card-height" v-slot:panel>
       <a-card-title
         >{{ title || '' }}
 
@@ -26,7 +26,7 @@
 
             <a-card-actions>
               <a-spacer />
-              <a-btn color="green darken-1" variant="text" @click="dialog = false"> Close </a-btn>
+              <a-btn color="green-darken-1" variant="text" @click="dialog = false"> Close </a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
@@ -41,7 +41,7 @@
         </a-btn>
         <a-icon @click="$emit('close')">mdi-close-circle-outline</a-icon>
       </a-card-title>
-      <div class="error red text--white pa-2" v-if="error">{{ error }}</div>
+      <div class="error red text-white pa-2" v-if="error">{{ error }}</div>
       <div class="editor-height" :id="'monaco-editor-' + _uid"></div>
     </a-card>
   </div>

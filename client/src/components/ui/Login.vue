@@ -2,8 +2,8 @@
   <a-card v-if="!signInLinkSent" class="pa-6 card-width">
     <div class="d-sm-flex justify-center">
       <div class="pl-sm-5 pr-sm-10 py-6">
-        <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
-        <h1 class="heading--text" v-else>Welcome Back!</h1>
+        <h1 class="text-heading text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
+        <h1 class="text-heading" v-else>Welcome Back!</h1>
         <a-form>
           <a-text-field
             label="E-Mail"

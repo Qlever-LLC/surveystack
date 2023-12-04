@@ -246,9 +246,9 @@ export default {
 .farm-os-planting >>> .v-list-item__title .green-chip,
 .farm-os-planting >>> .v-list-item__title .blue-chip {
   display: inline-flex;
-  border: 1px var(--v-focus-base) solid;
+  border: 1px rgb(var(--v-theme-focus)) solid;
   background-color: white;
-  color: var(--v-focus-base);
+  color: rgb(var(--v-theme-focus));
   border-radius: 0.4rem;
   font-weight: bold;
   font-size: 80%;

@@ -35,7 +35,7 @@
           <template v-slot:item="{ item }">
             <div class="d-flex flex-column py-1">
               <div>{{ item.text }}</div>
-              <div class="text--secondary caption">{{ item.path }}</div>
+              <div class="text-secondary caption">{{ item.path }}</div>
             </div>
           </template>
         </a-select>
@@ -134,7 +134,7 @@
               <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
             </a-col>
             <a-col cols="1">
-              <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+              <div class="body-2 text-secondary mt-1 d-flex align-center justify-end" style="height: 100%">
                 {{ submissions.pagination.total }} total
               </div>
             </a-col>
@@ -196,7 +196,7 @@
           <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
         </a-col>
         <a-col cols="1">
-          <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+          <div class="body-2 text-secondary mt-1 d-flex align-center justify-end" style="height: 100%">
             {{ submissions.pagination.total }} total
           </div>
         </a-col>

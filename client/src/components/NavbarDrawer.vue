@@ -16,8 +16,11 @@
           <v-list-item-content>
             <a-list-item-title>
               {{ item.label }}
-              <a-chip v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
-                color="accent" small>
+              <a-chip
+                v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+                color="accent"
+                small
+              >
                 {{ readyToSubmitCount }}
               </a-chip>
             </a-list-item-title>
@@ -68,7 +71,7 @@
     </a-list>
 
     <template v-slot:append>
-      <div dark class="grey--text">
+      <div dark class="text-grey">
         <p class="pt-4 pl-4">
           Version:
           <router-link to="/app/info" class="decoration-none">{{ lcl.shortHash }}</router-link>
@@ -91,7 +94,7 @@ export default {
     },
   },
 
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const store = useStore();
 
     let groupsLink = { name: 'groups-list' };
@@ -209,7 +212,7 @@ export default {
 
     // Methods
     const closeNavBar = () => {
-      console.log("closeNavBar")
+      console.log('closeNavBar');
       emit('update:modelValue', !props.modelValue);
     };
 

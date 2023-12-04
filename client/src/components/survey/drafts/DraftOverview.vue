@@ -8,7 +8,7 @@
     </a-banner>
     <a-card>
       <a-card-title>{{ survey.name }}</a-card-title>
-      <a-card-subtitle class="grey--text mt-n5">
+      <a-card-subtitle class="text-grey mt-n5">
         {{ submission._id }}
         <br />
         <strong v-if="submission.meta.dateSubmitted">
@@ -51,11 +51,9 @@
             <!-- title -->
             <a-card-title class="d-block mb-0 pb-0">
               <div class="d-flex flex-row align-baseline">
-                <span
-                  class="grey--text text--darken-1 mr-1 text-no-wrap"
-                  style="font-weight: initial; font-size: initial"
-                  >{{ display.questionNumber }}</span
-                >
+                <span class="text-grey-darken-1 mr-1 text-no-wrap" style="font-weight: initial; font-size: initial">{{
+                  display.questionNumber
+                }}</span>
                 <app-control-label
                   class="ml-2 mb-0 flex-grow-1"
                   :value="display.label"
@@ -67,10 +65,7 @@
 
             <!-- path (not shown) -->
             <a-card-text v-if="false" class="my-0 py-0">
-              <span
-                class="font-weight-light grey--text text--darken-2 mt-n1"
-                style="font-size: 0.9rem; position: relative"
-              >
+              <span class="font-weight-light text-grey-darken-2 mt-n1" style="font-size: 0.9rem; position: relative">
                 {{ display.path }}
               </span>
             </a-card-text>
@@ -98,7 +93,7 @@
 
             <!-- date modified -->
             <a-card-text class="pt-1 pb-0" v-if="display.modified">
-              <div class="d-flex justify-space-between text--secondary" style="font-size: 0.8rem">
+              <div class="d-flex justify-space-between text-secondary" style="font-size: 0.8rem">
                 <div v-if="display.modified">{{ display.modified }}</div>
                 <div v-if="display.modifiedHumanized">{{ display.modifiedHumanized }} ago</div>
               </div>
@@ -273,7 +268,9 @@ export default {
 <style scoped>
 .number-chip {
   display: inline-flex;
-  box-shadow: 0 0 1px 0px white inset, 0 0 1px 0px white;
+  box-shadow:
+    0 0 1px 0px white inset,
+    0 0 1px 0px white;
   /* border: 1px solid red; */
   border: 1px solid currentColor;
   background-color: white;

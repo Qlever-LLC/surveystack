@@ -80,7 +80,7 @@
 
       <div class="mt-8 mb-4">
         <h3>Group Memberships</h3>
-        <p class="mt-1 mb-5 grey--text text-body-2">These are your group memberships. You can select one to leave.</p>
+        <p class="mt-1 mb-5 text-grey text-body-2">These are your group memberships. You can select one to leave.</p>
         <div class="d-flex align-center">
           <active-group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
           <a-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"

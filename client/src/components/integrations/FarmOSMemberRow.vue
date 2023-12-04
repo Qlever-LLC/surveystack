@@ -3,7 +3,7 @@
     <div class="user-row">
       <div class="user-icon"><span v-if="user.admin" class="mdi mdi-crown pr-1 mr-2"></span></div>
       <div class="user-name">{{ user.name }}</div>
-      <div class="user-email ml-2 font-weight-light text--lighten-2">{{ user.email }}</div>
+      <div class="user-email ml-2 font-weight-light text-lighten-2">{{ user.email }}</div>
     </div>
     <div class="instance-map mt-1 pb-1" v-for="instance in instanceMap" :key="`instance-${instance.name}`">
       <div class="instance-name ml-4">

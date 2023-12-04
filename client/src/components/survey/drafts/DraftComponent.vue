@@ -64,7 +64,7 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-0 grey lighten-4"
+      class="draft-footer px-0 grey-lighten-4"
       :class="{ 'show-submit': showOverview }"
       :style="{
         left: moveFooter ? '256px' : '0px',
@@ -84,7 +84,7 @@
     <a-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
       <div class="text-body-1 my-4 text-center">
         Click on the
-        <a-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
+        <a-btn fab dark x-small color="blue-darken-2" style="pointer-events: none">
           <a-icon>mdi-plus</a-icon>
         </a-btn>
         to add questions to your survey
@@ -305,6 +305,7 @@ export default {
   font-size: 14px;
   opacity: 0;
 }
+
 .draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
   position: absolute;
   content: '';
@@ -342,7 +343,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
 }
 
 .draft-content {
@@ -353,7 +354,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
 }
 
 .draft-footer {

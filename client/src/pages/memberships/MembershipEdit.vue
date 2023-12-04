@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <span class="text--secondary overline">{{ entity._id }}</span>
+    <span class="text-secondary overline">{{ entity._id }}</span>
     <h1>Edit Membership</h1>
 
     <a-card class="pa-4 mb-4">
@@ -45,7 +45,7 @@
       <a-card-actions class="d-flex justify-space-between align-center">
         <div>
           <a-btn color="primary" @click="resend"> <a-icon left>mdi-email-send-outline</a-icon> Resend </a-btn>
-          <span class="ml-1 caption text--secondary">{{
+          <span class="ml-1 caption text-secondary">{{
             entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'
           }}</span>
         </div>

@@ -46,12 +46,12 @@
           :type="el.type"
           :dataName="el.name"
         />
-        <div class="grey--text text--darken-1" v-if="el.options.hidden">
+        <div class="text-grey-darken-1" v-if="el.options.hidden">
           {{ displayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="mb-2 context-actions">
           <a-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
-            <a-icon color="grey lighten-1">mdi-content-copy</a-icon>
+            <a-icon color="grey-lighten-1">mdi-content-copy</a-icon>
           </a-btn>
           <a-btn
             icon
@@ -94,7 +94,7 @@
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
             @click.stop="() => showDeleteModal(idx)"
           >
-            <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
+            <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey-lighten-1'">
               mdi-delete
             </a-icon>
           </a-btn>
@@ -103,7 +103,7 @@
             x-small
             v-if="el.options.hidden"
             @click.stop="$emit('unhide-control', el)"
-            color="grey lighten-1"
+            color="grey-lighten-1"
             style="margin-bottom: -8px"
           >
             unhide
@@ -113,7 +113,7 @@
             x-small
             v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
             @click.stop="$emit('hide-control', el)"
-            color="grey lighten-1"
+            color="grey-lighten-1"
             class="mb-4"
           >
             hide
@@ -179,10 +179,10 @@
     </a-dialog>
   </draggable>
   <div v-else>
-    <a-card class="text--secondary">
+    <a-card class="text-secondary">
       <a-card-title>Empty survey</a-card-title>
       <a-card-text v-if="!readOnly">
-        <div class="text--primary">
+        <div class="text-primary">
           You can add questions by clicking the <strong>plus icon</strong>
           below.
         </div>
@@ -324,7 +324,7 @@ export default {
       this.$emit('toggle-library', libraryId);
     },
     getLibraryIconColor(libraryId) {
-      return `${this.libraryId && this.libraryId === libraryId ? 'green' : 'grey'} lighten-1`;
+      return `${this.libraryId && this.libraryId === libraryId ? 'green-lighten-1' : 'grey-lighten-1'}`;
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {
@@ -404,7 +404,7 @@ export default {
 }
 
 .control-item-selected {
-  border-left: 2px solid var(--v-primary-base);
+  border-left: 2px solid rgb(var(--v-theme-primary));
 }
 
 .context-actions {
@@ -420,7 +420,7 @@ export default {
   left: 0;
   top: 100%;
   margin-top: 13px;
-  background-color: var(--v-info-base);
+  background-color: rgb(var(--v-theme-info));
   padding: 0.75rem 1.5rem;
   border-radius: 3px;
 }
@@ -433,7 +433,7 @@ export default {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid var(--v-info-base);
+  border-bottom: 7px solid rgb(var(--v-theme-info));
   top: 100%;
   margin-top: 3px;
   left: 50%;

@@ -4,7 +4,7 @@
     <div ref="header" class="mt-heading mt-divider" :class="{ 'mt-elevation-shadow': isHeaderFloating }">
       <div
         v-for="(header, colIdx) in headers"
-        class="caption font-weight-bold text--secondary mt-cell-wrap"
+        class="caption font-weight-bold text-secondary mt-cell-wrap"
         :class="{
           'mt-fixed': fixColMask[colIdx],
           'mt-elevation-shadow': isLeftFloating && colIdx === fixedColumns - 1,

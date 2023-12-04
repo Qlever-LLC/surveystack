@@ -1,7 +1,7 @@
 <template>
   <a-container>
     <a-card class="pa-4 mb-4">
-      <span class="text--secondary overline">{{ this.entity._id }}</span>
+      <span class="text-secondary overline">{{ this.entity._id }}</span>
 
       <h1>{{ editMode ? 'Edit Group Integration' : 'Create Group Integration' }}</h1>
 

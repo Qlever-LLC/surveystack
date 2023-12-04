@@ -13,7 +13,7 @@
           :src="integratedHyloGroup.bannerUrl"
         >
           <a-app-bar flat color="rgba(0, 0, 0, 0)">
-            <a-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </a-toolbar-title>
+            <a-toolbar-title class="text-h6 text-white pl-0"> Hylo Integration </a-toolbar-title>
 
             <a-spacer />
             <a-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
@@ -25,7 +25,7 @@
                 <a-card-actions>
                   <a-spacer />
                   <a-btn
-                    color="green darken-1"
+                    color="green-darken-1"
                     text
                     @click="removeGroupIntegration"
                     :loading="isRemoveGroupIntegrationInProgress"
@@ -38,18 +38,18 @@
           </a-app-bar>
           <a-spacer />
 
-          <a-card-title class="white--text mt-8">
+          <a-card-title class="text-white mt-8">
             <a-avatar size="56">
               <img alt="group" :src="integratedHyloGroup.avatarUrl" />
             </a-avatar>
-            <a-col class="ml-3"
-              ><p class="text-h5 mb-1">{{ integratedHyloGroup.name }}</p>
+            <a-col class="ml-3">
+              <p class="text-h5 mb-1">{{ integratedHyloGroup.name }}</p>
 
               <p class="text-subtitle-2 mb-0">{{ integratedHyloGroup.location }}</p>
             </a-col>
           </a-card-title>
 
-          <a-card-text class="white--text">
+          <a-card-text class="text-white">
             &nbsp;Your group is integrated with
             <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo

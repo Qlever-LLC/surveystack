@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <span class="text--secondary overline">{{ entity._id }}</span>
+    <span class="text-secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <a-card class="pa-4 mb-4">
       <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">

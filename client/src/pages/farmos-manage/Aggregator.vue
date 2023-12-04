@@ -142,7 +142,7 @@
 
     <div v-if="farmsNotInAggregator.length > 0 && !loading">
       <h2>Farms in Surveystack which are not present on FarmOS Aggregator</h2>
-      <p class="grey--text text--darken-2">These instances have likely been removed from the aggregator.</p>
+      <p class="text-grey-darken-2">These instances have likely been removed from the aggregator.</p>
       <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
@@ -195,7 +195,7 @@
 
     <div v-if="farmsNotInSurvestack.length > 0 && !loading">
       <h2>Farms on FarmOS Aggregator which are not mapped to Groups in Surveystack</h2>
-      <p class="grey--text text--darken-2">
+      <p class="text-grey-darken-2">
         These instances are likely self hosted or have not been added to a payment plan of a group.
       </p>
       <a-table v-if="!loading">

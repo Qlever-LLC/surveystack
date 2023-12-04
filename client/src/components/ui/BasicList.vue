@@ -1,6 +1,6 @@
 <template>
   <a-card :loading="loading">
-    <a-card-title class="heading--text">
+    <a-card-title class="text-heading">
       <slot name="title">
         {{ title }}
       </slot>
@@ -31,7 +31,7 @@
         </div>
       </a-list>
 
-      <div v-else class="grey--text">No {{ title }} yet</div>
+      <div v-else class="text-grey">No {{ title }} yet</div>
     </a-card-text>
   </a-card>
 </template>

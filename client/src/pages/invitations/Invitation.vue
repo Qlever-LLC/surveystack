@@ -3,7 +3,7 @@
     <a-alert v-if="errorMsg" class="mt-4" mode="fade" text type="error">{{ errorMsg }}</a-alert>
     <template v-if="initialized && membership">
       <h1>Invitation</h1>
-      <p class="subtitle-2 text--secondary">{{ code }}</p>
+      <p class="subtitle-2 text-secondary">{{ code }}</p>
       <div v-if="membership.meta.status === 'pending'">
         <a-alert class="mt-4" outlined v-if="membership" type="info"
           >This code allows you to join <strong>{{ membership.group.name }}</strong

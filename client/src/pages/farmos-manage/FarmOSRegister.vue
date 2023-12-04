@@ -101,7 +101,7 @@
         return-object
       />
 
-      <div class="text-left text--secondary">Unit System to use</div>
+      <div class="text-left text-secondary">Unit System to use</div>
       <a-radio-group v-model="localViewModel.form.units">
         <a-radio label="Metric" value="metric" />
         <a-radio label="US" value="us" />
@@ -189,7 +189,7 @@
 
       <app-dialog
         labelConfirm="Refresh Members"
-        class="primary--text mx-4"
+        class="text-primary mx-4"
         v-model="invite"
         @cancel="invite = false"
         width="400"
@@ -215,7 +215,7 @@
     <app-dialog
       title="Field Import"
       labelConfirm="OK"
-      class="primary--text mx-4"
+      class="text-primary mx-4"
       v-model="successDialog"
       @cancel="successDialog = false"
       @confirm="successDialog = false"

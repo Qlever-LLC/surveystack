@@ -19,7 +19,7 @@
     </template>
 
     <a-card>
-      <a-card-title class="grey--text text--darken-2"> <slot name="title" />!! </a-card-title>
+      <a-card-title class="text-grey-darken-2"> <slot name="title" />!! </a-card-title>
 
       <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
@@ -48,7 +48,7 @@
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
               <a-progress-circular v-if="isLoading" indeterminate color="primary" />
-              <a-icon v-else color="gray darken-4">mdi-paperclip</a-icon>
+              <a-icon v-else color="gray-darken-4">mdi-paperclip</a-icon>
             </div>
           </div>
 

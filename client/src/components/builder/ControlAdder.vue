@@ -2,7 +2,7 @@
   <div class="control-adder">
     <a-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
-        <a-btn fab color="blue darken-2" dark data-testid="control-adder-open">
+        <a-btn fab color="blue-darken-2" dark data-testid="control-adder-open">
           <a-icon v-if="fabIsOpen">mdi-close</a-icon>
           <a-icon v-else>mdi-plus</a-icon>
         </a-btn>
@@ -26,12 +26,12 @@
             color="white"
             key="group"
             @click="addControl(group)"
-            class="ma-1 indigo--text bg-white shadow"
+            class="ma-1 text-indigo bg-white shadow"
             outlined
             small
             data-testid="add-control-group"
           >
-            <a-icon left v-if="group.icon" color="indigo lighten-2">
+            <a-icon left v-if="group.icon" color="indigo-lighten-2">
               {{ group.icon }}
             </a-icon>
             Group

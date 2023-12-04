@@ -18,7 +18,7 @@
           <v-list-item-content>
             <div>
               <span class="font-weight-medium mr-1">{{ filter.field }}</span>
-              <span class="font-weight-regular text--secondary mr-1">{{ filter.operator.text }}</span>
+              <span class="font-weight-regular text-secondary mr-1">{{ filter.operator.text }}</span>
               <span class="font-weight-boldmr-1">{{ filter.value }}</span>
             </div>
           </v-list-item-content>
