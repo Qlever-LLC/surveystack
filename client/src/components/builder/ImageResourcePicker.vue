@@ -2,10 +2,7 @@
   <div class="image-resource-picker">
     Image resource picker
     <a-list>
-      <a-list-item v-for="image in value" :key="image.src">
-        <v-list-item-avatar>
-          <a-icon>mdi-image</a-icon>
-        </v-list-item-avatar>
+      <a-list-item v-for="image in value" :key="image.src" prepend-avatar="mdi-image">
         <v-list-item-content>
           {{ image.name }}
         </v-list-item-content>

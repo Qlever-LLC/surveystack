@@ -14,10 +14,7 @@
       <a-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
         <a-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
-            <a-list-item :to="`/surveys/${e._id}`">
-              <a-list-item-icon>
-                <a-icon v-if="e.pinned">mdi-pin</a-icon>
-              </a-list-item-icon>
+            <a-list-item :to="`/surveys/${e._id}`" :prepend-icon="e.pinned ? 'mdi-pin' : ''">
               <v-list-item-content>
                 <div>
                   <a-list-item-title>{{ e.name }}</a-list-item-title>
@@ -43,34 +40,31 @@
             </div>
           </div>
           <div v-for="(e, i) in surveys.content" :key="e._id">
-            <a-list-item :to="`/surveys/${e._id}`">
-              <a-list-item-icon>
-                <a-icon v-if="e.pinned">mdi-pin</a-icon>
-                <a-btn
-                  v-if="e.meta.submissions === 'public' || !e.meta.submissions"
-                  :to="`/surveys/${e._id}`"
-                  title="Everyone can submit"
-                  icon
-                >
-                  <a-icon>mdi-earth</a-icon>
-                </a-btn>
-                <a-btn
-                  v-if="e.meta.submissions === 'user'"
-                  :to="`/surveys/${e._id}`"
-                  title="Only signed-in users can submit"
-                  icon
-                >
-                  <a-icon>mdi-account</a-icon>
-                </a-btn>
-                <a-btn
-                  v-if="e.meta.submissions === 'group'"
-                  :to="`/surveys/${e._id}`"
-                  title="Everyone group members can submit"
-                  icon
-                >
-                  <a-icon>mdi-account-group</a-icon>
-                </a-btn>
-              </a-list-item-icon>
+            <a-list-item :to="`/surveys/${e._id}`" :prepend-icon="e.pinned ? 'mdi-pin' : ''">
+              <a-btn
+                v-if="e.meta.submissions === 'public' || !e.meta.submissions"
+                :to="`/surveys/${e._id}`"
+                title="Everyone can submit"
+                icon
+              >
+                <a-icon>mdi-earth</a-icon>
+              </a-btn>
+              <a-btn
+                v-if="e.meta.submissions === 'user'"
+                :to="`/surveys/${e._id}`"
+                title="Only signed-in users can submit"
+                icon
+              >
+                <a-icon>mdi-account</a-icon>
+              </a-btn>
+              <a-btn
+                v-if="e.meta.submissions === 'group'"
+                :to="`/surveys/${e._id}`"
+                title="Everyone group members can submit"
+                icon
+              >
+                <a-icon>mdi-account-group</a-icon>
+              </a-btn>
               <v-list-item-content>
                 <div>
                   <a-list-item-title>{{ e.name }}</a-list-item-title>

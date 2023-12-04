@@ -82,13 +82,16 @@
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
           class="file-list-item my-2"
+          :prepend-avatar="
+            isResourceTypeOf(fileResourceKey, 'image')
+              ? 'mdi-image'
+              : isResourceTypeOf(fileResourceKey, 'text')
+                ? 'mdi-file-document-outline'
+                : isResourceTypeOf(fileResourceKey, 'pdf')
+                  ? 'mdi-file-document-outline'
+                  : 'mdi-file-outline'
+          "
         >
-          <v-list-item-avatar>
-            <a-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" large>mdi-image</a-icon>
-            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</a-icon>
-            <a-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</a-icon>
-            <a-icon v-else large>mdi-file-outline</a-icon>
-          </v-list-item-avatar>
           <v-list-item-content>
             <a-list-item-title
               v-if="editIndex !== index"

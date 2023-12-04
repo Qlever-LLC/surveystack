@@ -13,11 +13,6 @@
             <a-list-item-title>{{ e.email }}</a-list-item-title>
             <a-list-item-subtitle>{{ e.name }}</a-list-item-subtitle>
           </v-list-item-content>
-          <a-list-item-icon>
-            <a-btn v-if="false" :to="`/users/${e._id}/edit`" variant="text">
-              <a-icon>mdi-pencil</a-icon>
-            </a-btn>
-          </a-list-item-icon>
         </a-list-item>
         <a-divider />
       </div>

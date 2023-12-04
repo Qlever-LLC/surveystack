@@ -12,10 +12,8 @@
           @click="() => handleInput(item.value)"
           :value="i"
           color="focus"
+          prepend-icon="mdi-account-group"
         >
-          <a-list-item-icon>
-            <a-icon>mdi-account-group</a-icon>
-          </a-list-item-icon>
           <a-list-item-title>
             {{ item.text }}
           </a-list-item-title>

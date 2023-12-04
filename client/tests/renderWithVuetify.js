@@ -120,7 +120,6 @@ localVue.component('a-list', AList);
 localVue.component('a-list-group', AListGroup);
 localVue.component('a-list-item', AListItem);
 localVue.component('a-list-item-action', AListItemAction);
-localVue.component('a-list-item-icon', AListItemIcon);
 localVue.component('a-list-item-subtitle', AListItemSubtitle);
 localVue.component('a-list-item-title', AListItemTitle);
 localVue.component('a-list-subheader', AListSubheader);

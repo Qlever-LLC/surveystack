@@ -1,5 +1,8 @@
 <template>
   <v-list-item
+    :append-icon="appendIcon"
+    :prepend-avatar="prependAvatar"
+    :prepend-icon="prependIcon"
     :flat="flat"
     :dense="dense"
     :link="link"
@@ -28,6 +31,9 @@ export default {
     target: { type: String, required: false },
     value: { type: undefined, required: false },
     color: { type: String, required: false },
+    appendIcon: { type: String, required: false },
+    prependIcon: { type: String, required: false },
+    prependAvatar: { type: String, required: false },
   },
   emits: ['click'],
   computed: {
