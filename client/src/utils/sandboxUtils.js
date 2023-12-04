@@ -327,7 +327,7 @@ export function lookupFromResource(survey, resourceNames, lookup, lookupColumn, 
  * @param {boolean} [show=true] - Optional parameter to print.  Use as switch to show all in a script / document
  * Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
  */
-export function rettyLog(label, status = '', show = true) {
+export function prettyLog(label, status = '', show = true) {
   if (show) {
     const styles = {
       success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
