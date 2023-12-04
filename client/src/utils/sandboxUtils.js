@@ -806,62 +806,41 @@ export const unstable = {
     return date.slice(2, 10);
   },
 
-  /** findUrl
-   * Find a URL to associate with this newly created asset!
-   * @submission {object} the submission object from the survey, needed to do full survey search for URLs
-   * @spreadsheet {object} the object containing all rows of the spreadsheet (matrix) question
-   * @row {object} the current row of the spreadsheet being searched
-   */
-  findUrl(submission, spreadsheet, row) {
-    let url = null;
-    // 1. find url in the current row (stop at the 1st one)
-    let value = row ? row.planting.value : undefined; // get this rows plantings
-    for (let i = 0; i < value.length; i++) {
-      if (value[i] && value[i].url) {
-        url = value[i].url;
-        this.prettyLog(`found URL in this row: ${url}`, 'success');
-        break;
-      }
-    }
-    // 2a. get all URLs the user has entered in nearby rows (stop at the 1st one)
-    if (!url && Array.isArray(spreadsheet)) {
-      // if it's in an array (spreadsheet), otherwise skip this step
-      console.log('checking urls');
-      let urls = new Set([]);
-      spreadsheet.forEach((row) => {
-        row.planting.value.forEach((planting) => {
-          if (planting && planting.url) urls.add(planting.url);
-        });
+/** findUrl
+ * Find a URL in a list of objects or return '
+ * Will search each object in order, starting with the first
+ * In a survey with spreadsheet (matrix) questions pass (row, spreadsheet, submission) to search from this object outward
+ * @locations {object} the object to be searchedfor URLs (could be submission, parent, row, matrix, etc.)
+ */
+findUrl(...locations) {
+  let url = '';
+  console.log(Array.isArray(locations));
+  if (Array.isArray(locations)) {
+      locations.forEach((location) => {
+          console.log(Array.isArray(location));
+          utils.utils.unstable.prettyLog('Looking for URL...', 'info');
+          let locationFlat = utils.utils.unstable.flattenAll(location);
+          console.log(locationFlat);
+          let objectKeys = Object.keys(locationFlat);
+          for (let i = 0; i < objectKeys.length; i++) {
+              if (
+                  objectKeys[i].includes('url') &&
+                  typeof locationFlat[objectKeys[i]] === 'string' &&
+                  utils.utils.unstable.isValidURL(locationFlat[objectKeys[i]])
+              ) {
+                  console.log('this')
+                  url = locationFlat[objectKeys[i]];
+                  utils.utils.unstable.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
+                  break;
+              }
+          }
       });
-      urls = Array.from(urls);
-      this.prettyLog(`urls nearby: ${urls.join(' ')}`, 'info');
-      // 2b. find url in any nearby entries
-      if (!url && urls.length > 0) {
-        url = urls[0];
-        this.prettyLog(`found URL in nearby row ${url}`, 'success');
-      }
-    }
-    // 3. find a url somewhere in the submission (stop at the 1st one)
-    if (!url) {
-      let all = this.flattenAll(submission);
-      let objectKeys = Object.keys(all);
-      for (let i = 0; i < objectKeys.length; i++) {
-        if (
-          objectKeys[i].includes('url') &&
-          typeof all[objectKeys[i]] === 'string' &&
-          this.isValidURL(all[objectKeys[i]])
-        ) {
-          url = all[objectKeys[i]];
-          this.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
-          break;
-        }
-      }
-    }
-    if (!url) {
-      this.prettyLog(`no URL found.  Cannot generate apiCompose`, `warning`);
-    }
-    return url;
-  },
+  }
+  if (!url) {
+      utils.utils.unstable.prettyLog(`no URL found.`, `warning`);
+  }
+  return url;
+},
 
   /**
    * getQuantity
@@ -872,11 +851,12 @@ export const unstable = {
    * @param {type} type of quantity (required, one of the accepted farmOS types)
    * @param {value} value of the quantity
    * @param {label} label for the quantity
-   * @param {units} units for te quantity
+   * @param {units} units for the quantity
+   * @param {string} apiComposeType to indicate if this should be pushed to FarmOS or somewhere else 
    */
-  getQuantity(url, uuid, type, value = null, label = null, units = null) {
+  getQuantity(url, uuid, type, value = null, label = null, units = null, apiComposeType = 'farmos') {
     const quantity = {
-      type: 'farmos',
+      type: apiComposeType,
       url: url,
       time: Date.now(),
       entity: {
