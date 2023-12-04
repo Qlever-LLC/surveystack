@@ -19,11 +19,9 @@
           :to="`/g${membership.group.path}`"
           three-line
         >
-          <v-list-item-content>
-            <span class="text-secondary caption">{{ membership.group.path }}</span>
-            <a-list-item-title>{{ membership.group.name }}</a-list-item-title>
-            <a-list-item-subtitle class="text-secondary">{{ membership.role }}</a-list-item-subtitle>
-          </v-list-item-content>
+          <span class="text-secondary caption">{{ membership.group.path }}</span>
+          <a-list-item-title>{{ membership.group.name }}</a-list-item-title>
+          <a-list-item-subtitle class="text-secondary">{{ membership.role }}</a-list-item-subtitle>
         </a-list-item>
       </a-list>
     </a-card>

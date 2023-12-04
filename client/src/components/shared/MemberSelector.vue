@@ -21,7 +21,7 @@
               dialog = false;
             "
           >
-            <v-list-item-content v-if="member.meta && member.meta.status === 'pending'">
+            <div v-if="member.meta && member.meta.status === 'pending'">
               <a-list-item-title class="text-secondary"
                 >[Pending] {{ member.meta.invitationEmail
                 }}{{ member.meta.invitationName ? ` - ${member.meta.invitationName}` : '' }}</a-list-item-title
@@ -29,11 +29,11 @@
               <a-list-item-subtitle>{{
                 member.meta.dateSent ? `sent ${member.meta.dateSent}` : 'Invitation not sent yet'
               }}</a-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-content v-else>
+            </div>
+            <div v-else>
               <a-list-item-title>{{ member.user.name }}</a-list-item-title>
               <a-list-item-subtitle>{{ member.user.email }}</a-list-item-subtitle>
-            </v-list-item-content>
+            </div>
           </a-list-item>
         </a-list>
       </a-card-text>

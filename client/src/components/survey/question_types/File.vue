@@ -92,20 +92,18 @@
                   : 'mdi-file-outline'
           "
         >
-          <v-list-item-content>
-            <a-list-item-title
-              v-if="editIndex !== index"
-              :data-test-id="'file_' + index"
-              class="text-wrap font-bold"
-              v-text="getLabelFromKey(fileResourceKey)"
-            ></a-list-item-title>
-            <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
-              <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
-            </a-list-item-title>
-            <a-list-item-subtitle v-if="showUploadProgressIndex === index"
-              ><a-progress-linear indeterminate class="mb-0"
-            /></a-list-item-subtitle>
-          </v-list-item-content>
+          <a-list-item-title
+            v-if="editIndex !== index"
+            :data-test-id="'file_' + index"
+            class="text-wrap font-bold"
+            v-text="getLabelFromKey(fileResourceKey)"
+          ></a-list-item-title>
+          <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
+            <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
+          </a-list-item-title>
+          <a-list-item-subtitle v-if="showUploadProgressIndex === index"
+            ><a-progress-linear indeterminate class="mb-0"
+          /></a-list-item-subtitle>
           <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
             <a-btn icon @click="editResourceName(fileResourceKey, index)">
               <a-icon color="grey-lighten-1">mdi-pencil</a-icon>

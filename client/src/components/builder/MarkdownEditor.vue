@@ -69,9 +69,7 @@
               <a-list-subheader class="px-2 py-0" cssSticky>Click to insert </a-list-subheader>
 
               <a-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
-                <v-list-item-content>
-                  <a-list-item-title>{{ item.label }}</a-list-item-title>
-                </v-list-item-content>
+                <a-list-item-title>{{ item.label }}</a-list-item-title>
               </a-list-item>
             </a-list>
           </div>

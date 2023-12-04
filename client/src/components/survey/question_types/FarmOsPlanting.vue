@@ -38,9 +38,7 @@
                 <a-radio :value="true" color="focus" />
               </a-radio-group>
             </a-list-item-action>
-            <v-list-item-content>
-              <a-list-item-title v-html="item.label" />
-            </v-list-item-content>
+            <a-list-item-title v-html="item.label" />
           </template>
         </a-list-item>
       </v-list-item-group>

@@ -14,10 +14,8 @@
           two-line
           :to="`/${integrationType}-integrations/${integration._id}/edit`"
         >
-          <v-list-item-content>
-            <a-list-item-title>{{ integration.name }}</a-list-item-title>
-            <a-list-item-subtitle>{{ integration.type }}</a-list-item-subtitle>
-          </v-list-item-content>
+          <a-list-item-title>{{ integration.name }}</a-list-item-title>
+          <a-list-item-subtitle>{{ integration.type }}</a-list-item-subtitle>
         </a-list-item>
       </template>
       <div v-else class="text-grey">No {{ title }} yet</div>

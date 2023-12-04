@@ -21,10 +21,8 @@
         <div v-for="(entity, idx) in filteredEntities" :key="idx">
           <a-list-item two-line :to="link(entity)">
             <slot name="entity" v-bind:entity="entity">
-              <v-list-item-content>
-                <a-list-item-title>Title #{{ idx }}</a-list-item-title>
-                <a-list-item-subtitle>Subtitle</a-list-item-subtitle>
-              </v-list-item-content>
+              <a-list-item-title>Title #{{ idx }}</a-list-item-title>
+              <a-list-item-subtitle>Subtitle</a-list-item-subtitle>
             </slot>
           </a-list-item>
           <a-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />

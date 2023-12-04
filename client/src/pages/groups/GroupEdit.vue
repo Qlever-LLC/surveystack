@@ -117,7 +117,7 @@
           :filter="filterMembers"
         >
           <template v-slot:entity="{ entity }">
-            <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
+            <div v-if="entity.meta && entity.meta.status === 'pending'">
               <a-list-item-title class="text-secondary"
                 >[Pending] {{ entity.meta.invitationEmail
                 }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</a-list-item-title
@@ -125,11 +125,12 @@
               <a-list-item-subtitle>{{
                 entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
               }}</a-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-content v-else>
+            </div>
+            <div>
+              v-else>
               <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
               <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
-            </v-list-item-content>
+            </div>
             <a-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
               <a-row cssGap12px>
                 <app-confirm-membership-button
@@ -164,10 +165,8 @@
           :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`"
         >
           <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <a-list-item-title>{{ entity.name }}</a-list-item-title>
-              <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
-            </v-list-item-content>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
           </template>
         </app-basic-list>
       </a-col>

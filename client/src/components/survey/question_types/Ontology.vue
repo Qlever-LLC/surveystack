@@ -44,14 +44,12 @@
         </a-chip>
       </template>
       <template v-slot:item="data">
-        <v-list-item-content>
-          <a-list-item-title>
-            {{ data.item.label }}
-            <a-chip v-if="data.item.count" small class="ma-2">
-              {{ data.item.count }}
-            </a-chip>
-          </a-list-item-title>
-        </v-list-item-content>
+        <a-list-item-title>
+          {{ data.item.label }}
+          <a-chip v-if="data.item.count" small class="ma-2">
+            {{ data.item.count }}
+          </a-chip>
+        </a-list-item-title>
       </template>
     </a-select>
     <a-select
@@ -92,14 +90,12 @@
         </a-chip>
       </template>
       <template v-slot:item="data">
-        <v-list-item-content>
-          <a-list-item-title>
-            {{ data.item.label }}
-            <a-chip v-if="data.item.count" small class="ma-2">
-              {{ data.item.count }}
-            </a-chip>
-          </a-list-item-title>
-        </v-list-item-content>
+        <a-list-item-title>
+          {{ data.item.label }}
+          <a-chip v-if="data.item.count" small class="ma-2">
+            {{ data.item.count }}
+          </a-chip>
+        </a-list-item-title>
       </template>
     </a-select>
     <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
@@ -147,13 +143,11 @@
       </template>
       <template v-slot:no-data>
         <a-list-item>
-          <v-list-item-content>
-            <a-list-item-title>
-              No values matching "<strong>{{ comboboxSearch }}</strong
-              >". Press <kbd>enter</kbd> <span v-if="!!control.options.hasMultipleSelections">or <kbd>,</kbd></span> to
-              create a new one
-            </a-list-item-title>
-          </v-list-item-content>
+          <a-list-item-title>
+            No values matching "<strong>{{ comboboxSearch }}</strong
+            >". Press <kbd>enter</kbd> <span v-if="!!control.options.hasMultipleSelections">or <kbd>,</kbd></span> to
+            create a new one
+          </a-list-item-title>
         </a-list-item>
       </template>
     </a-select>

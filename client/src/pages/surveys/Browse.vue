@@ -15,15 +15,13 @@
         <a-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
             <a-list-item :to="`/surveys/${e._id}`" :prepend-icon="e.pinned ? 'mdi-pin' : ''">
-              <v-list-item-content>
-                <div>
-                  <a-list-item-title>{{ e.name }}</a-list-item-title>
-                  <a-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
-                    {{ getGroupName(e.meta.group.id) }}
-                  </a-list-item-subtitle>
-                  <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
-                </div>
-              </v-list-item-content>
+              <div>
+                <a-list-item-title>{{ e.name }}</a-list-item-title>
+                <a-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
+                </a-list-item-subtitle>
+                <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
+              </div>
             </a-list-item>
             <a-divider v-if="i < pinnedSurveys.length - 1" />
           </div>
@@ -65,17 +63,15 @@
               >
                 <a-icon>mdi-account-group</a-icon>
               </a-btn>
-              <v-list-item-content>
-                <div>
-                  <a-list-item-title>{{ e.name }}</a-list-item-title>
-                  <a-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
-                    {{ getGroupName(e.meta.group.id) }}
-                  </a-list-item-subtitle>
-                  <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
-                  <br />
-                  <small v-if="e.createdAgo" class="text-grey">created {{ e.createdAgo }} ago</small>
-                </div>
-              </v-list-item-content>
+              <div>
+                <a-list-item-title>{{ e.name }}</a-list-item-title>
+                <a-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
+                </a-list-item-subtitle>
+                <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
+                <br />
+                <small v-if="e.createdAgo" class="text-grey">created {{ e.createdAgo }} ago</small>
+              </div>
             </a-list-item>
             <a-divider v-if="i < surveys.content.length - 1" />
           </div>

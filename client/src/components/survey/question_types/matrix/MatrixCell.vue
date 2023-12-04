@@ -116,12 +116,10 @@
     </template>
     <template v-slot:no-data>
       <a-list-item>
-        <v-list-item-content>
-          <a-list-item-title>
-            No values matching "<strong>{{ comboboxSearch }}</strong
-            >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
-          </a-list-item-title>
-        </v-list-item-content>
+        <a-list-item-title>
+          No values matching "<strong>{{ comboboxSearch }}</strong
+          >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
+        </a-list-item-title>
       </a-list-item>
     </template>
   </a-select>
@@ -154,9 +152,7 @@
     </template>
 
     <template v-slot:item="data" v-if="!!header.multiple">
-      <v-list-item-content>
-        <a-list-item-title v-html="data.item.label" />
-      </v-list-item-content>
+      <a-list-item-title v-html="data.item.label" />
     </template>
     <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>
@@ -187,9 +183,7 @@
     </template>
 
     <template v-slot:item="data" v-if="!!header.multiple">
-      <v-list-item-content>
-        <a-list-item-title v-html="data.item.label" />
-      </v-list-item-content>
+      <a-list-item-title v-html="data.item.label" />
     </template>
     <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>

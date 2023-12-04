@@ -9,10 +9,8 @@
     <a-card>
       <div v-for="e in entities" :key="e._id">
         <a-list-item :to="`/users/${e._id}`">
-          <v-list-item-content>
-            <a-list-item-title>{{ e.email }}</a-list-item-title>
-            <a-list-item-subtitle>{{ e.name }}</a-list-item-subtitle>
-          </v-list-item-content>
+          <a-list-item-title>{{ e.email }}</a-list-item-title>
+          <a-list-item-subtitle>{{ e.name }}</a-list-item-subtitle>
         </a-list-item>
         <a-divider />
       </div>

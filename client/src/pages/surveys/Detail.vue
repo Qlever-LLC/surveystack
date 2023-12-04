@@ -39,26 +39,24 @@
         >
           <a-list max-width="260">
             <a-list-item @click="startDraft(entity)">
-              <v-list-item-content>
-                <a-list-item-title>Start survey</a-list-item-title>
-                <v-list-item-content class="multiline-subtitle">
-                  Start a survey as the user you are signed in with
-                </v-list-item-content>
-              </v-list-item-content>
+              <a-list-item-title>Start survey</a-list-item-title>
+              <div class="multiline-subtitle">Start a survey as the user you are signed in with</div>
             </a-list-item>
             <a-list-item @click="showSelectMember = true">
-              <v-list-item-content>
-                <a-list-item-title>Start survey as a member</a-list-item-title>
-                <v-list-item-content class="multiline-subtitle">
-                  Select the member for whom you want to start the survey
-                </v-list-item-content>
-              </v-list-item-content>
+              <a-list-item-title>Start survey as a member</a-list-item-title>
+              <div class="multiline-subtitle">Select the member for whom you want to start the survey</div>
             </a-list-item>
           </a-list>
         </btn-dropdown>
 
         <div class="my-3 d-flex justify-center">
-          <a-btn color="primary" variant="text" large :loading="download.loading" @click="downloadPrintablePdf(entity._id)">
+          <a-btn
+            color="primary"
+            variant="text"
+            large
+            :loading="download.loading"
+            @click="downloadPrintablePdf(entity._id)"
+          >
             Print Blank Survey
           </a-btn>
         </div>

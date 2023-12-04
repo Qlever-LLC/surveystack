@@ -15,13 +15,11 @@
               }
             "
           >
-            <v-list-item-content>
-              <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
-              <a-list-item-subtitle
-                >last modified
-                {{ searchResult.meta ? renderDateFromNow(searchResult.meta.dateModified) : '' }}</a-list-item-subtitle
-              >
-            </v-list-item-content>
+            <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
+            <a-list-item-subtitle
+              >last modified
+              {{ searchResult.meta ? renderDateFromNow(searchResult.meta.dateModified) : '' }}</a-list-item-subtitle
+            >
           </a-list-item>
         </a-list>
       </a-card-text>

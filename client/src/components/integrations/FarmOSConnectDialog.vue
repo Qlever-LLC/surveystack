@@ -32,15 +32,13 @@
           </template>
 
           <template v-slot:item="{ item }">
-            <v-list-item-content style="width: min-content">
-              <a-list-item-title>{{ item.instanceName }}</a-list-item-title>
-              <a-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
-                >owner(s):</a-list-item-subtitle
-              >
-              <a-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
-                {{ owner.name }}({{ owner.email }})
-              </a-list-item-subtitle>
-            </v-list-item-content>
+            <a-list-item-title>{{ item.instanceName }}</a-list-item-title>
+            <a-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
+              >owner(s):</a-list-item-subtitle
+            >
+            <a-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
+              {{ owner.name }}({{ owner.email }})
+            </a-list-item-subtitle>
           </template>
         </a-select>
         <a-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">

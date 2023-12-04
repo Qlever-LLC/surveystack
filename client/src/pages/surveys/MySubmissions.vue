@@ -31,21 +31,17 @@
             <a-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <div v-for="(item, i) in activeTabPageContent" :key="i">
-                  <a-list-item>
-                    <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <a-card :elevation="3" class="py-3 px-4">
-                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
-                          {{ item.meta.survey.name }}
-                        </a-list-item-title>
-                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
-                        <a-list-item-subtitle class="font-weight-regular mt-2">
-                          ID: {{ item._id }}
-                        </a-list-item-subtitle>
-                        <a-list-item-subtitle class="font-weight-regular mt-2">
-                          {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </a-list-item-subtitle>
-                      </a-card>
-                    </v-list-item-content>
+                  <a-list-item @click="select(item)" class="cursor-pointer" two-line>
+                    <a-card :elevation="3" class="py-3 px-4">
+                      <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        {{ item.meta.survey.name }}
+                      </a-list-item-title>
+                      <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                      <a-list-item-subtitle class="font-weight-regular mt-2"> ID: {{ item._id }} </a-list-item-subtitle>
+                      <a-list-item-subtitle class="font-weight-regular mt-2">
+                        {{ new Date(item.meta.dateCreated).toLocaleString() }}
+                      </a-list-item-subtitle>
+                    </a-card>
                     <a-list-item-action>
                       <a-tooltip bottom>
                         <template v-slot:activator="{ on }">
@@ -55,7 +51,7 @@
                             @click="() => handleSubmitClick(item._id)"
                             v-on="on"
                           >
-                            <a-icon> mdi-cloud-upload-outline </a-icon>
+                            <a-icon> mdi-cloud-upload-outline</a-icon>
                           </a-btn>
                         </template>
                         <span>Upload Submission</span>
@@ -79,21 +75,17 @@
 
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <div v-for="(item, i) in tab.content" :key="i">
-                  <a-list-item>
-                    <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                      <a-card :elevation="3" class="py-3 px-4">
-                        <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
-                          {{ item.meta.survey.name }}
-                        </a-list-item-title>
-                        <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
-                        <a-list-item-subtitle class="font-weight-regular mt-2">
-                          ID: {{ item._id }}
-                        </a-list-item-subtitle>
-                        <a-list-item-subtitle class="font-weight-regular mt-2">
-                          {{ new Date(item.meta.dateCreated).toLocaleString() }}
-                        </a-list-item-subtitle>
-                      </a-card>
-                    </v-list-item-content>
+                  <a-list-item @click="select(item)" class="cursor-pointer" two-line>
+                    <a-card :elevation="3" class="py-3 px-4">
+                      <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                        {{ item.meta.survey.name }}
+                      </a-list-item-title>
+                      <a-list-item-title class="font-weight-regular" v-else> Loading name </a-list-item-title>
+                      <a-list-item-subtitle class="font-weight-regular mt-2"> ID: {{ item._id }} </a-list-item-subtitle>
+                      <a-list-item-subtitle class="font-weight-regular mt-2">
+                        {{ new Date(item.meta.dateCreated).toLocaleString() }}
+                      </a-list-item-subtitle>
+                    </a-card>
                   </a-list-item>
                 </div>
                 <a-pagination

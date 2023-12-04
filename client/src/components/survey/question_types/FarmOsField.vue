@@ -47,9 +47,7 @@
       </template>
 
       <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-        <v-list-item-content>
-          <a-list-item-title v-html="data.item.label" />
-        </v-list-item-content>
+        <a-list-item-title v-html="data.item.label" />
       </template>
       <template v-slot:item="{ item }" v-else>
         <div v-html="item.label"></div>

@@ -12,10 +12,8 @@
           </a-container>
           <template v-if="libraryConsumers !== null">
             <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
-              <v-list-item-content>
-                <small class="text-grey">{{ c._id }}</small>
-                <a-list-item-title>{{ c.name }}</a-list-item-title>
-              </v-list-item-content>
+              <small class="text-grey">{{ c._id }}</small>
+              <a-list-item-title>{{ c.name }}</a-list-item-title>
             </a-list-item>
           </template>
         </a-list>

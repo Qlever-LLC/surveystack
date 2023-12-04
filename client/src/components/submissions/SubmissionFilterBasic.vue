@@ -15,13 +15,11 @@
     <a-card outlined v-if="filters.length > 0">
       <a-list dense>
         <a-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
-          <v-list-item-content>
-            <div>
-              <span class="font-weight-medium mr-1">{{ filter.field }}</span>
-              <span class="font-weight-regular text-secondary mr-1">{{ filter.operator.text }}</span>
-              <span class="font-weight-boldmr-1">{{ filter.value }}</span>
-            </div>
-          </v-list-item-content>
+          <div>
+            <span class="font-weight-medium mr-1">{{ filter.field }}</span>
+            <span class="font-weight-regular text-secondary mr-1">{{ filter.operator.text }}</span>
+            <span class="font-weight-boldmr-1">{{ filter.value }}</span>
+          </div>
           <a-list-item-action @click="remove(i)">
             <a-btn icon small>
               <a-icon>mdi-trash-can-outline</a-icon>

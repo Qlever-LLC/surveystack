@@ -33,10 +33,8 @@
           :linkNew="{ name: 'groups-new', query: { dir: entity.path } }"
         >
           <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <a-list-item-title>{{ entity.name }}</a-list-item-title>
-              <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
-            </v-list-item-content>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
           </template>
         </app-basic-list>
       </a-col>
@@ -51,10 +49,8 @@
           :linkNew="`/groups/edit/${entity._id}`"
         >
           <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <a-list-item-title>{{ entity.name }}</a-list-item-title>
-              <a-list-item-subtitle>{{ entity._id }}</a-list-item-subtitle>
-            </v-list-item-content>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity._id }}</a-list-item-subtitle>
           </template>
         </app-basic-list>
       </a-col>

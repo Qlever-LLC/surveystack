@@ -79,13 +79,11 @@
           @click="openResource(resource)"
           :inactive="resource.type !== resourceTypes.FILE && resource.type !== resourceTypes.ONTOLOGY_LIST"
         >
-          <v-list-item-content style="user-select: text">
-            <a-list-item-title>{{ resource.label }}</a-list-item-title>
-            <a-list-item-subtitle v-if="resource.type === resourceTypes.FILE">
-              {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
-            </a-list-item-subtitle>
-            <a-list-item-subtitle v-else> {{ resource.name }}</a-list-item-subtitle>
-          </v-list-item-content>
+          <a-list-item-title style="user-select: text">{{ resource.label }}</a-list-item-title>
+          <a-list-item-subtitle v-if="resource.type === resourceTypes.FILE" style="user-select: text">
+            {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
+          </a-list-item-subtitle>
+          <a-list-item-subtitle v-else style="user-select: text"> {{ resource.name }}</a-list-item-subtitle>
           <a-icon v-if="resource.libraryId" color="grey-lighten-1">mdi-library</a-icon>
           <a-list-item-action v-if="resource.type === resourceTypes.FILE">
             <a-btn icon>
@@ -95,9 +93,7 @@
         </a-list-item>
       </template>
       <a-list-item v-else>
-        <v-list-item-content>
-          <a-list-item-title class="text-secondary">No resources found</a-list-item-title>
-        </v-list-item-content>
+        <a-list-item-title class="text-secondary">No resources found</a-list-item-title>
       </a-list-item>
     </a-list>
   </div>

@@ -3,9 +3,7 @@
     Image resource picker
     <a-list>
       <a-list-item v-for="image in value" :key="image.src" prepend-avatar="mdi-image">
-        <v-list-item-content>
-          {{ image.name }}
-        </v-list-item-content>
+        {{ image.name }}
         <a-list-item-action>
           <a-icon>mdi-delete</a-icon>
         </a-list-item-action>
