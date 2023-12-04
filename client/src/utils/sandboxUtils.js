@@ -224,6 +224,120 @@ export function getCleanNumber(num, sigFigs) {
   return val;
 }
 
+/**
+ * getSubmission
+ *
+ * Allows you to get a previous submission to test against quickly
+ * Searches archived and non-archived, defaults to current survey ID but can specify another
+ * @param {submission} current submission object (submission)
+ * @param {submissionId} ID of the submission you want to test against
+ * @param {surveyId} (optional) ID of the survey you want to find the submission in
+ */
+export async function getSubmission(submission, submissionId, _surveyId = undefined) {
+  let surveyId = _surveyId ? _surveyId : submission.meta.survey.id;
+  try {
+    // search in archived surveys first
+    let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`;
+    this.prettyLog('check submission in archived url', 'info');
+    this.prettyLog(url);
+    let response = await fetch(url);
+    let result = await response.text();
+    result = JSON.parse(result);
+    // if not present, search in non-archived surveys
+    if (result.length === 0 || !result[0] || !result[0].data) {
+      url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
+      this.prettyLog('check submission in non archived url', 'info');
+      this.prettyLog(url);
+      response = await fetch(url);
+      result = await response.text();
+      result = JSON.parse(result);
+    }
+    if (result && result[0] && result[0].data) {
+      submission = result[0]; // assign this so we can test against it
+      this.prettyLog(`found: submission id ${submissionId}`, 'success');
+      this.prettyLog(submission);
+    } else {
+      submission = {};
+      this.prettyLog(
+        `did not find the submission id ${submissionId}.  Try a different submission id or survey id`,
+        'warning'
+      );
+      console.table(result);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return submission;
+}
+
+/**
+ * lookupFromResource
+ *
+ * look up a row of values from one or more resources lists, returns those values
+ * you may also specify which columns in the row you want to return.
+ * @object {survey} the survey you'll be using to lookup the resource list
+ * @array {resourceNames} the name of the resource list (slug name)
+ * @string {lookup} the thing you're looking up
+ * @string {lookupColumn} the column to search for the thing you're looking up
+ * @string {returnColumns} which columns to include if this finds the row you're looking for
+ */
+export function lookupFromResource(survey, resourceNames, lookup, lookupColumn, ...returnColumns) {
+  let items;
+  let foundFlag = 0; // flag to stop looking if you find it
+  resourceNames.forEach((resourceName) => {
+    if (!foundFlag) {
+      const resource = survey.resources.find((object) => object.name === resourceName);
+      if (resource && lookup) {
+        items = resource.content.find((object) => object[lookupColumn] === lookup);
+        if (typeof items === 'object' && !Array.isArray(items)) {
+          this.prettyLog(`Found ${lookup} in ${resourceName}`, 'success');
+          foundFlag = 1;
+          if (returnColumns && returnColumns.length) {
+            let someItems = {};
+            returnColumns.forEach((column) => {
+              if (items && items[column]) {
+                someItems[column] = items[column];
+              } else {
+                this.prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
+              }
+            });
+            items = someItems;
+          }
+        } else {
+          this.prettyLog(`Did not find ${lookup} in ${resourceName}`, 'info');
+        }
+      } else {
+        if (!lookup) this.prettyLog(`Did not find Lookup field "${lookup}" in "${resourceName}" resource`, 'warning');
+        if (!resource) this.prettyLog(`Did not find "${resourceName}" resource`, 'warning');
+      }
+    }
+  });
+  // if it's empty, return null
+  return items && Object.keys(items).length > 0 ? items : null;
+}
+
+/**
+ * prettyLog
+ *
+ * Logs messages with optional colored backgrounds based on the status parameter.
+ * Logging is controlled by the config.log flag.
+ *
+ * @param {string} label - The message to log.
+ * @param {string} [status=''] - The status of the message, which determines the background color.
+ * @param {boolean} [show=true] - Optional parameter to print.  Use as switch to show all in a script / document
+ * Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
+ */
+export function rettyLog(label, status = '', show = true) {
+  if (show) {
+    const styles = {
+      success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
+      warning: 'background-color: #de9250; padding: 0.2rem 1.5rem;',
+      info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
+    };
+    const style = styles[status] || '';
+    console.log('%c' + label, style);
+  }
+}
 
 export async function getResourceAsText(resourceKey) {
   return parseText(await getResource(resourceKey));
@@ -345,121 +459,6 @@ export const unstable = {
     } else {
       // if neither, assume parent.  add error checking here also
       return parent;
-    }
-  },
-
-  /**
-   * getSubmission
-   *
-   * Allows you to get a previous submission to test against quickly
-   * Searches archived and non-archived, defaults to current survey ID but can specify another
-   * @param {submission} current submission object (submission)
-   * @param {submissionId} ID of the submission you want to test against
-   * @param {surveyId} (optional) ID of the survey you want to find the submission in
-   */
-  async getSubmission(submission, submissionId, _surveyId = undefined) {
-    let surveyId = _surveyId ? _surveyId : submission.meta.survey.id;
-    try {
-      // search in archived surveys first
-      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`;
-      this.prettyLog('check submission in archived url', 'info');
-      this.prettyLog(url);
-      let response = await fetch(url);
-      let result = await response.text();
-      result = JSON.parse(result);
-      // if not present, search in non-archived surveys
-      if (result.length === 0 || !result[0] || !result[0].data) {
-        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
-        this.prettyLog('check submission in non archived url', 'info');
-        this.prettyLog(url);
-        response = await fetch(url);
-        result = await response.text();
-        result = JSON.parse(result);
-      }
-      if (result && result[0] && result[0].data) {
-        submission = result[0]; // assign this so we can test against it
-        this.prettyLog(`found: submission id ${submissionId}`, 'success');
-        this.prettyLog(submission);
-      } else {
-        submission = {};
-        this.prettyLog(
-          `did not find the submission id ${submissionId}.  Try a different submission id or survey id`,
-          'warning'
-        );
-        console.table(result);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-    return submission;
-  },
-
-  /**
-   * lookupFromResource
-   *
-   * look up a row of values from one or more resources lists, returns those values
-   * you may also specify which columns in the row you want to return.
-   * @object {survey} the survey you'll be using to lookup the resource list
-   * @array {resourceNames} the name of the resource list (slug name)
-   * @string {lookup} the thing you're looking up
-   * @string {lookupColumn} the column to search for the thing you're looking up
-   * @string {returnColumns} which columns to include if this finds the row you're looking for
-   */
-  lookupFromResource(survey, resourceNames, lookup, lookupColumn, ...returnColumns) {
-    let items;
-    let foundFlag = 0; // flag to stop looking if you find it
-    resourceNames.forEach((resourceName) => {
-      if (!foundFlag) {
-        const resource = survey.resources.find((object) => object.name === resourceName);
-        if (resource && lookup) {
-          items = resource.content.find((object) => object[lookupColumn] === lookup);
-          if (typeof items === 'object' && !Array.isArray(items)) {
-            this.prettyLog(`Found ${lookup} in ${resourceName}`, 'success');
-            foundFlag = 1;
-            if (returnColumns && returnColumns.length) {
-              let someItems = {};
-              returnColumns.forEach((column) => {
-                if (items && items[column]) {
-                  someItems[column] = items[column];
-                } else {
-                  this.prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
-                }
-              });
-              items = someItems;
-            }
-          } else {
-            this.prettyLog(`Did not find ${lookup} in ${resourceName}`, 'info');
-          }
-        } else {
-          if (!lookup) this.prettyLog(`Did not find Lookup field "${lookup}" in "${resourceName}" resource`, 'warning');
-          if (!resource) this.prettyLog(`Did not find "${resourceName}" resource`, 'warning');
-        }
-      }
-    });
-    // if it's empty, return null
-    return items && Object.keys(items).length > 0 ? items : null;
-  },
-
-  /**
-   * prettyLog
-   *
-   * Logs messages with optional colored backgrounds based on the status parameter.
-   * Logging is controlled by the config.log flag.
-   *
-   * @param {string} label - The message to log.
-   * @param {string} [status=''] - The status of the message, which determines the background color.
-   * @param {boolean} [show=true] - Optional parameter to print.  Use as switch to show all in a script / document
-   * Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
-   */
-  prettyLog(label, status = '', show = true) {
-    if (show) {
-      const styles = {
-        success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
-        warning: 'background-color: #de9250; padding: 0.2rem 1.5rem;',
-        info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
-      };
-      const style = styles[status] || '';
-      console.log('%c' + label, style);
     }
   },
 
@@ -788,59 +787,37 @@ export const unstable = {
     return obj;
   },
 
-  /**
-   * Extracts a portion of the input date string for a more concise representation.
-   *
-   * This function takes a date string and returns a substring of it, starting from
-   * the third character and ending at the tenth character (inclusive).
-   *
-   * For instance, given the input "2023-10-05T12:45:00Z", the function will return "23-10-05".
-   *
-   * It is important to ensure that the input date string is in a consistent format
-   * to achieve the expected results.
-   *
-   * @param {string} date - The input date string to be transformed.
-   * @return {string} - Returns the extracted portion of the date string.
+  /** findUrl
+   * Find a URL in a list of objects or return '
+   * Will search each object in order, starting with the first
+   * In a survey with spreadsheet (matrix) questions pass (row, spreadsheet, submission) to search from this object outward
+   * @locations {object} the object to be searchedfor URLs (could be submission, parent, row, matrix, etc.)
    */
-  dateReadable(date) {
-    return date.slice(2, 10);
-  },
-
-/** findUrl
- * Find a URL in a list of objects or return '
- * Will search each object in order, starting with the first
- * In a survey with spreadsheet (matrix) questions pass (row, spreadsheet, submission) to search from this object outward
- * @locations {object} the object to be searchedfor URLs (could be submission, parent, row, matrix, etc.)
- */
-findUrl(...locations) {
-  let url = '';
-  console.log(Array.isArray(locations));
-  if (Array.isArray(locations)) {
+  findUrl(...locations) {
+    let url = '';
+    if (Array.isArray(locations)) {
       locations.forEach((location) => {
-          console.log(Array.isArray(location));
-          utils.utils.unstable.prettyLog('Looking for URL...', 'info');
-          let locationFlat = utils.utils.unstable.flattenAll(location);
-          console.log(locationFlat);
-          let objectKeys = Object.keys(locationFlat);
-          for (let i = 0; i < objectKeys.length; i++) {
-              if (
-                  objectKeys[i].includes('url') &&
-                  typeof locationFlat[objectKeys[i]] === 'string' &&
-                  utils.utils.unstable.isValidURL(locationFlat[objectKeys[i]])
-              ) {
-                  console.log('this')
-                  url = locationFlat[objectKeys[i]];
-                  utils.utils.unstable.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
-                  break;
-              }
+        this.prettyLog('Looking for URL...', 'info');
+        let locationFlat = this.flattenAll(location);
+        let objectKeys = Object.keys(locationFlat);
+        for (let i = 0; i < objectKeys.length; i++) {
+          if (
+            objectKeys[i].includes('url') &&
+            typeof locationFlat[objectKeys[i]] === 'string' &&
+            this.isValidURL(locationFlat[objectKeys[i]])
+          ) {
+            url = locationFlat[objectKeys[i]];
+            this.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
+            break;
           }
+        }
       });
-  }
-  if (!url) {
-      utils.utils.unstable.prettyLog(`no URL found.`, `warning`);
-  }
-  return url;
-},
+    }
+    if (!url) {
+      this.prettyLog(`no URL found.`, `warning`);
+    }
+    return url;
+  },
 
   /**
    * getQuantity
@@ -904,6 +881,24 @@ findUrl(...locations) {
   },
 
   /**
+   * Extracts a portion of the input date string for a more concise representation.
+   *
+   * This function takes a date string and returns a substring of it, starting from
+   * the third character and ending at the tenth character (inclusive).
+   *
+   * For instance, given the input "2023-10-05T12:45:00Z", the function will return "23-10-05".
+   *
+   * It is important to ensure that the input date string is in a consistent format
+   * to achieve the expected results.
+   *
+   * @param {string} date - The input date string to be transformed.
+   * @return {string} - Returns the extracted portion of the date string.
+   */
+  dateReadable(date) {
+    return date.slice(2, 10);
+  },
+
+  /**
    * Converts a string to a more readable format.
    *
    * This function performs two main transformations on the input string:
@@ -927,6 +922,9 @@ export const utils = {
   getCleanArray,
   getCleanNumber,
   getClean,
+  getSubmission,
+  lookupFromResource,
+  prettyLog,
   getResourceAsText,
   getResourceAsArrayBuffer,
   getResource,
