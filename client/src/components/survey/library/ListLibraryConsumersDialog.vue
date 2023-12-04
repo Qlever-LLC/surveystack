@@ -13,7 +13,7 @@
           <template v-if="libraryConsumers !== null">
             <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
               <v-list-item-content>
-                <small class="grey--text">{{ c._id }}</small>
+                <small class="text-grey">{{ c._id }}</small>
                 <a-list-item-title>{{ c.name }}</a-list-item-title>
               </v-list-item-content>
             </a-list-item>

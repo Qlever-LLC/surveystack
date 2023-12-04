@@ -23,8 +23,9 @@
     :rounded="rounded"
     :variant="variant"
     v-bind="$attrs"
-    @click="emitClick">
-    <slot/>
+    @click="emitClick"
+  >
+    <slot />
   </v-btn>
 </template>
 
@@ -125,7 +126,7 @@ export default {
   setup(_, { emit }) {
     const emitClick = (e) => {
       emit('click', e);
-    }
+    };
     return { emitClick };
   },
 };

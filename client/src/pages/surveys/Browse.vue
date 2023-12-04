@@ -24,7 +24,7 @@
                   <a-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
                     {{ getGroupName(e.meta.group.id) }}
                   </a-list-item-subtitle>
-                  <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
+                  <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
                 </div>
               </v-list-item-content>
             </a-list-item>
@@ -39,7 +39,7 @@
           <div class="px-5 py-2">
             <a-text-field v-model="search" label="Search" prepend-icon="mdi-magnify" />
             <div class="d-flex justify-end mb-4">
-              <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
+              <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
             </div>
           </div>
           <div v-for="(e, i) in surveys.content" :key="e._id">
@@ -77,9 +77,9 @@
                   <a-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                     {{ getGroupName(e.meta.group.id) }}
                   </a-list-item-subtitle>
-                  <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
+                  <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
                   <br />
-                  <small v-if="e.createdAgo" class="grey--text">created {{ e.createdAgo }} ago</small>
+                  <small v-if="e.createdAgo" class="text-grey">created {{ e.createdAgo }} ago</small>
                 </div>
               </v-list-item-content>
             </a-list-item>
@@ -319,7 +319,7 @@ export default {
 }
 
 .wrapper {
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
   width: 100%;
   height: 100%;
 }

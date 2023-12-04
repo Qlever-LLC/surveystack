@@ -14,7 +14,7 @@
     >
       <template v-slot:title>Installing Android App</template>
       <template>
-        <p class="text--primary">
+        <p class="text-primary">
           Installing the Android Application allows to connect to Bluetooth and USB Devices for taking measurements.
 
           <br /><br />

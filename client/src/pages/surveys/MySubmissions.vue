@@ -28,7 +28,6 @@
             :value="tab.name"
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
           >
-            <!-- -->
             <a-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <div v-for="(item, i) in activeTabPageContent" :key="i">
@@ -67,7 +66,7 @@
 
                 <a-spacer class="flex-grow-1" />
                 <a-card-actions>
-                  <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
+                  <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey-darken-1" />
                 </a-card-actions>
               </template>
               <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
@@ -101,7 +100,7 @@
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
-                  color="grey darken-1"
+                  color="grey-darken-1"
                 />
               </template>
               <div v-else>
@@ -402,13 +401,16 @@ export default {
 .wrapper {
   height: 100%;
 }
+
 .cursor-pointer {
   cursor: pointer;
 }
+
 .v-tabs-items,
 .v-tab-item {
   height: 100%;
 }
+
 .v-list-item,
 .v-list-item {
   padding: 0 0;

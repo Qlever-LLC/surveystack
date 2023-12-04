@@ -148,7 +148,7 @@
         <print-settings-dialog v-model="printSettingDialogIsVisible" :survey="survey" />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
-        <div class="body-2 grey--text caption">
+        <div class="body-2 text-grey caption">
           Size: {{ surveySize }} MB
           <a-btn
             v-if="surveySize > 1"

@@ -80,6 +80,6 @@ export default {
 
 <style scoped>
 >>> .v-list-item.v-list-item--active {
-  color: var(--v-focus-base) !important;
+  color: rgb(var(--v-theme-focus)) !important;
 }
 </style>

@@ -87,9 +87,9 @@ export default {
       isOpen: this.defaultOpen,
       showChangesOnly: !this.defaultShowUnchanged,
       colors: {
-        changed: 'amber lighten-1',
-        added: 'green lighten-1',
-        removed: 'red lighten-1',
+        changed: 'amber-lighten-1',
+        added: 'green-lighten-1',
+        removed: 'red-lighten-1',
       },
       localChangesToDiscard: [],
     };

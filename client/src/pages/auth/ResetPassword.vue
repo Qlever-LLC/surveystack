@@ -106,6 +106,6 @@ export default {
 <style scoped>
 .wrapper {
   height: 100%;
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
 }
 </style>

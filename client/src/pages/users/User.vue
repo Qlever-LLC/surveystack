@@ -6,7 +6,7 @@
         <a-btn v-if="$store.getters['auth/isSuperAdmin']" outlined small :href="`/users/${user._id}/edit`">
           <a-icon small>mdi-pencil</a-icon>Edit
         </a-btn>
-        <p class="display-1 text--primary mt-2 mb-1">{{ user.name }}</p>
+        <p class="display-1 text-primary mt-2 mb-1">{{ user.name }}</p>
         <p class="subtitle-1">{{ user.email }}</p>
       </a-card-text>
     </a-card>
@@ -20,9 +20,9 @@
           three-line
         >
           <v-list-item-content>
-            <span class="text--secondary caption">{{ membership.group.path }}</span>
+            <span class="text-secondary caption">{{ membership.group.path }}</span>
             <a-list-item-title>{{ membership.group.name }}</a-list-item-title>
-            <a-list-item-subtitle class="text--secondary">{{ membership.role }}</a-list-item-subtitle>
+            <a-list-item-subtitle class="text-secondary">{{ membership.role }}</a-list-item-subtitle>
           </v-list-item-content>
         </a-list-item>
       </a-list>

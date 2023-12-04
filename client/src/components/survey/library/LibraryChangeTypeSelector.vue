@@ -4,7 +4,7 @@
       <a-col v-if="disabled" cols="auto" class="pa-0 mt-1"
         ><b
           >Change level:
-          <span class="primary--text">{{ textByValue }}</span>
+          <span class="text-primary">{{ textByValue }}</span>
         </b>
       </a-col>
       <a-col v-else cols="auto" class="pa-0">

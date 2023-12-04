@@ -22,7 +22,7 @@
       title="Deactivate FarmOS"
       :maxWidth="600"
       labelConfirm="Deactivate FarmOS for Group"
-      class="primary--text mx-4"
+      class="text-primary mx-4"
       @confirm="disable"
       v-model="showDeactivateDialog"
       @cancel="showDeactivateDialog = false"

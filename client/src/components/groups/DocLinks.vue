@@ -27,7 +27,7 @@
             </div>
             <div class="d-flex">
               <a-btn icon @click.stop="() => showDeleteModal(idx)">
-                <a-icon color="grey lighten-1">mdi-delete</a-icon>
+                <a-icon color="grey-lighten-1">mdi-delete</a-icon>
               </a-btn>
             </div>
           </div>
@@ -36,8 +36,8 @@
     </draggable>
     <a-card class="ma-2" outlined elevation="1" v-else>
       <a-card-text>
-        <span class="title text--secondary">No documentation links yet</span><br />
-        <span class="font-weight-light grey--text text--darken-2"
+        <span class="title text-secondary">No documentation links yet</span><br />
+        <span class="font-weight-light text-grey-darken-2"
           >You can add documentation links from the menu in the top right</span
         >
       </a-card-text>

@@ -11,16 +11,16 @@
       </a-btn>
     </div>
 
-    <h1 class="heading--text">{{ entity.name }}</h1>
+    <h1 class="text-heading">{{ entity.name }}</h1>
     <div v-if="surveyInfo" class="survey-info">
       <div class="survey-description" v-if="surveyInfo.description">
         {{ surveyInfo.description }}
       </div>
-      <div class="text--secondary survey-info-submissions-count">
+      <div class="text-secondary survey-info-submissions-count">
         {{ surveyInfo.submissions }}
         {{ surveyInfo.submissions === 1 ? 'submission' : 'submissions' }}
       </div>
-      <div v-if="surveyInfo.latestSubmission" class="text--secondary survey-info-latest-submission">
+      <div v-if="surveyInfo.latestSubmission" class="text-secondary survey-info-latest-submission">
         Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
       </div>
     </div>
@@ -63,7 +63,7 @@
           </a-btn>
         </div>
 
-        <div class="text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
+        <div class="text-secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
           {{ submissionRightsHint }}
         </div>
 

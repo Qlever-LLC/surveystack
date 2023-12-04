@@ -1,7 +1,7 @@
 <template>
   <a-container>
     <a-card class="pa-4 mb-4">
-      <span class="text--secondary overline">{{ this.entity._id }}</span>
+      <span class="text-secondary overline">{{ this.entity._id }}</span>
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
 
       <a-form class="mt-3" @keydown.enter.prevent="submit">

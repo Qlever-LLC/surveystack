@@ -105,7 +105,7 @@
           </v-list-item-content>
           <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
             <a-btn icon @click="editResourceName(fileResourceKey, index)">
-              <a-icon color="grey lighten-1">mdi-pencil</a-icon>
+              <a-icon color="grey-lighten-1">mdi-pencil</a-icon>
             </a-btn>
           </a-list-item-action>
           <a-list-item-action v-if="editIndex === index">
@@ -115,7 +115,7 @@
           </a-list-item-action>
           <a-list-item-action>
             <a-btn icon @click="remove(index)">
-              <a-icon color="grey lighten-1">mdi-close-circle</a-icon>
+              <a-icon color="grey-lighten-1">mdi-close-circle</a-icon>
             </a-btn>
           </a-list-item-action>
         </a-list-item>
@@ -334,12 +334,12 @@ export default {
 }
 
 .dropzone:hover {
-  border-color: var(--v-primary-base);
+  border-color: rgb(var(--v-theme-primary));
   background-color: #e3f2fd;
 }
 
 .dragging {
-  border-color: var(--v-primary-base);
+  border-color: rgb(var(--v-theme-primary));
   background-color: #e3f2fd;
 }
 

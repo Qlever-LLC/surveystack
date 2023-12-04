@@ -2,7 +2,7 @@
   <a-card min-height="70vh" class="d-flex flex-column">
     <a-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
-        <div class="grey--text text--darken-2">Ontology List Editor</div>
+        <div class="text-grey-darken-2">Ontology List Editor</div>
         <div class="d-flex align-center ml-auto mr-2">
           <a-btn
             color="primary"
@@ -364,6 +364,7 @@ export default {
 .v-data-table >>> tbody > tr > td.text-start {
   padding: 0px 4px;
 }
+
 .v-data-table >>> tbody > tr > td > .v-simple-checkbox {
   margin-left: 12px;
 }

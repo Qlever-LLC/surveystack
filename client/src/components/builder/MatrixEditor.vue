@@ -14,7 +14,7 @@
     <a-card class="d-flex flex-column">
       <a-card-title class="d-block">
         <div class="d-flex justify-space-between align-center">
-          <div class="grey--text text--darken-2">Matrix Column Editor</div>
+          <div class="text-grey-darken-2">Matrix Column Editor</div>
           <div class="d-flex align-center ml-auto mr-2">
             <a-btn color="primary" @click="addColumn"> <a-icon left>mdi-plus</a-icon>Add Column </a-btn>
           </div>
@@ -116,7 +116,7 @@
                         label="Multi-select"
                         hide-details
                         dense
-                        color="grey darken-1"
+                        color="grey-darken-1"
                         class="mt-0 ml-2 align-center align-self-start"
                       />
                       <a-checkbox
@@ -125,7 +125,7 @@
                         label="Allow custom answer"
                         hide-details
                         dense
-                        color="grey darken-1"
+                        color="grey-darken-1"
                         class="mt-0 ml-2 align-center align-self-start"
                       >
                         <template v-slot:helper-text>
@@ -140,7 +140,7 @@
                         helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
                         hide-details
                         dense
-                        color="grey darken-1"
+                        color="grey-darken-1"
                         class="mt-0 ml-2 align-center align-self-start"
                       />
                     </div>
@@ -204,14 +204,14 @@
                       helper-text="Make this a required field"
                       hide-details
                       class="mt-4 align-center align-self-start"
-                      color="grey darken-1"
+                      color="grey-darken-1"
                     />
                     <a-checkbox
                       v-model="item.redacted"
                       label="Private"
                       helper-text="Visible to submitter and admins only"
                       class="mt-2 align-center align-self-start"
-                      color="grey darken-1"
+                      color="grey-darken-1"
                     />
                     <a-checkbox
                       v-if="allowSetAllowHide"
@@ -219,7 +219,7 @@
                       label="Allow hide"
                       class="mt-2 align-center align-self-start"
                       helper-text="Allow users of this question set to hide this column"
-                      color="grey darken-1"
+                      color="grey-darken-1"
                     />
                     <a-checkbox
                       v-if="!allowSetAllowHide && item.allowHide"
@@ -227,14 +227,14 @@
                       label="Hidden"
                       class="mt-2 align-center align-self-start"
                       helper-text="Submitters can not see this column. This option is intentionally allowed by the question set designer"
-                      color="grey darken-1"
+                      color="grey-darken-1"
                     />
                     <a-checkbox
                       v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
                       v-model="item.multiple"
                       label="Multi-select"
                       class="mt-2 align-center align-self-start"
-                      color="grey darken-1"
+                      color="grey-darken-1"
                     />
 
                     <h4 class="mt-6 mb-4">Display Options</h4>

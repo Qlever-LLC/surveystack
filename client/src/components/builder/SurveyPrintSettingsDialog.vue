@@ -9,7 +9,7 @@
             v-model="survey.meta.printOptions.showInstruction"
             label="Show Instructions"
             helper-text="Display instructions questions on PDFs of completed submissions."
-            color="grey darken-1"
+            color="grey-darken-1"
             class="align-center align-self-start"
           />
         </div>
@@ -18,7 +18,7 @@
             v-model="survey.meta.printOptions.showUnanswered"
             label="Show Unanswered"
             helper-text='Display unanswered questions on PDFs of completed submissions. Unanswered questions will show "No answer" in the PDF.'
-            color="grey darken-1"
+            color="grey-darken-1"
             class="align-center align-self-start"
           />
         </div>
@@ -33,7 +33,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'survey-print-settings-dialog',
   props: {

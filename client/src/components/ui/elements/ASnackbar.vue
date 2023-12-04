@@ -53,7 +53,7 @@ export default {
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-top: 8px solid var(--v-primary-lighten1);
+  border-top: 8px solid rgb(var(--v-theme-primary-lighten1));
   position: fixed;
   bottom: 0;
   left: 50%;

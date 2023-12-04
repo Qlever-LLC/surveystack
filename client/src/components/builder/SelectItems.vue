@@ -17,7 +17,7 @@
     </template>
 
     <a-card>
-      <a-card-title class="grey--text text--darken-2"> Default value </a-card-title>
+      <a-card-title class="text-grey-darken-2"> Default value </a-card-title>
 
       <a-card-text cssDialogContent>
         <div v-if="multiple" class="checkbox-group">

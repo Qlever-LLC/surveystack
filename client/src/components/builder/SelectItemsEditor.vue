@@ -18,7 +18,7 @@
     </template>
 
     <a-card>
-      <a-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
+      <a-card-title class="d-flex justify-space-between align-center text-grey-darken-2">
         Selection List
         <a-btn color="primary" @click="addItem"> <a-icon left>mdi-plus</a-icon>Add Row</a-btn>
       </a-card-title>

@@ -169,7 +169,7 @@ export default {
 
 <style scoped>
 .home {
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
   height: 100%;
 }
 

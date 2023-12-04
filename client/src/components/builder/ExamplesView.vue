@@ -1,5 +1,5 @@
 <template>
-  <a-card cssHeight90vh color="grey darken-3">
+  <a-card cssHeight90vh color="grey-darken-3">
     <a-container>
       <a-row>
         <a-spacer />

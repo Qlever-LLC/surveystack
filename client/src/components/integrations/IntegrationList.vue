@@ -20,13 +20,12 @@
           </v-list-item-content>
         </a-list-item>
       </template>
-      <div v-else class="grey--text">No {{ title }} yet</div>
+      <div v-else class="text-grey">No {{ title }} yet</div>
     </a-card-text>
   </a-card>
 </template>
 
 <script>
-
 export default {
   props: {
     entities: {

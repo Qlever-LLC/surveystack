@@ -11,7 +11,7 @@
 
     <a-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
-      <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
+      <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
     </div>
     <a-container v-if="loading" class="d-flex align-center justify-center" cssHeight100>
       <a-progress-circular :size="50" color="primary" indeterminate />
@@ -34,7 +34,7 @@
                   <span>{{ c.name }}</span>
                 </a-tooltip>
                 <div>
-                  <small class="grey--text">{{ c._id }}</small>
+                  <small class="text-grey">{{ c._id }}</small>
                 </div>
                 <a-chip dark small outlined color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
@@ -248,14 +248,12 @@ export default {
 .control-item-selected::before {
   border-color: #4caf50 !important;
 }
-/*
-.control-item-selected {
-border-left: 2px solid var(--v-primary-base);
-}*/
+
 .graphical-view {
   overflow: auto;
   margin-top: 6px;
 }
+
 .v-card:focus:before {
   opacity: 0 !important;
 }
