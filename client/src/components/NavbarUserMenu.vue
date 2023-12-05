@@ -9,7 +9,7 @@
       location="bottom"
     >
       <template v-slot:activator="{ props }">
-        <a-btn variant="text" v-bind="props" @click="checkIsOwner(props)">
+        <a-btn variant="text" v-bind="props" @click="checkIsOwner()">
           <a-icon>mdi-account</a-icon>
         </a-btn>
       </template>
