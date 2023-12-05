@@ -8,8 +8,8 @@
         @closed="showFeedback = false"
       >
         You are currently shapeshifting...
-        <a href="/shapeshift?mode=off" class="text-info" @click.prevent="$store.dispatch('auth/leaveShapeshift')"
-          >Click to return as '{{ $store.state.auth.shapeshiftUser.email }}'</a
+        <a href="/shapeshift?mode=off" class="text-info" @click.prevent="leaveShapeshift"
+          >Click to return as '{{ shapeshiftUser.email }}'</a
         >
       </app-feedback>
       <h1>Profile</h1>
@@ -104,7 +104,9 @@
           </a-card-text>
           <a-card-actions>
             <a-spacer />
-            <a-btn variant="text" @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </a-btn>
+            <a-btn variant="text" @click.stop="isLeaveDialogOpen = false">
+              {{ parentAdminGroup ? 'Close' : 'Cancel' }}
+            </a-btn>
             <a-btn v-if="!parentAdminGroup" variant="text" color="red" @click.stop="leaveGroup"> Leave </a-btn>
           </a-card-actions>
         </a-card>
@@ -187,6 +189,9 @@ export default {
       }
       return null;
     },
+    shapeshiftUser() {
+      return this.$store.state.auth.shapeshiftUser;
+    },
   },
   methods: {
     async submitData() {
@@ -254,6 +259,9 @@ export default {
           console.error('Error on loading user:', e);
         }
       }
+    },
+    leaveShapeshift() {
+      this.$store.dispatch('auth/leaveShapeshift');
     },
   },
   created() {

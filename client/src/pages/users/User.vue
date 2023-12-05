@@ -3,7 +3,7 @@
     <a-card>
       <a-card-text>
         <div class="overline">{{ user._id }}</div>
-        <a-btn v-if="$store.getters['auth/isSuperAdmin']" variant="outlined" small :href="`/users/${user._id}/edit`">
+        <a-btn v-if="isSuperAdmin" variant="outlined" small :href="`/users/${user._id}/edit`">
           <a-icon small>mdi-pencil</a-icon>Edit
         </a-btn>
         <p class="display-1 text-primary mt-2 mb-1">{{ user.name }}</p>
@@ -41,6 +41,11 @@ export default {
       },
       memberships: [],
     };
+  },
+  methods: {
+    isSuperAdmin() {
+      return this.$store.getters['auth/isSuperAdmin'];
+    },
   },
   async created() {
     const { id } = this.$route.params;

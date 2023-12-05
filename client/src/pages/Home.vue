@@ -4,7 +4,7 @@
       <a-col>
         <a-img
           v-if="isWhitelabel"
-          :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
+          :src="whitelabelPartner.hero || whitelabelPartner.logo"
           class="my-3"
           contain
           height="128"

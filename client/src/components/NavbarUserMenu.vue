@@ -4,7 +4,7 @@
       left
       attach="#app-menu"
       offset-y
-      v-if="$store.getters['auth/isLoggedIn']"
+      v-if="isLoggedIn"
       :close-on-content-click="false"
       max-height="calc(100% - 100px)"
     >
@@ -59,6 +59,9 @@ export default {
       set(val) {
         this.$store.dispatch('memberships/setActiveGroup', val);
       },
+    },
+    isLoggedIn() {
+      return this.$store.getters['auth/isLoggedIn'];
     },
   },
   methods: {

@@ -9,7 +9,7 @@
           :required="control && control.options && control.options.required"
           :anon="control && control.options && control.options.redacted"
           :showOverviewIcon="true"
-          :questionNumber="$store.getters['draft/questionNumber']"
+          :questionNumber="questionNumber"
           @showOverviewClicked="showOverview = !showOverview"
         />
       </a-toolbar-title>
@@ -43,6 +43,9 @@ export default {
     },
     control() {
       return this.$store.getters['draft/control'];
+    },
+    questionNumber() {
+      return this.$store.getters['draft/questionNumber'];
     },
     groupPath() {
       return this.$store.getters['draft/groupPath'];

@@ -46,7 +46,7 @@
               </a-btn>
             </a-list-item-title>
           </a-list-item>
-          <a-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
+          <a-list-item class="d-flex align-center">
             <a-list-item-title>
               <a-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">

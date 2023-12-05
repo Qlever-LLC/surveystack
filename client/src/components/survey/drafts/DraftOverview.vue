@@ -1,8 +1,8 @@
 <template>
   <a-container class="wrapper">
-    <a-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
+    <a-banner class="my-2" v-if="errors" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
-      <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
+      <li v-for="(error, i) in errors" :key="i">
         <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
       </li>
     </a-banner>
@@ -148,6 +148,11 @@ export default {
       created: '',
       submitted: '',
     };
+  },
+  computed: {
+    errors() {
+      return this.$store.getters['draft/errors'];
+    },
   },
   methods: {
     expand(group) {
