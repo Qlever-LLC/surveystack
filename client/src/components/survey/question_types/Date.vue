@@ -31,13 +31,13 @@
           v-model="datePickerIsVisible"
           :close-on-content-click="false"
           transition="scale-transition"
-          offset-y
+          location="bottom"
           max-width="290px"
           min-width="290px"
         >
-          <template v-slot:activator="{ on }">
+          <template v-slot:activator="{ props }">
             <a-text-field
-              v-on="on"
+              v-bind="props"
               @change="updateDateInput"
               @input="datePickerIsVisible = false"
               :value="dateFormatted"

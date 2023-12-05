@@ -10,11 +10,17 @@
     clearable
     hide-details
   />
-  <a-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
-    <template v-slot:activator="{ on, attrs }">
+  <a-menu
+    v-else
+    v-model="menuIsOpen"
+    :close-on-content-click="false"
+    transition="scale-transition"
+    location="bottom"
+    min-width="auto"
+  >
+    <template v-slot:activator="{ props }">
       <a-text-field
-        v-on="on"
-        v-bind="attrs"
+        v-bind="props"
         @input="onChange"
         @blur="$emit('blur')"
         label="Default value"
@@ -28,7 +34,7 @@
     </template>
     <a-date-picker
       v-model="date"
-      @input="open = false"
+      @input="menuIsOpen = false"
       :type="type === 'date-month-year' ? 'month' : 'date'"
       :range="type === 'date-week-month-year'"
       show-adjacent-months
@@ -60,7 +66,7 @@ export default {
 
   data() {
     return {
-      open: false,
+      menuIsOpen: false,
     };
   },
   computed: {
@@ -78,7 +84,7 @@ export default {
           : format(this.dateValue, this.formatter);
       },
       set(date) {
-        if (!this.open) {
+        if (!this.menuIsOpen) {
           return;
         }
         const pickedDate = Array.isArray(date) ? date[0] : date;

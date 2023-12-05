@@ -11,8 +11,12 @@
 
       <a-spacer />
       <offline-indicator />
-      <a-btn class="help-btn" variant="text" href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
-        target="_blank">
+      <a-btn
+        class="help-btn"
+        variant="text"
+        href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
+        target="_blank"
+      >
         <a-icon size="22">mdi-help-circle-outline</a-icon>
       </a-btn>
       <navbar-user-menu />
@@ -35,19 +39,17 @@ export default {
     NavbarUserMenu,
     NavbarDrawer,
   },
-  setup () {
+  setup() {
     const store = useStore();
 
-    const drawerIsVisible = computed(
-      {
-        get () {
-          return store.getters['appui/menu'];
-        },
-        set (value) {
-          store.dispatch('appui/setMenu', value);
-        },
-      }
-    )
+    const drawerIsVisible = computed({
+      get() {
+        return store.getters['appui/menu'];
+      },
+      set(value) {
+        store.dispatch('appui/setMenu', value);
+      },
+    });
 
     const appTitle = computed(() => {
       return store.getters['appui/title'];

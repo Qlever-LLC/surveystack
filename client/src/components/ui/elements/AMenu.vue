@@ -3,40 +3,42 @@
     :attach="attach"
     :close-on-content-click="closeOnContentClick"
     :disabled="disabled"
-    :left="left"
+    :location="location"
     :max-height="maxHeight"
     :max-width="maxWidth"
     :min-width="minWidth"
-    :offset-y="offsetY"
     :transition="transition"
-    :value="value"
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
     v-bind="$attrs"
-    @input="$emit('input', $event)"
   >
-    <template v-slot:activator="{ on, attrs }">
-      <slot name="activator" :on="on" :attrs="attrs"></slot>
+    <template v-slot:activator="{ props }">
+      <slot name="activator" :props="props" />
     </template>
-    <slot></slot>
+    <slot />
   </v-menu>
 </template>
 
 <script>
 export default {
   name: 'AMenu',
+  emits: ['update:modelValue'],
   props: {
     attach: { type: undefined, default: false },
     closeOnContentClick: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
-    left: { type: Boolean, default: false },
+    location: {
+      type: String,
+      validator: function (value) {
+        return ['top', 'bottom', 'start', 'end'].includes(value);
+      },
+      required: false,
+    },
     maxHeight: { type: [Number, String], default: 'auto' },
     maxWidth: { type: [Number, String], default: 'auto' },
     minWidth: { type: [Number, String], required: false },
-    offsetY: { type: Boolean, default: false },
     transition: { type: String, default: 'v-menu-transition' },
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
   },
-  emits: ['input'],
 };
 </script>
-
-<style scoped></style>

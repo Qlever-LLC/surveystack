@@ -30,9 +30,9 @@
       {{ openResourceError }}
     </a-alert>
     <div class="d-flex justify-end">
-      <a-menu offset-y left>
-        <template v-slot:activator="{ on }">
-          <a-btn color="primary" v-on="on">
+      <a-menu location="bottom" v-model="menuIsOpen">
+        <template v-slot:activator="{ props }">
+          <a-btn color="primary" v-bind="props">
             <a-icon left>mdi-plus</a-icon>
             Add resource
           </a-btn>
@@ -134,6 +134,7 @@ export default {
       uploadingResource: false,
       downloadingResource: false,
       openResourceError: false,
+      menuIsOpen: false,
     };
   },
   methods: {

@@ -55,9 +55,9 @@
           @ok="publishUpdateToLibrary"
           @cancel="updateLibraryDialogIsVisible = false"
         />
-        <a-menu offset-y left>
-          <template v-slot:activator="{ on }">
-            <a-btn icon v-on="on">
+        <a-menu location="bottom" v-model="menuIsOpen">
+          <template v-slot:activator="{ props }">
+            <a-btn icon v-bind="props">
               <a-icon>mdi-dots-vertical</a-icon>
             </a-btn>
           </template>
@@ -286,6 +286,7 @@ export default {
       surveyGroupName: 'Group Not Found',
       librarySurveyPublishedAndDraft: null,
       availableSubmissions,
+      menuIsOpen: false,
     };
   },
   async created() {

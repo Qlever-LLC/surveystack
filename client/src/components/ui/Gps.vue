@@ -1,8 +1,8 @@
 <template>
   <div>
-    <a-menu offset-y>
-      <template v-slot:activator="{ on, attrs }">
-        <a-btn v-bind="attrs" v-on="on" class="button">
+    <a-menu v-model="menuIsOpen" location="bottom">
+      <template v-slot:activator="{ props }">
+        <a-btn v-bind="props" class="button">
           <a-icon>mdi-dots-vertical</a-icon>
         </a-btn>
       </template>
@@ -37,6 +37,7 @@ export default {
       snackbar: false,
       snackbarText: '',
       expandedVal: this.expanded ? 0 : null,
+      menuIsOpen: false,
     };
   },
   props: {

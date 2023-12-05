@@ -1,15 +1,15 @@
 <template>
   <div>
     <a-menu
-      left
-      attach="#app-menu"
-      offset-y
       v-if="isLoggedIn"
+      attach="#app-menu"
       :close-on-content-click="false"
       max-height="calc(100% - 100px)"
+      v-model="menuIsOpen"
+      location="bottom"
     >
-      <template v-slot:activator="{ on }">
-        <a-btn variant="text" v-on="on" @click="checkIsOwner">
+      <template v-slot:activator="{ props }">
+        <a-btn variant="text" v-bind="props" @click="checkIsOwner(props)">
           <a-icon>mdi-account</a-icon>
         </a-btn>
       </template>
@@ -48,6 +48,7 @@ export default {
   },
   data() {
     return {
+      menuIsOpen: false,
       isOwner: false,
     };
   },

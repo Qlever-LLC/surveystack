@@ -194,15 +194,14 @@
       :close-on-content-click="false"
       v-model="menus[`${index}_${header.value}`]"
       transition="scale-transition"
-      offset-y
+      location="bottom"
       max-width="290px"
       min-width="290px"
       :disabled="disabled"
     >
-      <template v-slot:activator="{ on, attrs }">
+      <template v-slot:activator="{ props }">
         <a-text-field
-          v-on="on"
-          v-bind="attrs"
+          v-bind="props"
           @click="setActivePickerMonth"
           :value="getDateLabel"
           hide-details
