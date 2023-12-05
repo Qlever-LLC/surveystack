@@ -4,21 +4,19 @@
       <a-list-item-title v-if="activeGroup">{{ activeGroupName }}</a-list-item-title>
       <a-list-item-title v-else>No Group selected</a-list-item-title>
     </template>
-    <a-list-item flat class="pt-0" color="focus">
-      <v-list-item-group :value="activeItem" color="primary" mandatory>
-        <a-list-item
-          v-for="(item, i) in groupItems"
-          :key="item.value"
-          @click="() => handleInput(item.value)"
-          :value="i"
-          color="focus"
-          prepend-icon="mdi-account-group"
-        >
-          <a-list-item-title>
-            {{ item.text }}
-          </a-list-item-title>
-        </a-list-item>
-      </v-list-item-group>
+    <a-list-item flat class="pt-0" color="focus" v-model:selected="activeItem">
+      <a-list-item
+        v-for="(item, i) in groupItems"
+        :key="item.value"
+        @click="() => handleInput(item.value)"
+        :value="i"
+        color="focus"
+        prepend-icon="mdi-account-group"
+      >
+        <a-list-item-title>
+          {{ item.text }}
+        </a-list-item-title>
+      </a-list-item>
     </a-list-item>
   </a-list-group>
 </template>

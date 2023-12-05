@@ -60,25 +60,23 @@
             top
             left
           >
-            <a-list class="pa-0 mx-auto" max-width="280">
-              <v-list-item-group v-model="invitationMethod">
-                <a-list-item two-line :value="INVITATION_METHODS.INVITE">
-                  <a-list-item-title>Invite Member</a-list-item-title>
-                  <div class="multiline-subtitle">
-                    Send them an email to agree to join your group. They only join once they click the "Join" link in
-                    the email.
-                  </div>
-                </a-list-item>
+            <a-list class="pa-0 mx-auto" max-width="280" v-model:selected="invitationMethod">
+              <a-list-item two-line :value="INVITATION_METHODS.INVITE">
+                <a-list-item-title>Invite Member</a-list-item-title>
+                <div class="multiline-subtitle">
+                  Send them an email to agree to join your group. They only join once they click the "Join" link in the
+                  email.
+                </div>
+              </a-list-item>
 
-                <a-list-item three-line :value="INVITATION_METHODS.ADD">
-                  <a-list-item-title>Add Member</a-list-item-title>
-                  <div class="multiline-subtitle">
-                    The member joins immediately. An email is still sent informing them they are joined. This is useful
-                    when using "Call for Submissions" to send this member survey requests without waiting for them to
-                    check their email.
-                  </div>
-                </a-list-item>
-              </v-list-item-group>
+              <a-list-item three-line :value="INVITATION_METHODS.ADD">
+                <a-list-item-title>Add Member</a-list-item-title>
+                <div class="multiline-subtitle">
+                  The member joins immediately. An email is still sent informing them they are joined. This is useful
+                  when using "Call for Submissions" to send this member survey requests without waiting for them to
+                  check their email.
+                </div>
+              </a-list-item>
             </a-list>
           </btn-dropdown>
         </div>

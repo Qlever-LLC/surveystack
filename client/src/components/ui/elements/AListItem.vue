@@ -3,16 +3,18 @@
     :append-icon="appendIcon"
     :prepend-avatar="prependAvatar"
     :prepend-icon="prependIcon"
-    :flat="flat"
-    :dense="dense"
+    :variant="flat ? 'flat' : 'text'"
+    :density="dense ? 'compact' : 'default'"
     :link="link"
     :lines="twoLine ? 'two' : threeLine ? 'three' : 'one'"
     :href="href"
     :to="to"
     :target="target"
     :value="value"
-    v-on="hasClickListener ? { click: (v) => $emit('click', v) } : {}"
+    v-bind="$attrs"
+    @click="$emit('click', $event)"
   >
+    <slot name="prepend" />
     <slot />
   </v-list-item>
 </template>
@@ -22,11 +24,11 @@ export default {
   props: {
     flat: { type: Boolean, required: false },
     dense: { type: Boolean, required: false },
-    link: { type: Boolean, required: false },
+    link: { type: Boolean, default: undefined },
     twoLine: { type: Boolean, required: false },
     threeLine: { type: Boolean, required: false },
     href: { type: [String, Object], required: false },
-    to: { type: [String, Object], required: false },
+    to: { type: String, required: false },
     target: { type: String, required: false },
     value: { type: undefined, required: false },
     color: { type: String, required: false },
@@ -35,14 +37,5 @@ export default {
     prependAvatar: { type: String, required: false },
   },
   emits: ['click'],
-  computed: {
-    hasClickListener() {
-      // we should only register the @click handler on v-list-item if we need to
-      // otherwise v-list-item would show hover effects even if our consumer does not want it to be clickable
-      // TODO The `$listeners` is deprecated  vue/no-deprecated-dollar-listeners-api
-      // eslint-disable-next-line vue/no-deprecated-dollar-listeners-api
-      return this.$listeners && this.$listeners.click;
-    },
-  },
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-subheader :class="{ sticky: cssSticky }"> <slot /> </v-subheader>
+  <v-list-subheader :class="{ sticky: cssSticky }"> <slot /> </v-list-subheader>
 </template>
 
 <script>

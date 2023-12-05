@@ -50,9 +50,9 @@
                 >
                   <a-list-item-title>SurveyStack Help</a-list-item-title>
                 </a-list-item>
-                <a-list-item href="https://www.surveystack.io" target="_blank" prepend-icon="mdi-information-outline">
+                <v-list-item href="https://www.surveystack.io" target="_blank" prepend-icon="mdi-information-outline">
                   <a-list-item-title>About</a-list-item-title>
-                </a-list-item>
+                </v-list-item>
               </a-list>
             </a-expansion-panel-text>
           </a-expansion-panel>

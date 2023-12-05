@@ -24,41 +24,34 @@
           :searchable="false"
         >
           <template v-slot:entity="{ entity }">
-            <div class="d-flex">
-              <div class="mr-2">
-                <a-btn
+            <a-list-item class="d-flex" :to="`/surveys/${entity.id}`">
+              <template #prepend>
+                <a-icon
                   v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
-                  :to="`/surveys/${entity.id}`"
+                  icon="mdi-earth"
                   title="Everyone can submit"
-                  icon
-                >
-                  <a-icon>mdi-earth</a-icon>
-                </a-btn>
-                <a-btn
+                />
+                <a-icon
                   v-if="entity.meta.submissions === 'user'"
-                  :to="`/surveys/${entity.id}`"
+                  icon="mdi-account"
                   title="Only signed-in users can submit"
-                  icon
-                >
-                  <a-icon>mdi-account</a-icon>
-                </a-btn>
-                <a-btn
+                />
+                <a-icon
                   v-if="entity.meta.submissions === 'group'"
-                  :to="`/surveys/${entity.id}`"
+                  icon="mdi-account-group"
                   title="Everyone group members can submit"
-                  icon
-                >
-                  <a-icon>mdi-account-group</a-icon>
-                </a-btn>
-              </div>
-              <div>
-                <a-list-item-title>{{ entity.name }}</a-list-item-title>
-                <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-              </div>
-              <div class="d-flex align-center ml-3">
-                <a-btn color="primary" small>Take Survey</a-btn>
-              </div>
-            </div>
+                />
+              </template>
+              <template #default>
+                <div>
+                  <a-list-item-title>{{ entity.name }}</a-list-item-title>
+                  <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
+                </div>
+                <div class="d-flex align-center ml-3">
+                  <a-btn color="primary" small>Take Survey</a-btn>
+                </div>
+              </template>
+            </a-list-item>
           </template>
         </app-basic-list>
       </a-col>
@@ -74,38 +67,27 @@
           :link="(e) => `/surveys/${e.id}`"
         >
           <template v-slot:entity="{ entity }">
-            <div class="d-flex">
-              <div class="mr-2">
-                <a-btn
+            <a-list-item class="d-flex" :to="`/surveys/${entity.id}`" @click="$emit('test')">
+              <template #prepend>
+                <a-icon
                   v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
-                  :to="`/surveys/${entity.id}`"
+                  icon="mdi-earth"
                   title="Everyone can submit"
-                  icon
-                >
-                  <a-icon>mdi-earth</a-icon>
-                </a-btn>
-                <a-btn
+                />
+                <a-icon
                   v-if="entity.meta.submissions === 'user'"
-                  :to="`/surveys/${entity.id}`"
+                  icon="mdi-account"
                   title="Only signed-in users can submit"
-                  icon
-                >
-                  <a-icon>mdi-account</a-icon>
-                </a-btn>
-                <a-btn
+                />
+                <a-icon
                   v-if="entity.meta.submissions === 'group'"
-                  :to="`/surveys/${entity.id}`"
+                  icon="mdi-account-group"
                   title="Everyone group members can submit"
-                  icon
-                >
-                  <a-icon>mdi-account-group</a-icon>
-                </a-btn>
-              </div>
-              <div>
-                <a-list-item-title>{{ entity.name }}</a-list-item-title>
-                <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-              </div>
-            </div>
+                />
+              </template>
+              <a-list-item-title>{{ entity.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
+            </a-list-item>
           </template>
         </app-basic-list>
       </a-col>

@@ -12,36 +12,35 @@
 
     <a-progress-circular v-if="loading" indeterminate color="secondary" class="my-8" />
 
-    <a-list style="overflow: auto">
-      <v-list-item-group
-        v-if="!loading"
-        :disabled="loading"
-        :value="listSelection"
-        @change="localChange"
-        :multiple="!!control.options.hasMultipleSelections"
+    <a-list
+      v-if="!loading"
+      :disabled="loading"
+      style="overflow: auto"
+      v-model:selected="listSelection"
+      :selectStrategy="!!control.options.hasMultipleSelections ? 'classic' : 'single-leaft'"
+      @update:selected="localChange"
+    >
+      <a-list-item
+        v-for="(item, idx) in transformed"
+        :value="hashItem(item)"
+        :key="`item_${idx}`"
+        :disabled="!control.options.hasMultipleSelections && item.value.isField"
       >
-        <a-list-item
-          v-for="(item, idx) in transformed"
-          :value="hashItem(item)"
-          :key="`item_${idx}`"
-          :disabled="!control.options.hasMultipleSelections && item.value.isField"
-        >
-          <template v-slot:default="{ active }">
-            <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
-              <a-checkbox
-                v-if="control.options.hasMultipleSelections"
-                :value="active"
-                :true-value="hashItem(item)"
-                color="focus"
-              />
-              <a-radio-group v-else :value="active">
-                <a-radio :value="true" color="focus" />
-              </a-radio-group>
-            </a-list-item-action>
-            <a-list-item-title v-html="item.label" />
-          </template>
-        </a-list-item>
-      </v-list-item-group>
+        <template v-slot:default="{ active }">
+          <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
+            <a-checkbox
+              v-if="control.options.hasMultipleSelections"
+              :value="active"
+              :true-value="hashItem(item)"
+              color="focus"
+            />
+            <a-radio-group v-else :value="active">
+              <a-radio :value="true" color="focus" />
+            </a-radio-group>
+          </a-list-item-action>
+          <a-list-item-title v-html="item.label" />
+        </template>
+      </a-list-item>
     </a-list>
     <app-control-more-info :value="control.moreInfo" />
   </div>
