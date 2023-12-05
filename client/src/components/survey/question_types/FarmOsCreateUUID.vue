@@ -11,13 +11,12 @@
     />
     <div style="display: flex">
       <div style="flex: 1">
-        <!-- TODO in Vue3 remove .native -->
         <a-text-field
           outlined
           :label="control.hint"
           :value="localValue"
           @input="onInput"
-          @keyup.native.enter.prevent="submit"
+          @keyup.enter.prevent="submit"
           ref="textField"
           class="full-width"
           :disabled="!relevant"

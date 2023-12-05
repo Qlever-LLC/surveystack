@@ -18,7 +18,6 @@
     draggable=".draggable-item"
     :group="draggableGroup"
   >
-    <!-- TODO in Vue3 remove .native -->
     <a-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
@@ -29,7 +28,7 @@
         { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
       ]"
       :key="el.id || el._id"
-      @mousedown.native.stop.left="$emit('control-selected', el)"
+      @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
       :data-control-contains-page="descendantHasPage(el)"

@@ -9,7 +9,6 @@
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize"
     />
-    <!-- TODO in Vue3 remove .native -->
     <a-select
       engineering="autocomplete"
       :disabled="loading"
@@ -22,7 +21,7 @@
       :label="control.hint"
       :chips="this.control.options.hasMultipleSelections"
       :multiple="this.control.options.hasMultipleSelections"
-      @keyup.native.enter.prevent="submit"
+      @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
       selectionSlot

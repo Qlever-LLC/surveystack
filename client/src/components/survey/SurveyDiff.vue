@@ -21,11 +21,10 @@
         </a-tooltip>
 
         <a-spacer />
-        <!-- TODO in Vue3 remove .native -->
         <a-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"
-          @click.native.stop=""
+          @click.stop=""
           v-model="showChangesOnly"
           label="changes only"
         />

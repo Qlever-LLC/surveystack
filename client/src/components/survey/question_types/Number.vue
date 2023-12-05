@@ -9,14 +9,13 @@
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize"
     />
-    <!-- TODO in Vue3 remove .native -->
     <a-text-field
       outlined
       type="number"
       :label="control.hint"
       :value="value"
       @input="onInput"
-      @keyup.native.enter.prevent="submit"
+      @keyup.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"
       hide-details="auto"
