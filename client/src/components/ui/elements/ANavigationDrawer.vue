@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer :modelValue="modelValue">
+  <v-navigation-drawer :modelValue="modelValue" :order="-1">
     <slot />
     <template v-slot:append>
       <slot name="append" />

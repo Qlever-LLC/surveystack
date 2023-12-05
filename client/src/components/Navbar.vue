@@ -1,6 +1,6 @@
 <template>
   <nav class="app-navbar">
-    <a-app-bar app clipped-left color="appbar" absolute>
+    <a-app-bar clipped-left color="appbar" absolute>
       <a-app-bar-nav-icon @click="toggleDrawer" />
       <a-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
