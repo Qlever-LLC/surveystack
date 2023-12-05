@@ -1,8 +1,7 @@
 <template>
-  <!--rename to v-expansion-panel-text in v3-->
-  <v-expansion-panel-content>
+  <v-expansion-panel-text>
     <slot />
-  </v-expansion-panel-content>
+  </v-expansion-panel-text>
 </template>
 
 <script>

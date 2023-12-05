@@ -1,9 +1,8 @@
 <template>
-  <!--rename to v-expansion-panel-title in v3-->
-  <v-expansion-panel-header :expand-icon="expandIcon">
+  <v-expansion-panel-title :expand-icon="expandIcon">
     <slot name="actions" />
     <slot />
-  </v-expansion-panel-header>
+  </v-expansion-panel-title>
 </template>
 
 <script>
