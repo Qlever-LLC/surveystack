@@ -77,7 +77,11 @@
                     >
                       ARCHIVE
                     </a-btn>
-                    <a-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" variant="text" color="secondary"
+                    <a-btn
+                      @click="$emit('reassignment', $event)"
+                      :disabled="actionsAreDisabled"
+                      variant="text"
+                      color="secondary"
                       >REASSIGN</a-btn
                     >
                     <a-btn
@@ -109,9 +113,8 @@
         />
       </template>
 
-      <template v-for="header in headers" v-slot:[`header.${header.value}`]>
+      <template v-for="header in headers" :key="header.value" v-slot:[`header.${header.value}`]>
         <span
-          :key="header.value"
           @click.stop="openModal($event, [header.text, -1, header.value])"
           :class="{ activeHeader: isModalOpen([header.text, -1, header.value]) }"
         >
