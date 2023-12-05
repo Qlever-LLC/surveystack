@@ -46,6 +46,9 @@ module.exports = {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
     allowedHosts: 'all',
     compress: true,
+    client: {
+      overlay: false,
+    },
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
