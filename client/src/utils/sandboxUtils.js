@@ -238,27 +238,27 @@ export async function getSubmission(submission, submissionId, _surveyId = undefi
   try {
     // search in archived surveys first
     let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`;
-    this.prettyLog('check submission in archived url', 'info');
-    this.prettyLog(url);
+    prettyLog('check submission in archived url', 'info');
+    prettyLog(url);
     let response = await fetch(url);
     let result = await response.text();
     result = JSON.parse(result);
     // if not present, search in non-archived surveys
     if (result.length === 0 || !result[0] || !result[0].data) {
       url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
-      this.prettyLog('check submission in non archived url', 'info');
-      this.prettyLog(url);
+      prettyLog('check submission in non archived url', 'info');
+      prettyLog(url);
       response = await fetch(url);
       result = await response.text();
       result = JSON.parse(result);
     }
     if (result && result[0] && result[0].data) {
       submission = result[0]; // assign this so we can test against it
-      this.prettyLog(`found: submission id ${submissionId}`, 'success');
-      this.prettyLog(submission);
+      prettyLog(`found: submission id ${submissionId}`, 'success');
+      prettyLog(submission);
     } else {
       submission = {};
-      this.prettyLog(
+      prettyLog(
         `did not find the submission id ${submissionId}.  Try a different submission id or survey id`,
         'warning'
       );
@@ -290,7 +290,7 @@ export function lookupFromResource(survey, resourceNames, lookup, lookupColumn, 
       if (resource && lookup) {
         items = resource.content.find((object) => object[lookupColumn] === lookup);
         if (typeof items === 'object' && !Array.isArray(items)) {
-          this.prettyLog(`Found ${lookup} in ${resourceName}`, 'success');
+          prettyLog(`Found ${lookup} in ${resourceName}`, 'success');
           foundFlag = 1;
           if (returnColumns && returnColumns.length) {
             let someItems = {};
@@ -298,17 +298,17 @@ export function lookupFromResource(survey, resourceNames, lookup, lookupColumn, 
               if (items && items[column]) {
                 someItems[column] = items[column];
               } else {
-                this.prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
+                prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
               }
             });
             items = someItems;
           }
         } else {
-          this.prettyLog(`Did not find ${lookup} in ${resourceName}`, 'info');
+          prettyLog(`Did not find ${lookup} in ${resourceName}`, 'info');
         }
       } else {
-        if (!lookup) this.prettyLog(`Did not find Lookup field "${lookup}" in "${resourceName}" resource`, 'warning');
-        if (!resource) this.prettyLog(`Did not find "${resourceName}" resource`, 'warning');
+        if (!lookup) prettyLog(`Did not find Lookup field "${lookup}" in "${resourceName}" resource`, 'warning');
+        if (!resource) prettyLog(`Did not find "${resourceName}" resource`, 'warning');
       }
     }
   });
@@ -700,7 +700,7 @@ export const unstable = {
   addMaterials(quantity, ...materials) {
     // check to make sure this not empty or invalid
     if (quantity && quantity.entity && quantity.entity.type === 'quantity--material') {
-      this.prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
+      prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
       if (materials) {
         if (!quantity.entity.relationships || !quantity.entity.relationships.material_type) {
           quantity.entity.relationships.material_type = {};
@@ -711,12 +711,12 @@ export const unstable = {
             type: 'taxonomy_term--material_type',
             name: material,
           });
-          this.prettyLog(`Added: ${material}`, 'success');
+          prettyLog(`Added: ${material}`, 'success');
         });
       }
       return quantity;
     } else {
-      this.prettyLog(
+      prettyLog(
         'A material must be added to a "quantity--material" entity.  Please change the quantity "type" field and try again',
         'error'
       );
@@ -733,7 +733,7 @@ export const unstable = {
    * @param {quantities} type of quantity (one of the accepted farmOS types)
    */
   addQuantityToLog(log, ...quantities) {
-    this.prettyLog(`trying to add quantities to ${log.entity.type}`, 'info');
+    .prettyLog(`trying to add quantities to ${log.entity.type}`, 'info');
     if ((!log.entity.relationships || !log.entity.relationships.quantity) && quantities && quantities.length > 0) {
       log.entity.relationships.quantity = {};
       log.entity.relationships.quantity.data = [];
@@ -743,7 +743,7 @@ export const unstable = {
         type: quantity.entity.type,
         id: quantity.entity.id,
       });
-      this.prettyLog(`Added: ${quantity.entity.type}, ${quantity.entity.id}`, 'success');
+      prettyLog(`Added: ${quantity.entity.type}, ${quantity.entity.id}`, 'success');
     });
     return log;
   },
@@ -776,13 +776,13 @@ export const unstable = {
             type: type,
             [field]: name,
           });
-          this.prettyLog(`Added ${type} ${name}`, 'success');
+          prettyLog(`Added ${type} ${name}`, 'success');
         } else {
-          this.prettyLog(`'${name}' is a duplicate and was not added.`, 'info');
+          prettyLog(`'${name}' is a duplicate and was not added.`, 'info');
         }
       });
     } else {
-      this.prettyLog(`Could not add relationship data, some required information was missing`, 'warning');
+      prettyLog(`Could not add relationship data, some required information was missing`, 'warning');
     }
     return obj;
   },
@@ -797,7 +797,7 @@ export const unstable = {
     let url = '';
     if (Array.isArray(locations)) {
       locations.forEach((location) => {
-        this.prettyLog('Looking for URL...', 'info');
+        prettyLog('Looking for URL...', 'info');
         let locationFlat = this.flattenAll(location);
         let objectKeys = Object.keys(locationFlat);
         for (let i = 0; i < objectKeys.length; i++) {
@@ -807,14 +807,14 @@ export const unstable = {
             this.isValidURL(locationFlat[objectKeys[i]])
           ) {
             url = locationFlat[objectKeys[i]];
-            this.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
+            prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
             break;
           }
         }
       });
     }
     if (!url) {
-      this.prettyLog(`no URL found.`, `warning`);
+      prettyLog(`no URL found.`, `warning`);
     }
     return url;
   },
