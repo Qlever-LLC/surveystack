@@ -88,7 +88,7 @@ import CopyToClipboard from '@/components/submissions/CopyToClipboard.vue';
 export default {
   components: { CopyToClipboard },
   props: {
-    value: {
+    modelValue: {
       required: true,
     },
     items: {
@@ -129,7 +129,7 @@ export default {
   computed: {
     show: {
       get() {
-        return this.value;
+        return this.modelValue;
       },
       set(value) {
         this.$emit('input', value);
