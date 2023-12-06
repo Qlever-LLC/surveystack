@@ -115,7 +115,6 @@ localVue.component('a-icon', AIcon);
 localVue.component('a-img', AImg);
 localVue.component('a-input', AInput);
 localVue.component('a-label', ALabel);
-localVue.component('a-layout', ALayout);
 localVue.component('a-list', AList);
 localVue.component('a-list-group', AListGroup);
 localVue.component('a-list-item', AListItem);

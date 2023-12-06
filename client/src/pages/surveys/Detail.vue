@@ -73,10 +73,8 @@
       </div>
     </div>
   </a-container>
-  <a-container fill-height v-else>
-    <a-layout column justify-center align-center>
-      <a-progress-circular :size="50" color="primary" indeterminate />
-    </a-layout>
+  <a-container cssHeight100 cssDisplayCenterOfPage v-else>
+    <a-progress-circular :size="50" color="primary" indeterminate />
   </a-container>
 </template>
 
