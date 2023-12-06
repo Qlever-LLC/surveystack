@@ -11,7 +11,7 @@
       <a-btn class="ma-2" @click="add" color="primary">Apply</a-btn>
     </div>
 
-    <a-card outlined v-if="filters.length > 0">
+    <a-card variant="outlined" v-if="filters.length > 0">
       <a-list dense>
         <a-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
           <div>

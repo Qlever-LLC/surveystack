@@ -1,5 +1,5 @@
 <template>
-  <a-card dark class="mt-4">
+  <a-card theme="dark" class="mt-4">
     <a-card-title>
       Console Log<a-spacer />
       <a-icon @click="$emit('clear')">mdi-delete</a-icon>

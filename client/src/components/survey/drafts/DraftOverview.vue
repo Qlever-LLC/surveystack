@@ -40,7 +40,7 @@
             v-if="display.relevant || !display.hidden"
             @click="$emit('goto', display.path)"
             :color="display.background"
-            :dark="display.dark"
+            :theme="'dark' ?? display.dark"
             :style="{
               opacity: display.relevant ? 1.0 : 0.5,
               'border-left': display.active ? '4px solid green !important' : '',

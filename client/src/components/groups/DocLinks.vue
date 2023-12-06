@@ -17,7 +17,7 @@
       @start="drag = true"
       @end="drag = false"
     >
-      <a-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" outlined>
+      <a-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" variant="outlined">
         <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -34,7 +34,7 @@
         </a-card-text>
       </a-card>
     </draggable>
-    <a-card class="ma-2" outlined elevation="1" v-else>
+    <a-card class="ma-2" variant="outlined" elevation="1" v-else>
       <a-card-text>
         <span class="title text-secondary">No documentation links yet</span><br />
         <span class="font-weight-light text-grey-darken-2"
