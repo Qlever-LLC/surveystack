@@ -87,7 +87,7 @@ export default {
   setup(props, { emit }) {
     const store = useStore();
 
-    let groupsLink = { name: 'groups-list' };
+    let groupsLink = '/groups';
     if (store.getters['whitelabel/isWhitelabel']) {
       groupsLink = `/g${store.getters['whitelabel/partner'].path}`;
     }
@@ -102,13 +102,13 @@ export default {
         {
           type: 'link',
           label: 'My Submissions',
-          to: { name: 'my-submissions' },
+          to: '/surveys/my-submissions',
           icon: 'mdi-clipboard',
         },
         {
           type: 'link',
           label: 'Browse',
-          to: { name: 'surveys-browse' },
+          to: '/surveys/browse',
           icon: 'mdi-magnify',
         },
       ],
@@ -120,13 +120,13 @@ export default {
         {
           type: 'link',
           label: 'Builder',
-          to: { name: 'surveys-new' },
+          to: '/surveys/new',
           icon: 'mdi-newspaper-plus',
         },
         {
           type: 'link',
           label: 'Scripts',
-          to: { name: 'scripts-list' },
+          to: '/scripts',
           icon: 'mdi-language-javascript',
         },
         {
@@ -144,17 +144,13 @@ export default {
         {
           type: 'link',
           label: 'Users',
-          to: {
-            name: 'users-list',
-          },
+          to: '/users',
           icon: 'mdi-account-search',
         },
         {
           type: 'link',
           label: 'FarmOS',
-          to: {
-            name: 'farmos-manage',
-          },
+          to: '/farmos-manage',
           icon: 'mdi-leaf-circle-outline',
         },
       ],

@@ -14,10 +14,10 @@
         </a-btn>
       </template>
       <a-list flat>
-        <a-list-item link :to="{ name: 'auth-profile' }" prepend-icon="mdi-account-circle">
+        <a-list-item link to="/auth/profile" prepend-icon="mdi-account-circle">
           <a-list-item-title> Profile </a-list-item-title>
         </a-list-item>
-        <a-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }" prepend-icon="mdi-leaf-circle-outline">
+        <a-list-item v-if="isOwner" link to="/farmos/profile" prepend-icon="mdi-leaf-circle-outline">
           <a-list-item-title> FarmOS Profile </a-list-item-title>
         </a-list-item>
         <a-divider />
