@@ -10,7 +10,7 @@
           class="mt-3"
           v-model="entity.meta.invitationEmail"
           label="Email"
-          outlined
+          variant="outlined"
           :rules="emailRules"
           validate-on-blur
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
@@ -19,8 +19,9 @@
         <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationName"
-          outlined
+          variant="outlined"
           hint="Default name for newly registered users"
+          labelSlot
         >
           <template v-slot:label>
             <div>Name <small>(optional)</small></div>

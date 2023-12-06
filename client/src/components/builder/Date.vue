@@ -21,10 +21,10 @@
     <template v-slot:activator="{ props }">
       <a-text-field
         v-bind="props"
-        @input="onChange"
+        :modelValue="formattedDate"
+        @update:modelValue="onChange"
         @blur="$emit('blur')"
         label="Default value"
-        :value="formattedDate"
         :class="$vnode.data.staticClass"
         :dense="dense"
         readonly

@@ -6,7 +6,7 @@
       <a-btn color="primary" class="ml-4" :to="newRoute" variant="text">New...</a-btn>
     </a-card-title>
     <a-card-text>
-      <a-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
+      <a-text-field label="Search" v-model="q" id="oursci-group-list-search" append-inner-icon="mdi-magnify" />
       <template v-if="entities && entities.length > 0">
         <a-list-item
           v-for="integration in integrations"

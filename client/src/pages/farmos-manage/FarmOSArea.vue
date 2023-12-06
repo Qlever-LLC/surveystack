@@ -1,7 +1,13 @@
 <template>
   <div style="width: 100%">
     <a-form>
-      <a-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
+      <a-text-field
+        @update:modelValue="(val) => updateName(val)"
+        :modelValue="value.name"
+        label="Name"
+        placeholder="Name"
+        variant="outlined"
+      />
     </a-form>
     <div id="farmos-map" style="width: 100%; height: 500px"></div>
   </div>

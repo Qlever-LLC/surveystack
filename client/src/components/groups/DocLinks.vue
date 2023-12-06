@@ -66,9 +66,23 @@
         <a-card-title>Add documentation link</a-card-title>
         <a-card-text>
           <a-form v-model="newIsValid" ref="form">
-            <a-text-field class="mt-3" v-model="newDoc.label" label="Label" outlined required :rules="labelRules" />
+            <a-text-field
+              class="mt-3"
+              v-model="newDoc.label"
+              label="Label"
+              variant="outlined"
+              required
+              :rules="labelRules"
+            />
 
-            <a-text-field class="mt-3" v-model="newDoc.link" label="Link" outlined required :rules="linkRules" />
+            <a-text-field
+              class="mt-3"
+              v-model="newDoc.link"
+              label="Link"
+              variant="outlined"
+              required
+              :rules="linkRules"
+            />
 
             <a-checkbox
               v-model="addToDescendants"

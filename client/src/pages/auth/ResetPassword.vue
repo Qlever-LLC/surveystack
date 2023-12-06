@@ -9,14 +9,14 @@
             v-model="newPassword"
             label="Password"
             :type="passwordInputType"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append="showPasswords = !showPasswords"
           />
           <a-text-field
             v-model="newPasswordConfirmation"
             label="Password confirmation"
             :type="passwordInputType"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append="showPasswords = !showPasswords"
           />
           <div class="d-flex justify-end">

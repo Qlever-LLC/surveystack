@@ -16,7 +16,7 @@
         <div class="d-flex flex-grow-1">
           <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
-            outlined
+            variant="outlined"
             v-model="seats"
             label="Max Seats"
             type="number"
@@ -95,7 +95,7 @@
     </div>
 
     <div class="search">
-      <a-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search" />
+      <a-text-field variant="solo" placeholder="Search" prepend-inner-icon="mdi-magnify" clear-icon v-model="search" />
     </div>
     <FarmOSGroupTable
       :members="filteredMembers"

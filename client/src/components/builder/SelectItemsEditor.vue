@@ -7,12 +7,12 @@
         ref="anchorRef"
         label="Resource"
         placeholder="Add Options"
-        :value="getLabel"
+        :modelValue="getLabel"
         class="mt-6"
         :class="$vnode.data.staticClass"
         hide-details
         readonly
-        outlined
+        variant="outlined"
         :disabled="disabled"
       />
     </template>
@@ -36,16 +36,16 @@
           <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
             <a-text-field
               class="flex-grow-1"
-              :value="item.label"
-              @input="(value) => onInput(index, 'label', value)"
+              :modelValue="item.label"
+              @update:modelValue="(value) => onInput(index, 'label', value)"
               :rules="rules"
               :hide-details="false"
               dense
             />
             <a-text-field
               class="flex-grow-1"
-              :value="item.value"
-              @input="(value) => onInput(index, 'value', value)"
+              :modelValue="item.value"
+              @update:modelValue="(value) => onInput(index, 'value', value)"
               :rules="rules"
               :hide-details="false"
               dense

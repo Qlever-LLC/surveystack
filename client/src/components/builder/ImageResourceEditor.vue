@@ -19,27 +19,27 @@
         ref="form"
       >
         <a-text-field
-          :value="resource.label"
-          @input="handleUpdateLabel"
+          :modelValue="resource.label"
+          @update:modelValue="handleUpdateLabel"
           label="Image Label"
           :rules="[nameHasValidLength]"
           persistent-hint
-          outlined
+          variant="outlined"
         />
         <a-text-field
-          :value="resource.name"
-          @input="handleUpdateName"
+          :modelValue="resource.name"
+          @update:modelValue="handleUpdateName"
           label="Image Data Name"
           persistent-hint
-          outlined
+          variant="outlined"
           :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
         />
         <a-text-field
-          :value="resource.content"
-          @input="handleUpdateContent"
+          :modelValue="resource.content"
+          @update:modelValue="handleUpdateContent"
           label="Image URL"
           persistent-hint
-          outlined
+          variant="outlined"
         />
       </a-form>
     </a-card-text>

@@ -32,7 +32,7 @@
         <a-card-title />
         <a-card-text class="flex-grow-1">
           <div class="px-5 py-2">
-            <a-text-field v-model="search" label="Search" prepend-icon="mdi-magnify" />
+            <a-text-field v-model="search" label="Search" append-inner-icon="mdi-magnify" />
             <div class="d-flex justify-end mb-4">
               <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
             </div>

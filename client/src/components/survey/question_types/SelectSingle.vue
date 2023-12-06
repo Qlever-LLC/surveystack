@@ -37,11 +37,11 @@
             <template v-slot:label>
               <a-text-field
                 class="text-field-other"
-                :value="customSelection"
-                @input="handleCustomSelectionInput"
+                :modelValue="customSelection"
+                @update:modelValue="handleCustomSelectionInput"
                 data-test-id="custom-input"
                 hide-details
-                outlined
+                variant="outlined"
                 dense
                 label="other"
                 color="focus"

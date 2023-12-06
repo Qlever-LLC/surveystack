@@ -12,10 +12,10 @@
     <div style="display: flex">
       <div style="flex: 1">
         <a-text-field
-          outlined
+          variant="outlined"
           :label="control.hint"
-          :value="localValue"
-          @input="onInput"
+          :modelValue="localValue"
+          @update:modelValue="onInput"
           @keyup.enter.prevent="submit"
           ref="textField"
           class="full-width"

@@ -3,7 +3,7 @@
     <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
     <span class="text-secondary">{{ this.entity._id }}</span>
     <a-form class="mt-3" @keydown.enter.prevent="submit">
-      <a-text-field v-model="entity.name" label="Name" outlined hide-details />
+      <a-text-field v-model="entity.name" label="Name" variant="outlined" hide-details />
       <active-group-selector
         class="my-4"
         label="Group"

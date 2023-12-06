@@ -61,7 +61,7 @@
       <a-card>
         <a-card-title>Search surveys</a-card-title>
         <a-card-text>
-          <a-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
+          <a-text-field v-model="q" append-inner-icon="mdi-magnify" @update:modelValue="(e) => $emit('search', e)" />
           <a-list>
             <a-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
               <a-list-item-title>{{ searchResult.name }}</a-list-item-title>

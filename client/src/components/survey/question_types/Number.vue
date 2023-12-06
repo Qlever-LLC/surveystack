@@ -10,11 +10,11 @@
       @initialize="initialize"
     />
     <a-text-field
-      outlined
+      variant="outlined"
       type="number"
       :label="control.hint"
-      :value="value"
-      @input="onInput"
+      :modelValue="value"
+      @update:modelValue="onInput"
       @keyup.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"

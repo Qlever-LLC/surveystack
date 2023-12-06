@@ -8,8 +8,8 @@
           label="E-Mail"
           type="text"
           class="form-control"
-          :value="entity.email.toLowerCase()"
-          @input="entity.email = $event.toLowerCase()"
+          :modelValue="entity.email.toLowerCase()"
+          @update:modelValue="entity.email = $event.toLowerCase()"
           color="focus"
           hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
@@ -21,7 +21,7 @@
           :type="passwordInputType"
           class="form-control"
           v-model="entity.password"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
           @click:append="showPasswords = !showPasswords"
           color="focus"
         />

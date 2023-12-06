@@ -21,7 +21,9 @@
             </a-card-text>
             <a-card-actions>
               <a-spacer />
-              <a-btn color="primary" variant="text" @click="submitEmail" :loading="isSubmittingEmail"> Update email </a-btn>
+              <a-btn color="primary" variant="text" @click="submitEmail" :loading="isSubmittingEmail">
+                Update email
+              </a-btn>
             </a-card-actions>
           </a-card>
         </a-dialog>
@@ -33,7 +35,7 @@
           <a-text-field
             tabindex="3"
             v-model="entity.password"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append="showPasswords = !showPasswords"
             label="Password"
             :type="showPasswords ? 'text' : 'password'"
@@ -44,7 +46,7 @@
           <a-text-field
             tabindex="4"
             v-model="passwordConfirmation"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append="showPasswords = !showPasswords"
             label="Password (Confirmation)"
             :type="showPasswords ? 'text' : 'password'"

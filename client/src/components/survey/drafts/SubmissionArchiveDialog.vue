@@ -12,7 +12,7 @@
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
           v-model="archiveReasonOther"
-          outlined
+          variant="outlined"
         />
       </a-card-text>
       <a-card-actions>

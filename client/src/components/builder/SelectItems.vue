@@ -4,10 +4,10 @@
       <a-text-field
         v-on="on"
         v-bind="attrs"
-        @input="onChange"
+        :modelValue="getLabel"
+        @update:modelValue="onChange"
         ref="anchorRef"
         label="Default value"
-        :value="getLabel"
         :class="$vnode.data.staticClass"
         clearable
         hide-details

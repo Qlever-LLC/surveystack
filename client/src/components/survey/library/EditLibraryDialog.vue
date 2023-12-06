@@ -3,7 +3,7 @@
     <a-card>
       <a-card-title> Add Survey To Library </a-card-title>
       <a-card-text>
-        <a-text-field :value="localLibrarySurvey.name" label="Title" readonly />
+        <a-text-field :modelValue="localLibrarySurvey.name" label="Title" readonly />
         <h3>Description</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryDescription" class="mb-4" />
         <h3>Applications</h3>

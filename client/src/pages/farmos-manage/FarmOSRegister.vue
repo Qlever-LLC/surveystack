@@ -35,9 +35,10 @@
             placeholder="Enter Subdomain"
             :suffix="'.' + planUrl"
             :loading="localViewModel.loading"
-            outlined
+            variant="outlined"
+            appendSlot
           >
-            <template v-slot:append-outer>
+            <template v-slot:append>
               <a-icon
                 style="margin-top: -8px"
                 v-if="viewModel.form.instanceNameValid === true || viewModel.form.instanceNameValid === false"
@@ -63,7 +64,7 @@
         v-model="localViewModel.form.email"
         label="E-Mail Address of Primary User"
         placeholder="Farmer's E-Mail"
-        outlined
+        variant="outlined"
         :rules="emailRules"
       />
 
@@ -71,7 +72,7 @@
         v-model="localViewModel.form.fullName"
         label="Full Name of the Farmer"
         placeholder="Farmer's Name"
-        outlined
+        variant="outlined"
         :rules="nameRules"
       />
 
@@ -79,7 +80,7 @@
         v-model="localViewModel.form.farmName"
         label="Name of the Farm"
         placeholder="Farm Name"
-        outlined
+        variant="outlined"
         :rules="nameRules"
       />
 
@@ -87,7 +88,7 @@
         v-model="localViewModel.form.farmAddress"
         label="Farm Address / Location"
         placeholder="123 Fake Street, Exampletown, NY"
-        outlined
+        variant="outlined"
         :rules="addressRules"
       />
 

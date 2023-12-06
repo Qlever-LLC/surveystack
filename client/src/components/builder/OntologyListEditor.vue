@@ -54,25 +54,25 @@
       <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
         <a-text-field
-          :value="resource.label"
+          :modelValue="resource.label"
+          @update:modelValue="handleUpdateLabel"
           :disabled="disabled"
-          @input="handleUpdateLabel"
           label="List Label"
           persistent-hint
           class="mx-2"
         />
         <!-- TODO: validate unique data name -->
         <a-text-field
-          :value="resource.name"
+          :modelValue="resource.name"
+          @update:modelValue="handleUpdateName"
           :disabled="disabled"
-          @input="handleUpdateName"
           label="List Data Name"
           persistent-hint
           class="mx-2"
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
 
-        <a-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
+        <a-text-field v-model="search" append-inner-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
           <a-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
             <a-icon>mdi-delete</a-icon>
@@ -91,13 +91,13 @@
         :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
       >
         <template v-slot:item.label="{ item }">
-          <a-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.label" :disabled="disabled" variant="solo" dense hide-details />
         </template>
         <template v-slot:item.value="{ item }">
-          <a-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.value" :disabled="disabled" variant="solo" dense hide-details />
         </template>
         <template v-slot:item.tags="{ item }">
-          <a-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
+          <a-text-field v-model="item.tags" :disabled="disabled" variant="solo" dense hide-details />
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">

@@ -3,10 +3,9 @@
     ref="refAnchor"
     @blur="$emit('blur')"
     @click="$emit('click', $event)"
-    @click:append="$emit('click:append', $event)"
-    @change="$emit('change', $event)"
+    @click:appendInner="$emit('click:appendInner', $event)"
+    @change="$emit('click', $event)"
     @focusout="$emit('focusout')"
-    @input="$emit('input', $event)"
     @keydown.esc="$emit('keydown.esc')"
     @keyup.enter="$emit('keyup.enter')"
     :autocomplete="autocomplete"
@@ -16,36 +15,35 @@
     :primary="primary"
     :required="required"
     :tabindex="tabindex"
-    :append-icon="appendIcon"
+    :append-inner-icon="appendInnerIcon"
     :autofocus="autofocus"
     :clear-icon="clearIcon"
     :clearable="clearable"
     :color="color"
-    :dense="dense"
+    :density="dense ? 'compact' : 'default'"
     :disabled="disabled"
     :error-messages="errorMessages"
-    :filled="filled"
     :hide-details="hideDetails"
     :hint="hint"
     :label="label"
     :loading="loading"
-    :outlined="outlined"
     :persistent-hint="persistentHint"
     :placeholder="placeholder"
-    :prepend-icon="prependIcon"
+    :prepend-inner-icon="prependInnerIcon"
     :readonly="readonly"
     :rules="rules"
     :single-line="singleLine"
-    :solo="solo"
     :suffix="suffix"
     :type="type"
     :validate-on-blur="validateOnBlur"
-    :value="value"
+    :variant="variant"
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
   >
-    <template v-slot:append-outer>
-      <slot name="append-outer" />
+    <template v-if="appendSlot" v-slot:append>
+      <slot name="append" />
     </template>
-    <template v-slot:label>
+    <template v-if="labelSlot" v-slot:label>
       <slot name="label" />
     </template>
   </v-text-field>
@@ -55,8 +53,19 @@
 export default {
   name: 'ATextField',
   // click event listened to by slot:activator
-  emits: ['blur', 'click', 'click:append', 'change', 'focusout', 'input', 'keydown.esc', 'keyup.enter'],
+  emits: [
+    'blur',
+    'click',
+    'click:appendInner',
+    'change',
+    'focusout',
+    'keydown.esc',
+    'keyup.enter',
+    'update:modelValue',
+  ],
   props: {
+    appendSlot: { type: Boolean, required: false },
+    labelSlot: { type: Boolean, required: false },
     //non vuetify props
     autocomplete: { type: String, required: false },
     dataTestId: { type: String, required: false },
@@ -65,31 +74,36 @@ export default {
     required: { type: Boolean, required: false },
     tabindex: { type: String, required: false },
     //vuetify props
-    appendIcon: { type: String, required: false },
+    appendInnerIcon: { type: String, required: false },
     autofocus: { type: Boolean, required: false },
     clearIcon: { type: String, required: false },
     clearable: { type: Boolean, required: false },
-    color: { type: String, required: false },
+    color: { type: String, required: false, default: 'focus' },
     dense: { type: Boolean, required: false },
     disabled: { type: Boolean, required: false },
     errorMessages: { type: [Array, String], required: false },
-    filled: { type: Boolean, required: false },
     hideDetails: { type: [Boolean, String], required: false },
     hint: { type: String, required: false },
     label: { type: String, required: false },
     loading: { type: [Boolean, String], required: false },
-    outlined: { type: Boolean, required: false },
     persistentHint: { type: Boolean, required: false },
     placeholder: { type: String, required: false },
-    prependIcon: { type: String, required: false },
+    prependInnerIcon: { type: String, required: false },
     readonly: { type: Boolean, required: false },
     rules: { type: Array, required: false },
     singleLine: { type: Boolean, required: false },
-    solo: { type: Boolean, required: false },
     suffix: { type: String, required: false },
     type: { type: String, required: false },
     validateOnBlur: { type: Boolean, required: false },
-    value: { type: undefined, required: false },
+    variant: {
+      type: String,
+      validator: function (value) {
+        return ['outlined', 'underlined', 'filled', 'solo'].includes(value);
+      },
+      default: 'underlined',
+      required: false,
+    },
+    modelValue: { type: String, required: false },
   },
   methods: {
     blur() {

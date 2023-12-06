@@ -9,8 +9,8 @@
             label="E-Mail"
             type="text"
             class="form-control"
-            :value="entity.email"
-            @input="entity.email = $event.toLowerCase()"
+            v-model="entity.email"
+            @update:model-value="entity.email = $event.toLowerCase()"
             color="focus"
           />
           <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
@@ -22,8 +22,8 @@
             :type="passwordInputType"
             class="form-control"
             v-model="entity.password"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords"
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:appendInner="showPasswords = !showPasswords"
             color="focus"
           />
           <div class="d-flex justify-space-around align-center">

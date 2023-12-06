@@ -39,13 +39,13 @@
             <a-text-field
               v-bind="props"
               @change="updateDateInput"
-              @input="datePickerIsVisible = false"
-              :value="dateFormatted"
+              @update:modelValue="datePickerIsVisible = false"
+              :modelValue="dateFormatted"
               label="Year"
               persistent-hint
-              prepend-icon="mdi-calendar"
+              prepend-inner-icon="mdi-calendar"
               readonly
-              outlined
+              variant="outlined"
               color="focus"
             />
           </template>

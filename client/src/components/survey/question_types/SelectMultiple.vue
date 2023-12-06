@@ -36,10 +36,10 @@
         <a-text-field
           label="other"
           v-model="customValue"
-          outlined
+          variant="outlined"
           dense
           hide-details
-          @input="onCustomChange"
+          @update:modelValue="onCustomChange"
           color="focus"
         />
       </div>

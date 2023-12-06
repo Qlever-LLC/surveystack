@@ -10,7 +10,7 @@
       </slot>
     </a-card-title>
     <a-card-text>
-      <a-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
+      <a-text-field label="Search" v-model="q" append-inner-icon="mdi-magnify" v-if="searchable" />
       <a-list
         v-if="entities.length > 0"
         :style="{

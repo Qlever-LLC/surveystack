@@ -52,7 +52,7 @@
             <a-text-field
               tabindex="3"
               v-model="password"
-              :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+              :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
               @click:append="showPasswords = !showPasswords"
               label="Password"
               :type="showPasswords ? 'text' : 'password'"
@@ -63,7 +63,7 @@
             <a-text-field
               tabindex="4"
               v-model="passwordConfirmation"
-              :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+              :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
               @click:append="showPasswords = !showPasswords"
               label="Password (Confirmation)"
               :type="showPasswords ? 'text' : 'password'"

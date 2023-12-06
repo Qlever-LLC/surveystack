@@ -64,7 +64,7 @@
             id="group-slug"
             v-model="entity.slug"
             :readonly="!editSlug"
-            :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
+            :append-inner-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
             autocomplete="off"
             @click:append="editSlug = !editSlug"
             hint="URL friendly version of name"

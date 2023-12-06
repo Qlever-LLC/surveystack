@@ -5,16 +5,16 @@
         ref="anchorRef"
         v-on="on"
         v-bind="attrs"
+        :modelValue="getText"
+        @update:modelValue="onTextFieldChange"
         :label="label"
         :placeholder="placeholder"
-        :value="getText"
         :class="[$vnode.data.staticClass, $attrs.class]"
         :disabled="disabled"
         hide-details
         readonly
-        outlined
+        variant="outlined"
         clearable
-        @input="onTextFieldChange"
       />
     </template>
 

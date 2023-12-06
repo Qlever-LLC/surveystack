@@ -169,7 +169,7 @@
     <a-card-text>
       <div class="mt-4">
         <a-text-field
-          :value="surveyGroupName"
+          :modelValue="surveyGroupName"
           label="Group"
           readonly
           disabled

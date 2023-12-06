@@ -8,10 +8,10 @@
 
     <a-row class="align-baseline">
       <a-col>
-        <a-text-field outlined primary label="New Plan Name" v-model.trim="planName" />
+        <a-text-field variant="outlined" primary label="New Plan Name" v-model.trim="planName" />
       </a-col>
       <a-col>
-        <a-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl" />
+        <a-text-field variant="outlined" primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl" />
       </a-col>
       <a-col>
         <a-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</a-btn>

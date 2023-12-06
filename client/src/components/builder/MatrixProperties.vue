@@ -6,13 +6,13 @@
         v-bind="attrs"
         ref="anchorRef"
         label="Resource"
-        :value="getLabel"
+        :modelValue="getLabel"
         placeholder="Add Columns"
         class="mt-6"
         :class="$vnode.data.staticClass"
         hide-details
         readonly
-        outlined
+        variant="outlined"
         :disabled="disabled"
       />
     </template>

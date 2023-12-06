@@ -2,9 +2,9 @@
 <template>
   <a-text-field
     v-if="header.type === 'text'"
-    :value="value"
-    @input="onInput"
-    outlined
+    :modelValue="value"
+    @update:modelValue="onInput"
+    variant="outlined"
     hide-details
     autocomplete="off"
     :disabled="disabled"
@@ -13,9 +13,9 @@
     <div style="flex: 1">
       <a-text-field
         ref="text-qrcode"
-        :value="value"
-        @input="onInput"
-        outlined
+        :modelValue="value"
+        @update:modelValue="onInput"
+        variant="outlined"
         hide-details
         autocomplete="off"
         :disabled="disabled"
@@ -27,19 +27,19 @@
   </div>
   <a-text-field
     v-else-if="header.type === 'farmos_uuid'"
-    :value="localValue"
-    @input="onFarmOsInput"
-    outlined
+    :modelValue="localValue"
+    @update:modelValue="onFarmOsInput"
+    variant="outlined"
     hide-details
     autocomplete="off"
     :disabled="disabled"
   />
   <a-text-field
     v-else-if="header.type === 'number'"
-    :value="value"
-    @input="onNumberInput"
+    :modelValue="value"
+    @update:modelValue="onNumberInput"
     type="number"
-    outlined
+    variant="outlined"
     hide-details="auto"
     :disabled="disabled"
     :rules="[isValidNumber]"
@@ -203,9 +203,9 @@
         <a-text-field
           v-bind="props"
           @click="setActivePickerMonth"
-          :value="getDateLabel"
+          :modelValue="getDateLabel"
           hide-details
-          outlined
+          variant="outlined"
           autocomplete="off"
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
@@ -226,7 +226,7 @@
     </a-menu>
   </div>
 
-  <a-text-field v-else value="unknown cell type" outlined hide-details disabled />
+  <a-text-field v-else value="unknown cell type" variant="outlined" hide-details disabled />
 </template>
 
 <script>

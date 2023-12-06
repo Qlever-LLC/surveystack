@@ -1,8 +1,8 @@
 <template>
   <!-- v-if="state.isEditing" -->
   <a-text-field
-    :value="value"
-    @input="$emit('input', $event)"
+    :modelValue="value"
+    @update:modelValue="$emit('input', $event)"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
     class="display-1 pt-0 mt-0"
