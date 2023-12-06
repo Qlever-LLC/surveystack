@@ -16,7 +16,13 @@
       @start="drag = true"
       @end="drag = false"
     >
-      <a-card v-for="(el, idx) in entities" :key="`${idx}-survey-${el._id}`" class="ma-2 mx-6" elevation="1" outlined>
+      <a-card
+        v-for="(el, idx) in entities"
+        :key="`${idx}-survey-${el._id}`"
+        class="ma-2 mx-6"
+        elevation="1"
+        variant="outlined"
+      >
         <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -37,7 +43,7 @@
         </a-card-text>
       </a-card>
     </draggable>
-    <a-card class="ma-2" outlined elevation="1" v-else>
+    <a-card class="ma-2" variant="outlined" elevation="1" v-else>
       <a-card-text>
         <span class="title text-secondary">No pinned surveys yet</span><br />
         <span class="font-weight-light text-grey-darken-2">You can add surveys from the menu in the top right</span>

@@ -19,7 +19,7 @@
         >.
       </p>
 
-      <a-card outlined>
+      <a-card variant="outlined">
         <a-card-text> <div>User Details</div></a-card-text>
         <a-card-text>
           <a-form>

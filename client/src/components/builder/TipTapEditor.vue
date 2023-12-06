@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
-  <a-card outlined class="tiptap-editor">
+  <a-card varaint="outlined" class="tiptap-editor">
     <a-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
         <a-toolbar color="grey-lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
