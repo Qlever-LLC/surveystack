@@ -17,7 +17,7 @@ import api from '@/services/api.service';
 import codeEditor from '@/components/ui/CodeEditor.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
-// const codeEditor = () => import('@/components/ui/CodeEditor.vue');
+// const codeEditor = defineAsyncComponent(() => import('@/components/ui/CodeEditor.vue'));
 
 export default {
   components: {

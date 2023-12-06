@@ -117,8 +117,9 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import { defineAsyncComponent } from 'vue';
 
-const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
+const SurveyBuilder = defineAsyncComponent(() => import('@/components/builder/SurveyBuilder.vue'));
 
 export default {
   components: {

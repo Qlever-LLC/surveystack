@@ -15,10 +15,11 @@ import SelectMultiple from './SelectMultiple.vue';
 import SelectSingle from './SelectSingle.vue';
 import String from './String.vue';
 import FarmosUuid from './FarmOsCreateUUID.vue';
+import { defineAsyncComponent } from 'vue';
 
-const GeoJSON = () => import('./GeoJSON.vue');
-const InstructionsImageSplit = () => import('./InstructionsImageSplit.vue');
-const Location = () => import('./Location.vue');
+const GeoJSON = defineAsyncComponent(() => import('./GeoJSON.vue'));
+const InstructionsImageSplit = defineAsyncComponent(() => import('./InstructionsImageSplit.vue'));
+const Location = defineAsyncComponent(() => import('./Location.vue'));
 
 export default function addQuestionTypesComponents(app) {
   app.component('AppControlFile', _File);

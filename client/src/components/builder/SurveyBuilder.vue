@@ -274,8 +274,9 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
+import { defineAsyncComponent } from 'vue';
 
-const codeEditor = () => import('@/components/ui/CodeEditor.vue');
+const codeEditor = defineAsyncComponent(() => import('@/components/ui/CodeEditor.vue'));
 
 const initialRelevanceCode = (variable) => `\
 /**
