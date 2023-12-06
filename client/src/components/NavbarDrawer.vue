@@ -26,7 +26,11 @@
       <a-divider dark class="my-1" />
 
       <a-list-item class="pa-0">
-        <a-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
+        <a-expansion-panels
+          class="pa-0 ma-0 no-background"
+          variant="accordion"
+          :modelValue="docs.length > 2 ? undefined : 0"
+        >
           <a-expansion-panel>
             <a-expansion-panel-title class="pa-0 ma-0">
               <a-list-subheader>DOCUMENTATION</a-list-subheader>

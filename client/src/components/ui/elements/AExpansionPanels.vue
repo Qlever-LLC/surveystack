@@ -1,11 +1,5 @@
 <template>
-  <v-expansion-panels
-    :accordion="accordion"
-    :flat="flat"
-    :multiple="multiple"
-    :value="value"
-    @change="$emit('input', $event)"
-  >
+  <v-expansion-panels :multiple="multiple" :modelValue="modelValue" :variant="variant" @change="$emit('input', $event)">
     <slot />
   </v-expansion-panels>
 </template>
@@ -15,9 +9,16 @@ export default {
   name: 'AExpansionPanels',
   props: {
     accordion: { type: Boolean, default: false },
-    flat: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
+    variant: {
+      type: String,
+      validator: function (value) {
+        return ['default', 'inset', 'accordion', 'popout'].includes(value);
+      },
+      default: 'default',
+      required: false,
+    },
   },
   emits: ['input'],
 };

@@ -4,7 +4,7 @@
     <a-icon color="success" class="mr-1">mdi-check-bold</a-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </a-card-text>
-  <a-expansion-panels v-else flat multiple v-model="mainPanelState">
+  <a-expansion-panels v-else multiple v-model="mainPanelState">
     <a-expansion-panel>
       <a-expansion-panel-title v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>

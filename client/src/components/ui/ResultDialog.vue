@@ -28,7 +28,7 @@
                     </a-card-title>
 
                     <a-card-text>
-                      <a-expansion-panels accordion>
+                      <a-expansion-panels variant="accordion">
                         <a-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
                           :key="i"
