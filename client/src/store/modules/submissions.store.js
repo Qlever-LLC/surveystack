@@ -129,7 +129,7 @@ const actions = {
     router.push({
       name: 'submissions-drafts-detail',
       params: { id: submission._id },
-      query: { minimal_ui: router.currentRoute.query.minimal_ui },
+      query: { minimal_ui: router.currentRoute.value.query.minimal_ui },
     });
   },
   async [types.actions.update]({ commit }, submission) {
