@@ -18,8 +18,7 @@
           </slot>
         </div>
       </div>
-      <!-- TODO The `$scopedSlots` is deprecated  vue/no-deprecated-dollar-scopedslots-api -->
-      <div v-if="$scopedSlots['row-actions']" class="mt-header-left-spacer" />
+      <div v-if="$slots.rowActions()" class="mt-header-left-spacer" />
     </div>
     <div ref="body" class="mt-body pb-1" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div
@@ -46,14 +45,13 @@
             </slot>
           </div>
         </div>
-        <!-- TODO The `$scopedSlots` is deprecated  vue/no-deprecated-dollar-scopedslots-api -->
         <div
-          v-if="$scopedSlots['row-actions']"
+          v-if="$slots.rowActions()"
           class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 white"
           :class="{ 'mt-elevation-shadow': isRightFloating }"
         >
           <div class="mt-actions d-flex align-center">
-            <slot name="row-actions" v-bind:rowIdx="rowIdx"></slot>
+            <slot name="rowActions" v-bind:rowIdx="rowIdx"></slot>
           </div>
         </div>
       </div>

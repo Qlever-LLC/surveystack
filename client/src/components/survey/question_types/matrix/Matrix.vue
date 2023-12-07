@@ -117,7 +117,7 @@
           />
         </a-form>
       </template>
-      <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
+      <template v-if="!isMobile" v-slot:rowActions="{ rowIdx }">
         <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
           <div class="d-flex">
             <a-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
