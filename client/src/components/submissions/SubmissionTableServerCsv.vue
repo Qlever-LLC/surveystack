@@ -78,10 +78,6 @@ export default {
   methods: {
     hello(value, field) {
       this.searchFields[field] = value;
-      // this.$set(this.searchFields, field, value);
-
-      console.log(field);
-      console.log(value);
     },
     createCustomFilter(field) {
       return (value, search, item) => {

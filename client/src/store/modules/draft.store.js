@@ -542,7 +542,7 @@ const mutations = {
       throw new Error(`Trying to set property for the invalid path: ${path}`);
     }
 
-    Vue.set(parent, childKey, value);
+    parent[childKey] = value;
   },
   SET_NEXT_ENABLE(state, enable) {
     state.enableNext = enable;
@@ -588,7 +588,7 @@ const mutations = {
     state.showConfirmSubmission = show;
   },
   SET_FARMOS_RESOURCE(state, { type, resource }) {
-    Vue.set(state.farmOsCache, type, resource);
+    state.farmOsCache[type] = resource;
   },
   SET_ERRORS(state, errors) {
     state.errors = errors;
