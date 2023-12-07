@@ -170,7 +170,6 @@ const actions = {
       console.error('Could not fetch the remote file data', error);
     }
 
-    db.persistResource(resource);
     commit('ADD_RESOURCE', resource);
 
     return resource;
@@ -178,6 +177,7 @@ const actions = {
   async fetchScriptResource({ commit, getters, dispatch }, resource) {
     try {
       let resourceStored = getters['getResource'](resource.id);
+      // TODO: navigator.onLine is not reliable
       if (isOnline()) {
         //always load latest script version if online
         const { data: scriptCode } = await api.get(`/scripts/${resource.content}`);
