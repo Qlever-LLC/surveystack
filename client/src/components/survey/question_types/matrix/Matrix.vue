@@ -302,7 +302,7 @@ export default {
       },
     },
     isMobile() {
-      return !this.$vuetify.breakpoint.smAndUp || this.forceMobile;
+      return !this.$vuetify.display.smAndUp || this.forceMobile;
     },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };

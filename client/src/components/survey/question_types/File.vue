@@ -50,12 +50,12 @@
           <a-icon color="primary" x-large>mdi-cloud-upload-outline</a-icon>
         </div>
         <div class="col-12 font-weight-bold">
-          {{ $vuetify.breakpoint.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
+          {{ $vuetify.display.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
         </div>
         <div
           class="col-12 pt-0"
           v-if="
-            ($vuetify.breakpoint.mobile || forceMobile) &&
+            ($vuetify.display.mobile || forceMobile) &&
             supportsImageCapture() &&
             isMimeTypeAllowed(control.options.source.types, 'image')
           "
