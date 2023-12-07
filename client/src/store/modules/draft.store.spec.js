@@ -3,7 +3,7 @@ import { createSurvey } from '@/utils/surveys';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 
-const { actions, mutations } = draftStore;
+const { actions, mutations, getters } = draftStore;
 
 // marker control ID's to setup the initial state
 const INITIAL_FIRST_CONTROL_ID = 'first-node';
@@ -11,6 +11,9 @@ const INITIAL_CURRENT_CONTROL_ID = 'current-node'; // if not set, it'll be the s
 const EXPECTED_NEXT_CONTROL_ID = 'next-node'; // if not set, commit('SHOW_OVERVIEW', true) is expected
 
 const createStateWithControls = (controls) => {
+  if (!Array.isArray(controls)) {
+    throw new Error('controls must be an array');
+  }
   const survey = {
     ...createSurvey({ group: { id: null, path: null } }),
   };
@@ -415,6 +418,29 @@ describe('draft store', () => {
         const state = { node: {}, firstNode: {} };
         mutations.NEXT(state, {});
         expect(state.firstNode).toBe(state.firstNode);
+      });
+    });
+  });
+
+  describe('getters', () => {
+    describe('hasRequiredUnanswered', () => {
+      it('does not throw an error for a matrix in a group', () => {
+        const controls = createControl({
+          type: 'group',
+          // id: INITIAL_FIRST_CONTROL_ID,
+          children: [
+            createControl({
+              type: 'matrix',
+              id: INITIAL_FIRST_CONTROL_ID,
+            }),
+            createControl({ type: 'number' }),
+          ],
+        });
+        const state = createStateWithControls([controls]);
+        const _getters = {
+          path: getters.path(state),
+        };
+        getters.hasRequiredUnanswered(state, _getters);
       });
     });
   });

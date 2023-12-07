@@ -2,6 +2,9 @@ import { createControlInstance } from '@/utils/surveyConfig';
 import { uniqueId } from 'lodash';
 
 export const addRevisionToSurvey = (survey, controls) => {
+  if (!Array.isArray(controls)) {
+    throw new Error('controls must be an array');
+  }
   const revision = {
     version: survey.revisions.length + 1,
     controls,

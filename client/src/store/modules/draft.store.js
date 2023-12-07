@@ -134,6 +134,14 @@ const getters = {
         });
       }
 
+      // console.log(
+      //   'draft store 137',
+      //   // state.node,
+      //   // getters,
+      //   state.submission.data,
+      //   getters.path,
+      // );
+
       const questionValue = get(state.submission, getters.path).value;
       if (questionValue) {
         for (const row of questionValue) {
@@ -148,6 +156,37 @@ const getters = {
         }
       }
     }
+
+    // if (state.node.model.type === 'matrix') {
+    //   /*
+    //   When the columns of a matrix are required, but the matrix question itself is not,
+    //   the user can proceed with the survey without filling in the matrix.
+    //   But if a row is added, then a value must be placed in the required column
+    // */
+    //   const matrixName = state.node.model.name;
+    //   //detect required columns
+    //   let requiredColumnNames = [];
+    //   if (state.node.model.options.source.content) {
+    //     state.node.model.options.source.content.forEach((c) => {
+    //       if (c.required) {
+    //         requiredColumnNames.push(c.value);
+    //       }
+    //     });
+    //   }
+    //   if (state.submission.data[matrixName].value) {
+    //     for (const row of state.submission.data[matrixName].value) {
+    //       for (const requiredC of requiredColumnNames) {
+    //         if (
+    //           row[requiredC].value === null ||
+    //           (row[requiredC].value instanceof String && row[requiredC].value.trim() === '')
+    //         ) {
+    //           return true;
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+
 
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
