@@ -18,7 +18,7 @@
           </slot>
         </div>
       </div>
-      <div v-if="$slots.rowActions()" class="mt-header-left-spacer" />
+      <div v-if="$slots.rowActions" class="mt-header-left-spacer" />
     </div>
     <div ref="body" class="mt-body pb-1" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div
@@ -46,7 +46,7 @@
           </div>
         </div>
         <div
-          v-if="$slots.rowActions()"
+          v-if="$slots.rowActions"
           class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 white"
           :class="{ 'mt-elevation-shadow': isRightFloating }"
         >
