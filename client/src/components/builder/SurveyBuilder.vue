@@ -409,13 +409,13 @@ export default {
       const nextVersionObj = this.survey.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
-
-      this.$set(this.survey, 'revisions', cloneDeep(this.initialSurvey.revisions));
-
+      //TODO do not mutate survey prop
+      this.survey.revisions = cloneDeep(this.initialSurvey.revisions);
       this.survey.revisions.push(nextVersionObj);
       this.survey.meta.dateModified = date;
     },
     addToLibrary() {
+      //TODO do not mutate survey prop
       this.survey.meta.isLibrary = true;
       this.saveDraft();
     },
@@ -479,6 +479,7 @@ export default {
     },
     updateLibraryResources(newLibraryResources) {
       // add updated resources
+      //TODO do not mutate survey prop
       this.survey.resources = this.survey.resources.concat(newLibraryResources);
       // remove library resources which are not used anymore (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
       this.cleanupLibraryResources();
@@ -491,12 +492,14 @@ export default {
     },
     cleanupSurveyRefResources() {
       const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      //TODO do not mutate survey prop
       this.survey.resources = this.survey.resources.filter(
         (resource) => resource.type !== resourceTypes.SURVEY_REFERENCE || isResourceReferenced(controls, resource.id)
       );
     },
     cleanupLibraryResources() {
       const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      //TODO do not mutate survey prop
       this.survey.resources = this.survey.resources.filter(
         (resource) => !resource.libraryId || isResourceReferenced(controls, resource.id)
       );
@@ -702,11 +705,11 @@ export default {
     },
     hideControl(control) {
       this.controlSelected(control);
-      this.$set(this.control.options, 'hidden', true);
+      this.control.options.hidden = true;
     },
     unhideControl(control) {
       this.controlSelected(control);
-      this.$set(this.control.options, 'hidden', undefined);
+      this.control.options.hidden = undefined;
     },
     controlAdded(control) {
       if (!this.control) {
@@ -761,16 +764,17 @@ export default {
         const newResources = setResource(this.survey.resources, newResource);
         this.setSurveyResources(newResources);
         //store resource id to the script's source
-        this.$set(this.control.options, 'source', newResource.id);
+        this.control.options.source = newResource.id;
         //clean up unused script references
         this.cleanupScriptRefResources();
         this.cleanupSurveyRefResources();
       } else {
-        this.$set(this.control.options, 'source', value);
+        this.control.options.source = value;
       }
     },
     setSurveyResources(resources) {
-      this.$set(this.survey, 'resources', resources);
+      //TODO do not mutate survey prop
+      this.survey.resources = resources;
     },
     setControlParams(params) {
       this.control.options.params = params;

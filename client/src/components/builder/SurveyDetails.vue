@@ -355,17 +355,15 @@ export default {
     },
     updateSurveyName(name) {
       this.$emit('set-survey-name', name);
-      // this.$set(this.value, 'name', name);
     },
     updateSurveyGroup({ _id }) {
       this.$emit('set-survey-group', _id);
-      // this.$set(this.value, 'group', _id);
     },
     updateSurveyDescription(description) {
       this.$emit('set-survey-description', description);
-      // this.$set(this.value, 'description', description);
     },
     addToLibrary(library) {
+      //TODO do not mutate value prop
       this.value = library;
       this.$emit('addToLibrary');
       this.editLibraryDialogIsVisible = false;
