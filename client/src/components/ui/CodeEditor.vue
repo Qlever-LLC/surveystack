@@ -42,7 +42,7 @@
         <a-icon @click="$emit('close')">mdi-close-circle-outline</a-icon>
       </a-card-title>
       <div class="error red text-white pa-2" v-if="error">{{ error }}</div>
-      <div class="editor-height" :id="'monaco-editor-' + _uid"></div>
+      <div class="editor-height" :id="'monaco-editor-' + uuid"></div>
     </a-card>
   </div>
 </template>
@@ -69,6 +69,8 @@
 </style>
 
 <script>
+import { ref, getCurrentInstance } from 'vue';
+
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
 
@@ -105,6 +107,7 @@ export default {
   },
   data() {
     return {
+      uuid: getCurrentInstance().uid,
       editor: null,
       model: null,
       viewState: null,
@@ -167,7 +170,7 @@ export default {
       const model = monaco.editor.createModel(v, this.language);
 
       this.editor.dispose();
-      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
+      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this.uuid}`), {
         theme: this.theme,
         language: this.language,
         automaticLayout: true,
@@ -207,7 +210,7 @@ export default {
   mounted() {
     this.model = monaco.editor.createModel(this.code, this.language);
 
-    this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
+    this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this.uuid}`), {
       theme: this.theme,
       language: this.language,
       automaticLayout: true,

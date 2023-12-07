@@ -1,12 +1,13 @@
 <template>
-  <div class="code-editor pa-0" :id="'monaco-editor-' + _uid"></div>
+  <div class="code-editor pa-0" :id="'monaco-editor-' + uuid"></div>
 </template>
 <script>
 import * as monaco from 'monaco-editor';
+import { ref, getCurrentInstance } from 'vue';
 
 export default {
   props: {
-    value: {
+    modelValue: {
       required: true,
     },
     raw: {
@@ -17,18 +18,19 @@ export default {
   data() {
     return {
       editor: null,
+      uuid: getCurrentInstance().uid,
     };
   },
   computed: {
     valueString() {
-      return JSON.stringify(this.value, null, 2);
+      return JSON.stringify(this.modelValue, null, 2);
     },
   },
   methods: {
     writeBack(value) {
       try {
         const obj = JSON.parse(value);
-        if (JSON.stringify(this.value) !== JSON.stringify(obj)) {
+        if (JSON.stringify(this.modelValue) !== JSON.stringify(obj)) {
           this.$emit('input', obj);
         }
       } catch (error) {
@@ -37,7 +39,7 @@ export default {
     },
     refresh() {
       console.log('value cahnged');
-      const text = this.raw ? this.value : JSON.stringify(this.value, null, 2);
+      const text = this.raw ? this.modelValue : JSON.stringify(this.modelValue, null, 2);
       const model = monaco.editor.createModel(text, 'javascript');
       console.log('models', monaco.editor.getModels());
 
@@ -46,7 +48,7 @@ export default {
         this.editor.dispose();
       }
 
-      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
+      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this.uuid}`), {
         language: 'javascript',
         automaticLayout: true,
         readOnly: true,
@@ -55,7 +57,7 @@ export default {
     },
   },
   watch: {
-    value() {
+    modelValue() {
       this.refresh();
     },
   },
