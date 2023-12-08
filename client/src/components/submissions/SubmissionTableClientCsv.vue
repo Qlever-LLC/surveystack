@@ -469,7 +469,7 @@ export default {
           ) {
             return;
           }
-          this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
+          this.searchFields[header] = ''; // v-data-table search/filter is not used at this moment
 
           if (rawHeaders.includes(header)) {
             headers.push({

@@ -409,9 +409,8 @@ export default {
       const nextVersionObj = this.surveyUnderWork.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
-
-      this.$set(this.surveyUnderWork, 'revisions', cloneDeep(this.initialSurvey.revisions));
-
+      //TODO do not mutate survey prop
+      this.surveyUnderWork.revisions = cloneDeep(this.initialSurvey.revisions);
       this.surveyUnderWork.revisions.push(nextVersionObj);
       this.surveyUnderWork.meta.dateModified = date;
     },
@@ -702,11 +701,11 @@ export default {
     },
     hideControl(control) {
       this.controlSelected(control);
-      this.$set(this.control.options, 'hidden', true);
+      this.control.options.hidden = true;
     },
     unhideControl(control) {
       this.controlSelected(control);
-      this.$set(this.control.options, 'hidden', undefined);
+      this.control.options.hidden = undefined;
     },
     controlAdded(control) {
       if (!this.control) {
@@ -761,16 +760,17 @@ export default {
         const newResources = setResource(this.surveyUnderWork.resources, newResource);
         this.setSurveyResources(newResources);
         //store resource id to the script's source
-        this.$set(this.control.options, 'source', newResource.id);
+        this.control.options.source = newResource.id;
         //clean up unused script references
         this.cleanupScriptRefResources();
         this.cleanupSurveyRefResources();
       } else {
-        this.$set(this.control.options, 'source', value);
+        this.control.options.source = value;
       }
     },
     setSurveyResources(resources) {
-      this.$set(this.surveyUnderWork, 'resources', resources);
+      //TODO do not mutate survey prop
+      this.surveyUnderWork.resources = resources;
     },
     setControlParams(params) {
       this.control.options.params = params;

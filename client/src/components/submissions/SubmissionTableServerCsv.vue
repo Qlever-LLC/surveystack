@@ -95,7 +95,7 @@ export default {
           if (this.excludeMeta && header.startsWith('meta')) {
             return;
           }
-          this.$set(this.searchFields, header, '');
+          this.searchFields[header] = '';
           headers.push({ text: header, value: header, filter: this.createCustomFilter(header) });
         });
       }
