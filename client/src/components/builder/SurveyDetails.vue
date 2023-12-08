@@ -287,6 +287,7 @@ export default {
       librarySurveyPublishedAndDraft: null,
       availableSubmissions,
       menuIsOpen: false,
+      value: this.modelValue,
     };
   },
   async created() {
@@ -298,7 +299,7 @@ export default {
   },
   props: [
     'survey',
-    'value',
+    'modelValue',
     'isNew',
     'isSaving',
     'isUpdating',

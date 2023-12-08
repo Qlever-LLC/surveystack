@@ -1,7 +1,7 @@
 <template>
   <div class="screen-root">
     <a-dialog v-model="viewCode">
-      <app-code-view :value="survey" @update:value="survey" style="height: 80vh" />
+      <app-code-view v-model="surveyUnderWork" style="height: 80vh" />
     </a-dialog>
 
     <a-dialog v-model="viewSubmission">
@@ -39,8 +39,7 @@
           <survey-details
             :version="version"
             :draft="isDraft"
-            :modelValue="survey"
-            @update:modelValue="survey"
+            v-model="surveyUnderWork"
             :survey="survey"
             :isNew="!editMode"
             :isSaving="isSaving"
@@ -86,7 +85,7 @@
       <pane class="pane pane-library" v-if="showLibrary">
         <div class="px-4">
           <question-library
-            :survey="survey"
+            :survey="surveyUnderWork"
             :libraryId="libraryId"
             @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
@@ -100,7 +99,7 @@
           <control-properties
             v-if="control"
             :control="control"
-            :survey="survey"
+            :survey="surveyUnderWork"
             :initialize="optionsInitialize"
             :calculate="optionsCalculate"
             :relevance="optionsRelevance"
@@ -195,7 +194,7 @@
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
             :submission="instance"
-            :survey="survey"
+            :survey="surveyUnderWork"
             :persist="false"
             class="builder-draft"
             builder
@@ -353,6 +352,7 @@ export default {
       activeCode: '',
       scriptCode: null,
       // survey entity
+      surveyUnderWork: this.survey,
       codeRefreshCounter: 0,
       submissionCode: '',
       instance: null,
@@ -396,7 +396,7 @@ export default {
     saveDraft() {
       if (!this.isDraft) {
         this.createDraft();
-        this.initNavbarAndDirtyFlag(this.survey);
+        this.initNavbarAndDirtyFlag(this.surveyUnderWork);
       }
       this.$emit('onSaveDraft');
     },
@@ -406,17 +406,17 @@ export default {
       const nextVersion = latestVersion + 1;
       const date = new Date().toISOString();
 
-      const nextVersionObj = this.survey.revisions.find((revision) => revision.version === latestVersion);
+      const nextVersionObj = this.surveyUnderWork.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
 
-      this.$set(this.survey, 'revisions', cloneDeep(this.initialSurvey.revisions));
+      this.$set(this.surveyUnderWork, 'revisions', cloneDeep(this.initialSurvey.revisions));
 
-      this.survey.revisions.push(nextVersionObj);
-      this.survey.meta.dateModified = date;
+      this.surveyUnderWork.revisions.push(nextVersionObj);
+      this.surveyUnderWork.meta.dateModified = date;
     },
     addToLibrary() {
-      this.survey.meta.isLibrary = true;
+      this.surveyUnderWork.meta.isLibrary = true;
       this.saveDraft();
     },
     async addQuestionsFromLibrary(librarySurveyId) {
@@ -463,7 +463,7 @@ export default {
         this.updateToLibrary.latestVersion,
         updatedLibraryControls,
         updatedResources,
-        this.survey.resources
+        this.surveyUnderWork.resources
       );
       // update the survey resources
       this.updateLibraryResources(updatedResources);
@@ -479,25 +479,25 @@ export default {
     },
     updateLibraryResources(newLibraryResources) {
       // add updated resources
-      this.survey.resources = this.survey.resources.concat(newLibraryResources);
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.concat(newLibraryResources);
       // remove library resources which are not used anymore (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
       this.cleanupLibraryResources();
     },
     cleanupScriptRefResources() {
-      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
-      this.survey.resources = this.survey.resources.filter(
+      const controls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.filter(
         (resource) => resource.type !== resourceTypes.SCRIPT_REFERENCE || isResourceReferenced(controls, resource.id)
       );
     },
     cleanupSurveyRefResources() {
-      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
-      this.survey.resources = this.survey.resources.filter(
+      const controls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.filter(
         (resource) => resource.type !== resourceTypes.SURVEY_REFERENCE || isResourceReferenced(controls, resource.id)
       );
     },
     cleanupLibraryResources() {
-      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
-      this.survey.resources = this.survey.resources.filter(
+      const controls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.filter(
         (resource) => !resource.libraryId || isResourceReferenced(controls, resource.id)
       );
     },
@@ -534,10 +534,10 @@ export default {
 
       this.version = version;
 
-      const v = this.survey.revisions[this.survey.revisions.length - 1].version;
-      const amountQuestions = getSurveyPositions(this.survey, v);
+      const v = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].version;
+      const amountQuestions = getSurveyPositions(this.surveyUnderWork, v);
       this.setNavbarContent({
-        title: this.survey.name || 'Untitled Survey',
+        title: this.surveyUnderWork.name || 'Untitled Survey',
         subtitle: `
           <span class="question-title-chip">Version ${version}</span>
           <!--<span class="ml-2">${amountQuestions.length} Question${
@@ -607,7 +607,7 @@ export default {
           code: this.activeCode,
           fname: tab,
           submission: this.instance,
-          survey: this.survey,
+          survey: this.surveyUnderWork,
           parent: this.parent,
           log: (arg) => {
             this.log = `${this.log}${arg}\n`;
@@ -639,7 +639,7 @@ export default {
       this.closeLibrary();
       this.control = control;
       if (control && control.type === 'script' && control.options.source) {
-        const scriptResource = this.survey.resources.find((r) => r.id === control.options.source);
+        const scriptResource = this.surveyUnderWork.resources.find((r) => r.id === control.options.source);
         let scriptId;
         if (scriptResource) {
           scriptId = scriptResource.content;
@@ -758,7 +758,7 @@ export default {
           content: value.id,
         };
         //update survey resources
-        const newResources = setResource(this.survey.resources, newResource);
+        const newResources = setResource(this.surveyUnderWork.resources, newResource);
         this.setSurveyResources(newResources);
         //store resource id to the script's source
         this.$set(this.control.options, 'source', newResource.id);
@@ -770,17 +770,19 @@ export default {
       }
     },
     setSurveyResources(resources) {
-      this.$set(this.survey, 'resources', resources);
+      this.$set(this.surveyUnderWork, 'resources', resources);
     },
     setControlParams(params) {
       this.control.options.params = params;
     },
     validateSurveyName() {
-      return !!this.survey.name && /^[\w-\s]{5,}$/.test(this.survey.name) ? true : 'Survey name is invalid';
+      return !!this.surveyUnderWork.name && /^[\w-\s]{5,}$/.test(this.surveyUnderWork.name)
+        ? true
+        : 'Survey name is invalid';
     },
     validateSurveyQuestions() {
       const namePattern = /^[\w-]{1,}$/; // one character should be ok, especially within groups
-      const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      const currentControls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
       const uniqueNames = uniqBy(currentControls, 'name');
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
       const allNamesContainOnlyValidCharacters = !currentControls.some((control) => !namePattern.test(control.name));
@@ -799,10 +801,10 @@ export default {
         : 'Questions list contains an invalid data name';
     },
     createInstance() {
-      const { version } = this.survey.revisions[this.survey.revisions.length - 1];
+      const { version } = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1];
 
       this.instance = createSubmissionFromSurvey({
-        survey: this.survey,
+        survey: this.surveyUnderWork,
         version,
         instance: this.instance,
       });
@@ -821,13 +823,13 @@ export default {
       return this.isDraft;
     },
     isDraft() {
-      const len = this.survey.revisions.length;
+      const len = this.surveyUnderWork.revisions.length;
 
-      if (!this.survey.revisions || len === 0) {
+      if (!this.surveyUnderWork.revisions || len === 0) {
         return false;
       }
 
-      return this.survey.revisions[len - 1].version !== this.survey.latestVersion;
+      return this.surveyUnderWork.revisions[len - 1].version !== this.surveyUnderWork.latestVersion;
     },
     enableUpdate() {
       if (!this.surveyIsValid) {
@@ -838,9 +840,9 @@ export default {
         return false;
       }
       if (
-        this.initialSurvey.name !== this.survey.name ||
-        this.initialSurvey.description !== this.survey.description ||
-        this.initialSurvey.meta.submissions !== this.survey.meta.submissions
+        this.initialSurvey.name !== this.surveyUnderWork.name ||
+        this.initialSurvey.description !== this.surveyUnderWork.description ||
+        this.initialSurvey.meta.submissions !== this.surveyUnderWork.meta.submissions
       ) {
         return true;
       }
@@ -860,7 +862,7 @@ export default {
 
       if (!this.editMode) {
         // if survey new
-        if (this.initialSurvey.name !== this.survey.name) {
+        if (this.initialSurvey.name !== this.surveyUnderWork.name) {
           return true;
         }
       }
@@ -873,7 +875,7 @@ export default {
       }
 
       if (!this.editMode) {
-        if (this.initialSurvey.name !== this.survey.name) {
+        if (this.initialSurvey.name !== this.surveyUnderWork.name) {
           return true;
         }
       }
@@ -904,10 +906,11 @@ export default {
       return this.control.type === 'script';
     },
     currentVersion() {
-      return this.survey.revisions[this.survey.revisions.length - 1].version;
+      return this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].version;
     },
     currentControls() {
-      return this.survey.revisions[this.survey.revisions.length - 1].controls;
+      console.log(this.surveyUnderWork);
+      return this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
     },
     sharedCode() {
       if (!this.instance) {
@@ -1011,7 +1014,7 @@ export default {
     survey: {
       handler(newVal) {
         this.initNavbarAndDirtyFlag(newVal);
-        if (!this.initialSurvey || !this.survey) {
+        if (!this.initialSurvey || !this.surveyUnderWork) {
           this.surveyUnchanged = true;
         }
 
@@ -1036,9 +1039,9 @@ export default {
     },
   },
   created() {
-    this.initNavbarAndDirtyFlag(this.survey);
+    this.initNavbarAndDirtyFlag(this.surveyUnderWork);
     this.createInstance();
-    this.checkForLibraryUpdates(this.survey);
+    this.checkForLibraryUpdates(this.surveyUnderWork);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue
