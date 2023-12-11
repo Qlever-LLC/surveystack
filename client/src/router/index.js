@@ -256,7 +256,7 @@ const routes = [
     components: getComponents(GroupEdit),
   },
   {
-    path: '/g/*',
+    path: '/g/:pathMatch(.*)', //TODO
     name: 'groups-by-path',
     components: getComponents(Group),
   },
