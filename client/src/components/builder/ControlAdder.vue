@@ -1,59 +1,59 @@
 <template>
   <div class="control-adder">
-    <a-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
+    <!-- <a-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
         <a-btn fab color="blue-darken-2" dark data-testid="control-adder-open">
           <a-icon v-if="fabIsOpen">mdi-close</a-icon>
           <a-icon v-else>mdi-plus</a-icon>
         </a-btn>
       </template>
-      <template v-slot:default>
-        <div class="button-grid">
-          <a-btn
-            dark
-            color="white"
-            key="library"
-            @click="openLibrary()"
-            class="ma-1 d-inline-block shadow green span-button"
-            outlined
-            small
-            data-testid="add-control-library"
-          >
-            search question library
-          </a-btn>
-          <a-btn
-            dark
-            color="white"
-            key="group"
-            @click="addControl(group)"
-            class="ma-1 text-indigo bg-white shadow"
-            outlined
-            small
-            data-testid="add-control-group"
-          >
-            <a-icon left v-if="group.icon" color="indigo-lighten-2">
-              {{ group.icon }}
-            </a-icon>
-            Group
-          </a-btn>
-          <a-btn
-            small
-            dark
-            color="indigo"
-            v-for="el in filteredComponents"
-            :key="el.type"
-            @click="addControl(el)"
-            class="ma-1 d-inline-block shadow"
-            :data-testid="'add-control-' + el.type"
-          >
-            <a-icon dark left v-if="el.icon">
-              {{ el.icon }}
-            </a-icon>
-            {{ el.name.replace('_', ' ') }}
-          </a-btn>
-        </div>
-      </template>
-    </a-speed-dial>
+      <template v-slot:default> -->
+    <div class="button-grid">
+      <a-btn
+        dark
+        color="white"
+        key="library"
+        @click="openLibrary()"
+        class="ma-1 d-inline-block shadow green span-button"
+        outlined
+        small
+        data-testid="add-control-library"
+      >
+        search question library
+      </a-btn>
+      <a-btn
+        dark
+        color="white"
+        key="group"
+        @click="addControl(group)"
+        class="ma-1 text-indigo bg-white shadow"
+        outlined
+        small
+        data-testid="add-control-group"
+      >
+        <a-icon left v-if="group.icon" color="indigo-lighten-2">
+          {{ group.icon }}
+        </a-icon>
+        Group
+      </a-btn>
+      <a-btn
+        small
+        dark
+        color="indigo"
+        v-for="el in filteredComponents"
+        :key="el.type"
+        @click="addControl(el)"
+        class="ma-1 d-inline-block shadow"
+        :data-testid="'add-control-' + el.type"
+      >
+        <a-icon dark left v-if="el.icon">
+          {{ el.icon }}
+        </a-icon>
+        {{ el.name.replace('_', ' ') }}
+      </a-btn>
+    </div>
+    <!-- </template>
+    </a-speed-dial> -->
   </div>
 </template>
 
