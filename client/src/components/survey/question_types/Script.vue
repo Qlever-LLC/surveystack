@@ -111,7 +111,7 @@ export default {
       };
     },
     parent() {
-      const parentPath = getParentPath(this.$vnode.key);
+      const parentPath = getParentPath(this.$.vnode.key);
       const parentData = get(this.submission, parentPath);
       return parentData;
     },
