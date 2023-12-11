@@ -26,7 +26,7 @@
       </div>
       <div v-else class="d-flex flex-row">
         <div class="half px-1">
-          <a-btn v-show="showPrev" @click="$emit('prev')" variant="flat" large color="primary" class="full">
+          <a-btn v-show="showPrev" @click="$emit('prev')" variant="outlined" large color="primary" class="full">
             Previous
           </a-btn>
         </div>

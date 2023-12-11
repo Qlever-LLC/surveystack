@@ -64,7 +64,7 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-0 grey-lighten-4"
+      class="draft-footer px-0 bg-grey-lighten-4"
       :class="{ 'show-submit': showOverview }"
       :style="{
         left: moveFooter ? '256px' : '0px',
