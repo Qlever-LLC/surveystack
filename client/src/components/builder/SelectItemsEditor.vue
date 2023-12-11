@@ -32,7 +32,7 @@
         <div v-if="items.length === 0" class="mt-8 text-center">
           Please click <strong>Add row</strong> button to add new item.
         </div>
-        <draggable v-else :list="items" class="draggable">
+        <VueDraggable v-else :list="items" class="draggable">
           <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
             <a-text-field
               class="flex-grow-1"
@@ -52,7 +52,7 @@
             />
             <a-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</a-icon>
           </div>
-        </draggable>
+        </VueDraggable>
       </a-card-text>
 
       <a-divider />
@@ -67,11 +67,11 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 
 export default {
   components: {
-    draggable,
+    VueDraggable,
   },
   props: {
     value: {

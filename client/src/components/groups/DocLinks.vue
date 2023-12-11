@@ -6,7 +6,7 @@
       <a-btn color="primary" variant="text" @click="showAddDialog = true">New.. </a-btn>
     </a-card-title>
     <a-card-subtitle>Custom links which appear in the side menu when logged into your group</a-card-subtitle>
-    <draggable
+    <VueDraggable
       v-if="group.docs && group.docs.length !== 0"
       class="draggable list-group"
       tag="div"
@@ -33,7 +33,7 @@
           </div>
         </a-card-text>
       </a-card>
-    </draggable>
+    </VueDraggable>
     <a-card class="ma-2" variant="outlined" elevation="1" v-else>
       <a-card-text>
         <span class="title text-secondary">No documentation links yet</span><br />
@@ -106,13 +106,13 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import api from '@/services/api.service';
 
 export default {
   name: 'nested-draggable',
   components: {
-    draggable,
+    VueDraggable,
   },
   data() {
     return {

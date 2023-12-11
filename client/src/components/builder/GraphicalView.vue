@@ -4,22 +4,23 @@
     WARNING: this component renders recursively, be careful!
     vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props
   -->
-  <draggable
-    v-if="controls.length !== 0 || index.length !== 0"
+  <VueDraggable
+    v-if="modelValue.length !== 0 || index.length !== 0"
     class="draggable"
     :class="controls"
-    :style="scaleStyles"
+    :style="scaleStyles()"
     :disabled="readOnly"
     tag="div"
-    :list="controls"
+    v-model="modelValue"
     :invertSwap="true"
     @start="startHandler"
     @end="endHandler"
     draggable=".draggable-item"
     :group="draggableGroup"
+    ref="rootDraggable"
   >
     <a-card
-      v-for="(el, idx) in controls"
+      v-for="(el, idx) in modelValue"
       class="control-item mb-2"
       :class="[
         { 'control-item-selected': el === selected },
@@ -176,7 +177,7 @@
         </a-card-actions>
       </a-card>
     </a-dialog>
-  </draggable>
+  </VueDraggable>
   <div v-else>
     <a-card class="text-secondary">
       <a-card-title>Empty survey</a-card-title>
@@ -191,7 +192,7 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
@@ -201,15 +202,15 @@ import ControlCardHeader from './ControlCardHeader';
 export default {
   name: 'nested-draggable',
   components: {
-    draggable,
+    VueDraggable,
     ControlCardHeader,
   },
   data() {
     return {
+      modelValue: this.controls,
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
-      scaleStyles: {},
       hoveredControl: null,
       pageInPageHintIsVisible: false,
       draggableGroup: {
@@ -268,6 +269,20 @@ export default {
     },
   },
   methods: {
+    scaleStyles() {
+      if (this.$refs.rootDraggable) {
+        const height = this.$refs.rootDraggable.clientHeight;
+        const width = this.$refs.rootDraggable.clientWidth;
+        return this.style === 1.0
+          ? {}
+          : {
+              transform: `scale(${this.scale})`,
+              transformOrigin: 'top left',
+              marginRight: `-${width * (1.0 - this.scale)}px`,
+              marginBottom: `-${height * (1.0 - this.scale)}px`,
+            };
+      } else return {};
+    },
     startHandler(ev) {
       if (ev.item.dataset.controlType === 'page') {
         this.pageInPageHintIsVisible = true;
@@ -297,7 +312,7 @@ export default {
       console.log(name);
     },
     removeAt(idx) {
-      this.controls.splice(idx, 1);
+      this.modelValue.splice(idx, 1);
       this.$emit('control-removed');
     },
     createIndex(current, idx) {
@@ -335,18 +350,6 @@ export default {
     areActionsVisible(control) {
       return !this.readOnly && this.hoveredControl === control;
     },
-  },
-  mounted() {
-    const { width, height } = this.$el.getBoundingClientRect();
-    this.scaleStyles =
-      this.style === 1.0
-        ? {}
-        : {
-            transform: `scale(${this.scale})`,
-            transformOrigin: 'top left',
-            marginRight: `-${width * (1.0 - this.scale)}px`,
-            marginBottom: `-${height * (1.0 - this.scale)}px`,
-          };
   },
 };
 </script>

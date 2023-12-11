@@ -25,7 +25,7 @@
       <a-card-text class="pt-0">
         <div class="d-flex justify-start"></div>
         <div>
-          <draggable
+          <VueDraggable
             class="d-flex flex-row pa-2 px-4"
             style="overflow-x: auto"
             v-model="columns"
@@ -255,7 +255,7 @@
             <a-btn @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
               <a-icon dark>mdi-plus</a-icon>
             </a-btn>
-          </draggable>
+          </VueDraggable>
         </div>
       </a-card-text>
       <a-spacer />
@@ -268,7 +268,7 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import Draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
@@ -299,7 +299,7 @@ const createOptions = (src) => {
 export default {
   components: {
     AppOntologyListEditor,
-    Draggable,
+    VueDraggable,
     Ontology,
     Date,
   },

@@ -5,7 +5,7 @@
       <a-spacer />
       <a-btn color="primary" variant="text" @click="openSearchDialog">New..</a-btn>
     </a-card-title>
-    <draggable
+    <VueDraggable
       v-if="entities.length !== 0"
       class="draggable list-group"
       tag="div"
@@ -42,7 +42,7 @@
           </div>
         </a-card-text>
       </a-card>
-    </draggable>
+    </VueDraggable>
     <a-card class="ma-2" variant="outlined" elevation="1" v-else>
       <a-card-text>
         <span class="title text-secondary">No pinned surveys yet</span><br />
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
@@ -94,7 +94,7 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 export default {
   name: 'nested-draggable',
   components: {
-    draggable,
+    VueDraggable,
   },
   data() {
     return {
