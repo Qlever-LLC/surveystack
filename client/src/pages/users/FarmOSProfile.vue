@@ -6,15 +6,21 @@
         class="mt-4"
         style="cursor: pointer"
         mode="fade"
-        text
+        variant="text"
         type="success"
         @click="successMessage = null"
         >{{ successMessage }}</a-alert
       >
 
-      <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
-        errorMessage
-      }}</a-alert>
+      <a-alert
+        v-if="errorMessage"
+        style="cursor: pointer"
+        class="mt-4 cursor-pointer"
+        mode="fade"
+        variant="text"
+        type="error"
+        >{{ errorMessage }}</a-alert
+      >
 
       <p class="mt-4 mb-6">
         You are logged in as
@@ -43,7 +49,7 @@
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
-            text
+            variant="text"
             type="error"
             >{{ errorDialogMessage }}</a-alert
           >
@@ -88,7 +94,7 @@
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
-            text
+            variant="text"
             type="error"
             >{{ errorDialogMessage }}</a-alert
           >

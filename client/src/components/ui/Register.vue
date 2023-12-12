@@ -36,11 +36,11 @@
           <a-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </a-btn>
         </div>
       </a-form>
-      <a-alert class="mt-4" outlined v-if="membership" type="info"
+      <a-alert class="mt-4" variant="outlined" v-if="membership" type="info"
         >Your code is eligible to join <strong>{{ membership.group.name }}</strong></a-alert
       >
 
-      <a-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</a-alert>
+      <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }}</a-alert>
     </a-card>
   </a-container>
 </template>

@@ -63,7 +63,7 @@
         </a-form>
       </a-card-text>
     </a-card>
-    <!-- <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</a-alert> -->
+    <!-- <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" variant="text" :type="status.type">{{ status.message }}</a-alert> -->
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
         status.message

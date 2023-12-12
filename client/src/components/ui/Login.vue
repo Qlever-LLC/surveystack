@@ -74,7 +74,7 @@
       </template>
     </div>
 
-    <a-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</a-alert>
+    <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }}</a-alert>
   </a-card>
   <a-alert
     v-else
@@ -82,7 +82,7 @@
     prominent
     border-color
     color="success"
-    border="left"
+    border="start"
     elevation="2"
     class="card-width mb-0"
   >

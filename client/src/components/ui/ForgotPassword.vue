@@ -16,7 +16,9 @@
           >Back to login</a
         >
       </div>
-      <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</a-alert>
+      <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" variant="text" :type="status.type">{{
+        status.message
+      }}</a-alert>
     </a-card>
   </a-container>
 </template>

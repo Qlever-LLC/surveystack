@@ -4,17 +4,15 @@
   <v-alert
     :border="border"
     :color="color"
-    :colored-border="borderColor"
-    :dismissible="closable"
+    :border-color="borderColor"
+    :closable="closable"
     :elevation="elevation"
     :icon="icon"
     :mode="mode"
-    :outlined="outlined"
     :prominent="prominent"
-    :text="text"
     :type="type"
+    :variant="variant"
     v-bind="$attrs"
-    v-on="$listeners"
   >
     <template v-slot:default>
       <slot name="default" />
@@ -32,10 +30,15 @@ export default {
     elevation: { type: [Number, String], required: false },
     icon: { type: [Boolean, String], required: false },
     mode: { type: String, required: false },
-    outlined: { type: Boolean, default: false },
     prominent: { type: Boolean, default: false },
-    text: { type: Boolean, default: false },
     type: { type: String, required: false },
+    variant: {
+      type: String,
+      validator: function (value) {
+        return ['flat', 'text', 'elevated', 'tonal', 'outlined', 'plain'].includes(value);
+      },
+      required: false,
+    },
   },
 };
 </script>

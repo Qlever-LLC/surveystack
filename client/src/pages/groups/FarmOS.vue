@@ -8,14 +8,20 @@
       class="mt-4"
       style="cursor: pointer"
       mode="fade"
-      text
+      variant="text"
       type="success"
       @click="successMessage = null"
       >{{ successMessage }}</a-alert
     >
-    <a-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
-      errorMessage
-    }}</a-alert>
+    <a-alert
+      v-if="errorMessage"
+      style="cursor: pointer"
+      class="mt-4 cursor-pointer"
+      mode="fade"
+      variant="text"
+      type="error"
+      >{{ errorMessage }}</a-alert
+    >
 
     <app-dialog
       modal

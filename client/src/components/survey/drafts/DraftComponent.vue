@@ -105,7 +105,7 @@
       </div>
     </a-sheet>
   </div>
-  <a-alert v-else border="left" prominent text type="error">
+  <a-alert v-else border="start" prominent variant="text" type="error">
     <a-row align="center">
       <a-col class="grow">
         This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the

@@ -86,7 +86,7 @@
           </tbody>
         </template>
       </a-table>
-      <a-alert v-else class="mt-4" mode="fade" text type="warning">
+      <a-alert v-else class="mt-4" mode="fade" variant="text" type="warning">
         No Group Mappings exist for {{ selectedInstance }}
       </a-alert>
 

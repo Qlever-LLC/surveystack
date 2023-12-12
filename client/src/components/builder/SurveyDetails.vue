@@ -243,7 +243,7 @@
 
       <a-tooltip bottom v-if="validationErrors.length > 0">
         <template v-slot:activator="{ on }">
-          <a-alert type="error" border-color border="left" class="mt-2" elevation="2" v-on="on">
+          <a-alert type="error" border-color border="start" class="mt-2" elevation="2" v-on="on">
             Survey contains errors
           </a-alert>
         </template>

@@ -1,10 +1,16 @@
 <template>
   <a-container>
-    <a-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
-      successMessage
-    }}</a-alert>
+    <a-alert
+      v-if="successMessage"
+      class="mt-4"
+      mode="fade"
+      variant="text"
+      type="success"
+      @click="successMessage = null"
+      >{{ successMessage }}</a-alert
+    >
 
-    <a-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error" @click="errorMessage = null">{{
+    <a-alert v-if="errorMessage" class="mt-4" mode="fade" variant="text" type="error" @click="errorMessage = null">{{
       errorMessage
     }}</a-alert>
 
@@ -37,7 +43,7 @@
       </a-window-item>
     </a-window>
 
-    <a-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</a-alert>
+    <a-alert v-if="errorMessage" class="mt-4" mode="fade" variant="text" type="error">{{ errorMessage }}</a-alert>
   </a-container>
 </template>
 

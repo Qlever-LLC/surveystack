@@ -23,7 +23,7 @@
 
     <a-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
-      text
+      variant="text"
       type="warning"
       color="orange"
       elevation="2"

@@ -1,11 +1,11 @@
 <template>
   <a-container>
-    <a-alert v-if="errorMsg" class="mt-4" mode="fade" text type="error">{{ errorMsg }}</a-alert>
+    <a-alert v-if="errorMsg" class="mt-4" mode="fade" variant="text" type="error">{{ errorMsg }}</a-alert>
     <template v-if="initialized && membership">
       <h1>Invitation</h1>
       <p class="subtitle-2 text-secondary">{{ code }}</p>
       <div v-if="membership.meta.status === 'pending'">
-        <a-alert class="mt-4" outlined v-if="membership" type="info"
+        <a-alert class="mt-4" variant="outlined" v-if="membership" type="info"
           >This code allows you to join <strong>{{ membership.group.name }}</strong
           >!
         </a-alert>
@@ -16,7 +16,7 @@
         </div>
       </div>
       <div v-else>
-        <a-alert class="mt-4" outlined v-if="membership" type="error"
+        <a-alert class="mt-4" variant="outlined" v-if="membership" type="error"
           >This code has already been activated and is no longer valid...
         </a-alert>
       </div>
