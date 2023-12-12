@@ -3,7 +3,7 @@
     <a-card>
       <a-card-title>
         Publish
-        <a-chip dark small color="green" class="mx-2">
+        <a-chip small color="green" class="mx-2">
           Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
         </a-chip>
         to Library

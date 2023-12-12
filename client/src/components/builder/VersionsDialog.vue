@@ -9,7 +9,6 @@
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
             <div class="col-10 mt-1 py-0">
               <a-chip
-                dark
                 small
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
                 :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'"

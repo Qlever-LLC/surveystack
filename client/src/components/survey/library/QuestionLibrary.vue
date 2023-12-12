@@ -36,7 +36,7 @@
                 <div>
                   <small class="text-grey">{{ c._id }}</small>
                 </div>
-                <a-chip dark small outlined color="grey" class="font-weight-medium mt-1">
+                <a-chip small variant="outlined" color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
                 </a-chip>
               </a-col>

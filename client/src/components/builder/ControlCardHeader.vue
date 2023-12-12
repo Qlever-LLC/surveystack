@@ -9,7 +9,7 @@
     <a-col class="body-1 text-truncate">
       <div class="font-weight-light text-grey-darken-2">
         <span class="text-truncate">{{ index }}: {{ dataName }}</span>
-        <a-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" outlined small :color="chipColor">
+        <a-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" variant="outlined" small :color="chipColor">
           {{ chipLabel }}
         </a-chip>
       </div>

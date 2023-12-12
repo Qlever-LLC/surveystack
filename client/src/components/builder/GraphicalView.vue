@@ -63,7 +63,6 @@
           <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
-            dark
             small
             :color="
               availableLibraryUpdates[el.libraryId] === null

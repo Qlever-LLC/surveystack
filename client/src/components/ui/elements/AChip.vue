@@ -4,14 +4,12 @@
   <v-chip
     @click="$emit('click', $event)"
     @click:close="$emit('click:close', $event)"
-    v-on="$listeners"
     :close="close"
     :color="color"
-    :dark="dark"
     :input-value="inputValue"
     :label="label"
-    :outlined="outlined"
-    :small="small"
+    :size="xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
+    :variant="variant"
     :title="title"
   >
     <slot />
@@ -26,12 +24,20 @@ export default {
     //vuetify props
     close: { type: Boolean, required: false },
     color: { type: String, required: false },
-    dark: { type: Boolean, required: false },
     inputValue: { type: undefined, required: false },
     label: { type: Boolean, required: false },
-    outlined: { type: Boolean, required: false },
+    xSmall: { type: Boolean, required: false },
     small: { type: Boolean, required: false },
+    large: { type: Boolean, required: false },
+    xLarge: { type: Boolean, required: false },
     title: { type: String, required: false },
+    variant: {
+      type: String,
+      validator: function (value) {
+        return ['flat', 'text', 'elevated', 'tonal', 'outlined', 'plain'].includes(value);
+      },
+      required: false,
+    },
   },
 };
 </script>

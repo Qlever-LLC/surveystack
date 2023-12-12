@@ -162,7 +162,7 @@
           </a-btn>
         </div>
         <div class="text-left">
-          <a-chip dark small outlined color="grey"> Version {{ version }}</a-chip>
+          <a-chip small variant="outlined" color="grey"> Version {{ version }}</a-chip>
         </div>
       </div>
     </a-card-title>

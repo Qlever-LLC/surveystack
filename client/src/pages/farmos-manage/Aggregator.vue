@@ -160,7 +160,6 @@
                   <a-chip
                     small
                     class="ma-1"
-                    dark
                     color="blue"
                     v-for="(userMapping, uidx) in farm.userMappings"
                     :key="`farm-${idx}-user-${uidx}`"
@@ -173,7 +172,6 @@
                   <a-chip
                     class="ma-1"
                     small
-                    dark
                     color="green"
                     v-for="(groupMapping, gidx) in farm.groupMappings"
                     :key="`farm-${idx}-group-${gidx}`"
@@ -213,7 +211,7 @@
               <td>{{ `${farm.instanceName}` }}</td>
               <td>
                 <div>
-                  <a-chip small class="ma-1" dark v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
+                  <a-chip small class="ma-1" v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
                     {{ tag }}
                   </a-chip>
                 </div>

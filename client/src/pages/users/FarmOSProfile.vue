@@ -367,7 +367,6 @@
                     class="ma-1"
                     small
                     close
-                    dark
                     color="green"
                     v-for="(group, uidx) in instance.groups"
                     :key="`instance-${idx}-group-${uidx}`"
@@ -384,7 +383,6 @@
                     class="ma-1"
                     small
                     close
-                    dark
                     color="blue"
                     v-for="(user, uidx) in getEmailsWithoutMySelf(instance.otherUsers)"
                     :key="`instance-${idx}-user-${uidx}`"

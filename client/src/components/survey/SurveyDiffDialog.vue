@@ -3,9 +3,9 @@
     <a-card>
       <a-card-title>
         Compare
-        <a-chip dark small color="green" class="mx-2"> Version {{ revisionA.version }} </a-chip>
+        <a-chip small color="green" class="mx-2"> Version {{ revisionA.version }} </a-chip>
         to
-        <a-chip dark small color="green" class="mx-2"> Version {{ revisionB.version }} </a-chip>
+        <a-chip small color="green" class="mx-2"> Version {{ revisionB.version }} </a-chip>
       </a-card-title>
       <survey-diff
         :controls-remote-revision-old="revisionA.controls"

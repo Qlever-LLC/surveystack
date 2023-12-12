@@ -15,7 +15,7 @@
         appendOuterSlot
       >
         <template v-slot:append-outer>
-          <a-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
+          <a-chip style="margin-top: -10px" color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
           </a-chip>
         </template>
@@ -42,7 +42,9 @@
       <a-tooltip top :disabled="!!path">
         <template v-slot:activator="{ on }">
           <div v-on="on">
-            <a-btn variant="text" color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </a-btn>
+            <a-btn variant="text" color="green" @click="previewDialogIsVisible = true" :disabled="!path">
+              Preview
+            </a-btn>
           </div>
         </template>
         <span>No Submitted Surveys Available</span>

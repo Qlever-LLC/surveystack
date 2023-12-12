@@ -66,7 +66,6 @@
                 <a-chip
                   small
                   class="ma-1"
-                  dark
                   color="blue"
                   v-for="(userMapping, uidx) in instance.userMappings"
                   :key="`instance-${idx}-user-${uidx}`"
@@ -79,7 +78,6 @@
                 <a-chip
                   class="ma-1"
                   small
-                  dark
                   color="green"
                   v-for="(groupMapping, gidx) in instance.groupMappings"
                   :key="`instance-${idx}-group-${gidx}`"

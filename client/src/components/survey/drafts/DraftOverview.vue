@@ -99,7 +99,7 @@
             </a-card-text>
           </a-card>
 
-          <a-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
+          <a-chip v-else @click="expand(display.collateGroup)" small color="grey" class="mr-0 mr-1">
             {{ display.collate }} Irrelevant Questions
           </a-chip>
         </a-timeline-item>
