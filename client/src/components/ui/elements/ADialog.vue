@@ -5,20 +5,20 @@
     v-bind="$attrs"
     @click:outside="$emit('click:outside', $event)"
     @input="$emit('input', $event)"
+    @update:modelValue="$emit('update:modelValue', $event)"
     :content-class="cssLoginPage ? 'loginPage' : ''"
     :role="role"
     :fullscreen="fullscreen"
     :height="height"
-    :hide-overlay="hideOverlay"
     :persistent="persistent"
     :max-height="maxHeight"
     :max-width="maxWidth"
+    :modelValue="modelValue"
     :scrollable="scrollable"
     :width="width"
-    :value="value"
   >
-    <template v-slot:activator="{ on, attrs }">
-      <slot name="activator" :on="on" :attrs="attrs" />
+    <template v-slot:activator="{ props }">
+      <slot name="activator" :props="props" />
     </template>
     <slot />
   </v-dialog>
@@ -26,7 +26,7 @@
 
 <script>
 export default {
-  emits: ['click:outside', 'input'],
+  emits: ['click:outside', 'input', 'update:modelValue'],
   props: {
     //non vuetify props
     cssLoginPage: { type: Boolean, required: false },
@@ -34,13 +34,12 @@ export default {
     //vuetify props
     fullscreen: { type: Boolean, required: false },
     height: { type: [String, Number], required: false },
-    hideOverlay: { type: Boolean, required: false },
-    persistent: { type: Boolean, required: false },
     maxHeight: { type: [String, Number], required: false },
     maxWidth: { type: [String, Number], required: false },
+    modelValue: { type: undefined, required: false },
+    persistent: { type: Boolean, required: false },
     scrollable: { type: Boolean, required: false },
     width: { type: [String, Number], required: false },
-    value: { type: undefined, required: false },
   },
 };
 </script>

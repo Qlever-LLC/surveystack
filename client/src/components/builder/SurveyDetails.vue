@@ -5,8 +5,8 @@
         <survey-name-editor v-model="value.name" />
         <a-spacer />
         <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
-          <template v-slot:activator="{ on }">
-            <a-btn icon v-on="on">
+          <template v-slot:activator="{ props }">
+            <a-btn icon v-bind="props">
               <a-icon>mdi-pencil</a-icon>
             </a-btn>
           </template>
@@ -29,8 +29,8 @@
           </a-card>
         </a-dialog>
         <a-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
-          <template v-slot:activator="{ on }">
-            <a-btn icon v-on="on">
+          <template v-slot:activator="{ props }">
+            <a-btn icon v-bind="props">
               <a-icon>mdi-dresser</a-icon>
             </a-btn>
           </template>

@@ -1,5 +1,5 @@
 <template>
-  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
+  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <a-card>
       <a-card-title>
         Publish

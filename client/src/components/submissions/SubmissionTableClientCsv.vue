@@ -190,7 +190,7 @@
       @close="closeModal"
     />
 
-    <a-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
+    <a-dialog :modelValue="downloadingResource" persistent width="300" role="downloadingResourceProgressDialog">
       <a-card>
         <a-card-text class="pa-4">
           <span>Downloading file resource</span>

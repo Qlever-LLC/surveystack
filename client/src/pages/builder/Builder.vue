@@ -44,7 +44,7 @@
       You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
 
-    <a-dialog v-model="submitting" hide-overlay persistent width="300">
+    <a-dialog v-model="submitting" persistent width="300">
       <a-card>
         <a-card-text class="pa-4">
           <span>Submitting Builder</span>

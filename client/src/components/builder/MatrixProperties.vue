@@ -1,15 +1,12 @@
 <template>
-  <a-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
-    <template v-slot:activator="{ on, attrs }">
+  <a-dialog v-model="open" @click:outside="open = false">
+    <template v-slot:activator="{ props }">
       <a-text-field
-        v-on="on"
-        v-bind="attrs"
-        ref="anchorRef"
+        v-bind="props"
         label="Resource"
         :modelValue="getLabel"
         placeholder="Add Columns"
         class="mt-6"
-        :class="$vnode.data.staticClass"
         hide-details
         readonly
         variant="outlined"
@@ -20,8 +17,7 @@
     <matrix-editor
       :resources="resources"
       :allowSetAllowHide="allowSetAllowHide"
-      :modelValue="value"
-      @update:modelValue="value"
+      v-model="value"
       @change="setResource"
       @delete="removeResource"
       @close-dialog="open = false"
@@ -39,7 +35,7 @@ export default {
     MatrixEditor,
   },
   props: {
-    value: {
+    modelValue: {
       type: Object,
     },
     resources: {
@@ -58,6 +54,7 @@ export default {
   data() {
     return {
       open: false,
+      value: this.modelValue,
     };
   },
   computed: {

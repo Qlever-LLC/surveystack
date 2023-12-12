@@ -11,8 +11,8 @@
   >
 
   <a-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
-    <template v-slot:activator="{ on, attrs }">
-      <a-btn :disabled="loading" v-bind="attrs" v-on:click.prevent="on.click" small>Invite to Hylo</a-btn>
+    <template v-slot:activator="{ props }">
+      <a-btn :disabled="loading" v-bind="props" small>Invite to Hylo</a-btn>
     </template>
     <a-card>
       <a-card-title> Confirm Invitation </a-card-title>

@@ -9,8 +9,8 @@
       <a-card-title v-if="editMode">
         {{ currentEmail }} <a-spacer />
         <a-dialog v-model="isEmailDialogOpen">
-          <template v-slot:activator="{ on, attrs }">
-            <a-btn small variant="text" v-bind="attrs" v-on="on"> Change Email </a-btn>
+          <template v-slot:activator="{ props }">
+            <a-btn small variant="text" v-bind="props"> Change Email </a-btn>
           </template>
           <a-card>
             <a-card-title class="text-h5"> Change Email </a-card-title>

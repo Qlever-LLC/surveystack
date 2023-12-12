@@ -8,6 +8,7 @@
     @focusout="$emit('focusout')"
     @keydown.esc="$emit('keydown.esc')"
     @keyup.enter="$emit('keyup.enter')"
+    @update:modelValue="$emit('update:modelValue', $event)"
     :autocomplete="autocomplete"
     :class="{ noBorder: disabled }"
     :data-test-id="dataTestId"
@@ -27,6 +28,7 @@
     :hint="hint"
     :label="label"
     :loading="loading"
+    :modelValue="modelValue"
     :persistent-hint="persistentHint"
     :placeholder="placeholder"
     :prepend-inner-icon="prependInnerIcon"
@@ -37,8 +39,6 @@
     :type="type"
     :validate-on-blur="validateOnBlur"
     :variant="variant"
-    :modelValue="modelValue"
-    @update:modelValue="$emit('update:modelValue', $event)"
   >
     <template v-if="appendSlot" v-slot:append>
       <slot name="append" />
@@ -106,9 +106,6 @@ export default {
     modelValue: { type: String, required: false },
   },
   methods: {
-    blur() {
-      this.$refs.refAnchor.blur();
-    },
     focus() {
       this.$refs.refAnchor.focus();
     },

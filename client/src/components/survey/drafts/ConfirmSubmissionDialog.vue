@@ -1,5 +1,5 @@
 <template>
-  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
+  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="400">
     <a-card>
       <a-card-title> Confirm Submission </a-card-title>
       <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>

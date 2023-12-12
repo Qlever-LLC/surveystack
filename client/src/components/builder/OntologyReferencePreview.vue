@@ -1,5 +1,5 @@
 <template>
-  <a-dialog v-model="open" max-width="50%" hide-overlay>
+  <a-dialog v-model="open" max-width="50%">
     <a-card min-height="50vh" class="d-flex flex-column">
       <a-card-title class="justify-space-between align-center">
         <p>Survey Reference Preview</p>

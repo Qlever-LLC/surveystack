@@ -1,14 +1,12 @@
 <template>
   <a-dialog v-model="open" width="500" @click:outside="cancel">
-    <template v-slot:activator="{ on, attrs }">
+    <template v-slot:activator="{ props }">
       <a-text-field
-        v-on="on"
-        v-bind="attrs"
+        v-bind="props"
         :modelValue="getLabel"
         @update:modelValue="onChange"
-        ref="anchorRef"
         label="Default value"
-        :class="$vnode.data.staticClass"
+        class="mt-3"
         clearable
         hide-details
         readonly
@@ -94,7 +92,6 @@ export default {
     },
     close() {
       this.open = false;
-      this.$refs.anchorRef.blur();
     },
     cancel() {
       this.selected = getArrayValue(this.value);
