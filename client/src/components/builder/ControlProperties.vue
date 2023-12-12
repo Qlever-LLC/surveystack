@@ -1,19 +1,19 @@
 <template>
   <div class="property-panel">
     <a-card-title class="pl-0">Properties</a-card-title>
-    <a-form v-if="control">
+    <a-form v-if="controlInProgress">
       <!-- Default properties -->
-      <a-text-field v-model="control.label" label="Label" hide-details />
+      <a-text-field v-model="controlInProgress.label" label="Label" hide-details />
       <a-text-field
-        v-model="control.name"
+        v-model="controlInProgress.name"
         label="Value"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         hide-details
       />
-      <a-text-field v-model="control.hint" label="Hint" hide-details />
+      <a-text-field v-model="controlInProgress.hint" label="Hint" hide-details />
       <markdown-editor
-        v-model="control.moreInfo"
+        v-model="controlInProgress.moreInfo"
         :resources="survey.resources"
         label="More info"
         placeholder="Add more info here"
@@ -26,7 +26,7 @@
       <!-- Control properties -->
       <a-text-field
         v-if="isText"
-        v-model="control.defaultValue"
+        v-model="controlInProgress.defaultValue"
         @blur="handleDefaultValueTrim"
         label="Default value"
         hide-details
@@ -34,7 +34,7 @@
       <a-text-field
         v-if="isNumber"
         type="number"
-        v-model="control.defaultValue"
+        v-model="controlInProgress.defaultValue"
         @blur="handleDefaultValueTrim"
         label="Default value"
         hide-details="auto"
@@ -42,15 +42,19 @@
       />
       <instructions-editor
         v-if="isInstructions"
-        v-model="control.options.source"
+        v-model="controlInProgress.options.source"
         class="mt-6"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
       />
       <instructions-image-split-editor
         v-if="isInstructionsImageSplit"
-        v-model="control.options.source"
+        v-model="controlInProgress.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />
@@ -58,49 +62,59 @@
         v-if="isDate"
         :items="dateTypes"
         label="Type"
-        v-model="control.options.subtype"
-        @input="() => (control.defaultValue = null)"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.subtype"
+        @input="() => (controlInProgress.defaultValue = null)"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         hide-details
       />
       <select-items-editor
         v-if="isSelect"
-        v-model="control.options.source"
-        @set-control-source="() => (control.defaultValue = null)"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.source"
+        @set-control-source="() => (controlInProgress.defaultValue = null)"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         class="mt-3"
       />
       <ontology-properties
         v-if="isOntology"
-        :value="control.options.source"
+        :value="controlInProgress.options.source"
         :resources="survey.resources"
-        :disable-selection="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disable-selection="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
       <a-text-field
         v-if="isMatrix"
-        v-model="control.options.source.config.addRowLabel"
+        v-model="controlInProgress.options.source.config.addRowLabel"
         label="Add Row label"
         hide-details
       />
       <matrix-properties
         v-if="isMatrix"
-        v-model="control.options.source"
+        v-model="controlInProgress.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         :allowSetAllowHide="!!survey.meta.isLibrary"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        @set-control-required="control.options.required = true"
+        @set-control-required="controlInProgress.options.required = true"
         class="mt-3"
       />
       <a-select
-        v-if="this.control.type === 'file'"
+        v-if="controlInProgress.type === 'file'"
         label="Restrict uploaded file types (.csv, .pdf, etc.)"
-        v-model="control.options.source.types"
+        v-model="controlInProgress.options.source.types"
         :items="fileTypes"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         multiple
         chips
         clearable
@@ -119,7 +133,9 @@
         item-text="name"
         item-value="_id"
         append-outer-icon="mdi-open-in-new"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         hide-details
         selectionSlot
       >
@@ -127,7 +143,12 @@
           <div>{{ item.name }}</div>
         </template>
       </a-select>
-      <a-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
+      <a-text-field
+        v-if="isScript"
+        v-model="controlInProgress.options.buttonLabel"
+        label="Run Button Label"
+        hide-details
+      />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <a-textarea
         v-if="isScript"
@@ -135,7 +156,9 @@
         @input="handleScriptParamsChange"
         label="Parameters"
         :rules="[validateScriptParams]"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         class="pt-3"
         hide-details
       />
@@ -143,18 +166,22 @@
         engineering="combobox"
         v-if="isFarmOsUuid"
         label="FarmOS Type"
-        v-model="control.options.farmOsType"
+        v-model="controlInProgress.options.farmOsType"
         @input="handleFarmOsTypeChange"
-        :items="control.options.farmOsTypes"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :items="controlInProgress.options.farmOsTypes"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
       />
       <a-checkbox
-        v-if="control.type === 'ontology'"
+        v-if="controlInProgress.type === 'ontology'"
         class="ml-2 align-center align-self-start"
         color="grey-darken-1"
         label="Multiple select"
-        v-model="control.options.hasMultipleSelections"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.hasMultipleSelections"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         dense
       />
       <a-checkbox
@@ -162,14 +189,16 @@
         class="ml-2 align-center align-self-start"
         color="grey-darken-1"
         label="Allow custom answer"
-        v-model="control.options.allowCustomSelection"
+        v-model="controlInProgress.options.allowCustomSelection"
         @input="
           () => {
-            control.options.allowAutocomplete = true;
-            control.defaultValue = null;
+            controlInProgress.options.allowAutocomplete = true;
+            controlInProgress.defaultValue = null;
           }
         "
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         dense
       >
         <template v-slot:helper-text>
@@ -182,38 +211,40 @@
         class="ml-2 align-center align-self-start"
         color="grey-darken-1"
         label="Autocomplete"
-        v-model="control.options.allowAutocomplete"
+        v-model="controlInProgress.options.allowAutocomplete"
         :disabled="
-          (!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot) ||
-          control.options.allowCustomSelection
+          (!!controlInProgress.libraryId &&
+            !controlInProgress.options.allowModify &&
+            !controlInProgress.isLibraryRoot) ||
+          controlInProgress.options.allowCustomSelection
         "
         helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
         dense
       />
       <ontology
         v-if="isOntology"
-        v-model="control.defaultValue"
-        :multiple="control.options.hasMultipleSelections"
-        :customAnswer="control.options.allowCustomSelection"
-        :autocomplete="control.options.allowAutocomplete"
-        :source="control.options.source"
+        v-model="controlInProgress.defaultValue"
+        :multiple="controlInProgress.options.hasMultipleSelections"
+        :customAnswer="controlInProgress.options.allowCustomSelection"
+        :autocomplete="controlInProgress.options.allowAutocomplete"
+        :source="controlInProgress.options.source"
         :resources="survey.resources"
       />
       <date
-        v-if="isDate && control.options.subtype"
-        v-model="control.defaultValue"
+        v-if="isDate && controlInProgress.options.subtype"
+        v-model="controlInProgress.defaultValue"
         @input="() => $forceUpdate()"
         @blur="handleDefaultValueTrim"
-        :type="control.options.subtype"
+        :type="controlInProgress.options.subtype"
         class="mt-3"
       />
       <select-items
-        v-if="isSelect && control.options.source"
-        v-model="control.defaultValue"
+        v-if="isSelect && controlInProgress.options.source"
+        v-model="controlInProgress.defaultValue"
         @blur="handleDefaultValueTrim"
-        :items="control.options.source"
-        :custom="control.options.allowCustomSelection"
-        :multiple="control.type === 'selectMultiple'"
+        :items="controlInProgress.options.source"
+        :custom="controlInProgress.options.allowCustomSelection"
+        :multiple="controlInProgress.type === 'selectMultiple'"
         class="mt-3"
       />
 
@@ -222,16 +253,20 @@
       <a-checkbox
         v-if="hasRequiredOption"
         label="Required"
-        v-model="control.options.required"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.required"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         helper-text="Make this a required field"
         color="grey-darken-1"
         class="align-center align-self-start"
       />
       <a-checkbox
         label="Private"
-        v-model="control.options.redacted"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.redacted"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         helper-text="Only admins and original submitters can see this field"
         color="grey-darken-1"
         class="align-center align-self-start"
@@ -239,7 +274,7 @@
       <a-checkbox
         v-if="isPage"
         label="Compact"
-        v-model="control.options.compact"
+        v-model="controlInProgress.options.compact"
         helper-text="Reduce the spaces and combine fields into one card"
         color="grey-darken-1"
         class="align-center align-self-start"
@@ -247,56 +282,62 @@
       <a-checkbox
         v-if="isText"
         label="QR Code"
-        v-model="control.options.enableQr"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        v-model="controlInProgress.options.enableQr"
+        :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         color="grey-darken-1"
         class="align-center align-self-start"
       />
       <a-checkbox
-        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
+        v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow modify"
-        v-model="control.options.allowModify"
+        v-model="controlInProgress.options.allowModify"
         helper-text="Allow users of this question set to modify this question"
         color="grey-darken-1"
         class="align-center align-self-start"
       />
       <a-checkbox
-        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
+        v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow hide"
-        v-model="control.options.allowHide"
+        v-model="controlInProgress.options.allowHide"
         helper-text="Allow users of this question set to hide this question"
         color="grey-darken-1"
         class="align-center align-self-start"
       />
       <a-checkbox
-        v-if="control.libraryId && control.options.allowHide"
+        v-if="controlInProgress.libraryId && controlInProgress.options.allowHide"
         label="Hidden"
-        v-model="control.options.hidden"
+        v-model="controlInProgress.options.hidden"
         helper-text="Submitters can not see this field. This option is intentionally allowed by the question set designer"
         color="grey-darken-1"
         class="align-center align-self-start"
       />
       <a-checkbox
-        v-if="control.type === 'farmOsPlanting' || control.type === 'farmOsFarm' || control.type === 'farmOsField'"
+        v-if="
+          controlInProgress.type === 'farmOsPlanting' ||
+          controlInProgress.type === 'farmOsFarm' ||
+          controlInProgress.type === 'farmOsField'
+        "
         label="Multiple select"
-        v-model="control.options.hasMultipleSelections"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.hasMultipleSelections"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         color="grey-darken-1"
         class="align-center align-self-start"
       />
       <a-checkbox
         v-if="isFile"
         label="Multiple upload"
-        v-model="control.options.source.allowMultiple"
+        v-model="controlInProgress.options.source.allowMultiple"
         helper-text="Allow user to upload multiple files"
         color="grey-darken-1"
         class="align-center align-self-start"
       />
       <a-checkbox
-        v-if="control.type === 'script'"
+        v-if="controlInProgress.type === 'script'"
         label="Native Script"
-        v-model="control.options.isNativeScript"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        v-model="controlInProgress.options.isNativeScript"
+        :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         helper-text="Show Download Link for Surveystack Kit APK"
         color="grey-darken-1"
         class="align-center align-self-start"
@@ -306,7 +347,7 @@
           v-for="opt in geoJsonOptions"
           :key="opt.key"
           :label="opt.text"
-          v-model="control.options.geoJSON[opt.key]"
+          v-model="controlInProgress.options.geoJSON[opt.key]"
           color="grey-darken-1"
           class="align-center align-self-start"
         />
@@ -334,7 +375,11 @@
           <a-checkbox
             label="Relevance Expression"
             v-model="relevance.enabled"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            :disabled="
+              !!controlInProgress.libraryId &&
+              !controlInProgress.options.allowModify &&
+              !controlInProgress.isLibraryRoot
+            "
             color="grey-darken-1"
             class="align-center align-self-start"
           />
@@ -345,7 +390,11 @@
           <a-checkbox
             label="Initialize Expression"
             v-model="initialize.enabled"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            :disabled="
+              !!controlInProgress.libraryId &&
+              !controlInProgress.options.allowModify &&
+              !controlInProgress.isLibraryRoot
+            "
             color="grey-darken-1"
             class="align-center align-self-start"
           />
@@ -388,7 +437,11 @@
           <a-checkbox
             label="Api Compose Expression"
             v-model="apiCompose.enabled"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            :disabled="
+              !!controlInProgress.libraryId &&
+              !controlInProgress.options.allowModify &&
+              !controlInProgress.isLibraryRoot
+            "
             color="grey-darken-1"
             class="align-center align-self-start"
           />
@@ -400,7 +453,14 @@
 
       <!-- Print layout -->
       <template v-if="hasLayoutOptions">
-        <a-btn v-if="!showLayout" color="grey-darken-1" class="align-self-end" @click="showLayout = true" small variant="text">
+        <a-btn
+          v-if="!showLayout"
+          color="grey-darken-1"
+          class="align-self-end"
+          @click="showLayout = true"
+          small
+          variant="text"
+        >
           Print Layout
         </a-btn>
         <div v-else class="extra-options">
@@ -413,7 +473,7 @@
           <div v-if="isMatrix">
             <a-checkbox
               label="Table format"
-              v-model="control.options.printLayout.table"
+              v-model="controlInProgress.options.printLayout.table"
               helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
               color="grey-darken-1"
               class="align-center align-self-start"
@@ -423,7 +483,7 @@
           <div v-if="isFile">
             <a-checkbox
               label="Show preview"
-              v-model="control.options.printLayout.preview"
+              v-model="controlInProgress.options.printLayout.preview"
               helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
               color="grey-darken-1"
               class="align-center align-self-start"
@@ -435,7 +495,7 @@
             <div class="mt-2">
               <a-checkbox
                 label="Show all resource list options"
-                v-model="control.options.printLayout.showAllOptionsPrintable"
+                v-model="controlInProgress.options.printLayout.showAllOptionsPrintable"
                 helper-text="Show the complete list of possible options when printing a fresh survey"
                 color="grey-darken-1"
                 class="align-center align-self-start"
@@ -446,7 +506,7 @@
             <div class="mt-2">
               <a-checkbox
                 label="Show all resource list options"
-                v-model="control.options.printLayout.showAllOptions"
+                v-model="controlInProgress.options.printLayout.showAllOptions"
                 helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
                 color="grey-darken-1"
                 class="align-center align-self-start"
@@ -455,7 +515,7 @@
 
             <a-select
               label="Answer layout"
-              v-model="control.options.printLayout.columns"
+              v-model="controlInProgress.options.printLayout.columns"
               :items="[1, 2, 3, 4, 5]"
               color="focus"
               :menu-props="{ contentClass: 'layout-select' }"
@@ -549,6 +609,7 @@ export default {
   },
   data() {
     return {
+      controlInProgress: this.control,
       showAdvanced: false,
       showLayout: false,
       // if we migrate to using Vue Composition API, the script functionality could be extracted out into a `useScriptProperties` hook
@@ -609,51 +670,51 @@ export default {
       return this.controls.map((control) => control.name);
     },
     isGroup() {
-      return this.control.type === 'group';
+      return this.controlInProgress.type === 'group';
     },
     isFile() {
-      return this.control.type === 'file' || this.control.type === 'image';
+      return this.controlInProgress.type === 'file' || this.controlInProgress.type === 'image';
     },
     isDate() {
-      return this.control.type === 'date';
+      return this.controlInProgress.type === 'date';
     },
     isText() {
-      return this.control.type === 'string';
+      return this.controlInProgress.type === 'string';
     },
     isNumber() {
-      return this.control.type === 'number';
+      return this.controlInProgress.type === 'number';
     },
     isScript() {
-      return this.control.type === 'script';
+      return this.controlInProgress.type === 'script';
     },
     isInstructions() {
-      return this.control.type === 'instructions';
+      return this.controlInProgress.type === 'instructions';
     },
     isSelect() {
-      return /select/i.test(this.control.type);
+      return /select/i.test(this.controlInProgress.type);
     },
     isOntology() {
-      return this.control.type === 'ontology';
+      return this.controlInProgress.type === 'ontology';
     },
     isMatrix() {
-      return this.control.type === 'matrix';
+      return this.controlInProgress.type === 'matrix';
     },
     isGeoJSON() {
-      return this.control.type === 'geoJSON';
+      return this.controlInProgress.type === 'geoJSON';
     },
     isInstructionsImageSplit() {
-      return this.control.type === 'instructionsImageSplit';
+      return this.controlInProgress.type === 'instructionsImageSplit';
     },
     isPage() {
-      return this.control.type === 'page';
+      return this.controlInProgress.type === 'page';
     },
     isFarmOsUuid() {
-      return this.control.type === 'farmOsUuid';
+      return this.controlInProgress.type === 'farmOsUuid';
     },
     hasRequiredOption() {
       return (
-        this.control.options.required ||
-        !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
+        this.controlInProgress.options.required ||
+        !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.controlInProgress.type)
       );
     },
     hasExpressionEnabled() {
@@ -672,8 +733,8 @@ export default {
   methods: {
     nameIsUnique() {
       const hasSameNameAndDifferentId = (control) =>
-        control.name === this.control.name && control.id !== this.control.id;
-      const parent = findParentByChildId(this.control.id, this.controls);
+        control.name === this.controlInProgress.name && control.id !== this.controlInProgress.id;
+      const parent = findParentByChildId(this.controlInProgress.id, this.controls);
 
       const controlsWithSameName = parent
         ? parent.children.filter(hasSameNameAndDifferentId)
@@ -724,11 +785,11 @@ export default {
       }
     },
     handleDefaultValueTrim() {
-      const value = this.control.defaultValue;
-      this.control.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      const value = this.controlInProgress.defaultValue;
+      this.controlInProgress.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
     },
     handleFarmOsTypeChange(type) {
-      this.control.options.farmOsType = getValueOrNull(type);
+      this.controlInProgress.options.farmOsType = getValueOrNull(type);
     },
     validateScriptParams(params) {
       try {
@@ -743,31 +804,34 @@ export default {
     },
     getScriptParams() {
       return (
-        (this.control && this.control.options && JSON.stringify(this.control.options.params)) || JSON.stringify({})
+        (this.controlInProgress &&
+          this.controlInProgress.options &&
+          JSON.stringify(this.controlInProgress.options.params)) ||
+        JSON.stringify({})
       );
     },
     updateScript() {
       if (this.isScript) {
         this.fetchScripts();
       }
-      const scriptResource = this.survey.resources.find((r) => r.id === this.control.options.source);
+      const scriptResource = this.survey.resources.find((r) => r.id === this.controlInProgress.options.source);
       if (scriptResource) {
         this.scriptSourceId = scriptResource.content;
       } else {
         //fallback to directly using script id in case of legacy survey
-        this.scriptSourceId = this.control.options.source;
+        this.scriptSourceId = this.controlInProgress.options.source;
       }
       this.scriptParams = this.getScriptParams();
     },
   },
   watch: {
-    'control.name': {
+    'controlInProgress.name': {
       handler(newVal) {
         const key = convertToKey(newVal);
-        this.control.name = key;
+        this.controlInProgress.name = key;
       },
     },
-    'control.id': {
+    'controlInProgress.id': {
       handler(newVal, oldVal) {
         if (this.isScript && newVal !== oldVal) {
           this.updateScript();
