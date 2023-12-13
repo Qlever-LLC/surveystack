@@ -6,24 +6,24 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended" // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly",
     "jest/globals": true
   },
-  "parserOptions": {
-    "ecmaVersion": 2020,
-    "sourceType": "module"
-  },
   "rules": {
-    "no-unused-vars": [1]
+    "no-unused-vars": "off", // we will rely on @typescript-eslint/no-unused-vars instead
+    "@typescript-eslint/no-unused-vars": ["error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }]
   },
   "overrides": [
     {
       "files": [
-        "**/*.spec.js"
+        "**/*.spec.{js,ts}"
       ],
       "env": {
         "jest": true
