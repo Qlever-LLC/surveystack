@@ -5,6 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const LCL = require('last-commit-log');
 
 const fs = require('fs');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 const lcl = new LCL('../');
 const commit = lcl.getLastCommitSync();
@@ -28,9 +29,11 @@ module.exports = {
       },
       fallback: {
         path: require.resolve('path-browserify'),
+        //buffer: require.resolve('buffer-browserify'),
       },
     },
     plugins: [
+      new NodePolyfillPlugin(),
       new MonacoWebpackPlugin({
         languages: ['javascript', 'typescript'],
         features: [],
