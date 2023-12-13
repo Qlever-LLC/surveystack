@@ -7,7 +7,6 @@ import * as utils from '../helpers/surveys';
 
 import { hasPermission } from './farmos/apiCompose';
 import { aggregator } from './farmos/aggregator';
-import { db } from '../db';
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -288,31 +287,6 @@ export const handle = async ({ submission, survey, user }) => {
   });
 
   return results;
-};
-
-const testAggregatorConnection = async (url, apiKey) => {
-  const agentOptions = {
-    host: url,
-    port: '443',
-    path: '/',
-    rejectUnauthorized: false,
-  };
-
-  const agent = new https.Agent(agentOptions);
-
-  const r = await axios.get(`https://${url}/api/v2/farms/`, {
-    headers: {
-      accept: 'application/json',
-      'api-key': apiKey,
-    },
-    httpsAgent: agent,
-  });
-
-  if (r.status === 200) {
-    return true;
-  } else {
-    throw Error('unable to connect to aggregator');
-  }
 };
 
 export const isFarmosUrlAvailable = async (url, apiKey) => {

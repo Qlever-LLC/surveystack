@@ -1,5 +1,4 @@
 import boom from '@hapi/boom';
-import axios from 'axios';
 import { ObjectId } from 'mongodb';
 import querystring from 'querystring';
 import jsonSafeStringify from 'json-stringify-safe';
@@ -375,7 +374,6 @@ export const handleSyncGroupOutput = async (options) => {
     syncGroupWithHylo: _syncGroupWithHylo,
     addMember: _addMember,
     upsertHyloUser: _upsertHyloUser,
-    gqlRequest: _gqlRequest,
     gqlRequestWithUrl: _gqlRequestWithUrl,
     postHyloUser: _postHyloUser,
   } = { ...deps, syncUserWithHylo, syncGroupWithHylo, addMember, upsertHyloUser, ...options };
@@ -465,13 +463,8 @@ export const handleSyncGroupOutput = async (options) => {
 export const handleJoinGroupOutput = async (options) => {
   const {
     output: _output,
-    user,
-    group,
     logger,
-    hyloGroupId,
-    addMember: _addMember,
     queryHyloGroup: _queryHyloGroup,
-    gqlRequest: _gqlRequest,
     gqlRequestWithUrl: _gqlRequestWithUrl,
     postHyloUser: _postHyloUser,
     upsertHyloUser: _upsertHyloUser,

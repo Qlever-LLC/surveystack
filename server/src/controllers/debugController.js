@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
@@ -12,11 +11,11 @@ import {
 import { createDummyResults } from '../services/dummy.service';
 import { initAdmins } from '../services/admin.service';
 
-const getDefault = async (req, res) => {
+const getDefault = async (_req, res) => {
   return res.send('This is the debug route');
 };
 
-const throwError = async (req, res) => {
+const throwError = async (_req, _res) => {
   throw boom.badRequest("It's a bad request");
 };
 
@@ -26,7 +25,7 @@ const createDummySubmissions = async (req, res) => {
   return res.send(r);
 };
 
-const tabulaRasa = async (req, res) => {
+const tabulaRasa = async (_req, res) => {
   if (process.env.NODE_ENV !== 'development') {
     throw boom.badRequest('Can only tabula rasa on development server');
   }

@@ -777,7 +777,7 @@ const getCleanupSurveyInfo = async (req, res) => {
 
 const cleanupSurvey = async (req, res) => {
   const { id } = req.params;
-  const { versions: requestedVersionsToDelete, resourceIds, auto, dryRun } = req.query;
+  const { versions: requestedVersionsToDelete, auto, dryRun } = req.query;
   const { survey, versionsToKeep, versionsToDelete } = await getSurveyAndCleanupInfo(id, res);
 
   // Don't allow deletion of survey versions that have associated submissions

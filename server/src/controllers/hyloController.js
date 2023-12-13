@@ -2,7 +2,6 @@ import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { ObjectId } from 'mongodb';
 import Joi from 'joi';
 
-import _ from 'lodash';
 import boom from '@hapi/boom';
 
 import { gqlRequest } from '../services/hylo/utils';

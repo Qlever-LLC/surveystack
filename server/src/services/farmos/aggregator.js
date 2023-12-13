@@ -1,5 +1,4 @@
 import boom from '@hapi/boom';
-import { triggerAsyncId } from 'async_hooks';
 import axios from 'axios';
 import https from 'https';
 import _ from 'lodash';
