@@ -24,34 +24,38 @@
           :searchable="false"
         >
           <template v-slot:entity="{ entity }">
-            <a-list-item class="d-flex" :to="`/surveys/${entity.id}`">
-              <template #prepend>
+            <v-row no-gutters>
+              <v-col cols="auto" class="flex-grow-0 justify-center align-self-center mr-3">
                 <a-icon
                   v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
                   icon="mdi-earth"
                   title="Everyone can submit"
+                  color="grey-darken-1"
+                  large
                 />
                 <a-icon
                   v-if="entity.meta.submissions === 'user'"
                   icon="mdi-account"
                   title="Only signed-in users can submit"
+                  color="grey-darken-1"
+                  large
                 />
                 <a-icon
                   v-if="entity.meta.submissions === 'group'"
                   icon="mdi-account-group"
                   title="Everyone group members can submit"
+                  color="grey-darken-1"
+                  large
                 />
-              </template>
-              <template #default>
-                <div>
-                  <a-list-item-title>{{ entity.name }}</a-list-item-title>
-                  <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-                </div>
-                <div class="d-flex align-center ml-3">
-                  <a-btn color="primary" small>Take Survey</a-btn>
-                </div>
-              </template>
-            </a-list-item>
+              </v-col>
+              <v-col col="10" class="flex-grow-1">
+                <a-list-item-title>{{ entity.name }}</a-list-item-title>
+                <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
+              </v-col>
+              <v-col col="1" class="flex-grow-0 align-self-center ml-3">
+                <a-btn color="primary" small>Take Survey</a-btn>
+              </v-col>
+            </v-row>
           </template>
         </app-basic-list>
       </a-col>
@@ -67,27 +71,35 @@
           :link="(e) => `/surveys/${e.id}`"
         >
           <template v-slot:entity="{ entity }">
-            <a-list-item class="d-flex" :to="`/surveys/${entity.id}`" @click="$emit('test')">
-              <template #prepend>
+            <v-row no-gutters>
+              <v-col cols="auto" class="flex-grow-0 justify-center align-self-center mr-3">
                 <a-icon
                   v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
                   icon="mdi-earth"
                   title="Everyone can submit"
+                  color="grey-darken-1"
+                  large
                 />
                 <a-icon
                   v-if="entity.meta.submissions === 'user'"
                   icon="mdi-account"
                   title="Only signed-in users can submit"
+                  color="grey-darken-1"
+                  large
                 />
                 <a-icon
                   v-if="entity.meta.submissions === 'group'"
                   icon="mdi-account-group"
                   title="Everyone group members can submit"
+                  color="grey-darken-1"
+                  large
                 />
-              </template>
-              <a-list-item-title>{{ entity.name }}</a-list-item-title>
-              <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-            </a-list-item>
+              </v-col>
+              <v-col col="11" class="flex-grow-1">
+                <a-list-item-title>{{ entity.name }}</a-list-item-title>
+                <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
+              </v-col>
+            </v-row>
           </template>
         </app-basic-list>
       </a-col>
