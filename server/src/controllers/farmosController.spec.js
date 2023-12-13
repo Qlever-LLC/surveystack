@@ -2,7 +2,7 @@ import boom from '@hapi/boom';
 import mockAxios from 'axios';
 import _ from 'lodash';
 import { ObjectId } from 'mongodb';
-const { getDb } = require('../db');
+import { getDb } from '../db';
 
 import * as manage from '../services/farmos/manage';
 
@@ -19,8 +19,6 @@ import {
   superAdminCreateFarmOsInstance,
   groupAdminMinimumGetGroupInformation,
   removeMembershipHook,
-  mapUser,
-  getDomain,
   addNotes,
   addSuperAdminNotes,
   updateOwnership,
@@ -147,7 +145,7 @@ const createFarmOSDomain = async (gs) => {
 
 describe('farmos-controller', () => {
   it('get-farmos-instances', async () => {
-    const { group, admin1, user1 } = await init();
+    const { user1 } = await init();
 
     await mapFarmOSInstanceToUser(user1.user._id, 'user.farmos.dev', true, origin);
 
@@ -160,7 +158,7 @@ describe('farmos-controller', () => {
   });
 
   it('get-farmos-instances-not-logged-in', async () => {
-    const { group, admin1, user1 } = await init();
+    const { user1 } = await init();
 
     await mapFarmOSInstanceToUser(user1.user._id, 'farm1.farmos.dev', true, origin);
 
@@ -169,7 +167,7 @@ describe('farmos-controller', () => {
   });
 
   it('get-instances-for-admin', async () => {
-    const { group, admin1, user1 } = await init();
+    const { admin1, user1 } = await init();
 
     await mapFarmOSInstanceToUser(user1.user._id, 'user-farm.farmos.dev', true, origin);
 
@@ -195,7 +193,7 @@ describe('farmos-controller', () => {
     const instanceName = 'farmos.net';
     const parentGroup = await createGroup({ name: 'GroupA' });
     const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
-    const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
+    await parentGroup.createSubGroup({ name: 'GroupAB' });
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
@@ -231,7 +229,7 @@ describe('farmos-controller', () => {
     const instanceName = 'farmos.net';
     const parentGroup = await createGroup({ name: 'GroupA' });
     const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
-    const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
+    await parentGroup.createSubGroup({ name: 'GroupAB' });
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
@@ -278,7 +276,7 @@ describe('farmos-controller', () => {
     const instanceName = 'farmos.net';
     const parentGroup = await createGroup({ name: 'GroupA' });
     const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
-    const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
+    await parentGroup.createSubGroup({ name: 'GroupAB' });
     const extGroup = await createGroup({ name: 'GroupZ' });
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
@@ -528,7 +526,7 @@ describe('farmos-controller', () => {
     process.env.FARMOS_AGGREGATOR_APIKEY = 'x';
     process.env.FARMOS_CREATE_KEY = 'x';
 
-    const { group, admin1, user1 } = await init();
+    const { group, user1 } = await init();
 
     // TODO create Plan (id, name, url)
     setPlanForGroup(group._id, 'unit-test-plan');
@@ -591,9 +589,9 @@ describe('farmos-controller', () => {
   it('farmos-groupAdminMinimumGetGroupInformation works fine', async () => {
     const group = await createGroup({ name: 'Bionutrient' });
     const admin1_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
-    const admin1 = await group.createAdminMember(admin1_data);
+    await group.createAdminMember(admin1_data);
     const user1_data = { userOverrides: { name: 'Dave Jole', email: 'djole2352@gmail.com' } };
-    const user1 = await group.createUserMember(user1_data);
+    await group.createUserMember(user1_data);
     await createFarmosGroupSettings(group._id);
     const req = { params: { groupId: group._id } };
     const res = mockResSuperAdmin(true);
@@ -923,7 +921,7 @@ describe('farmos-controller', () => {
 
   it('delete Instance success', async () => {
     const instanceName = 'instanceName';
-    const { group, admin1, user1 } = await init();
+    const { group, user1 } = await init();
     const user = user1.user;
     await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
     await addFarmToSurveystackGroupAndSendNotification(instanceName, group._id, origin);
@@ -962,7 +960,7 @@ describe('farmos-controller', () => {
   });
   it('delete Instance error', async () => {
     const instanceName = 'instanceName';
-    const { group, admin1, user1 } = await init();
+    const { user1 } = await init();
     const user = user1.user;
     await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
 
@@ -992,7 +990,7 @@ describe('farmos-controller', () => {
 
   it('remove Instance From Group success', async () => {
     const instanceName = 'instanceName';
-    const { group, admin1, user1 } = await init();
+    const { group, user1 } = await init();
     const user = user1.user;
     await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
     await addFarmToSurveystackGroupAndSendNotification(instanceName, group._id, origin);
@@ -1017,7 +1015,7 @@ describe('farmos-controller', () => {
 
   it('remove Instance From Group error', async () => {
     const instanceName = 'instanceName';
-    const { group, admin1, user1 } = await init();
+    const { group, user1 } = await init();
     const user = user1.user;
     await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
 

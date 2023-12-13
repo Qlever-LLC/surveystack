@@ -180,13 +180,7 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
 });
 
 describe('surveyController', () => {
-  let librarySurvey,
-    librarySurveySubmission,
-    consumerSurvey,
-    consumerSubmission,
-    createSubmission,
-    admin,
-    res;
+  let librarySurvey, admin, res;
 
   beforeEach(async () => {
     const group = await createGroup();
@@ -196,16 +190,8 @@ describe('surveyController', () => {
     const libraryResult = await mockControlsAndSubmission({
       meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
     });
-    createSubmission = libraryResult.createSubmission;
     librarySurvey = libraryResult.survey;
-    librarySurveySubmission = libraryResult.submission;
-    const consumerResult = await mockControlsAndSubmission(
-      undefined,
-      librarySurvey._id,
-      librarySurvey.lastedVersion
-    );
-    consumerSurvey = consumerResult.survey;
-    consumerSubmission = consumerResult.submission;
+    await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.lastedVersion);
   });
 
   describe('getSurvey', () => {
@@ -403,25 +389,14 @@ describe('surveyController', () => {
   });
 
   describe('cleanup', () => {
-    let librarySurvey,
-      librarySurveySubmission,
-      consumerSurvey,
-      consumerSubmission,
-      createSubmission;
+    let librarySurvey, createSubmission;
     beforeEach(async () => {
       const libraryResult = await mockControlsAndSubmission({
         meta: { isLibrary: true },
       });
       createSubmission = libraryResult.createSubmission;
       librarySurvey = libraryResult.survey;
-      librarySurveySubmission = libraryResult.submission;
-      const consumerResult = await mockControlsAndSubmission(
-        undefined,
-        librarySurvey._id,
-        librarySurvey.latestVersion
-      );
-      consumerSurvey = consumerResult.survey;
-      consumerSubmission = consumerResult.submission;
+      await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.latestVersion);
     });
     describe('getSurveyAndCleanupInfo', () => {
       it('returns the survey by the id passed', async () => {

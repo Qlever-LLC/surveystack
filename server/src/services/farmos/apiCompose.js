@@ -1,9 +1,4 @@
 import { db } from '../../db';
-import { ObjectId } from 'mongodb';
-
-import axios from 'axios';
-import boom from '@hapi/boom';
-import https from 'https';
 
 /**
  * Does user have permission to push to instance?
@@ -62,49 +57,4 @@ export const hasPermission = async (userId, instanceName) => {
 
   // eslint-disable-next-line no-prototype-builtins
   return allowedInstances.hasOwnProperty(instanceName);
-};
-
-/**
- *
- * @param {*} endpoint log / asset
- * @param {*} bundle respective bundle
- * @returns
- */
-const wrapCreateSubrequest = (endpoint, bundle) => {
-  return {
-    uri: `api/${endpoint}/${bundle}`,
-    action: 'create',
-    headers: {
-      Accept: 'application/vnd.api+json',
-      'Content-Type': 'application/vnd.api+json',
-    },
-  };
-};
-
-/**
- *
- * @returns an empty array if term exists, a new term subrequest otherwise
- */
-const createTerm = (termName, taxonomyType, taxonomy) => {
-  return [];
-};
-
-/**
- * TODO create subrequest with new asset
- */
-const createAsset = async (instanceName, taxonomy, apiCompose) => {};
-
-/**
- * TODO create subrequest with new asset
- */
-
-const createLog = async (instanceName, taxonomy, apiCompose) => {};
-
-/**
- *
- * handle apiCompose for farmos 2.0
- *
- */
-export const handleApiCompose = async (req, res) => {
-  return []; // success and error messages
 };

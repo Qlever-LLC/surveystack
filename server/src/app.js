@@ -1,4 +1,4 @@
-import dotenv from 'dotenv-defaults/config';
+import 'dotenv-defaults/config';
 
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
@@ -14,7 +14,6 @@ import { initLogging } from './middleware/logging';
 import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
 
-import resources from './controllers/resources';
 import { createCookieOptions } from './constants';
 import { toggleMiddleware } from './services/featureToggle.service';
 import { ObjectId } from 'mongodb';
@@ -116,8 +115,6 @@ function createApp() {
   // routes
   app.use(`${PATH_PREFIX}/api`, apiRoutes);
   app.use(`${PATH_PREFIX}/api`, errorHandlers.developmentErrors);
-
-  app.use('/resources/:id', resources.serve);
 
   if (process.env.NODE_ENV === 'development') {
     app.use('/debug', debugRoutes);

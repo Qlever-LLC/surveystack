@@ -129,11 +129,11 @@ describe('fetching farminfo', () => {
   });
 
   it('get-endpoints-and-bundles', async () => {
-    mockAxios.get.mockImplementation((req) => {
+    mockAxios.get.mockImplementation(() => {
       return Promise.resolve({ data: mockResponses.apiResponse });
     });
 
-    mockAxios.post.mockImplementation((req) => {
+    mockAxios.post.mockImplementation(() => {
       return Promise.resolve({ data: subrequetsResponse });
     });
 

@@ -1,4 +1,4 @@
-import { MongoClient, Db, ObjectId } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 /**
  * @type {Db}
