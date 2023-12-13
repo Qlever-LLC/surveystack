@@ -23,7 +23,7 @@ export default {
     xSmall: { type: Boolean, required: false },
     large: { type: Boolean, required: false },
     xLarge: { type: Boolean, required: false },
-    size: { type: Number, required: false }, //custom font size, wins over small/xSmall/large/xLarge
+    size: { type: [Number, String], required: false }, //custom font size, wins over small/xSmall/large/xLarge
     disabled: { type: Boolean, required: false }, //v3: TODO replace by v-btn
   },
 };
