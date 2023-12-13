@@ -19,7 +19,7 @@
         </div>
 
         <a-text-field v-model="subject" label="Subject" variant="filled" />
-        <a-textarea rows="10" v-model="body" label="Message" filled hide-details />
+        <a-textarea rows="10" v-model="body" label="Message" hide-details />
         <div v-if="showMissingMagicLinkWarning" class="mt-2 text-error">
           Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
         </div>

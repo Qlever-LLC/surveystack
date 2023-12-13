@@ -1,14 +1,6 @@
 <template>
   <div>
-    <a-textarea
-      filled
-      :rows="rows"
-      :value="valueString"
-      @input="writeBack($event)"
-      outlined
-      :label="label"
-      cssFontMonospace
-    />
+    <a-textarea :rows="rows" :value="valueString" @input="writeBack($event)" :label="label" cssFontMonospace />
   </div>
 </template>
 <script>
