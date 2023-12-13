@@ -20,7 +20,7 @@
                 label="Allow Submissions for..."
                 :items="availableSubmissions"
               />
-              <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
+              <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" variant="outlined" />
             </a-card-text>
             <a-card-actions class="mr-3">
               <a-spacer />

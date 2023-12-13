@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-form class="d-flex flex-column">
-      <a-textarea v-model="value.match" outlined label="Match" rows="3" />
+      <a-textarea v-model="value.match" variant="outlined" label="Match" rows="3" />
       <a-row>
         <a-col>
           <a-text-field v-model="value.sort" label="Sort" dense />
