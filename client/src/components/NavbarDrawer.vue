@@ -1,7 +1,7 @@
 <template>
   <a-navigation-drawer :modelValue="modelValue">
     <div class="d-flex justify-end mt-3 mr-3">
-      <a-btn large icon @click="closeNavBar">
+      <a-btn large variant="flat" icon @click="closeNavBar">
         <a-icon>mdi-close</a-icon>
       </a-btn>
     </div>
@@ -32,10 +32,10 @@
           :modelValue="docs.length > 2 ? undefined : 0"
         >
           <a-expansion-panel>
-            <a-expansion-panel-title class="pa-0 ma-0">
+            <a-expansion-panel-title class="py-0 pl-0">
               <a-list-subheader>DOCUMENTATION</a-list-subheader>
             </a-expansion-panel-title>
-            <a-expansion-panel-text class="pa-0 ma-0 no-padding">
+            <a-expansion-panel-text class="pa-0 ma-0">
               <a-list class="pa-0 ma-0">
                 <a-list-item
                   v-for="(doc, index) in docs"
@@ -51,10 +51,16 @@
                   href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
                   target="_blank"
                   prepend-icon="mdi-help-circle-outline"
+                  class="pa-0"
                 >
                   <a-list-item-title>SurveyStack Help</a-list-item-title>
                 </a-list-item>
-                <v-list-item href="https://www.surveystack.io" target="_blank" prepend-icon="mdi-information-outline">
+                <v-list-item
+                  href="https://www.surveystack.io"
+                  target="_blank"
+                  prepend-icon="mdi-information-outline"
+                  class="pa-0"
+                >
                   <a-list-item-title>About</a-list-item-title>
                 </v-list-item>
               </a-list>
