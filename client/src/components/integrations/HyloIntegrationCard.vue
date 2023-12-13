@@ -17,8 +17,8 @@
 
             <a-spacer />
             <a-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
-              <template v-slot:activator="{ on, attrs }">
-                <a-btn variant="text" v-bind="attrs" v-on="on" color="white"> Remove integration </a-btn>
+              <template v-slot:activator="{ props }">
+                <a-btn variant="text" v-bind="props" color="white"> Remove integration </a-btn>
               </template>
               <a-card>
                 <a-card-title class="text-h5"> Are you sure? </a-card-title>
@@ -64,8 +64,8 @@
 
         <a-card-text>
           <a-dialog v-model="integrateDialog" width="500">
-            <template v-slot:activator="{ on, attrs }">
-              <a-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </a-btn>
+            <template v-slot:activator="{ props }">
+              <a-btn color="primary" dark v-bind="props"> Integrate with Hylo </a-btn>
             </template>
 
             <a-card>

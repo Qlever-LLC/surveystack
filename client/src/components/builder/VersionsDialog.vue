@@ -1,5 +1,5 @@
 <template>
-  <a-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
+  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
     <a-card>
       <a-card-title>Survey Versions</a-card-title>
       <a-card-text cssMaxHeight500px>

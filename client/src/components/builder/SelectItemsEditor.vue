@@ -1,15 +1,12 @@
 <template>
-  <a-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
-    <template v-slot:activator="{ on, attrs }">
+  <a-dialog v-model="open" width="500" @click:outside="close">
+    <template v-slot:activator="{ props }">
       <a-text-field
-        v-on="on"
-        v-bind="attrs"
-        ref="anchorRef"
+        v-bind="props"
         label="Resource"
         placeholder="Add Options"
         :modelValue="getLabel"
         class="mt-6"
-        :class="$vnode.data.staticClass"
         hide-details
         readonly
         variant="outlined"
@@ -117,7 +114,6 @@ export default {
     },
     close() {
       this.open = false;
-      this.$refs.anchorRef.blur();
     },
     save() {
       this.$emit('set-control-source', this.validItems);

@@ -1,15 +1,13 @@
 <template>
-  <a-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
-    <template v-slot:activator="{ on, attrs }">
+  <a-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="close">
+    <template v-slot:activator="{ props }">
       <a-text-field
-        ref="anchorRef"
-        v-on="on"
-        v-bind="attrs"
+        v-bind="props"
         :modelValue="getText"
         @update:modelValue="onTextFieldChange"
         :label="label"
         :placeholder="placeholder"
-        :class="[$vnode.data.staticClass, $attrs.class]"
+        :class="$attrs.class"
         :disabled="disabled"
         hide-details
         readonly
@@ -19,7 +17,7 @@
     </template>
 
     <a-card>
-      <a-card-title class="text-grey-darken-2"> <slot name="title" />!! </a-card-title>
+      <a-card-title class="text-grey-darken-2"> <slot name="title" /> </a-card-title>
 
       <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
@@ -95,7 +93,7 @@ const TEXT_LENGTH = 60;
 
 export default {
   props: {
-    value: { type: String },
+    modelValue: { type: String },
     label: { type: String },
     placeholder: { type: String },
     disabled: { type: Boolean },
@@ -117,7 +115,7 @@ export default {
       return 1050;
     },
     getText() {
-      const text = this.value || '';
+      const text = this.modelValue || '';
       return text.length > TEXT_LENGTH ? text.slice(0, TEXT_LENGTH) + '...' : text;
     },
     getPreview() {
@@ -253,7 +251,6 @@ export default {
     },*/
     close() {
       this.open = false;
-      this.$refs.anchorRef.blur();
     },
     save() {
       this.$emit('input', this.markdown);
@@ -267,12 +264,12 @@ export default {
       }
       this.isLoading = false;
       this.viewMode = 0;
-      this.markdown = this.value || '';
+      this.markdown = this.modelValue || '';
       this.updateCaretPosition();
     },
   },
   created() {
-    this.markdown = this.value || '';
+    this.markdown = this.modelValue || '';
   },
 };
 </script>

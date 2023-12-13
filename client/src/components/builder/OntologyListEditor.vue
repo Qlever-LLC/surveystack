@@ -27,8 +27,8 @@
           </a-tooltip>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
           <a-dialog v-model="deleteDialogIsVisible" max-width="290">
-            <template v-slot:activator="{ on }">
-              <a-btn icon v-on="on" class="ml-2" :disabled="disabled">
+            <template v-slot:activator="{ props }">
+              <a-btn icon v-bind="props" class="ml-2" :disabled="disabled">
                 <a-icon>mdi-delete</a-icon>
                 <!-- Delete List -->
               </a-btn>

@@ -13,10 +13,10 @@
               <template v-if="item.logs && item.logs.length">
                 <a-divider class="mx-4" />
                 <a-dialog width="500">
-                  <template v-slot:activator="{ on, attrs }">
+                  <template v-slot:activator="{ props }">
                     <a-card-actions>
                       <a-spacer />
-                      <a-btn variant="text" v-bind="attrs" v-on="on"> Logs </a-btn>
+                      <a-btn variant="text" v-bind="props"> Logs </a-btn>
                     </a-card-actions>
                   </template>
 

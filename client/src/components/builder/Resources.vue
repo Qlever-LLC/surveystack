@@ -10,7 +10,7 @@
         @close-dialog="ontologyEditorDialog = false"
       />
     </a-dialog>
-    <a-dialog :value="uploadingResource" hide-overlay persistent width="300">
+    <a-dialog :modelValue="uploadingResource" persistent width="300">
       <a-card>
         <a-card-text class="pa-4">
           <span>Uploading file resource</span>
@@ -18,7 +18,7 @@
         </a-card-text>
       </a-card>
     </a-dialog>
-    <a-dialog :value="downloadingResource" hide-overlay persistent width="300">
+    <a-dialog :modelValue="downloadingResource" persistent width="300">
       <a-card>
         <a-card-text class="pa-4">
           <span>Downloading file resource</span>

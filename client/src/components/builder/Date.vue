@@ -25,7 +25,7 @@
         @update:modelValue="onChange"
         @blur="$emit('blur')"
         label="Default value"
-        :class="$vnode.data.staticClass"
+        class="mt-3"
         :dense="dense"
         readonly
         clearable
