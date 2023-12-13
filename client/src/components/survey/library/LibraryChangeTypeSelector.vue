@@ -22,9 +22,7 @@
       <a-col cols="auto" class="pa-0 align-self-center">
         <a-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <a-icon color="grey" dark v-bind="attrs" v-on="on" class="ml-3 align-center">
-              mdi-information-outline
-            </a-icon>
+            <a-icon color="grey" v-bind="attrs" v-on="on" class="ml-3 align-center"> mdi-information-outline </a-icon>
           </template>
           <p>
             <b>Major:</b><br />

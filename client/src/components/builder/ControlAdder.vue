@@ -46,7 +46,7 @@
         class="ma-1 d-inline-block shadow"
         :data-testid="'add-control-' + el.type"
       >
-        <a-icon dark left v-if="el.icon">
+        <a-icon left v-if="el.icon">
           {{ el.icon }}
         </a-icon>
         {{ el.name.replace('_', ' ') }}
