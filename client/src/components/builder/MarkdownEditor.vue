@@ -41,6 +41,7 @@
               @dragover.prevent="showAttach = true"
               @dragleave.prevent="showAttach = false"
               @drop.prevent="onDrop"
+              variant="outlined"
               cssMarkdown
             />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
