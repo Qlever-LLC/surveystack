@@ -49,11 +49,15 @@
 <script>
 export default {
   props: {
-    value: {
+    modelValue: {
       type: Object,
     },
   },
-
+  data() {
+    return {
+      value: this.modelValue,
+    };
+  },
   computed: {
     validQuery() {
       try {
