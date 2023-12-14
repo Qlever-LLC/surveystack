@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:16
 
 COPY ./client/dist /app/client/dist
 COPY ./server/dist /app/server/dist
