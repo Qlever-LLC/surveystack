@@ -163,7 +163,10 @@
 export default {
   emits: ['blur', 'change', 'click:append-outer', 'focus', 'input', 'keyup.enter', 'update:search-input'],
   props: {
-    //choose btw select - autocomplete - combobox
+    //TODO @benoit: try to remove this prop:
+    //do we ever need select? imho its just autocomplete without text input, we could always offer text input and remove v-select here
+    //combobox is just autocomplete with manual input of a not-yet-existing item
+    //so instead of engineering, we could just add a prop "allowCustomItem" (boolean). If true, use combobox, else use autocomplete
     engineering: {
       validator: function (value) {
         // The value must match one of these strings
