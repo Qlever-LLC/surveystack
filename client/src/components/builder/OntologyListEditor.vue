@@ -101,12 +101,26 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
-            <a-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</a-icon>
-            <a-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</a-icon>
-            <a-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</a-icon>
-            <a-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled">
-              mdi-trash-can-outline
-            </a-icon>
+            <a-btn @click="moveItemUp(item)" tabindex="-1" :disabled="disabled" icon variant="flat" small>
+              <a-icon icon="mdi-arrow-up" />
+            </a-btn>
+            <a-btn
+              class="ml-2"
+              @click="moveItemDown(item)"
+              tabindex="-1"
+              :disabled="disabled"
+              icon
+              variant="flat"
+              small
+            >
+              <a-icon icon="mdi-arrow-down" />
+            </a-btn>
+            <a-btn class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled" icon variant="flat" small>
+              <a-icon icon="mdi-content-copy" />
+            </a-btn>
+            <a-btn class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled" icon variant="flat" small>
+              <a-icon icon="mdi-trash-can-outline" />
+            </a-btn>
           </div>
         </template>
       </v-data-table>

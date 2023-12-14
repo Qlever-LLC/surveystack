@@ -5,7 +5,6 @@
     :start="left"
     :end="right"
     :size="size ? size : xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
-    :disabled="disabled"
     v-bind="$attrs"
   >
     <slot />
@@ -24,7 +23,6 @@ export default {
     large: { type: Boolean, required: false },
     xLarge: { type: Boolean, required: false },
     size: { type: [Number, String], required: false }, //custom font size, wins over small/xSmall/large/xLarge
-    disabled: { type: Boolean, required: false }, //v3: TODO replace by v-btn
   },
 };
 </script>
