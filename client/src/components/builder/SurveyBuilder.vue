@@ -67,7 +67,8 @@
           <graphical-view
             v-if="!viewCode"
             :selected="control"
-            :controls="currentControls"
+            :modelValue="currentControls"
+            @update:modelValue="updateSurvey"
             :availableLibraryUpdates="availableLibraryUpdates"
             :libraryId="showLibrary ? libraryId : null"
             @control-selected="controlSelected"
@@ -409,7 +410,6 @@ export default {
       const nextVersionObj = this.surveyUnderWork.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
-      //TODO do not mutate survey prop
       this.surveyUnderWork.revisions = cloneDeep(this.initialSurvey.revisions);
       this.surveyUnderWork.revisions.push(nextVersionObj);
       this.surveyUnderWork.meta.dateModified = date;
@@ -685,6 +685,9 @@ export default {
 
       this.scriptCode = data;
     },
+    updateSurvey(controls) {
+      this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls = controls;
+    },
     duplicateControl(control) {
       if (this.control && this.currentControls.length > 0) {
         const position = getPosition(this.control, this.currentControls);
@@ -909,7 +912,6 @@ export default {
       return this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].version;
     },
     currentControls() {
-      console.log(this.surveyUnderWork);
       return this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
     },
     sharedCode() {

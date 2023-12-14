@@ -5,22 +5,23 @@
     vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props
   -->
   <VueDraggable
-    v-if="modelValue.length !== 0 || index.length !== 0"
+    v-if="draggableControls.length !== 0 || index.length !== 0"
     class="draggable"
     :class="controls"
     :style="scaleStyles()"
     :disabled="readOnly"
     tag="div"
-    v-model="modelValue"
+    v-model="draggableControls"
     :invertSwap="true"
     @start="startHandler"
     @end="endHandler"
+    @update="onUpdate"
     draggable=".draggable-item"
     :group="draggableGroup"
     ref="rootDraggable"
   >
     <a-card
-      v-for="(el, idx) in modelValue"
+      v-for="(el, idx) in draggableControls"
       class="control-item mb-2"
       :class="[
         { 'control-item-selected': el === selected },
@@ -127,7 +128,7 @@
           { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
-        :controls="el.children"
+        v-model="el.children"
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
@@ -149,7 +150,7 @@
           { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
-        :controls="el.children"
+        v-model="el.children"
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
@@ -204,9 +205,10 @@ export default {
     VueDraggable,
     ControlCardHeader,
   },
+  emits: ['update:modelValue'],
   data() {
     return {
-      modelValue: this.controls,
+      draggableControls: this.modelValue,
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
@@ -231,7 +233,7 @@ export default {
     };
   },
   props: {
-    controls: {
+    modelValue: {
       required: false,
       type: Array,
     },
@@ -268,6 +270,9 @@ export default {
     },
   },
   methods: {
+    onUpdate() {
+      this.$emit('update:modelValue', this.draggableControls);
+    },
     scaleStyles() {
       if (this.$refs.rootDraggable) {
         const height = this.$refs.rootDraggable.clientHeight;
@@ -311,7 +316,7 @@ export default {
       console.log(name);
     },
     removeAt(idx) {
-      this.modelValue.splice(idx, 1);
+      this.draggableControls.splice(idx, 1);
       this.$emit('control-removed');
     },
     createIndex(current, idx) {
