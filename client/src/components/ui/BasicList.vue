@@ -20,6 +20,9 @@
       >
         <div v-for="(entity, idx) in filteredEntities" :key="idx">
           <a-list-item two-line :to="link(entity)">
+            <template v-slot:prepend>
+              <slot name="prepend" v-bind:entity="entity" />
+            </template>
             <slot name="entity" v-bind:entity="entity">
               <a-list-item-title>Title #{{ idx }}</a-list-item-title>
               <a-list-item-subtitle>Subtitle</a-list-item-subtitle>

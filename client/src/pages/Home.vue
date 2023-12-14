@@ -23,31 +23,11 @@
           :link="(e) => `/surveys/${e.id}`"
           :searchable="false"
         >
+          <template v-slot:prepend="{ entity }">
+            <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
+          </template>
           <template v-slot:entity="{ entity }">
             <v-row no-gutters>
-              <v-col cols="auto" class="flex-grow-0 justify-center align-self-center mr-3">
-                <a-icon
-                  v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
-                  icon="mdi-earth"
-                  title="Everyone can submit"
-                  color="grey-darken-1"
-                  large
-                />
-                <a-icon
-                  v-if="entity.meta.submissions === 'user'"
-                  icon="mdi-account"
-                  title="Only signed-in users can submit"
-                  color="grey-darken-1"
-                  large
-                />
-                <a-icon
-                  v-if="entity.meta.submissions === 'group'"
-                  icon="mdi-account-group"
-                  title="Everyone group members can submit"
-                  color="grey-darken-1"
-                  large
-                />
-              </v-col>
               <v-col col="10" class="flex-grow-1">
                 <a-list-item-title>{{ entity.name }}</a-list-item-title>
                 <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
@@ -70,36 +50,12 @@
           title="More Surveys"
           :link="(e) => `/surveys/${e.id}`"
         >
+          <template v-slot:prepend="{ entity }">
+            <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
+          </template>
           <template v-slot:entity="{ entity }">
-            <v-row no-gutters>
-              <v-col cols="auto" class="flex-grow-0 justify-center align-self-center mr-3">
-                <a-icon
-                  v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
-                  icon="mdi-earth"
-                  title="Everyone can submit"
-                  color="grey-darken-1"
-                  large
-                />
-                <a-icon
-                  v-if="entity.meta.submissions === 'user'"
-                  icon="mdi-account"
-                  title="Only signed-in users can submit"
-                  color="grey-darken-1"
-                  large
-                />
-                <a-icon
-                  v-if="entity.meta.submissions === 'group'"
-                  icon="mdi-account-group"
-                  title="Everyone group members can submit"
-                  color="grey-darken-1"
-                  large
-                />
-              </v-col>
-              <v-col col="11" class="flex-grow-1">
-                <a-list-item-title>{{ entity.name }}</a-list-item-title>
-                <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-              </v-col>
-            </v-row>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
           </template>
         </app-basic-list>
       </a-col>
@@ -140,6 +96,28 @@ export default {
     return {
       loginIsVisible: this.$store.getters['auth/isLoggedIn'] || true,
     };
+  },
+  methods: {
+    getIcon(e) {
+      if (e.pinned) {
+        return 'mdi-pin';
+      } else if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'mdi-earth';
+      } else if (e.meta.submissions === 'user') {
+        return 'mdi-account';
+      } else if (e.meta.submissions === 'group') {
+        return 'mdi-account-group';
+      }
+    },
+    getTitle(e) {
+      if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'Everyone can submit';
+      } else if (e.meta.submissions === 'user') {
+        return 'Only signed-in users can submit';
+      } else if (e.meta.submissions === 'group') {
+        return 'Everyone group members can submit';
+      }
+    },
   },
   computed: {
     isLoggedIn() {

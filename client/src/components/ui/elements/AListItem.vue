@@ -14,8 +14,12 @@
     v-bind="$attrs"
     @click="$emit('click', $event)"
   >
-    <slot name="prepend" />
-    <slot />
+    <template v-if="!prependIcon" v-slot:prepend>
+      <slot name="prepend" />
+    </template>
+    <template v-slot:default>
+      <slot name="default" />
+    </template>
   </v-list-item>
 </template>
 

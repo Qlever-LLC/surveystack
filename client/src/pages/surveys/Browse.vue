@@ -37,33 +37,12 @@
               <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
             </div>
           </div>
-          <div v-for="(e, i) in surveys.content" :key="e._id">
-            <a-list-item :to="`/surveys/${e._id}`" :prepend-icon="e.pinned ? 'mdi-pin' : ''">
-              <a-btn
-                v-if="e.meta.submissions === 'public' || !e.meta.submissions"
-                :to="`/surveys/${e._id}`"
-                title="Everyone can submit"
-                icon
-              >
-                <a-icon>mdi-earth</a-icon>
-              </a-btn>
-              <a-btn
-                v-if="e.meta.submissions === 'user'"
-                :to="`/surveys/${e._id}`"
-                title="Only signed-in users can submit"
-                icon
-              >
-                <a-icon>mdi-account</a-icon>
-              </a-btn>
-              <a-btn
-                v-if="e.meta.submissions === 'group'"
-                :to="`/surveys/${e._id}`"
-                title="Everyone group members can submit"
-                icon
-              >
-                <a-icon>mdi-account-group</a-icon>
-              </a-btn>
-              <div>
+          <v-list>
+            <div v-for="(e, i) in surveys.content" :key="e._id">
+              <a-list-item :to="`/surveys/${e._id}`">
+                <template v-slot:prepend>
+                  <a-icon :icon="getIcon(e)" :title="getTitle(e)" large />
+                </template>
                 <a-list-item-title>{{ e.name }}</a-list-item-title>
                 <a-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
@@ -71,10 +50,10 @@
                 <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
                 <br />
                 <small v-if="e.createdAgo" class="text-grey">created {{ e.createdAgo }} ago</small>
-              </div>
-            </a-list-item>
-            <a-divider v-if="i < surveys.content.length - 1" />
-          </div>
+              </a-list-item>
+              <a-divider v-if="i < surveys.content.length - 1" />
+            </div>
+          </v-list>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </a-card-text>
         <a-card-actions>
@@ -201,6 +180,26 @@ export default {
     },
   },
   methods: {
+    getIcon(e) {
+      if (e.pinned) {
+        return 'mdi-pin';
+      } else if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'mdi-earth';
+      } else if (e.meta.submissions === 'user') {
+        return 'mdi-account';
+      } else if (e.meta.submissions === 'group') {
+        return 'mdi-account-group';
+      }
+    },
+    getTitle(e) {
+      if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'Everyone can submit';
+      } else if (e.meta.submissions === 'user') {
+        return 'Only signed-in users can submit';
+      } else if (e.meta.submissions === 'group') {
+        return 'Everyone group members can submit';
+      }
+    },
     getGroupName(id) {
       const group = this.groups.find((item) => item._id === id);
       if (group) {
