@@ -88,7 +88,7 @@
             </td>
             <td>{{ instance.owner }}</td>
             <td>
-              <a-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)" dark>Unmap</a-btn>
+              <a-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)">Unmap</a-btn>
             </td>
           </tr>
         </tbody>

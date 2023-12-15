@@ -1,7 +1,7 @@
 <template>
   <a-navigation-drawer :modelValue="modelValue">
     <div class="d-flex justify-end mt-3 mr-3">
-      <a-btn large variant="flat" icon @click="closeNavBar">
+      <a-btn large icon @click="closeNavBar">
         <a-icon>mdi-close</a-icon>
       </a-btn>
     </div>

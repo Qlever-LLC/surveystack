@@ -8,18 +8,25 @@
     :icon="icon"
     :fab="fab"
     :size="xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
-    :dark="dark"
     :elevation="elevation"
     :color="color"
     :href="href"
     :target="target"
     :to="to"
-    :dense="dense"
+    :density="dense ? 'compact' : 'default'"
     :rounded="rounded"
     :variant="variant"
-    :class="fab ? 'rounded-circle' : ''"
+    :class="fab ? 'rounded-circle' : icon ? 'text-medium-emphasis' : ''"
+    :style="
+      !fab
+        ? ''
+        : xSmall
+          ? 'min-width:32px;width:32px;min-height:32px;height:32px;'
+          : small
+            ? 'min-width:40px;width:40px;min-height:40px;height:40px;'
+            : 'min-width:56px;width:56px;min-height:56px;height:56px;'
+    "
     v-bind="$attrs"
-    @click="emitClick"
   >
     <slot />
   </v-btn>
@@ -27,7 +34,6 @@
 
 <script>
 export default {
-  emits: ['click'],
   props: {
     type: {
       type: String,
@@ -54,7 +60,6 @@ export default {
       default: false,
     },
     fab: {
-      //TODO REMOVE
       type: Boolean,
       default: false,
     },
@@ -71,10 +76,6 @@ export default {
       default: false,
     },
     xLarge: {
-      type: Boolean,
-      default: false,
-    },
-    dark: {
       type: Boolean,
       default: false,
     },
@@ -111,14 +112,8 @@ export default {
       validator: function (value) {
         return ['flat', 'text', 'elevated', 'tonal', 'outlined', 'plain'].includes(value);
       },
-      required: false,
+      default: (props) => (props.icon ? 'text' : undefined), // if it's an icon button, use text as default like it was in v2
     },
-  },
-  setup(_, { emit }) {
-    const emitClick = (e) => {
-      emit('click', e);
-    };
-    return { emitClick };
   },
 };
 </script>

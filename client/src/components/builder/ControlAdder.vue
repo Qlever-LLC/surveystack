@@ -2,7 +2,7 @@
   <div class="control-adder">
     <!-- <a-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
-        <a-btn fab color="blue-darken-2" dark data-testid="control-adder-open">
+        <a-btn fab color="blue-darken-2" data-testid="control-adder-open">
           <a-icon v-if="fabIsOpen">mdi-close</a-icon>
           <a-icon v-else>mdi-plus</a-icon>
         </a-btn>

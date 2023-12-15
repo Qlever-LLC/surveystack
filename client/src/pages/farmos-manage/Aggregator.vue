@@ -80,7 +80,7 @@
             <tr v-for="(group, idx) in mappedGroups" :key="`grp-${idx}`">
               <td>{{ group.name }}</td>
               <td>
-                <a-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)" dark>Unmap</a-btn>
+                <a-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)">Unmap</a-btn>
               </td>
             </tr>
           </tbody>
@@ -132,7 +132,7 @@
               <td>{{ `${mapping.user.name} (${mapping.user.email})` }}</td>
               <td>{{ mapping.owner }}</td>
               <td>
-                <a-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)" dark>Unmap</a-btn>
+                <a-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)">Unmap</a-btn>
               </td>
             </tr>
           </tbody>
@@ -181,9 +181,7 @@
                 </div>
               </td>
               <td>
-                <a-btn x-small color="red" @click="$emit('unmap-farm', farm.instanceName)" dark
-                  >Remove all Mappings</a-btn
-                >
+                <a-btn x-small color="red" @click="$emit('unmap-farm', farm.instanceName)">Remove all Mappings</a-btn>
               </td>
             </tr>
           </tbody>
@@ -217,7 +215,7 @@
                 </div>
               </td>
               <td>
-                <a-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</a-btn>
+                <a-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)">Map to Group</a-btn>
               </td>
               <td>
                 <textarea v-if="farm.note" readonly rows="3" v-model="farm.note"></textarea>

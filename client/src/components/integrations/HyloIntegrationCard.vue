@@ -65,7 +65,7 @@
         <a-card-text>
           <a-dialog v-model="integrateDialog" width="500">
             <template v-slot:activator="{ props }">
-              <a-btn color="primary" dark v-bind="props"> Integrate with Hylo </a-btn>
+              <a-btn color="primary" v-bind="props"> Integrate with Hylo </a-btn>
             </template>
 
             <a-card>

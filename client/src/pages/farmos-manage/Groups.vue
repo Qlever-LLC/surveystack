@@ -102,7 +102,7 @@
               </div>
             </td>
             <td>
-              <a-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</a-btn>
+              <a-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)">Unmap</a-btn>
             </td>
           </tr>
         </tbody>

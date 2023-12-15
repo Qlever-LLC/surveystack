@@ -101,7 +101,7 @@
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
-            <a-btn @click="moveItemUp(item)" tabindex="-1" :disabled="disabled" icon variant="flat" small>
+            <a-btn @click="moveItemUp(item)" tabindex="-1" :disabled="disabled" icon small>
               <a-icon icon="mdi-arrow-up" />
             </a-btn>
             <a-btn
@@ -115,10 +115,10 @@
             >
               <a-icon icon="mdi-arrow-down" />
             </a-btn>
-            <a-btn class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled" icon variant="flat" small>
+            <a-btn class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled" icon small>
               <a-icon icon="mdi-content-copy" />
             </a-btn>
-            <a-btn class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled" icon variant="flat" small>
+            <a-btn class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled" icon small>
               <a-icon icon="mdi-trash-can-outline" />
             </a-btn>
           </div>

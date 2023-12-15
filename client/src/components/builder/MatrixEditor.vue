@@ -252,8 +252,8 @@
               </div>
             </div>
 
-            <a-btn @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
-              <a-icon>mdi-plus</a-icon>
+            <a-btn @click="addColumn" class="align-self-center mx-4 my-6" fab small color="primary">
+              <a-icon x-large>mdi-plus</a-icon>
             </a-btn>
           </VueDraggable>
         </div>

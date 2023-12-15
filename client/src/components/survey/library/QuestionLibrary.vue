@@ -4,7 +4,7 @@
       <a-icon class="mr-1">mdi-library</a-icon>
       Question Library
       <a-spacer />
-      <a-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" variant="flat" small tile elevation="0">
+      <a-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" small tile elevation="0">
         <a-icon> mdi-close </a-icon>
       </a-btn>
     </a-card-title>

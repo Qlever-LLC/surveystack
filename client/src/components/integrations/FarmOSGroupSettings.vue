@@ -38,7 +38,7 @@
             :item-text="(p) => `${p.planName} (${p.planUrl})`"
           />
         </div>
-        <a-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</a-btn>
+        <a-btn color="red" @click="$emit('deactivate')">Deactivate FarmOS for Group</a-btn>
       </a-card-text>
     </a-card>
     <div class="d-flex justify-space-between">

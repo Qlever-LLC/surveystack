@@ -84,20 +84,20 @@
     <a-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
       <div class="text-body-1 my-4 text-center">
         Click on the
-        <a-btn fab dark x-small color="blue-darken-2" style="pointer-events: none">
-          <a-icon>mdi-plus</a-icon>
+        <a-btn fab x-small elevation="4" color="blue-darken-2" style="pointer-events: none; border-radius: 50%">
+          <a-icon large>mdi-plus</a-icon>
         </a-btn>
         to add questions to your survey
       </div>
       <div class="text-body-1 my-4 text-center">
-        <a-btn dark small color="primary" class="my-1 mr-1" style="pointer-events: none">
+        <a-btn small color="primary" class="my-1 mr-1" style="pointer-events: none">
           <a-icon class="mr-1">mdi-content-save</a-icon>
           Save
         </a-btn>
         to create a draft
       </div>
       <div class="text-body-1 my-4 text-center">
-        <a-btn dark small class="my-1 mr-1" color="green" style="pointer-events: none">
+        <a-btn small class="my-1 mr-1" color="green" style="pointer-events: none">
           <a-icon class="mr-1">mdi-cloud-upload</a-icon>
           Publish
         </a-btn>
