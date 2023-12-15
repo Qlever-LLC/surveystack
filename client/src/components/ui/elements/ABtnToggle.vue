@@ -1,8 +1,10 @@
 <template>
   <v-btn-toggle
-    :dense="dense"
+    :density="dense ? 'compact' : 'default'"
     :mandatory="mandatory"
-    :value="value" @change="$emit('input', $event)" >
+    :value="value"
+    @change="$emit('input', $event)"
+  >
     <slot />
   </v-btn-toggle>
 </template>
