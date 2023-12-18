@@ -1,5 +1,5 @@
 <template>
-  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" persistent width="300">
+  <a-dialog :modelValue="modelValue" @input="(v) => $emit('input', v)" persistent width="300">
     <a-card>
       <a-card-text class="pa-4">
         <span>{{ message }}</span>
@@ -12,7 +12,7 @@
 <script>
 export default {
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },

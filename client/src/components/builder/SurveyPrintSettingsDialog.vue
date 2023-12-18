@@ -1,5 +1,5 @@
 <template>
-  <a-dialog :modelValue="value" @input="$emit('input', $event)" width="350" max-width="75%">
+  <a-dialog :modelValue="modelValue" @input="$emit('input', $event)" width="350" max-width="75%">
     <a-card>
       <a-card-title> Print settings </a-card-title>
 
@@ -36,7 +36,7 @@
 export default {
   name: 'survey-print-settings-dialog',
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
