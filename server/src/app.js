@@ -25,7 +25,6 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 
 function createApp() {
   const app = express();
-  const frontend = expressStaticGzip('../client/dist', { index: false });
 
   app.use(initLogging);
 
@@ -53,21 +52,7 @@ function createApp() {
   app.use(express.json({ limit: '8mb' }));
   app.use(express.urlencoded({ extended: true }));
 
-  const whitelist = ['https://cdpn.io', 'https://app.our-sci.net', 'https://dashboard.our-sci.net'];
-  const corsOptions = {
-    origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1 || !origin) {
-        callback(null, true); // specifically allow whitelisted origins including credentials
-      } else if (origin.startsWith('http://localhost') || origin.startsWith('http://192.168')) {
-        callback(null, true);
-      } else {
-        //callback(new Error('Not allowed by CORS'));
-        callback(null, true);
-      }
-    },
-    credentials: true,
-  };
-  app.use(cors(corsOptions));
+  app.use(cors({ credentials: true }));
 
   // auth
   app.use(async (req, res, next) => {
@@ -122,6 +107,7 @@ function createApp() {
 
   // Serve Vue.js from dist folder
   // https://github.com/bripkens/connect-history-api-fallback/tree/master/examples/static-files-and-index-rewrite
+  const frontend = expressStaticGzip('../client/dist', { index: false });
   app.use(frontend); // will catch majority of static file requests
   app.use(history()); // will rewrite requests to index.html when necessary
   app.use(frontend); // will catch rewritten requests
