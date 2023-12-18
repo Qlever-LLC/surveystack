@@ -20,7 +20,7 @@
 
     <a-window v-model="tab">
       <a-window-item v-for="item in items" :key="item.name">
-        <v-component
+        <component
           @map-group="mapGroup"
           @unmap-group="unmapGroup"
           @map-user="mapUser"
@@ -39,7 +39,7 @@
           @create-plan="createPlan"
           @delete-plan="deletePlan"
           @addSuperAdminNote="addSuperAdminNote"
-        ></v-component>
+        ></component>
       </a-window-item>
     </a-window>
 
