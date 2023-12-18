@@ -126,8 +126,7 @@
                 entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
               }}</a-list-item-subtitle>
             </div>
-            <div>
-              v-else>
+            <div v-else>
               <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
               <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
             </div>
