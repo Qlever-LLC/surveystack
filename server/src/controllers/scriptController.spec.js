@@ -133,7 +133,7 @@ describe('Script Endpoints', () => {
         .expect(401);
     });
 
-    it('returns a 400 if the script is not given a group', async () => {
+    it('returns a 400 if the script is not given a group (invalid request body)', async () => {
       const { user: groupAdminUser } = await group.createAdminMember({
         userOverrides: { token: '1234' },
       });

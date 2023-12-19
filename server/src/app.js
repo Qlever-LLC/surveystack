@@ -5,10 +5,12 @@ import expressStaticGzip from 'express-static-gzip';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
+import * as OpenApiValidator from 'express-openapi-validator';
+import { MongoSerDes } from 'mongo-serdes-js';
 
 import { db } from './db';
 import { getRoles } from './services/roles.service';
-import errorHandlers from './handlers/errorHandlers';
+import { errorHandler } from './handlers/errorHandlers';
 import { initLogging } from './middleware/logging';
 
 import apiRoutes from './routes/api';
@@ -17,6 +19,7 @@ import debugRoutes from './routes/debug';
 import { createCookieOptions } from './constants';
 import { toggleMiddleware } from './services/featureToggle.service';
 import { ObjectId } from 'mongodb';
+import openApiSpecDocument from './open-api-spec';
 
 const subdomainRedirect = {
   rfc: 'bionutrient',
@@ -53,6 +56,27 @@ function createApp() {
   app.use(express.urlencoded({ extended: true }));
 
   app.use(cors({ credentials: true }));
+
+  app.use(
+    OpenApiValidator.middleware({
+      apiSpec: openApiSpecDocument,
+      ignoreUndocumented: true,
+      // validating responses is critical for automated tests
+      validateResponses: ['development', 'test'].includes(String(process.env.NODE_ENV).trim()),
+      serDes: [
+        OpenApiValidator.serdes.dateTime.serializer,
+        OpenApiValidator.serdes.date.serializer,
+        MongoSerDes.objectid.serializer,
+      ],
+      formats: [
+        {
+          name: 'objectid',
+          type: 'string',
+          validate: (v) => /^[0-9a-fA-F]{24}$/.test(v.toString()),
+        },
+      ],
+    })
+  );
 
   // auth
   app.use(async (req, res, next) => {
@@ -99,7 +123,7 @@ function createApp() {
 
   // routes
   app.use(`${PATH_PREFIX}/api`, apiRoutes);
-  app.use(`${PATH_PREFIX}/api`, errorHandlers.developmentErrors);
+  app.use(`${PATH_PREFIX}/api`, errorHandler);
 
   if (process.env.NODE_ENV === 'development') {
     app.use('/debug', debugRoutes);
