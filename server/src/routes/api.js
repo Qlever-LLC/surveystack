@@ -6,7 +6,7 @@ import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
 import userController from '../controllers/userController';
-import scriptController from '../controllers/scriptController';
+import * as scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import * as farmosController from '../controllers/farmosController';
 import * as hyloController from '../controllers/hyloController';
@@ -260,14 +260,16 @@ router.put(
 );
 router.delete(
   '/memberships/:id',
-  catchErrors(membershipController.deleteMembership, async (membership, origin) => {
-    try {
-      await farmosController.removeMembershipHook(membership, origin);
-    } catch (error) {
-      // log the error, but don't escalate as it is not critical
-      console.log(error);
-    }
-  })
+  catchErrors(
+    membershipController.deleteMembership(async (membership, origin) => {
+      try {
+        await farmosController.removeMembershipHook(membership, origin);
+      } catch (error) {
+        // log the error, but don't escalate as it is not critical
+        console.log(error);
+      }
+    })
+  )
 );
 
 router.post(
