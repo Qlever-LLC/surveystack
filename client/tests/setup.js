@@ -1,9 +1,15 @@
-import Vue from 'vue';
-import Vuetify from 'vuetify';
-import '@testing-library/jest-dom';
-import { TextEncoder, TextDecoder } from 'util';
+import { config as vueconfig } from '@vue/test-utils';
+import { createVuetify } from 'vuetify';
 
-Vue.use(Vuetify);
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
+
+const vuetify = createVuetify({
+  components,
+  directives,
+});
+
+vueconfig.global.plugins.push(vuetify);
 
 window.scrollTo = () => {};
 
@@ -16,5 +22,6 @@ Object.defineProperty(global.self, 'crypto', {
 });
 
 //until this gets closed https://github.com/inrupt/solid-client-authn-js/issues/1676
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+//TODO issue above is closed now, test if it works
+//global.TextEncoder = TextEncoder;
+//global.TextDecoder = TextDecoder;
