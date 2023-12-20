@@ -1,11 +1,7 @@
 import { mount, shallowMount } from '@vue/test-utils';
-import Vuetify from 'vuetify';
+import vuetify from '@/plugins/vuetify';
 import Ontology from './Ontology.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
-
-import { localVue } from '@/../tests/renderWithVuetify';
-
-const vuetify = new Vuetify();
 
 const resources = [
   {
@@ -74,8 +70,9 @@ function getMountOpts(opts = {}) {
       value: options.value,
       index: 'data.dropdown_1',
     },
-    vuetify,
-    localVue,
+    global: {
+      plugins: [vuetify],
+    },
   };
 }
 
