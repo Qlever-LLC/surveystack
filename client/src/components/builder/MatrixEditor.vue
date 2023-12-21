@@ -37,23 +37,20 @@
           >
             <div class="draggable-column" v-for="(item, i) in columns" :key="i">
               <!-- vertical bar indicating which columns are locked to the left -->
-              <a-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
-                <template v-slot:activator="{ on, attrs }">
-                  <a-card
-                    width="26px"
-                    height="100%"
-                    class="draggable-handle mx-1 py-3 d-flex flex-column justify-space-around align-center"
-                    elevation="3"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    <a-divider vertical class="lock-line-decor" />
-                    <a-icon class="my-1">mdi-arrow-horizontal-lock</a-icon>
-                    <a-divider vertical class="lock-line-decor" />
-                  </a-card>
-                </template>
-                <span>Columns to the left of this line will always be visible</span>
-              </a-tooltip>
+              <a-card
+                v-if="item.isFixedUntilMarker"
+                width="26px"
+                height="100%"
+                class="draggable-handle mx-1 py-3 d-flex flex-column justify-space-around align-center"
+                elevation="3"
+              >
+                <a-divider vertical class="lock-line-decor" />
+                <a-icon class="my-1">mdi-arrow-horizontal-lock</a-icon>
+                <a-divider vertical class="lock-line-decor" />
+                <a-tooltip top open-delay="500" activator="parent"
+                  >Columns to the left of this line will always be visible</a-tooltip
+                >
+              </a-card>
 
               <div v-else>
                 <a-card width="16rem" min-width="16rem" class="mx-1" elevation="3">

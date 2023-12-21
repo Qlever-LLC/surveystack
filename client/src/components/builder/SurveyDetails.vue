@@ -178,79 +178,50 @@
           class="mb-2 survey-group-name-input"
         />
         <div class="d-flex flex-wrap justify-end align-center">
-          <a-tooltip bottom v-if="!isNew">
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <a-btn
-                  v-if="!isNew"
-                  :dark="enableUpdate"
-                  :disabled="!enableUpdate || isSaving"
-                  :loading="isUpdating"
-                  @click="$emit('update')"
-                  color="primary"
-                  class="my-1 mr-1"
-                >
-                  <a-icon class="mr-1">mdi-update</a-icon>
-                  Update
-                </a-btn>
-              </div>
-            </template>
-            <span
-              >Override an existing <strong>published</strong> Survey.
+          <a-btn
+            v-if="!isNew"
+            :disabled="!enableUpdate || isSaving"
+            :loading="isUpdating"
+            @click="$emit('update')"
+            color="primary"
+            class="my-1 mr-1"
+          >
+            <a-icon class="mr-1">mdi-update</a-icon>
+            Update
+            <a-tooltip bottom activator="parent">
+              Override an existing <strong>published</strong> Survey.
               <br />
-              Updating is only possible <em>only</em> when changing Labels of a Question.</span
-            >
-          </a-tooltip>
-          <a-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <a-btn
-                  :dark="enablePublish"
-                  class="my-1 mr-1"
-                  @click="publish"
-                  color="green"
-                  :disabled="!enablePublish"
-                >
-                  <a-icon class="mr-1">mdi-cloud-upload</a-icon>
-                  Publish
-                </a-btn>
-              </div>
-            </template>
+              Updating is only possible <em>only</em> when changing Labels of a Question.
+            </a-tooltip>
+          </a-btn>
+          <a-btn class="my-1 mr-1" @click="publish" color="green" :disabled="!enablePublish">
+            <a-icon class="mr-1">mdi-cloud-upload</a-icon>
+            Publish
+            <a-tooltip bottom activator="parent">Publish current version of Survey to users</a-tooltip>
+          </a-btn>
 
-            <span>Publish current version of Survey to users</span>
-          </a-tooltip>
-
-          <a-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <a-btn
-                  :dark="enableSaveDraft"
-                  @click="$emit('saveDraft')"
-                  color="primary"
-                  :disabled="!enableSaveDraft || isUpdating"
-                  :loading="isSaving"
-                  class="my-1 mr-1"
-                >
-                  <a-icon class="mr-1">mdi-content-save</a-icon>
-                  Save
-                </a-btn>
-              </div>
-            </template>
-            <span>Save a new draft <strong>version</strong> of the Survey</span>
-          </a-tooltip>
+          <a-btn
+            @click="$emit('saveDraft')"
+            color="primary"
+            :disabled="!enableSaveDraft || isUpdating"
+            :loading="isSaving"
+            class="my-1 mr-1"
+          >
+            <a-icon class="mr-1">mdi-content-save</a-icon>
+            Save
+            <a-tooltip bottom activator="parent">Save a new draft <strong>version</strong> of the Survey</a-tooltip>
+          </a-btn>
         </div>
       </div>
 
-      <a-tooltip bottom v-if="validationErrors.length > 0">
-        <template v-slot:activator="{ on }">
-          <a-alert type="error" border-color border="start" class="mt-2" elevation="2" v-on="on">
-            Survey contains errors
-          </a-alert>
-        </template>
-        <div v-for="error in validationErrors" :key="error">
-          {{ error }}
-        </div>
-      </a-tooltip>
+      <a-alert v-if="validationErrors.length > 0" type="error" border="start" class="mt-2" elevation="2">
+        Survey contains errors
+        <a-tooltip bottom activator="parent">
+          <div v-for="error in validationErrors" :key="error">
+            {{ error }}
+          </div>
+        </a-tooltip>
+      </a-alert>
     </a-card-text>
   </a-card>
 </template>

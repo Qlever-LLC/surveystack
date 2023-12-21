@@ -43,19 +43,10 @@
                       </a-list-item-subtitle>
                     </a-card>
                     <a-list-item-action>
-                      <a-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                          <a-btn
-                            v-if="readyToSubmitHas(item._id)"
-                            icon
-                            @click="() => handleSubmitClick(item._id)"
-                            v-on="on"
-                          >
-                            <a-icon> mdi-cloud-upload-outline</a-icon>
-                          </a-btn>
-                        </template>
-                        <span>Upload Submission</span>
-                      </a-tooltip>
+                      <a-btn v-if="readyToSubmitHas(item._id)" icon @click="() => handleSubmitClick(item._id)">
+                        <a-icon> mdi-cloud-upload-outline</a-icon>
+                        <a-tooltip bottom activator="parent">Upload Submission</a-tooltip>
+                      </a-btn>
                     </a-list-item-action>
                   </a-list-item>
                 </div>

@@ -19,16 +19,16 @@
           :key="`user-${user.id}-instance-${instance.name}-group-${group.name}`"
         >
           <div class="group-chip mx-1" v-if="idx < 3 || more.includes(`${user.id}-${instance.name}`)">
-            <a-tooltip top>
-              <template v-slot:activator="{ on }">
-                <a-chip small v-on="on"> {{ group.name }}</a-chip>
-              </template>
-              <span>{{ group.path }}</span>
-            </a-tooltip>
+            <a-chip small>
+              {{ group.name }}
+              <a-tooltip top activator="parent">{{ group.path }}</a-tooltip>
+            </a-chip>
           </div>
         </div>
         <div v-if="instance.groups.length >= 4 && !more.includes(`${user.id}-${instance.name}`)">
-          <a-btn variant="text" x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 3}` }} more</a-btn>
+          <a-btn variant="text" x-small @click="showMore(user, instance)">
+            + {{ `${instance.groups.length - 3}` }} more
+          </a-btn>
         </div>
         <a-btn
           text

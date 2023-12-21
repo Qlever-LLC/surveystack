@@ -20,25 +20,25 @@
         />
       </a-col>
       <a-col cols="auto" class="pa-0 align-self-center">
-        <a-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <a-icon color="grey" v-bind="attrs" v-on="on" class="ml-3 align-center"> mdi-information-outline </a-icon>
-          </template>
-          <p>
-            <b>Major:</b><br />
-            May make data from old versions incomparable to this new version. <br />Changes existing data, how it's
-            collected or interpreted. <br />QS users should review this thoroughly before updating
-          </p>
-          <p>
-            <b>Minor:</b><br />
-            A survey improvement. This doesn't change the meaning or comparability of the existing questions, it only
-            adds/improves.
-          </p>
-          <p>
-            <b>Small fix:</b><br />
-            Fixes a problem or error. Everyone should update.
-          </p>
-        </a-tooltip>
+        <a-icon color="grey" class="ml-3 align-center">
+          mdi-information-outline
+          <a-tooltip bottom activator="parent"
+            ><p>
+              <b>Major:</b><br />
+              May make data from old versions incomparable to this new version. <br />Changes existing data, how it's
+              collected or interpreted. <br />QS users should review this thoroughly before updating
+            </p>
+            <p>
+              <b>Minor:</b><br />
+              A survey improvement. This doesn't change the meaning or comparability of the existing questions, it only
+              adds/improves.
+            </p>
+            <p>
+              <b>Small fix:</b><br />
+              Fixes a problem or error. Everyone should update.
+            </p></a-tooltip
+          >
+        </a-icon>
       </a-col>
     </a-row>
   </a-container>

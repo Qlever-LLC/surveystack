@@ -17,14 +17,11 @@
           </a-btn>
         </div>
         <div class="d-flex align-center">
-          <a-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled" />
-              </div>
-            </template>
-            CSV must have column headers 'label', 'value', and optionally 'tags'
-          </a-tooltip>
+          <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled">
+            <a-tooltip bottom activator="parent"
+              >CSV must have column headers 'label', 'value', and optionally 'tags'</a-tooltip
+            >
+          </select-items-upload-button>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
           <a-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ props }">

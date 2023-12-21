@@ -9,8 +9,8 @@
     :top="top"
     :transition="transition"
   >
-    <template v-slot:activator="{ on, attrs }">
-      <slot name="activator" :on="on" :attrs="attrs"></slot>
+    <template v-slot:activator="{ props }">
+      <slot name="activator" :props="props"></slot>
     </template>
     <slot />
   </v-tooltip>
