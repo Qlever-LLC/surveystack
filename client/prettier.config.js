@@ -5,5 +5,5 @@ module.exports = {
   useTabs: false,
   printWidth: 120,
   arrowParens: 'always',
-  bracketSameLine: true,
+  bracketSameLine: false,
 };
