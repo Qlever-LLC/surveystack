@@ -72,7 +72,7 @@
       </app-gps>
     </div>
 
-    <a-overlay class="text-center" :value="!value && !gpsLocation && !mapError && !geolocationError" light absolute>
+    <a-overlay class="text-center" :modelValue="!value && !gpsLocation && !mapError && !geolocationError" absolute>
       <a-card theme="light">
         <a-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>
