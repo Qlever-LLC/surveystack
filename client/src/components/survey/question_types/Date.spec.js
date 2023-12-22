@@ -1,6 +1,5 @@
-import { createLocalVue, mount } from '@vue/test-utils';
-import Vue from 'vue';
-import Vuetify from 'vuetify';
+import { mount } from '@vue/test-utils';
+import vuetify from '@/plugins/vuetify';
 import Date from '@/components/survey/question_types/Date.vue';
 
 // const control = {
@@ -30,25 +29,18 @@ import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 
 const dateControl = createControlInstance(availableControls.find((c) => c.type === 'date'));
 
-Vue.use(Vuetify);
-const localVue = createLocalVue();
-
 describe.skip('Date Question Type', () => {
-  let vuetify;
-  beforeEach(() => {
-    vuetify = new Vuetify();
-  });
-
   test('renders menu passed', () => {
     // const msg = 'new message';
 
     const wrapper = mount(Date, {
-      localVue,
-      vuetify,
-      propsData: {
+      props: {
         control: dateControl,
         value: null,
         index: 0,
+      },
+      global: {
+        plugins: [vuetify],
       },
       data() {
         return {
