@@ -8,7 +8,7 @@ describe('ResultDialog', () => {
   it('displays basic data', () => {
     const { getByText } = renderWithVuetify(ResultDialog, {
       routes: noRoutes,
-      propsData: {
+      props: {
         value: true,
         title: 'title',
         items: [
@@ -35,12 +35,14 @@ describe('ResultDialog', () => {
     // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
     it.skip('emits close event', async () => {
       const { getByText, emitted } = renderWithVuetify(ResultDialog, {
-        propsData: {
+        props: {
           value: true,
         },
-        mocks: {
-          $router: {
-            push: jest.fn(),
+        global: {
+          mocks: {
+            $router: {
+              push: jest.fn(),
+            },
           },
         },
       });

@@ -13,7 +13,7 @@ describe('AuthSelector', () => {
   describe('AuthSelector renders expected views', () => {
     it('Renders Login view by default', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: {},
+        props: {},
         store,
         routes: noRoutes,
       });
@@ -21,7 +21,7 @@ describe('AuthSelector', () => {
     });
     it('Renders Login view for init prop', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: { init: 'login-per-default' },
+        props: { init: 'login-per-default' },
         store,
         routes: noRoutes,
       });
@@ -29,7 +29,7 @@ describe('AuthSelector', () => {
     });
     it('Renders Register view for init prop', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: { init: 'register' },
+        props: { init: 'register' },
         store,
         routes: noRoutes,
       });
@@ -37,7 +37,7 @@ describe('AuthSelector', () => {
     });
     it('Renders Forgot Password view for init prop', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: { init: 'forgot-password' },
+        props: { init: 'forgot-password' },
         store,
         routes: noRoutes,
       });
@@ -48,7 +48,7 @@ describe('AuthSelector', () => {
   describe('AuthSelector navigation with internal state', () => {
     it('Navigates from Login view to Register view when user clicks Register now button', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: {},
+        props: {},
         store,
         routes: noRoutes,
       });
@@ -59,7 +59,7 @@ describe('AuthSelector', () => {
     });
     it('Navigates from Login view to Forgot Password view when user clicks Forgot Password button', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: {},
+        props: {},
         store,
         routes: noRoutes,
       });
@@ -71,7 +71,7 @@ describe('AuthSelector', () => {
     });
     it('Navigates from Register view to Login view when user clicks Sign in button', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: { init: 'register' },
+        props: { init: 'register' },
         store,
         routes: noRoutes,
       });
@@ -82,7 +82,7 @@ describe('AuthSelector', () => {
     });
     it('Navigates from Forgot Password view to Login view when user clicks Sign in button', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
-        propsData: { init: 'forgot-password' },
+        props: { init: 'forgot-password' },
         store,
         routes: noRoutes,
       });

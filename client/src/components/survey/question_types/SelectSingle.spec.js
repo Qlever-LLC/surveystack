@@ -23,7 +23,7 @@ function getMountOpts(opts = {}) {
     value: opts.value || null,
   };
   return {
-    propsData: {
+    props: {
       control: {
         hint: '',
         id: '1',

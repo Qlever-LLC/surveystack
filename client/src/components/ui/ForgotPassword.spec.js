@@ -12,9 +12,11 @@ describe('ForgotPassword component', () => {
       const { getByRole } = renderWithVuetify(ForgotPassword, {
         routes: noRoutes,
         store: {},
-        propsData: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
+        props: {},
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+          },
         },
       });
       getByRole('link', { name: 'Back to login' });
@@ -23,9 +25,11 @@ describe('ForgotPassword component', () => {
       const { getByRole } = renderWithVuetify(ForgotPassword, {
         routes: noRoutes,
         store: {},
-        propsData: { useLink: false },
-        stubs: {
-          RouterLink: RouterLinkStub,
+        props: { useLink: false },
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+          },
         },
       });
       getByRole('button', { name: 'Back to login' });
@@ -36,10 +40,12 @@ describe('ForgotPassword component', () => {
     it('shows an error when email is empty', async () => {
       const { getByLabelText, getByText, queryByText } = renderWithVuetify(ForgotPassword, {
         routes: noRoutes,
-        propsData: {},
+        props: {},
         store: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+          },
         },
       });
       const emailInput = getByLabelText('Email');
@@ -63,11 +69,13 @@ describe('ForgotPassword component', () => {
       mockAxios.post.mockImplementation(() => Promise.resolve());
       const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
         routes: noRoutes,
-        propsData: {},
+        props: {},
         store: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
+          },
         },
       });
       const emailInput = getByLabelText('Email');
@@ -84,11 +92,13 @@ describe('ForgotPassword component', () => {
       mockAxios.post.mockImplementation(() => Promise.reject(error500));
       const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
         routes: noRoutes,
-        propsData: {},
+        props: {},
         store: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
+          },
         },
       });
       const emailInput = getByLabelText('Email');

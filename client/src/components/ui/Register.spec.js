@@ -20,9 +20,11 @@ describe('Register component', () => {
       const { getByRole } = renderWithVuetify(Register, {
         routes: noRoutes,
         store: {},
-        propsData: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
+        props: {},
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+          },
         },
       });
       getByRole('link', { name: 'Already have an account?' });
@@ -31,9 +33,11 @@ describe('Register component', () => {
       const { getByRole } = renderWithVuetify(Register, {
         routes: noRoutes,
         store: {},
-        propsData: { useLink: false },
-        stubs: {
-          RouterLink: RouterLinkStub,
+        props: { useLink: false },
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+          },
         },
       });
       getByRole('button', { name: 'Already have an account?' });
@@ -44,10 +48,12 @@ describe('Register component', () => {
     it('shows an error when password is passed without email', async () => {
       const { getByLabelText, getByText, queryByText } = renderWithVuetify(Register, {
         routes: noRoutes,
-        propsData: {},
+        props: {},
         store: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+          },
         },
       });
       const passwordInput = getByLabelText('Password');
@@ -62,10 +68,12 @@ describe('Register component', () => {
     it('shows an error when email is passed without password', async () => {
       const { getByLabelText, getByText, queryByText } = renderWithVuetify(Register, {
         routes: noRoutes,
-        propsData: {},
+        props: {},
         store: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+          },
         },
       });
       const emailInput = getByLabelText('E-Mail');
@@ -98,18 +106,20 @@ describe('Register component', () => {
             'surveys/fetchPinned': jest.fn(),
           },
         },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
+        global: {
+          mocks: {
+            $route: {
+              params: { redirect: false },
+              query: {},
+            },
+            $router: {
+              push,
+            },
           },
-          $router: {
-            push,
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
           },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
         },
       });
       const emailInput = getByLabelText('E-Mail');
@@ -149,18 +159,20 @@ describe('Register component', () => {
             'surveys/fetchPinned': jest.fn(),
           },
         },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
+        global: {
+          mocks: {
+            $route: {
+              params: { redirect: false },
+              query: {},
+            },
+            $router: {
+              push,
+            },
           },
-          $router: {
-            push,
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
           },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
         },
       });
       const emailInput = getByLabelText('E-Mail');
@@ -192,18 +204,20 @@ describe('Register component', () => {
             'surveys/fetchPinned': jest.fn(),
           },
         },
-        mocks: {
-          $route: {
-            params: { redirect: true },
-            query: {},
+        global: {
+          mocks: {
+            $route: {
+              params: { redirect: true },
+              query: {},
+            },
+            $router: {
+              push,
+            },
           },
-          $router: {
-            push,
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
           },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
         },
       });
       const emailInput = getByLabelText('E-Mail');
@@ -231,18 +245,20 @@ describe('Register component', () => {
             'surveys/fetchPinned': jest.fn(),
           },
         },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
+        global: {
+          mocks: {
+            $route: {
+              params: { redirect: false },
+              query: {},
+            },
+            $router: {
+              push,
+            },
           },
-          $router: {
-            push,
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
           },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
         },
       });
       const emailInput = getByLabelText('E-Mail');
@@ -271,10 +287,12 @@ describe('Register component', () => {
             'auth/login': authLoginMock,
           },
         },
-        propsData: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
+        props: {},
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
+          },
         },
       });
       const emailInput = getByLabelText('E-Mail');
@@ -299,10 +317,12 @@ describe('Register component', () => {
             'auth/login': authLoginMock,
           },
         },
-        propsData: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
+        props: {},
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
+          },
         },
       });
       const emailInput = getByLabelText('E-Mail');
@@ -327,10 +347,12 @@ describe('Register component', () => {
             'auth/login': authLoginMock,
           },
         },
-        propsData: {},
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
+        props: {},
+        global: {
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
+          },
         },
       });
       const emailInput = getByLabelText('E-Mail');

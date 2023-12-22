@@ -188,7 +188,7 @@ describe('GeoJSON Question', () => {
     let updateProps;
     beforeEach(() => {
       const renderOptions = {
-        propsData: {
+        props: {
           control: getControlProps(),
           value: null,
           index: 'data.geojson_1',
@@ -251,7 +251,7 @@ describe('GeoJSON Question', () => {
   describe('automatic initialization behavior', () => {
     it('activates geolocate control and geocoder has focus for null value', async () => {
       const renderOptions = {
-        propsData: {
+        props: {
           control: getControlProps(),
           value: null,
           index: 'data.geojson_1',
@@ -271,7 +271,7 @@ describe('GeoJSON Question', () => {
 
     it('does not activate geolocate control and geocoder is not expanded when value exists', async () => {
       const renderOptions = {
-        propsData: {
+        props: {
           control: getControlProps(),
           value: mockFeatureCollection(),
           index: 'data.geojson_1',
@@ -342,7 +342,7 @@ describe('GeoJSON Question', () => {
   describe('builder', () => {
     it('builder renders edit control toggles', async () => {
       const renderOptions = {
-        propsData: {
+        props: {
           control: mockControl(),
           controls: [mockControl()],
           value: null,
@@ -362,7 +362,7 @@ describe('GeoJSON Question', () => {
     it('control toggles work', async () => {
       const control = mockControl();
       const renderOptions = {
-        propsData: {
+        props: {
           control,
           controls: [mockControl()],
           value: null,

@@ -53,7 +53,7 @@ function getMountOpts(opts = {}) {
     source: opts.source || 'resource-1',
   };
   return {
-    propsData: {
+    props: {
       control: {
         hint: '',
         id: '5',

@@ -18,25 +18,27 @@ const TransitionStub = {
 beforeEach(() => localStorage.clear());
 
 // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
-const renderLogin = ({ propsData, params, query, getters, actions, $router } = {}) =>
+const renderLogin = ({ props, params, query, getters, actions, $router } = {}) =>
   renderWithVuetify(Login, {
     store: {
       getters: { ...getters },
       actions: { ...actions },
     },
-    propsData: { ...propsData },
-    mocks: {
-      $route: {
-        params: { ...params },
-        query: { ...query },
+    props: { ...props },
+    global: {
+      mocks: {
+        $route: {
+          params: { ...params },
+          query: { ...query },
+        },
+        $router: {
+          ...$router,
+        },
       },
-      $router: {
-        ...$router,
+      stubs: {
+        RouterLink: RouterLinkStub,
+        transition: TransitionStub,
       },
-    },
-    stubs: {
-      RouterLink: RouterLinkStub,
-      transition: TransitionStub,
     },
   });
 
@@ -44,13 +46,13 @@ const renderLogin = ({ propsData, params, query, getters, actions, $router } = {
 const testBothSides = (description, settings, test, beforeBoth = () => {}) => {
   describe('with magic link', () => {
     beforeEach(beforeBoth);
-    const linkSettings = { ...settings, propsData: { ...settings.propsData, defaultUsePassword: false } };
+    const linkSettings = { ...settings, props: { ...settings.propsData, defaultUsePassword: false } };
     // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
     it.skip(description, async () => await test(renderLogin(linkSettings), false));
   });
   describe('with user/password', () => {
     beforeEach(beforeBoth);
-    const pwSettings = { ...settings, propsData: { ...settings.propsData, defaultUsePassword: true } };
+    const pwSettings = { ...settings, props: { ...settings.propsData, defaultUsePassword: true } };
     // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
     it.skip(description, async () => await test(renderLogin(pwSettings), true));
   });
@@ -58,7 +60,7 @@ const testBothSides = (description, settings, test, beforeBoth = () => {}) => {
 
 describe('Login component', () => {
   describe('navigation links and buttons', () => {
-    testBothSides('Renders link to Register by default', { propsData: { useLink: true } }, async () => {
+    testBothSides('Renders link to Register by default', { props: { useLink: true } }, async () => {
       screen.getByRole('link', { name: /Register now/i });
     });
 
@@ -68,7 +70,7 @@ describe('Login component', () => {
           invitationOnly ? "Don't" : 'Do'
         } render the Register section when the whitelabel is "invitationOnly: ${invitationOnly}"`,
         {
-          propsData: { useLink: true },
+          props: { useLink: true },
           getters: {
             'whitelabel/isWhitelabel': () => true,
             'whitelabel/partner': () => ({
@@ -95,7 +97,7 @@ describe('Login component', () => {
 
     testBothSides(
       'Renders button to Register when useLink is false',
-      { propsData: { useLink: false } },
+      { props: { useLink: false } },
       async ({ getByRole }) => {
         getByRole('button', { name: /Register now/i });
       }
@@ -104,13 +106,13 @@ describe('Login component', () => {
     describe('with user/password', () => {
       // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
       it.skip('Renders link to Forgot Password by default', async () => {
-        const { getByRole } = renderLogin({ propsData: { defaultUsePassword: true } });
+        const { getByRole } = renderLogin({ props: { defaultUsePassword: true } });
         getByRole('link', { name: 'Forgot password?' });
       });
 
       // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
       it.skip('Renders button to Forgot Password when useLink is false', async () => {
-        const { getByRole } = renderLogin({ propsData: { defaultUsePassword: true, useLink: false } });
+        const { getByRole } = renderLogin({ props: { defaultUsePassword: true, useLink: false } });
         getByRole('button', { name: 'Forgot password?' });
       });
     });
@@ -121,7 +123,7 @@ describe('Login component', () => {
       // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
       it.skip('shows an error when email is empty', async () => {
         renderLogin({
-          propsData: { defaultUsePassword: false },
+          props: { defaultUsePassword: false },
         });
         expect(screen.queryByText('E-Mail must not be empty.')).toBeNull();
         await fireEvent.click(screen.getByText(/Send link/i));
@@ -133,7 +135,7 @@ describe('Login component', () => {
         const sendMagicLink = jest.fn();
         const landingPath = '/in/the/app';
         renderLogin({
-          propsData: { defaultUsePassword: false },
+          props: { defaultUsePassword: false },
           actions: { 'auth/sendMagicLink': sendMagicLink },
           query: { landingPath },
         });
@@ -149,7 +151,7 @@ describe('Login component', () => {
         const sendMagicLink = jest.fn();
         const landingPath = '/in/the/app';
         renderLogin({
-          propsData: { defaultUsePassword: false },
+          props: { defaultUsePassword: false },
           actions: { 'auth/sendMagicLink': sendMagicLink },
           query: { landingPath },
         });
@@ -168,7 +170,7 @@ describe('Login component', () => {
           throw { response: { data: { message: errorText } } };
         });
         renderLogin({
-          propsData: { defaultUsePassword: false },
+          props: { defaultUsePassword: false },
           actions: { 'auth/sendMagicLink': sendMagicLink },
         });
         const emailInput = screen.getByLabelText('E-Mail');
@@ -183,7 +185,7 @@ describe('Login component', () => {
       // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
       it.skip('shows an error when email is passed without password', async () => {
         const { getByLabelText, getByText, queryByText } = renderLogin({
-          propsData: { defaultUsePassword: true },
+          props: { defaultUsePassword: true },
         });
         const emailInput = getByLabelText('E-Mail');
         fireEvent.update(emailInput, 'email.error@error.com');
@@ -197,7 +199,7 @@ describe('Login component', () => {
       // TODO solve error mocks can't be used with VueRouter on localVue https://v1.test-utils.vuejs.org/guides/#using-with-vue-router
       it.skip('shows an error when password is passed without email', async () => {
         const { getByLabelText, getByText, queryByText } = renderLogin({
-          propsData: { defaultUsePassword: true },
+          props: { defaultUsePassword: true },
         });
         const passwordInput = getByLabelText('Password');
         fireEvent.update(passwordInput, 'somePassword');
@@ -220,7 +222,7 @@ describe('Login component', () => {
             'auth/login': authLoginMock,
             'surveys/fetchPinned': jest.fn(),
           },
-          propsData: { defaultUsePassword: true },
+          props: { defaultUsePassword: true },
         });
         const emailInput = getByLabelText('E-Mail');
         fireEvent.update(emailInput, 'someValidMail@mail.com');
@@ -247,7 +249,7 @@ describe('Login component', () => {
             'auth/login': authLoginMock,
             'surveys/fetchPinned': jest.fn(),
           },
-          propsData: { defaultUsePassword: true },
+          props: { defaultUsePassword: true },
         });
         const emailInput = getByLabelText('E-Mail');
         fireEvent.update(emailInput, 'email.error@error.com');
@@ -276,10 +278,12 @@ describe('Login component', () => {
               'surveys/fetchPinned': jest.fn(),
             },
           },
-          propsData: { defaultUsePassword: true },
-          stubs: {
-            RouterLink: RouterLinkStub,
-            transition: TransitionStub,
+          props: { defaultUsePassword: true },
+          global: {
+            stubs: {
+              RouterLink: RouterLinkStub,
+              transition: TransitionStub,
+            },
           },
         });
         const emailInput = getByLabelText('E-Mail');
@@ -306,7 +310,7 @@ describe('Login component', () => {
       mockAxios.post.mockImplementation(() => Promise.resolve());
       const push = jest.fn();
       const { getByLabelText, getByText } = renderWithVuetify(Login, {
-        propsData: { defaultUsePassword: true },
+        props: { defaultUsePassword: true },
         store: {
           getters: {
             'whitelabel/isWhitelabel': () => true,
@@ -319,18 +323,20 @@ describe('Login component', () => {
             'surveys/fetchPinned': jest.fn(),
           },
         },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
+        global: {
+          mocks: {
+            $route: {
+              params: { redirect: false },
+              query: {},
+            },
+            $router: {
+              push,
+            },
           },
-          $router: {
-            push,
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
           },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
         },
       });
 
@@ -374,7 +380,7 @@ describe('Login component', () => {
           'auth/login': login,
           'surveys/fetchPinned': jest.fn(),
         },
-        propsData: { defaultUsePassword: true },
+        props: { defaultUsePassword: true },
         $router: {
           push,
         },
@@ -405,7 +411,7 @@ describe('Login component', () => {
       const push = jest.fn();
       const login = jest.fn(() => Promise.resolve());
       const { getByLabelText, getByText } = renderWithVuetify(Login, {
-        propsData: { defaultUsePassword: true },
+        props: { defaultUsePassword: true },
         store: {
           getters: {
             'whitelabel/isWhitelabel': () => false,
@@ -415,18 +421,20 @@ describe('Login component', () => {
             'surveys/fetchPinned': jest.fn(),
           },
         },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
+        global: {
+          mocks: {
+            $route: {
+              params: { redirect: false },
+              query: {},
+            },
+            $router: {
+              push,
+            },
           },
-          $router: {
-            push,
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
           },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
         },
       });
 
@@ -454,7 +462,7 @@ describe('Login component', () => {
     it.skip("submit and get the redirection '/' ", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderWithVuetify(Login, {
-        propsData: { defaultUsePassword: true },
+        props: { defaultUsePassword: true },
         store: {
           getters: {
             'whitelabel/isWhitelabel': () => false,
@@ -464,18 +472,20 @@ describe('Login component', () => {
             'surveys/fetchPinned': jest.fn(),
           },
         },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
+        global: {
+          mocks: {
+            $route: {
+              params: { redirect: false },
+              query: {},
+            },
+            $router: {
+              push,
+            },
           },
-          $router: {
-            push,
+          stubs: {
+            RouterLink: RouterLinkStub,
+            transition: TransitionStub,
           },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
         },
       });
 
@@ -504,7 +514,7 @@ describe('Login component', () => {
           'surveys/fetchPinned': jest.fn(),
         },
         params: { redirect: true },
-        propsData: { defaultUsePassword: true },
+        props: { defaultUsePassword: true },
         $router: {
           push,
         },

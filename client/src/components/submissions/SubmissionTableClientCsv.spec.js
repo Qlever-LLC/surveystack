@@ -404,7 +404,7 @@ describe('SubmissionTableClientCsv', () => {
   describe('SubmissionTableClientCsv UI Tests', () => {
     it('should check that the modal text content is the same with the clicked table cell', async () => {
       const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-        propsData: { submissions: mockSubmissions(), selected: [] },
+        props: { submissions: mockSubmissions(), selected: [] },
         router: router,
         store: createStoreObject(),
       });
@@ -420,7 +420,7 @@ describe('SubmissionTableClientCsv', () => {
 
     it('set modal to hidden when overlay is clicked', async () => {
       const { getByTestId, getByText, queryByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-        propsData: { submissions: mockSubmissions(), selected: [] },
+        props: { submissions: mockSubmissions(), selected: [] },
         router: router,
         store: createStoreObject(),
       });
@@ -437,7 +437,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('should check that the modal text content is the same with the clicked table cell', async () => {
     const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: { submissions: mockSubmissions(), selected: [] },
+      props: { submissions: mockSubmissions(), selected: [] },
       router: router,
       store: createStoreObject(),
     });
@@ -453,7 +453,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('emits update:selected event when submission checkbox is clicked', async () => {
     const { getAllByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: { submissions: mockSubmissions(), selected: [] },
+      props: { submissions: mockSubmissions(), selected: [] },
       router: router,
       store: createStoreObject(),
     });
@@ -465,7 +465,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('displays selected text and submission action buttons when the selected prop contains a submission from the submissions prop', async () => {
     const { getByRole, getByText } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
+      props: {
         submissions: mockSubmissions(),
         selected: [
           {
@@ -485,7 +485,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('emits showArchiveModal event when archive button is clicked', async () => {
     const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
+      props: {
         submissions: mockSubmissions(),
         selected: [
           {
@@ -505,7 +505,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('should emit resubmit event when resubmit button is clicked', async () => {
     const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
+      props: {
         submissions: mockSubmissions(),
         selected: [
           {
@@ -525,7 +525,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('should emit reassignment event when reassign button is clicked', async () => {
     const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
+      props: {
         submissions: mockSubmissions(),
         selected: [
           {
@@ -545,7 +545,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('should disable reassign Button if actionsAreDisabled prop is set to true', async () => {
     const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
+      props: {
         submissions: mockSubmissions(),
         actionsAreDisabled: true,
         selected: [
@@ -565,7 +565,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('should disable resubmit Button if actionsAreDisabled prop is set to true', async () => {
     const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
+      props: {
         submissions: mockSubmissions(),
         actionsAreDisabled: true,
         selected: [
@@ -585,7 +585,7 @@ describe('SubmissionTableClientCsv', () => {
 
   it('should disable archive Button if actionsAreDisabled prop is set to true', async () => {
     const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
+      props: {
         submissions: mockSubmissions(),
         actionsAreDisabled: true,
         selected: [
