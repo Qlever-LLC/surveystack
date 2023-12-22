@@ -80,7 +80,7 @@
     v-else
     icon="mdi-email-fast"
     prominent
-    border-color
+    border-color="success"
     color="success"
     border="start"
     elevation="2"
