@@ -46,7 +46,7 @@ describe('SelectSingle question', () => {
   it('sets value as array', () => {
     const wrapper = mount(SelectSingle, getMountOpts());
     const radios = wrapper.findAll('[role="radio"]');
-    radios.at(0).setChecked();
+    radios[0].setChecked();
     expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
   });
 
