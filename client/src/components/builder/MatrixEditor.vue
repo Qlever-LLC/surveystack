@@ -27,7 +27,7 @@
         <div>
           <VueDraggable
             class="d-flex flex-row pa-2 px-4"
-            style="overflow-x: auto"
+            style="overflow: auto; height: 75vh"
             v-model="columns"
             group="columns"
             @start="drag = true"
@@ -81,9 +81,11 @@
                     <a-text-field v-model="item.value" label="Value" dense />
                     <a-select
                       label="Type"
-                      :value="item.type"
-                      @input="(type) => onChanged(item, { type, defaultValue: null })"
+                      :modelValue="item.type"
+                      @update:modelValue="(type) => onChanged(item, { type, defaultValue: null })"
                       :items="$options.MATRIX_COLUMN_TYPES"
+                      item-title="text"
+                      item-value="value"
                       dense
                     />
 
@@ -91,8 +93,10 @@
                       <div class="d-flex flex-row flex-wrap">
                         <a-select
                           v-model="item.resource"
-                          @input="(resource) => onChanged(item, { resource, defaultValue: null })"
+                          @update:modelValue="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
+                          item-title="text"
+                          item-value="value"
                           label="Resource"
                           hide-details
                           dense

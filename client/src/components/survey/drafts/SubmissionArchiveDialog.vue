@@ -7,7 +7,7 @@
       <a-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
-        <a-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
+        <a-select v-model="archiveReason" :items="availableArchiveReasons" variant="outlined" />
         <a-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
@@ -28,7 +28,7 @@
 export default {
   props: {
     persistent: Boolean,
-    value: Boolean,
+    modelValue: Boolean,
     labelConfirm: String,
     width: [String, Number],
     title: {
@@ -47,6 +47,7 @@ export default {
 
   data() {
     return {
+      value: this.modelValue,
       archiveReason: this.reason,
       archiveReasonOther: '',
       availableArchiveReasons: ['TEST_DATA', 'INCORRECT_DATA', 'EQUIPMENT_ERROR', 'USER_ERROR', 'RESUBMIT', 'OTHER'],

@@ -10,7 +10,14 @@
         </a-btn>
       </div>
       <a-form class="mt-3" @keydown.enter.prevent="submit">
-        <a-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
+        <a-select
+          :items="availableStatus"
+          item-title="text"
+          item-value="value"
+          v-model="entity.meta.status"
+          label="Status"
+          disabled
+        />
 
         <a-text-field v-model="entity.group" label="Group" disabled />
 
@@ -26,7 +33,14 @@
           hint="Default name for newly registered users"
         />
 
-        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" />
+        <a-select
+          class="mt-3"
+          :items="availableRoles"
+          item-title="text"
+          item-value="value"
+          v-model="entity.role"
+          label="Role"
+        />
 
         <div class="d-flex mt-2">
           <a-btn class="ml-auto" variant="text" @click="cancel">Cancel</a-btn>

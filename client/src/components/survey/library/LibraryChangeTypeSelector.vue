@@ -9,14 +9,16 @@
       </a-col>
       <a-col v-else cols="auto" class="pa-0">
         <a-select
-          outlined
+          variant="outlined"
           dense
           hide-details
           :readonly="disabled"
           v-model="content"
+          @update:modelValue="$emit('input', content)"
           :label="label ? label : 'Change type'"
           :items="availableLibraryChangeTypes"
-          @input="$emit('input', content)"
+          item-title="text"
+          item-value="value"
         />
       </a-col>
       <a-col cols="auto" class="pa-0 align-self-center">

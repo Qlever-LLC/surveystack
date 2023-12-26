@@ -9,13 +9,13 @@
         </a-btn>
       </a-row>
       <a-row class="d-flex flex-grow-1">
-        <a-tabs v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
-          <a-tab href="#drafts" class="background">
+        <a-tabs :modelValue="activeTab" centered icons-and-text grow @change="updateActiveTab">
+          <a-tab href="#drafts" value="drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
               <a-icon class="mr-2">mdi-file-document-edit</a-icon>Drafts
             </span>
           </a-tab>
-          <a-tab href="#sent" class="background">
+          <a-tab href="#sent" value="sent" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
               <a-icon class="mr-2">mdi-email-check</a-icon>Sent
             </span>
@@ -326,7 +326,7 @@ export default {
       this.isLoading = false;
     },
     async updateActiveTab(tab) {
-      // console.log(tab);
+      this.activeTab = tab;
       if (tab === 'sent') {
         await this.fetchRemoteSubmissions();
       }

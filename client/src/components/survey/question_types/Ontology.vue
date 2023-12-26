@@ -1,4 +1,6 @@
-<!-- eslint-disable vue/no-deprecated-v-bind-sync -->
+<!-- TODO in unit test before v-select and v-autocomplete were different
+  data-test-id="dropdown" exists
+  data-test-id="autocomplete" was removed-->
 <template>
   <div class="ontology question">
     <app-control-label
@@ -10,136 +12,75 @@
       @initialize="initialize"
     />
     <a-select
-      v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
+      v-if="sourceIsValid && !control.options.allowCustomSelection"
       :label="control.hint"
       :placeholder="getPlaceholder"
-      :value="getValue"
-      @change="onChange"
+      :modelValue="getValue"
+      @update:modelValue="onChange"
       @focus="onFocus"
       @blur="onBlur"
       :items="items"
-      item-text="label"
+      item-title="label"
       item-value="value"
       :menu-props="autocompleteMenuProps"
-      :chips="!!control.options.hasMultipleSelections"
       :multiple="!!control.options.hasMultipleSelections"
       color="focus"
       hide-details
-      outlined
+      variant="outlined"
       class="full-width dropdown"
       data-test-id="dropdown"
-      :selectionSlot="!!control.options.hasMultipleSelections"
-      :itemSlot="!!control.options.hasMultipleSelections"
       cssMinHeight56px
+      :itemSlot="!!control.options.hasMultipleSelections"
     >
-      <template v-slot:selection="data">
-        <a-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          @click="clickOnChip(data)"
-          @click:close="remove(data.item)"
-        >
-          {{ data.item.label }}
+      <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
+        <a-chip v-bind="props" closable>
+          {{ item.title }}
         </a-chip>
       </template>
-      <template v-slot:item="data">
-        <a-list-item-title>
-          {{ data.item.label }}
-          <a-chip v-if="data.item.count" small class="ma-2">
-            {{ data.item.count }}
-          </a-chip>
-        </a-list-item-title>
+      <template v-slot:item="{ props, item }">
+        <a-list-item v-bind="props">
+          <a-list-item-title>
+            {{ item.label }}
+            <a-chip v-if="item.count" small class="ma-2">
+              {{ item.count }}
+            </a-chip>
+          </a-list-item-title>
+        </a-list-item>
       </template>
     </a-select>
     <a-select
-      engineering="autocomplete"
-      v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
-      @blur="onBlur"
-      @change="onChange"
-      @focus="onFocus"
-      ref="dropdownRef"
-      :label="control.hint"
-      :placeholder="getPlaceholder"
-      :value="getValue"
-      :items="items"
-      item-text="label"
-      item-value="value"
-      :delimiters="[',']"
-      :menu-props="autocompleteMenuProps"
-      :chips="!!control.options.hasMultipleSelections"
-      :multiple="!!control.options.hasMultipleSelections"
-      color="focus"
-      outlined
-      hide-details
-      class="full-width dropdown"
-      data-test-id="autocomplete"
-      :selectionSlot="!!control.options.hasMultipleSelections"
-      :itemSlot="!!control.options.hasMultipleSelections"
-      cssMinHeight56px
-    >
-      <template v-slot:selection="data">
-        <a-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          @click="clickOnChip(data)"
-          @click:close="remove(data.item)"
-        >
-          {{ data.item.label }}
-        </a-chip>
-      </template>
-      <template v-slot:item="data">
-        <a-list-item-title>
-          {{ data.item.label }}
-          <a-chip v-if="data.item.count" small class="ma-2">
-            {{ data.item.count }}
-          </a-chip>
-        </a-list-item-title>
-      </template>
-    </a-select>
-    <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
-    <a-select
-      engineering="combobox"
+      allowCustomItem
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
-      ref="dropdownRef"
       :label="control.hint"
       :placeholder="getPlaceholder"
-      :value="getValue"
-      @change="onChange"
+      :modelValue="getValue"
+      @update:modelValue="onChange"
+      v-model:search="comboboxSearch"
       @focus="onFocus"
       @blur="onBlur"
       :items="items"
-      item-text="label"
+      item-title="label"
       item-value="value"
       :menu-props="autocompleteMenuProps"
       :delimiters="[',']"
       :return-object="false"
-      :search-input.sync="comboboxSearch"
-      :chips="!!control.options.hasMultipleSelections"
       :multiple="!!control.options.hasMultipleSelections"
       color="focus"
-      outlined
+      variant="outlined"
       hide-details
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
-      selectionSlot
-      noDataSlot
       cssMinHeight56px
+      noDataSlot
+      selectionSlot
     >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <a-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          @click="clickOnChip(data)"
-          @click:close="removeValue(data.item)"
-        >
-          {{ getLabelForItemValue(data.item) }}
+      <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
+        <a-chip v-bind="props" closable>
+          {{ getLabelForItemValue(item.value) }}
         </a-chip>
       </template>
-      <template v-slot:selection="data" v-else>
-        {{ getLabelForItemValue(data.item) }}
+      <template v-slot:selection="{ item }" v-if="!control.options.hasMultipleSelections">
+        {{ getLabelForItemValue(item.value) }}
       </template>
       <template v-slot:no-data>
         <a-list-item>
@@ -188,9 +129,6 @@ export default {
     },
     onChange(value) {
       this.comboboxSearch = null;
-      if (this.$refs.dropdownRef && !this.control.options.hasMultipleSelections) {
-        this.$refs.dropdownRef.blur();
-      }
       if (this.value !== value) {
         if (Array.isArray(value)) {
           this.changed(getValueOrNull(value.map(getValueOrNull)));
@@ -263,6 +201,7 @@ export default {
       }
       return defaultProps;
     },
+    // TODO imho remove this.control.options.allowAutocomplete because we merged v-select and v-autocomplete
     getPlaceholder() {
       if ((this.control.hint && this.isFocus) || !this.control.hint) {
         if (!this.control.options.allowCustomSelection && !this.control.options.allowAutocomplete) {

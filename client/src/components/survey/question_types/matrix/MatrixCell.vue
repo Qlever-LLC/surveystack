@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-deprecated-v-bind-sync -->
 <template>
   <a-text-field
     v-if="header.type === 'text'"
@@ -45,74 +44,54 @@
     :rules="[isValidNumber]"
   />
   <a-select
-    v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
+    v-else-if="header.type === 'dropdown' && !header.custom"
     :placeholder="header.multiple ? 'Select answers' : 'Select answer'"
-    :value="value"
-    @input="onInput"
+    :modelValue="value"
+    @update:modelValue="onInput"
     :items="items"
-    item-text="label"
+    item-title="label"
     item-value="value"
     :multiple="header.multiple"
     :disabled="disabled"
     hide-details
-    outlined
-    selectionSlot
+    variant="outlined"
     cssFlexNoWrap
     cssOneLineSpan
+    selectionSlot
   >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
+      <matrix-cell-selection-label v-bind="props" :label="item.raw.label" :index="index" :value="value" />
+    </template>
+    <template v-slot:chip="{ props, item, index }" v-else>
+      <matrix-cell-selection-label v-bind="props" :label="item.raw.label" :index="index" :value="value" />
     </template>
   </a-select>
   <a-select
-    engineering="autocomplete"
-    v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
-    ref="dropdownRef"
-    placeholder="Type to search"
-    :value="value"
-    @input="onDropDownInput"
-    :items="items"
-    item-text="label"
-    item-value="value"
-    :delimiters="[',']"
-    :return-object="false"
-    :multiple="header.multiple"
-    :disabled="disabled"
-    hide-details
-    outlined
-    selectionSlot
-    cssFlexNoWrap
-    cssOneLineSpan
-  >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
-    </template>
-  </a-select>
-  <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
-  <a-select
-    engineering="combobox"
+    allowCustomItem
     v-else-if="header.type === 'dropdown' && header.custom"
-    ref="dropdownRef"
     placeholder="Type to search or add custom answer"
-    :value="value"
-    @input="onDropDownInput"
-    :search-input.sync="comboboxSearch"
+    :modelValue="value"
+    @update:modelValue="onDropDownInput"
+    v-model:search="comboboxSearch"
     :items="items"
-    item-text="label"
+    item-title="label"
     item-value="value"
     :delimiters="[',']"
     :return-object="false"
     :multiple="header.multiple"
     :disabled="disabled"
     hide-details
-    outlined
+    variant="outlined"
     selectionSlot
     noDataSlot
     cssFlexNoWrap
     cssOneLineSpan
   >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
+    <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
+      <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
+    </template>
+    <template v-slot:chip="{ props, item, index }" v-else>
+      <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
     </template>
     <template v-slot:no-data>
       <a-list-item>
@@ -124,69 +103,68 @@
     </template>
   </a-select>
   <a-select
-    engineering="autocomplete"
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
     :multiple="header.multiple"
-    :value="value"
-    @input="onInput"
+    :modelValue="value"
+    @update:modelValue="onInput"
     :label="value ? value.farmName : null"
-    item-text="value.name"
+    item-title="value.name"
     item-value="value"
     hide-details
     clearable
-    outlined
+    variant="outlined"
     :disabled="disabled || loading"
     selectionSlot
     itemSlot
     cssFlexNoWrap
     cssOneLineSpan
   >
-    <template v-slot:selection="data" v-if="!!header.multiple">
-      <a-chip v-bind="data.attrs" :input-value="data.selected" @click="clickOnChip(data)">
-        <span v-html="data.item.label" />
+    <template v-slot:chip="{ props, item }" v-if="!!header.multiple">
+      <a-chip v-bind="props" closable>
+        <span v-html="item.raw.label" />
       </a-chip>
     </template>
     <template v-slot:selection="{ item }" v-else>
       <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
     </template>
 
-    <template v-slot:item="data" v-if="!!header.multiple">
-      <a-list-item-title v-html="data.item.label" />
-    </template>
-    <template v-slot:item="{ item }" v-else>
-      <div v-html="item.label"></div>
+    <template v-slot:item="{ props, item }">
+      <a-list-item v-bind="props">
+        <a-list-item-title v-html="item.raw.label" />
+      </a-list-item>
     </template>
   </a-select>
 
   <a-select
-    engineering="autocomplete"
     v-else-if="header.type === 'farmos_planting'"
     :multiple="header.multiple"
-    :value="value"
-    @input="(v) => onInput(localChange(v))"
+    :modelValue="value"
+    @update:modelValue="(v) => onInput(localChange(v))"
     :items="farmos.plantings || []"
     :label="value ? value.farmName : null"
-    item-text="value.name"
+    item-title="value.name"
     item-value="value"
     hide-details
     clearable
-    outlined
+    variant="outlined"
     :disabled="disabled || loading"
     selectionSlot
     itemSlot
     cssFlexNoWrap
     cssOneLineSpan
   >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :html="item.label" :index="index" :value="value" />
+    <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
+      <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
+    </template>
+    <template v-slot:chip="{ props, item, index }" v-else>
+      <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
 
-    <template v-slot:item="data" v-if="!!header.multiple">
-      <a-list-item-title v-html="data.item.label" />
-    </template>
-    <template v-slot:item="{ item }" v-else>
-      <div v-html="item.label"></div>
+    <template v-slot:item="{ props, item }">
+      <a-list-item v-bind="props">
+        <a-list-item-title v-html="item.raw.label" />
+      </a-list-item>
     </template>
   </a-select>
   <div v-else-if="header.type === 'date'">
@@ -245,6 +223,7 @@ export default {
     MatrixCellSelectionLabel,
   },
   props: {
+    // TODO imho remove header.autocomplete because we merged v-select and v-autocomplete
     header: {
       type: Object,
     },
@@ -323,18 +302,11 @@ export default {
     },
   },
   methods: {
-    clickOnChip(data) {
-      data.select;
-    },
     isValidNumber(val) {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     onInput(value) {
-      if (this.header.type === 'dropdown') {
-        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : [value]);
-      } else {
-        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
-      }
+      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
       this.$emit('changed');
     },
     onDateInput(value) {
@@ -360,9 +332,6 @@ export default {
     onDropDownInput(value) {
       this.onInput(value);
       this.comboboxSearch = null;
-      if (this.$refs.dropdownRef && !this.header.multiple) {
-        this.$refs.dropdownRef.blur();
-      }
     },
     getDropdownLabel(value) {
       const dropdownItems = this.items;

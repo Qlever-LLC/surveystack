@@ -25,24 +25,23 @@
       <template v-slot:title>Reassign Submission</template>
       <template>
         <a-select
-          engineering="autocomplete"
           :items="reassignment.groups"
+          item-title="text"
+          item-value="value"
           v-model="reassignment.group"
           label="Group"
-          :filter="reassignGroupFilter"
+          :custom-filter="reassignGroupFilter"
           itemSlot
         >
-          <template v-slot:item="{ item }">
-            <div class="d-flex flex-column py-1">
-              <div>{{ item.text }}</div>
-              <div class="text-secondary caption">{{ item.path }}</div>
-            </div>
+          <template v-slot:item="{ props, item }">
+            <a-list-item v-bind="props" :title="item.raw.text" :subtitle="item.raw.path"> </a-list-item>
           </template>
         </a-select>
         <a-select
-          engineering="autocomplete"
           :disabled="reassignment.group === null"
           :items="reassignment.users"
+          item-title="text"
+          item-value="value"
           v-model="reassignment.user"
           label="User"
         />
@@ -103,13 +102,23 @@
         <a-card-text>
           <a-row>
             <a-col md="2" sm="6">
-              <a-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" />
+              <a-select
+                label="Range"
+                dense
+                :items="apiDownloadRanges"
+                item-title="text"
+                item-value="value"
+                hide-details
+                v-model="apiDownloadRange"
+              />
             </a-col>
             <a-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
               <a-select
                 label="Matrix answers"
                 dense
                 :items="apiDownloadExpandAllMatricesOptions"
+                item-title="text"
+                item-value="value"
                 hide-details
                 v-model="apiDownloadExpandAllMatrices"
               />
@@ -125,9 +134,11 @@
                 label="Page Size"
                 dense
                 :items="pageSizes"
+                item-title="text"
+                item-value="value"
                 hide-details
                 v-model="pageSize"
-                @change="changedPaginationSize"
+                @update:modelValue="changedPaginationSize"
               />
             </a-col>
             <a-col cols="10">
@@ -187,9 +198,11 @@
             label="Page Size"
             dense
             :items="pageSizes"
+            item-title="text"
+            item-value="value"
             hide-details
             v-model="pageSize"
-            @change="changedPaginationSize"
+            @update:modelValue="changedPaginationSize"
           />
         </a-col>
         <a-col cols="10">

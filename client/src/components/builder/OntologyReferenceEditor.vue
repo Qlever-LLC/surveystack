@@ -3,18 +3,17 @@
     <a-card-title> Survey Reference Editor </a-card-title>
     <a-card-text>
       <a-select
-        engineering="autocomplete"
         label="Select Survey"
-        outlined
+        variant="outlined"
         :items="surveys"
         v-model="surveyId"
-        @change="surveyChanged"
+        @update:modelValue="surveyChanged()"
         :loading="loading"
         item-value="_id"
-        item-text="name"
-        appendOuterSlot
+        item-title="name"
+        appendSlot
       >
-        <template v-slot:append-outer>
+        <template v-slot:append>
           <a-chip style="margin-top: -10px" color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
           </a-chip>
@@ -23,15 +22,14 @@
 
       <template v-if="surveyId">
         <a-select
-          engineering="autocomplete"
           label="Select Path"
-          outlined
-          @change="updateResource"
+          variant="outlined"
           :items="paths"
           v-model="path"
+          @update:modelValue="updateResource"
           :loading="loading"
           item-value="path"
-          item-text="name"
+          item-title="name"
         />
       </template>
     </a-card-text>
@@ -113,6 +111,7 @@ export default {
     updateResource() {
       const survey = getSurveyById(this.surveys, this.surveyId);
       const path = getPathByPath(this.paths, this.path);
+      if (!path) return;
       this.$emit('change', {
         ...this.resource,
         label: `${survey && survey.name} - ${path.control.label}`,
@@ -127,7 +126,8 @@ export default {
       this.updateResource();
       this.$emit('close-dialog');
     },
-    async surveyChanged({ version }) {
+    async surveyChanged(version) {
+      if (!this.surveyId) return;
       const versionParam = version || 'latest';
       const { data } = await api.get(`/surveys/${this.surveyId}?version=${versionParam}`);
       if (!version) {
@@ -176,7 +176,7 @@ export default {
       this.surveyVersion = this.resource.content.version || '';
 
       if (this.surveyVersion) {
-        await this.surveyChanged({ version: this.surveyVersion });
+        await this.surveyChanged(this.surveyVersion);
       }
     }
 

@@ -2,26 +2,24 @@
   <a-container>
     <a-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
       <a-select
-        engineering="autocomplete"
         v-if="!!localViewModel.groups"
-        outlined
+        variant="outlined"
         primary
         label="Select Group"
         v-model="localViewModel.form.groupId"
-        :item-text="(g) => `${g.name} (${g.path})`"
+        :item-title="(g) => `${g.name} (${g.path})`"
         item-value="_id"
         :items="localViewModel.groups"
         :rules="[(v) => !!v || `select group`]"
       />
 
       <a-select
-        engineering="autocomplete"
-        outlined
+        variant="outlined"
         primary
         label="Select Plan"
         v-model="localViewModel.form.plan"
         :items="localViewModel.plans"
-        :item-text="(p) => `${p.planName}, ${p.planUrl}`"
+        :item-title="(p) => `${p.planName}, ${p.planUrl}`"
         item-value="_id"
         :rules="[(v) => !!v || `select plan`]"
       />
@@ -93,9 +91,8 @@
       />
 
       <a-select
-        engineering="autocomplete"
         label="Timezone"
-        outlined
+        variant="outlined"
         :items="timezones"
         v-model="localViewModel.form.timezone"
         :rules="[(v) => !!v || `select time zone`]"
@@ -109,18 +106,18 @@
       </a-radio-group>
 
       <a-select
-        engineering="autocomplete"
         label="Owner of the FarmOS Instance"
-        outlined
+        variant="outlined"
         :items="localViewModel.users"
         item-value="id"
-        :item-text="(item) => `${item.name} (${item.email})`"
+        :item-title="(item) => `${item.name} (${item.email})`"
         v-model="localViewModel.form.owner"
         :rules="[(v) => !!v || `select at least one owner`]"
         return-object
       />
 
-      <!-- <a-select
+      <!-- WARNING: Is not up to date as it is a comment 
+        <a-select
         engineering="autocomplete"
         label="Admins with Access to Farm"
         v-model="localViewModel.form.admins"

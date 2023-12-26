@@ -3,7 +3,7 @@
     <a-form>
       <a-text-field
         @update:modelValue="(val) => updateName(val)"
-        :modelValue="value.name"
+        :modelValue="value"
         label="Name"
         placeholder="Name"
         variant="outlined"

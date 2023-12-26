@@ -7,13 +7,12 @@
     </div>
 
     <a-select
-      engineering="autocomplete"
       v-if="!loading && !!mappings"
-      outlined
+      variant="outlined"
       primary
       label="Select Instance from Aggregator"
       v-model="selectedInstance"
-      item-text="url"
+      item-title="url"
       item-value="url"
       :items="mappings.aggregatorFarms"
     />
@@ -51,12 +50,11 @@
 
       <div class="d-flex my-2 align-baseline">
         <a-select
-          engineering="autocomplete"
-          outlined
+          variant="outlined"
           primary
           label="Map Group to Instance"
           v-model="selectedGroup"
-          :item-text="(g) => `${g.name} (${g.path})`"
+          :item-title="(g) => `${g.name} (${g.path})`"
           item-value="_id"
           :items="groups"
           class="mt-4 mr-4"
@@ -99,15 +97,14 @@
 
       <div class="d-flex my-2 justify-space-between align-baseline">
         <a-select
-          engineering="autocomplete"
           v-if="!loading && !!groups"
           class="mt-4"
-          outlined
+          variant="outlined"
           primary
           hint="Select User"
           label="Map User to Instance"
           v-model="selectedUser"
-          :item-text="(item) => `${item.name} (${item.email})`"
+          :item-title="(item) => `${item.name} (${item.email})`"
           item-value="_id"
           :items="users"
         />

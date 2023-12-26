@@ -1,19 +1,18 @@
 <template>
-  <a-card cssHeight90vh color="grey-darken-3">
+  <a-card cssHeight90vh>
     <a-container>
       <a-row>
         <a-spacer />
         <a-select
-          engineering="autocomplete"
           style="max-width: 800px"
           rounded
-          dark
-          solo
           label="Select example and copy"
           v-model="selected"
           :items="files"
+          item-title="text"
+          item-value="value"
           single-line
-          filled
+          variant="solo-filled"
         />
         <a-btn variant="text" class="ma-2" color="white" @click="close"> Close </a-btn>
       </a-row>

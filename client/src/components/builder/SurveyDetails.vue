@@ -15,10 +15,12 @@
             <a-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <a-select
-                outlined
+                variant="outlined"
                 v-model="value.meta.submissions"
                 label="Allow Submissions for..."
                 :items="availableSubmissions"
+                item-title="text"
+                item-value="value"
               />
               <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" variant="outlined" />
             </a-card-text>

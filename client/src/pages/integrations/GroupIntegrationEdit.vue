@@ -8,7 +8,14 @@
       <a-form class="mt-3" @keydown.enter.prevent="submit">
         <a-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" variant="outlined" />
 
-        <a-select :items="integrationTypes" v-model="entity.type" label="Type" outlined />
+        <a-select
+          :items="integrationTypes"
+          item-title="text"
+          item-value="value"
+          v-model="entity.type"
+          label="Type"
+          variant="outlined"
+        />
 
         <app-json-editor v-model="entity.data" />
         <div class="d-flex ma-2">

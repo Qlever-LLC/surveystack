@@ -24,19 +24,22 @@
           />
 
           <a-select
-            engineering="autocomplete"
-            outlined
+            variant="outlined"
             class="flex-grow-1 flex-shrink-0"
             label="Select FarmOS Plans for Group"
             multiple
-            deletable-chips
-            @change="$emit('plansChanged', selectedPlans)"
+            @update:modelValue="$emit('plansChanged', selectedPlans)"
             v-model="selectedPlans"
             :items="plans"
             :item-value="(p) => p._id"
-            small-chips
-            :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          />
+            :item-title="(p) => `${p.planName} (${p.planUrl})`"
+          >
+            <template v-slot:chip="{ props, item }">
+              <a-chip v-bind="props" closable>
+                {{ item.title }}
+              </a-chip>
+            </template>
+          </a-select>
         </div>
         <a-btn color="red" @click="$emit('deactivate')">Deactivate FarmOS for Group</a-btn>
       </a-card-text>

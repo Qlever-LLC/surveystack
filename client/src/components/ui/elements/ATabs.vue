@@ -1,6 +1,6 @@
 <template>
   <v-tabs
-    @change="handleCustomChange"
+    @update:modelValue="handleCustomChange"
     :background-color="backgroundColor"
     :centered="centered"
     :color="color"
@@ -8,7 +8,7 @@
     :fixed-tabs="fixedTabs"
     :grow="grow"
     :icons-and-text="iconsAndText"
-    :value="value"
+    :modelValue="modelValue"
   >
     <slot />
   </v-tabs>
@@ -26,7 +26,7 @@ export default {
     fixedTabs: { type: Boolean, required: false },
     grow: { type: Boolean, required: false },
     iconsAndText: { type: Boolean, required: false },
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
   },
   methods: {
     handleCustomChange(event) {

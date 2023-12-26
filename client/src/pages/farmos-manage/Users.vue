@@ -11,13 +11,12 @@
     </div>
 
     <a-select
-      engineering="autocomplete"
       v-if="!loading && !!groups"
-      outlined
+      variant="outlined"
       primary
       label="Select User"
       v-model="selectedUser"
-      :item-text="(item) => `${item.name} (${item.email})`"
+      :item-title="(item) => `${item.name} (${item.email})`"
       item-value="_id"
       :items="users"
     />
@@ -38,15 +37,14 @@
           <tr>
             <td>
               <a-select
-                engineering="autocomplete"
                 v-if="!loading && !!mappings"
                 class="mt-6"
-                outlined
+                variant="outlined"
                 primary
                 label="Select FarmOS Instance"
                 v-model="selectedInstance"
                 item-value="instanceName"
-                item-text="instanceName"
+                item-title="instanceName"
                 :items="instances"
               />
             </td>
