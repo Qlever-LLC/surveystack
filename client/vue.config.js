@@ -3,6 +3,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const LCL = require('last-commit-log');
+const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 
 const fs = require('fs');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
@@ -42,6 +43,7 @@ module.exports = {
       new CopyPlugin({
         patterns: ['src/utils/sandboxUtils.js'],
       }),
+      new VuetifyPlugin({ autoImport: true }), // Enabled by default
     ],
   },
   transpileDependencies: ['vuetify'],
