@@ -80,7 +80,7 @@ describe('Ontology question', () => {
   describe('Ontology List source', () => {
     it('sets value as an array in single selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts());
-      const dropDown = wrapper.find('a-select-stub');
+      const dropDown = wrapper.find('a-select-stub'); //TODO according to https://test-utils.vuejs.org/migration/, only querySelector syntax is supported. Use findComponent(Comp) to find a Vue component
       dropDown.vm.$emit('change', 'dog');
       expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
     });

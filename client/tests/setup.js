@@ -9,6 +9,7 @@ const vuetify = createVuetify({
 });
 
 vueconfig.global.plugins.push(vuetify);
+vueconfig.global.renderStubDefaultSlot = true;
 
 window.scrollTo = () => {};
 

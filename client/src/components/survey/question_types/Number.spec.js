@@ -79,7 +79,7 @@ describe('Number question', () => {
       test(`emits change(${JSON.stringify(result)}) when the input value is ${JSON.stringify(value)}`, () => {
         const wrapper = mount(Number, getMountOpts({ value: 0 }));
         const input = wrapper.find('[data-test-id="input"]');
-        input.setValue(value);
+        input.setValue(value); // todo check works for select, checkbox, radio button, input, textarea. Returns nextTick.
         const { changed } = wrapper.emitted();
         expect(changed.pop()).toEqual([result]);
       });

@@ -46,14 +46,14 @@ describe('SelectSingle question', () => {
   it('sets value as array', () => {
     const wrapper = mount(SelectSingle, getMountOpts());
     const radios = wrapper.findAll('[role="radio"]');
-    radios[0].setChecked();
+    radios[0].setChecked(); //TODO removed. Now part of setValue
     expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
   });
 
   it('sets custom input value as array', () => {
     const wrapper = mount(SelectSingle, getMountOpts({ allowCustomSelection: true }));
     const customInput = wrapper.find('[data-test-id="custom-input"]');
-    customInput.setValue('custom input');
+    customInput.setValue('custom input'); //TODO CHECK works for select, checkbox, radio button, input, textarea. Returns nextTick.
     // Apparently this doesn't matter?
     // await wrapper.vm.$nextTick();
     expect(wrapper.emitted().changed[0][0]).toEqual(['custom input']);

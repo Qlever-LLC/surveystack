@@ -262,8 +262,9 @@ describe('GeoJSON Question', () => {
       const { getByTitle, getByPlaceholderText } = renderWithVuetify(GeoJSON, renderOptions);
 
       await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(true);
+      expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(true); //TODO CONTAINS removed. Use find
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
+      //TODO CONTAINS removed. Use find
       expect(getByPlaceholderText('Search for address...').parentElement.classList.contains('gcd-gl-expanded')).toBe(
         true
       );
@@ -282,8 +283,10 @@ describe('GeoJSON Question', () => {
       const { getByTitle, getByPlaceholderText } = renderWithVuetify(GeoJSON, renderOptions);
 
       await new Promise((resolve) => setTimeout(resolve, 0));
+      //TODO CONTAINS removed. Use find
       expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(false);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
+      //TODO CONTAINS removed. Use find
       expect(getByPlaceholderText('Search for address...').parentElement.classList.contains('gcd-gl-expanded')).toBe(
         false
       );
