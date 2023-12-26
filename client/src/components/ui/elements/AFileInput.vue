@@ -1,5 +1,5 @@
 <template>
-  <v-file-input @change="$emit('change', $event)" :label="label" />
+  <v-file-input @update:modelValue="$emit('change', $event)" :label="label" />
 </template>
 
 <script>
