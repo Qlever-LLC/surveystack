@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { defineAsyncComponent } from 'vue';
 import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
@@ -38,20 +37,18 @@ import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import store from '@/store';
 
-const MySubmissions = defineAsyncComponent(() => import('@/pages/surveys/MySubmissions.vue'));
-const FarmosManage = defineAsyncComponent(() => import('@/pages/farmos-manage/FarmosManage.vue'));
-const GroupEdit = defineAsyncComponent(() => import('@/pages/groups/GroupEdit.vue'));
+const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
+const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
+const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
 // integrations
-const MembershipIntegrationEdit = defineAsyncComponent(
-  () => import('@/pages/integrations/MembershipIntegrationEdit.vue')
-);
-const GroupIntegrationEdit = defineAsyncComponent(() => import('@/pages/integrations/GroupIntegrationEdit.vue'));
-const Kit = defineAsyncComponent(() => import('@/pages/Kit.vue'));
-const Builder = defineAsyncComponent(() => import('@/pages/builder/Builder.vue'));
-const Script = defineAsyncComponent(() => import('@/pages/scripts/Script.vue'));
-const ScriptEdit = defineAsyncComponent(() => import('@/pages/scripts/ScriptEdit.vue'));
-const FarmOSGroupManage = defineAsyncComponent(() => import('@/pages/groups/FarmOS.vue'));
-const HyloGroupManage = defineAsyncComponent(() => import('@/pages/groups/Hylo.vue'));
+const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
+const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
+const Kit = () => import('@/pages/Kit.vue');
+const Builder = () => import('@/pages/builder/Builder.vue');
+const Script = () => import('@/pages/scripts/Script.vue');
+const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
+const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
+const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
 
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {

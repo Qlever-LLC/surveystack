@@ -7,7 +7,7 @@
     :max-width="maxWidth"
     :selected="selected"
     :select-strategy="selectStrategy"
-    @update:selected="$emit('update:selected')"
+    @update:selected="$emit('update:selected', $event)"
   >
     <slot />
   </v-list>

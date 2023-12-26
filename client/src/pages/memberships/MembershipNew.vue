@@ -160,8 +160,8 @@ export default {
       sendEmail: 'SEND_NOW',
       INVITATION_METHODS,
       invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
-        ? localStorage[LS_MEMBER_INVITATION_METHOD]
-        : INVITATION_METHODS.INVITE,
+        ? [localStorage[LS_MEMBER_INVITATION_METHOD]]
+        : [INVITATION_METHODS.INVITE],
       isSubmitting: false,
       emailRules: [(v) => !!v || 'E-mail is required', (v) => EmailValidator.validate(v) || 'E-mail must be valid'],
     };
@@ -179,7 +179,7 @@ export default {
       }
       const data = this.entity;
       const url =
-        this.invitationMethod === this.INVITATION_METHODS.INVITE
+        this.invitationMethod === [this.INVITATION_METHODS.INVITE]
           ? `/memberships?sendEmail=${this.sendEmail}`
           : `/memberships/confirmed`;
 
@@ -215,7 +215,7 @@ export default {
   },
   watch: {
     invitationMethod(newValue) {
-      localStorage[LS_MEMBER_INVITATION_METHOD] = newValue;
+      localStorage[LS_MEMBER_INVITATION_METHOD] = newValue[0];
     },
   },
   async created() {

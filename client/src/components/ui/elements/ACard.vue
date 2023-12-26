@@ -38,6 +38,7 @@ export default {
     loading: { type: [Boolean, String], required: false },
     minHeight: { type: [Number, String], required: false },
     minWidth: { type: [Number, String], required: false },
+    //TODO check if we want to allow changing theme on component level
     theme: {
       type: String,
       validator: function (value) {

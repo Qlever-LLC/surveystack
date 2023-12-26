@@ -1,5 +1,5 @@
 <template>
-  <a-alert border="start" :type="type" border-color :elevation="elevation" :color="color" :icon="icon">
+  <a-alert border="start" :type="type" :border-color="color" :elevation="elevation" :color="color" :icon="icon">
     <strong v-if="title" class="mr-1">{{ title }}</strong>
     <slot />
     <a-icon v-if="closeable" class="float-right" @click="$emit('closed')">mdi-close-circle</a-icon>

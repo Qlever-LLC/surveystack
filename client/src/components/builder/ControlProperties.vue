@@ -549,12 +549,12 @@
               </template>
 
               <template #append>
-                <a-tooltip max-width="400" transition="slide-x-transition" right>
-                  <template v-slot:activator="{ on, attrs }">
-                    <a-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</a-icon>
-                  </template>
-                  Set the number of items in a row
-                </a-tooltip>
+                <a-icon v-bind="props" size="20">
+                  mdi-help-circle-outline
+                  <a-tooltip max-width="400" transition="slide-x-transition" right activator="parent">
+                    Set the number of items in a row
+                  </a-tooltip>
+                </a-icon>
               </template>
             </a-select>
           </template>

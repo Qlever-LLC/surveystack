@@ -1,10 +1,10 @@
 <template>
-  <a-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left">
-    <template v-slot:activator="{ on, attrs }">
-      <a-icon small color="red-darken-2" v-bind="attrs" v-on="on" class="ml-1">mdi-asterisk</a-icon>
-    </template>
-    <span>Required</span>
-  </a-tooltip>
+  <a-icon small color="red-darken-2" class="ml-1">
+    mdi-asterisk
+    <a-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left" activator="parent"
+      >Required</a-tooltip
+    ></a-icon
+  >
 </template>
 
 <script>

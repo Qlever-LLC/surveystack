@@ -37,16 +37,10 @@
     <a-card-actions>
       <a-spacer />
       <a-btn variant="text" @click="closeHandler"> Close </a-btn>
-      <a-tooltip top :disabled="!!path">
-        <template v-slot:activator="{ on }">
-          <div v-on="on">
-            <a-btn variant="text" color="green" @click="previewDialogIsVisible = true" :disabled="!path">
-              Preview
-            </a-btn>
-          </div>
-        </template>
-        <span>No Submitted Surveys Available</span>
-      </a-tooltip>
+      <a-btn variant="text" color="green" @click="previewDialogIsVisible = true" :disabled="!path">
+        Preview
+        <a-tooltip top activator="parent">No Submitted Surveys Available</a-tooltip>
+      </a-btn>
       <a-btn variant="text" color="error" @click="deleteResource"> Delete </a-btn>
       <a-btn variant="text" color="primary" @click="updateAndClose"> Save </a-btn>
     </a-card-actions>

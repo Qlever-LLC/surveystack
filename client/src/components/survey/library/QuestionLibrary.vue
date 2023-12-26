@@ -27,12 +27,10 @@
           >
             <a-row cssMinHeight96px>
               <a-col cssMinWidth0px>
-                <a-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
-                  </template>
-                  <span>{{ c.name }}</span>
-                </a-tooltip>
+                <div class="title text-truncate">
+                  {{ c.name }}
+                  <a-tooltip bottom activator="parent">{{ c.name }}</a-tooltip>
+                </div>
                 <div>
                   <small class="text-grey">{{ c._id }}</small>
                 </div>
@@ -68,8 +66,8 @@
                 <!--TODO Resolve #48, then uncomment this
                 div>
                   <a-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <div v-bind="attrs" v-on="on">
+                    <template v-slot:activator="{ props }">
+                      <div v-bind="props">
                         <a-icon class="mr-1 pb-1">mdi-account-group</a-icon>
                         {{ c.meta.libraryUsageCountSurveys ? c.meta.libraryUsageCountSurveys : 0 }}
                       </div>
@@ -78,15 +76,9 @@
                   </a-tooltip>
                 </div-->
                 <div>
-                  <a-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <div v-bind="attrs" v-on="on">
-                        <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
-                        {{ c.meta.libraryUsageCountSubmissions ? c.meta.libraryUsageCountSubmissions : 0 }}
-                      </div>
-                    </template>
-                    <span>Number of submission using this</span>
-                  </a-tooltip>
+                  <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
+                  {{ c.meta.libraryUsageCountSubmissions ? c.meta.libraryUsageCountSubmissions : 0 }}
+                  <a-tooltip bottom activator="parent">Number of submission using this</a-tooltip>
                 </div>
               </a-col>
             </a-row>

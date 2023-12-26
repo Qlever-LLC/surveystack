@@ -9,16 +9,12 @@
       <a-expansion-panel-title v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
-        <a-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
-          <template v-slot:activator="{ on, attrs }">
-            <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on">
-              <a-badge overlap bordered left :color="color" :content="count.toString()">
-                <a-icon :color="color">{{ icon }}</a-icon>
-              </a-badge>
-            </span>
-          </template>
-          <span>{{ tooltip }}</span>
-        </a-tooltip>
+        <span v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon" class="flex-grow-0 mr-2">
+          <a-badge overlap bordered left :color="color" :content="count.toString()">
+            <a-icon :color="color">{{ icon }}</a-icon>
+          </a-badge>
+          <a-tooltip bottom activator="parent">{{ tooltip }}</a-tooltip>
+        </span>
 
         <a-spacer />
         <a-switch

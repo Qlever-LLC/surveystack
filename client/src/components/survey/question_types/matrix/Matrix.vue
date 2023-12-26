@@ -93,12 +93,10 @@
       @addRow="add"
     >
       <template v-slot:header-cell="{ header }">
-        <a-tooltip top>
-          <template v-slot:activator="{ on }">
-            <span class="flex-grow-1 text-truncate" v-on="on">{{ header.label }}</span>
-          </template>
-          <span>{{ header.type }}: {{ header.label }}</span>
-        </a-tooltip>
+        <span class="flex-grow-1 text-truncate">
+          {{ header.label }}
+          <a-tooltip top activator="parent">{{ header.type }}: {{ header.label }}</a-tooltip>
+        </span>
         <app-redacted v-if="header.redacted" />
         <app-required v-if="header.required" />
       </template>
