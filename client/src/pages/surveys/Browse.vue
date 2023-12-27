@@ -2,7 +2,7 @@
   <div class="wrapper">
     <a-container>
       <a-tabs v-model="activeTab" fixed-tabs>
-        <a-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
+        <a-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name" :value="tab.name">
           <span v-if="tab.name === 'active-group'" class="text-no-wrap">
             {{ activeGroupName }}
           </span>
@@ -61,8 +61,7 @@
             v-if="surveys.content.length > 0"
             v-model="page"
             :length="activeTabPaginationLength"
-            @input="() => getDataForTab(activeTab)"
-          />
+            @input="() => getDataForTab(activeTab)" />
         </a-card-actions>
       </a-card>
     </a-container>

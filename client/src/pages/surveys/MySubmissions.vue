@@ -9,7 +9,7 @@
         </a-btn>
       </a-row>
       <a-row class="d-flex flex-grow-1">
-        <a-tabs :modelValue="activeTab" centered icons-and-text grow @change="updateActiveTab">
+        <a-tabs v-model="activeTab" grow @update:modelValue="updateActiveTab">
           <a-tab href="#drafts" value="drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
               <a-icon class="mr-2">mdi-file-document-edit</a-icon>Drafts
@@ -26,10 +26,9 @@
             v-for="tab in tabs"
             :key="tab.name"
             :value="tab.name"
-            class="flex-grow-1 flex-column align-center justify-center align-content-center"
-          >
+            class="flex-grow-1 flex-column align-center justify-center align-content-center">
             <a-card class="d-flex flex-column justify-space-between background">
-              <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
+              <template v-if="activeTab !== 'sent' && activeTabPageContent.length > 0">
                 <div v-for="(item, i) in activeTabPageContent" :key="i">
                   <a-list-item @click="select(item)" class="cursor-pointer" two-line>
                     <a-card :elevation="3" class="py-3 px-4">
@@ -56,7 +55,7 @@
                   <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey-darken-1" />
                 </a-card-actions>
               </template>
-              <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
+              <div v-else-if="activeTab !== 'sent' && activeTabPageContent.length < 0">
                 <a-row align="center" justify="center">
                   <a-col>
                     <a-alert color="primary" class="black-text" variant="text">No Drafts</a-alert>
@@ -64,7 +63,7 @@
                 </a-row>
               </div>
 
-              <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
+              <template v-else-if="activeTab === 'sent' && tab.content.length > 0">
                 <div v-for="(item, i) in tab.content" :key="i">
                   <a-list-item @click="select(item)" class="cursor-pointer" two-line>
                     <a-card :elevation="3" class="py-3 px-4">
@@ -83,8 +82,7 @@
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
-                  color="grey-darken-1"
-                />
+                  color="grey-darken-1" />
               </template>
               <div v-else>
                 <a-row align="center" justify="center">
@@ -112,16 +110,14 @@
         :dateSubmitted="activeSubmission.meta.dateSubmitted"
         v-model="confirmSubmissionIsVisible"
         @close="handleConfirmSubmissionDialogClose"
-        @submit="() => uploadSubmission(activeSubmission)"
-      />
+        @submit="() => uploadSubmission(activeSubmission)" />
       <submitting-dialog v-model="this.isSubmitting" />
       <result-dialog
         v-model="showResult"
         :items="resultItems"
         @input="handleResultDialogInput"
         title="Result of Submission"
-        persistent
-      />
+        persistent />
     </a-container>
   </div>
 </template>
@@ -317,7 +313,6 @@ export default {
       this.isLoading = false;
     },
     async updateActiveTab(tab) {
-      this.activeTab = tab;
       if (tab === 'sent') {
         await this.fetchRemoteSubmissions();
       }

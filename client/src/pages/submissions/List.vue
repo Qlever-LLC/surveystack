@@ -6,8 +6,7 @@
       maxWidth="50rem"
       labelConfirm="Archive"
       @cancel="showArchiveModal = false"
-      @confirm="(reason) => archiveSubmissions(selected, reason)"
-    >
+      @confirm="(reason) => archiveSubmissions(selected, reason)">
       <template v-slot:title>Confirm Submission Archiving</template>
     </app-submission-archive-dialog>
 
@@ -20,8 +19,7 @@
       v-model="reassignment.showModal"
       @cancel="reassignment.showModal = false"
       @confirm="reassign(selected)"
-      labelConfirm="Reassign"
-    >
+      labelConfirm="Reassign">
       <template v-slot:title>Reassign Submission</template>
       <template>
         <a-select
@@ -31,8 +29,7 @@
           v-model="reassignment.group"
           label="Group"
           :custom-filter="reassignGroupFilter"
-          itemSlot
-        >
+          itemSlot>
           <template v-slot:item="{ props, item }">
             <a-list-item v-bind="props" :title="item.raw.text" :subtitle="item.raw.path"> </a-list-item>
           </template>
@@ -43,8 +40,7 @@
           item-title="text"
           item-value="value"
           v-model="reassignment.user"
-          label="User"
-        />
+          label="User" />
       </template>
     </app-dialog>
 
@@ -61,8 +57,7 @@
             color="secondary"
             class="ml-2"
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
-            @click="startDraft(surveyEntity)"
-          >
+            @click="startDraft(surveyEntity)">
             <a-icon left>mdi-plus</a-icon>
             New submission
           </a-btn>
@@ -80,15 +75,13 @@
               @show-advanced="(ev) => (showAdvancedFilters = ev)"
               :basicFilters="basicFilters"
               @apply-basic-filters="applyBasicFilters"
-              @reset="reset"
-            />
+              @reset="reset" />
             <app-submissions-filter-advanced
               v-if="showAdvancedFilters"
               v-model="filter"
               @show-advanced="(ev) => (showAdvancedFilters = ev)"
               @apply-advanced-filters="fetchData"
-              @reset="reset"
-            />
+              @reset="reset" />
           </a-expansion-panel-text>
         </a-expansion-panel>
       </a-expansion-panels>
@@ -109,8 +102,7 @@
                 item-title="text"
                 item-value="value"
                 hide-details
-                v-model="apiDownloadRange"
-              />
+                v-model="apiDownloadRange" />
             </a-col>
             <a-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
               <a-select
@@ -120,8 +112,7 @@
                 item-title="text"
                 item-value="value"
                 hide-details
-                v-model="apiDownloadExpandAllMatrices"
-              />
+                v-model="apiDownloadExpandAllMatrices" />
             </a-col>
             <a-col md="2" sm="6">
               <a-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </a-btn>
@@ -138,8 +129,7 @@
                 item-value="value"
                 hide-details
                 v-model="pageSize"
-                @update:modelValue="changedPaginationSize"
-              />
+                @update:modelValue="changedPaginationSize" />
             </a-col>
             <a-col cols="10">
               <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
@@ -156,12 +146,16 @@
 
     <a-container>
       <a-tabs v-model="tab">
-        <a-tab v-for="view in views" :key="view.tab">
-          {{ view.tab }}
-        </a-tab>
+        <a-tab v-for="view in views" :key="view.tab" :value="view.component"> {{ view.tab }} </a-tab>
       </a-tabs>
-      <a-window v-model="tab" touchless>
-        <a-window-item>
+      <a-window v-model="tab">
+        <a-window-item v-if="tab === 'tree'">
+          <app-submissions-tree :submissions="submissions" />
+        </a-window-item>
+        <a-window-item v-if="tab === 'raw'">
+          <app-submissions-code :submissions="submissions" />
+        </a-window-item>
+        <a-window-item v-else>
           <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
           <app-submissions-table-client-csv
             :submissions="submissions"
@@ -180,14 +174,7 @@
             @showArchiveModal="showArchiveModal = true"
             @reassignment="reassignment.showModal = true"
             @resubmit="resubmit(selected[0])"
-            @showArchived="filter.showArchived = $event"
-          />
-        </a-window-item>
-        <a-window-item>
-          <app-submissions-tree :submissions="submissions" />
-        </a-window-item>
-        <a-window-item>
-          <app-submissions-code :submissions="submissions" />
+            @showArchived="filter.showArchived = $event" />
         </a-window-item>
       </a-window>
 
@@ -202,8 +189,7 @@
             item-value="value"
             hide-details
             v-model="pageSize"
-            @update:modelValue="changedPaginationSize"
-          />
+            @update:modelValue="changedPaginationSize" />
         </a-col>
         <a-col cols="10">
           <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />

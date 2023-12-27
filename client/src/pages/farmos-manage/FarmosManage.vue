@@ -14,12 +14,12 @@
       errorMessage
     }}</a-alert>
 
-    <a-tabs v-model="tab" background-color="transparent" color="basil" grow>
-      <a-tab v-for="item in items" :key="item.name">{{ item.name }}</a-tab>
+    <a-tabs v-model="tab" @update:modelValue="updateTab" bg-color="transparent" color="basil" grow>
+      <a-tab v-for="item in items" :key="item.name" :value="item.id">{{ item.name }}</a-tab>
     </a-tabs>
 
-    <a-window v-model="tab">
-      <a-window-item v-for="item in items" :key="item.name">
+    <a-window :modelValue="getTab">
+      <a-window-item v-for="item in items" :key="item.name" :value="item.id">
         <component
           @map-group="mapGroup"
           @unmap-group="unmapGroup"
@@ -27,19 +27,19 @@
           @unmap-user="unmapUser"
           @unmap-farm="unmapFarm"
           :plans="plans"
-          :is="item.component"
+          :is="tab.component"
           :groups="groups"
           :mappings="mappings"
           :notes="notes"
           :users="users"
           :loading="loading"
-          :viewModel="item.viewModel || {}"
+          :viewModel="tab.viewModel || {}"
           @check-url="checkUrl"
           @create-instance="createInstance"
           @create-plan="createPlan"
           @delete-plan="deletePlan"
-          @addSuperAdminNote="addSuperAdminNote"
-        ></component>
+          @addSuperAdminNote="addSuperAdminNote">
+        </component>
       </a-window-item>
     </a-window>
 
@@ -129,6 +129,15 @@ export default {
     await this.reload();
   },
   methods: {
+    updateTab(tid) {
+      this.tab = this.items.find(({ id }) => id === tid);
+    },
+    getTab() {
+      if (this.tab === null) {
+        this.tab = this.items[0];
+      }
+      return this.tab;
+    },
     async reload() {
       this.loading = true;
       const { data: notes } = await api.get('/farmos/notes/all');

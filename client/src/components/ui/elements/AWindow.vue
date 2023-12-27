@@ -1,5 +1,5 @@
 <template>
-  <v-window :touchless="touchless" v-model="value" @change="$emit('input', $event)">
+  <v-window v-model="value" @update:modelValue="$emit('update:modelValue', $event)">
     <slot />
   </v-window>
 </template>
@@ -7,10 +7,8 @@
 <script>
 export default {
   props: {
-    touchless: { type: Boolean, default: false },
     modelValue: { type: undefined, required: false },
   },
-  emits: ['input'],
   data() {
     return {
       value: this.modelValue,
