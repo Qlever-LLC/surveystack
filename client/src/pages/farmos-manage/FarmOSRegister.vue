@@ -10,8 +10,7 @@
         :item-title="(g) => `${g.name} (${g.path})`"
         item-value="_id"
         :items="localViewModel.groups"
-        :rules="[(v) => !!v || `select group`]"
-      />
+        :rules="[(v) => !!v || `select group`]" />
 
       <a-select
         variant="outlined"
@@ -21,8 +20,7 @@
         :items="localViewModel.plans"
         :item-title="(p) => `${p.planName}, ${p.planUrl}`"
         item-value="_id"
-        :rules="[(v) => !!v || `select plan`]"
-      />
+        :rules="[(v) => !!v || `select plan`]" />
 
       <a-row class="align-baseline">
         <a-col>
@@ -34,8 +32,7 @@
             :suffix="'.' + planUrl"
             :loading="localViewModel.loading"
             variant="outlined"
-            appendSlot
-          >
+            appendSlot>
             <template v-slot:append>
               <a-icon
                 style="margin-top: -8px"
@@ -63,32 +60,28 @@
         label="E-Mail Address of Primary User"
         placeholder="Farmer's E-Mail"
         variant="outlined"
-        :rules="emailRules"
-      />
+        :rules="emailRules" />
 
       <a-text-field
         v-model="localViewModel.form.fullName"
         label="Full Name of the Farmer"
         placeholder="Farmer's Name"
         variant="outlined"
-        :rules="nameRules"
-      />
+        :rules="nameRules" />
 
       <a-text-field
         v-model="localViewModel.form.farmName"
         label="Name of the Farm"
         placeholder="Farm Name"
         variant="outlined"
-        :rules="nameRules"
-      />
+        :rules="nameRules" />
 
       <a-text-field
         v-model="localViewModel.form.farmAddress"
         label="Farm Address / Location"
         placeholder="123 Fake Street, Exampletown, NY"
         variant="outlined"
-        :rules="addressRules"
-      />
+        :rules="addressRules" />
 
       <a-select
         label="Timezone"
@@ -96,8 +89,7 @@
         :items="timezones"
         v-model="localViewModel.form.timezone"
         :rules="[(v) => !!v || `select time zone`]"
-        return-object
-      />
+        return-object />
 
       <div class="text-left text-secondary">Unit System to use</div>
       <a-radio-group v-model="localViewModel.form.units">
@@ -113,8 +105,7 @@
         :item-title="(item) => `${item.name} (${item.email})`"
         v-model="localViewModel.form.owner"
         :rules="[(v) => !!v || `select at least one owner`]"
-        return-object
-      />
+        return-object />
 
       <!-- WARNING: Is not up to date as it is a comment 
         <a-select
@@ -169,8 +160,7 @@
 
       <app-field-list
         v-if="localViewModel.form.fields.length > 0"
-        v-model="localViewModel.form.fields"
-      ></app-field-list>
+        v-model="localViewModel.form.fields"></app-field-list>
 
       <a-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</a-btn>
 
@@ -180,8 +170,7 @@
         ref="field-creator"
         v-model="field"
         @done="fieldImported"
-        @cancel="cancelFieldImport"
-      ></app-field-creator>
+        @cancel="cancelFieldImport"></app-field-creator>
 
       <a-divider class="my-4" />
 
@@ -197,8 +186,7 @@
       <a-checkbox
         :rules="agreeRules"
         v-model="localViewModel.form.agree"
-        label="Agree to Terms of Serviceand  Privacy Policy of Farmos"
-      />
+        label="Agree to Terms of Serviceand  Privacy Policy of Farmos" />
       <div class="text-left mb-4">
         Visit
         <a href="https://farmier.com/terms" target="blank">Terms of Service</a>
