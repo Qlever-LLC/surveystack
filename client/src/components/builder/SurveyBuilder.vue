@@ -89,7 +89,6 @@
             data-testid="question-library" />
         </div>
       </pane>
-
       <pane class="pane pane-controls" v-if="control">
         <a-card class="px-4 pb-3 m-2 mb-3">
           <control-properties

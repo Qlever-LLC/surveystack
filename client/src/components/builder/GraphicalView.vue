@@ -18,8 +18,7 @@
     @update="onUpdate"
     draggable=".draggable-item"
     :group="draggableGroup"
-    ref="rootDraggable"
-  >
+    ref="rootDraggable">
     <a-card
       v-for="(el, idx) in draggableControls"
       class="control-item mb-2"
@@ -33,20 +32,17 @@
       @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
-      :data-control-contains-page="descendantHasPage(el)"
-    >
+      :data-control-contains-page="descendantHasPage(el)">
       <div
         class="d-flex justify-space-between align-center"
         @mouseover.stop="handleCardHoverChange({ control: el, isHovering: true })"
-        @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })"
-      >
+        @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })">
         <control-card-header
           v-if="!el.options.hidden"
           :index="displayIndex(createIndex(index, idx + 1))"
           :title="getDisplay(el)"
           :type="el.type"
-          :dataName="el.name"
-        />
+          :dataName="el.name" />
         <div class="text-grey-darken-1" v-if="el.options.hidden">
           {{ displayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
         </div>
@@ -57,8 +53,7 @@
           <a-btn
             icon
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-            @mousedown.stop="toggleLibrary(el.libraryId)"
-          >
+            @mousedown.stop="toggleLibrary(el.libraryId)">
             <a-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</a-icon>
           </a-btn>
           <a-chip
@@ -78,13 +73,11 @@
                 : availableLibraryUpdates[el.libraryId]
                   ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
                   : 'newest available version'
-            "
-          >
+            ">
             <a-icon
               v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
               @click.stop="$emit('update-library-control', el)"
-              left
-            >
+              left>
               mdi-refresh
             </a-icon>
             Version {{ el.libraryVersion }}
@@ -92,8 +85,7 @@
           <a-btn
             icon
             v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
-            @click.stop="() => showDeleteModal(idx)"
-          >
+            @click.stop="() => showDeleteModal(idx)">
             <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey-lighten-1'">
               mdi-delete
             </a-icon>
@@ -104,8 +96,7 @@
             v-if="el.options.hidden"
             @click.stop="$emit('unhide-control', el)"
             color="grey-lighten-1"
-            style="margin-bottom: -8px"
-          >
+            style="margin-bottom: -8px">
             unhide
           </a-btn>
           <a-btn
@@ -114,8 +105,7 @@
             v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
             @click.stop="$emit('hide-control', el)"
             color="grey-lighten-1"
-            class="mb-4"
-          >
+            class="mb-4">
             hide
           </a-btn>
         </div>
@@ -140,8 +130,7 @@
         @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
         :data-control-type="el.type"
-        :data-control-contains-page="descendantHasPage(el)"
-      />
+        :data-control-contains-page="descendantHasPage(el)" />
 
       <nested-draggable
         v-if="el.type == 'page' && !el.options.hidden"
@@ -162,8 +151,7 @@
         @unhide-control="$emit('unhide-control', $event)"
         :data-control-type="el.type"
         :data-control-contains-page="descendantHasPage(el)"
-        :index="createIndex(index, idx + 1)"
-      />
+        :index="createIndex(index, idx + 1)" />
     </a-card>
 
     <a-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
