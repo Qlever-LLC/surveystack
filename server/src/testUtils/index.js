@@ -168,9 +168,9 @@ export const createScript = async ({ group }) => {
     'farmOsPlanting' |
     'farmOsFarm' |
     'geoJSON'
-  } | *[] controls
+  }[] controls
 */
-export const createSurvey = async (control = '', overrides = {}) => {
+export const createSurvey = async (controls = [], overrides = {}) => {
   const now = new Date();
   const group = await createGroup();
   const surveyDoc = {
@@ -244,11 +244,6 @@ export const createSurvey = async (control = '', overrides = {}) => {
   };
 
   const controlDocs = [];
-  const controls = Array.isArray(control)
-    ? control
-    : typeof control === 'string' && control
-    ? [control]
-    : [];
 
   controls.forEach((ctrl, index) => {
     const controlGenerator = getControlGenerator(ctrl);

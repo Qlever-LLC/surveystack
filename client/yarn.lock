@@ -2620,7 +2620,7 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@our-sci/farmos-map@^2.3.7":
+"@our-sci/farmos-map@2.3.7":
   version "2.3.7"
   resolved "https://gitlab.com/api/v4/projects/48349961/packages/npm/@our-sci/farmos-map/-/@our-sci/farmos-map-2.3.7.tgz#e739ebcb78526fb458023ff6c89f5e7515a8e21f"
   integrity sha1-5znry3hSb7RYAj/2yJ9edRWo4h8=
