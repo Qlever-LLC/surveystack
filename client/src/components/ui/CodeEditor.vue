@@ -32,15 +32,15 @@
 
         <a-spacer />
         <a-icon v-if="saveable" class="mr-4" @click="$emit('save', code)">mdi-content-save</a-icon>
-        <a-btn class="mr-2" variant="outlined" color="white" v-if="examples" @click="$emit('examples')">
+        <a-btn class="mr-2" variant="outlined" v-if="examples" @click="$emit('examples')">
           <a-icon left>mdi-code-braces</a-icon>Examples
         </a-btn>
-        <a-btn class="mr-2" variant="outlined" color="white" v-if="runnable" @click="$emit('run', code)">
+        <a-btn class="mr-2" variant="outlined" v-if="runnable" @click="$emit('run', code)">
           <a-icon left>mdi-play</a-icon> Run
         </a-btn>
         <a-icon v-if="$attrs.onClose" @click="$emit('close')">mdi-close-circle-outline</a-icon>
       </a-card-title>
-      <div class="error red text-white pa-2" v-if="error">{{ error }}</div>
+      <div class="error text-red pa-2" v-if="error">{{ error }}</div>
       <code-view
         :modelValue="code"
         :read-only="readonly"
