@@ -130,14 +130,11 @@
           <pane size="80">
             <div style="height: 100%">
               <a-tabs v-if="control.options" v-model="selectedTab">
-                <a-tab :disabled="!control.options.relevance.enabled" value="relevance"> Relevance</a-tab>
-                <a-tab :disabled="!control.options.initialize.enabled" value="initialize"> Initialize</a-tab>
-                <a-tab :disabled="!control.options.calculate.enabled" value="calculate"> Calculate</a-tab>
-                <a-tab :disabled="!control.options.constraint.enabled" value="constraint"> Constraint</a-tab>
-                <a-tab
-                  v-if="control.options.apiCompose"
-                  :disabled="!control.options.apiCompose.enabled"
-                  value="apiCompose">
+                <a-tab :disabled="!control.options.relevance.enabled"> Relevance</a-tab>
+                <a-tab :disabled="!control.options.initialize.enabled"> Initialize</a-tab>
+                <a-tab :disabled="!control.options.calculate.enabled"> Calculate</a-tab>
+                <a-tab :disabled="!control.options.constraint.enabled"> Constraint</a-tab>
+                <a-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
                 </a-tab>
                 <a-tab v-if="control.type === 'script'"> Script</a-tab>

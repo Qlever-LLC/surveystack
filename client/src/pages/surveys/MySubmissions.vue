@@ -28,7 +28,7 @@
             :value="tab.name"
             class="flex-grow-1 flex-column align-center justify-center align-content-center">
             <a-card class="d-flex flex-column justify-space-between background">
-              <template v-if="activeTab !== 'sent' && activeTabPageContent.length > 0">
+              <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <div v-for="(item, i) in activeTabPageContent" :key="i">
                   <a-list-item @click="select(item)" class="cursor-pointer" two-line>
                     <a-card :elevation="3" class="py-3 px-4">
@@ -55,7 +55,7 @@
                   <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey-darken-1" />
                 </a-card-actions>
               </template>
-              <div v-else-if="activeTab !== 'sent' && activeTabPageContent.length < 0">
+              <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
                 <a-row align="center" justify="center">
                   <a-col>
                     <a-alert color="primary" class="black-text" variant="text">No Drafts</a-alert>
@@ -63,7 +63,7 @@
                 </a-row>
               </div>
 
-              <template v-else-if="activeTab === 'sent' && tab.content.length > 0">
+              <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <div v-for="(item, i) in tab.content" :key="i">
                   <a-list-item @click="select(item)" class="cursor-pointer" two-line>
                     <a-card :elevation="3" class="py-3 px-4">

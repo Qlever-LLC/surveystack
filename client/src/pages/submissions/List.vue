@@ -146,16 +146,12 @@
 
     <a-container>
       <a-tabs v-model="tab">
-        <a-tab v-for="view in views" :key="view.tab" :value="view.component"> {{ view.tab }} </a-tab>
+        <a-tab v-for="view in views" :key="view.tab">
+          {{ view.tab }}
+        </a-tab>
       </a-tabs>
-      <a-window v-model="tab">
-        <a-window-item v-if="tab === 'tree'">
-          <app-submissions-tree :submissions="submissions" />
-        </a-window-item>
-        <a-window-item v-if="tab === 'raw'">
-          <app-submissions-code :submissions="submissions" />
-        </a-window-item>
-        <a-window-item v-else>
+      <a-window v-model="tab" touchless>
+        <a-window-item>
           <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
           <app-submissions-table-client-csv
             :submissions="submissions"
@@ -175,6 +171,12 @@
             @reassignment="reassignment.showModal = true"
             @resubmit="resubmit(selected[0])"
             @showArchived="filter.showArchived = $event" />
+        </a-window-item>
+        <a-window-item>
+          <app-submissions-tree :submissions="submissions" />
+        </a-window-item>
+        <a-window-item>
+          <app-submissions-code :submissions="submissions" />
         </a-window-item>
       </a-window>
 

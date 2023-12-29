@@ -9,10 +9,10 @@ export default {
   props: {
     modelValue: { type: undefined, required: false },
   },
-  data() {
-    return {
-      value: this.modelValue,
-    };
+  computed: {
+    value() {
+      return this.modelValue;
+    },
   },
 };
 </script>

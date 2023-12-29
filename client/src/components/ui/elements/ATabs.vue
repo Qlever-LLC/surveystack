@@ -1,6 +1,6 @@
 <template>
   <v-tabs
-    v-model="value"
+    :modelValue="modelValue"
     @update:modelValue="$emit('update:modelValue', $event)"
     :bg-color="bgColor"
     :color="color"
@@ -19,11 +19,6 @@ export default {
     fixedTabs: { type: Boolean, required: false },
     grow: { type: Boolean, required: false },
     modelValue: { type: undefined, required: false },
-  },
-  data() {
-    return {
-      value: this.modelValue,
-    };
   },
 };
 </script>
