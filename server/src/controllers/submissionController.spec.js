@@ -69,7 +69,7 @@ async function mockControlsAndSubmission() {
 describe('submissionController', () => {
   describe('getSubmissionsCsv', () => {
     it('returns expected CSV for geojson question type', async () => {
-      const { survey, createSubmission } = await createSurvey('geoJSON');
+      const { survey, createSubmission } = await createSurvey(['geoJSON']);
       const { submission } = await createSubmission();
       const mockReq = createReq({ query: { showCsvMeta: 'true', survey: survey._id } });
       const mockRes = await createRes();
@@ -199,7 +199,7 @@ describe('submissionController', () => {
     let survey, submission;
 
     beforeEach(async () => {
-      const { survey: _survey, createSubmission } = await createSurvey('text');
+      const { survey: _survey, createSubmission } = await createSurvey(['text']);
       const { submission: _submission } = await createSubmission();
       survey = _survey;
       submission = _submission;
