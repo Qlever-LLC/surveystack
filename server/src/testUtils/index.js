@@ -1,5 +1,4 @@
 import getSubmissionDataGenerator from './submissionData';
-import getSubmissionHeadersGenerator from './submissionHeader';
 import getControlGenerator from './surveyControls';
 
 const crypto = jest.requireActual('crypto');
@@ -168,9 +167,9 @@ export const createScript = async ({ group }) => {
     'farmOsPlanting' |
     'farmOsFarm' |
     'geoJSON'
-  } | *[] controls
+  }[] controls
 */
-export const createSurvey = async (control = '', overrides = {}) => {
+export const createSurvey = async (controls = [], overrides = {}) => {
   const now = new Date();
   const group = await createGroup();
   const surveyDoc = {
@@ -244,11 +243,6 @@ export const createSurvey = async (control = '', overrides = {}) => {
   };
 
   const controlDocs = [];
-  const controls = Array.isArray(control)
-    ? control
-    : typeof control === 'string' && control
-    ? [control]
-    : [];
 
   controls.forEach((ctrl, index) => {
     const controlGenerator = getControlGenerator(ctrl);
@@ -275,34 +269,11 @@ export const createSurvey = async (control = '', overrides = {}) => {
 
   const createSubmission = async (_overrides = {}) => {
     let data = {};
-    const headers = [
-      '_id',
-      'meta.dateCreated',
-      'meta.dateModified',
-      'meta.dateSubmitted',
-      'meta.survey.id',
-      'meta.survey.name',
-      'meta.survey.version',
-      'meta.revision',
-      'meta.permissions',
-      'meta.status.0.type',
-      'meta.status.0.value.at',
-      'meta.group.id',
-      'meta.group.path',
-      'meta.specVersion',
-      'meta.creator',
-      'meta.permanentResults',
-    ];
 
     controls.forEach((ctrl, index) => {
       const dataGenerator = getSubmissionDataGenerator(ctrl);
       if (typeof dataGenerator === 'function') {
         data = { ...data, ...dataGenerator({}, index + 1) };
-      }
-
-      const headersGenerator = getSubmissionHeadersGenerator(ctrl);
-      if (typeof headersGenerator === 'function') {
-        headers.push(...headersGenerator(index + 1));
       }
     });
 
@@ -342,7 +313,6 @@ export const createSurvey = async (control = '', overrides = {}) => {
 
     return {
       submission,
-      headers,
     };
   };
 
@@ -394,4 +364,4 @@ export const createRes = async ({ user = null } = {}) => ({
   _headers: {},
 });
 
-export { getSubmissionDataGenerator, getSubmissionHeadersGenerator, getControlGenerator };
+export { getSubmissionDataGenerator, getControlGenerator };
