@@ -10,8 +10,7 @@
         clearable
         hide-details
         readonly
-        :disabled="getDisabled"
-      />
+        :disabled="getDisabled" />
     </template>
 
     <a-card>
@@ -26,11 +25,10 @@
             :label="item.label"
             :selected-item="item.value"
             class="mt-2"
-            hide-details
-          />
+            hide-details />
           <a-checkbox v-if="custom" v-model="selected" label="other" selected-item="other" class="mt-2" hide-details />
         </div>
-        <a-radio-group v-else :value="selected ? selected[0] : null" @input="selected = [$event]">
+        <a-radio-group v-else :modelValue="selected ? selected[0] : null" @update:modelValue="selected = [$event]">
           <a-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
           <a-radio v-if="custom" label="other" value="other" />
         </a-radio-group>
