@@ -19,8 +19,7 @@
       multi-sort
       disable-pagination
       :hide-default-header="headers.length === 0"
-      hide-default-footer
-    >
+      hide-default-footer>
       <template v-slot:top>
         <a-toolbar flat class="my-5" cssBackgroundCream>
           <a-row>
@@ -28,23 +27,20 @@
               <div class="d-flex justify-space-between align-center">
                 <div class="d-flex justify-space-between align-center mt-5">
                   <a-switch
-                    :value="!excludeMeta"
-                    @input="$emit('excludeMetaChange', $event)"
+                    :modelValue="!excludeMeta"
+                    @update:modelValue="$emit('excludeMetaChange', $event)"
                     label="Show metadata"
-                    class="mt-2"
-                  />
+                    class="mt-2" />
                   <a-switch
-                    :value="archived"
-                    @input="$emit('showArchived', $event)"
+                    :modelValue="archived"
+                    @update:modelValue="$emit('showArchived', $event)"
                     label="View archived only"
-                    class="mt-2 ml-5"
-                  />
+                    class="mt-2 ml-5" />
                   <a-switch
-                    :value="isExpandMatrix"
-                    @input="isExpandMatrix = $event"
+                    :modelValue="isExpandMatrix"
+                    @update:modelValue="isExpandMatrix = $event"
                     label="Expand matrix questions"
-                    class="mt-2 ml-5"
-                  />
+                    class="mt-2 ml-5" />
                 </div>
                 <div class="d-flex align-center" v-if="selected.length > 0">
                   <div>
@@ -56,16 +52,14 @@
                       :disabled="actionsAreDisabled"
                       color="error"
                       text
-                      @click="$emit('showDeleteModal', $event)"
-                    >
+                      @click="$emit('showDeleteModal', $event)">
                       DELETE
                     </a-btn>
                     <a-btn
                       v-if="selected[0]['meta.archived'] === 'true'"
                       :disabled="actionsAreDisabled"
                       text
-                      @click="$emit('archiveSubmissions', $event)"
-                    >
+                      @click="$emit('archiveSubmissions', $event)">
                       RESTORE
                     </a-btn>
                     <a-btn
@@ -73,8 +67,7 @@
                       :disabled="actionsAreDisabled"
                       color="error"
                       text
-                      @click="$emit('showArchiveModal', $event)"
-                    >
+                      @click="$emit('showArchiveModal', $event)">
                       ARCHIVE
                     </a-btn>
                     <a-btn
@@ -89,8 +82,7 @@
                       :disabled="actionsAreDisabled"
                       text
                       color="primary"
-                      @click="$emit('resubmit', $event)"
-                    >
+                      @click="$emit('resubmit', $event)">
                       RESUBMIT
                     </a-btn>
                   </div>
@@ -109,15 +101,13 @@
           color="#777"
           class="custom-checkbox"
           hide-details
-          role="checkbox"
-        />
+          role="checkbox" />
       </template>
 
       <template v-for="header in headers" :key="header.value" v-slot:[`header.${header.value}`]>
         <span
           @click.stop="openModal($event, [header.text, -1, header.value])"
-          :class="{ activeHeader: isModalOpen([header.text, -1, header.value]) }"
-        >
+          :class="{ activeHeader: isModalOpen([header.text, -1, header.value]) }">
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
             {{ header.text }}
           </div>
@@ -134,8 +124,7 @@
               color="#777"
               class="custom-checkbox"
               hide-details
-              role="checkbox"
-            />
+              role="checkbox" />
           </td>
           <td
             v-for="header in headers"
@@ -144,23 +133,20 @@
             :class="{
               active: isModalOpen([getCellValue(item, header.value), index, header.value]),
               'expand-cell': isExpandMatrix,
-            }"
-          >
+            }">
             <table v-if="Array.isArray(item[header.value])" width="100%" cellSpacing="0" class="mt-6">
               <tr
                 v-for="(child, i) in item[header.value]"
                 :key="i"
                 :class="{
                   'last-row': item[header.value].length === item.count,
-                }"
-              >
+                }">
                 <td
                   class="matrix-cell"
                   :class="{
                     active: isModalOpen([child, index, header.value, i]),
                   }"
-                  @click.stop="openModal($event, [getCellValue(child), index, header.value, i], true)"
-                >
+                  @click.stop="openModal($event, [getCellValue(child), index, header.value, i], true)">
                   <div :class="{ truncate: shouldTruncate(child) }">
                     {{ getCellValue(child) }}
                   </div>
@@ -169,8 +155,7 @@
             </table>
             <div
               v-else-if="item[header.value].includes('resources/')"
-              :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
-            >
+              :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }">
               <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
             </div>
             <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
@@ -187,8 +172,7 @@
       :left="modalLeftPosition"
       :top="modalTopPosition"
       :showCopyButton="modalShowCopyButton"
-      @close="closeModal"
-    />
+      @close="closeModal" />
 
     <a-dialog :modelValue="downloadingResource" persistent width="300" role="downloadingResourceProgressDialog">
       <a-card>

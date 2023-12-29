@@ -22,8 +22,7 @@
           v-if="isOpen"
           @click.stop=""
           v-model="showChangesOnly"
-          label="changes only"
-        />
+          label="changes only" />
       </a-expansion-panel-title>
       <a-expansion-panel-text>
         <survey-diff-card-tree
@@ -31,8 +30,7 @@
           :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
           :version-name-remote-revision-old="versionNameRemoteRevisionOld"
           :version-name-remote-revision-new="versionNameRemoteRevisionNew"
-          @discard-changed="discardChanged"
-        />
+          @discard-changed="discardChanged" />
       </a-expansion-panel-text>
     </a-expansion-panel>
   </a-expansion-panels>

@@ -1,16 +1,20 @@
 <template>
-  <v-switch :input-value="value" :label="label" :hide-details="hideDetails" @change="$emit('input', $event)" />
+  <v-switch
+    :modelValue="modelValue"
+    :label="label"
+    :hide-details="hideDetails"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    color="primary" />
 </template>
 
 <script>
 export default {
   name: 'ASwitch',
   props: {
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
     label: { type: String, required: false },
     hideDetails: { type: [Boolean, String], required: false },
   },
-  emits: ['input'],
 };
 </script>
 
