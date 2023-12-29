@@ -6,7 +6,7 @@
 
         <a-card-text>
           <div v-for="(item, idx) in messages" :key="idx">
-            <a-card theme="dark" variant="outlined" class="mb-2" :color="item.error ? 'red-darken-4' : 'green'">
+            <a-card variant="outlined" class="mb-2" :color="item.error ? 'red-darken-4' : 'green'">
               <a-card-text class="text-white">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </a-card-text>
@@ -32,8 +32,7 @@
                         <a-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
                           :key="i"
-                          :readonly="!item.data"
-                        >
+                          :readonly="!item.data">
                           <a-expansion-panel-title>
                             <template v-slot:actions v-if="!item.data"><a-spacer /> </template>
                             <div class="mr-4 flex-grow-0">

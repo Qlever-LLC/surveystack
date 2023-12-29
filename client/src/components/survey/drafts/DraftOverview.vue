@@ -34,19 +34,16 @@
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :icon="display.icon"
           :color="display.color"
-          :hide-dot="display.hidden"
-        >
+          :hide-dot="display.hidden">
           <a-card
             v-if="display.relevant || !display.hidden"
             @click="$emit('goto', display.path)"
             :color="display.background"
-            :theme="'dark' ?? display.dark"
             :style="{
               opacity: display.relevant ? 1.0 : 0.5,
               'border-left': display.active ? '4px solid green !important' : '',
             }"
-            class="pb-1"
-          >
+            class="pb-1">
             <!-- title -->
             <a-card-title class="d-block mb-0 pb-0">
               <div class="d-flex flex-row align-baseline">
@@ -57,8 +54,7 @@
                   class="ml-2 mb-0 flex-grow-1"
                   :value="display.label"
                   :redacted="display.redacted"
-                  :required="display.required"
-                />
+                  :required="display.required" />
               </div>
             </a-card-title>
 
@@ -74,8 +70,7 @@
               <div
                 class="d-flex"
                 style="max-width: 99%; position: absolute"
-                @click.stop="display.ellipsis = !display.ellipsis"
-              >
+                @click.stop="display.ellipsis = !display.ellipsis">
                 <div class="overview-value overview-value-ellipsis">
                   {{ display.value }}
                 </div>
@@ -245,7 +240,6 @@ export default {
           color: icon[1],
           questionNumber,
           background,
-          dark: false,
           relevant,
           hidden: !relevant,
           collate,

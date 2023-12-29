@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-dialog v-model="show" max-width="350">
-      <a-card class="pa-4" theme="dark" color="red">
+      <a-card class="pa-4" color="red">
         <a-card-title class="headline">{{ title }}</a-card-title>
         <template v-for="(error, idx) in errors" :key="'error_' + idx">
           <div>

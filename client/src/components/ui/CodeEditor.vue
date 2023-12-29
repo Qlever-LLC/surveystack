@@ -1,6 +1,6 @@
 <template>
   <div class="full">
-    <a-card theme="dark" color="dark-blue-lighten-2" class="card-height">
+    <a-card color="dark-blue-lighten-2" class="card-height">
       <a-card-title
         >{{ title || '' }}
 
