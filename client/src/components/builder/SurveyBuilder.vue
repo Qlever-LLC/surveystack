@@ -121,7 +121,6 @@
           @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
-          :refresh="codeRefreshCounter"
           @change="updateScriptCode"
           @save="saveScript">
         </code-editor>
@@ -151,7 +150,6 @@
                 :code="activeCode"
                 :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
                 class="main-code-editor"
-                :refresh="codeRefreshCounter"
                 runnable="true"
                 :error="codeError"
                 @run="runCode"
@@ -346,7 +344,6 @@ export default {
       scriptCode: null,
       // survey entity
       surveyUnderWork: this.survey,
-      codeRefreshCounter: 0,
       submissionCode: '',
       instance: null,
       initialSurvey: cloneDeep(this.survey),
