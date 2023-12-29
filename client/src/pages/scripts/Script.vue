@@ -8,7 +8,7 @@
     <h1>{{ entity.name }}</h1>
     <div class="text-secondary mb-2">{{ entity._id }}</div>
 
-    <code-editor title="" class="code-editor" readonly="true" :code="this.entity.content" />
+    <code-editor title="" class="code-editor" :readonly="true" :code="this.entity.content" />
   </a-container>
 </template>
 
