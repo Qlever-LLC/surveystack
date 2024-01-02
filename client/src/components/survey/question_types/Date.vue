@@ -71,7 +71,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
-  props: { centered: { type: Boolean, default: true }, value: { type: String } },
+  props: { centered: { type: Boolean, default: true } },
   data() {
     return {
       datePickerIsVisible: false,
