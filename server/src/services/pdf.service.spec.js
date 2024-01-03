@@ -14,7 +14,7 @@ describe('pdf.service', () => {
       'group',
       'instructions',
       'instructionsImageSplit',
-      'text',
+      'string',
       'number',
       'date',
       'location',
@@ -199,7 +199,7 @@ describe('pdf.service', () => {
     describe('getValidControls', () => {
       it('should always exclude hidden controls', () => {
         const controls = [
-          getControlGenerator('text')(),
+          getControlGenerator('string')(),
           getControlGenerator('number')(),
           {
             ...getControlGenerator('group')(),
@@ -212,7 +212,7 @@ describe('pdf.service', () => {
 
       it('should exclude instructions/instructionsImageSplit questions when `survey.meta.printOptions.showInstruction=false` if submitted PDF', () => {
         const controls = [
-          getControlGenerator('text')(),
+          getControlGenerator('string')(),
           getControlGenerator('instructions')(),
           getControlGenerator('instructionsImageSplit')(),
         ];
@@ -226,7 +226,7 @@ describe('pdf.service', () => {
 
       it('should always exclude the questions of `meta.relevant=false` if submitted PDF', () => {
         const controls = [
-          getControlGenerator('text')({ name: 'text_5' }),
+          getControlGenerator('string')({ name: 'text_5' }),
           getControlGenerator('number')({ name: 'number_6' }),
           getControlGenerator('date')({ name: 'date_7' }),
         ];
@@ -246,7 +246,7 @@ describe('pdf.service', () => {
         const controls = [
           getControlGenerator('instructions')({ name: 'instructions_3' }),
           getControlGenerator('instructionsImageSplit')({ name: 'instructions_split_4' }),
-          getControlGenerator('text')({ name: 'text_5' }),
+          getControlGenerator('string')({ name: 'text_5' }),
           getControlGenerator('number')({ name: 'number_6' }),
         ];
         const surveyEntity = cloneDeep(survey);
