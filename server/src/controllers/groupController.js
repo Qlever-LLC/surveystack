@@ -258,7 +258,7 @@ const updateGroup = async (req, res) => {
       { _id: entity._id },
       { $set: { ...entity } },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
 

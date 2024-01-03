@@ -227,7 +227,7 @@ const resendInvitation = async (req, res) => {
     .findOneAndUpdate(
       { _id: membership._id },
       { $set: { 'meta.dateSent': new Date() } },
-      { returnOriginal: false }
+      { returnDocument: 'after' }
     );
   return res.send(updated.value);
 };
@@ -248,7 +248,7 @@ const updateMembership = async (req, res) => {
   try {
     let updated = await db
       .collection(col)
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: update }, { returnOriginal: false });
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: update }, { returnDocument: 'after' });
     return res.send(updated);
   } catch (err) {
     console.log(err);

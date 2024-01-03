@@ -208,7 +208,7 @@ const migrateLibraryIds = async () => {
       { _id: new ObjectId(survey._id) },
       { $set: survey },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
 
@@ -258,7 +258,7 @@ const migrateResourceLibraryIds = async () => {
       { _id: new ObjectId(survey._id) },
       { $set: survey },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
 
@@ -346,7 +346,7 @@ const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 6 } },
-          { returnOriginal: false }
+          { returnDocument: 'after' }
         );
 
       continue;
@@ -359,7 +359,7 @@ const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnOriginal: false }
+        { returnDocument: 'after' }
       );
 
     modifiedCount++;
@@ -427,7 +427,7 @@ const migrateSurveyOntologyOptions_VXtoV7 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 7 } },
-          { returnOriginal: false }
+          { returnDocument: 'after' }
         );
 
       continue;
@@ -440,7 +440,7 @@ const migrateSurveyOntologyOptions_VXtoV7 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnOriginal: false }
+        { returnDocument: 'after' }
       );
 
     modifiedCount++;
@@ -527,7 +527,7 @@ const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 9 } },
-          { returnOriginal: false }
+          { returnDocument: 'after' }
         );
 
       continue;
@@ -540,7 +540,7 @@ const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnOriginal: false }
+        { returnDocument: 'after' }
       );
 
     modifiedCount++;

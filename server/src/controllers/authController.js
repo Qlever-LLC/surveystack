@@ -160,7 +160,7 @@ const resetPassword = async (req, res) => {
       { _id: existingUser._id },
       { $set: { password: hash, token: uuidv4() } },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
     return res.send(updated);
