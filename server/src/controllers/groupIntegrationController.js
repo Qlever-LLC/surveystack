@@ -92,7 +92,7 @@ const updateIntegration = async (req, res) => {
       { _id: new ObjectId(id) },
       { $set: entity },
       {
-        returnDocument: 'after',
+        returnOriginal: false,
       }
     );
     return res.send(updated);

@@ -957,7 +957,7 @@ const updateSubmission = async (req, res) => {
     { _id: new ObjectId(id) },
     { $set: updateOperation },
     {
-      returnDocument: 'after',
+      returnOriginal: false,
     }
   );
 
@@ -1177,7 +1177,7 @@ const reassignSubmission = async (req, res) => {
     .findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: updateOperation },
-      { returnDocument: 'after' }
+      { returnOriginal: false }
     );
   return res.send({ ...updated.value, ...apiComposeResults });
 };

@@ -102,7 +102,7 @@ async function mockControlsAndSubmission(
     { _id: survey._id },
     { $set: survey },
     {
-      returnDocument: 'after',
+      returnOriginal: false,
     }
   );
 
@@ -451,7 +451,7 @@ describe('surveyController', () => {
           { _id: librarySurvey._id },
           { $set: librarySurvey },
           {
-            returnDocument: 'after',
+            returnOriginal: false,
           }
         );
         const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -522,7 +522,7 @@ describe('surveyController', () => {
           { _id: submissionToDel._id },
           { $set: submissionToDel },
           {
-            returnDocument: 'after',
+            returnOriginal: false,
           }
         );
 
@@ -540,7 +540,7 @@ describe('surveyController', () => {
           { _id: submissionToDel._id },
           { $set: submissionToDel },
           {
-            returnDocument: 'after',
+            returnOriginal: false,
           }
         );
 
@@ -558,7 +558,7 @@ describe('surveyController', () => {
           { _id: submissionToDel._id },
           { $set: submissionToDel },
           {
-            returnDocument: 'after',
+            returnOriginal: false,
           }
         );
 

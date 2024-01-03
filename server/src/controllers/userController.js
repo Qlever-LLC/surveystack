@@ -271,7 +271,7 @@ const updateUser = async (req, res) => {
       .findOneAndUpdate(
         { _id: new ObjectId(id) },
         { $set: updatedUser },
-        { returnDocument: 'after' }
+        { returnOriginal: false }
       );
     return res.send(updated);
   } catch (err) {

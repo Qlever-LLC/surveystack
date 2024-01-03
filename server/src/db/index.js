@@ -21,11 +21,7 @@ export const COLL_GROUPS_HYLO_MAPPINGS = 'groups.hylo-mappings'; // TODO rename 
 const connectDatabase = async () => {
   const url = process.env.DATABASE_URL;
   const dbName = process.env.DATABASE_NAME;
-  mongoClient = new MongoClient(url, {
-    poolSize: 10,
-    useNewUrlParser: true,
-    useUnifiedTopology: true, //[MONGODB DRIVER] Warning: Current Server Discovery and Monitoring engine is deprecated
-  });
+  mongoClient = new MongoClient(url, { poolSize: 10, useNewUrlParser: true });
   await mongoClient.connect();
   db = mongoClient.db(dbName);
   await db.collection('users').createIndex({ email: 1 }, { unique: true });
@@ -208,7 +204,7 @@ const migrateLibraryIds = async () => {
       { _id: new ObjectId(survey._id) },
       { $set: survey },
       {
-        returnDocument: 'after',
+        returnOriginal: false,
       }
     );
 
@@ -258,7 +254,7 @@ const migrateResourceLibraryIds = async () => {
       { _id: new ObjectId(survey._id) },
       { $set: survey },
       {
-        returnDocument: 'after',
+        returnOriginal: false,
       }
     );
 
@@ -346,7 +342,7 @@ const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 6 } },
-          { returnDocument: 'after' }
+          { returnOriginal: false }
         );
 
       continue;
@@ -359,7 +355,7 @@ const migrateSurveyControlPrintLayout_VXtoV6 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnDocument: 'after' }
+        { returnOriginal: false }
       );
 
     modifiedCount++;
@@ -427,7 +423,7 @@ const migrateSurveyOntologyOptions_VXtoV7 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 7 } },
-          { returnDocument: 'after' }
+          { returnOriginal: false }
         );
 
       continue;
@@ -440,7 +436,7 @@ const migrateSurveyOntologyOptions_VXtoV7 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnDocument: 'after' }
+        { returnOriginal: false }
       );
 
     modifiedCount++;
@@ -527,7 +523,7 @@ const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
         .findOneAndUpdate(
           { _id: new ObjectId(survey._id) },
           { $set: { 'meta.specVersion': 9 } },
-          { returnDocument: 'after' }
+          { returnOriginal: false }
         );
 
       continue;
@@ -540,7 +536,7 @@ const migrateSurveyControlPrintLayout_VXtoV9 = async () => {
       .findOneAndUpdate(
         { _id: new ObjectId(survey._id) },
         { $set: survey },
-        { returnDocument: 'after' }
+        { returnOriginal: false }
       );
 
     modifiedCount++;

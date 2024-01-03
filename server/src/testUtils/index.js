@@ -120,7 +120,7 @@ export const setRole = async (membershipId, role) => {
     { _id: membershipId },
     { $set: { role } },
     {
-      returnDocument: 'after',
+      returnOriginal: false,
     }
   );
 };

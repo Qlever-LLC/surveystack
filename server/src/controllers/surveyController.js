@@ -573,7 +573,7 @@ const updateSurvey = async (req, res) => {
       { _id: new ObjectId(id) },
       { $set: entity },
       {
-        returnDocument: 'after',
+        returnOriginal: false,
       }
     );
     return res.send(updated);
@@ -798,7 +798,7 @@ const cleanupSurvey = async (req, res) => {
               revisions: filteredSurveyRevisions,
             },
           },
-          { returnDocument: 'after' }
+          { returnOriginal: false }
         );
         await deleteArchivedTestSubmissions(
           id,
