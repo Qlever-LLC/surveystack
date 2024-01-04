@@ -280,7 +280,10 @@ describe('SubmissionTableClientCsv', () => {
 
   describe('transformMatrixHeaders', () => {
     it('collapses matrix question type', () => {
-      const expected = mockHeaders('matrix');
+      const expected = {
+        headers: mockHeaders('matrix'),
+        matrixHeaders: ['data.matrix_1.value'],
+      };
       expect(transformMatrixHeaders(mockHeaders(), mockSubmissions().content)).toEqual(expected);
     });
 
@@ -370,27 +373,30 @@ describe('SubmissionTableClientCsv', () => {
           },
         },
       ];
-      const expected = [
-        '_id',
-        'meta.dateCreated',
-        'meta.dateModified',
-        'meta.dateSubmitted',
-        'meta.survey.id',
-        'meta.survey.name',
-        'meta.survey.version',
-        'meta.revision',
-        'meta.permissions',
-        'meta.status.0.type',
-        'meta.status.0.value.at',
-        'meta.group.id',
-        'meta.group.path',
-        'meta.specVersion',
-        'meta.creator',
-        'meta.permanentResults',
-        'data.page_1.text_2.value',
-        'data.page_1.matrix_3.value',
-        'data.page_1.matrix_4.value',
-      ];
+      const expected = {
+        headers: [
+          '_id',
+          'meta.dateCreated',
+          'meta.dateModified',
+          'meta.dateSubmitted',
+          'meta.survey.id',
+          'meta.survey.name',
+          'meta.survey.version',
+          'meta.revision',
+          'meta.permissions',
+          'meta.status.0.type',
+          'meta.status.0.value.at',
+          'meta.group.id',
+          'meta.group.path',
+          'meta.specVersion',
+          'meta.creator',
+          'meta.permanentResults',
+          'data.page_1.text_2.value',
+          'data.page_1.matrix_3.value',
+          'data.page_1.matrix_4.value',
+        ],
+        matrixHeaders: ['data.page_1.matrix_3.value', 'data.page_1.matrix_4.value'],
+      };
       expect(transformMatrixHeaders(headers, data)).toEqual(expected);
     });
   });

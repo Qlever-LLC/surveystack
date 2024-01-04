@@ -195,6 +195,7 @@
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
+          clearable
         />
       </template>
       <v-date-picker

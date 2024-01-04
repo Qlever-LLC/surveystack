@@ -248,24 +248,24 @@ function matrixHeadersFromSubmission(submission, parentKey = '') {
   return headers;
 }
 
-export function transformMatrixHeaders(headers, submissions) {
+export function transformMatrixHeaders(rawHeaders, submissions) {
   // Get matrix headers from submissions raw data by filtering "meta.type" = "matrix"
   let matrixHeaders = [];
   submissions.forEach((submission) => {
     matrixHeaders = [...new Set([...matrixHeaders, ...matrixHeadersFromSubmission(submission)])];
   });
 
-  const result = [];
-  headers.forEach((header) => {
+  const headers = [];
+  rawHeaders.forEach((header) => {
     const matched = matrixHeaders.find((h) => header.startsWith(h));
     if (!matched) {
-      result.push(header);
-    } else if (!result.includes(matched)) {
-      result.push(matched);
+      headers.push(header);
+    } else if (!headers.includes(matched)) {
+      headers.push(matched);
     }
   });
 
-  return result;
+  return { headers, matrixHeaders };
 }
 
 const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted'];
@@ -446,46 +446,51 @@ export default {
       };
     },
     createHeaders() {
-      const headers = [];
-      if (this.parsed) {
-        const rawHeaders = this.parsed.meta.fields;
-        const matrixHeaders = transformMatrixHeaders(rawHeaders, this.submissions.content);
-        PREFERRED_HEADERS.forEach((header) => {
-          if (matrixHeaders.includes(header)) {
-            headers.push({
-              text: header,
-              value: header,
-              filter: this.createCustomFilter(header),
-            });
-          }
-        });
-        matrixHeaders.forEach((header) => {
-          if (
-            PREFERRED_HEADERS.includes(header) ||
-            (this.excludeMeta && (header.startsWith('meta') || header.includes('meta')))
-          ) {
-            return;
-          }
-          this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
-
-          if (rawHeaders.includes(header)) {
-            headers.push({
-              text: header,
-              value: header,
-              filter: this.createCustomFilter(header),
-            });
-          } else {
-            const properties = getPropertiesFromMatrix(rawHeaders, header);
-            headers.push(
-              ...properties.map((h) => ({
-                text: `${header}.${h}`,
-                value: [header, h].join(MATRIX_SEPARATOR),
-                filter: this.createCustomFilter([header, h].join(MATRIX_SEPARATOR)),
-              }))
-            );
-          }
-        });
+      if (!this.parsed) {
+        this.headers = [];
       }
+
+      const headers = [];
+      let rawHeaders = this.parsed.meta.fields;
+      const { headers: cleanedHeaders, matrixHeaders } = transformMatrixHeaders(rawHeaders, this.submissions.content);
+      rawHeaders = rawHeaders.filter((header) => !matrixHeaders.includes(header));
+
+      PREFERRED_HEADERS.forEach((header) => {
+        if (cleanedHeaders.includes(header)) {
+          headers.push({
+            text: header,
+            value: header,
+            filter: this.createCustomFilter(header),
+          });
+        }
+      });
+      cleanedHeaders.forEach((header) => {
+        if (
+          PREFERRED_HEADERS.includes(header) ||
+          (this.excludeMeta && (header.startsWith('meta') || header.includes('meta')))
+        ) {
+          return;
+        }
+        this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
+
+        if (rawHeaders.includes(header)) {
+          headers.push({
+            text: header,
+            value: header,
+            filter: this.createCustomFilter(header),
+          });
+        } else {
+          const properties = getPropertiesFromMatrix(rawHeaders, header);
+          headers.push(
+            ...properties.map((h) => ({
+              text: `${header}.${h}`,
+              value: [header, h].join(MATRIX_SEPARATOR),
+              filter: this.createCustomFilter([header, h].join(MATRIX_SEPARATOR)),
+            }))
+          );
+        }
+      });
+
       this.headers = headers;
     },
     onUpdateSortBy(value) {
