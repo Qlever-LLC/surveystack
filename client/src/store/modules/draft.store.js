@@ -65,6 +65,7 @@ const createInitialState = () => ({
   firstNode: null,
   showOverview: false,
   showConfirmSubmission: false,
+  enableNext: true,
   errors: null,
   persist: false,
   farmOsCache: {}, // Cache for farmos resources, should be reset when survey starts
@@ -77,6 +78,7 @@ const getters = {
   submission: (state) => state.submission,
   property: (state) => (path, fallback) => get(state.submission, path, fallback),
   control: (state) => state.node && state.node.model, // current survey control
+  enableNext: (state) => state.enableNext,
   path: (state) =>
     state.node
       ? state.node
@@ -115,7 +117,38 @@ const getters = {
     (state) =>
     (path, fallback = true) =>
       surveyStackUtils.getRelevance(state.submission, path, fallback),
-  hasRequiredUnanswered: (state) => {
+  hasRequiredUnanswered: (state, getters) => {
+    if (state.node.model.type === 'matrix') {
+      /*
+      When the columns of a matrix are required, but the matrix question itself is not,
+      the user can proceed with the survey without filling in the matrix.
+      But if a row is added, then a value must be placed in the required column
+    */
+      //detect required columns
+      let requiredColumnNames = [];
+      if (state.node.model.options.source.content) {
+        state.node.model.options.source.content.forEach((c) => {
+          if (c.required) {
+            requiredColumnNames.push(c.value);
+          }
+        });
+      }
+
+      const questionValue = get(state.submission, getters.path).value;
+      if (questionValue) {
+        for (const row of questionValue) {
+          for (const requiredC of requiredColumnNames) {
+            if (
+              row[requiredC].value === null ||
+              (row[requiredC].value instanceof String && row[requiredC].value.trim() === '')
+            ) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
@@ -191,6 +224,9 @@ const actions = {
     if (initialize && state.node.model.type === 'page') {
       await dispatch('initialize', state.node);
     }
+  },
+  setNextEnable({ commit }, enable) {
+    commit('SET_NEXT_ENABLE', enable);
   },
   async next({ commit, state, dispatch }) {
     dispatch('calculateApiCompose');
@@ -507,6 +543,9 @@ const mutations = {
     }
 
     Vue.set(parent, childKey, value);
+  },
+  SET_NEXT_ENABLE(state, enable) {
+    state.enableNext = enable;
   },
   NEXT(state, node) {
     // console.log('next', node, state);

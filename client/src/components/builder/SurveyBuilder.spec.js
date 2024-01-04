@@ -130,12 +130,6 @@ describe('add control', () => {
       { inputLabel: 'Label', type: 'string', value: 'Foo Bar', propPath: 'label' },
       { inputLabel: 'Value', type: 'number', value: 'control_name', propPath: 'name' },
       { inputLabel: 'Hint', type: 'page', value: 'Heads up!', propPath: 'hint' },
-      {
-        inputLabel: 'More info',
-        type: 'instructionsImageSplit',
-        value: 'Info',
-        propPath: 'moreInfo',
-      },
       { inputLabel: 'Default value', type: 'string', value: 'Initial', propPath: 'defaultValue' },
       { inputLabel: 'QR Code', type: 'string', value: true, propPath: 'options.enableQr' },
       { inputLabel: 'Required', type: 'matrix', value: true, propPath: 'options.required' },
@@ -226,6 +220,12 @@ describe('add control', () => {
         type: 'geoJSON',
         value: false,
         propPath: 'options.geoJSON.showCircle',
+      },
+      {
+        inputLabel: 'Show geotrace control',
+        type: 'geoJSON',
+        value: true,
+        propPath: 'options.geoJSON.showGeoTrace',
       },
       { inputLabel: 'Type', type: 'date', value: 'date-year', propPath: 'options.subtype' },
       {

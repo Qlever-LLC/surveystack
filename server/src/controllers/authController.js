@@ -48,9 +48,10 @@ const register = async (req, res) => {
   });
 
   try {
-    let r = await db.collection(col).insertOne(user);
-    assert.equal(1, r.insertedCount);
-    const payload = await createLoginPayload(r.ops[0]);
+    const insertResult = await db.collection(col).insertOne(user);
+    assert.equal(insertResult?.acknowledged, true);
+    const insertedUser = { _id: insertResult.insertedId, ...user };
+    const payload = await createLoginPayload(insertedUser);
     return res.send(payload);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
@@ -160,7 +161,7 @@ const resetPassword = async (req, res) => {
       { _id: existingUser._id },
       { $set: { password: hash, token: uuidv4() } },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
     return res.send(updated);

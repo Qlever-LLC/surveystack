@@ -86,12 +86,14 @@ export async function getSignedDownloadUrl(resourceKey) {
   return url;
 }
 
-export function getPublicDownloadUrl(resourceKey) {
-  const s3BaseUrl =
-    window.location.origin.indexOf('app.surveystack.io') > -1
-      ? 'https://surveystack.s3.amazonaws.com/'
-      : 'https://surveystack-test.s3.amazonaws.com/';
-  return s3BaseUrl + resourceKey;
+export function getPublicDownloadUrl(resourceKey, escape = false) {
+  // TODO: update to only use environment variable. is there any reason not to?
+  const s3BaseUrl = process.env.VUE_APP_S3_BASE_URL
+    ? process.env.VUE_APP_S3_BASE_URL
+    : window.location.origin.indexOf('app.surveystack.io') > -1
+    ? 'https://surveystack.s3.amazonaws.com/'
+    : 'https://surveystack-test.s3.amazonaws.com/';
+  return s3BaseUrl + (escape ? encodeURI(resourceKey) : resourceKey);
 }
 
 export async function uploadFileResource(store, resourceKey, clearCacheAfterUpload) {

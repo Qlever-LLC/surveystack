@@ -308,12 +308,10 @@ export const buildPipeline = async (req, res) => {
     }
 
     if (!_.isEmpty(project)) {
-      const autoProjections = {};
       if (_.some(project, (v) => v === 0) && _.some(project, (v) => v === 1)) {
         throw boom.badRequest(`One can not mix and match inclusion and exclusion in project stage`);
       }
 
-      project = { ...project, ...autoProjections };
       pipeline.push({ $project: project });
     }
   }
@@ -794,14 +792,14 @@ const createSubmission = async (req, res) => {
           ...submissionsToQSLs,
         ];
 
-        const result = await db.collection(col).insertMany(submissionsToInsert);
+        const insertResult = await db.collection(col).insertMany(submissionsToInsert);
 
-        if (submissionsToInsert.length !== result.insertedCount) {
+        if (submissionsToInsert.length !== Object.keys(insertResult.insertedIds).length) {
           await session.abortTransaction();
           return;
         }
 
-        return result;
+        return insertResult;
       });
     } catch (error) {
       throw boom.boomify(error);
@@ -812,10 +810,7 @@ const createSubmission = async (req, res) => {
     throw boom.internal('The transaction was intentionally aborted.');
   }
 
-  res.send({
-    ...results,
-    ...apiComposeResults,
-  });
+  res.send(apiComposeResults);
 };
 
 // if submission contains question set library questions, return a submission subset for each question set library
@@ -957,7 +952,7 @@ const updateSubmission = async (req, res) => {
     { _id: new ObjectId(id) },
     { $set: updateOperation },
     {
-      returnOriginal: false,
+      returnDocument: 'after',
     }
   );
 
@@ -1066,7 +1061,7 @@ const bulkReassignSubmissions = async (req, res) => {
 
         const insertResult = await db.collection(col).insertMany(submissionsToArchive);
 
-        if (submissionsToArchive.length !== insertResult.insertedCount) {
+        if (submissionsToArchive.length !== Object.keys(insertResult.insertedIds).length) {
           await session.abortTransaction();
           return;
         }
@@ -1102,10 +1097,7 @@ const bulkReassignSubmissions = async (req, res) => {
     throw boom.internal('The transaction was intentionally aborted.');
   }
 
-  res.send({
-    result: results.result,
-    ...apiComposeResults,
-  });
+  res.send(apiComposeResults);
 };
 
 const reassignSubmission = async (req, res) => {
@@ -1177,7 +1169,7 @@ const reassignSubmission = async (req, res) => {
     .findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: updateOperation },
-      { returnOriginal: false }
+      { returnDocument: 'after' }
     );
   return res.send({ ...updated.value, ...apiComposeResults });
 };

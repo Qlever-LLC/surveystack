@@ -1,6 +1,5 @@
 import mockAxios from 'axios';
-import { createGroup, createReq, createRes, createUser } from '../../testUtils';
-import { getAscendantGroups, getDescendantGroups } from '../roles.service';
+import { createGroup } from '../../testUtils';
 import {
   mapFarmOSInstanceToUser,
   listFarmOSInstancesForUser,
@@ -46,7 +45,7 @@ const origin = 'url';
 
 describe('manageFarmOS', () => {
   it('mapFarmOSInstanceToUser && removeFarmFromUser in same group', async () => {
-    const { group, admin1, user1 } = await init();
+    const { user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
     await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true, origin);
     let results = await listFarmOSInstancesForUser(user1.user._id);
@@ -70,7 +69,7 @@ describe('manageFarmOS', () => {
     expect(results[0].instanceName).toBe(farmOSInstanceNameBis);
   });
   it('mapFarmOSInstanceToUser && removeFarmFromUser in differents groups', async () => {
-    const { group, admin1, user1 } = await init();
+    const { user1 } = await init();
     const init2 = await init();
     const farmOSInstanceName = 'test.surveystack.io';
     const farmOSInstanceNameBis = 'test2.surveystack.io';
@@ -88,7 +87,7 @@ describe('manageFarmOS', () => {
     expect(results[0].instanceName).toBe(farmOSInstanceNameBis);
   });
   it('mapFarmOSInstanceToUser and unmapFarmOSInstance', async () => {
-    const { group, admin1, user1 } = await init();
+    const { user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
     const farmOSInstanceName2 = 'test2.surveystack.io';
     const res = await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true, origin);
@@ -108,7 +107,7 @@ describe('manageFarmOS', () => {
   });
 
   it('create instance admin access', async () => {
-    const { group, admin1, user1 } = await init();
+    const { admin1, user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
     const someAdminFarmOSInstanceName = 'admin.surveystack.io';
     await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true, origin);
@@ -131,7 +130,7 @@ describe('manageFarmOS', () => {
     expect(results[0].owner).toBe(true);
   });
   it('createFarmOSInstanceForUserAndGroup && removeFarmFromSurveystackGroup', async () => {
-    const { group, admin1, user1 } = await init();
+    const { group, user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
     await createFarmOSInstanceForUserAndGroup(
       user1.user._id,

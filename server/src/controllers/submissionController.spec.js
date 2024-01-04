@@ -21,7 +21,7 @@ const {
 } = submissionController;
 
 async function mockControlsAndSubmission() {
-  const { survey, createSubmission } = await createSurvey(['text', 'number']);
+  const { survey, createSubmission } = await createSurvey(['string', 'number']);
   const { submission: _submission } = await createSubmission();
 
   const controls = survey.revisions[survey.latestVersion - 1].controls;
@@ -29,7 +29,7 @@ async function mockControlsAndSubmission() {
   const libraryVersion = 3;
   const groupOverride = {
     children: [
-      getControlGenerator('text')({ libraryId, libraryVersion, libraryIsInherited: true }),
+      getControlGenerator('string')({ libraryId, libraryVersion, libraryIsInherited: true }),
     ],
     isLibraryRoot: true,
     libraryId,
@@ -42,7 +42,7 @@ async function mockControlsAndSubmission() {
     getControlGenerator('group')(
       {
         ...groupOverride,
-        options: { ...getControlGenerator('text')().options, redacted: true },
+        options: { ...getControlGenerator('string')().options, redacted: true },
       },
       2
     ),
@@ -54,10 +54,10 @@ async function mockControlsAndSubmission() {
     data: {
       ..._submission.data,
       ...getSubmissionDataGenerator('page')(
-        getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')())
+        getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')())
       ),
-      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')(), 2),
-      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')(), 3),
+      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 2),
+      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 3),
     },
   };
 
@@ -69,7 +69,7 @@ async function mockControlsAndSubmission() {
 describe('submissionController', () => {
   describe('getSubmissionsCsv', () => {
     it('returns expected CSV for geojson question type', async () => {
-      const { survey, createSubmission } = await createSurvey('geoJSON');
+      const { survey, createSubmission } = await createSurvey(['geoJSON']);
       const { submission } = await createSubmission();
       const mockReq = createReq({ query: { showCsvMeta: 'true', survey: survey._id } });
       const mockRes = await createRes();
@@ -116,7 +116,7 @@ describe('submissionController', () => {
     let submission;
 
     beforeEach(async () => {
-      const { createSubmission } = await createSurvey(['instructions', 'text', 'ontology']);
+      const { createSubmission } = await createSurvey(['instructions', 'string', 'ontology']);
       const { submission: _submission } = await createSubmission();
       submission = _submission;
     });
@@ -168,7 +168,11 @@ describe('submissionController', () => {
 
   describe('postSubmissionPdf', () => {
     it('should return PDF base64 when `base64=1` if success', async () => {
-      const { survey, createSubmission } = await createSurvey(['instructions', 'text', 'ontology']);
+      const { survey, createSubmission } = await createSurvey([
+        'instructions',
+        'string',
+        'ontology',
+      ]);
       const { submission } = await createSubmission();
       await createUser({ _id: submission.meta.creator });
       const req = createReq({ body: { survey, submission }, query: { base64: '1' } });
@@ -184,7 +188,11 @@ describe('submissionController', () => {
     });
 
     it('should throw error if PDF generate failed', async () => {
-      const { survey, createSubmission } = await createSurvey(['instructions', 'text', 'ontology']);
+      const { survey, createSubmission } = await createSurvey([
+        'instructions',
+        'string',
+        'ontology',
+      ]);
       const { submission } = await createSubmission();
       const req = createReq({ body: { survey, submission }, query: { base64: '1' } });
       const res = await createRes({
@@ -199,7 +207,7 @@ describe('submissionController', () => {
     let survey, submission;
 
     beforeEach(async () => {
-      const { survey: _survey, createSubmission } = await createSurvey('text');
+      const { survey: _survey, createSubmission } = await createSurvey(['string']);
       const { submission: _submission } = await createSubmission();
       survey = _survey;
       submission = _submission;

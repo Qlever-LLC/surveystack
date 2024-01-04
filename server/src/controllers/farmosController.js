@@ -1,8 +1,9 @@
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
-import Joi from 'joi';
-import joiObjectId from 'joi-objectid';
-Joi.objectId = joiObjectId(Joi);
+import BaseJoi from 'joi';
+import JoiObjectId from '@marsup/joi-objectid';
+
+const Joi = BaseJoi.extend(JoiObjectId);
 
 import isString from 'lodash/isString';
 import _, { result } from 'lodash';
@@ -287,7 +288,7 @@ export const getAssets = async (req, res) => {
           name: a.attributes.name,
           id: a.id,
           instanceName: instance.instanceName,
-          archived: a.attributes.archived,
+          archived: a.attributes.status == 'archived',
           location:
             a.relationships && a.relationships.location ? a.relationships.location.data : undefined,
         };
@@ -418,7 +419,7 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  if (typeof owner == undefined) {
+  if (typeof owner === 'undefined') {
     throw boom.badData('owner attribute missing');
   }
   const { origin } = req.headers;
@@ -708,7 +709,7 @@ export const updatePlansForGroup = async (req, res) => {
 
   const updatedPlanIds = plans.map((p) => new ObjectId(p));
 
-  const r = await db.collection('farmos-group-settings').updateOne(
+  await db.collection('farmos-group-settings').updateOne(
     {
       _id: groupSetting._id,
     },
@@ -721,7 +722,6 @@ export const updatePlansForGroup = async (req, res) => {
 
   return res.send({
     status: 'ok',
-    // res: r,
   });
 };
 
@@ -730,7 +730,7 @@ export const updateSeats = async (req, res) => {
     seats: Joi.number().integer().min(0).max(10000).required(),
   });
 
-  const r = await db.collection('farmos-group-settings').updateOne(
+  await db.collection('farmos-group-settings').updateOne(
     {
       _id: groupSetting._id,
     },
@@ -743,7 +743,6 @@ export const updateSeats = async (req, res) => {
 
   return res.send({
     status: 'ok',
-    // res: r,
   });
 };
 
@@ -1571,24 +1570,21 @@ export const removeMembershipHook = async (membership, origin) => {
     const connectedFarmsToCheck = memberInfo.connectedFarms.filter((f) => f.groups.length > 0);
     const toDelete = connectedFarmsToCheck.filter((f) => !instances.includes(f.instanceName));
 
-    const results = [];
     for (const connectedFarm of toDelete) {
       await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
         connectedFarm.instanceName,
         connectedFarm.groups.map((g) => g.groupId),
         origin
       );
-      const res = await db.collection('farmos-group-mapping').deleteMany({
+      await db.collection('farmos-group-mapping').deleteMany({
         instanceName: connectedFarm.instanceName,
         groupId: {
           $in: connectedFarm.groups.map((g) => asMongoId(g.groupId)),
         },
       });
-      results.push(res.result.ok);
     }
   } catch (error) {
     console.log('error', error);
-    return;
   }
 };
 

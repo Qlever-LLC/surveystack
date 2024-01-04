@@ -14,7 +14,7 @@ describe('pdf.service', () => {
       'group',
       'instructions',
       'instructionsImageSplit',
-      'text',
+      'string',
       'number',
       'date',
       'location',
@@ -199,7 +199,7 @@ describe('pdf.service', () => {
     describe('getValidControls', () => {
       it('should always exclude hidden controls', () => {
         const controls = [
-          getControlGenerator('text')(),
+          getControlGenerator('string')(),
           getControlGenerator('number')(),
           {
             ...getControlGenerator('group')(),
@@ -212,7 +212,7 @@ describe('pdf.service', () => {
 
       it('should exclude instructions/instructionsImageSplit questions when `survey.meta.printOptions.showInstruction=false` if submitted PDF', () => {
         const controls = [
-          getControlGenerator('text')(),
+          getControlGenerator('string')(),
           getControlGenerator('instructions')(),
           getControlGenerator('instructionsImageSplit')(),
         ];
@@ -226,7 +226,7 @@ describe('pdf.service', () => {
 
       it('should always exclude the questions of `meta.relevant=false` if submitted PDF', () => {
         const controls = [
-          getControlGenerator('text')({ name: 'text_5' }),
+          getControlGenerator('string')({ name: 'text_5' }),
           getControlGenerator('number')({ name: 'number_6' }),
           getControlGenerator('date')({ name: 'date_7' }),
         ];
@@ -246,7 +246,7 @@ describe('pdf.service', () => {
         const controls = [
           getControlGenerator('instructions')({ name: 'instructions_3' }),
           getControlGenerator('instructionsImageSplit')({ name: 'instructions_split_4' }),
-          getControlGenerator('text')({ name: 'text_5' }),
+          getControlGenerator('string')({ name: 'text_5' }),
           getControlGenerator('number')({ name: 'number_6' }),
         ];
         const surveyEntity = cloneDeep(survey);
@@ -267,7 +267,7 @@ describe('pdf.service', () => {
     describe('control.options.printLayout', () => {
       describe('showAllOptions', () => {
         it('should render all options for selectSingle/selectMultiple/ontology questions when `showAllOptions=true`', async () => {
-          const { survey, createSubmission } = await createSurvey('selectSingle');
+          const { survey, createSubmission } = await createSurvey(['selectSingle']);
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.showAllOptions = true;
@@ -303,7 +303,7 @@ describe('pdf.service', () => {
         });
 
         it('should render value(s) only for selectSingle/selectMultiple/ontology questions when `showAllOptions=false`', async () => {
-          const { survey, createSubmission } = await createSurvey('selectMultiple');
+          const { survey, createSubmission } = await createSurvey(['selectMultiple']);
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.showAllOptions = false;
@@ -322,7 +322,7 @@ describe('pdf.service', () => {
 
       describe('columns', () => {
         it('should render column layout with given columns for selectSingle/selectMultiple/ontology questions', async () => {
-          const { survey, createSubmission } = await createSurvey('ontology');
+          const { survey, createSubmission } = await createSurvey(['ontology']);
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.showAllOptions = true;
@@ -366,7 +366,7 @@ describe('pdf.service', () => {
 
       describe('showAllOptionsPrintable', () => {
         it('should render all options for selectSingle/selectMultiple/ontology questions when `showAllOptionsPrintable=true` if paper PDF', async () => {
-          const { survey } = await createSurvey('selectMultiple');
+          const { survey } = await createSurvey(['selectMultiple']);
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.showAllOptionsPrintable = true;
           control.options.printLayout.columns = 2;
@@ -403,7 +403,7 @@ describe('pdf.service', () => {
         });
 
         it('should render empty space for selectSingle/selectMultiple/ontology questions when `showAllOptionsPrintable=false` if paper PDF', async () => {
-          const { survey } = await createSurvey('selectSingle');
+          const { survey } = await createSurvey(['selectSingle']);
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.showAllOptionsPrintable = false;
           control.index = [1];
@@ -444,7 +444,7 @@ describe('pdf.service', () => {
 
       describe('preview', () => {
         it('should render preview of image for image/file questions when `preview=true` if submitted PDF', async () => {
-          const { survey, createSubmission } = await createSurvey('file');
+          const { survey, createSubmission } = await createSurvey(['file']);
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.preview = true;
@@ -476,7 +476,7 @@ describe('pdf.service', () => {
         });
 
         it('should not render preview of image for image/file questions when `preview=false` if submitted PDF', async () => {
-          const { survey, createSubmission } = await createSurvey('image');
+          const { survey, createSubmission } = await createSurvey(['image']);
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.preview = false;
@@ -505,7 +505,7 @@ describe('pdf.service', () => {
 
       describe('table', () => {
         it('should render table view of matrix questions when `table=true` if submitted PDF', async () => {
-          const { survey, createSubmission } = await createSurvey('matrix');
+          const { survey, createSubmission } = await createSurvey(['matrix']);
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.table = true;
@@ -531,7 +531,7 @@ describe('pdf.service', () => {
         });
 
         it('should render list view of matrix question when `table=false` if submitted PDF', async () => {
-          const { survey, createSubmission } = await createSurvey('matrix');
+          const { survey, createSubmission } = await createSurvey(['matrix']);
           const { submission } = await createSubmission();
           const control = survey.revisions[1].controls[0];
           control.options.printLayout.table = false;

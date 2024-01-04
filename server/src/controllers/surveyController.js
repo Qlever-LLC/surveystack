@@ -515,9 +515,9 @@ const createSurvey = async (req, res) => {
   entity.meta.creator = res.locals.auth.user._id;
 
   try {
-    let r = await db.collection(SURVEYS_COLLECTION).insertOne(entity);
-    assert.equal(1, r.insertedCount);
-    return res.send(r);
+    const insertResult = await db.collection(SURVEYS_COLLECTION).insertOne(entity);
+    assert.equal(insertResult?.acknowledged, true);
+    return res.send({ _id: insertResult.insertedId, ...entity });
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
@@ -573,7 +573,7 @@ const updateSurvey = async (req, res) => {
       { _id: new ObjectId(id) },
       { $set: entity },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
     return res.send(updated);
@@ -597,8 +597,10 @@ const deleteSurvey = async (req, res) => {
   }
 
   try {
-    let r = await db.collection(SURVEYS_COLLECTION).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
+    const deleteResult = await db
+      .collection(SURVEYS_COLLECTION)
+      .deleteOne({ _id: new ObjectId(id) });
+    assert.equal(1, deleteResult.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
@@ -798,7 +800,7 @@ const cleanupSurvey = async (req, res) => {
               revisions: filteredSurveyRevisions,
             },
           },
-          { returnOriginal: false }
+          { returnDocument: 'after' }
         );
         await deleteArchivedTestSubmissions(
           id,

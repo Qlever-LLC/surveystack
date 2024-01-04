@@ -319,7 +319,11 @@ export default {
       this.value = null;
     },
     onInput(value) {
-      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      if (this.header.type === 'dropdown') {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : [value]);
+      } else {
+        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      }
       this.$emit('changed');
     },
     onDateInput(value) {

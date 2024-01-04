@@ -22,7 +22,7 @@ describe('CSV Service', () => {
       // });
 
       it('applies geojsonTransformer function to submissions object', async () => {
-        const { createSubmission } = await createSurvey('geoJSON');
+        const { createSubmission } = await createSurvey(['geoJSON']);
         const { submission } = await createSubmission();
         const actual = transformSubmissionQuestionTypes(submission.data, {
           geoJSON: geojsonTransformer,
@@ -34,7 +34,7 @@ describe('CSV Service', () => {
       });
 
       it('applies geojsonTransformer function correctly to nested submissions object', async () => {
-        const { createSubmission } = await createSurvey('group');
+        const { createSubmission } = await createSurvey(['group']);
         const { submission } = await createSubmission();
         submission.data.group_1 = {
           ...submission.data.group_1,
@@ -49,11 +49,11 @@ describe('CSV Service', () => {
       });
 
       it('does not modify structure incorrectly', async () => {
-        const { createSubmission } = await createSurvey('group');
+        const { createSubmission } = await createSurvey(['group']);
         const { submission } = await createSubmission();
         submission.data.group_1 = {
           ...submission.data.group_1,
-          ...getSubmissionDataGenerator('text')(),
+          ...getSubmissionDataGenerator('string')(),
           ...getSubmissionDataGenerator('geoJSON')({}, 2),
         };
         const expected = _.cloneDeep(submission.data);
@@ -177,7 +177,7 @@ describe('CSV Service', () => {
 
     describe('fileTransformer', () => {
       it('applies fileTransformer function to files in submissions object', async () => {
-        const { createSubmission } = await createSurvey('file');
+        const { createSubmission } = await createSurvey(['file']);
         const { submission } = await createSubmission();
         const actual = transformSubmissionQuestionTypes(submission.data, {
           file: fileTransformer,
@@ -188,7 +188,7 @@ describe('CSV Service', () => {
       });
 
       it('applies fileTransformer function to images in submissions object', async () => {
-        const { createSubmission } = await createSurvey('image');
+        const { createSubmission } = await createSurvey(['image']);
         const { submission } = await createSubmission();
         const actual = transformSubmissionQuestionTypes(submission.data, {
           image: fileTransformer,

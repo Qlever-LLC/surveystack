@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
+import { createLocalVue } from '@vue/test-utils';
 import GeoJSON, { addBaseLayer, getNextValue, addDrawingLayer } from './GeoJSON.vue';
 
 import ControlProperties from '../../builder/ControlProperties.vue';
@@ -14,12 +15,19 @@ const style = document.createElement('style');
 style.setAttribute('type', 'text/css');
 style.innerHTML = cssFile;
 
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
+
 const getControlProps = (opts) => {
   const options = {
     showPolygon: true,
     showLine: true,
     showPoint: true,
     showCircle: true,
+    showGeoTrace: true,
     ...opts,
   };
   return {
@@ -34,6 +42,7 @@ const getControlProps = (opts) => {
         showLine: options.showLine,
         showPoint: options.showPoint,
         showCircle: options.showCircle,
+        showGeoTrace: options.showGeoTrace,
       },
     },
     type: 'GeoJSON',
@@ -90,6 +99,7 @@ function mockControl() {
         showLine: true,
         showCircle: true,
         showPoint: true,
+        showGeoTrace: true,
       },
     },
     id: '60b524795575f00001f504dc',
@@ -158,6 +168,7 @@ function mockSurvey() {
                 showLine: true,
                 showCircle: true,
                 showPoint: true,
+                showGeoTrace: true,
               },
             },
             id: '60b524795575f00001f504dc',
@@ -172,13 +183,14 @@ function mockSurvey() {
 
 describe('GeoJSON Question', () => {
   describe('hides controls', () => {
-    let getByRole;
     let getByTitle;
     let getByText;
     let container;
     let updateProps;
+    const localVue = createLocalVue();
     beforeEach(() => {
       const renderOptions = {
+        localVue,
         propsData: {
           control: getControlProps(),
           value: null,
@@ -187,17 +199,18 @@ describe('GeoJSON Question', () => {
         router: router,
       };
 
-      ({ getByTitle, getByText, getByRole, container, updateProps } = renderWithVuetify(GeoJSON, renderOptions));
+      ({ getByTitle, getByText, container, updateProps } = renderWithVuetify(GeoJSON, renderOptions));
       container.append(style);
     });
 
-    it('shows drawing controls by default', () => {
-      expect(getByTitle('Draw a Polygon')).toBeVisible();
+    it('shows drawing controls by default', async () => {
+      // Necessary  controls
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(getByTitle('Draw a field or area using your GPS location')).toBeVisible();
+      expect(getByTitle('Draw a field or area')).toBeVisible();
       expect(getByTitle('Draw a Line')).toBeVisible();
       expect(getByTitle('Draw a Point')).toBeVisible();
       expect(getByTitle('Draw a Circle')).toBeVisible();
-      expect(getByTitle('Modify features')).toBeVisible();
-      expect(getByTitle('Move features')).toBeVisible();
 
       getByText('hint');
       getByText('label');
@@ -207,7 +220,7 @@ describe('GeoJSON Question', () => {
     const thingsToTest = [
       {
         key: 'showPolygon',
-        text: 'Draw a Polygon',
+        text: 'Draw a field or area',
       },
       {
         key: 'showLine',
@@ -221,6 +234,10 @@ describe('GeoJSON Question', () => {
         key: 'showCircle',
         text: 'Draw a Circle',
       },
+      {
+        key: 'showGeoTrace',
+        text: 'Draw a field or area using your GPS location',
+      },
     ];
 
     thingsToTest.forEach(({ key, text }) => {
@@ -228,15 +245,14 @@ describe('GeoJSON Question', () => {
         await updateProps({
           control: getControlProps({ [key]: false }),
         });
+        await new Promise((resolve) => setTimeout(resolve, 0));
         expect(getByTitle(text)).not.toBeVisible();
-        expect(getByTitle('Modify features')).toBeVisible();
-        expect(getByTitle('Move features')).toBeVisible();
       });
     });
   });
 
   describe('automatic initialization behavior', () => {
-    it('activates geolocate control and geocoder has focus for null value', () => {
+    it('activates geolocate control and geocoder has focus for null value', async () => {
       const renderOptions = {
         propsData: {
           control: getControlProps(),
@@ -246,11 +262,9 @@ describe('GeoJSON Question', () => {
         router: router,
       };
 
-      const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
-        GeoJSON,
-        renderOptions
-      );
+      const { getByTitle, getByPlaceholderText } = renderWithVuetify(GeoJSON, renderOptions);
 
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(true);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
       expect(getByPlaceholderText('Search for address...').parentElement.classList.contains('gcd-gl-expanded')).toBe(
@@ -268,10 +282,7 @@ describe('GeoJSON Question', () => {
         router: router,
       };
 
-      const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
-        GeoJSON,
-        renderOptions
-      );
+      const { getByTitle, getByPlaceholderText } = renderWithVuetify(GeoJSON, renderOptions);
 
       expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(false);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
@@ -347,6 +358,7 @@ describe('GeoJSON Question', () => {
       getByText('Show line control');
       getByText('Show point control');
       getByText('Show circle control');
+      getByText('Show geotrace control');
     });
 
     it('control toggles work', async () => {
@@ -366,15 +378,18 @@ describe('GeoJSON Question', () => {
       const lineControl = getByText('Show line control');
       const pointControl = getByText('Show point control');
       const circleControl = getByText('Show circle control');
+      const geotraceControl = getByText('Show geotrace control');
       fireEvent.click(polygonControl);
       fireEvent.click(lineControl);
       fireEvent.click(pointControl);
-      await fireEvent.click(circleControl);
+      fireEvent.click(circleControl);
+      fireEvent.click(geotraceControl);
       expect(control.options.geoJSON).toEqual({
         showPolygon: false,
         showLine: false,
-        showCircle: false,
         showPoint: false,
+        showCircle: false,
+        showGeoTrace: false,
       });
     });
 
@@ -384,6 +399,7 @@ describe('GeoJSON Question', () => {
         showLine: true,
         showCircle: true,
         showPoint: true,
+        showGeoTrace: false,
       });
     });
   });

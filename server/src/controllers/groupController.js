@@ -222,11 +222,11 @@ const createGroup = async (req, res) => {
     }
   }
 
-  let r;
+  let insertResult;
 
   try {
-    r = await db.collection(col).insertOne(entity);
-    assert.equal(1, r.insertedCount);
+    insertResult = await db.collection(col).insertOne(entity);
+    assert.equal(insertResult?.acknowledged, true);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       throw boom.conflict(`Conflict _id or path: "${String(entity._id)}", "${entity.path}"`);
@@ -240,7 +240,7 @@ const createGroup = async (req, res) => {
     role: 'admin',
   });
 
-  return res.send(r);
+  return res.send({ _id: insertResult.insertedId, ...entity });
 };
 
 const updateGroup = async (req, res) => {
@@ -258,7 +258,7 @@ const updateGroup = async (req, res) => {
       { _id: entity._id },
       { $set: { ...entity } },
       {
-        returnOriginal: false,
+        returnDocument: 'after',
       }
     );
 
@@ -322,8 +322,8 @@ const deleteGroup = async (req, res) => {
         message: `No entity with _id exists: ${id}`,
       });
     }
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
+    const deleteResult = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    assert.equal(1, deleteResult.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
@@ -350,11 +350,11 @@ const addDocLink = async (req, res) => {
       groupIdsToUpdate.push(existing._id);
     }
 
-    let result = await db
+    await db
       .collection(col)
       .updateMany({ _id: { $in: groupIdsToUpdate } }, { $addToSet: { docs: doc } });
 
-    return res.send(result);
+    return res.status(200).send();
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
@@ -380,11 +380,11 @@ const removeDocLink = async (req, res) => {
       groupIdsToUpdate.push(existing._id);
     }
 
-    let result = await db
+    await db
       .collection(col)
       .updateMany({ _id: { $in: groupIdsToUpdate } }, { $pull: { docs: { link: doc.link } } });
 
-    return res.send(result);
+    return res.status(200).send();
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
