@@ -35,7 +35,7 @@ async function mockControlsAndSubmission(
   consumeLibraryVersion,
   addDraftVersion = false
 ) {
-  const { survey, createSubmission } = await createSurvey(['text', 'number'], surveyOverrides);
+  const { survey, createSubmission } = await createSurvey(['string', 'number'], surveyOverrides);
   const { submission: _submission } = await createSubmission();
 
   const controls = survey.revisions[survey.latestVersion - 1].controls;
@@ -45,7 +45,7 @@ async function mockControlsAndSubmission(
   if (consumeLibraryId) {
     groupOverride = {
       children: [
-        getControlGenerator('text')({ libraryId, libraryVersion, libraryIsInherited: true }),
+        getControlGenerator('string')({ libraryId, libraryVersion, libraryIsInherited: true }),
       ],
       isLibraryRoot: true,
       libraryId: consumeLibraryId,
@@ -54,7 +54,7 @@ async function mockControlsAndSubmission(
   } else {
     groupOverride = {
       children: [
-        getControlGenerator('text')({ libraryId, libraryVersion, libraryIsInherited: true }),
+        getControlGenerator('string')({ libraryId, libraryVersion, libraryIsInherited: true }),
       ],
     };
   }
@@ -65,7 +65,7 @@ async function mockControlsAndSubmission(
     getControlGenerator('group')(
       {
         ...groupOverride,
-        options: { ...getControlGenerator('text')().options, redacted: true },
+        options: { ...getControlGenerator('string')().options, redacted: true },
       },
       2
     ),
@@ -77,10 +77,10 @@ async function mockControlsAndSubmission(
     data: {
       ..._submission.data,
       ...getSubmissionDataGenerator('page')(
-        getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')())
+        getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')())
       ),
-      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')(), 2),
-      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')(), 3),
+      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 2),
+      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 3),
     },
   };
 
@@ -548,7 +548,7 @@ describe('surveyController', () => {
 
   describe('getSurveyPdf', () => {
     it('should return PDF base64 if success', async () => {
-      const { survey } = await createSurvey(['instructions', 'text', 'ontology']);
+      const { survey } = await createSurvey(['instructions', 'string', 'ontology']);
       const req = createReq({ params: { id: survey._id } });
       const res = await createRes({
         user: { _id: survey.meta.creator, permissions: [] },

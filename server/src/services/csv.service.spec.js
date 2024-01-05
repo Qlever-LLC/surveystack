@@ -53,7 +53,7 @@ describe('CSV Service', () => {
         const { submission } = await createSubmission();
         submission.data.group_1 = {
           ...submission.data.group_1,
-          ...getSubmissionDataGenerator('text')(),
+          ...getSubmissionDataGenerator('string')(),
           ...getSubmissionDataGenerator('geoJSON')({}, 2),
         };
         const expected = _.cloneDeep(submission.data);

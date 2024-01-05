@@ -5,6 +5,7 @@ import authController from '../controllers/authController';
 import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
+import { syncDrafts } from '../controllers/submissionController.part.ts';
 import userController from '../controllers/userController';
 import * as scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
@@ -157,6 +158,11 @@ router.post(
   '/submissions/bulk-delete',
   [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
   catchErrors(submissionController.deleteSubmissions)
+);
+router.post(
+  '/submissions/sync-drafts',
+  [assertAuthenticated],
+  catchErrors(syncDrafts),
 );
 
 /** Surveys */
