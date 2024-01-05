@@ -19,6 +19,4 @@ const createScript = async ({ group }) => {
   return script;
 };
 
-export {
-  createScript,
-};
+export { createScript };

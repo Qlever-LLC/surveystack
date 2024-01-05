@@ -42,7 +42,4 @@ const createRes = async ({ user = null } = {}) => ({
   _headers: {},
 });
 
-export {
-  createReq,
-  createRes,
-};
+export { createReq, createRes };

@@ -136,7 +136,4 @@ const createSurvey = async (controls = [], overrides = {}) => {
   };
 };
 
-export {
-  createSurvey,
-  getControlGenerator,
-};
+export { createSurvey, getControlGenerator };

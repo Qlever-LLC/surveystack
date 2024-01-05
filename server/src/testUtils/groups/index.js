@@ -105,10 +105,4 @@ const setRole = async (membershipId, role) => {
   );
 };
 
-export {
-  createGroup,
-  createMembership,
-  deleteMemberships,
-  setRole,
-  asMongoId,
-};
+export { createGroup, createMembership, deleteMemberships, setRole, asMongoId };

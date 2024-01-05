@@ -20,7 +20,4 @@ const createUser = async (overrides = {}) => {
   return { _id: insertResult.insertedId, ...user };
 };
 
-export {
-  createUser,
-  createSuperAdmin,
-};
+export { createUser, createSuperAdmin };

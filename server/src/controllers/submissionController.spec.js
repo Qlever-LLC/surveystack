@@ -36,7 +36,7 @@ describe('submissionController', () => {
     beforeEach(async () => {
       group = await createGroup();
       ({ user } = await group.createUserMember({
-        userOverrides: { token }
+        userOverrides: { token },
       }));
       authHeaderValue = `${user.email} ${token}`;
     });
@@ -45,33 +45,27 @@ describe('submissionController', () => {
       const { createSubmissionDoc } = await createSurvey(['string']);
       const draftSubmission = createSubmissionDoc({
         _id: ObjectId().toString(),
-        meta: createSubmissionMeta({ isDraft: true })
+        meta: createSubmissionMeta({ isDraft: true }),
       });
 
-      return request(app)
-        .post('/api/submissions/sync-drafts')
-        .send([draftSubmission])
-        .expect(401);
+      return request(app).post('/api/submissions/sync-drafts').send([draftSubmission]).expect(401);
     });
-    
+
     it('returns 400 if any of the submissions in the request are not drafts', async () => {
       const { createSubmissionDoc } = await createSurvey(['string']);
       const draftSubmission = createSubmissionDoc({
         _id: ObjectId().toString(),
-        meta: createSubmissionMeta({ isDraft: true, creator: user._id })
+        meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
       });
       const nonDraftSubmission = createSubmissionDoc({
         _id: ObjectId().toString(),
-        meta: createSubmissionMeta({ isDraft: false, creator: user._id })
+        meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
       });
-      
+
       return request(app)
         .post('/api/submissions/sync-drafts')
         .set('Authorization', authHeaderValue)
-        .send([
-          draftSubmission,
-          nonDraftSubmission,
-        ])
+        .send([draftSubmission, nonDraftSubmission])
         .expect(400);
     });
 
@@ -82,20 +76,17 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({
           isDraft: true,
           creator: user._id,
-        })
+        }),
       });
       const submissionNotOwnedByRequestingUser = createSubmissionDoc({
         _id: ObjectId().toString(),
-        meta: createSubmissionMeta({ isDraft: true })
+        meta: createSubmissionMeta({ isDraft: true }),
       });
 
       return request(app)
         .post('/api/submissions/sync-drafts')
         .set('Authorization', authHeaderValue)
-        .send([
-          submissionOwnedByRequestingUser,
-          submissionNotOwnedByRequestingUser,
-        ])
+        .send([submissionOwnedByRequestingUser, submissionNotOwnedByRequestingUser])
         .expect(401);
     });
 
@@ -139,7 +130,7 @@ describe('submissionController', () => {
     async function mockControlsAndSubmission() {
       const { survey, createSubmission } = await createSurvey(['string', 'number']);
       const { submission: _submission } = await createSubmission();
-    
+
       const controls = survey.revisions[survey.latestVersion - 1].controls;
       const libraryId = new ObjectId();
       const libraryVersion = 3;
@@ -164,7 +155,7 @@ describe('submissionController', () => {
         ),
         getControlGenerator('group')(groupOverride, 3)
       );
-    
+
       const submission = {
         ..._submission,
         data: {
@@ -176,11 +167,11 @@ describe('submissionController', () => {
           ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 3),
         },
       };
-    
+
       submission.data.group_3.text_1.meta.permissions = ['admin'];
-    
+
       return { controls, submission };
-    };
+    }
 
     it('returns no submission for empty params', async () => {
       const controls = [];
@@ -258,7 +249,11 @@ describe('submissionController', () => {
 
   describe('postSubmissionPdf', () => {
     it('should return PDF base64 when `base64=1` if success', async () => {
-      const { survey, createSubmission } = await createSurvey(['instructions', 'string', 'ontology']);
+      const { survey, createSubmission } = await createSurvey([
+        'instructions',
+        'string',
+        'ontology',
+      ]);
       const { submission } = await createSubmission();
       await createUser({ _id: submission.meta.creator });
       const req = createReq({ body: { survey, submission }, query: { base64: '1' } });
@@ -274,7 +269,11 @@ describe('submissionController', () => {
     });
 
     it('should throw error if PDF generate failed', async () => {
-      const { survey, createSubmission } = await createSurvey(['instructions', 'string', 'ontology']);
+      const { survey, createSubmission } = await createSurvey([
+        'instructions',
+        'string',
+        'ontology',
+      ]);
       const { submission } = await createSubmission();
       const req = createReq({ body: { survey, submission }, query: { base64: '1' } });
       const res = await createRes({
