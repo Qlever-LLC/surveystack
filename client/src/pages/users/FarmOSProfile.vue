@@ -9,8 +9,8 @@
         variant="text"
         type="success"
         @click="successMessage = null"
-        >{{ successMessage }}</a-alert
-      >
+        >{{ successMessage }}
+      </a-alert>
 
       <a-alert
         v-if="errorMessage"
@@ -19,8 +19,9 @@
         mode="fade"
         variant="text"
         type="error"
-        >{{ errorMessage }}</a-alert
       >
+        {{ errorMessage }}
+      </a-alert>
 
       <p class="mt-4 mb-6">
         You are logged in as
@@ -51,9 +52,9 @@
             mode="fade"
             variant="text"
             type="error"
-            >{{ errorDialogMessage }}</a-alert
-          >
-          <a-btn block @click="addUser" color="primary" target="_blank"> Add </a-btn>
+            >{{ errorDialogMessage }}
+          </a-alert>
+          <a-btn block @click="addUser" color="primary" target="_blank"> Add</a-btn>
         </div>
       </app-dialog>
       <!-- add confirmation Dialog -->
@@ -96,8 +97,8 @@
             mode="fade"
             variant="text"
             type="error"
-            >{{ errorDialogMessage }}</a-alert
-          >
+            >{{ errorDialogMessage }}
+          </a-alert>
           <a-btn block @click="changeOwner" color="primary" target="_blank"> Update</a-btn>
         </div>
       </app-dialog>
@@ -150,7 +151,7 @@
             <li>See this farm's fields or plantings when filling out surveys.</li>
             <li>Push data from Survey Stack surveys into this farmOS farm.</li>
           </ol>
-          <a-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm</a-btn>
+          <a-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -185,7 +186,7 @@
             wish to continue access your farmOS farm you should sign up with hosting through Farmier at that point.
           </p>
           <p>If you want to transfer ownership of this farm to someone else, press the 'move' button instead.</p>
-          <a-btn block @click="confirmDeleteInstance" color="primary" target="_blank"> Confirm</a-btn>
+          <a-btn block @click="confirmDeleteInstance" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -211,7 +212,7 @@
             member of this group.
           </p>
           <p>This will also affect anyone else linked to this farm through Survey Stack.</p>
-          <a-btn block @click="confirmRemoveInstFromGrpDialog" color="primary" target="_blank"> Confirm</a-btn>
+          <a-btn block @click="confirmRemoveInstFromGrpDialog" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -231,7 +232,7 @@
             Are you sure? Removing this users access means they can no longer see your farmOS instance or access your
             fields, plantings or logs through in their surveys.
           </p>
-          <a-btn block @click="confirmRemoveInstFromOthUsrDialog" color="primary" target="_blank"> Confirm</a-btn>
+          <a-btn block @click="confirmRemoveInstFromOthUsrDialog" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -254,110 +255,80 @@
                 <div class="pt-3" style="white-space: nowrap">{{ instance.instanceName }}</div>
                 <div class="pb-3">
                   <span v-if="instance.isOwner">
-                    <a-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <a-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="blue"
-                          :href="getInstanceLink(instance.instanceName)"
-                          target="_blank"
-                        >
-                          access
-                        </a-btn>
-                      </template>
-                      <span>Access FarmOS instance</span>
-                    </a-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="blue"
+                      :href="getInstanceLink(instance.instanceName)"
+                      target="_blank"
+                    >
+                      access
+                      <a-tooltip top activator="parent">Access FarmOS instance</a-tooltip>
+                    </a-btn>
 
-                    <a-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <a-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="black"
-                          @click="addUserToInstance(instance.instanceName)"
-                        >
-                          add
-                        </a-btn>
-                      </template>
-                      <span>Add a user to your instance</span>
-                    </a-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="black"
+                      @click="addUserToInstance(instance.instanceName)"
+                    >
+                      add
+                      <a-tooltip top activator="parent">Add a user to your instance</a-tooltip>
+                    </a-btn>
 
-                    <a-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <a-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="black"
-                          @click="moveInstance(instance.instanceName)"
-                        >
-                          re-assign
-                        </a-btn>
-                      </template>
-                      <span>Re-assign the instance's ownership</span>
-                    </a-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="black"
+                      @click="moveInstance(instance.instanceName)"
+                    >
+                      re-assign
+                      <a-tooltip top activator="parent">Re-assign the instance's ownership</a-tooltip>
+                    </a-btn>
 
-                    <a-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <a-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="red"
-                          @click="deleteInstance(instance.instanceName)"
-                        >
-                          delete
-                        </a-btn>
-                      </template>
-                      <span>Delete this instance</span>
-                    </a-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="red"
+                      @click="deleteInstance(instance.instanceName)"
+                    >
+                      delete
+                      <a-tooltip top activator="parent">Delete this instance</a-tooltip>
+                    </a-btn>
                   </span>
                   <span v-else>
-                    <a-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <a-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="blue"
-                          :href="getInstanceLink(instance.instanceName)"
-                          target="_blank"
-                        >
-                          access
-                        </a-btn>
-                      </template>
-                      <span>Access FarmOS instance</span>
-                    </a-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="blue"
+                      :href="getInstanceLink(instance.instanceName)"
+                      target="_blank"
+                    >
+                      access
+                      <a-tooltip top activator="parent">Access FarmOS instance</a-tooltip>
+                    </a-btn>
 
-                    <a-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <a-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="red"
-                          @click="removeInstance(instance.instanceName)"
-                        >
-                          remove
-                        </a-btn>
-                      </template>
-                      <span>Remove this instance</span>
-                    </a-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="red"
+                      @click="removeInstance(instance.instanceName)"
+                    >
+                      remove
+                      <a-tooltip top activator="parent">Remove this instance</a-tooltip>
+                    </a-btn>
                   </span>
                 </div>
               </td>
@@ -404,7 +375,8 @@
     </template>
     <template v-else>
       <h1>FarmOS Profile</h1>
-      You are not logged in... <router-link to="/auth/login">Go to Login</router-link>
+      You are not logged in...
+      <router-link to="/auth/login">Go to Login</router-link>
     </template>
   </a-container>
 </template>

@@ -6,12 +6,10 @@
         Update Groups with Access to Farm Instance
         <br />
         <a-select
-          engineering="autocomplete"
           label="Select Groups"
           multiple
-          chips
           :items="allGroups"
-          :item-text="(g) => `${g.name} (${g.path})`"
+          :item-title="(g) => `${g.name} (${g.path})`"
           :item-value="(g) => `${g._id}`"
           class="mt-4"
           v-model="selectedGroups"
@@ -19,6 +17,11 @@
           open-on-clear
           prependItemSlot
         >
+          <template v-slot:chip="{ props, item }">
+            <a-chip v-bind="props" closable>
+              {{ item.title }}
+            </a-chip>
+          </template>
           <template v-slot:prepend-item>
             <a-btn
               :disabled="loading"

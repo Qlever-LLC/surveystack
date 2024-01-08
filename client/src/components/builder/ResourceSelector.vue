@@ -2,14 +2,14 @@
   <a-select
     label="Resource"
     :placeholder="placeholder"
-    :value="value"
-    @input="handleSelect"
+    :modelValue="value"
+    @update:modelValue="handleSelect"
     :items="items"
-    item-text="label"
+    item-title="label"
     item-value="id"
     :disabled="disabled"
     hide-details
-    :outlined="outlined"
+    :variant="outlined ? 'outlined' : ''"
   />
 </template>
 
@@ -18,7 +18,7 @@ const NEW_RESOURCE_PREFIX = 'NEW_';
 
 export default {
   props: {
-    value: {
+    modelValue: {
       required: true,
       validator: (prop) => typeof prop === 'string' || prop === null,
     },
@@ -45,6 +45,11 @@ export default {
       type: Boolean,
     },
   },
+  data() {
+    return {
+      value: this.modelValue,
+    };
+  },
   computed: {
     filteredResources() {
       return this.resourceTypes.length === 0
@@ -63,6 +68,7 @@ export default {
   },
   methods: {
     handleSelect(val) {
+      this.value = val;
       if (val.includes(NEW_RESOURCE_PREFIX)) {
         this.$emit('on-new', val.replace(NEW_RESOURCE_PREFIX, ''));
       } else {

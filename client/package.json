@@ -19,6 +19,7 @@
   },
   "license": "GPL-3.0-only",
   "dependencies": {
+    "@guolao/vue-monaco-editor": "^1.4.1",
     "@mapbox/mapbox-gl-geocoder": "^5.0.1",
     "@mapbox/togeojson": "^0.16.0",
     "@mdi/font": "^7.3.67",

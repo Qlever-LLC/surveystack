@@ -1,39 +1,24 @@
 <template>
   <v-tabs
-    @change="handleCustomChange"
-    :background-color="backgroundColor"
-    :centered="centered"
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    :bg-color="bgColor"
     :color="color"
-    :dark="dark"
     :fixed-tabs="fixedTabs"
-    :grow="grow"
-    :icons-and-text="iconsAndText"
-    :value="value"
-  >
+    :grow="grow">
     <slot />
   </v-tabs>
 </template>
 
 <script>
 export default {
-  emits: ['change', 'input'],
   props: {
     //vuetify props
-    backgroundColor: { type: String, required: false },
-    centered: { type: Boolean, required: false },
+    bgColor: { type: String, required: false },
     color: { type: String, required: false },
-    dark: { type: String, required: false },
     fixedTabs: { type: Boolean, required: false },
     grow: { type: Boolean, required: false },
-    iconsAndText: { type: Boolean, required: false },
-    value: { type: undefined, required: false },
-  },
-  methods: {
-    handleCustomChange(event) {
-      // @change emits input for v-model case
-      this.$emit('input', event);
-      this.$emit('change', event);
-    },
+    modelValue: { type: undefined, required: false },
   },
 };
 </script>

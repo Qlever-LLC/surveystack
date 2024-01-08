@@ -68,7 +68,7 @@
         </a-list>
       </a-menu>
     </div>
-    <a-select :items="availableFilters" v-model="filter" label="Filter" />
+    <a-select :items="availableFilters" item-title="text" item-value="value" v-model="filter" label="Filter" />
     <a-text-field v-model="search" label="Search" autocomplete="off" />
     <a-list>
       <template v-if="filteredResources.length > 0">

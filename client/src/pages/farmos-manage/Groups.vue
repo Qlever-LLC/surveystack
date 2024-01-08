@@ -11,19 +11,19 @@
     </div>
 
     <a-select
-      engineering="autocomplete"
       v-if="!loading && !!groups"
-      outlined
+      variant="outlined"
       primary
       label="Select Group"
       v-model="selectedGroup"
-      :item-text="(g) => `${g.name} (${g.path})`"
+      :item-title="(g) => `${g.name} (${g.path})`"
       item-value="_id"
       :items="groups"
     />
 
     <!-- <a-row class="align-baseline">
       <a-col>
+        WARNING: Is not up to date as it is a comment 
         <a-select
           engineering="autocomplete"
           v-if="!loading && !!groups"
@@ -56,15 +56,14 @@
           <tr>
             <td>
               <a-select
-                engineering="autocomplete"
                 v-if="!loading && !!mappings"
                 class="mt-6"
-                outlined
+                variant="outlined"
                 primary
                 label="Select FarmOS Instance"
                 v-model="selectedInstance"
                 item-value="instanceName"
-                item-text="instanceName"
+                item-title="instanceName"
                 :items="instances"
               />
             </td>

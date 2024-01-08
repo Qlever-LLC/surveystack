@@ -25,10 +25,10 @@ export default {
   props: {
     border: { type: String, required: false },
     color: { type: String, required: false },
-    borderColor: { type: Boolean, default: false },
+    borderColor: { type: String, default: undefined },
     closable: { type: Boolean, default: false },
     elevation: { type: [Number, String], required: false },
-    icon: { type: [Boolean, String], required: false },
+    icon: { type: undefined, required: false },
     mode: { type: String, required: false },
     prominent: { type: Boolean, default: false },
     type: { type: String, required: false },

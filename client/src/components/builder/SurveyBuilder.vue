@@ -18,8 +18,7 @@
       :library-root-group="updateLibraryRootGroup"
       :to-survey="updateToLibrary"
       @update="updateLibraryConfirmed"
-      @cancel="updateLibraryCancelled"
-    />
+      @cancel="updateLibraryCancelled" />
 
     <a-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
@@ -27,8 +26,7 @@
       type="warning"
       color="orange"
       elevation="2"
-      closable
-    >
+      closable>
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </a-alert>
 
@@ -62,8 +60,7 @@
             @addToLibrary="addToLibrary"
             class="mb-4"
             data-testid="survey-details"
-            @show-version-dialog="$emit('show-version-dialog')"
-          />
+            @show-version-dialog="$emit('show-version-dialog')" />
           <graphical-view
             v-if="!viewCode"
             :selected="control"
@@ -78,8 +75,7 @@
             @update-library-control="updateLibrary"
             @hide-control="hideControl"
             @unhide-control="unhideControl"
-            data-testid="graphical-view"
-          />
+            data-testid="graphical-view" />
         </div>
       </pane>
 
@@ -90,11 +86,9 @@
             :libraryId="libraryId"
             @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
-            data-testid="question-library"
-          />
+            data-testid="question-library" />
         </div>
       </pane>
-
       <pane class="pane pane-controls" v-if="control">
         <a-card class="px-4 pb-3 m-2 mb-3">
           <control-properties
@@ -116,8 +110,7 @@
             @set-survey-resources="setSurveyResources"
             @set-control-params="setControlParams"
             @set-script-editor-is-visible="setScriptIsVisible"
-            data-testid="control-properties"
-          />
+            data-testid="control-properties" />
         </a-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
@@ -127,10 +120,8 @@
           @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
-          :refresh="codeRefreshCounter"
           @change="updateScriptCode"
-          @save="saveScript"
-        >
+          @save="saveScript">
         </code-editor>
       </pane>
 
@@ -138,7 +129,7 @@
         <splitpanes horizontal class="code-resizer">
           <pane size="80">
             <div style="height: 100%">
-              <a-tabs v-if="control.options" v-model="selectedTab" background-color="bg-blue-grey-darken-4" dark>
+              <a-tabs v-if="control.options" v-model="selectedTab">
                 <a-tab :disabled="!control.options.relevance.enabled"> Relevance</a-tab>
                 <a-tab :disabled="!control.options.initialize.enabled"> Initialize</a-tab>
                 <a-tab :disabled="!control.options.calculate.enabled"> Calculate</a-tab>
@@ -155,15 +146,13 @@
                 :code="activeCode"
                 :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
                 class="main-code-editor"
-                :refresh="codeRefreshCounter"
                 runnable="true"
                 :error="codeError"
                 @run="runCode"
                 :result="evaluated"
                 @change="updateSelectedCode"
                 :examples="true"
-                @examples="showExamples = true"
-              >
+                @examples="showExamples = true">
               </code-editor>
             </div>
           </pane>
@@ -175,16 +164,14 @@
 
       <pane
         class="pane pane-submission-code pane-shared-code"
-        v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)"
-      >
+        v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)">
         <div class="code-editor">
           <code-editor
             title="Shared Code"
             v-if="survey"
             class="code-editor"
             readonly="true"
-            :code="sharedCode"
-          ></code-editor>
+            :code="sharedCode"></code-editor>
         </div>
       </pane>
 
@@ -199,8 +186,7 @@
             :persist="false"
             class="builder-draft"
             builder
-            :forceMobile="isPreviewMobile"
-          >
+            :forceMobile="isPreviewMobile">
             <template v-slot:toolbar-actions>
               <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <a-btn :value="false" dense>
@@ -227,7 +213,7 @@
           </app-draft-component>
         </div>
 
-        <a-overlay :value="enableSaveDraft">
+        <a-overlay :modelValue="enableSaveDraft">
           <a-card>
             <a-card-text> Please Save Draft to update Survey Preview.</a-card-text>
           </a-card>
@@ -354,7 +340,6 @@ export default {
       scriptCode: null,
       // survey entity
       surveyUnderWork: this.survey,
-      codeRefreshCounter: 0,
       submissionCode: '',
       instance: null,
       initialSurvey: cloneDeep(this.survey),

@@ -14,7 +14,7 @@
       errorMessage
     }}</a-alert>
 
-    <a-tabs v-model="tab" background-color="transparent" color="basil" grow>
+    <a-tabs v-model="tab" bg-color="transparent" color="basil" grow>
       <a-tab v-for="item in items" :key="item.name">{{ item.name }}</a-tab>
     </a-tabs>
 
@@ -38,8 +38,8 @@
           @create-instance="createInstance"
           @create-plan="createPlan"
           @delete-plan="deletePlan"
-          @addSuperAdminNote="addSuperAdminNote"
-        ></component>
+          @addSuperAdminNote="addSuperAdminNote">
+        </component>
       </a-window-item>
     </a-window>
 

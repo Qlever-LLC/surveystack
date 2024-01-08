@@ -1,8 +1,22 @@
-<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <div>
-    <a-select engineering="autocomplete" :items="fieldItems" label="Field" v-model="selectedField" hide-details />
-    <a-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
+    <a-select
+      :items="fieldItems"
+      item-title="text"
+      item-value="value"
+      label="Field"
+      v-model="selectedField"
+      hide-details
+    />
+    <a-select
+      :items="operators.default"
+      item-title="text"
+      item-value="value"
+      label="Operator"
+      v-model="selectedOperator"
+      hide-details
+      return-object
+    />
     <a-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
 
     <div class="d-flex justify-end">

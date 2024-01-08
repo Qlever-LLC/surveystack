@@ -24,19 +24,22 @@
           />
 
           <a-select
-            engineering="autocomplete"
-            outlined
+            variant="outlined"
             class="flex-grow-1 flex-shrink-0"
             label="Select FarmOS Plans for Group"
             multiple
-            deletable-chips
-            @change="$emit('plansChanged', selectedPlans)"
+            @update:modelValue="$emit('plansChanged', selectedPlans)"
             v-model="selectedPlans"
             :items="plans"
             :item-value="(p) => p._id"
-            small-chips
-            :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          />
+            :item-title="(p) => `${p.planName} (${p.planUrl})`"
+          >
+            <template v-slot:chip="{ props, item }">
+              <a-chip v-bind="props" closable>
+                {{ item.title }}
+              </a-chip>
+            </template>
+          </a-select>
         </div>
         <a-btn color="red" @click="$emit('deactivate')">Deactivate FarmOS for Group</a-btn>
       </a-card-text>
@@ -49,22 +52,19 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <a-container class="pa-0" fluid>
-            <a-tooltip bottom :disabled="canAddCoffeeShop">
-              <template v-slot:activator="{ on, attrs }">
-                <div v-bind="attrs" v-on="on">
-                  <a-checkbox
-                    class="ma-0 pa-0"
-                    label="Add this group to the Coffee Shop"
-                    v-model="groupInfos.groupHasCoffeeShopAccess"
-                    :ripple="false"
-                    :disabled="!canAddCoffeeShop"
-                    hide-details
-                    @input="$emit('addGrpCoffeeShop', $event)"
-                  />
-                </div>
-              </template>
-              <span>Talk to your parent group administrator to enable this option</span>
-            </a-tooltip>
+            <a-checkbox
+              class="ma-0 pa-0"
+              label="Add this group to the Coffee Shop"
+              v-model="groupInfos.groupHasCoffeeShopAccess"
+              :ripple="false"
+              :disabled="!canAddCoffeeShop"
+              hide-details
+              @input="$emit('addGrpCoffeeShop', $event)"
+            >
+              <a-tooltip bottom activator="parent">
+                Talk to your parent group administrator to enable this option
+              </a-tooltip>
+            </a-checkbox>
             <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"

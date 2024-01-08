@@ -27,7 +27,7 @@
         <div>
           <VueDraggable
             class="d-flex flex-row pa-2 px-4"
-            style="overflow-x: auto"
+            style="overflow: auto; height: 75vh"
             v-model="columns"
             group="columns"
             @start="drag = true"
@@ -37,23 +37,20 @@
           >
             <div class="draggable-column" v-for="(item, i) in columns" :key="i">
               <!-- vertical bar indicating which columns are locked to the left -->
-              <a-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
-                <template v-slot:activator="{ on, attrs }">
-                  <a-card
-                    width="26px"
-                    height="100%"
-                    class="draggable-handle mx-1 py-3 d-flex flex-column justify-space-around align-center"
-                    elevation="3"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    <a-divider vertical class="lock-line-decor" />
-                    <a-icon class="my-1">mdi-arrow-horizontal-lock</a-icon>
-                    <a-divider vertical class="lock-line-decor" />
-                  </a-card>
-                </template>
-                <span>Columns to the left of this line will always be visible</span>
-              </a-tooltip>
+              <a-card
+                v-if="item.isFixedUntilMarker"
+                width="26px"
+                height="100%"
+                class="draggable-handle mx-1 py-3 d-flex flex-column justify-space-around align-center"
+                elevation="3"
+              >
+                <a-divider vertical class="lock-line-decor" />
+                <a-icon class="my-1">mdi-arrow-horizontal-lock</a-icon>
+                <a-divider vertical class="lock-line-decor" />
+                <a-tooltip top open-delay="500" activator="parent"
+                  >Columns to the left of this line will always be visible</a-tooltip
+                >
+              </a-card>
 
               <div v-else>
                 <a-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
@@ -81,9 +78,11 @@
                     <a-text-field v-model="item.value" label="Value" dense />
                     <a-select
                       label="Type"
-                      :value="item.type"
-                      @input="(type) => onChanged(item, { type, defaultValue: null })"
+                      :modelValue="item.type"
+                      @update:modelValue="(type) => onChanged(item, { type, defaultValue: null })"
                       :items="$options.MATRIX_COLUMN_TYPES"
+                      item-title="text"
+                      item-value="value"
                       dense
                     />
 
@@ -91,8 +90,10 @@
                       <div class="d-flex flex-row flex-wrap">
                         <a-select
                           v-model="item.resource"
-                          @input="(resource) => onChanged(item, { resource, defaultValue: null })"
+                          @update:modelValue="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
+                          item-title="text"
+                          item-value="value"
                           label="Resource"
                           hide-details
                           dense

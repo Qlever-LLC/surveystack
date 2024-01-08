@@ -1,11 +1,10 @@
 <template>
   <v-radio-group
-    :value="value"
-    @change="$emit('input', $event)"
+    :modelValue="value"
+    @update:modelValue="$emit('update:modelValue', $event)"
     :name="name"
     :disabled="disabled"
-    :hide-details="hideDetails"
-  >
+    :hide-details="hideDetails">
     <slot />
   </v-radio-group>
 </template>
@@ -13,12 +12,16 @@
 <script>
 export default {
   name: 'ARadioGroup',
-  emits: ['input'],
   props: {
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
     name: { type: String, required: false },
     disabled: { type: Boolean, required: false },
     hideDetails: { type: [Boolean, String], required: false },
+  },
+  computed: {
+    value() {
+      return this.modelValue;
+    },
   },
 };
 </script>

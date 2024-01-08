@@ -7,18 +7,21 @@
 
         <br />
         <a-select
-          engineering="autocomplete"
           label="Select Farms"
           multiple
           chips
-          deletable-chips
+          closable-chips
           :items="farmInstances"
-          :item-text="(i) => `${i.instanceName}`"
+          :item-title="(i) => `${i.instanceName}`"
           class="mt-4"
           v-model="selectedFarms"
           prependItemSlot
           itemSlot
         >
+          <template v-slot:chip="{ props, item }">
+            <v-chip v-bind="props">{{ item.raw.instanceName }}</v-chip>
+          </template>
+
           <template v-slot:prepend-item>
             <a-btn
               @click="connect"
@@ -31,14 +34,16 @@
             </a-btn>
           </template>
 
-          <template v-slot:item="{ item }">
-            <a-list-item-title>{{ item.instanceName }}</a-list-item-title>
-            <a-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
-              >owner(s):</a-list-item-subtitle
-            >
-            <a-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
-              {{ owner.name }}({{ owner.email }})
-            </a-list-item-subtitle>
+          <template v-slot:item="{ props, item }">
+            <a-list-item v-bind="props">
+              <a-list-item-title>{{ item.instanceName }}</a-list-item-title>
+              <a-list-item-subtitle v-if="item.raw.owners.length > 0" class="d-flex justify-end"
+                >owner(s):</a-list-item-subtitle
+              >
+              <a-list-item-subtitle class="d-flex justify-end" v-for="owner in item.raw.owners" :key="owner.email">
+                {{ owner.name }}({{ owner.email }})
+              </a-list-item-subtitle>
+            </a-list-item>
           </template>
         </a-select>
         <a-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">

@@ -2,14 +2,13 @@
   <a-sheet outlined class="pa-8">
     <div class="display-1">
       KML Importer
-      <a-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <a-icon color="primary" v-bind="attrs" v-on="on">mdi-information</a-icon>
-        </template>
-        <span>
-          Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz first.
-        </span>
-      </a-tooltip>
+      <a-icon color="primary"
+        >mdi-information
+        <a-tooltip bottom activator="parent"
+          >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz
+          first.</a-tooltip
+        >
+      </a-icon>
     </div>
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 
@@ -19,12 +18,13 @@
     <template v-if="kml !== ''">
       <a-row>
         <a-select
-          engineering="autocomplete"
           v-model="field"
           :items="fields"
-          outlined
+          item-title="text"
+          item-value="value"
+          variant="outlined"
           label="Select Field"
-          @change="selected"
+          @update:modelValue="selected"
         />
       </a-row>
       <a-row class="text-center">
@@ -38,7 +38,7 @@ import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
 export default {
-  props: ['value'],
+  props: ['modelValue'],
   data() {
     return {
       kml: '', // string of KML
@@ -48,6 +48,7 @@ export default {
       fields: [],
       field: null,
       name: '',
+      value: this.modelValue,
     };
   },
   methods: {
@@ -73,7 +74,11 @@ export default {
       });
       console.log(wktString);
     },
-    async getFile(e) {
+    async getFile(files) {
+      const e = files[0];
+      if (!e) {
+        return;
+      }
       const holder = await e.text();
       this.kml = holder;
       this.importKml();

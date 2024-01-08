@@ -69,7 +69,9 @@
                   <a-icon>mdi-code-tags</a-icon>
                 </a-btn> -->
 
-              <!-- <a-select
+              <!--
+                WARNING: Is not up to date as it is a comment 
+                <a-select
                   :items="getParagraphStyles(isActive, commands)"
                 >
                   <template v-slot:selection="{ item, index }">

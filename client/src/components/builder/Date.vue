@@ -1,9 +1,10 @@
 <template>
   <a-select
-    engineering="autocomplete"
     v-if="type === 'date-year'"
     label="Default value"
     v-model="year"
+    :modelValue="getYear"
+    @update:modelValue="setYear"
     :items="years"
     :menu-props="{ offsetY: true }"
     :dense="dense"
@@ -59,13 +60,14 @@ import getWeekOfMonth from 'date-fns/getWeekOfMonth';
 export default {
   emits: ['blur', 'input'],
   props: {
-    value: { type: String },
+    modelValue: { type: String },
     type: { type: String },
     dense: { type: Boolean, default: false },
   },
 
   data() {
     return {
+      value: this.modelValue,
       menuIsOpen: false,
     };
   },
@@ -90,7 +92,7 @@ export default {
         const pickedDate = Array.isArray(date) ? date[0] : date;
         let target = parse(pickedDate, this.formatter, new Date());
         if (!isValid(target)) {
-          this.$emit('input', null);
+          this.$emit('update:modelValue', null);
           return;
         }
 
@@ -103,19 +105,7 @@ export default {
         } else if (this.type === 'date-week-month-year') {
           target = startOfWeek(target);
         }
-        this.$emit('input', target.toISOString());
-      },
-    },
-    year: {
-      get() {
-        return this.value ? Number(this.value.substring(0, 4)) : null;
-      },
-      set(year) {
-        if (typeof year === 'number') {
-          this.$emit('input', new Date(year, 0).toISOString());
-        } else {
-          this.$emit('input', null);
-        }
+        this.$emit('update:modelValue', target.toISOString());
       },
     },
     years() {
@@ -142,9 +132,19 @@ export default {
     },
   },
   methods: {
+    getYear() {
+      return this.value ? Number(this.value.substring(0, 4)) : null;
+    },
+    setYear(year) {
+      if (typeof year === 'number') {
+        this.$emit('update:modelValue', new Date(year, 0).toISOString());
+      } else {
+        this.$emit('update:modelValue', null);
+      }
+    },
     onChange(value) {
       if (!value) {
-        this.$emit('input', null);
+        this.$emit('update:modelValue', null);
       }
     },
   },

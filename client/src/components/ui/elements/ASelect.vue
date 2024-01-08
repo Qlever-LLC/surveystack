@@ -1,61 +1,13 @@
 <template>
-  <v-select
-    v-if="engineering === 'select'"
-    @blur="$emit('blur')"
-    @change="$emit('change', $event)"
-    @focus="$emit('focus')"
-    @input="$emit('input', $event)"
-    :class="{
-      minHeightAuto: cssMinHeightAuto,
-      minHeight56px: cssMinHeight56px,
-      flexWrap: cssFlexWrap,
-      flexNoWrap: cssFlexNoWrap,
-      oneLineSpan: cssOneLineSpan,
-    }"
-    :data-test-id="dataTestId"
-    :chips="chips"
-    :clearable="clearable"
-    :color="color"
-    :deletable-chips="deletableChips"
-    :dense="dense"
-    :disabled="disabled"
-    :hide-details="hideDetails"
-    :hint="hint"
-    :item-text="itemText"
-    :item-value="itemValue"
-    :items="items"
-    :label="label"
-    :menu-props="menuProps"
-    :multiple="multiple"
-    :outlined="outlined"
-    :persistent-hint="persistentHint"
-    :placeholder="placeholder"
-    :readonly="readonly"
-    :return-object="returnObject"
-    :value="value"
-  >
-    <template v-if="selectionSlot" v-slot:selection="{ item, index }">
-      <slot name="selection" :item="item" :index="index" />
-    </template>
-
-    <template v-if="itemSlot" v-slot:item="{ item, on, attrs }">
-      <slot name="item" :item="item" :on="on" :attrs="attrs" />
-    </template>
-
-    <template v-if="appendOuterSlot" v-slot:append-outer>
-      <slot name="append-outer" />
-    </template>
-  </v-select>
-
   <v-autocomplete
-    v-else-if="engineering === 'autocomplete'"
+    v-if="!allowCustomItem"
     ref="selectRef"
+    :modelValue="modelValue"
+    @update:modelValue="clearSearchAndEmitAutocompleteUpdate"
+    v-model:search="internalSearch"
     @blur="$emit('blur')"
-    @change="$emit('change', $event)"
-    @click:append-outer="$emit('click:append-outer', $event)"
-    @focus="$emit('focus', $event)"
-    @input="$emit('input', $event)"
-    @keyup.enter="$emit('keyup.enter')"
+    @click:append="$emit('click:append', $event)"
+    @focus="$emit('focus')"
     :class="{
       minHeightAuto: cssMinHeightAuto,
       minHeight56px: cssMinHeight56px,
@@ -63,63 +15,64 @@
       flexNoWrap: cssFlexNoWrap,
       oneLineSpan: cssOneLineSpan,
     }"
-    :data-test-id="dataTestId"
-    :delimiters="delimiters"
-    :primary="primary"
-    :append-outer-icon="appendOuterIcon"
+    :append-icon="appendIcon"
     :chips="chips"
     :clearable="clearable"
+    :closable-chips="closableChips"
     :color="color"
-    :dark="dark"
-    :deletable-chips="deletableChips"
-    :dense="dense"
+    :custom-filter="customFilter"
+    :data-test-id="dataTestId"
+    :density="dense ? 'compact' : 'default'"
     :disabled="disabled"
-    :filled="filled"
     :hide-details="hideDetails"
     :hint="hint"
-    :item-text="itemText"
-    :item-value="itemValue"
     :items="items"
+    :item-title="itemTitle"
+    :item-value="itemValue"
     :label="label"
     :loading="loading"
     :menu-props="menuProps"
     :multiple="multiple"
-    :open-on-clear="openOnClear"
-    :outlined="outlined"
+    :variant="variant"
+    :persistent-hint="persistentHint"
     :placeholder="placeholder"
+    :primary="primary"
+    :readonly="readonly"
     :return-object="returnObject"
     :rounded="rounded"
     :rules="rules"
-    :small-chips="smallChips"
-    :solo="solo"
     :single-line="singleLine"
-    :value="value"
   >
-    <template v-if="selectionSlot" v-slot:selection="{ item, index }">
-      <slot name="selection" :item="item" :index="index" />
+    <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
+      <slot name="selection" :props="props" :item="item" :index="index" />
     </template>
 
-    <template v-if="itemSlot" v-slot:item="{ item }">
-      <slot name="item" :item="item" />
+    <template v-if="multiple" v-slot:chip="{ props, item, index }">
+      <slot name="chip" :props="props" :item="item" :index="index" />
     </template>
 
-    <template v-if="appendOuterSlot" v-slot:append-outer>
-      <slot name="append-outer" />
+    <template v-if="itemSlot" v-slot:item="{ props, item }">
+      <slot name="item" :props="props" :item="item" />
     </template>
 
     <template v-if="prependItemSlot" v-slot:prepend-item>
       <slot name="prepend-item" />
     </template>
+
+    <template v-if="appendSlot" v-slot:append>
+      <slot name="append" />
+    </template>
   </v-autocomplete>
 
   <v-combobox
-    v-else-if="engineering === 'combobox'"
+    v-else-if="allowCustomItem"
     ref="selectRef"
+    :modelValue="value"
+    @update:modelValue="updateValue"
+    :search="searchInput"
+    @update:search="updateSearch"
     @blur="$emit('blur')"
-    @change="onChange"
     @focus="$emit('focus', $event)"
-    @input="onInput"
-    @update:search-input="onSearchInputUpdate"
     :class="{
       minHeightAuto: cssMinHeightAuto,
       minHeight56px: cssMinHeight56px,
@@ -127,28 +80,32 @@
       flexNoWrap: cssFlexNoWrap,
       oneLineSpan: cssOneLineSpan,
     }"
-    :data-test-id="dataTestId"
-    :delimiters="delimiters"
     :chips="chips"
     :clearable="clearable"
     :color="color"
+    :data-test-id="dataTestId"
+    :delimiters="delimiters"
     :dense="dense"
     :hide-details="hideDetails"
+    :hide-no-data="!noDataSlot"
+    :hide-selected="noDataSlot"
     :disabled="disabled"
-    :item-text="itemText"
-    :item-value="itemValue"
     :items="items"
+    :item-title="itemTitle"
+    :item-value="itemValue"
     :label="label"
     :menu-props="menuProps"
     :multiple="multiple"
-    :outlined="outlined"
+    :variant="variant"
     :placeholder="placeholder"
     :return-object="returnObject"
-    :search-input="internalSearch"
-    :value="value"
   >
-    <template v-if="selectionSlot" v-slot:selection="{ item, index }">
-      <slot name="selection" :item="item" :index="index" />
+    <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
+      <slot name="selection" :props="props" :item="item" :index="index" />
+    </template>
+
+    <template v-if="multiple" v-slot:chip="{ props, item, index }">
+      <slot name="chip" :props="props" :item="item" :index="index" />
     </template>
 
     <template v-if="noDataSlot" v-slot:no-data>
@@ -158,32 +115,22 @@
 </template>
 
 <script>
-// import { ref } from 'vue';
-
 export default {
-  emits: ['blur', 'change', 'click:append-outer', 'focus', 'input', 'keyup.enter', 'update:search-input'],
+  emits: ['blur', 'click:append', 'focus', 'update:search'],
   props: {
-    //TODO @benoit: try to remove this prop:
-    //do we ever need select? imho its just autocomplete without text input, we could always offer text input and remove v-select here
+    //Don't use v-select because its just autocomplete without text input, we could always offer text input and remove v-select here
     //combobox is just autocomplete with manual input of a not-yet-existing item
-    //so instead of engineering, we could just add a prop "allowCustomItem" (boolean). If true, use combobox, else use autocomplete
-    engineering: {
-      validator: function (value) {
-        // The value must match one of these strings
-        return ['select', 'autocomplete', 'combobox'].includes(value);
-      },
-      default: 'select',
-      required: false,
-    },
+    //so to know which one to use, we just add a prop "allowCustomItem" (boolean). If true, use combobox, else use autocomplete
+    allowCustomItem: { type: Boolean, required: false, default: false },
     /* Named slot set to true to render slot
       Example:
       <a-select ... selectionSlot>
-        <template v-slot:selection="data">
+        <template v-slot:selection="{ props, item, index }">
       </a-select>
     */
     selectionSlot: { type: Boolean, required: false },
     itemSlot: { type: Boolean, required: false },
-    appendOuterSlot: { type: Boolean, required: false },
+    appendSlot: { type: Boolean, required: false },
     prependItemSlot: { type: Boolean, required: false },
     noDataSlot: { type: Boolean, required: false },
     //non vuetify props
@@ -195,101 +142,69 @@ export default {
     dataTestId: { type: String, required: false },
     delimiters: { type: Array, required: false },
     primary: { type: Boolean, required: false },
+    //vuetify v-model props
+    modelValue: { type: undefined, required: false },
+    searchInput: { type: undefined, required: false },
     //vuetify props
-    appendOuterIcon: { type: String, required: false },
+    appendIcon: { type: undefined, required: false },
     chips: { type: Boolean, required: false },
     clearable: { type: Boolean, required: false },
+    closableChips: { type: Boolean, required: false },
     color: { type: String, required: false },
-    dark: { type: Boolean, required: false },
-    deletableChips: { type: Boolean, required: false },
+    customFilter: { type: Function, required: false },
     dense: { type: Boolean, required: false },
     disabled: { type: Boolean, required: false },
-    filled: { type: Boolean, required: false },
-    filter: { type: Function, required: false },
     hideDetails: { type: [Boolean, String], required: false },
     hint: { type: String, required: false },
-    itemText: { type: [String, Array, Function], required: false },
-    itemValue: { type: [String, Array, Function], required: false },
     items: { type: Array, required: false },
+    itemTitle: { type: [String, Array, Function], required: false },
+    itemValue: { type: [String, Array, Function], required: false },
     label: { type: String, required: false },
-    loading: { type: Boolean, required: false },
+    loading: { type: [String, Boolean], required: false },
     menuProps: { type: [String, Array, Object], required: false },
     multiple: { type: Boolean, required: false },
     openOnClear: { type: Boolean, required: false },
-    outlined: { type: Boolean, required: false },
     persistentHint: { type: Boolean, required: false },
     placeholder: { type: String, required: false },
     readonly: { type: Boolean, required: false },
     returnObject: { type: Boolean, required: false },
-    rounded: { type: Boolean, required: false },
+    rounded: { type: [String, Number, Boolean], required: false },
     rules: { type: Array, required: false },
-    searchInput: { type: String, required: false },
     singleLine: { type: Boolean, required: false },
-    smallChips: { type: Boolean, required: false },
-    solo: { type: Boolean, required: false },
-    value: { type: undefined, required: false },
+    variant: {
+      type: String,
+      validator: function (value) {
+        return ['underlined', 'outlined', 'filled', 'solo', 'solo-inverted', 'solo-filled', 'plain'].includes(value);
+      },
+      default: 'underlined',
+      required: false,
+    },
   },
 
-  //TODO Vue3 Composition API causes error in several Unit Tests
-
-  // setup(props, { emit }) {
-  //   const selectRef = ref(null);
-  //   const internalSearch = ref(props.searchInput);
-  //   const multiple = ref(props.multiple);
-
-  //   function blur() {
-  //     selectRef.value.blur();
-  //   }
-
-  //   function onSearchInputUpdate(newVal) {
-  //     internalSearch.value = newVal;
-  //     emit('update:search-input', newVal);
-  //   }
-
-  //   function onChange(val) {
-  //     if (multiple.value || internalSearch.value !== null) {
-  //       emit('change', val);
-  //     }
-  //     internalSearch.value = null;
-  //   }
-  //   function onInput(val) {
-  //     if (multiple.value || internalSearch.value !== null) {
-  //       emit('input', val);
-  //     }
-  //   }
-
-  //   return {
-  //     selectRef,
-  //     internalSearch,
-  //     blur,
-  //     onSearchInputUpdate,
-  //     onChange,
-  //     onInput,
-  //   };
-  // },
   data() {
     return {
-      internalSearch: this.searchInput,
+      internalSearch: null,
+      value: this.modelValue,
+      inputSearch: this.searchInput,
     };
   },
   methods: {
-    blur() {
-      this.$refs.selectRef.blur();
-    },
-    onSearchInputUpdate(newVal) {
-      this.internalSearch = newVal;
-      this.$emit('update:search-input', newVal);
-    },
-    onChange(val) {
-      if (this.multiple || this.internalSearch) {
-        this.$emit('change', val);
+    clearSearchAndEmitAutocompleteUpdate(ev) {
+      if (!this.multiple) {
+        this.$refs.selectRef.blur();
       }
-      this.internalSearch = null;
-    },
-    onInput(val) {
-      if (this.multiple || this.internalSearch) {
-        this.$emit('input', val);
+      if (this.multiple) {
+        this.internalSearch = null;
       }
+      this.$emit('update:modelValue', ev);
+    },
+    updateValue(val) {
+      this.value = val;
+      this.$emit('update:modelValue', val);
+    },
+    updateSearch(val) {
+      this.inputSearch = val;
+      this.$emit('update:search', val);
     },
   },
 };
@@ -316,5 +231,9 @@ export default {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.v-input__control {
+  flex-grow: 1;
 }
 </style>

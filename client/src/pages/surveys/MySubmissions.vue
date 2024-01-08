@@ -9,13 +9,13 @@
         </a-btn>
       </a-row>
       <a-row class="d-flex flex-grow-1">
-        <a-tabs v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
-          <a-tab href="#drafts" class="background">
+        <a-tabs v-model="activeTab" grow @update:modelValue="updateActiveTab">
+          <a-tab href="#drafts" value="drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
               <a-icon class="mr-2">mdi-file-document-edit</a-icon>Drafts
             </span>
           </a-tab>
-          <a-tab href="#sent" class="background">
+          <a-tab href="#sent" value="sent" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
               <a-icon class="mr-2">mdi-email-check</a-icon>Sent
             </span>
@@ -26,8 +26,7 @@
             v-for="tab in tabs"
             :key="tab.name"
             :value="tab.name"
-            class="flex-grow-1 flex-column align-center justify-center align-content-center"
-          >
+            class="flex-grow-1 flex-column align-center justify-center align-content-center">
             <a-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <div v-for="(item, i) in activeTabPageContent" :key="i">
@@ -43,19 +42,10 @@
                       </a-list-item-subtitle>
                     </a-card>
                     <a-list-item-action>
-                      <a-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                          <a-btn
-                            v-if="readyToSubmitHas(item._id)"
-                            icon
-                            @click="() => handleSubmitClick(item._id)"
-                            v-on="on"
-                          >
-                            <a-icon> mdi-cloud-upload-outline</a-icon>
-                          </a-btn>
-                        </template>
-                        <span>Upload Submission</span>
-                      </a-tooltip>
+                      <a-btn v-if="readyToSubmitHas(item._id)" icon @click="() => handleSubmitClick(item._id)">
+                        <a-icon> mdi-cloud-upload-outline</a-icon>
+                        <a-tooltip bottom activator="parent">Upload Submission</a-tooltip>
+                      </a-btn>
                     </a-list-item-action>
                   </a-list-item>
                 </div>
@@ -92,8 +82,7 @@
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
-                  color="grey-darken-1"
-                />
+                  color="grey-darken-1" />
               </template>
               <div v-else>
                 <a-row align="center" justify="center">
@@ -121,16 +110,14 @@
         :dateSubmitted="activeSubmission.meta.dateSubmitted"
         v-model="confirmSubmissionIsVisible"
         @close="handleConfirmSubmissionDialogClose"
-        @submit="() => uploadSubmission(activeSubmission)"
-      />
+        @submit="() => uploadSubmission(activeSubmission)" />
       <submitting-dialog v-model="this.isSubmitting" />
       <result-dialog
         v-model="showResult"
         :items="resultItems"
         @input="handleResultDialogInput"
         title="Result of Submission"
-        persistent
-      />
+        persistent />
     </a-container>
   </div>
 </template>
@@ -326,7 +313,6 @@ export default {
       this.isLoading = false;
     },
     async updateActiveTab(tab) {
-      // console.log(tab);
       if (tab === 'sent') {
         await this.fetchRemoteSubmissions();
       }

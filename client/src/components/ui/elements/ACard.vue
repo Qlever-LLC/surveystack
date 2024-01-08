@@ -1,5 +1,3 @@
-<!-- eslint-disable vue/no-deprecated-dollar-listeners-api -->
-<!-- TODO The `$listeners` is deprecated  vue/no-deprecated-dollar-listeners-api -->
 <template>
   <v-card
     v-bind="$attrs"
@@ -14,10 +12,8 @@
     :loading="loading"
     :min-height="minHeight"
     :min-width="minWidth"
-    :theme="theme"
     :variant="variant"
-    :width="width"
-  >
+    :width="width">
     <slot />
   </v-card>
 </template>
@@ -38,13 +34,6 @@ export default {
     loading: { type: [Boolean, String], required: false },
     minHeight: { type: [Number, String], required: false },
     minWidth: { type: [Number, String], required: false },
-    theme: {
-      type: String,
-      validator: function (value) {
-        return ['dark', 'light'].includes(value);
-      },
-      required: false,
-    },
     variant: {
       type: String,
       validator: function (value) {

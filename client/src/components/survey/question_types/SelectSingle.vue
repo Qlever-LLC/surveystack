@@ -6,34 +6,30 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <app-control-hint :value="control.hint" />
     <div class="py-2">
       <a-radio-group
-        :value="Array.isArray(value) ? value[0] : value"
-        @input="onChange"
+        :modelValue="Array.isArray(value) ? value[0] : value"
+        @update:modelValue="onChange"
         v-if="sourceIsValid"
         class="mt-0"
         data-test-id="radio-group"
-        hide-details
-      >
+        hide-details>
         <template>
           <a-radio
             v-for="(item, index) in filteredSource"
             :label="item.label"
             :value="item.value"
             :key="index"
-            color="focus"
-          />
+            color="focus" />
           <a-radio
             :value="customSelection || 'other'"
             v-if="control.options.allowCustomSelection"
             class="mt-1"
             @change="customSelection = customSelection || 'other'"
             data-test-id="custom-input-radio"
-            color="focus"
-          >
+            color="focus">
             <template v-slot:label>
               <a-text-field
                 class="text-field-other"
@@ -44,8 +40,7 @@
                 variant="outlined"
                 dense
                 label="other"
-                color="focus"
-              />
+                color="focus" />
             </template>
           </a-radio>
         </template>

@@ -6,8 +6,7 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <app-control-hint :value="control.hint" />
 
     <div v-show="!offlineMode" :id="`map-question-geocoder-${index}`" class="geocoder" style="z-index: 200" />
@@ -31,8 +30,7 @@
               :dark="!disablePick"
               class="mx-4 full"
               color="primary"
-              @click="pickLocation"
-            >
+              @click="pickLocation">
               Pick
             </a-btn>
           </div>
@@ -72,8 +70,8 @@
       </app-gps>
     </div>
 
-    <a-overlay class="text-center" :value="!value && !gpsLocation && !mapError && !geolocationError" light absolute>
-      <a-card theme="light">
+    <a-overlay class="text-center" :modelValue="!value && !gpsLocation && !mapError && !geolocationError" absolute>
+      <a-card>
         <a-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>
           <div class="mt-2">

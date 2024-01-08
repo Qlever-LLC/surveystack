@@ -4,7 +4,14 @@
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <a-card class="pa-4 mb-4">
       <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
-        <a-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined />
+        <a-select
+          class="mt-3"
+          :items="availableRoles"
+          item-title="text"
+          item-value="value"
+          v-model="entity.role"
+          label="Role"
+          variant="outlined" />
 
         <a-text-field
           class="mt-3"
@@ -13,23 +20,21 @@
           variant="outlined"
           :rules="emailRules"
           validate-on-blur
-          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
-        />
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work." />
 
         <a-text-field
           class="mt-3"
           v-model="entity.meta.invitationName"
           variant="outlined"
           hint="Default name for newly registered users"
-          labelSlot
-        >
+          labelSlot>
           <template v-slot:label>
             <div>Name <small>(optional)</small></div>
           </template>
         </a-text-field>
 
         <a-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
-          <a-radio label="Send an invitation email" value="SEND_NOW">
+          <a-radio label="Send an invitation email" value="SEND_NOW" labelSlot>
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Send an invitation email</div>
@@ -37,7 +42,7 @@
               </div>
             </template>
           </a-radio>
-          <a-radio label="Do not send an invitation email at this moment" value="SEND_LATER">
+          <a-radio label="Do not send an invitation email at this moment" value="SEND_LATER" labelSlot>
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Do not send an invitation email now</div>
@@ -59,8 +64,7 @@
             color="primary"
             elevation="0"
             top
-            left
-          >
+            left>
             <a-list class="pa-0 mx-auto" max-width="280" v-model:selected="invitationMethod">
               <a-list-item two-line :value="INVITATION_METHODS.INVITE">
                 <a-list-item-title>Invite Member</a-list-item-title>
@@ -152,8 +156,8 @@ export default {
       sendEmail: 'SEND_NOW',
       INVITATION_METHODS,
       invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
-        ? localStorage[LS_MEMBER_INVITATION_METHOD]
-        : INVITATION_METHODS.INVITE,
+        ? [localStorage[LS_MEMBER_INVITATION_METHOD]]
+        : [INVITATION_METHODS.INVITE],
       isSubmitting: false,
       emailRules: [(v) => !!v || 'E-mail is required', (v) => EmailValidator.validate(v) || 'E-mail must be valid'],
     };
@@ -171,7 +175,7 @@ export default {
       }
       const data = this.entity;
       const url =
-        this.invitationMethod === this.INVITATION_METHODS.INVITE
+        this.invitationMethod === [this.INVITATION_METHODS.INVITE]
           ? `/memberships?sendEmail=${this.sendEmail}`
           : `/memberships/confirmed`;
 
@@ -207,7 +211,7 @@ export default {
   },
   watch: {
     invitationMethod(newValue) {
-      localStorage[LS_MEMBER_INVITATION_METHOD] = newValue;
+      localStorage[LS_MEMBER_INVITATION_METHOD] = newValue[0];
     },
   },
   async created() {

@@ -2,7 +2,7 @@
   <a-row class="text-center">
     <template v-if="state === states.IDLE">
       <a-col cols="12">
-        <app-kml-importer v-model="importedField" @change="onImport"></app-kml-importer>
+        <app-kml-importer v-model="importedField" @update:modelValue="onImport"></app-kml-importer>
       </a-col>
       <a-col cols="12"> OR </a-col>
       <a-col cols="12">

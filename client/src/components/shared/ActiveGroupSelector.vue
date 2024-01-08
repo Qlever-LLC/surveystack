@@ -1,19 +1,23 @@
 <template>
   <div class="survey-group-selector">
     <a-select
-      :value="value"
-      @input="handleInput"
+      :modelValue="value"
+      @update:modelValue="handleInput"
       :items="groupItems"
-      item-text="text"
+      item-title="text"
       item-value="value"
       :label="label"
-      :outlined="outlined"
+      :variant="outlined ? 'outlined' : ''"
       hide-details
       color="focus"
       itemSlot
     >
-      <template v-slot:item="{ item }">
-        <span :class="item.className" :style="item.style">{{ item.text }}</span>
+      <template v-slot:item="{ props, item }">
+        <a-list-item v-bind="props">
+          <a-list-item-title>
+            <span :class="item.className" :style="item.style">{{ item.text }}</span>
+          </a-list-item-title>
+        </a-list-item>
       </template>
     </a-select>
   </div>
@@ -37,7 +41,7 @@ function makeTree(groups, lvl = 1) {
 
 export default {
   props: {
-    value: {
+    modelValue: {
       type: [String, Object],
     },
     // with returnObject=true the v-model value returns an object {id: groupId, path: groupPath},
@@ -62,6 +66,11 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  data() {
+    return {
+      value: this.modelValue,
+    };
   },
   computed: {
     groups() {
@@ -109,6 +118,7 @@ export default {
   },
   methods: {
     handleInput(val) {
+      this.value = val;
       this.$emit('input', val);
     },
     getMargin(lvl) {

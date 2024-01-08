@@ -3,6 +3,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const LCL = require('last-commit-log');
+const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 
 const fs = require('fs');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
@@ -42,6 +43,7 @@ module.exports = {
       new CopyPlugin({
         patterns: ['src/utils/sandboxUtils.js'],
       }),
+      new VuetifyPlugin({ autoImport: true }), // Enabled by default
     ],
   },
   transpileDependencies: ['vuetify'],
@@ -85,7 +87,6 @@ module.exports = {
     workboxOptions: {
       // swSrc is required in InjectManifest mode.
       swDest: 'service-worker.js',
-      // ...other Workbox options...
       clientsClaim: true,
       skipWaiting: true,
       navigateFallback: 'index.html',
@@ -95,10 +96,26 @@ module.exports = {
           urlPattern: /\/api\/.*$/,
           handler: 'NetworkFirst',
         },
-        // {
-        //   urlPattern: /https:\/\/api\.mapbox\.com.*$/,
-        //   handler: 'CacheFirst',
-        // },
+        // TODO: use VUE_APP_S3_BASE_URL for S3 rules, currently we don't have custom env variables per environment in client pipeline
+        // Conditionally add caching rule if S3_BASE_URL env var is defined
+        ...(process.env.VUE_APP_S3_BASE_URL
+          ? [
+              {
+                urlPattern: new RegExp(`${process.env.VUE_APP_S3_BASE_URL}resources/.*`),
+                handler: 'NetworkFirst',
+              },
+            ]
+          : []),
+        // caching rule for production S3 resources
+        {
+          urlPattern: new RegExp(`https://surveystack.s3.amazonaws.com/resources/.*`),
+          handler: 'NetworkFirst',
+        },
+        // caching rule for review and staging environments for s3 resources
+        {
+          urlPattern: new RegExp(`https://surveystack-test.s3.amazonaws.com/resources/.*`),
+          handler: 'NetworkFirst',
+        },
       ],
     },
   },

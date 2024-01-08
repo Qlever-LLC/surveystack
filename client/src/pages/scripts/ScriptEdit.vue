@@ -2,28 +2,19 @@
   <a-container>
     <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
     <span class="text-secondary">{{ this.entity._id }}</span>
-    <a-form class="mt-3" @keydown.enter.prevent="submit">
-      <a-text-field v-model="entity.name" label="Name" variant="outlined" hide-details />
-      <active-group-selector
-        class="my-4"
-        label="Group"
-        v-model="entity.meta.group"
-        outlined
-        returnObject
-        adminGroupsOnly
-      />
-      <code-editor
-        title=""
-        class="code-editor"
-        :code="this.entity && this.entity.content"
-        @keydown.enter.prevent="submit"
-        @change="updateCode"
-      />
-      <div class="d-flex mt-2 justify-end">
-        <a-btn variant="text" @click="cancel">Cancel</a-btn>
-        <a-btn color="primary" @click="submit">Save</a-btn>
-      </div>
-    </a-form>
+    <a-text-field v-model="entity.name" label="Name" variant="outlined" hide-details />
+    <active-group-selector
+      class="my-4"
+      label="Group"
+      v-model="entity.meta.group"
+      outlined
+      returnObject
+      adminGroupsOnly />
+    <code-editor title="" class="code-editor" :code="this.entity && this.entity.content" @change="updateCode" />
+    <div class="d-flex mt-5 justify-end">
+      <a-btn variant="text" @click="cancel">Cancel</a-btn>
+      <a-btn color="primary" @click="submit">Save</a-btn>
+    </div>
   </a-container>
 </template>
 
@@ -179,6 +170,6 @@ export function render(props, state, setState) {
 
 <style scoped>
 .code-editor {
-  height: 77vh;
+  height: 75vh;
 }
 </style>

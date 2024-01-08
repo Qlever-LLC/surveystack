@@ -1,103 +1,74 @@
-<!-- eslint-disable vue/no-deprecated-v-bind-sync -->
+<!-- TODO in unit test before v-select and v-autocomplete were different
+data-test-id="dropdown" exists
+data-test-id="autocomplete" was removed-->
 <template>
   <a-select
-    v-if="!customAnswer && !autocomplete"
-    label="Default value"
-    :value="getValue"
-    @change="onChange"
-    :items="items"
-    item-text="label"
-    item-value="value"
-    :menu-props="autocompleteMenuProps"
-    :multiple="multiple"
-    :disabled="!sourceIsValid"
-    :dense="dense"
-    color="focus"
-    :outlined="outlined"
-    clearable
-    hide-details
+    v-if="!customAnswer"
+    :modelValue="getValue"
+    @update:modelValue="updateAutocomplete"
     class="full-width dropdown"
+    clearable
+    color="focus"
+    cssMinHeightAuto
     data-test-id="dropdown"
-    :itemSlot="multiple"
-    cssMinHeightAuto
-  >
-    <template v-slot:item="data">
-      <a-list-item-title>
-        {{ data.item.label }}
-        <a-chip v-if="data.item.count" small class="ma-2">
-          {{ data.item.count }}
-        </a-chip>
-      </a-list-item-title>
-    </template>
-  </a-select>
-  <a-select
-    engineering="autocomplete"
-    v-else-if="!customAnswer && autocomplete"
-    @change="onChange"
-    ref="dropdownRef"
-    label="Default value"
-    :value="getValue"
+    :dense="dense"
+    :disabled="!sourceIsValid"
+    hide-details
     :items="items"
-    item-text="label"
+    item-title="label"
     item-value="value"
+    label="Default value"
     :menu-props="autocompleteMenuProps"
     :multiple="multiple"
-    :disabled="!sourceIsValid"
-    :dense="dense"
-    color="focus"
-    :outlined="outlined"
-    clearable
-    hide-details
-    class="full-width dropdown"
-    data-test-id="autocomplete"
+    :variant="outlined ? 'outlined' : undefined"
     :itemSlot="multiple"
-    cssMinHeightAuto
   >
-    <template v-slot:item="data">
-      <a-list-item-title>
-        {{ data.item.label }}
-        <a-chip v-if="data.item.count" small class="ma-2">
-          {{ data.item.count }}
-        </a-chip>
-      </a-list-item-title>
+    <template v-slot:chip="{ props, item }">
+      <a-chip v-bind="props" closable>{{ item.raw.value }}</a-chip>
+    </template>
+    <template v-slot:item="{ props, item }">
+      <a-list-item v-bind="props">
+        <a-list-item-title>
+          {{ item.label }}
+          <a-chip v-if="item.count" small class="ma-2">
+            {{ item.count }}
+          </a-chip>
+        </a-list-item-title>
+      </a-list-item>
     </template>
   </a-select>
-  <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
   <a-select
-    engineering="combobox"
     v-else-if="customAnswer"
-    ref="dropdownRef"
-    label="Default value"
-    :value="getValue"
-    @input="setValue"
-    @change="onChange"
-    :search-input.sync="comboboxSearch"
-    :items="items"
-    item-text="label"
-    item-value="value"
+    allowCustomItem
+    :modelValue="getValue"
+    @update:modelValue="updateCombobox"
+    v-model:search="comboboxSearch"
+    class="full-width custom-ontology dropdown"
+    clearable
+    color="focus"
+    cssMinHeightAuto
+    data-test-id="combobox"
     :delimiters="[',']"
-    :return-object="false"
+    :dense="dense"
+    :disabled="!sourceIsValid"
+    hide-details
+    :items="items"
+    item-title="label"
+    item-value="value"
+    label="Default value"
     :menu-props="autocompleteMenuProps"
     :multiple="multiple"
-    :disabled="!sourceIsValid"
-    :dense="dense"
-    color="focus"
     :outlined="outlined"
-    clearable
-    hide-details
-    class="full-width custom-ontology dropdown"
-    data-test-id="combobox"
-    selectionSlot
     noDataSlot
-    cssMinHeightAuto
+    selectionSlot
   >
-    <template v-slot:selection="data" v-if="multiple">
-      <a-chip :input-value="data.selected" close @click="clickOnChip(data)" @click:close="remove(data.item)">
-        {{ getLabelForItemValue(data.item) }}
+    <template v-slot:chip="{ props, item }">
+      <a-chip v-bind="props" closable>
+        {{ getLabelForItemValue(item.value) }}
       </a-chip>
     </template>
-    <template v-slot:selection="data" v-else>
-      {{ getLabelForItemValue(data.item) }}
+    <template v-slot:selection="{ item }" v-if="!multiple">
+      {{ getLabelForItemValue(item.value) }}
     </template>
     <template v-slot:no-data>
       <a-list-item>
@@ -121,6 +92,7 @@ export default {
     value: { required: true },
     multiple: { type: Boolean, default: false },
     customAnswer: { type: Boolean, default: false },
+    // TODO imho remove autocomplete because we merged v-select and v-autocomplete
     autocomplete: { type: Boolean, default: false },
     dense: { type: Boolean, default: false },
     outlined: { type: Boolean, default: false },
@@ -136,28 +108,20 @@ export default {
     };
   },
   methods: {
-    clickOnChip(data) {
-      data.select;
+    emitValueToParent(value) {
+      this.values = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      this.$emit('input', this.values);
     },
-    onChange(value) {
+    updateAutocomplete(value) {
+      this.emitValueToParent(value);
+    },
+    updateCombobox(value) {
+      this.emitValueToParent(value);
       this.comboboxSearch = null;
-      this.$emit('input', getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value));
-      if (this.$refs.dropdownRef && !this.multiple) {
-        this.$refs.dropdownRef.blur();
-      }
-    },
-    remove(value) {
-      this.setValue(getValueOrNull(this.values.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);
       return (item && item.label) || value;
-    },
-    setValue(value) {
-      this.values = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
-      if (this.multiple) {
-        this.$emit('input', this.values);
-      }
     },
   },
   computed: {

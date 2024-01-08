@@ -4,14 +4,13 @@
       <a-card-text v-if="isLoading">
         <a-card-title> Hylo Integraton </a-card-title>
         <a-spacer />
-        <a-skeleton-loader type="list-item-avatar, card-heading" />
+        <a-skeleton-loader type="list-item-avatar, heading" />
       </a-card-text>
       <template v-else-if="integratedHyloGroup">
         <a-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
           height="250"
-          :src="integratedHyloGroup.bannerUrl"
-        >
+          :src="integratedHyloGroup.bannerUrl">
           <a-app-bar flat color="rgba(0, 0, 0, 0)">
             <a-toolbar-title class="text-h6 text-white pl-0"> Hylo Integration </a-toolbar-title>
 
@@ -28,8 +27,7 @@
                     color="green-darken-1"
                     text
                     @click="removeGroupIntegration"
-                    :loading="isRemoveGroupIntegrationInProgress"
-                  >
+                    :loading="isRemoveGroupIntegrationInProgress">
                     Yes, remove Hylo integration
                   </a-btn>
                 </a-card-actions>
@@ -79,15 +77,13 @@
                   placeholder="Link to your Hylo group"
                   :loading="isLoadingHyloGroup"
                   :error-messages="findError"
-                  class="mb-2"
-                />
+                  class="mb-2" />
                 <a-col align="center">
                   <a-btn
                     color="primary"
                     :disabled="!groupFound || isCreateIntegratedHyloGroupInProgress"
                     :loading="isSetIntegratedInProgress"
-                    @click="setIntegratedGroup"
-                  >
+                    @click="setIntegratedGroup">
                     {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
                   </a-btn>
                 </a-col>
@@ -103,8 +99,7 @@
                     color="primary"
                     :loading="isCreateIntegratedHyloGroupInProgress"
                     :disabled="isSetIntegratedInProgress"
-                    @click="createIntegratedHyloGroup"
-                  >
+                    @click="createIntegratedHyloGroup">
                     Integrate with a new Hylo group
                   </a-btn></a-col
                 >

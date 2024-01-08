@@ -9,16 +9,12 @@
       <a-expansion-panel-title v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
-        <a-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
-          <template v-slot:activator="{ on, attrs }">
-            <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on">
-              <a-badge overlap bordered left :color="color" :content="count.toString()">
-                <a-icon :color="color">{{ icon }}</a-icon>
-              </a-badge>
-            </span>
-          </template>
-          <span>{{ tooltip }}</span>
-        </a-tooltip>
+        <span v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon" class="flex-grow-0 mr-2">
+          <a-badge overlap bordered left :color="color" :content="count.toString()">
+            <a-icon :color="color">{{ icon }}</a-icon>
+          </a-badge>
+          <a-tooltip bottom activator="parent">{{ tooltip }}</a-tooltip>
+        </span>
 
         <a-spacer />
         <a-switch
@@ -26,8 +22,7 @@
           v-if="isOpen"
           @click.stop=""
           v-model="showChangesOnly"
-          label="changes only"
-        />
+          label="changes only" />
       </a-expansion-panel-title>
       <a-expansion-panel-text>
         <survey-diff-card-tree
@@ -35,8 +30,7 @@
           :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
           :version-name-remote-revision-old="versionNameRemoteRevisionOld"
           :version-name-remote-revision-new="versionNameRemoteRevisionNew"
-          @discard-changed="discardChanged"
-        />
+          @discard-changed="discardChanged" />
       </a-expansion-panel-text>
     </a-expansion-panel>
   </a-expansion-panels>
