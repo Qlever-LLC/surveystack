@@ -81,25 +81,25 @@ describe('pdf.service', () => {
     });
 
     describe('filename', () => {
-      it('should contains the survey name when printable pdf', () => {
+      it('should contain the survey name when printable pdf', () => {
         const filename = surveyGenerator.filename();
         expect(filename).toContain('Mock Survey Name');
       });
 
-      it('should contains the survey name when submitted pdf', () => {
+      it('should contain the survey name when submitted pdf', () => {
         const filename = submissionGenerator.filename();
         expect(filename).toContain('Mock Survey Name');
       });
 
-      it('should contains the last 6 characters of the submission ID when submitted pdf', () => {
+      it('should contain the last 6 characters of the submission ID when submitted pdf', () => {
         const filename = submissionGenerator.filename();
         expect(filename).toContain(String(submission._id).slice(-6));
       });
 
-      it('should contains the date of the submission in the existence order of submitted, modified and created', () => {
+      it('should contain the date of the submission in the existence order of submitted, modified and created', () => {
         const filename = submissionGenerator.filename();
         expect(filename).toContain(
-          pdfService.formatDate(submission.meta.dateSubmitted, 'YYYY-MM-DD-HH-mm-ss')
+          pdfService.formatDate(submission.meta.dateSubmitted.toISOString(), 'YYYY-MM-DD-HH-mm-ss')
         );
       });
     });
@@ -165,7 +165,10 @@ describe('pdf.service', () => {
                 table: {
                   body: [
                     ['Submitted to', 'Mock Group Name (/group-1/)'],
-                    ['Submitted on', pdfService.formatDate(submission.meta.dateSubmitted)],
+                    [
+                      'Submitted on',
+                      pdfService.formatDate(submission.meta.dateSubmitted.toISOString()),
+                    ],
                     [
                       'Submitted by',
                       {
