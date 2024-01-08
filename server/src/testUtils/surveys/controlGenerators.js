@@ -347,7 +347,7 @@ const getControlGenerator = (control = '') =>
     group: groupControl,
     instructions: instructionsControl,
     instructionsImageSplit: instructionsImageSplitControl,
-    text: stringControl,
+    string: stringControl,
     number: numberControl,
     date: dateControl,
     location: locationControl,

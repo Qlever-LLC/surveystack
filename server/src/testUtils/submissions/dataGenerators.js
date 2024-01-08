@@ -253,7 +253,7 @@ const getSubmissionDataGenerator = (control = '') =>
     group: groupData,
     instructions: instructionsData,
     instructionsImageSplit: instructionsImageSplitData,
-    text: stringData,
+    string: stringData,
     number: numberData,
     date: dateData,
     location: locationData,

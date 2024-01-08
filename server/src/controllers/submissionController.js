@@ -308,12 +308,10 @@ export const buildPipeline = async (req, res) => {
     }
 
     if (!_.isEmpty(project)) {
-      const autoProjections = {};
       if (_.some(project, (v) => v === 0) && _.some(project, (v) => v === 1)) {
         throw boom.badRequest(`One can not mix and match inclusion and exclusion in project stage`);
       }
 
-      project = { ...project, ...autoProjections };
       pipeline.push({ $project: project });
     }
   }
