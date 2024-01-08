@@ -42,6 +42,8 @@
     hide-details="auto"
     :disabled="disabled"
     :rules="[isValidNumber]"
+    clearable
+    @click:clear="setToNull"
   />
   <a-select
     v-else-if="header.type === 'dropdown' && !header.custom"
@@ -55,6 +57,7 @@
     :disabled="disabled"
     hide-details
     variant="outlined"
+    clearable
     cssFlexNoWrap
     cssOneLineSpan
     selectionSlot
@@ -188,6 +191,8 @@
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
+          clearable
+          @click:clear="setToNull"
         />
       </template>
       <a-date-picker
@@ -303,7 +308,10 @@ export default {
   },
   methods: {
     isValidNumber(val) {
-      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+      return isNaN(Number(val)) || (this.header.required && val === null) ? 'Please enter a number' : true;
+    },
+    setToNull() {
+      this.value = null;
     },
     onInput(value) {
       this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
@@ -311,11 +319,13 @@ export default {
     },
     onDateInput(value) {
       const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
-      const date = parse(value, 'yyyy-MM-dd', new Date());
+      let date = new Date(value);
+
       if (!isValidFormat || !isValid(date)) {
         return;
       }
-      this.value = date.toISOString();
+      // remove 'Z'
+      this.value = date.toISOString().slice(0, -1);
       this.$emit('changed');
     },
     onFarmOsInput(value) {
@@ -325,8 +335,15 @@ export default {
       }
     },
     onNumberInput(value) {
-      const numValue = Number(value);
-      this.value = isNaN(numValue) ? null : numValue;
+      if (value === '' || value === null || value === undefined) {
+        this.value = null;
+      } else {
+        const numValue = Number(value);
+        if (numValue || value === '0') {
+          // possibility to write 1e2 => 100
+          this.value = numValue;
+        }
+      }
       this.$emit('changed');
     },
     onDropDownInput(value) {

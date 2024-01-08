@@ -29,6 +29,7 @@
       variant="outlined"
       class="full-width dropdown"
       data-test-id="dropdown"
+      clearable
       cssMinHeight56px
       :itemSlot="!!control.options.hasMultipleSelections"
     >

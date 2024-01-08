@@ -9,7 +9,8 @@
         label="Value"
         :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        hide-details />
+        hide-details
+      />
       <a-text-field v-model="controlInProgress.hint" label="Hint" hide-details />
       <markdown-editor
         v-model="controlInProgress.moreInfo"
@@ -17,7 +18,8 @@
         label="More info"
         placeholder="Add more info here"
         class="mt-6"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)">
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+      >
         <template #title>More info (markdown supported)</template>
       </markdown-editor>
 
@@ -27,22 +29,27 @@
         v-model="controlInProgress.defaultValue"
         @blur="handleDefaultValueTrim"
         label="Default value"
-        hide-details />
+        hide-details
+      />
       <a-text-field
         v-if="isNumber"
         type="number"
         v-model="controlInProgress.defaultValue"
-        @blur="handleDefaultValueTrim"
+        @blur="handleDefaultValueTrimNumber"
         label="Default value"
         hide-details="auto"
-        :rules="[isValidNumber]" />
+        :rules="[isValidNumber]"
+        clearable
+        @click:clear="setToNull"
+      />
       <instructions-editor
         v-if="isInstructions"
         v-model="controlInProgress.options.source"
         class="mt-6"
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
-        " />
+        "
+      />
       <instructions-image-split-editor
         v-if="isInstructionsImageSplit"
         v-model="controlInProgress.options.source"
@@ -51,7 +58,8 @@
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        @set-control-source="(val) => $emit('set-control-source', val)" />
+        @set-control-source="(val) => $emit('set-control-source', val)"
+      />
       <a-select
         v-if="isDate"
         :items="dateTypes"
@@ -63,7 +71,8 @@
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
-        hide-details />
+        hide-details
+      />
       <select-items-editor
         v-if="isSelect"
         v-model="controlInProgress.options.source"
@@ -71,7 +80,8 @@
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
-        class="mt-3" />
+        class="mt-3"
+      />
       <ontology-properties
         v-if="isOntology"
         :value="controlInProgress.options.source"
@@ -80,12 +90,14 @@
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
         @set-control-source="(val) => $emit('set-control-source', val)"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)" />
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+      />
       <a-text-field
         v-if="isMatrix"
         v-model="controlInProgress.options.source.config.addRowLabel"
         label="Add Row label"
-        hide-details />
+        hide-details
+      />
       <matrix-properties
         v-if="isMatrix"
         v-model="controlInProgress.options.source"
@@ -97,7 +109,8 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-required="controlInProgress.options.required = true"
-        class="mt-3" />
+        class="mt-3"
+      />
       <a-select
         v-if="controlInProgress.type === 'file'"
         label="Restrict uploaded file types (.csv, .pdf, etc.)"
@@ -112,7 +125,8 @@
         chips
         clearable
         closable-chips
-        hide-details />
+        hide-details
+      />
       <a-select
         v-if="isScript"
         v-model="scriptSourceId"
@@ -128,7 +142,8 @@
         item-title="name"
         item-value="_id"
         label="Script Source"
-        selectionSlot>
+        selectionSlot
+      >
         <template v-slot:selection="{ props, item }">
           <div v-bind="props">{{ item.title }}</div>
         </template>
@@ -137,7 +152,8 @@
         v-if="isScript"
         v-model="controlInProgress.options.buttonLabel"
         label="Run Button Label"
-        hide-details />
+        hide-details
+      />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <a-textarea
         v-if="isScript"
@@ -149,7 +165,8 @@
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
         class="pt-3"
-        hide-details />
+        hide-details
+      />
       <a-select
         allowCustomItem
         v-if="isFarmOsUuid"
@@ -159,7 +176,8 @@
         :items="controlInProgress.options.farmOsTypes"
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
-        " />
+        "
+      />
       <a-checkbox
         v-if="controlInProgress.type === 'ontology'"
         class="ml-2 align-center align-self-start"
@@ -169,7 +187,8 @@
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
-        dense />
+        dense
+      />
       <a-checkbox
         v-if="isSelect || isOntology"
         class="ml-2 align-center align-self-start"
@@ -185,7 +204,8 @@
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
-        dense>
+        dense
+      >
         <template v-slot:helper-text>
           Allows the user to input answers that do not exist within the provided items.
           <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
@@ -204,7 +224,8 @@
           controlInProgress.options.allowCustomSelection
         "
         helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
-        dense />
+        dense
+      />
       <ontology
         v-if="isOntology"
         v-model="controlInProgress.defaultValue"
@@ -212,14 +233,16 @@
         :customAnswer="controlInProgress.options.allowCustomSelection"
         :autocomplete="controlInProgress.options.allowAutocomplete"
         :source="controlInProgress.options.source"
-        :resources="survey.resources" />
+        :resources="survey.resources"
+      />
       <date
         v-if="isDate && controlInProgress.options.subtype"
         v-model="controlInProgress.defaultValue"
         @update:modelValue="() => $forceUpdate()"
         @blur="handleDefaultValueTrim"
         :type="controlInProgress.options.subtype"
-        class="mt-3" />
+        class="mt-3"
+      />
       <select-items
         v-if="isSelect && controlInProgress.options.source"
         v-model="controlInProgress.defaultValue"
@@ -227,7 +250,8 @@
         :items="controlInProgress.options.source"
         :custom="controlInProgress.options.allowCustomSelection"
         :multiple="controlInProgress.type === 'selectMultiple'"
-        class="mt-3" />
+        class="mt-3"
+      />
 
       <!-- Control options -->
       <a-spacer />
@@ -240,7 +264,8 @@
         "
         helper-text="Make this a required field"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         label="Private"
         v-model="controlInProgress.options.redacted"
@@ -249,42 +274,48 @@
         "
         helper-text="Only admins and original submitters can see this field"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="isPage"
         label="Compact"
         v-model="controlInProgress.options.compact"
         helper-text="Reduce the spaces and combine fields into one card"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="isText"
         label="QR Code"
         v-model="controlInProgress.options.enableQr"
         :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow modify"
         v-model="controlInProgress.options.allowModify"
         helper-text="Allow users of this question set to modify this question"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow hide"
         v-model="controlInProgress.options.allowHide"
         helper-text="Allow users of this question set to hide this question"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="controlInProgress.libraryId && controlInProgress.options.allowHide"
         label="Hidden"
         v-model="controlInProgress.options.hidden"
         helper-text="Submitters can not see this field. This option is intentionally allowed by the question set designer"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="
           controlInProgress.type === 'farmOsPlanting' ||
@@ -297,14 +328,16 @@
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="isFile"
         label="Multiple upload"
         v-model="controlInProgress.options.source.allowMultiple"
         helper-text="Allow user to upload multiple files"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <a-checkbox
         v-if="controlInProgress.type === 'script'"
         label="Native Script"
@@ -312,7 +345,8 @@
         :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         helper-text="Show Download Link for Surveystack Kit APK"
         color="grey-darken-1"
-        class="align-center align-self-start" />
+        class="align-center align-self-start"
+      />
       <template v-if="isGeoJSON">
         <a-checkbox
           v-for="opt in geoJsonOptions"
@@ -320,7 +354,8 @@
           :label="opt.text"
           v-model="controlInProgress.options.geoJSON[opt.key]"
           color="grey-darken-1"
-          class="align-center align-self-start" />
+          class="align-center align-self-start"
+        />
       </template>
 
       <!-- Advanced properties -->
@@ -330,7 +365,8 @@
         class="align-self-end"
         @click="showAdvanced = true"
         small
-        text>
+        text
+      >
         advanced
       </a-btn>
       <div v-else class="extra-options">
@@ -350,7 +386,8 @@
               !controlInProgress.isLibraryRoot
             "
             color="grey-darken-1"
-            class="align-center align-self-start" />
+            class="align-center align-self-start"
+          />
           <a-icon color="grey-darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
@@ -364,7 +401,8 @@
               !controlInProgress.isLibraryRoot
             "
             color="grey-darken-1"
-            class="align-center align-self-start" />
+            class="align-center align-self-start"
+          />
           <a-icon class="align-self-start" color="grey-darken-1" @click="$emit('code-initialize')" size="20">
             mdi-open-in-new
           </a-icon>
@@ -410,7 +448,8 @@
               !controlInProgress.isLibraryRoot
             "
             color="grey-darken-1"
-            class="align-center align-self-start" />
+            class="align-center align-self-start"
+          />
           <a-icon class="align-self-start" color="grey-darken-1" @click="$emit('code-api-compose')" size="20">
             mdi-open-in-new
           </a-icon>
@@ -425,7 +464,8 @@
           class="align-self-end"
           @click="showLayout = true"
           small
-          variant="text">
+          variant="text"
+        >
           Print Layout
         </a-btn>
         <div v-else class="extra-options">
@@ -441,7 +481,8 @@
               v-model="controlInProgress.options.printLayout.table"
               helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
               color="grey-darken-1"
-              class="align-center align-self-start" />
+              class="align-center align-self-start"
+            />
           </div>
 
           <div v-if="isFile">
@@ -450,7 +491,8 @@
               v-model="controlInProgress.options.printLayout.preview"
               helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
               color="grey-darken-1"
-              class="align-center align-self-start" />
+              class="align-center align-self-start"
+            />
           </div>
 
           <template v-if="isSelect || isOntology">
@@ -461,7 +503,8 @@
                 v-model="controlInProgress.options.printLayout.showAllOptionsPrintable"
                 helper-text="Show the complete list of possible options when printing a fresh survey"
                 color="grey-darken-1"
-                class="align-center align-self-start" />
+                class="align-center align-self-start"
+              />
             </div>
 
             <div>Filled Submission</div>
@@ -471,7 +514,8 @@
                 v-model="controlInProgress.options.printLayout.showAllOptions"
                 helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
                 color="grey-darken-1"
-                class="align-center align-self-start" />
+                class="align-center align-self-start"
+              />
             </div>
 
             <a-select
@@ -483,7 +527,8 @@
               hide-details
               selectionSlot
               itemSlot
-              appendSlot>
+              appendSlot
+            >
               <template v-slot:selection="{ item }">
                 {{ item.value === 1 ? '1 column' : `${item.value} columns` }}
               </template>
@@ -765,8 +810,24 @@ export default {
       }
       return true;
     },
+    handleDefaultValueTrimNumber() {
+      const val = this.control.defaultValue;
+      if (val === '0') {
+        //the number 0 is to be considered separately because Number(0) is also equal to false
+        const value = String(Number(this.control.defaultValue));
+        this.control.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      } else if (Number(val)) {
+        const value = Number(this.control.defaultValue);
+        this.control.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      } else {
+        this.control.defaultValue = null;
+      }
+    },
     isValidNumber(val) {
-      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+      return isNaN(Number(val)) ? 'Please enter a number' : true;
+    },
+    setToNull(e) {
+      e.target.value = null;
     },
     getScriptParams() {
       return (
