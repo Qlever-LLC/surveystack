@@ -1,20 +1,19 @@
 <template>
   <v-checkbox
-    :input-value="value"
-    :value="selectedItem"
-    @change="change"
-    @click="click"
-    :true-value="trueValue"
-    :indeterminate="indeterminate"
     :color="color"
-    :dense="dense"
+    :density="dense ? 'compact' : 'default'"
     :disabled="disabled"
     :hide-details="hideDetails"
-    :label="label"
-    :rules="rules"
     :hint="hint"
+    :indeterminate="indeterminate"
+    :label="label"
+    :modelValue="modelValue"
     :persistent-hint="persistentHint"
-  >
+    :rules="rules"
+    :true-value="trueValue"
+    :value="selectedItem"
+    @click="$emit('click', $event)"
+    @update:modelValue="$emit('update:modelValue', $event)">
     <template v-slot:append v-if="helperText || $slots['helper-text']">
       <v-tooltip max-width="400" transition="slide-x-transition" right>
         <template v-slot:activator="{ on, attrs }">
@@ -29,11 +28,12 @@
 
 <script>
 export default {
+  emits: ['click', 'update:modelValue'],
   props: {
-    value: {
+    modelValue: {
       //set by v-model
       type: undefined, //typically a boolean or an array (then combined with the value prop
-      default: false,
+      required: false,
     },
     selectedItem: {
       type: undefined,
@@ -81,14 +81,6 @@ export default {
     },
     helperText: {
       type: String,
-    },
-  },
-  methods: {
-    change(value) {
-      this.$emit('input', value);
-    },
-    click(value) {
-      this.$emit('click', value);
     },
   },
 };

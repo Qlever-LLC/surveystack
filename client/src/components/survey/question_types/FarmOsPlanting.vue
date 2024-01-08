@@ -27,7 +27,7 @@
           <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
             <a-checkbox
               v-if="control.options.hasMultipleSelections"
-              :value="active"
+              :modelValue="active"
               :true-value="hashItem(item)"
               color="focus" />
             <a-radio-group v-else :modelValue="active">

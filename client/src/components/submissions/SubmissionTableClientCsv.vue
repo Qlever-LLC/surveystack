@@ -118,7 +118,7 @@
         <tr :key="item._id">
           <td :class="{ 'expand-cell': isExpandMatrix }">
             <a-checkbox
-              :value="isSelected"
+              :modelValue="isSelected"
               :disabled="!isSelectable(item)"
               @click="select(!isSelected)"
               color="#777"
