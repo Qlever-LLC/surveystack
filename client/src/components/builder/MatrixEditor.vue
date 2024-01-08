@@ -149,11 +149,13 @@
                       v-if="item.type === 'number'"
                       type="number"
                       v-model="item.defaultValue"
-                      @blur="() => handleDefaultValueTrim(i)"
+                      @blur="() => handleDefaultValueTrimNumber(i)"
                       label="Default value"
                       dense
                       hide-details="auto"
                       :rules="[isValidNumber]"
+                      clearable
+                      @click:clear="setToNull"
                     />
                     <ontology
                       v-if="item.type === 'dropdown'"
@@ -421,8 +423,24 @@ export default {
       const value = this.columns[i].defaultValue;
       this.columns[i].defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
     },
+    handleDefaultValueTrimNumber(i) {
+      const val = this.columns[i].defaultValue;
+      if (val === '0') {
+        //the number 0 is to be considered separately because Number(0) is also equal to false
+        const value = String(Number(this.columns[i].defaultValue));
+        this.columns[i].defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      } else if (Number(val)) {
+        const value = Number(this.columns[i].defaultValue);
+        this.columns[i].defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      } else {
+        this.columns[i].defaultValue = null;
+      }
+    },
     isValidNumber(val) {
-      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+      return isNaN(Number(val)) ? 'Please enter a number' : true;
+    },
+    setToNull(e) {
+      e.target.value = null;
     },
   },
   MATRIX_COLUMN_TYPES,
