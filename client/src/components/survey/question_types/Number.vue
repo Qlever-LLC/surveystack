@@ -22,6 +22,8 @@
       color="focus"
       :rules="[isValidNumber]"
       data-test-id="input"
+      clearable
+      @click:clear="setToNull"
     />
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -54,29 +56,26 @@ export default {
       }
       return false;
     },
-    parseInputToNumber(v) {
+    onInput(value) {
       // TODO: implicitly parse as Integer or Float?
       // Maybe add a separate question type like inputInteger, inputFloat?
-      const converted = Number(v);
-      if (v === '' || v === null || Number.isNaN(converted)) {
-        return false;
-      }
-      return converted;
-    },
-    onInput(v) {
-      if (this.value !== v) {
-        let converted = this.parseInputToNumber(v);
-
-        if (converted === false) {
-          // Report no value when the input is invalid or empty
-          this.changed(null);
-          return;
+      if (value === '' || value === null || value === undefined) {
+        this.changed(null);
+      } else {
+        const numValue = Number(value);
+        if (value === '0') {
+          this.changed(value);
+        } else if (numValue) {
+          // possibility to write 1e2 => 100
+          this.changed(numValue);
         }
-        this.changed(converted);
       }
     },
     isValidNumber(val) {
-      return this.parseInputToNumber(val) === false ? 'Please enter a number' : true;
+      return isNaN(Number(val)) || (this.required && val === null) ? 'Please enter a number' : true;
+    },
+    setToNull(e) {
+      e.target.value = null;
     },
   },
   mounted() {
