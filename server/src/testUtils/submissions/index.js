@@ -60,10 +60,6 @@ const createSubmissionWith =
     const insertResult = await getDb().collection('submissions').insertOne(submissionDoc);
     const submission = { _id: insertResult.insertedId, ...submissionDoc };
 
-    submission.meta.dateCreated = submission.meta.dateCreated.toISOString();
-    submission.meta.dateModified = submission.meta.dateModified.toISOString();
-    submission.meta.dateSubmitted = submission.meta.dateSubmitted.toISOString();
-
     return {
       submission,
     };
