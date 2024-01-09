@@ -6,8 +6,7 @@
     variant="outlined"
     hide-details
     autocomplete="off"
-    :disabled="disabled"
-  />
+    :disabled="disabled" />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
       <a-text-field
@@ -17,8 +16,7 @@
         variant="outlined"
         hide-details
         autocomplete="off"
-        :disabled="disabled"
-      />
+        :disabled="disabled" />
     </div>
     <div style="flex: 0; display: flex; align-items: center">
       <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
@@ -31,8 +29,7 @@
     variant="outlined"
     hide-details
     autocomplete="off"
-    :disabled="disabled"
-  />
+    :disabled="disabled" />
   <a-text-field
     v-else-if="header.type === 'number'"
     :modelValue="value"
@@ -42,7 +39,8 @@
     hide-details="auto"
     :disabled="disabled"
     :rules="[isValidNumber]"
-  />
+    clearable
+    @click:clear="setToNull" />
   <a-select
     v-else-if="header.type === 'dropdown' && !header.custom"
     :placeholder="header.multiple ? 'Select answers' : 'Select answer'"
@@ -55,10 +53,10 @@
     :disabled="disabled"
     hide-details
     variant="outlined"
+    clearable
     cssFlexNoWrap
     cssOneLineSpan
-    selectionSlot
-  >
+    selectionSlot>
     <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
       <matrix-cell-selection-label v-bind="props" :label="item.raw.label" :index="index" :value="value" />
     </template>
@@ -83,23 +81,13 @@
     hide-details
     variant="outlined"
     selectionSlot
-    noDataSlot
     cssFlexNoWrap
-    cssOneLineSpan
-  >
+    cssOneLineSpan>
     <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
       <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
     </template>
     <template v-slot:chip="{ props, item, index }" v-else>
       <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
-    </template>
-    <template v-slot:no-data>
-      <a-list-item>
-        <a-list-item-title>
-          No values matching "<strong>{{ comboboxSearch }}</strong
-          >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
-        </a-list-item-title>
-      </a-list-item>
     </template>
   </a-select>
   <a-select
@@ -118,8 +106,7 @@
     selectionSlot
     itemSlot
     cssFlexNoWrap
-    cssOneLineSpan
-  >
+    cssOneLineSpan>
     <template v-slot:chip="{ props, item }" v-if="!!header.multiple">
       <a-chip v-bind="props" closable>
         <span v-html="item.raw.label" />
@@ -152,8 +139,7 @@
     selectionSlot
     itemSlot
     cssFlexNoWrap
-    cssOneLineSpan
-  >
+    cssOneLineSpan>
     <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
       <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
@@ -175,8 +161,7 @@
       location="bottom"
       max-width="290px"
       min-width="290px"
-      :disabled="disabled"
-    >
+      :disabled="disabled">
       <template v-slot:activator="{ props }">
         <a-text-field
           v-bind="props"
@@ -188,7 +173,8 @@
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
-        />
+          clearable
+          @click:clear="setToNull" />
       </template>
       <a-date-picker
         :value="value"
@@ -199,8 +185,7 @@
             menus[`${index}_${header.value}`] = false;
           }
         "
-        no-title
-      />
+        no-title />
     </a-menu>
   </div>
 
@@ -303,7 +288,10 @@ export default {
   },
   methods: {
     isValidNumber(val) {
-      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+      return isNaN(Number(val)) || (this.header.required && val === null) ? 'Please enter a number' : true;
+    },
+    setToNull() {
+      this.value = null;
     },
     onInput(value) {
       this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
@@ -311,11 +299,13 @@ export default {
     },
     onDateInput(value) {
       const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
-      const date = parse(value, 'yyyy-MM-dd', new Date());
+      let date = new Date(value);
+
       if (!isValidFormat || !isValid(date)) {
         return;
       }
-      this.value = date.toISOString();
+      // remove 'Z'
+      this.value = date.toISOString().slice(0, -1);
       this.$emit('changed');
     },
     onFarmOsInput(value) {
@@ -325,8 +315,15 @@ export default {
       }
     },
     onNumberInput(value) {
-      const numValue = Number(value);
-      this.value = isNaN(numValue) ? null : numValue;
+      if (value === '' || value === null || value === undefined) {
+        this.value = null;
+      } else {
+        const numValue = Number(value);
+        if (numValue || value === '0') {
+          // possibility to write 1e2 => 100
+          this.value = numValue;
+        }
+      }
       this.$emit('changed');
     },
     onDropDownInput(value) {

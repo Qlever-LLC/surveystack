@@ -9,8 +9,7 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <a-select
       v-if="sourceIsValid && !control.options.allowCustomSelection"
       :label="control.hint"
@@ -29,9 +28,9 @@
       variant="outlined"
       class="full-width dropdown"
       data-test-id="dropdown"
+      clearable
       cssMinHeight56px
-      :itemSlot="!!control.options.hasMultipleSelections"
-    >
+      :itemSlot="!!control.options.hasMultipleSelections">
       <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
         <a-chip v-bind="props" closable>
           {{ item.title }}
@@ -71,9 +70,7 @@
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
       cssMinHeight56px
-      noDataSlot
-      selectionSlot
-    >
+      selectionSlot>
       <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
         <a-chip v-bind="props" closable>
           {{ getLabelForItemValue(item.value) }}
@@ -81,15 +78,6 @@
       </template>
       <template v-slot:selection="{ item }" v-if="!control.options.hasMultipleSelections">
         {{ getLabelForItemValue(item.value) }}
-      </template>
-      <template v-slot:no-data>
-        <a-list-item>
-          <a-list-item-title>
-            No values matching "<strong>{{ comboboxSearch }}</strong
-            >". Press <kbd>enter</kbd> <span v-if="!!control.options.hasMultipleSelections">or <kbd>,</kbd></span> to
-            create a new one
-          </a-list-item-title>
-        </a-list-item>
       </template>
     </a-select>
     <a-banner v-else-if="isLoading"> <a-icon class="mr-2 mdi-spin">mdi-loading</a-icon>Loading !</a-banner>
