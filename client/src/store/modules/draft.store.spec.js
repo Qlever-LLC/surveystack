@@ -425,22 +425,120 @@ describe('draft store', () => {
   describe('getters', () => {
     describe('hasRequiredUnanswered', () => {
       it('does not throw an error for a matrix in a group', () => {
-        const controls = createControl({
-          type: 'group',
-          // id: INITIAL_FIRST_CONTROL_ID,
-          children: [
-            createControl({
-              type: 'matrix',
-              id: INITIAL_FIRST_CONTROL_ID,
-            }),
-            createControl({ type: 'number' }),
-          ],
-        });
-        const state = createStateWithControls([controls]);
+        const controls = [
+          createControl({
+            type: 'group',
+            children: [
+              createControl({
+                type: 'matrix',
+                // TODO: improve this to use real logic for survey next to identify current control
+                id: INITIAL_FIRST_CONTROL_ID,
+              }),
+              createControl({ type: 'number' }),
+            ],
+          }),
+        ];
+        const state = createStateWithControls(controls);
         const _getters = {
           path: getters.path(state),
         };
-        getters.hasRequiredUnanswered(state, _getters);
+        const callHasRequiredUnanswered = () => getters.hasRequiredUnanswered(state, _getters);
+        expect(callHasRequiredUnanswered).not.toThrow();
+      });
+      it('returns true for a matrix with an empty row and a required column', () => {
+        const controls = [
+          createControl({
+            type: 'matrix',
+            id: INITIAL_FIRST_CONTROL_ID,
+          }),
+        ];
+        controls[0].options.source.content[0].required = true;
+        const state = createStateWithControls(controls);
+        const _getters = {
+          path: getters.path(state),
+        };
+        const pathString = `data.${controls[0].name}.value`;
+        const result = getters.hasRequiredUnanswered(state, _getters);
+        expect(result).toBe(false);
+        // TODO: improve this to use the actual logic for setting a matrix row
+        mutations.SET_PROPERTY(state, {
+          path: pathString,
+          value: [
+            {
+              sample: { value: null },
+              description: { value: null },
+            },
+          ],
+        });
+        const updatedResult = getters.hasRequiredUnanswered(state, _getters);
+        expect(updatedResult).toBe(true);
+      });
+      it('returns true for a group containing matrix with an empty row and a required column', () => {
+        const controls = [
+          createControl({
+            type: 'group',
+            children: [
+              createControl({
+                type: 'matrix',
+                id: INITIAL_FIRST_CONTROL_ID,
+              }),
+              createControl({ type: 'number' }),
+            ],
+          }),
+        ];
+        controls[0].children[0].options.source.content[0].required = true;
+        const state = createStateWithControls(controls);
+        const _getters = {
+          path: getters.path(state),
+        };
+        const pathString = `data.${controls[0].name}.${controls[0].children[0].name}.value`;
+        const result = getters.hasRequiredUnanswered(state, _getters);
+        expect(result).toBe(false);
+        mutations.SET_PROPERTY(state, {
+          path: pathString,
+          value: [
+            {
+              sample: { value: null },
+              description: { value: null },
+            },
+          ],
+        });
+        const updatedResult = getters.hasRequiredUnanswered(state, _getters);
+        expect(updatedResult).toBe(true);
+      });
+      it('returns true for a page containing a matrix with an empty row and a required column', () => {
+        const controls = [
+          createControl({
+            type: 'page',
+            id: INITIAL_FIRST_CONTROL_ID,
+            children: [
+              createControl({
+                type: 'matrix',
+              }),
+              createControl({ type: 'number' }),
+            ],
+          }),
+        ];
+
+        controls[0].children[0].options.source.content[0].required = true;
+        const state = createStateWithControls(controls);
+        const _getters = {
+          path: getters.path(state),
+        };
+        const pathString = `data.${controls[0].name}.${controls[0].children[0].name}.value`;
+        const result = getters.hasRequiredUnanswered(state, _getters);
+        expect(result).toBe(false);
+        mutations.SET_PROPERTY(state, {
+          path: pathString,
+          value: [
+            {
+              sample: { value: null },
+              description: { value: null },
+            },
+          ],
+        });
+        const updatedResult = getters.hasRequiredUnanswered(state, _getters);
+        expect(updatedResult).toBe(true);
       });
     });
   });

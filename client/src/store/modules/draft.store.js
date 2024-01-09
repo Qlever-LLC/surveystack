@@ -7,6 +7,46 @@ import { get } from 'lodash';
 import api from '@/services/api.service';
 import Vue from 'vue';
 
+const getPath = (node) =>
+  node
+    .getPath()
+    .map((n) => n.model.name)
+    .join('.');
+
+const hasRequiredUnansweredMatrix = (node, submission) => {
+  /*
+      When the columns of a matrix are required, but the matrix question itself is not,
+      the user can proceed with the survey without filling in the matrix.
+      But if a row is added, then a value must be placed in the required column
+    */
+  //detect required columns
+  let requiredColumnNames = [];
+  const path = getPath(node);
+  if (node.model.options.source.content) {
+    node.model.options.source.content.forEach((c) => {
+      if (c.required) {
+        requiredColumnNames.push(c.value);
+      }
+    });
+  }
+
+  const questionValue = get(submission, path).value;
+
+  if (questionValue) {
+    for (const row of questionValue) {
+      for (const requiredC of requiredColumnNames) {
+        if (
+          row[requiredC].value === null ||
+          (row[requiredC].value instanceof String && row[requiredC].value.trim() === '')
+        ) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
 /*
   README:
   This draft store uses TreeModel https://github.com/joaonuno/tree-model-js
@@ -79,15 +119,7 @@ const getters = {
   property: (state) => (path, fallback) => get(state.submission, path, fallback),
   control: (state) => state.node && state.node.model, // current survey control
   enableNext: (state) => state.enableNext,
-  path: (state) =>
-    state.node
-      ? state.node
-          .getPath()
-          .map((n) => n.model.name)
-          .join('.')
-          .replace('[', '.')
-          .replace(']', '')
-      : null,
+  path: (state) => (state.node ? getPath(state.node).replace('[', '.').replace(']', '') : null),
   nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
   atStart: (state) => state.node === state.firstNode,
   showOverview: (state) => state.showOverview,
@@ -119,84 +151,17 @@ const getters = {
       surveyStackUtils.getRelevance(state.submission, path, fallback),
   hasRequiredUnanswered: (state, getters) => {
     if (state.node.model.type === 'matrix') {
-      /*
-      When the columns of a matrix are required, but the matrix question itself is not,
-      the user can proceed with the survey without filling in the matrix.
-      But if a row is added, then a value must be placed in the required column
-    */
-      //detect required columns
-      let requiredColumnNames = [];
-      if (state.node.model.options.source.content) {
-        state.node.model.options.source.content.forEach((c) => {
-          if (c.required) {
-            requiredColumnNames.push(c.value);
-          }
-        });
-      }
-
-      // console.log(
-      //   'draft store 137',
-      //   // state.node,
-      //   // getters,
-      //   state.submission.data,
-      //   getters.path,
-      // );
-
-      const questionValue = get(state.submission, getters.path).value;
-      if (questionValue) {
-        for (const row of questionValue) {
-          for (const requiredC of requiredColumnNames) {
-            if (
-              row[requiredC].value === null ||
-              (row[requiredC].value instanceof String && row[requiredC].value.trim() === '')
-            ) {
-              return true;
-            }
-          }
-        }
-      }
+      return hasRequiredUnansweredMatrix(state.node, state.submission);
     }
-
-    // if (state.node.model.type === 'matrix') {
-    //   /*
-    //   When the columns of a matrix are required, but the matrix question itself is not,
-    //   the user can proceed with the survey without filling in the matrix.
-    //   But if a row is added, then a value must be placed in the required column
-    // */
-    //   const matrixName = state.node.model.name;
-    //   //detect required columns
-    //   let requiredColumnNames = [];
-    //   if (state.node.model.options.source.content) {
-    //     state.node.model.options.source.content.forEach((c) => {
-    //       if (c.required) {
-    //         requiredColumnNames.push(c.value);
-    //       }
-    //     });
-    //   }
-    //   if (state.submission.data[matrixName].value) {
-    //     for (const row of state.submission.data[matrixName].value) {
-    //       for (const requiredC of requiredColumnNames) {
-    //         if (
-    //           row[requiredC].value === null ||
-    //           (row[requiredC].value instanceof String && row[requiredC].value.trim() === '')
-    //         ) {
-    //           return true;
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-
 
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
-        const path = c
-          .getPath()
-          .map((n) => n.model.name)
-          .join('.');
-
-        if (c.model.options.required && !surveyStackUtils.isAnswered(c, state.submission)) {
+        const path = getPath(c);
+        if (
+          (c.model.options.required && !surveyStackUtils.isAnswered(c, state.submission)) ||
+          (c.model.type === 'matrix' && hasRequiredUnansweredMatrix(c, state.submission))
+        ) {
           requiredAndUnansweredPaths.push(path);
         }
       });
@@ -226,10 +191,7 @@ const getters = {
       if (node.isRoot()) {
         return true;
       }
-      const path = node
-        .getPath()
-        .map((n) => n.model.name)
-        .join('.');
+      const path = getPath(node);
       const control = node.model;
       overviews.push({ node, path, control });
       return true;
@@ -300,10 +262,7 @@ const actions = {
         .slice(1)
         .slice(0, -1)
         .some((parent) => {
-          const parentPath = parent
-            .getPath()
-            .map((n) => n.model.name)
-            .join('.');
+          const parentPath = getPath(parent);
           if (!get(state.submission, `${parentPath}.meta.relevant`, true)) {
             return true;
           }
@@ -376,10 +335,7 @@ const actions = {
         .slice(1)
         .slice(0, -1)
         .some((parent) => {
-          const parentPath = parent
-            .getPath()
-            .map((n) => n.model.name)
-            .join('.');
+          const parentPath = getPath(parent);
           if (!get(state.submission, `${parentPath}.meta.relevant`, true)) {
             return true;
           }
@@ -491,10 +447,7 @@ const actions = {
     }
   },
   async initializeForced({ commit, state, dispatch }, node) {
-    const path = node
-      .getPath()
-      .map((n) => n.model.name)
-      .join('.');
+    const path = getPath(node);
     //first set dateModified to null which is required in case of the value being re-initialized manually
     await dispatch('setProperty', {
       path: `${path}.meta.dateModified`,
@@ -587,7 +540,6 @@ const mutations = {
     state.enableNext = enable;
   },
   NEXT(state, node) {
-    // console.log('next', node, state);
     state.node = node;
     // if firstNode is not set, this is the initial step and the given node is the first node
     if (!state.firstNode) {
@@ -595,15 +547,11 @@ const mutations = {
     }
   },
   PREV(state, node) {
-    // console.log('prev', node, state);
     state.node = node;
   },
   GOTO(state, path) {
     state.root.walk((node) => {
-      const currentPath = node
-        .getPath()
-        .map((n) => n.model.name)
-        .join('.');
+      const currentPath = getPath(node);
       if (currentPath === path) {
         const parents = node.getPath();
         for (let i = 0; i < parents.length; i++) {

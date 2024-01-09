@@ -14,9 +14,9 @@ export const addRevisionToSurvey = (survey, controls) => {
   return revision;
 };
 
-export const createControl = ({ type, ...overrides }) => {
+export const createControl = ({ type, controlInstanceOverrides, ...overrides }) => {
   const control = {
-    ...createControlInstance({ type }),
+    ...createControlInstance({ type, ...controlInstanceOverrides }),
     name: `${type}_${uniqueId()}`,
     children: ['page', 'group'].includes(type) ? [] : undefined,
     ...overrides,
