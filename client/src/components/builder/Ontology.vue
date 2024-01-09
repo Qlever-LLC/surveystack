@@ -21,8 +21,7 @@ data-test-id="autocomplete" was removed-->
     :menu-props="autocompleteMenuProps"
     :multiple="multiple"
     :variant="outlined ? 'outlined' : undefined"
-    :itemSlot="multiple"
-  >
+    :itemSlot="multiple">
     <template v-slot:chip="{ props, item }">
       <a-chip v-bind="props" closable>{{ item.raw.value }}</a-chip>
     </template>
@@ -59,9 +58,7 @@ data-test-id="autocomplete" was removed-->
     :menu-props="autocompleteMenuProps"
     :multiple="multiple"
     :outlined="outlined"
-    noDataSlot
-    selectionSlot
-  >
+    selectionSlot>
     <template v-slot:chip="{ props, item }">
       <a-chip v-bind="props" closable>
         {{ getLabelForItemValue(item.value) }}
@@ -69,14 +66,6 @@ data-test-id="autocomplete" was removed-->
     </template>
     <template v-slot:selection="{ item }" v-if="!multiple">
       {{ getLabelForItemValue(item.value) }}
-    </template>
-    <template v-slot:no-data>
-      <a-list-item>
-        <a-list-item-title>
-          No values matching "<strong>{{ comboboxSearch }}</strong
-          >". Press <kbd>enter</kbd> <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
-        </a-list-item-title>
-      </a-list-item>
     </template>
   </a-select>
 </template>

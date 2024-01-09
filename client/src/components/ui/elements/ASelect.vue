@@ -41,8 +41,7 @@
     :return-object="returnObject"
     :rounded="rounded"
     :rules="rules"
-    :single-line="singleLine"
-  >
+    :single-line="singleLine">
     <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
       <slot name="selection" :props="props" :item="item" :index="index" />
     </template>
@@ -87,8 +86,8 @@
     :delimiters="delimiters"
     :dense="dense"
     :hide-details="hideDetails"
-    :hide-no-data="!noDataSlot"
-    :hide-selected="noDataSlot"
+    :hide-no-data="false"
+    :hide-selected="true"
     :disabled="disabled"
     :items="items"
     :item-title="itemTitle"
@@ -98,8 +97,7 @@
     :multiple="multiple"
     :variant="variant"
     :placeholder="placeholder"
-    :return-object="returnObject"
-  >
+    :return-object="returnObject">
     <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
       <slot name="selection" :props="props" :item="item" :index="index" />
     </template>
@@ -108,8 +106,17 @@
       <slot name="chip" :props="props" :item="item" :index="index" />
     </template>
 
-    <template v-if="noDataSlot" v-slot:no-data>
-      <slot name="no-data" />
+    <template v-slot:no-data>
+      <v-list-item>
+        <v-list-item-title v-if="inputSearch">
+          No results matching "<strong>{{ inputSearch }}</strong
+          >". Press <kbd>enter</kbd> <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
+        </v-list-item-title>
+        <v-list-item-title v-else
+          >Input your own value {{ inputSearch }} and press <kbd>enter</kbd>
+          <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
+        </v-list-item-title>
+      </v-list-item>
     </template>
   </v-combobox>
 </template>
@@ -132,7 +139,6 @@ export default {
     itemSlot: { type: Boolean, required: false },
     appendSlot: { type: Boolean, required: false },
     prependItemSlot: { type: Boolean, required: false },
-    noDataSlot: { type: Boolean, required: false },
     //non vuetify props
     cssMinHeightAuto: { type: Boolean, required: false },
     cssMinHeight56px: { type: Boolean, required: false },
