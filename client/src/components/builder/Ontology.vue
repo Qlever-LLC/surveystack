@@ -81,8 +81,6 @@ export default {
     value: { required: true },
     multiple: { type: Boolean, default: false },
     customAnswer: { type: Boolean, default: false },
-    // TODO imho remove autocomplete because we merged v-select and v-autocomplete
-    autocomplete: { type: Boolean, default: false },
     dense: { type: Boolean, default: false },
     outlined: { type: Boolean, default: false },
     source: { type: String },

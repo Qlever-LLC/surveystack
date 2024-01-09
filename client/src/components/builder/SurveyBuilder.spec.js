@@ -187,12 +187,6 @@ describe('add control', () => {
         propPath: 'options.hasMultipleSelections',
       },
       {
-        inputLabel: 'Autocomplete',
-        type: 'ontology',
-        value: true,
-        propPath: 'options.allowAutocomplete',
-      },
-      {
         inputLabel: 'Allow custom answer',
         type: 'ontology',
         value: true,

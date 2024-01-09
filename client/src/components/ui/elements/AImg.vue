@@ -1,5 +1,5 @@
 <template>
-  <v-img :contain="contain" :gradient="gradient" :height="height" :src="src">
+  <v-img :cover="cover" :gradient="gradient" :height="height" :src="src">
     <slot />
   </v-img>
 </template>
@@ -8,7 +8,7 @@
 export default {
   name: 'AImg',
   props: {
-    contain: {
+    cover: {
       type: Boolean,
       default: false,
     },

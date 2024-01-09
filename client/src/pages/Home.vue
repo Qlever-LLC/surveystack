@@ -2,12 +2,7 @@
   <a-container class="home" fluid>
     <a-row>
       <a-col>
-        <a-img
-          v-if="isWhitelabel"
-          :src="whitelabelPartner.hero || whitelabelPartner.logo"
-          class="my-3"
-          contain
-          height="128" />
+        <a-img v-if="isWhitelabel" :src="whitelabelPartner.hero || whitelabelPartner.logo" class="my-3" height="128" />
         <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
       </a-col>
     </a-row>
