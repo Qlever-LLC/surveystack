@@ -14,7 +14,7 @@ const light = {
     info: '#82AF9C',
     success: '#8bc34a',
     appbar: '#f5f5f5',
-    background: '#ffffff',
+    background: '#d9d9d9',
     heading: '#212121',
     focus: '#0E87CC',
   },
