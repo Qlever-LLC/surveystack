@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" position="fixed" location="center">
       {{ alertMessage }}
     </a-snackbar>
     <app-control-label
@@ -9,8 +9,7 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <app-control-hint :value="control.hint" />
 
     <div @drop.prevent="onDrop" @dragover.prevent="onDragOver" @dragleave="onDragLeave">
@@ -27,8 +26,7 @@
             ? control.options.source.types.join()
             : ''
         "
-        data-test-id="fileInput"
-      />
+        data-test-id="fileInput" />
       <input
         name="captureImage"
         id="captureImage"
@@ -38,14 +36,12 @@
         @change="filesChanged"
         capture="environment"
         accept="image/*"
-        data-test-id="captureImage"
-      />
+        data-test-id="captureImage" />
       <div
         class="dropzone row mx-0 text-center"
         :class="isDragging ? 'dragging' : ''"
         for="fileInput"
-        @click.stop="showFileChooser"
-      >
+        @click.stop="showFileChooser">
         <div class="col-12 pb-0">
           <a-icon color="primary" x-large>mdi-cloud-upload-outline</a-icon>
         </div>
@@ -58,16 +54,14 @@
             ($vuetify.display.mobile || forceMobile) &&
             supportsImageCapture() &&
             isMimeTypeAllowed(control.options.source.types, 'image')
-          "
-        >
+          ">
           <div class="col-12 pa-0 caption">--- or ----</div>
           <div class="col-12">
             <a-btn
               for="captureImage"
               class="text-center align-center justify-center"
               color="default"
-              @click.stop="captureImage"
-            >
+              @click.stop="captureImage">
               take a picture
               <a-icon right> mdi-camera-outline</a-icon>
             </a-btn>
@@ -90,14 +84,12 @@
                 : isResourceTypeOf(fileResourceKey, 'pdf')
                   ? 'mdi-file-document-outline'
                   : 'mdi-file-outline'
-          "
-        >
+          ">
           <a-list-item-title
             v-if="editIndex !== index"
             :data-test-id="'file_' + index"
             class="text-wrap font-bold"
-            v-text="getLabelFromKey(fileResourceKey)"
-          ></a-list-item-title>
+            v-text="getLabelFromKey(fileResourceKey)"></a-list-item-title>
           <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
             <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
           </a-list-item-title>

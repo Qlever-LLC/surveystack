@@ -1,5 +1,12 @@
 <template>
-  <a-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary-lighten-1" fixed bottom cssIosSnackbar>
+  <a-snackbar
+    :modelValue="modelValue"
+    @update:modelValue="handleInput"
+    :timeout="-1"
+    color="primary-lighten-1"
+    position="fixed"
+    location="bottom"
+    cssIosSnackbar>
     <a-btn @click="handleClose" icon class="close-button">
       <a-icon>mdi-close</a-icon>
     </a-btn>
@@ -18,14 +25,14 @@
 <script>
 export default {
   props: {
-    value: Boolean,
+    modelValue: Boolean,
   },
   methods: {
     handleInput(ev) {
-      this.$emit('input', ev);
+      this.$emit('update:modelValue', ev);
     },
     handleClose() {
-      this.$emit('input', false);
+      this.$emit('update:modelValue', false);
       localStorage.setItem('iosInstallBannerDismissed', true);
     },
   },
