@@ -10,6 +10,7 @@
         <a-img
           gradient="rgb(42, 64, 89), rgba(42, 64, 89, 0.2) 0px, rgba(42, 64, 89, 0.5)"
           height="250"
+          cover
           :src="integratedHyloGroup.bannerUrl">
           <a-app-bar flat color="rgba(0, 0, 0, 0)">
             <a-toolbar-title class="text-h6 text-white pl-0"> Hylo Integration </a-toolbar-title>
