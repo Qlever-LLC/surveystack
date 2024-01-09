@@ -1,7 +1,7 @@
 <template>
   <a-card class="pb-2">
-    <a-card-title
-      >Pinned Surveys
+    <a-card-title class="d-flex pa-4">
+      Pinned Surveys
       <a-spacer />
       <a-btn color="primary" variant="text" @click="openSearchDialog">New..</a-btn>
     </a-card-title>

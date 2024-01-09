@@ -1,7 +1,7 @@
 <template>
   <a-card class="pb-2">
-    <a-card-title
-      >Documentation Links
+    <a-card-title class="d-flex pa-4">
+      Documentation Links
       <a-spacer />
       <a-btn color="primary" variant="text" @click="showAddDialog = true">New.. </a-btn>
     </a-card-title>
@@ -15,8 +15,7 @@
       :invertSwap="true"
       :dragOptions="{ animation: 200 }"
       @start="drag = true"
-      @end="drag = false"
-    >
+      @end="drag = false">
       <a-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" variant="outlined">
         <a-card-text>
           <div class="d-flex justify-space-between align-center">
@@ -49,8 +48,7 @@
           <a-checkbox
             v-model="removeFromDescendants"
             label="Also remove this documentation link from all descendant groups"
-            hide-details
-          />
+            hide-details />
         </a-card-text>
         <a-card-text class="mt-4"> Are you sure you want to remove this documentation link? </a-card-text>
         <a-card-actions>
@@ -72,8 +70,7 @@
               label="Label"
               variant="outlined"
               required
-              :rules="labelRules"
-            />
+              :rules="labelRules" />
 
             <a-text-field
               class="mt-3"
@@ -81,14 +78,12 @@
               label="Link"
               variant="outlined"
               required
-              :rules="linkRules"
-            />
+              :rules="linkRules" />
 
             <a-checkbox
               v-model="addToDescendants"
               label="Also add this documentation link to all descendant groups"
-              hide-details
-            />
+              hide-details />
           </a-form>
         </a-card-text>
         <a-card-actions>
