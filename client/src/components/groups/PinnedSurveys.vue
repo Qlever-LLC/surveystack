@@ -14,19 +14,17 @@
       :invertSwap="true"
       :dragOptions="{ animation: 200 }"
       @start="drag = true"
-      @end="drag = false"
-    >
+      @end="drag = false">
       <a-card
         v-for="(el, idx) in entities"
         :key="`${idx}-survey-${el._id}`"
         class="ma-2 mx-6"
         elevation="1"
-        variant="outlined"
-      >
+        variant="outlined">
         <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
-              <span class="caption text-grey-darken-1">{{ el._id }}</span>
+              <span class="text-caption text-grey-darken-1">{{ el._id }}</span>
               <br />
               <span class="title">{{ el.name }}</span>
               <br />

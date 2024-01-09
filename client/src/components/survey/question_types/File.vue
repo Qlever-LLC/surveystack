@@ -55,7 +55,7 @@
             supportsImageCapture() &&
             isMimeTypeAllowed(control.options.source.types, 'image')
           ">
-          <div class="col-12 pa-0 caption">--- or ----</div>
+          <div class="col-12 pa-0 text-caption">--- or ----</div>
           <div class="col-12">
             <a-btn
               for="captureImage"

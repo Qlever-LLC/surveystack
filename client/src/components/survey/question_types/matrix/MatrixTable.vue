@@ -4,14 +4,13 @@
     <div ref="header" class="mt-heading mt-divider" :class="{ 'mt-elevation-shadow': isHeaderFloating }">
       <div
         v-for="(header, colIdx) in headers"
-        class="caption font-weight-bold text-secondary mt-cell-wrap"
+        class="text-caption font-weight-bold text-secondary mt-cell-wrap"
         :class="{
           'mt-fixed': fixColMask[colIdx],
           'mt-elevation-shadow': isLeftFloating && colIdx === fixedColumns - 1,
         }"
         :style="cellWidthStyles[colIdx]"
-        :key="colIdx"
-      >
+        :key="colIdx">
         <div ref="headerCells" class="white px-4 d-flex flex-nowrap mt-cell" :style="{ position: 'relative' }">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
@@ -25,31 +24,27 @@
         class="mt-row"
         v-for="(item, rowIdx) in rows"
         :key="rowIdx"
-        @click="isMobile && $emit('showEditDialog', rowIdx)"
-      >
+        @click="isMobile && $emit('showEditDialog', rowIdx)">
         <div
           class="mt-cell-wrap"
           v-for="(header, colIdx) in headers"
           :key="colIdx"
           :class="{ 'mt-elevation-shadow': isLeftFloating && colIdx === fixedColumns - 1 }"
-          :style="leftFixStyles[colIdx]"
-        >
+          :style="leftFixStyles[colIdx]">
           <div class="mt-cell d-flex align-center white px-1">
             <slot
               v-if="shouldRenderCell(rowIdx, colIdx)"
               name="row-cell"
               v-bind:header="header"
               v-bind:row="item"
-              v-bind:colIdx="colIdx"
-            >
+              v-bind:colIdx="colIdx">
             </slot>
           </div>
         </div>
         <div
           v-if="$slots.rowActions"
           class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 white"
-          :class="{ 'mt-elevation-shadow': isRightFloating }"
-        >
+          :class="{ 'mt-elevation-shadow': isRightFloating }">
           <div class="mt-actions d-flex align-center">
             <slot name="rowActions" v-bind:rowIdx="rowIdx"></slot>
           </div>
