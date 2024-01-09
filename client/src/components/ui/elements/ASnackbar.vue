@@ -9,10 +9,9 @@
     :light="light"
     :timeout="timeout"
     :top="top"
-    :value="value"
-  >
-    <template v-slot:action="{ attrs }">
-      <slot name="action" :attrs="attrs" />
+    :value="value">
+    <template v-slot:actions="{ props }">
+      <slot name="actions" :props="props" />
     </template>
     <slot />
   </v-snackbar>
