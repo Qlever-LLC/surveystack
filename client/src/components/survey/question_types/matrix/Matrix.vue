@@ -156,6 +156,7 @@ import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import { createRow } from './matrixUtils';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -318,18 +319,7 @@ export default {
   },
   methods: {
     add() {
-      // create empty row object from headers
-      const newRow = this.fields.reduce((prev, current) => ({ ...prev, [current]: { value: null } }), {});
-      for (const key of Object.keys(newRow)) {
-        const header = this.headers.find((h) => h.value === key);
-        if (!header) {
-          continue;
-        }
-        if (header.redacted) {
-          newRow[key].meta = { permissions: ['admin'] };
-        }
-        newRow[key].value = header.defaultValue || null;
-      }
+      const newRow = createRow(this.fields, this.headers);
       if (this.rows === null) {
         this.rows = [];
       }
