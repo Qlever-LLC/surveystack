@@ -16,8 +16,8 @@
     @update:modelValue="$emit('update:modelValue', $event)">
     <template v-slot:append v-if="helperText || $slots['helper-text']">
       <v-tooltip max-width="400" transition="slide-x-transition" right>
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+        <template v-slot:activator="{ props }">
+          <v-icon v-bind="props" size="20">mdi-help-circle-outline</v-icon>
         </template>
         <slot name="helper-text"></slot>
         <span v-if="helperText">{{ helperText }}</span>

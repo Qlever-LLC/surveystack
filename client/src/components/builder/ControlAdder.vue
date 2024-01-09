@@ -10,27 +10,23 @@
       <template v-slot:default> -->
     <div class="button-grid">
       <a-btn
-        dark
         color="white"
         key="library"
         @click="openLibrary()"
-        class="ma-1 d-inline-block shadow green span-button"
+        class="ma-1 d-inline-block shadow bg-green span-button"
         outlined
         small
-        data-testid="add-control-library"
-      >
+        data-testid="add-control-library">
         search question library
       </a-btn>
       <a-btn
-        dark
         color="white"
         key="group"
         @click="addControl(group)"
         class="ma-1 text-indigo bg-white shadow"
         outlined
         small
-        data-testid="add-control-group"
-      >
+        data-testid="add-control-group">
         <a-icon left v-if="group.icon" color="indigo-lighten-2">
           {{ group.icon }}
         </a-icon>
@@ -38,14 +34,12 @@
       </a-btn>
       <a-btn
         small
-        dark
         color="indigo"
         v-for="el in filteredComponents"
         :key="el.type"
         @click="addControl(el)"
         class="ma-1 d-inline-block shadow"
-        :data-testid="'add-control-' + el.type"
-      >
+        :data-testid="'add-control-' + el.type">
         <a-icon left v-if="el.icon">
           {{ el.icon }}
         </a-icon>

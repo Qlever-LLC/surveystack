@@ -213,7 +213,7 @@
           </app-draft-component>
         </div>
 
-        <a-overlay :modelValue="enableSaveDraft">
+        <a-overlay :modelValue="enableSaveDraft" contained location="center center" theme="dark" scrim="black">
           <a-card>
             <a-card-text> Please Save Draft to update Survey Preview.</a-card-text>
           </a-card>

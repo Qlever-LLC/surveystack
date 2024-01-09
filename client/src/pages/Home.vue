@@ -7,8 +7,7 @@
           :src="whitelabelPartner.hero || whitelabelPartner.logo"
           class="my-3"
           contain
-          height="128"
-        />
+          height="128" />
         <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
       </a-col>
     </a-row>
@@ -21,21 +20,20 @@
           :entities="pinnedWhitelabelSurveys"
           title="Get Started"
           :link="(e) => `/surveys/${e.id}`"
-          :searchable="false"
-        >
+          :searchable="false">
           <template v-slot:prepend="{ entity }">
             <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
           </template>
           <template v-slot:entity="{ entity }">
-            <v-row no-gutters>
-              <v-col col="10" class="flex-grow-1">
+            <a-row no-gutters>
+              <a-col col="10" class="flex-grow-1">
                 <a-list-item-title>{{ entity.name }}</a-list-item-title>
                 <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-              </v-col>
-              <v-col col="1" class="flex-grow-0 align-self-center ml-3">
+              </a-col>
+              <a-col col="1" class="flex-grow-0 align-self-center ml-3">
                 <a-btn color="primary" small>Take Survey</a-btn>
-              </v-col>
-            </v-row>
+              </a-col>
+            </a-row>
           </template>
         </app-basic-list>
       </a-col>
@@ -48,8 +46,7 @@
           v-if="pinned && pinned.length > 0"
           :entities="pinned"
           title="More Surveys"
-          :link="(e) => `/surveys/${e.id}`"
-        >
+          :link="(e) => `/surveys/${e.id}`">
           <template v-slot:prepend="{ entity }">
             <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
           </template>

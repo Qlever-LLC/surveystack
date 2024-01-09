@@ -41,7 +41,7 @@
             :color="display.background"
             :style="{
               opacity: display.relevant ? 1.0 : 0.5,
-              'border-left': display.active ? '4px solid green !important' : '',
+              'border-left': display.active ? '4px solid bg-green !important' : '',
             }"
             class="pb-1">
             <!-- title -->

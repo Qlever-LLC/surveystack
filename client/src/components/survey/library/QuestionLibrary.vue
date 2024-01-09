@@ -23,8 +23,7 @@
             @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
             class="control-item mb-2"
-            elevation="7"
-          >
+            elevation="7">
             <a-row cssMinHeight96px>
               <a-col cssMinWidth0px>
                 <div class="title text-truncate">
@@ -47,8 +46,7 @@
                   @click.stop="toggleCard(c._id)"
                   class="mt-n5 mr-1 d-inline-block shadow white span-button"
                   outlined
-                  small
-                >
+                  small>
                   back
                 </a-btn>
                 <a-btn
@@ -57,10 +55,9 @@
                   color="white"
                   key="library"
                   @click="addToSurvey(c._id)"
-                  class="mt-n5 d-inline-block shadow green span-button"
+                  class="mt-n5 d-inline-block shadow bg-green span-button"
                   outlined
-                  small
-                >
+                  small>
                   add to survey
                 </a-btn>
                 <!--TODO Resolve #48, then uncomment this
@@ -103,8 +100,7 @@
                   :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
-                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
-                />
+                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls" />
               </a-col>
             </a-row>
           </a-card>
@@ -115,8 +111,7 @@
       v-if="surveys.content.length > 0 && !selectedSurvey"
       v-model="page"
       :length="activeTabPaginationLength"
-      @input="() => fetchData()"
-    />
+      @input="() => fetchData()" />
   </div>
 </template>
 <script>

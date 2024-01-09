@@ -1,8 +1,7 @@
 <template>
   <a-card
     class="control-item d-flex flex-column"
-    :data-testid="`diff-card-${diffInfo.indexPath}-${diffInfo.changeType}`"
-  >
+    :data-testid="`diff-card-${diffInfo.indexPath}-${diffInfo.changeType}`">
     <button @click="isOpen = !isOpen" :disabled="!haveChangeDetails">
       <a-row>
         <control-card-header
@@ -13,8 +12,7 @@
           :dataName="diffInfo.name"
           :chip-label="diffInfo.hasBreakingChange ? 'required change' : diffInfo.changeType"
           :chip-color="diffInfo.color"
-          class="ml-3 align-self-center"
-        />
+          class="ml-3 align-self-center" />
         <a-spacer />
         <a-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
@@ -30,8 +28,7 @@
               v-if="versionNameLocalRevision"
               class="text-left"
               :class="isLocalVersionSelected ? 'header-selected' : isLocalVersionSelectable ? 'header-selectable' : ''"
-              @click="isLocalVersionSelectable && changeDiscarded(false)"
-            >
+              @click="isLocalVersionSelectable && changeDiscarded(false)">
               {{ versionNameLocalRevision }}
               <a-icon
                 v-if="isLocalVersionSelected"
@@ -47,8 +44,7 @@
               :class="
                 isNewRemoteVersionSelected ? 'header-selected' : isNewRemoteVersionSelectable ? 'header-selectable' : ''
               "
-              @click="isNewRemoteVersionSelectable && changeDiscarded(true)"
-            >
+              @click="isNewRemoteVersionSelectable && changeDiscarded(true)">
               {{ versionNameRemoteRevisionNew }}
               <a-icon
                 v-if="isNewRemoteVersionSelected"
@@ -66,8 +62,7 @@
             <td
               v-if="versionNameLocalRevision"
               :class="isLocalVersionSelected ? 'cell-selected' : isLocalVersionSelectable ? 'cell-selectable' : ''"
-              @click="isLocalVersionSelectable && changeDiscarded(false)"
-            >
+              @click="isLocalVersionSelectable && changeDiscarded(false)">
               {{ change.localValue }}
             </td>
             <td>{{ change.oldValue }}</td>
@@ -75,8 +70,7 @@
               :class="
                 isNewRemoteVersionSelected ? 'cell-selected' : isNewRemoteVersionSelectable ? 'cell-selectable' : ''
               "
-              @click="isNewRemoteVersionSelectable && changeDiscarded(true)"
-            >
+              @click="isNewRemoteVersionSelectable && changeDiscarded(true)">
               {{ change.newValue }}
             </td>
           </tr>
@@ -84,11 +78,11 @@
       </template>
     </a-table>
     <slot></slot>
-    <a-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" position="fixed" location="center">
       Selecting your Version of this question is not possible because the new
       {{ versionNameRemoteRevisionNew }} contains a required change.
-      <template v-slot:action="{ attrs }">
-        <a-btn color="white" variant="text" v-bind="attrs" @click="showErrorSnackbar = false"> Ok </a-btn>
+      <template v-slot:actions="{ props }">
+        <a-btn color="white" variant="text" v-bind="props" @click="showErrorSnackbar = false"> Ok </a-btn>
       </template>
     </a-snackbar>
   </a-card>

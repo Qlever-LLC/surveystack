@@ -1,18 +1,14 @@
 <template>
   <v-snackbar
-    @input="$emit('input', $event)"
     :class="{ snackbar: cssIosSnackbar }"
-    :bottom="bottom"
-    :centered="centered"
-    :fixed="fixed"
     :color="color"
-    :light="light"
+    :location="location"
+    :modelValue="modelValue"
+    :position="position"
     :timeout="timeout"
-    :top="top"
-    :value="value"
-  >
-    <template v-slot:action="{ attrs }">
-      <slot name="action" :attrs="attrs" />
+    @update:modelValue="$emit('update:modelValue', $event)">
+    <template v-slot:actions="{ props }">
+      <slot name="actions" :props="props" />
     </template>
     <slot />
   </v-snackbar>
@@ -20,20 +16,17 @@
 
 <script>
 export default {
-  emits: ['input'],
+  emits: ['update:modelValue'],
   props: {
     //non vuetify props
+    //TODO test on ios
     cssIosSnackbar: { type: Boolean, required: false },
-    //TODO vuetify props that will change with Vuetify 3
-    bottom: { type: Boolean, required: false }, //location
-    centered: { type: Boolean, required: false }, //location
-    fixed: { type: Boolean, required: false }, //position
-    top: { type: Boolean, required: false }, //position
     //vuetify props
-    light: { type: Boolean, required: false },
     color: { type: String, required: false },
+    location: { type: String, required: false },
+    modelValue: { type: undefined, required: false },
+    position: { type: String, required: false }, //location
     timeout: { type: [Number, String], required: false },
-    value: { type: undefined, required: false },
   },
 };
 </script>
@@ -53,7 +46,7 @@ export default {
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-top: 8px solid rgb(var(--v-theme-primary-lighten1));
+  border-top: 8px solid;
   position: fixed;
   bottom: 0;
   left: 50%;

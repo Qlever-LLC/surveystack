@@ -6,10 +6,9 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <app-control-hint :value="control.hint" />
-    <a-snackbar top light v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1">
+    <a-snackbar v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1" location="top">
       Keep this window open while tracing your area or field. If you switch applications you may lose the area you have
       traced.
       <a-btn
@@ -18,8 +17,7 @@
         rounded
         variant="flat"
         color="primary"
-        class="d-block ml-auto"
-      >
+        class="d-block ml-auto">
         Dismiss
       </a-btn>
     </a-snackbar>
@@ -35,8 +33,7 @@
         'hide-modify': !hasSomeDrawControl,
         'hide-geotrace': !control.options.geoJSON.showGeoTrace,
       }"
-      role="application"
-    />
+      role="application" />
 
     <div class="fields-table mt-6 d-none">
       <a-btn class="ml-auto" color="primary" @click="handleAddField">Add field</a-btn>
