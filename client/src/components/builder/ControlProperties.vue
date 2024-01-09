@@ -180,7 +180,6 @@
         v-model="controlInProgress.options.allowCustomSelection"
         @input="
           () => {
-            controlInProgress.options.allowAutocomplete = true;
             controlInProgress.defaultValue = null;
           }
         "
@@ -193,26 +192,11 @@
           <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
         </template>
       </a-checkbox>
-      <a-checkbox
-        v-if="isOntology"
-        class="ml-2 align-center align-self-start"
-        color="grey-darken-1"
-        label="Autocomplete"
-        v-model="controlInProgress.options.allowAutocomplete"
-        :disabled="
-          (!!controlInProgress.libraryId &&
-            !controlInProgress.options.allowModify &&
-            !controlInProgress.isLibraryRoot) ||
-          controlInProgress.options.allowCustomSelection
-        "
-        helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
-        dense />
       <ontology
         v-if="isOntology"
         v-model="controlInProgress.defaultValue"
         :multiple="controlInProgress.options.hasMultipleSelections"
         :customAnswer="controlInProgress.options.allowCustomSelection"
-        :autocomplete="controlInProgress.options.allowAutocomplete"
         :source="controlInProgress.options.source"
         :resources="survey.resources" />
       <date

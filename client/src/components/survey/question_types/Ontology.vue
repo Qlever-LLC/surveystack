@@ -189,12 +189,9 @@ export default {
       }
       return defaultProps;
     },
-    // TODO imho remove this.control.options.allowAutocomplete because we merged v-select and v-autocomplete
     getPlaceholder() {
       if ((this.control.hint && this.isFocus) || !this.control.hint) {
-        if (!this.control.options.allowCustomSelection && !this.control.options.allowAutocomplete) {
-          return this.control.options.hasMultipleSelections ? 'Select answers' : 'Select answer';
-        } else if (!this.control.options.allowCustomSelection && this.control.options.allowAutocomplete) {
+        if (!this.control.options.allowCustomSelection) {
           return 'Type to search';
         } else if (this.control.options.allowCustomSelection) {
           return 'Type to search or add custom answer';
