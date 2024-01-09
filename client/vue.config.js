@@ -43,7 +43,7 @@ module.exports = {
       new CopyPlugin({
         patterns: ['src/utils/sandboxUtils.js'],
       }),
-      new VuetifyPlugin({ autoImport: true }), // Enabled by default
+      new VuetifyPlugin({ autoImport: true, styles: { configFile: 'src/styles/settings.scss' } }),
     ],
   },
   transpileDependencies: ['vuetify'],
