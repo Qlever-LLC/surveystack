@@ -14,8 +14,7 @@
       @onDelete="onDelete"
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
-      @show-version-dialog="versionsDialogIsVisible = true"
-    />
+      @show-version-dialog="versionsDialogIsVisible = true" />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
       <a-progress-circular :size="50" color="primary" indeterminate />
     </div>
@@ -38,8 +37,7 @@
       @cancel="showOverrideModal = false"
       @confirm="onOverride"
       labelConfirm="Dismiss unpublished changes"
-      width="400"
-    >
+      width="400">
       <template v-slot:title>Confirm your action</template>
       You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
@@ -57,10 +55,9 @@
       v-model="showResult"
       :items="resultItems"
       title="Result of Submission"
-      additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      additionalMessage="<span class='text-caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
       :survey="survey"
-      :submission="submission"
-    />
+      :submission="submission" />
 
     <result-dialog
       v-model="showApiComposeErrors"
@@ -68,16 +65,14 @@
       title="ApiCompose Errors"
       :survey="survey"
       :submission="submission"
-      @close="showApiComposeErrors = false"
-    />
+      @close="showApiComposeErrors = false" />
 
     <versions-dialog
       v-if="versionsDialogIsVisible"
       v-model="versionsDialogIsVisible"
       @cancel="versionsDialogIsVisible = false"
       :survey-id="survey._id"
-      @reload-survey="onReloadSurvey"
-    />
+      @reload-survey="onReloadSurvey" />
 
     <a-snackbar v-model="showSnackbar" :timeout="4000">
       {{ capitalizeSnackbarMessage }}
@@ -87,8 +82,7 @@
   <div
     v-else
     class="d-flex justify-center align-center overlay-bg"
-    style="background: rgba(0, 0, 0, 0.45); height: 100%"
-  >
+    style="background: rgba(0, 0, 0, 0.45); height: 100%">
     <a-card max-width="500">
       <a-card-title>
         <a-icon class="mr-2 text-error">mdi-close-octagon</a-icon>

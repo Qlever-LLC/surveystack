@@ -38,7 +38,7 @@
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Send an invitation email</div>
-                <div class="font-weight-regular caption">An email invitation will be sent right now</div>
+                <div class="font-weight-regular text-caption">An email invitation will be sent right now</div>
               </div>
             </template>
           </a-radio>
@@ -46,7 +46,7 @@
             <template v-slot:label>
               <div>
                 <div class="font-weight-medium">Do not send an invitation email now</div>
-                <div class="font-weight-regular caption">You can send an email invitation later on</div>
+                <div class="font-weight-regular text-caption">You can send an email invitation later on</div>
               </div>
             </template>
           </a-radio>

@@ -20,8 +20,7 @@
                 label="Allow Submissions for..."
                 :items="availableSubmissions"
                 item-title="text"
-                item-value="value"
-              />
+                item-value="value" />
               <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" variant="outlined" />
             </a-card-text>
             <a-card-actions class="mr-3">
@@ -41,8 +40,7 @@
             <a-card-text>
               <app-resources
                 :resources="survey.resources"
-                @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-              />
+                @set-survey-resources="(val) => $emit('set-survey-resources', val)" />
             </a-card-text>
             <a-card-actions class="mr-3">
               <a-spacer />
@@ -55,8 +53,7 @@
           v-model="updateLibraryDialogIsVisible"
           :library-survey="librarySurveyPublishedAndDraft"
           @ok="publishUpdateToLibrary"
-          @cancel="updateLibraryDialogIsVisible = false"
-        />
+          @cancel="updateLibraryDialogIsVisible = false" />
         <a-menu location="bottom" v-model="menuIsOpen">
           <template v-slot:activator="{ props }">
             <a-btn icon v-bind="props">
@@ -79,8 +76,7 @@
                     ref="select-items-file-input-surveydetails"
                     accept=".json"
                     class="d-none"
-                    @change="(file) => $emit('import-survey', file)"
-                  />
+                    @change="(file) => $emit('import-survey', file)" />
                 </a-input>
               </a-list-item-title>
             </a-list-item>
@@ -139,18 +135,16 @@
           v-model="editLibraryDialogIsVisible"
           :library-survey="value"
           @ok="addToLibrary"
-          @cancel="editLibraryDialogIsVisible = false"
-        />
+          @cancel="editLibraryDialogIsVisible = false" />
         <list-library-consumers-dialog
           v-if="libraryConsumersDialogIsVisible"
           v-model="libraryConsumersDialogIsVisible"
           :library-survey="value"
-          @cancel="libraryConsumersDialogIsVisible = false"
-        />
+          @cancel="libraryConsumersDialogIsVisible = false" />
         <print-settings-dialog v-model="printSettingDialogIsVisible" :survey="survey" />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
-        <div class="body-2 text-grey caption">
+        <div class="body-2 text-grey text-caption">
           Size: {{ surveySize }} MB
           <a-btn
             v-if="surveySize > 1"
@@ -158,8 +152,7 @@
             x-small
             color="white"
             elevation="0"
-            class="mb-1"
-          >
+            class="mb-1">
             <a-icon x-small color="warning">mdi-alert</a-icon>try to clean up
           </a-btn>
         </div>
@@ -177,8 +170,7 @@
           disabled
           dense
           hide-details
-          class="mb-2 survey-group-name-input"
-        />
+          class="mb-2 survey-group-name-input" />
         <div class="d-flex flex-wrap justify-end align-center">
           <a-btn
             v-if="!isNew"
@@ -186,8 +178,7 @@
             :loading="isUpdating"
             @click="$emit('update')"
             color="primary"
-            class="my-1 mr-1"
-          >
+            class="my-1 mr-1">
             <a-icon class="mr-1">mdi-update</a-icon>
             Update
             <a-tooltip bottom activator="parent">
@@ -207,8 +198,7 @@
             color="primary"
             :disabled="!enableSaveDraft || isUpdating"
             :loading="isSaving"
-            class="my-1 mr-1"
-          >
+            class="my-1 mr-1">
             <a-icon class="mr-1">mdi-content-save</a-icon>
             Save
             <a-tooltip bottom activator="parent">Save a new draft <strong>version</strong> of the Survey</a-tooltip>

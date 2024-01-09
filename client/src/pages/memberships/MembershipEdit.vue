@@ -16,8 +16,7 @@
           item-value="value"
           v-model="entity.meta.status"
           label="Status"
-          disabled
-        />
+          disabled />
 
         <a-text-field v-model="entity.group" label="Group" disabled />
 
@@ -30,8 +29,7 @@
           class="mt-3"
           v-model="entity.meta.invitationName"
           label="Invitee Name"
-          hint="Default name for newly registered users"
-        />
+          hint="Default name for newly registered users" />
 
         <a-select
           class="mt-3"
@@ -39,8 +37,7 @@
           item-title="text"
           item-value="value"
           v-model="entity.role"
-          label="Role"
-        />
+          label="Role" />
 
         <div class="d-flex mt-2">
           <a-btn class="ml-auto" variant="text" @click="cancel">Cancel</a-btn>
@@ -59,7 +56,7 @@
       <a-card-actions class="d-flex justify-space-between align-center">
         <div>
           <a-btn color="primary" @click="resend"> <a-icon left>mdi-email-send-outline</a-icon> Resend </a-btn>
-          <span class="ml-1 caption text-secondary">{{
+          <span class="ml-1 text-caption text-secondary">{{
             entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'
           }}</span>
         </div>
@@ -100,8 +97,7 @@
       v-model="dialogInvitationLink"
       title="Invitation Link"
       @cancel="dialogInvitationLink = false"
-      @confirm="dialogInvitationLink = false"
-    >
+      @confirm="dialogInvitationLink = false">
       <p>
         Copy the following secret invitation link. It can be used to claim this membership - either by creating a new
         user account, or by using an already existing user account.
