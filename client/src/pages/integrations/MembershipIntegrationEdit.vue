@@ -13,8 +13,7 @@
           item-value="value"
           v-model="entity.type"
           label="Type"
-          variant="outlined"
-        />
+          variant="outlined" />
 
         <app-farmos-farm-picker
           v-if="entity.type === 'farmos-farm'"
@@ -25,8 +24,7 @@
               entity.data = ev;
               entity.name = ev.name;
             }
-          "
-        />
+          " />
         <app-json-editor v-model="entity.data" class="mt-3" />
 
         <div class="d-flex ma-2">
@@ -161,7 +159,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .code-editor {
   height: 77vh;
 }

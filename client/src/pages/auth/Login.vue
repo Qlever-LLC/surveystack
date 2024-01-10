@@ -16,7 +16,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .wrapper {
   background-color: rgb(var(--v-theme-background));
   height: 100%;

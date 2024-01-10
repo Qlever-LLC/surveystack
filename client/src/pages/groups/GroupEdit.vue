@@ -4,8 +4,7 @@
       v-model="learnMoreDialog"
       title="Premium Features"
       @confirm="learnMoreDialog = false"
-      @cancel="learnMoreDialog = false"
-    >
+      @cancel="learnMoreDialog = false">
       <p>
         With a paid subscription you can upgrade to
         <strong>your own white-labelled app</strong> with a <strong>custom url</strong>, and your
@@ -43,8 +42,7 @@
         :disabled="!entity._id"
         class="ma-2"
         :to="`/call-for-submissions?group=${entity._id}`"
-        color="secondary"
-      >
+        color="secondary">
         <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
       </a-btn>
     </div>
@@ -56,8 +54,7 @@
             placeholder="Enter group name"
             id="group-name"
             autocomplete="off"
-            v-model="entity.name"
-          />
+            v-model="entity.name" />
           <a-text-field
             label="Slug"
             placeholder="Enter group slug or use suggested"
@@ -69,8 +66,7 @@
             @click:append="editSlug = !editSlug"
             hint="URL friendly version of name"
             persistent-hint
-            :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
-          />
+            :disabled="isWhitelabel && entity.path === whitelabelPartner.path" />
           <div class="d-flex align-center mt-6">
             <a-checkbox
               label="Invitation Only"
@@ -82,8 +78,7 @@
               "
               persistent-hint
               :disabled="!isPremium"
-              class="d-inline mt-0"
-            />
+              class="d-inline mt-0" />
             <div class="ml-auto ml-sm-6">
               <a-btn small v-if="!isPremium" @click="learnMoreDialog = true" variant="outlined" color="primary"
                 >Learn more...
@@ -114,8 +109,7 @@
             name: 'memberships-new',
             query: { group: entity._id, role: 'user' },
           }"
-          :filter="filterMembers"
-        >
+          :filter="filterMembers">
           <template v-slot:entity="{ entity }">
             <div v-if="entity.meta && entity.meta.status === 'pending'">
               <a-list-item-title class="text-secondary"
@@ -136,16 +130,14 @@
                   v-if="entity.meta && entity.meta.status === 'pending'"
                   :membershipId="entity._id"
                   :email="entity.meta.invitationEmail"
-                  @confirmed="loadMembers"
-                />
+                  @confirmed="loadMembers" />
                 <app-member-hylo-status
                   v-if="entity.meta && entity.meta.status === 'active' && integratedHyloGroup"
                   :loading="isLoadingHyloGroup"
                   :membershipId="entity._id"
                   :hyloGroup="integratedHyloGroup"
                   :userName="entity.user.name"
-                  @updated="loadHyloGroup"
-                />
+                  @updated="loadHyloGroup" />
                 <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
               </a-row>
             </a-list-item-action>
@@ -161,8 +153,7 @@
           v-if="editMode"
           :entities="integrations"
           title="Integrations"
-          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`"
-        >
+          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
           <template v-slot:entity="{ entity }">
             <a-list-item-title>{{ entity.name }}</a-list-item-title>
             <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
@@ -178,8 +169,7 @@
           v-if="editMode"
           :entities="entity.surveys.pinned"
           :searchResults="searchResults"
-          @search="searchSurveys"
-        >
+          @search="searchSurveys">
         </app-pinned-surveys>
       </a-col>
     </a-row>
@@ -400,7 +390,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .api-border {
   border: 1px solid rgba(0, 0, 0, 0.24);
   border-radius: 4px;

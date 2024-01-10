@@ -10,8 +10,7 @@
       v-model="showAndroidInstallDialog"
       v-bind="dialogProps"
       @cancel="showAndroidInstallDialog = false"
-      @confirm="showAndroidInstallDialog = false"
-    >
+      @confirm="showAndroidInstallDialog = false">
       <template v-slot:title>Installing Android App</template>
       <template>
         <p class="text-primary">
@@ -30,8 +29,7 @@
           x-large
           color="green"
           href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
-          outlined
-        >
+          outlined>
           <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Download APK
         </a-btn>
@@ -50,8 +48,7 @@
           x-large
           color="green"
           outlined
-          @click="showAndroidInstallDialog = true"
-        >
+          @click="showAndroidInstallDialog = true">
           <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Install Android App
         </a-btn>
@@ -327,7 +324,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 iframe {
   width: 100%;
   display: block;

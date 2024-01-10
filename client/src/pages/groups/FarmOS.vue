@@ -44,8 +44,7 @@
       v-model="showLinkDialog"
       @cancel="showLinkDialog = false"
       @confirm="showLinkDialog = false"
-      title="Access FarmOS Instance"
-    >
+      title="Access FarmOS Instance">
       <div class="d-flex justify-center my-8">
         <a-btn
           :loading="!linkReady"
@@ -53,8 +52,7 @@
           :href="adminLink"
           @click="invalidateLink"
           color="primary"
-          target="_blank"
-        >
+          target="_blank">
           {{ linkReady ? 'Access' : 'Loading' }}</a-btn
         >
       </div>
@@ -65,8 +63,7 @@
       v-if="showCreateDialog"
       @check-url="checkUrl"
       @create-instance="createInstance"
-      :viewModel="createViewModel"
-    />
+      :viewModel="createViewModel" />
 
     <FarmOSConnectDialog
       v-model="showConnectDialog"
@@ -74,8 +71,7 @@
       :allowCreate="allowCreate"
       :loadingOwners="loadingOwners"
       @connect="connectFarms"
-      @create="createFarm"
-    />
+      @create="createFarm" />
 
     <FarmOSDisconnectDialog
       v-model="showDisonnectDialog"
@@ -84,15 +80,13 @@
       :allGroups="allGroups"
       :selectedGroupIds="selectedGroupIds"
       @updateGroups="updateGroups"
-      @cancelUpdate="cancelUpdate"
-    />
+      @cancelUpdate="cancelUpdate" />
 
     <FarmOSRemoveNoteDialog
       v-model="showRemoveNoteDialog"
       :loading="loading"
       @addNote="addNote"
-      @cancelNote="cancelNote"
-    />
+      @cancelNote="cancelNote" />
 
     <FarmOSGroupSettings
       class="ma-16"
@@ -107,8 +101,7 @@
       @deactivate="showDeactivateDialog = true"
       :plans="plans"
       :groupInfos="groupInfos"
-      :superAdmin="superAdmin"
-    >
+      :superAdmin="superAdmin">
     </FarmOSGroupSettings>
   </a-container>
 
@@ -710,7 +703,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .max-800 {
   max-width: 800px;
 }

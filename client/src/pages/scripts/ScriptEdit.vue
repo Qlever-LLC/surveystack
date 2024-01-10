@@ -168,7 +168,7 @@ export function render(props, state, setState) {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .code-editor {
   height: 75vh;
 }

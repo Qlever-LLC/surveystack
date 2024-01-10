@@ -9,8 +9,7 @@
             variant="flat"
             large
             color="primary"
-            class="full"
-          >
+            class="full">
             Cancel
           </a-btn>
         </div>
@@ -45,7 +44,7 @@ export default {
   props: ['showPrev', 'enableNext', 'enableSubmit', 'showSubmit', 'showNav'],
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .full {
   width: 100%;
 }

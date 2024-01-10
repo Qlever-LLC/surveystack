@@ -300,7 +300,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* fix tabs indentation on mobile */
 >>> .v-slide-group__prev {
   display: none !important;

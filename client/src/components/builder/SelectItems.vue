@@ -113,7 +113,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .checkbox-group >>> .v-input--selection-controls {
   margin-top: 4px;
 }

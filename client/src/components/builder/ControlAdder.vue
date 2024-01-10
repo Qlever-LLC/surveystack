@@ -97,7 +97,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .button-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

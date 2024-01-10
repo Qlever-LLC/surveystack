@@ -7,8 +7,7 @@
           :control="child"
           :autoFocus="i === 0"
           :forceMobile="forceMobile"
-          insidePage
-        />
+          insidePage />
       </div>
     </div>
 
@@ -18,8 +17,7 @@
         :class="{
           irrelevant: !$store.getters['draft/relevance'](path),
           hidden: !$store.getters['draft/relevance'](path) && insidePage,
-        }"
-      >
+        }">
         <app-control-label :value="control.label" :redacted="control.options && control.options.redacted" />
         <app-control-hint :value="control.hint" />
 
@@ -29,8 +27,7 @@
             :control="child"
             :autoFocus="autoFocus && i === 0"
             :forceMobile="forceMobile"
-            insidePage
-          />
+            insidePage />
         </div>
 
         <app-control-more-info :value="control.moreInfo" />
@@ -43,8 +40,7 @@
         :class="{
           irrelevant: !$store.getters['draft/relevance'](path),
           hidden: !$store.getters['draft/relevance'](path) && insidePage,
-        }"
-      >
+        }">
         <component
           :is="getComponentName(control)"
           :control="control"
@@ -65,8 +61,7 @@
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
           :forceMobile="forceMobile"
           :isInBuilder="isInBuilder"
-          @initialize="initialize(control.id)"
-        />
+          @initialize="initialize(control.id)" />
       </div>
     </div>
   </div>
@@ -204,7 +199,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .control {
   margin: 8px 0px;
   padding: 1rem;

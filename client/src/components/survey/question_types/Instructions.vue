@@ -14,7 +14,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .instructions >>> blockquote {
   border-left: 0.25em solid #dfe2e5;
   padding-left: 1em;

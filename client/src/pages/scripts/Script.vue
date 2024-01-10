@@ -36,7 +36,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .code-editor {
   height: 72vh;
   margin-bottom: 15px;

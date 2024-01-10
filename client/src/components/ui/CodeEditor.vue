@@ -88,7 +88,7 @@ const emit = defineEmits(['save', 'change', 'close', 'examples', 'run']);
 const dialog = ref(false);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .error {
   width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans',

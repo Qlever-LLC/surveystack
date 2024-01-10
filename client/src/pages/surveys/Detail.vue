@@ -35,8 +35,7 @@
           x-large
           color="primary"
           top
-          left
-        >
+          left>
           <a-list max-width="260">
             <a-list-item @click="startDraft(entity)">
               <a-list-item-title>Start survey</a-list-item-title>
@@ -55,8 +54,7 @@
             variant="text"
             large
             :loading="download.loading"
-            @click="downloadPrintablePdf(entity._id)"
-          >
+            @click="downloadPrintablePdf(entity._id)">
             Print Blank Survey
           </a-btn>
         </div>
@@ -68,8 +66,7 @@
         <member-selector
           :show="showSelectMember"
           @hide="showSelectMember = false"
-          @selected="startDraftAs(entity, $event)"
-        />
+          @selected="startDraftAs(entity, $event)" />
       </div>
     </div>
   </a-container>
@@ -298,7 +295,7 @@ export default {
 };
 </script>
 ,
-<style scoped>
+<style scoped lang="scss">
 .survey-description {
   margin: 16px 0px;
   white-space: pre-wrap;

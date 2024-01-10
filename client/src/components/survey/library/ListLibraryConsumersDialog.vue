@@ -66,7 +66,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }

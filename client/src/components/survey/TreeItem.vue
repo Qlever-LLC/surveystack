@@ -13,8 +13,7 @@
           :name="name"
           :item="child"
           @make-folder="$emit('make-folder', $event)"
-          @add-item="$emit('add-item', $event)"
-        ></tree-item>
+          @add-item="$emit('add-item', $event)"></tree-item>
       </ul>
     </li>
   </ul>
@@ -71,7 +70,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 body {
   font-family: Menlo, Consolas, monospace;
   color: #444;

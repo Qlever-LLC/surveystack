@@ -12,8 +12,7 @@
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.paragraph() }"
                 @click="commands.paragraph"
-                :disabled="disabled"
-              >
+                :disabled="disabled">
                 <a-icon>mdi-format-pilcrow</a-icon>
               </a-btn>
 
@@ -22,8 +21,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.heading({ level: 1 }) }"
-                @click="commands.heading({ level: 1 })"
-              >
+                @click="commands.heading({ level: 1 })">
                 <a-icon>mdi-format-header-1</a-icon>
               </a-btn>
 
@@ -32,8 +30,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.heading({ level: 2 }) }"
-                @click="commands.heading({ level: 2 })"
-              >
+                @click="commands.heading({ level: 2 })">
                 <a-icon>mdi-format-header-2</a-icon>
               </a-btn>
 
@@ -42,8 +39,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.heading({ level: 3 }) }"
-                @click="commands.heading({ level: 3 })"
-              >
+                @click="commands.heading({ level: 3 })">
                 <a-icon>mdi-format-header-3</a-icon>
               </a-btn>
             </div>
@@ -54,8 +50,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.blockquote() }"
-                @click="commands.blockquote"
-              >
+                @click="commands.blockquote">
                 <a-icon>mdi-format-quote-close</a-icon>
               </a-btn>
 
@@ -70,7 +65,7 @@
                 </a-btn> -->
 
               <!--
-                WARNING: Is not up to date as it is a comment 
+                WARNING: Is not up to date as it is a comment
                 <a-select
                   :items="getParagraphStyles(isActive, commands)"
                 >
@@ -93,8 +88,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.bullet_list() }"
-                @click="commands.bullet_list"
-              >
+                @click="commands.bullet_list">
                 <a-icon>mdi-format-list-bulleted</a-icon>
               </a-btn>
 
@@ -103,8 +97,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.ordered_list() }"
-                @click="commands.ordered_list"
-              >
+                @click="commands.ordered_list">
                 <a-icon>mdi-format-list-numbered</a-icon>
               </a-btn>
             </div>
@@ -133,8 +126,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.bold() }"
-                @click="commands.bold"
-              >
+                @click="commands.bold">
                 <a-icon>mdi-format-bold</a-icon>
               </a-btn>
 
@@ -143,8 +135,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.italic() }"
-                @click="commands.italic"
-              >
+                @click="commands.italic">
                 <a-icon>mdi-format-italic</a-icon>
               </a-btn>
 
@@ -153,8 +144,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.strike() }"
-                @click="commands.strike"
-              >
+                @click="commands.strike">
                 <a-icon>mdi-format-strikethrough</a-icon>
               </a-btn>
 
@@ -163,8 +153,7 @@
                 small
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.underline() }"
-                @click="commands.underline"
-              >
+                @click="commands.underline">
                 <a-icon>mdi-format-underline</a-icon>
               </a-btn>
             </div>
@@ -278,28 +267,24 @@
         class="menububble"
         :editor="editor"
         @hide="hideLinkMenu"
-        v-slot="{ commands, isActive, getMarkAttrs, menu }"
-      >
+        v-slot="{ commands, isActive, getMarkAttrs, menu }">
         <div
           class="menububble"
           :class="{ 'is-active': menu.isActive }"
-          :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
-        >
+          :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`">
           <a-card class="pa-0">
             <a-card-text class="pa-0">
               <form
                 class="menububble__form"
                 v-if="linkMenuIsActive"
-                @submit.prevent="setLinkUrl(commands.link, linkUrl)"
-              >
+                @submit.prevent="setLinkUrl(commands.link, linkUrl)">
                 <a-text-field
                   class="menububble__input ml-4"
                   dense
                   v-model="linkUrl"
                   placeholder="https://"
                   ref="linkInput"
-                  @keydown.esc="hideLinkMenu"
-                />
+                  @keydown.esc="hideLinkMenu" />
                 <a-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
                   <a-icon>mdi-check</a-icon>
                 </a-btn>
@@ -313,8 +298,7 @@
                   class="menububble__button"
                   @click="showLinkMenu(getMarkAttrs('link'))"
                   :class="{ 'is-active': isActive.link() }"
-                  icon
-                >
+                  icon>
                   <span>{{ isActive.link() ? 'Update Link' : 'Add Link' }}</span>
                   <a-icon>mdi-link</a-icon>
                 </a-btn>
@@ -472,7 +456,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .tiptap-editor >>> .ProseMirror {
   /* background-color: blue; */
   width: 100%;

@@ -388,7 +388,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .overlay-bg {
   background-color: rgba(0, 0, 0, 0.45);
 }

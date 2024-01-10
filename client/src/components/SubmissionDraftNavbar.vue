@@ -10,8 +10,7 @@
           :anon="control && control.options && control.options.redacted"
           :showOverviewIcon="true"
           :questionNumber="questionNumber"
-          @showOverviewClicked="showOverview = !showOverview"
-        />
+          @showOverviewClicked="showOverview = !showOverview" />
       </a-toolbar-title>
 
       <navbar-user-menu />
@@ -62,7 +61,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .title {
   font-size: 1rem !important;
 }

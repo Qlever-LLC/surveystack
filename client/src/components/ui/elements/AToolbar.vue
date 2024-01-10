@@ -5,8 +5,7 @@
     :dark="dark"
     :dense="dense"
     :flat="flat"
-    :tile="tile"
-  >
+    :tile="tile">
     <slot />
   </v-toolbar>
 </template>
@@ -27,7 +26,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .fullWidth >>> .v-toolbar__items {
   width: 100%;
 }

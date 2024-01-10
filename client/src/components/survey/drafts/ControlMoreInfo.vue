@@ -16,7 +16,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .control-more-info {
   color: rgba(0, 0, 0, 0.6);
   margin-top: 12px;

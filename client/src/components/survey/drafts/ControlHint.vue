@@ -10,7 +10,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .control-hint {
   color: rgba(0, 0, 0, 0.7);
   font-weight: 500;

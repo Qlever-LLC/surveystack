@@ -14,8 +14,7 @@
           item-value="value"
           v-model="entity.type"
           label="Type"
-          variant="outlined"
-        />
+          variant="outlined" />
 
         <app-json-editor v-model="entity.data" />
         <div class="d-flex ma-2">
@@ -135,7 +134,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .code-editor {
   height: 77vh;
 }

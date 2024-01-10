@@ -20,8 +20,7 @@
             v-model="seats"
             label="Max Seats"
             type="number"
-            @change="$emit('seatsChanged', seats)"
-          />
+            @change="$emit('seatsChanged', seats)" />
 
           <a-select
             variant="outlined"
@@ -32,8 +31,7 @@
             v-model="selectedPlans"
             :items="plans"
             :item-value="(p) => p._id"
-            :item-title="(p) => `${p.planName} (${p.planUrl})`"
-          >
+            :item-title="(p) => `${p.planName} (${p.planUrl})`">
             <template v-slot:chip="{ props, item }">
               <a-chip v-bind="props" closable>
                 {{ item.title }}
@@ -59,8 +57,7 @@
               :ripple="false"
               :disabled="!canAddCoffeeShop"
               hide-details
-              @input="$emit('addGrpCoffeeShop', $event)"
-            >
+              @input="$emit('addGrpCoffeeShop', $event)">
               <a-tooltip bottom activator="parent">
                 Talk to your parent group administrator to enable this option
               </a-tooltip>
@@ -72,16 +69,14 @@
               :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
               @input="$emit('allowSbGrpsJoinCoffeeShop', $event)"
-              :label="`Allow subgroups to join the Coffee Shop`"
-            />
+              :label="`Allow subgroups to join the Coffee Shop`" />
             <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
               @input="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
-              label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
-            />
+              label="Allow subgroups admins to create FarmOS Farms through Survey Stack" />
           </a-container>
         </div>
       </div>
@@ -101,8 +96,7 @@
       :members="filteredMembers"
       @open="(item) => $emit('open', item)"
       @connect="(item) => $emit('connect', item)"
-      @disconnect="(item) => $emit('disconnect', item)"
-    />
+      @disconnect="(item) => $emit('disconnect', item)" />
   </div>
 </template>
 
@@ -203,7 +197,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .v-data-table /deep/ .v-data-table__wrapper {
   overflow: unset;
 }

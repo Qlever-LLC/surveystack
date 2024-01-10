@@ -33,13 +33,15 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .modal {
   height: 0;
   width: 0;
 }
 .modal-content {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.19),
+    0 6px 6px rgba(0, 0, 0, 0.23);
   background-color: white;
   width: 100%;
   padding: 0.5rem;

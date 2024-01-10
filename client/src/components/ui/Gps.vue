@@ -77,7 +77,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 /* .map-container {
   font-family: monospace;
   justify-content: left;

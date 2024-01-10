@@ -61,7 +61,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .close-button {
   position: absolute;
   right: 10px;

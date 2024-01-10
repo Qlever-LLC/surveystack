@@ -15,8 +15,7 @@
         class="help-btn"
         variant="text"
         href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
-        target="_blank"
-      >
+        target="_blank">
         <a-icon size="22">mdi-help-circle-outline</a-icon>
       </a-btn>
       <navbar-user-menu />
@@ -88,7 +87,7 @@ export default {
   // },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .title {
   font-size: 1rem !important;
 }

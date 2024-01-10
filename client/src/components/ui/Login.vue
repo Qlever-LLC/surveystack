@@ -11,8 +11,7 @@
             class="form-control"
             v-model="entity.email"
             @update:model-value="entity.email = $event.toLowerCase()"
-            color="focus"
-          />
+            color="focus" />
           <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
             We'll send you an email to sign you in - no password needed! <b>Click send</b> then <b>check your email</b>.
           </div>
@@ -24,8 +23,7 @@
             v-model="entity.password"
             :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
             @click:appendInner="showPasswords = !showPasswords"
-            color="focus"
-          />
+            color="focus" />
           <div class="d-flex justify-space-around align-center">
             <template v-if="usePassword">
               <router-link
@@ -84,8 +82,7 @@
     color="success"
     border="start"
     elevation="2"
-    class="card-width mb-0"
-  >
+    class="card-width mb-0">
     <h1>Magic link sent!</h1>
     <p class="body-1 my-6">
       Follow the link we sent you at <span class="font-weight-medium">{{ entity.email }}</span> to finish logging in!
@@ -260,7 +257,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 a {
   text-decoration: none;
 }

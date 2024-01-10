@@ -336,7 +336,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pointer-events-none {
   pointer-events: none !important;
 }

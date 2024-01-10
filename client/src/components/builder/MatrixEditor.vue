@@ -426,7 +426,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .lock-line-decor {
   min-height: initial;
   flex-grow: 1;

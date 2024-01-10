@@ -10,15 +10,13 @@
             label="Password"
             :type="passwordInputType"
             :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords"
-          />
+            @click:append="showPasswords = !showPasswords" />
           <a-text-field
             v-model="newPasswordConfirmation"
             label="Password confirmation"
             :type="passwordInputType"
             :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords"
-          />
+            @click:append="showPasswords = !showPasswords" />
           <div class="d-flex justify-end">
             <a-btn type="submit" color="primary">Set password</a-btn>
           </div>
@@ -103,7 +101,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .wrapper {
   height: 100%;
   background-color: rgb(var(--v-theme-background));

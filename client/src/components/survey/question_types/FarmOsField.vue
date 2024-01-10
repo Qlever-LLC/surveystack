@@ -6,8 +6,7 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <a-select
       :disabled="loading"
       :modelValue="getValue"
@@ -22,8 +21,7 @@
       :loading="loading"
       color="focus"
       itemSlot
-      cssFlexWrap
-    >
+      cssFlexWrap>
       <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
         <a-chip v-bind="props" closable>
           {{ item.title }}
@@ -53,7 +51,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 div >>> .blue-chip,
 div >>> .orange-chip,
 div >>> .green-chip {

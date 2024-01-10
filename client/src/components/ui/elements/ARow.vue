@@ -3,8 +3,7 @@
     :class="{ gap12px: cssGap12px, minHeight96px: cssMinHeight96px, minWidth0px: cssMinWidth0px }"
     :align="align"
     :dense="dense"
-    :justify="justify"
-  >
+    :justify="justify">
     <slot />
   </v-row>
 </template>
@@ -24,7 +23,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .minWidth0px {
   min-width: 0px;
 }

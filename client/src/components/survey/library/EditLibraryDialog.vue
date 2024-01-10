@@ -16,8 +16,7 @@
           v-if="localLibrarySurvey.meta.isLibrary"
           v-model="localLibrarySurvey.meta.libraryLastChangeType"
           :disabled="false"
-          label="Latest change type"
-        />
+          label="Latest change type" />
       </a-card-text>
       <a-card-actions class="mr-3">
         <a-spacer />
@@ -64,7 +63,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }

@@ -16,8 +16,7 @@
     :readonly="readonly"
     :rows="rows"
     :rules="rules"
-    :variant="variant"
-  />
+    :variant="variant" />
 </template>
 
 <script>
@@ -53,7 +52,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .fontMonospace {
   font-family: monospace;
   font-size: 0.8rem;

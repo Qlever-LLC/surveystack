@@ -530,7 +530,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;

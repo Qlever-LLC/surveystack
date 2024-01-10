@@ -576,7 +576,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 body {
   font-family: Menlo, Consolas, monospace;
   color: #444;

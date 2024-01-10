@@ -28,7 +28,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .number-chip {
   display: inline-flex;
   border: 2px solid currentColor;

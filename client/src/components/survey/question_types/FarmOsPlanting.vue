@@ -230,7 +230,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .chip-no-wrap {
   white-space: nowrap;
 }

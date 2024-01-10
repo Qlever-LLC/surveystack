@@ -18,7 +18,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .console-container {
   background-color: #0004;
   padding: 12px;

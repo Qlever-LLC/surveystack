@@ -10,8 +10,7 @@
       :variant="outlined ? 'outlined' : ''"
       hide-details
       color="focus"
-      itemSlot
-    >
+      itemSlot>
       <template v-slot:item="{ props, item }">
         <a-list-item v-bind="props">
           <a-list-item-title>
@@ -133,7 +132,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 >>> .v-list-item > .no-parent-group::after {
   content: '';
   width: 100%;

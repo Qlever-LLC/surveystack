@@ -57,7 +57,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .round-border {
   border: 1px solid rgba(0, 0, 0, 0.24);
   border-radius: 4px;

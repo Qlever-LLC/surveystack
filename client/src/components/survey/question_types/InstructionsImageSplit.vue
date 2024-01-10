@@ -10,8 +10,7 @@
               :src="image.content"
               :alt="image.label"
               class="full-width"
-              style="max-height: 80vh; object-fit: contain"
-            />
+              style="max-height: 80vh; object-fit: contain" />
           </div>
         </div>
       </div>
@@ -182,7 +181,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .instructions-image-split .wrapper {
   display: block;
 }

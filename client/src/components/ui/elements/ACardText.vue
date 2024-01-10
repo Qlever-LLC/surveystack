@@ -6,8 +6,7 @@
       paddingBottom2px: cssPaddingBottom2px,
       dialogContent: cssDialogContent,
     }"
-    :disabled="disabled"
-  >
+    :disabled="disabled">
     <slot />
   </v-card-text>
 </template>
@@ -26,7 +25,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .maxHeight500px {
   max-height: 500px;
 }

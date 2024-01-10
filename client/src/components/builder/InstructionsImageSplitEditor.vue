@@ -7,16 +7,14 @@
         :disabled="disabled"
         :newResourceTypes="[resourceTypes.IMAGE]"
         @on-new="createResourceHandler"
-        @on-select="selectResourceHandler"
-      />
+        @on-select="selectResourceHandler" />
       <a-btn
         icon
         @click.stop="openDialog"
         :disabled="disabled"
         :class="{ 'd-none': !value }"
         class="ml-2 mt-3"
-        v-if="resource"
-      >
+        v-if="resource">
         <a-icon>mdi-pencil</a-icon>
       </a-btn>
     </div>
@@ -26,8 +24,7 @@
       :value="value.body"
       @input="handleBodyChange"
       :disabled="disabled"
-      hide-details
-    />
+      hide-details />
 
     <a-dialog v-model="imageDialogIsVisible" width="500">
       <image-resource-editor
@@ -35,8 +32,7 @@
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="closeDialog"
-      />
+        @close-dialog="closeDialog" />
     </a-dialog>
   </div>
 </template>
@@ -136,4 +132,4 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

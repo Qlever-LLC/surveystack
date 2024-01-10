@@ -281,7 +281,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .draft-component-wrapper.builder >>> .draft-footer.show-submit .full {
   position: relative;
 }
@@ -341,7 +341,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(var(--v-theme-background));
 }
 
 .draft-content {
@@ -352,7 +352,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(var(--v-theme-background));
 }
 
 .draft-footer {

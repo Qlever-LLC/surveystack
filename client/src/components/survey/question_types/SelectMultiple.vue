@@ -6,8 +6,7 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <app-control-hint :value="control.hint" />
 
     <div v-if="sourceIsValid" class="py-2">
@@ -19,8 +18,7 @@
             @input="onChange"
             hide-details
             class="my-1"
-            color="focus"
-          />
+            color="focus" />
         </div>
       </div>
 
@@ -31,8 +29,7 @@
           hide-details
           class="mt-0"
           :disabled="!customValue"
-          color="focus"
-        />
+          color="focus" />
         <a-text-field
           label="other"
           v-model="customValue"
@@ -40,8 +37,7 @@
           dense
           hide-details
           @update:modelValue="onCustomChange"
-          color="focus"
-        />
+          color="focus" />
       </div>
     </div>
 
@@ -154,4 +150,4 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

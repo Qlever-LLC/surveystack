@@ -6,8 +6,7 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <a-select
       :disabled="loading"
       :modelValue="getValue"
@@ -22,8 +21,7 @@
       :loading="loading"
       color="focus"
       class="autocomplete"
-      itemSlot
-    >
+      itemSlot>
       <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
         <a-chip v-bind="props" closable>
           {{ item.title }}
@@ -52,7 +50,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 >>> .v-list-item.v-list-item--active {
   color: rgb(var(--v-theme-focus)) !important;
 }

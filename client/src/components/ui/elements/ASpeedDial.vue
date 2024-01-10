@@ -6,8 +6,7 @@
     :transition="transition"
     :value="value"
     v-bind="$attrs"
-    @input="$emit('input', $event)"
-  >
+    @input="$emit('input', $event)">
     <template v-slot:activator>
       <slot name="activator"></slot>
     </template>
@@ -28,4 +27,4 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

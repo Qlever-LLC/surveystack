@@ -38,8 +38,7 @@
     :suffix="suffix"
     :type="type"
     :validate-on-blur="validateOnBlur"
-    :variant="variant"
-  >
+    :variant="variant">
     <template v-if="appendSlot" v-slot:append>
       <slot name="append" />
     </template>
@@ -113,7 +112,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .noBorder >>> .v-input__slot::before {
   border: none !important;
 }

@@ -8,8 +8,7 @@
         show-select
         item-key="_id"
         :search="search"
-        :mobile-breakpoint="0"
-      >
+        :mobile-breakpoint="0">
         <template v-slot:top>
           <a-toolbar flat>
             <a-row>
@@ -22,8 +21,7 @@
                   append-inner-icon="mdi-search"
                   label="Search"
                   single-line
-                  autocomplete="off"
-                />
+                  autocomplete="off" />
               </a-col>
               <a-col :cols="2">
                 <a-switch v-model="excludeMeta" label="Hide meta" class="mt-2" />
@@ -113,7 +111,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* https://vue-loader.vuejs.org/guide/scoped-css.html#child-component-root-elements */
 .v-data-table >>> td {
   font-family: monospace;

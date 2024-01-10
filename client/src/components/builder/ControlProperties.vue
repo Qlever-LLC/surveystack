@@ -827,7 +827,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .property-panel form {
   display: flex;
   flex-direction: column;

@@ -5,8 +5,7 @@
     :start="left"
     :end="right"
     :size="size ? size : xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
-    v-bind="$attrs"
-  >
+    v-bind="$attrs">
     <slot />
   </v-icon>
 </template>
@@ -27,4 +26,4 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

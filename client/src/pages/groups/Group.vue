@@ -30,8 +30,7 @@
           :entities="subgroups"
           title="Subgroups"
           :link="(e) => `/g${e.path}`"
-          :linkNew="{ name: 'groups-new', query: { dir: entity.path } }"
-        >
+          :linkNew="{ name: 'groups-new', query: { dir: entity.path } }">
           <template v-slot:entity="{ entity }">
             <a-list-item-title>{{ entity.name }}</a-list-item-title>
             <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
@@ -46,8 +45,7 @@
           :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []"
           title="Pinned Surveys"
           :link="(e) => `/surveys/${e._id}`"
-          :linkNew="`/groups/edit/${entity._id}`"
-        >
+          :linkNew="`/groups/edit/${entity._id}`">
           <template v-slot:entity="{ entity }">
             <a-list-item-title>{{ entity.name }}</a-list-item-title>
             <a-list-item-subtitle>{{ entity._id }}</a-list-item-subtitle>
@@ -168,7 +166,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .placeholder {
   display: flex;
   margin-bottom: 3rem;

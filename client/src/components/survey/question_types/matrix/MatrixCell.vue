@@ -384,7 +384,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 >>> .blue-chip,
 >>> .orange-chip,
 >>> .green-chip {

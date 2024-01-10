@@ -8,8 +8,7 @@
       @cancel="rowToBeDeleted = -1"
       title="Confirm Deletion"
       labelConfirm="DELETE"
-      :maxWidth="400"
-    >
+      :maxWidth="400">
       Do you want to delete this row?
     </app-dialog>
 
@@ -23,8 +22,7 @@
       @cancel="showConfirmInitializeDialog = false"
       title="Confirm Reset"
       labelConfirm="RESET"
-      :maxWidth="400"
-    >
+      :maxWidth="400">
       Do you want to reset this spreadsheet based on the previous answers in your survey? You will have to re-enter any
       custom information you have entered.
     </app-dialog>
@@ -54,8 +52,7 @@
                   :farmos="farmos"
                   :index="idx"
                   @changed="onInput"
-                  class="my-2"
-                />
+                  class="my-2" />
               </div>
             </a-form>
           </a-card-text>
@@ -77,8 +74,7 @@
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
       initializeTooltip="Reset rows"
-      @initialize="initializeConfirm"
-    />
+      @initialize="initializeConfirm" />
     <app-control-hint :value="control.hint" />
 
     <app-matrix-table
@@ -90,8 +86,7 @@
       :floatingFooterSize="isInBuilder ? 0 : 64"
       :addRowLabel="addRowLabel"
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
-      @addRow="add"
-    >
+      @addRow="add">
       <template v-slot:header-cell="{ header }">
         <span class="flex-grow-1 text-truncate">
           {{ header.label }}
@@ -111,8 +106,7 @@
             @changed="onInput"
             :disabled="isMobile"
             class="mt-2"
-            :loading="isFarmOsLoading"
-          />
+            :loading="isFarmOsLoading" />
         </a-form>
       </template>
       <template v-if="!isMobile" v-slot:rowActions="{ rowIdx }">
@@ -403,7 +397,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /*
   'scrollbar-color' and 'scrollbar-width' should be working on Firefox Android since version 64
   https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Scrollbars#Browser_compatibility

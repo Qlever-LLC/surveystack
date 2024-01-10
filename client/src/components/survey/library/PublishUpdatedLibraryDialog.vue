@@ -23,8 +23,7 @@
         :version-name-remote-revision-old="`Version ${localLibrarySurvey.latestVersion}`"
         :version-name-remote-revision-new="`Version ${
           localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version
-        }`"
-      />
+        }`" />
       <a-card-actions class="mr-3">
         <a-spacer />
         <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" variant="text">
@@ -81,7 +80,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }

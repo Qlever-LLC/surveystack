@@ -11,8 +11,7 @@
               editedItem = createEmptyItem();
               editItemDialogIsVisible = true;
             "
-            :disabled="disabled"
-          >
+            :disabled="disabled">
             <a-icon left>mdi-plus</a-icon>Add Row
           </a-btn>
         </div>
@@ -56,8 +55,7 @@
           :disabled="disabled"
           label="List Label"
           persistent-hint
-          class="mx-2"
-        />
+          class="mx-2" />
         <!-- TODO: validate unique data name -->
         <a-text-field
           :modelValue="resource.name"
@@ -66,8 +64,7 @@
           label="List Data Name"
           persistent-hint
           class="mx-2"
-          :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        />
+          :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]" />
 
         <a-text-field v-model="search" append-inner-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
@@ -85,8 +82,7 @@
         :search="search"
         item-key="id"
         disable-sort
-        :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
-      >
+        :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }">
         <template v-slot:item.label="{ item }">
           <a-text-field v-model="item.label" :disabled="disabled" variant="solo" dense hide-details />
         </template>
@@ -108,8 +104,7 @@
               :disabled="disabled"
               icon
               variant="flat"
-              small
-            >
+              small>
               <a-icon icon="mdi-arrow-down" />
             </a-btn>
             <a-btn class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled" icon small>
@@ -371,7 +366,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .v-data-table >>> tbody > tr > td.text-start {
   padding: 0px 4px;
 }

@@ -11,8 +11,7 @@
           :modelValue="entity.email.toLowerCase()"
           @update:modelValue="entity.email = $event.toLowerCase()"
           color="focus"
-          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
-        />
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work." />
 
         <a-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
 
@@ -23,8 +22,7 @@
           v-model="entity.password"
           :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
           @click:append="showPasswords = !showPasswords"
-          color="focus"
-        />
+          color="focus" />
 
         <div class="linkBlock d-flex justify-space-around align-center">
           <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">
@@ -159,7 +157,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 a {
   text-decoration: none;
 }

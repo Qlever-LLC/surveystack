@@ -7,8 +7,7 @@
       bottom
       @initialize="$emit('initialize')"
       :highlight="isModified"
-      :tooltip="initializeTooltip"
-    />
+      :tooltip="initializeTooltip" />
     <app-redacted v-if="redacted" bottom />
     <app-required v-if="required" bottom />
   </div>
@@ -44,7 +43,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .control-label {
   font-size: 1.25rem;
   line-height: 2rem;

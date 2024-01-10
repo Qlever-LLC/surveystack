@@ -315,7 +315,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .dropzone {
   border-radius: 4px;
   border-collapse: collapse;

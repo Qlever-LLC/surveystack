@@ -53,7 +53,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .v-text-field :deep(input) {
   font-size: 2.125rem;
   padding-top: 0;

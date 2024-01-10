@@ -39,7 +39,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .icon {
   height: 1.5rem;
   display: inline-block;

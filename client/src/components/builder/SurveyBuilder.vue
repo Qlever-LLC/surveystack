@@ -30,7 +30,7 @@
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </a-alert>
 
-    <splitpanes class="pane-root" vertical>
+    <splitpanes class="pane-root bg-white" vertical>
       <pane class="pane pane-survey">
         <div class="pane-fixed-wrapper pr-2" style="position: relative">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
@@ -175,7 +175,7 @@
         </div>
       </pane>
 
-      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
+      <pane class="pane pane-draft bg-white" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
         <div id="previewSurvey" style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
           <app-draft-component
@@ -1054,7 +1054,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .screen-root {
   width: 100%;
   height: 100%;

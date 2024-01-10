@@ -345,7 +345,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .drop-area {
   min-height: 4rem;
 }

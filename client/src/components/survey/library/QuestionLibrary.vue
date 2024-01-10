@@ -216,7 +216,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .control-item:first-child {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;

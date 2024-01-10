@@ -12,8 +12,7 @@
         hide-details
         readonly
         variant="outlined"
-        clearable
-      />
+        clearable />
     </template>
 
     <a-card>
@@ -42,8 +41,7 @@
               @dragleave.prevent="showAttach = false"
               @drop.prevent="onDrop"
               variant="outlined"
-              cssMarkdown
-            />
+              cssMarkdown />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
               <a-progress-circular v-if="isLoading" indeterminate color="primary" />
@@ -56,8 +54,7 @@
             v-if="viewMode === 0"
             :class="{
               'd-none': viewMode !== 0,
-            }"
-          >
+            }">
             <div class="toolbar mb-3" style="font-weight: 600; font-size: 1rem">
               <label for="fileRef">
                 <a> + Upload new image </a>
@@ -275,7 +272,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 >>> .toolbar label button {
   pointer-events: none !important;
 }

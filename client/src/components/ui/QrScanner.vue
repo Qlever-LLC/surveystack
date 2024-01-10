@@ -7,8 +7,7 @@
       :small="!!small"
       dark
       color="primary"
-      @click="isScannerOpen = true"
-    >
+      @click="isScannerOpen = true">
       <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
     </a-btn>
 
@@ -150,7 +149,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .video-container {
   position: relative;
 }

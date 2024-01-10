@@ -7,8 +7,7 @@
         :disabled="resource != null && resource.libraryId != null"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="ontologyEditorDialog = false"
-      />
+        @close-dialog="ontologyEditorDialog = false" />
     </a-dialog>
     <a-dialog :modelValue="uploadingResource" persistent width="300">
       <a-card>
@@ -60,8 +59,7 @@
                   id="upload-resource"
                   ref="upload-resource"
                   class="d-none"
-                  @change="createFileResource"
-                />
+                  @change="createFileResource" />
               </a-input>
             </a-list-item-title>
           </a-list-item>
@@ -77,8 +75,7 @@
           :key="resource.id"
           two-line
           @click="openResource(resource)"
-          :inactive="resource.type !== resourceTypes.FILE && resource.type !== resourceTypes.ONTOLOGY_LIST"
-        >
+          :inactive="resource.type !== resourceTypes.FILE && resource.type !== resourceTypes.ONTOLOGY_LIST">
           <a-list-item-title style="user-select: text">{{ resource.label }}</a-list-item-title>
           <a-list-item-subtitle v-if="resource.type === resourceTypes.FILE" style="user-select: text">
             {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
@@ -238,7 +235,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pointer-events-none {
   pointer-events: none !important;
 }

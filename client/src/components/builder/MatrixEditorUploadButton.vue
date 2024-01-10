@@ -13,8 +13,7 @@
         ref="select-items-file-input"
         accept=".csv"
         class="d-none"
-        @change="handleFileChange"
-      />
+        @change="handleFileChange" />
     </a-input>
   </div>
 </template>
@@ -72,7 +71,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pointer-events-none {
   pointer-events: none !important;
 }

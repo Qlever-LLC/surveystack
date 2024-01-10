@@ -25,7 +25,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .button {
   display: inline-block;
   margin: -5px 0;

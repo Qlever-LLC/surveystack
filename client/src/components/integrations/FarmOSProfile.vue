@@ -27,8 +27,7 @@
             color="white"
             close
             @click:close="onCloseGrpAccess(item, group.id)"
-            label
-          >
+            label>
             {{ group.value }}
           </a-chip>
         </td>
@@ -45,8 +44,7 @@
             color="white"
             close
             @click:close="onCloseOthAccess(item, other.id)"
-            label
-          >
+            label>
             {{ other.value }}
           </a-chip>
         </td>
@@ -92,7 +90,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .backGroundGrey {
   background-color: rgb(143, 142, 142) !important;
 }

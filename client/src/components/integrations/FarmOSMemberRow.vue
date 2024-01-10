@@ -16,8 +16,7 @@
         <div
           class="instance-group"
           v-for="(group, idx) in instance.groups"
-          :key="`user-${user.id}-instance-${instance.name}-group-${group.name}`"
-        >
+          :key="`user-${user.id}-instance-${instance.name}-group-${group.name}`">
           <div class="group-chip mx-1" v-if="idx < 3 || more.includes(`${user.id}-${instance.name}`)">
             <a-chip small>
               {{ group.name }}
@@ -34,8 +33,7 @@
           text
           small
           dense
-          @click="$emit('disconnect', { groupId: null, userId: user.id, instanceName: instance.name })"
-        >
+          @click="$emit('disconnect', { groupId: null, userId: user.id, instanceName: instance.name })">
           manage
         </a-btn>
       </div>
@@ -64,7 +62,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .local-container {
   display: flex;
   background-color: rgb(243, 242, 242);
