@@ -1,9 +1,7 @@
 <template>
   <a-card :loading="loading">
-    <a-card-title class="text-heading">
-      <slot name="title">
-        {{ title }}
-      </slot>
+    <a-card-title class="text-heading d-flex pa-4">
+      <slot name="title"> {{ title }} </slot>
       <a-spacer />
       <slot name="actions" v-if="editable">
         <a-btn color="primary" class="ml-4" :to="linkNew" variant="text">{{ labelNew }}</a-btn>
@@ -16,8 +14,7 @@
         :style="{
           'max-height': maxHeight || 'initial',
           'overflow-y': 'auto',
-        }"
-      >
+        }">
         <div v-for="(entity, idx) in filteredEntities" :key="idx">
           <a-list-item two-line :to="link(entity)">
             <template v-slot:prepend>
