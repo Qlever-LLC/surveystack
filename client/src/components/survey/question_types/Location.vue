@@ -75,7 +75,7 @@
         <a-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>
           <div class="mt-2">
-            <a-progress-linear indeterminate rounded height="6" />
+            <a-progress-linear rounded height="6" />
           </div>
         </a-card-text>
       </a-card>

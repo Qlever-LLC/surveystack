@@ -71,7 +71,7 @@
     </div>
   </a-container>
   <a-container cssHeight100 cssDisplayCenterOfPage v-else>
-    <a-progress-circular :size="50" color="primary" indeterminate />
+    <a-progress-circular :size="50" />
   </a-container>
 </template>
 

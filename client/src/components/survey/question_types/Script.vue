@@ -67,7 +67,7 @@
       </p>
     </div>
     <div v-else-if="isLoading" class="d-flex align-center justify-center">
-      <a-progress-circular indeterminate color="primary" class="ma-5" />
+      <a-progress-circular class="ma-5" />
     </div>
     <div v-else-if="loadingSourceFailed" class="text-center">
       <a-icon color="red">mdi-close-thick</a-icon>

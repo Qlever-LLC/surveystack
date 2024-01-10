@@ -125,7 +125,7 @@
     <app-control-more-info :value="control.moreInfo" />
 
     <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
-      <a-progress-circular indeterminate color="primary" size="24" />
+      <a-progress-circular size="24" />
       <div class="ml-2 text-secondary">Loading farmOS data</div>
     </div>
   </div>

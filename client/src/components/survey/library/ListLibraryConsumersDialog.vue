@@ -8,7 +8,7 @@
       <a-card-text>
         <a-list dense style="max-height: 500px" class="overflow-y-auto">
           <a-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" cssHeight100>
-            <a-progress-circular :size="50" color="primary" indeterminate />
+            <a-progress-circular :size="50" />
           </a-container>
           <template v-if="libraryConsumers !== null">
             <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">

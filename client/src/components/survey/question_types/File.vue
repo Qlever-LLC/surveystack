@@ -94,7 +94,7 @@
             <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
           </a-list-item-title>
           <a-list-item-subtitle v-if="showUploadProgressIndex === index"
-            ><a-progress-linear indeterminate class="mb-0"
+            ><a-progress-linear class="mb-0"
           /></a-list-item-subtitle>
           <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
             <a-btn icon @click="editResourceName(fileResourceKey, index)">

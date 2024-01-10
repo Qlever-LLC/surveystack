@@ -16,7 +16,7 @@
       @export-survey="exportSurvey"
       @show-version-dialog="versionsDialogIsVisible = true" />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
-      <a-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" />
     </div>
     <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
@@ -46,7 +46,7 @@
       <a-card>
         <a-card-text class="pa-4">
           <span>Submitting Builder</span>
-          <a-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear class="mb-0" />
         </a-card-text>
       </a-card>
     </a-dialog>

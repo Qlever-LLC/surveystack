@@ -5,10 +5,9 @@
       :survey="survey"
       :submission="submission"
       :persist="true"
-      @submit="submit"
-    />
+      @submit="submit" />
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
-      <a-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" />
     </div>
     <div v-else-if="hasError" class="text-center mt-8">
       Error Loading Draft Submission or Survey. Click <a @click="$router.back()">here</a> to go back to Survey.
@@ -26,8 +25,7 @@
       @cancel="abortEditSubmitted"
       @confirm="(reason) => (submission.meta.archivedReason = reason)"
       reason="RESUBMIT"
-      persistent
-    >
+      persistent>
       <template v-slot:title>Confirm Submission Edit</template>
       <template>
         This draft has previously been submitted. Are you sure you want to edit it? Submitting again will archive the
@@ -50,8 +48,7 @@
       "
       :survey="survey"
       :submission="submission"
-      @close="onCloseResultDialog"
-    />
+      @close="onCloseResultDialog" />
 
     <result-dialog
       v-model="showApiComposeErrors"
@@ -59,8 +56,7 @@
       title="ApiCompose Errors"
       :survey="survey"
       :submission="submission"
-      @close="showApiComposeErrors = false"
-    />
+      @close="showApiComposeErrors = false" />
   </div>
 </template>
 

@@ -5,7 +5,7 @@
 <script>
 export default {
   props: {
-    indeterminate: { type: Boolean, required: false },
+    indeterminate: { type: Boolean, required: false, default: true },
     rounded: { type: Boolean, required: false },
     height: { type: [Number, String], required: false },
   },

@@ -9,7 +9,7 @@
       @initialize="initialize" />
     <app-control-hint :value="control.hint" />
 
-    <a-progress-circular v-if="loading" indeterminate color="secondary" class="my-8" />
+    <a-progress-circular v-if="loading" color="secondary" class="my-8" />
 
     <a-list
       v-if="!loading"

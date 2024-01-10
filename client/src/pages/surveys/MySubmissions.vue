@@ -96,7 +96,7 @@
         </a-window>
         <a-card v-else>
           <a-card-text class="d-flex align-center justify-center">
-            <a-progress-circular :size="50" color="primary" indeterminate />
+            <a-progress-circular :size="50" />
           </a-card-text>
         </a-card>
       </a-row>
