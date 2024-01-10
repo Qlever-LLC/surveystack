@@ -10,6 +10,7 @@ const Submission: OpenAPIV3.SchemaObject = {
   Obviously we want to test that the surveystack client doesn't break but if there are other api consumers,
   we probably just have to wait to hear if we break them rather than trying to figure it out ahead of time.
   */
+  // TODO: apply `additionalProperties: false` in as many places as possible
   required: ['_id', 'data', 'meta'],
   properties: {
     _id: { type: 'string', format: 'objectid' },
@@ -33,7 +34,7 @@ const Submission: OpenAPIV3.SchemaObject = {
         // TODO: what is the type of permissions.items? Is this used or legacy?
         permissions: {
           type: 'array',
-          items: {}
+          items: {},
         },
         status: {
           type: 'array',
@@ -46,10 +47,10 @@ const Submission: OpenAPIV3.SchemaObject = {
                 type: 'object',
                 required: ['at'],
                 properties: {
-                  at: { type: 'string', format: 'date-time' }
-                }
-              }
-            }
+                  at: { type: 'string', format: 'date-time' },
+                },
+              },
+            },
           },
         },
         group: {
@@ -76,10 +77,10 @@ const DraftSubmission: OpenAPIV3.SchemaObject = {
       ...Submission.properties?.meta,
       properties: {
         ...(Submission.properties?.meta as OpenAPIV3.SchemaObject)?.properties,
-        isDraft: { type: 'boolean', enum: [true] }
-      }
-    }
-  }
+        isDraft: { type: 'boolean', enum: [true] },
+      },
+    },
+  },
 };
 
 export { Submission, DraftSubmission };

@@ -1,4 +1,8 @@
-import { createSubmissionDocFor, createSubmissionWith } from '../submissions';
+import {
+  createRequestSubmissionFor,
+  createSubmissionDocFor,
+  createSubmissionWith,
+} from '../submissions';
 import getControlGenerator from './controlGenerators';
 import { createGroup } from '../groups';
 const { ObjectId } = jest.requireActual('mongodb');
@@ -126,11 +130,13 @@ const createSurvey = async (controls = [], overrides = {}) => {
   const insertResult = await getDb().collection('surveys').insertOne(surveyDoc);
   const survey = { _id: insertResult.insertedId, ...surveyDoc };
 
+  const createRequestSubmission = createRequestSubmissionFor(survey);
   const createSubmissionDoc = createSubmissionDocFor(survey);
   const createSubmission = createSubmissionWith(createSubmissionDoc);
 
   return {
     survey,
+    createRequestSubmission,
     createSubmissionDoc,
     createSubmission,
   };

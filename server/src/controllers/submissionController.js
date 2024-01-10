@@ -898,7 +898,6 @@ const updateSubmission = async (req, res) => {
     'meta.dateModified': newSubmission.meta.dateModified,
     'meta.dateSubmitted': newSubmission.meta.dateSubmitted,
     'meta.specVersion': newSubmission.meta.specVersion,
-    // TODO: does meta.status need to be stored in the database?
     'meta.status': newSubmission.meta.status,
   };
 
@@ -1392,6 +1391,8 @@ const sendPdfLink = async (req, res) => {
 
   return res.send({ success: true });
 };
+
+export { sanitize };
 
 export default {
   getSubmissions,

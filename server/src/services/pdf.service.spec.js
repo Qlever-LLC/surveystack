@@ -99,7 +99,7 @@ describe('pdf.service', () => {
       it('should contains the date of the submission in the existence order of submitted, modified and created', () => {
         const filename = submissionGenerator.filename();
         expect(filename).toContain(
-          pdfService.formatDate(submission.meta.dateSubmitted, 'YYYY-MM-DD-HH-mm-ss')
+          pdfService.formatDate(submission.meta.dateSubmitted.toISOString(), 'YYYY-MM-DD-HH-mm-ss')
         );
       });
     });
@@ -165,7 +165,10 @@ describe('pdf.service', () => {
                 table: {
                   body: [
                     ['Submitted to', 'Mock Group Name (/group-1/)'],
-                    ['Submitted on', pdfService.formatDate(submission.meta.dateSubmitted)],
+                    [
+                      'Submitted on',
+                      pdfService.formatDate(submission.meta.dateSubmitted.toISOString()),
+                    ],
                     [
                       'Submitted by',
                       {
