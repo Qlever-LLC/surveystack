@@ -6,11 +6,10 @@
       :close-on-content-click="false"
       max-height="calc(100% - 100px)"
       v-model="menuIsOpen"
-      location="bottom"
-    >
+      location="bottom">
       <template v-slot:activator="{ props }">
         <a-btn variant="text" v-bind="props" @click="checkIsOwner()">
-          <a-icon>mdi-account</a-icon>
+          <a-icon large>mdi-account</a-icon>
         </a-btn>
       </template>
       <a-list flat>
