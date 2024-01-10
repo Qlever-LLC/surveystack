@@ -9,8 +9,7 @@
       :submitAsUser="submission.meta.submitAsUser"
       @submit="() => submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
-      :dateSubmitted="submission.meta.dateSubmitted"
-    />
+      :dateSubmitted="submission.meta.dateSubmitted" />
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
@@ -20,8 +19,7 @@
       :showOverviewIcon="true"
       :questionNumber="questionNumber"
       @showOverviewClicked="showOverview = !showOverview"
-      v-if="builder"
-    >
+      v-if="builder">
       <!-- forward all the slots -->
       <!-- TODO `slot` attributes are deprecated  vue/no-deprecated-slot-attribute -->
       <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
@@ -36,8 +34,7 @@
         :groupPath="groupPath"
         :overviews="$store.getters['draft/overviews']"
         @goto="goto"
-        class="maxw-60 mx-auto"
-      />
+        class="maxw-60 mx-auto" />
     </div>
 
     <!-- Content with questions -->
@@ -54,8 +51,7 @@
           @click="
             scrollY(500);
             overflowing = false;
-          "
-        >
+          ">
           <a-icon>mdi-arrow-down</a-icon>
         </a-btn>
       </a-fab-transition>
@@ -77,8 +73,7 @@
       :showNav="true"
       @next="next"
       @prev="prev"
-      @submit="submit"
-    />
+      @submit="submit" />
   </div>
   <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
     <a-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
@@ -346,7 +341,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: rgb(var(--v-theme-background));
+  background-color: rgb(255, 255, 255);
 }
 
 .draft-content {
@@ -357,7 +352,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: rgb(var(--v-theme-background));
+  background-color: rgb(255, 255, 255);
 }
 
 .draft-footer {

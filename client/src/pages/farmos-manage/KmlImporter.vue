@@ -1,6 +1,6 @@
 <template>
   <a-sheet outlined class="pa-8">
-    <div class="display-1">
+    <div class="text-h1">
       KML Importer
       <a-icon color="primary"
         >mdi-information
@@ -24,8 +24,7 @@
           item-value="value"
           variant="outlined"
           label="Select Field"
-          @update:modelValue="selected"
-        />
+          @update:modelValue="selected" />
       </a-row>
       <a-row class="text-center">
         <a-col><a-btn @click="$emit('change')" color="primary">Import</a-btn></a-col>

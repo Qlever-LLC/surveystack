@@ -6,7 +6,7 @@
         <a-btn v-if="isSuperAdmin" variant="outlined" small :to="`/users/${user._id}/edit`">
           <a-icon small>mdi-pencil</a-icon>Edit
         </a-btn>
-        <p class="display-1 text-primary mt-2 mb-1">{{ user.name }}</p>
+        <p class="text-h1 text-primary mt-2 mb-1">{{ user.name }}</p>
         <p class="subtitle-1">{{ user.email }}</p>
       </a-card-text>
     </a-card>

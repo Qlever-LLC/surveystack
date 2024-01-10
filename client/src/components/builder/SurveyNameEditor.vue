@@ -5,15 +5,14 @@
     @update:modelValue="$emit('input', $event)"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
-    class="display-1 pt-0 mt-0"
+    class="full-width"
     :rules="[rules.hasOnlyValidCharacters, rules.hasValidLength]"
-    :autofocus="value === ''"
-  />
+    :autofocus="value === ''" />
   <!-- <div
     v-else
     @click="() => setIsEditing(true)"
     @focus="() => setIsEditing(true)"
-    class="display-1 mb-4 mt-3 d-flex"
+    class="text-h1 mb-4 mt-3 d-flex"
     :style="{ borderBottom: '2px solid transparent', letterSpacing: 'normal !important', }"
   >
     <div v-if="value">{{ value }}</div>
@@ -54,3 +53,15 @@ export default {
   },
 };
 </script>
+<style scoped>
+.v-text-field :deep(input) {
+  font-size: 2.125rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 10px;
+  min-height: 0;
+}
+.v-text-field {
+  min-height: 0;
+}
+</style>

@@ -1,7 +1,7 @@
 <template>
   <div class="about d-flex justify-center flex-wrap" style="text-align: center !important">
     <a-flex class="mb-4 mt-8">
-      <h1 class="display-2 mb-3">Welcome to SurveyStack</h1>
+      <h1 class="text-h2 mb-3">Welcome to SurveyStack</h1>
       <p><strong>Note:</strong> This is a work in progress</p>
 
       <div class="text-center ma-8" v-if="showInstall">
