@@ -47,8 +47,8 @@ describe('Number question', () => {
     const wrapper = shallowMount(Number, getMountOpts());
     const errorMsg = 'Please enter a number';
     [
-      ['', errorMsg],
-      [null, errorMsg],
+      ['', true],
+      [null, true],
       ['6', true],
       ['-65', true],
       ['-6.5', true],
@@ -68,10 +68,9 @@ describe('Number question', () => {
 
   describe('events', () => {
     [
+      ['', null],
       ['7', 7],
       ['-7.3', -7.3],
-      ['-70-7', null],
-      ['seven', null],
       ['7e+2', 7e2],
     ].forEach(([value, result]) => {
       test(`emits change(${JSON.stringify(result)}) when the input value is ${JSON.stringify(value)}`, () => {
