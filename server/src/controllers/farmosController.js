@@ -6,7 +6,7 @@ import JoiObjectId from '@marsup/joi-objectid';
 const Joi = BaseJoi.extend(JoiObjectId);
 
 import isString from 'lodash/isString';
-import _, { result } from 'lodash';
+import _ from 'lodash';
 import boom from '@hapi/boom';
 import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service';
 import {
@@ -410,7 +410,7 @@ export const superAdminUnMapFarmosInstance = async (req, res) => {
 };
 
 export const superAdminMapFarmosInstanceToUser = async (req, res) => {
-  const { user, group, owner, instanceName } = req.body;
+  const { user, owner, instanceName } = req.body;
   if (!user) {
     throw boom.badData('user missing');
   }
@@ -431,7 +431,7 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
 };
 
 export const superAdminUnMapFarmosInstanceFromUser = async (req, res) => {
-  const { user, group, instanceName } = req.body;
+  const { user, instanceName } = req.body;
   if (!user) {
     throw boom.badData('user missing');
   }
@@ -470,8 +470,8 @@ export const superAdminUnMapFarmosInstanceFromAll = async (req, res) => {
  * Return all instances for group with mappings
  */
 export const getInstancesForGroup = async (req, res) => {
-  const userId = requireUserId(res);
-  const groupId = await requireGroupedAdmin(req, res);
+  requireUserId(res);
+  await requireGroupedAdmin(req, res);
 
   return res.send([]);
 };
@@ -479,7 +479,7 @@ export const getInstancesForGroup = async (req, res) => {
 /**
  * get list of farms that are connectable to users of group
  */
-export const getConnectableFarmsForGroup = async (req, res) => {
+export const getConnectableFarmsForGroup = async (_req, _res) => {
   /**
    * 1. only admins can do this, they pass a user from a group or subgroup
    * 2. get tagged farms from aggregator for this group and its subgroups
@@ -489,14 +489,14 @@ export const getConnectableFarmsForGroup = async (req, res) => {
 /**
  * update mapped instances for group
  */
-export const updateInstancesForGroup = async (req, res) => {
+export const updateInstancesForGroup = async (_req, res) => {
   return res.send([]);
 };
 
 /**
  * get list of instances for user, including who has access to them
  */
-export const getInstancesForUser = async (req, res) => {
+export const getInstancesForUser = async (_req, res) => {
   /**
    * 1. For this user list all instances that the user has access to
    * 2. indicate if owner or not
@@ -509,21 +509,21 @@ export const getInstancesForUser = async (req, res) => {
 /**
  * add / remove instance from user
  */
-export const updateInstancesForUser = async (req, res) => {
+export const updateInstancesForUser = async (_req, res) => {
   return res.send([]);
 };
 
 /**
  * change ownership of an instance
  */
-export const changeOwnershipForInstance = async (req, res) => {
+export const changeOwnershipForInstance = async (_req, res) => {
   return res.send([]);
 };
 
 /**
  * Super Admin can map instance to any user
  */
-export const assignFarmOSInstanceToUser = async (req, res) => {
+export const assignFarmOSInstanceToUser = async (_req, res) => {
   return res.send([]);
 };
 
@@ -830,8 +830,6 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
       errors,
     });
   }
-
-  const { origin } = req.headers;
 
   const {
     groupId: group,
@@ -1195,25 +1193,6 @@ export const extractOwnerUsersMappedInst = (instancesObj, ownerUsers) => {
   });
 
   return mergedData;
-};
-
-const assertUserInGroup = async (userId, groupId) => {
-  const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
-  if (!userRes) {
-    throw boom.notFound(`user with id: ${userId} not found`);
-  }
-
-  const memberships = await db
-    .collection('memberships')
-    .find({
-      group: new ObjectId(groupId),
-      user: new ObjectId(userRes._id),
-    })
-    .toArray();
-
-  if (memberships.length <= 0) {
-    throw boom.badData(`user not member of group: user, group: ${userId}, ${groupId}`);
-  }
 };
 
 const assertUserInSubGroup = async (userId, tree) => {
@@ -1843,7 +1822,7 @@ export const removeInstanceFromOtherUser = async (req, res) => {
   return res.send('the instance has been successfully removed from the user');
 };
 
-export const testConnection = async (req, res) => {
+export const testConnection = async (_req, _res) => {
   /**
    * TODO migrate Testconnection
    */
