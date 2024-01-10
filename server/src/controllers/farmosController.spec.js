@@ -649,9 +649,9 @@ describe('farmos-controller', () => {
     res = mockRes(admin.user._id);
     req = { params: { id: member.membership._id }, headers: { origin: origin } };
 
-    await membershipController.deleteMembership(req, res, undefined, async (membership) => {
+    await membershipController.deleteMembership(async (membership) => {
       await removeMembershipHook(membership, origin);
-    });
+    })(req, res, undefined);
 
     res = mockRes(member.user._id);
     req = {};

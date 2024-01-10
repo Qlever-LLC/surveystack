@@ -1,33 +1,26 @@
-import boom from '@hapi/boom';
-
-export const catchErrors = (fn, hook) => (req, res, next) => {
-  Promise.resolve(fn(req, res, next, hook)).catch((err) => {
-    console.log(err);
-    if (!err.isBoom) {
-      return next(boom.badImplementation(err));
-    }
-    next(err);
-  });
+export const catchErrors = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-export const notFound = (_req, _res, next) => {
-  next(boom.notFound());
+export const errorHandler = (err, _req, res, _next) => {
+  if (err.isBoom) {
+    res.status(err?.output?.statusCode ?? 500).json({ message: err.message });
+    return;
+  }
+  const status = err?.status ?? 500;
+  if (err?.status && err?.message) {
+    res.status(status).json({
+      message: err?.message,
+      errors: err?.errors,
+    });
+    return;
+  }
+  // log errors during development and in production
+  // but, do not log them during testing as it pollutes the test output
+  if (process.env.NODE_ENV !== 'test') {
+    console.log('Unhandled Error:', err);
+  }
+  res.status(status).send();
 };
 
-export const developmentErrors = (err, _req, res, _next) => {
-  console.log('Calling development Errors');
-  res.status((err.output && err.output.statusCode) || 500).json({ message: err.message });
-};
-
-export const productionErrors = (err, _req, res, _next) => {
-  res
-    .status((err.output && err.output.statusCode) || 500)
-    .json((err && err.output && err.output.payload) || err);
-};
-
-export default {
-  catchErrors,
-  notFound,
-  developmentErrors,
-  productionErrors,
-};
+export { catchErrors, errorHandler };
