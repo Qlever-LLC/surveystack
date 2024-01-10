@@ -175,7 +175,7 @@
         </div>
       </pane>
 
-      <pane class="pane pane-draft bg-white" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
+      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
         <div id="previewSurvey" style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
           <app-draft-component
@@ -188,19 +188,19 @@
             builder
             :forceMobile="isPreviewMobile">
             <template v-slot:toolbar-actions>
-              <a-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
-                <a-btn :value="false" dense>
+              <a-btn-toggle v-model="isPreviewMobile" style="height: 36px" class="my-auto">
+                <a-btn :value="false" dense variant="outlined">
                   <span class="hidden-sm-and-down">desktop</span>
-                  <a-icon right> mdi-monitor</a-icon>
+                  <a-icon right>mdi-monitor</a-icon>
                 </a-btn>
 
-                <a-btn :value="true">
+                <a-btn :value="true" variant="outlined">
                   <span class="hidden-sm-and-down">mobile</span>
-                  <a-icon right> mdi-cellphone</a-icon>
+                  <a-icon right>mdi-cellphone</a-icon>
                 </a-btn>
               </a-btn-toggle>
 
-              <a-btn @click="viewCode = true" class="ma-2" variant="text">
+              <a-btn @click="viewCode = true" class="ma-2" variant="outlined">
                 <span class="hidden-sm-and-down">survey</span>
                 <a-icon right>mdi-code-tags</a-icon>
               </a-btn>
