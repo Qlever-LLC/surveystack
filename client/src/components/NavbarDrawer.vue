@@ -15,8 +15,7 @@
             <a-chip
               v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
               color="accent"
-              small
-            >
+              small>
               {{ readyToSubmitCount }}
             </a-chip>
           </a-list-item-title>
@@ -29,8 +28,7 @@
         <a-expansion-panels
           class="pa-0 ma-0 no-background"
           variant="accordion"
-          :modelValue="docs.length > 2 ? undefined : 0"
-        >
+          :modelValue="docs.length > 2 ? undefined : 0">
           <a-expansion-panel>
             <a-expansion-panel-title class="py-0 pl-0">
               <a-list-subheader>DOCUMENTATION</a-list-subheader>
@@ -42,8 +40,7 @@
                   :key="doc.link + index"
                   :href="doc.link"
                   target="_blank"
-                  prepend-icon="mdi-notebook"
-                >
+                  prepend-icon="mdi-notebook">
                   <a-list-item-title>{{ doc.label }}</a-list-item-title>
                 </a-list-item>
 
@@ -51,16 +48,14 @@
                   href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
                   target="_blank"
                   prepend-icon="mdi-help-circle-outline"
-                  class="pa-0"
-                >
+                  class="pa-0">
                   <a-list-item-title>SurveyStack Help</a-list-item-title>
                 </a-list-item>
                 <v-list-item
                   href="https://www.surveystack.io"
                   target="_blank"
                   prepend-icon="mdi-information-outline"
-                  class="pa-0"
-                >
+                  class="pa-0">
                   <a-list-item-title>About</a-list-item-title>
                 </v-list-item>
               </a-list>
@@ -81,144 +76,133 @@
   </a-navigation-drawer>
 </template>
 
-<script>
-import { ref, computed } from 'vue';
+<script setup>
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 
-export default {
-  emits: ['update:modelValue'],
-  props: {
-    modelValue: {
-      type: Boolean,
-      required: true,
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const store = useStore();
+
+let groupsLink = '/groups';
+if (store.getters['whitelabel/isWhitelabel']) {
+  groupsLink = `/g${store.getters['whitelabel/partner'].path}`;
+}
+
+const lcl = JSON.parse(process.env.VUE_APP_LCL);
+const sidenav = {
+  collect: [
+    {
+      type: 'subheader',
+      label: 'COLLECT',
     },
-  },
-
-  setup(props, { emit }) {
-    const store = useStore();
-
-    let groupsLink = '/groups';
-    if (store.getters['whitelabel/isWhitelabel']) {
-      groupsLink = `/g${store.getters['whitelabel/partner'].path}`;
-    }
-
-    const lcl = JSON.parse(process.env.VUE_APP_LCL);
-    const sidenav = {
-      collect: [
-        {
-          type: 'subheader',
-          label: 'COLLECT',
-        },
-        {
-          type: 'link',
-          label: 'My Submissions',
-          to: '/surveys/my-submissions',
-          icon: 'mdi-clipboard',
-        },
-        {
-          type: 'link',
-          label: 'Browse',
-          to: '/surveys/browse',
-          icon: 'mdi-magnify',
-        },
-      ],
-      admin: [
-        {
-          type: 'subheader',
-          label: 'ADMIN',
-        },
-        {
-          type: 'link',
-          label: 'Builder',
-          to: '/surveys/new',
-          icon: 'mdi-newspaper-plus',
-        },
-        {
-          type: 'link',
-          label: 'Scripts',
-          to: '/scripts',
-          icon: 'mdi-language-javascript',
-        },
-        {
-          type: 'link',
-          label: 'Groups',
-          to: groupsLink,
-          icon: 'mdi-domain',
-        },
-      ],
-      superAdmin: [
-        {
-          type: 'subheader',
-          label: 'SUPER-ADMIN',
-        },
-        {
-          type: 'link',
-          label: 'Users',
-          to: '/users',
-          icon: 'mdi-account-search',
-        },
-        {
-          type: 'link',
-          label: 'FarmOS',
-          to: '/farmos-manage',
-          icon: 'mdi-leaf-circle-outline',
-        },
-      ],
-    };
-
-    const readyToSubmitCount = computed(() => {
-      return store.getters['submissions/readyToSubmit'].length;
-    });
-
-    const items = computed(() => {
-      const items = [];
-      const divider = { type: 'divider' };
-      items.push(...sidenav.collect);
-      if (store.getters['auth/isLoggedIn']) {
-        items.push(divider);
-        items.push(...sidenav.admin);
-      }
-      if (store.getters['auth/isSuperAdmin']) {
-        items.push(divider);
-        items.push(...sidenav.superAdmin);
-      }
-      return items;
-    });
-
-    const groups = computed(() => {
-      return store.getters['memberships/groups'];
-    });
-
-    const activeGroupId = computed(() => {
-      return store.getters['memberships/activeGroup'];
-    });
-
-    const docs = computed(() => {
-      const docs = new Map();
-      // add all docs of all groups to a map to make them distinct
-      groups.value.forEach((group) => {
-        if (group._id === activeGroupId.value && group.docs) {
-          group.docs.forEach((doc) => {
-            docs.set(doc.label + doc.link, doc);
-          });
-        }
-      });
-      return Array.from(docs.values());
-    });
-
-    // Methods
-    const closeNavBar = () => {
-      console.log('closeNavBar');
-      emit('update:modelValue', !props.modelValue);
-    };
-
-    return {
-      lcl,
-      readyToSubmitCount,
-      items,
-      docs,
-      closeNavBar,
-    };
-  },
+    {
+      type: 'link',
+      label: 'My Submissions',
+      to: '/surveys/my-submissions',
+      icon: 'mdi-clipboard',
+    },
+    {
+      type: 'link',
+      label: 'Browse',
+      to: '/surveys/browse',
+      icon: 'mdi-magnify',
+    },
+  ],
+  admin: [
+    {
+      type: 'subheader',
+      label: 'ADMIN',
+    },
+    {
+      type: 'link',
+      label: 'Builder',
+      to: '/surveys/new',
+      icon: 'mdi-newspaper-plus',
+    },
+    {
+      type: 'link',
+      label: 'Scripts',
+      to: '/scripts',
+      icon: 'mdi-language-javascript',
+    },
+    {
+      type: 'link',
+      label: 'Groups',
+      to: groupsLink,
+      icon: 'mdi-domain',
+    },
+  ],
+  superAdmin: [
+    {
+      type: 'subheader',
+      label: 'SUPER-ADMIN',
+    },
+    {
+      type: 'link',
+      label: 'Users',
+      to: '/users',
+      icon: 'mdi-account-search',
+    },
+    {
+      type: 'link',
+      label: 'FarmOS',
+      to: '/farmos-manage',
+      icon: 'mdi-leaf-circle-outline',
+    },
+  ],
 };
+
+const readyToSubmitCount = computed(() => {
+  return store.getters['submissions/readyToSubmit'].length;
+});
+
+const items = computed(() => {
+  const items = [];
+  const divider = { type: 'divider' };
+  items.push(...sidenav.collect);
+  if (store.getters['auth/isLoggedIn']) {
+    items.push(divider);
+    items.push(...sidenav.admin);
+  }
+  if (store.getters['auth/isSuperAdmin']) {
+    items.push(divider);
+    items.push(...sidenav.superAdmin);
+  }
+  return items;
+});
+
+const groups = computed(() => {
+  return store.getters['memberships/groups'];
+});
+
+const activeGroupId = computed(() => {
+  return store.getters['memberships/activeGroup'];
+});
+
+const docs = computed(() => {
+  const docs = new Map();
+  // add all docs of all groups to a map to make them distinct
+  groups.value.forEach((group) => {
+    if (group._id === activeGroupId.value && group.docs) {
+      group.docs.forEach((doc) => {
+        docs.set(doc.label + doc.link, doc);
+      });
+    }
+  });
+  return Array.from(docs.values());
+});
+
+// Methods
+function closeNavBar() {
+  console.log('closeNavBar', props.modelValue);
+  emit('update:modelValue', !props.modelValue);
+}
 </script>
