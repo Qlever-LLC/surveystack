@@ -514,21 +514,6 @@ describe('draft store', () => {
         const updatedResult = getters.hasRequiredUnanswered(state, _getters);
         expect(updatedResult).toBe(true);
       });
-      it('returns true for required question', () => {
-        const controls = [
-          createControl({
-            id: INITIAL_FIRST_CONTROL_ID,
-            type: 'number',
-            controlInstanceOverrides: { options: { ...defaultControlOptions, required: true } },
-          }),
-        ];
-        const state = createStateWithControls(controls);
-        const _getters = {
-          path: getters.path(state),
-        };
-        const result = getters.hasRequiredUnanswered(state, _getters);
-        expect(result).toBe(true);
-      });
       it('returns true for required question inside page', () => {
         const controls = [
           createControl({
@@ -560,7 +545,7 @@ describe('draft store', () => {
               createControl({
                 type: controlType,
                 id: INITIAL_FIRST_CONTROL_ID,
-                controlInstanceOverrides: { options: { required: true } },
+                controlInstanceOverrides: { options: { ...defaultControlOptions, required: true } },
               }),
             ];
             const state = createStateWithControls(controls);

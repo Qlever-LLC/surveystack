@@ -117,15 +117,10 @@ const getters = {
     (path, fallback = true) =>
       surveyStackUtils.getRelevance(state.submission, path, fallback),
   hasRequiredUnanswered: (state) => {
-    // const isRequiredUnanswered = (node, submission) =>
-    //   (node.model.options.required && !surveyStackUtils.isAnswered(node, submission)) ||
-    //   (node.model.type === 'matrix' && hasRequiredUnansweredMatrixColumns(node, submission));
-
     if (isRequiredUnanswered(state.node, state.submission)) {
       return true;
     }
 
-    // children
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
