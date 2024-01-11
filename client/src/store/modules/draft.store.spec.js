@@ -3,7 +3,7 @@ import { createSurvey } from '@/utils/surveys';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 import { createRow } from '@/components/survey/question_types/matrix/matrixUtils';
-import { defaultControlOptions } from '@/utils/surveyConfig';
+import { defaultControlOptions, availableControls } from '@/utils/surveyConfig';
 
 const { actions, mutations, getters } = draftStore;
 
@@ -426,27 +426,6 @@ describe('draft store', () => {
 
   describe('getters', () => {
     describe('hasRequiredUnanswered', () => {
-      it('does not throw an error for a matrix in a group', () => {
-        const controls = [
-          createControl({
-            type: 'group',
-            children: [
-              createControl({
-                type: 'matrix',
-                // TODO: improve this to use real logic for survey next to identify current control
-                id: INITIAL_FIRST_CONTROL_ID,
-              }),
-              createControl({ type: 'number' }),
-            ],
-          }),
-        ];
-        const state = createStateWithControls(controls);
-        const _getters = {
-          path: getters.path(state),
-        };
-        const callHasRequiredUnanswered = () => getters.hasRequiredUnanswered(state, _getters);
-        expect(callHasRequiredUnanswered).not.toThrow();
-      });
       it('returns true for a matrix with an empty row and a required column', () => {
         const controls = [
           createControl({
@@ -571,6 +550,27 @@ describe('draft store', () => {
         const result = getters.hasRequiredUnanswered(state, _getters);
         expect(result).toBe(true);
       });
+      const controlsThatCannotBeRequired = ['group', 'page', 'instructions', 'instructionsImageSplit'];
+      availableControls
+        .map((control) => control.type)
+        .filter((controlType) => !controlsThatCannotBeRequired.includes(controlType))
+        .forEach((controlType) => {
+          it(`returns true for a required ${controlType}`, () => {
+            const controls = [
+              createControl({
+                type: controlType,
+                id: INITIAL_FIRST_CONTROL_ID,
+                controlInstanceOverrides: { options: { required: true } },
+              }),
+            ];
+            const state = createStateWithControls(controls);
+            const _getters = {
+              path: getters.path(state),
+            };
+            const result = getters.hasRequiredUnanswered(state, _getters);
+            expect(result).toBe(true);
+          });
+        });
     });
   });
 });

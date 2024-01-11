@@ -62,7 +62,7 @@ export function queueAction(store, action, payload = null) {
   store.dispatch(action, payload);
 }
 
-export function isAnswered(node, submission) {
+export function isRequiredUnanswered(node, submission) {
   const { type } = node.model;
   const path = node
     .getPath()
@@ -71,33 +71,42 @@ export function isAnswered(node, submission) {
   const value = get(submission, `${path}.value`, null);
 
   if (type === 'matrix') {
-    if (!value || (Array.isArray(value) && value.length === 0)) {
-      return false;
+    if (node.model.options.required && (!value || (Array.isArray(value) && value.length === 0))) {
+      return true;
     }
+
     const requiredCols = node.model.options.source.content.filter((h) => h.required && !h.hidden).map((h) => h.value);
-    let answered = true;
-    for (const row of value) {
-      for (const requiredCol of requiredCols) {
-        if (row[requiredCol].value === null) {
-          answered = false;
+    let answered = false;
+    if (value) {
+      for (const row of value) {
+        for (const requiredCol of requiredCols) {
+          if (
+            row[requiredCol].value === null ||
+            (row[requiredCol].value instanceof String && row[requiredCol].value.trim() === '')
+          ) {
+            answered = true;
+          }
         }
       }
     }
-
     return answered;
   }
 
+  if (!node.model.options.required) {
+    return false;
+  }
+
   if (type === 'file' || type === 'image') {
-    return value != null && Array.isArray(value) && value.length > 0;
+    return value === null || (Array.isArray(value) && value.length === 0);
   }
 
   if (type === 'page' || type === 'instructions' || type === 'instructionsImageSplit') {
     // we may want to have a "instructions read" checkbox or similar at one point
     // for now, just assume this is answered so users can progress further
-    return true;
+    return false;
   }
 
-  return value != null;
+  return value === null;
 }
 
 export function getValueOrNull(v) {
@@ -171,7 +180,6 @@ export function isOnline() {
 export default {
   getAllNodes,
   queueAction,
-  isAnswered,
   getValueOrNull,
   createBasicQueryList,
   isOnline,

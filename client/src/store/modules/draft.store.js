@@ -6,46 +6,13 @@ import * as db from '@/store/db';
 import { get } from 'lodash';
 import api from '@/services/api.service';
 import Vue from 'vue';
+import { isRequiredUnanswered } from '@/utils/surveyStack';
 
 const getPath = (node) =>
   node
     .getPath()
     .map((n) => n.model.name)
     .join('.');
-
-const hasRequiredUnansweredMatrix = (node, submission) => {
-  /*
-      When the columns of a matrix are required, but the matrix question itself is not,
-      the user can proceed with the survey without filling in the matrix.
-      But if a row is added, then a value must be placed in the required column
-    */
-  //detect required columns
-  let requiredColumnNames = [];
-  const path = getPath(node);
-  if (node.model.options.source.content) {
-    node.model.options.source.content.forEach((c) => {
-      if (c.required) {
-        requiredColumnNames.push(c.value);
-      }
-    });
-  }
-
-  const questionValue = get(submission, path).value;
-
-  if (questionValue) {
-    for (const row of questionValue) {
-      for (const requiredC of requiredColumnNames) {
-        if (
-          row[requiredC].value === null ||
-          (row[requiredC].value instanceof String && row[requiredC].value.trim() === '')
-        ) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-};
 
 /*
   README:
@@ -149,38 +116,31 @@ const getters = {
     (state) =>
     (path, fallback = true) =>
       surveyStackUtils.getRelevance(state.submission, path, fallback),
-  hasRequiredUnanswered: (state, getters) => {
-    if (state.node.model.type === 'matrix') {
-      return hasRequiredUnansweredMatrix(state.node, state.submission);
+  hasRequiredUnanswered: (state) => {
+    // const isRequiredUnanswered = (node, submission) =>
+    //   (node.model.options.required && !surveyStackUtils.isAnswered(node, submission)) ||
+    //   (node.model.type === 'matrix' && hasRequiredUnansweredMatrixColumns(node, submission));
+
+    if (isRequiredUnanswered(state.node, state.submission)) {
+      return true;
     }
 
+    // children
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
         const path = getPath(c);
-        if (
-          (c.model.options.required && !surveyStackUtils.isAnswered(c, state.submission)) ||
-          (c.model.type === 'matrix' && hasRequiredUnansweredMatrix(c, state.submission))
-        ) {
+        if (isRequiredUnanswered(c, state.submission)) {
           requiredAndUnansweredPaths.push(path);
         }
       });
 
-      // eslint-disable-next-line no-restricted-syntax
       for (const path of requiredAndUnansweredPaths) {
         const relevant = surveyStackUtils.getRelevance(state.submission, path, true);
         if (relevant) {
           return true;
         }
       }
-
-      return false;
-    }
-
-    const { required } = state.node.model.options;
-
-    if (required && !surveyStackUtils.isAnswered(state.node, state.submission)) {
-      return true;
     }
 
     return false;
