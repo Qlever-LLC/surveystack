@@ -325,6 +325,11 @@ test server:
   extends: .pull-cache-only
   stage: test
   script:
-    - yarn server:test
+  # https://jestjs.io/docs/cli#--forceexit
+  # We are using forceExit instead of tracking down open handles left when the test suite completes.
+  # Upgrading from node 14 to node 18 resolves the open handles issue.
+  # Upgrading to node 18 is problematic while using Vue 2.
+  # So, once we upgrade to Vue 3, we should upgrade to Node 18, and then remove this forceExit flag.
+    - yarn server:test -- -- --forceExit
   needs:
     - lerna bootstrap

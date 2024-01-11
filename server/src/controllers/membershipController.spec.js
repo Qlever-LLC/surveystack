@@ -135,11 +135,11 @@ describe('activateMembershipByAdmin', () => {
 });
 
 describe('createConfirmedMembership', () => {
-  let group, admin, pendingUser, req, res, entity, invitationEmail;
+  let group, admin, req, res, entity, invitationEmail;
   beforeEach(async () => {
     group = await createGroup();
     admin = await group.createAdminMember();
-    pendingUser = await group.createUserMember({ meta: { status: 'pending' } });
+    await group.createUserMember({ meta: { status: 'pending' } });
     invitationEmail = 'foo@bar.com';
     entity = {
       group: group._id.toString(),

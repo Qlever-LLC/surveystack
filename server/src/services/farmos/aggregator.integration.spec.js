@@ -2,10 +2,11 @@
 
 import uuid from 'uuid';
 import { aggregator } from './aggregator';
+import { config as dotenvConfig } from 'dotenv';
+
+dotenvConfig();
 
 const TEST_FARM = 'buddingmoonfarm.farmos.dev';
-
-require('dotenv').config();
 jest.unmock('axios');
 
 const config = () => {
@@ -21,7 +22,7 @@ jest.setTimeout(60000);
 
 describe('test-aggregator-integration', () => {
   it('farminfo', async () => {
-    const { farminfo, getAssets, createLog } = config();
+    const { farminfo } = config();
 
     const r = await farminfo();
     console.log('result', r.data);
@@ -29,14 +30,14 @@ describe('test-aggregator-integration', () => {
 
   it('get-assets', async () => {
     jest.setTimeout(10000);
-    const { farminfo, getAssets, createLog } = config();
+    const { getAssets } = config();
 
     const assets = await getAssets(TEST_FARM, 'plant');
     console.log('assets', JSON.stringify(assets.data, null, 2));
   });
 
   it('create-log', async () => {
-    const { farminfo, getAssets, createLog } = config();
+    const { createLog } = config();
 
     const id = uuid.v4();
     const log = {
@@ -148,7 +149,7 @@ describe('test-aggregator-integration', () => {
   });
 
   it('create-and-delete-log', async () => {
-    const { farminfo, getAssets, createLog, getLogs, deleteAllWithSurveystackId } = config();
+    const { createLog, getLogs, deleteAllWithSurveystackId } = config();
 
     const id = uuid.v4();
     const data = uuid.v4();
@@ -179,7 +180,7 @@ describe('test-aggregator-integration', () => {
     expect(ids.includes(id)).toBe(false);
   });
   it('log-response', async () => {
-    const { farminfo, getAssets, createLog, getLogs, deleteAllWithSurveystackId } = config();
+    const { getLogs } = config();
 
     const { data: logs } = await getLogs(TEST_FARM, 'activity');
     console.log('data', JSON.stringify(logs, null, 2));

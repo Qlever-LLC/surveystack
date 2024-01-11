@@ -1,4 +1,3 @@
-import uuid from 'uuid';
 import { createGroup, deleteMemberships } from '../../testUtils';
 import {
   mapFarmOSInstanceToUser,
@@ -6,7 +5,6 @@ import {
   listFarmOSInstancesForUser,
   createFarmOSInstanceForUserAndGroup,
 } from './manage';
-import { createAsset } from './apiCompose';
 
 jest.mock('../../services/mail/mail.service');
 
@@ -64,40 +62,5 @@ describe('farmos2-api-compose', () => {
 
     const instancesAfter = await listFarmOSInstancesForUser(user2.user._id);
     expect(instancesAfter.length).toBe(0);
-  });
-  it('create-asset', async () => {
-    const id = uuid.v4();
-
-    const payload = {
-      data: {
-        id,
-        type: 'asset--plant',
-        attributes: {
-          name: 'Test plant Asset',
-          status: 'active',
-          geometry: '',
-        },
-        relationships: {
-          plant_type: {
-            data: [
-              {
-                type: 'taxonomy_term--plant_type',
-                surveystack_lookup_id: 'chiogga',
-              },
-            ],
-          },
-          asset: {
-            data: [
-              {
-                type: 'asset--land',
-                surveystack_lookup_id: 'North Field',
-              },
-            ],
-          },
-        },
-      },
-    };
-
-    createAsset();
   });
 });

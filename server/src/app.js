@@ -1,23 +1,25 @@
-import dotenv from 'dotenv-defaults/config';
+import 'dotenv-defaults/config';
 
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
+import * as OpenApiValidator from 'express-openapi-validator';
+import { MongoSerDes } from 'mongo-serdes-js';
 
 import { db } from './db';
 import { getRoles } from './services/roles.service';
-import errorHandlers from './handlers/errorHandlers';
+import { errorHandler } from './handlers/errorHandlers';
 import { initLogging } from './middleware/logging';
 
 import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
 
-import resources from './controllers/resources';
 import { createCookieOptions } from './constants';
 import { toggleMiddleware } from './services/featureToggle.service';
 import { ObjectId } from 'mongodb';
+import openApiSpecDocument from './open-api-spec';
 
 const subdomainRedirect = {
   rfc: 'bionutrient',
@@ -26,7 +28,6 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 
 function createApp() {
   const app = express();
-  const frontend = expressStaticGzip('../client/dist', { index: false });
 
   app.use(initLogging);
 
@@ -54,21 +55,28 @@ function createApp() {
   app.use(express.json({ limit: '8mb' }));
   app.use(express.urlencoded({ extended: true }));
 
-  const whitelist = ['https://cdpn.io', 'https://app.our-sci.net', 'https://dashboard.our-sci.net'];
-  const corsOptions = {
-    origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1 || !origin) {
-        callback(null, true); // specifically allow whitelisted origins including credentials
-      } else if (origin.startsWith('http://localhost') || origin.startsWith('http://192.168')) {
-        callback(null, true);
-      } else {
-        //callback(new Error('Not allowed by CORS'));
-        callback(null, true);
-      }
-    },
-    credentials: true,
-  };
-  app.use(cors(corsOptions));
+  app.use(cors({ credentials: true }));
+
+  app.use(
+    OpenApiValidator.middleware({
+      apiSpec: openApiSpecDocument,
+      ignoreUndocumented: true,
+      // validating responses is critical for automated tests
+      validateResponses: ['development', 'test'].includes(String(process.env.NODE_ENV).trim()),
+      serDes: [
+        OpenApiValidator.serdes.dateTime.serializer,
+        OpenApiValidator.serdes.date.serializer,
+        MongoSerDes.objectid.serializer,
+      ],
+      formats: [
+        {
+          name: 'objectid',
+          type: 'string',
+          validate: (v) => /^[0-9a-fA-F]{24}$/.test(v.toString()),
+        },
+      ],
+    })
+  );
 
   // auth
   app.use(async (req, res, next) => {
@@ -115,9 +123,7 @@ function createApp() {
 
   // routes
   app.use(`${PATH_PREFIX}/api`, apiRoutes);
-  app.use(`${PATH_PREFIX}/api`, errorHandlers.developmentErrors);
-
-  app.use('/resources/:id', resources.serve);
+  app.use(`${PATH_PREFIX}/api`, errorHandler);
 
   if (process.env.NODE_ENV === 'development') {
     app.use('/debug', debugRoutes);
@@ -125,6 +131,7 @@ function createApp() {
 
   // Serve Vue.js from dist folder
   // https://github.com/bripkens/connect-history-api-fallback/tree/master/examples/static-files-and-index-rewrite
+  const frontend = expressStaticGzip('../client/dist', { index: false });
   app.use(frontend); // will catch majority of static file requests
   app.use(history()); // will rewrite requests to index.html when necessary
   app.use(frontend); // will catch rewritten requests

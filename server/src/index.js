@@ -1,4 +1,4 @@
-import dotenv from 'dotenv-defaults/config';
+import 'dotenv-defaults/config';
 
 import { connectDatabase } from './db';
 import { initAdmins } from './services/admin.service';
