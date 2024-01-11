@@ -14,7 +14,7 @@
     "cross-env": "^7.0.3",
     "husky": "^7.0.0",
     "lerna": "^4.0.0",
-    "lint-staged": "^11.1.2",
+    "lint-staged": "^11.1.2"
   },
   "scripts": {
     "prepare": "husky install; git config --local include.path ../.gitconfig",
