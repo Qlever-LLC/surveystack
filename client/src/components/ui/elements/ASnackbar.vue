@@ -7,8 +7,8 @@
     :position="position"
     :timeout="timeout"
     @update:modelValue="$emit('update:modelValue', $event)">
-    <template v-slot:actions="{ props }">
-      <slot name="actions" :props="props" />
+    <template v-slot:actions>
+      <slot name="actions" />
     </template>
     <slot />
   </v-snackbar>
