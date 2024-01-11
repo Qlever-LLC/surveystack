@@ -1,5 +1,5 @@
 <template>
-  <v-badge :bordered="bordered" :color="color" :content="content" :left="left" :overlap="overlap">
+  <v-badge :bordered="bordered" :color="color" :content="content" :left="left">
     <slot />
   </v-badge>
 </template>
@@ -12,7 +12,6 @@ export default {
     content: { type: undefined, required: false },
     bordered: { type: Boolean, required: false },
     left: { type: Boolean, required: false },
-    overlap: { type: Boolean, required: false },
   },
 };
 </script>

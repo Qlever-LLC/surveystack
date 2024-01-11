@@ -10,7 +10,7 @@
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
         <span v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon" class="flex-grow-0 mr-2">
-          <a-badge overlap bordered left :color="color" :content="count.toString()">
+          <a-badge bordered left :color="color" :content="count.toString()">
             <a-icon :color="color">{{ icon }}</a-icon>
           </a-badge>
           <a-tooltip bottom activator="parent">{{ tooltip }}</a-tooltip>
