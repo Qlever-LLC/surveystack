@@ -6,6 +6,13 @@ import * as db from '@/store/db';
 import { get } from 'lodash';
 import api from '@/services/api.service';
 import Vue from 'vue';
+import { isRequiredUnanswered } from '@/utils/surveyStack';
+
+const getPath = (node) =>
+  node
+    .getPath()
+    .map((n) => n.model.name)
+    .join('.');
 
 /*
   README:
@@ -79,15 +86,7 @@ const getters = {
   property: (state) => (path, fallback) => get(state.submission, path, fallback),
   control: (state) => state.node && state.node.model, // current survey control
   enableNext: (state) => state.enableNext,
-  path: (state) =>
-    state.node
-      ? state.node
-          .getPath()
-          .map((n) => n.model.name)
-          .join('.')
-          .replace('[', '.')
-          .replace(']', '')
-      : null,
+  path: (state) => (state.node ? getPath(state.node).replace('[', '.').replace(']', '') : null),
   nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
   atStart: (state) => state.node === state.firstNode,
   showOverview: (state) => state.showOverview,
@@ -117,66 +116,26 @@ const getters = {
     (state) =>
     (path, fallback = true) =>
       surveyStackUtils.getRelevance(state.submission, path, fallback),
-  hasRequiredUnanswered: (state, getters) => {
-    if (state.node.model.type === 'matrix') {
-      /*
-      When the columns of a matrix are required, but the matrix question itself is not,
-      the user can proceed with the survey without filling in the matrix.
-      But if a row is added, then a value must be placed in the required column
-    */
-      //detect required columns
-      let requiredColumnNames = [];
-      if (state.node.model.options.source.content) {
-        state.node.model.options.source.content.forEach((c) => {
-          if (c.required) {
-            requiredColumnNames.push(c.value);
-          }
-        });
-      }
-
-      const questionValue = get(state.submission, getters.path).value;
-      if (questionValue) {
-        for (const row of questionValue) {
-          for (const requiredC of requiredColumnNames) {
-            if (
-              row[requiredC].value === null ||
-              (row[requiredC].value instanceof String && row[requiredC].value.trim() === '')
-            ) {
-              return true;
-            }
-          }
-        }
-      }
+  hasRequiredUnanswered: (state) => {
+    if (isRequiredUnanswered(state.node, state.submission)) {
+      return true;
     }
 
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
-        const path = c
-          .getPath()
-          .map((n) => n.model.name)
-          .join('.');
-
-        if (c.model.options.required && !surveyStackUtils.isAnswered(c, state.submission)) {
+        const path = getPath(c);
+        if (isRequiredUnanswered(c, state.submission)) {
           requiredAndUnansweredPaths.push(path);
         }
       });
 
-      // eslint-disable-next-line no-restricted-syntax
       for (const path of requiredAndUnansweredPaths) {
         const relevant = surveyStackUtils.getRelevance(state.submission, path, true);
         if (relevant) {
           return true;
         }
       }
-
-      return false;
-    }
-
-    const { required } = state.node.model.options;
-
-    if (required && !surveyStackUtils.isAnswered(state.node, state.submission)) {
-      return true;
     }
 
     return false;
@@ -187,10 +146,7 @@ const getters = {
       if (node.isRoot()) {
         return true;
       }
-      const path = node
-        .getPath()
-        .map((n) => n.model.name)
-        .join('.');
+      const path = getPath(node);
       const control = node.model;
       overviews.push({ node, path, control });
       return true;
@@ -261,10 +217,7 @@ const actions = {
         .slice(1)
         .slice(0, -1)
         .some((parent) => {
-          const parentPath = parent
-            .getPath()
-            .map((n) => n.model.name)
-            .join('.');
+          const parentPath = getPath(parent);
           if (!get(state.submission, `${parentPath}.meta.relevant`, true)) {
             return true;
           }
@@ -337,10 +290,7 @@ const actions = {
         .slice(1)
         .slice(0, -1)
         .some((parent) => {
-          const parentPath = parent
-            .getPath()
-            .map((n) => n.model.name)
-            .join('.');
+          const parentPath = getPath(parent);
           if (!get(state.submission, `${parentPath}.meta.relevant`, true)) {
             return true;
           }
@@ -452,10 +402,7 @@ const actions = {
     }
   },
   async initializeForced({ commit, state, dispatch }, node) {
-    const path = node
-      .getPath()
-      .map((n) => n.model.name)
-      .join('.');
+    const path = getPath(node);
     //first set dateModified to null which is required in case of the value being re-initialized manually
     await dispatch('setProperty', {
       path: `${path}.meta.dateModified`,
@@ -548,7 +495,6 @@ const mutations = {
     state.enableNext = enable;
   },
   NEXT(state, node) {
-    // console.log('next', node, state);
     state.node = node;
     // if firstNode is not set, this is the initial step and the given node is the first node
     if (!state.firstNode) {
@@ -556,15 +502,11 @@ const mutations = {
     }
   },
   PREV(state, node) {
-    // console.log('prev', node, state);
     state.node = node;
   },
   GOTO(state, path) {
     state.root.walk((node) => {
-      const currentPath = node
-        .getPath()
-        .map((n) => n.model.name)
-        .join('.');
+      const currentPath = getPath(node);
       if (currentPath === path) {
         const parents = node.getPath();
         for (let i = 0; i < parents.length; i++) {
