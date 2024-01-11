@@ -1,10 +1,9 @@
 <template>
-  <a-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="close">
+  <a-dialog v-model="open" :width="getDialogWidth" persistent>
     <template v-slot:activator="{ props }">
       <a-text-field
         v-bind="props"
         :modelValue="getText"
-        @update:modelValue="onTextFieldChange"
         :label="label"
         :placeholder="placeholder"
         :class="$attrs.class"
@@ -192,11 +191,6 @@ export default {
 
       this.update(resource);
     },
-    onTextFieldChange(val) {
-      if (!val) {
-        this.$emit('input', null);
-      }
-    },
     async onFileChange(e) {
       const file = e.target.files[0];
       if (!file) {
@@ -251,7 +245,7 @@ export default {
       this.open = false;
     },
     save() {
-      this.$emit('input', this.markdown);
+      this.$emit('update:modelValue', this.markdown);
       this.close();
     },
   },
