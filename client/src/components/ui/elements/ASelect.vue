@@ -84,7 +84,7 @@
     :color="color"
     :data-test-id="dataTestId"
     :delimiters="delimiters"
-    :dense="dense"
+    :density="dense ? 'compact' : 'default'"
     :hide-details="hideDetails"
     :hide-no-data="false"
     :hide-selected="true"
