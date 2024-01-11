@@ -21,7 +21,7 @@
     ref="rootDraggable">
     <a-card
       v-for="(el, idx) in draggableControls"
-      class="control-item mb-2"
+      class="control-item py-3"
       :class="[
         { 'control-item-selected': el === selected },
         { 'library-border': el.isLibraryRoot && !el.libraryIsInherited },
@@ -46,7 +46,7 @@
         <div class="text-grey-darken-1" v-if="el.options.hidden">
           {{ displayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
         </div>
-        <div class="mb-2 context-actions">
+        <div class="context-actions">
           <a-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
             <a-icon color="grey-lighten-1">mdi-content-copy</a-icon>
           </a-btn>

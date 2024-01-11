@@ -1,11 +1,11 @@
 <template>
   <a-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" cssMinWidth0px>
-    <a-icon :color="iconColor" large class="ml-3">
+    <a-icon :color="iconColor" x-large class="ml-3 align-self-center">
       {{ icon }}
       <a-tooltip bottom activator="parent">{{ typeName }}</a-tooltip>
     </a-icon>
-    <a-col class="body-1 text-truncate">
-      <div class="font-weight-light text-grey-darken-2">
+    <a-col class="text-truncate">
+      <div class="font-weight-light text-grey-darken-2" style="line-height: 1.5rem">
         <span class="text-truncate">{{ index }}: {{ dataName }}</span>
         <a-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" variant="outlined" small :color="chipColor">
           {{ chipLabel }}
