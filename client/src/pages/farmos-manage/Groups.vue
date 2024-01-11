@@ -7,7 +7,7 @@
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Groups</h1>
 
-      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
+      <a-progress-circular v-if="loading" class="my-8 align-center mt-6" />
     </div>
 
     <a-select
@@ -18,8 +18,7 @@
       v-model="selectedGroup"
       :item-title="(g) => `${g.name} (${g.path})`"
       item-value="_id"
-      :items="groups"
-    />
+      :items="groups" />
 
     <!-- <a-row class="align-baseline">
       <a-col>
@@ -64,8 +63,7 @@
                 v-model="selectedInstance"
                 item-value="instanceName"
                 item-title="instanceName"
-                :items="instances"
-              />
+                :items="instances" />
             </td>
             <td></td>
             <td>
@@ -82,8 +80,7 @@
                   class="ma-1"
                   color="blue"
                   v-for="(userMapping, uidx) in instance.userMappings"
-                  :key="`instance-${idx}-user-${uidx}`"
-                >
+                  :key="`instance-${idx}-user-${uidx}`">
                   {{ userMapping.user }}
                 </a-chip>
               </div>
@@ -94,8 +91,7 @@
                   small
                   color="green"
                   v-for="(groupMapping, gidx) in instance.groupMappings"
-                  :key="`instance-${idx}-group-${gidx}`"
-                >
+                  :key="`instance-${idx}-group-${gidx}`">
                   {{ groupMapping.group }}
                 </a-chip>
               </div>

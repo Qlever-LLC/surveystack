@@ -5,8 +5,8 @@
 <script>
 export default {
   props: {
-    color: { type: String, required: false },
-    indeterminate: { type: Boolean, required: false },
+    color: { type: String, required: false, default: 'primary' },
+    indeterminate: { type: [Boolean, String], required: false, default: 'disable-shrink' },
     size: { type: [Number, String], required: false },
     width: { type: [Number, String], required: false },
   },

@@ -3,7 +3,7 @@
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage FarmOS Instances</h1>
 
-      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
+      <a-progress-circular v-if="loading" class="my-8 align-center mt-6" />
     </div>
 
     <a-select
@@ -14,8 +14,7 @@
       v-model="selectedInstance"
       item-title="url"
       item-value="url"
-      :items="mappings.aggregatorFarms"
-    />
+      :items="mappings.aggregatorFarms" />
 
     <div class="d-flex flex-column mb-5" v-if="!!selectedInstance">
       <h3>Notes</h3>
@@ -24,8 +23,7 @@
         rows="3"
         style="border-style: dotted"
         class="pa-1 w-100"
-        v-model="selectedInstanceNote"
-      ></textarea>
+        v-model="selectedInstanceNote"></textarea>
     </div>
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
@@ -57,8 +55,7 @@
           :item-title="(g) => `${g.name} (${g.path})`"
           item-value="_id"
           :items="groups"
-          class="mt-4 mr-4"
-        />
+          class="mt-4 mr-4" />
         <a-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
           >Map</a-btn
         >
@@ -106,8 +103,7 @@
           v-model="selectedUser"
           :item-title="(item) => `${item.name} (${item.email})`"
           item-value="_id"
-          :items="users"
-        />
+          :items="users" />
 
         <a-checkbox v-model="owner" label="owner" class="mx-6" />
 
@@ -159,8 +155,7 @@
                     class="ma-1"
                     color="blue"
                     v-for="(userMapping, uidx) in farm.userMappings"
-                    :key="`farm-${idx}-user-${uidx}`"
-                  >
+                    :key="`farm-${idx}-user-${uidx}`">
                     {{ userMapping.user }}
                   </a-chip>
                 </div>
@@ -171,8 +166,7 @@
                     small
                     color="green"
                     v-for="(groupMapping, gidx) in farm.groupMappings"
-                    :key="`farm-${idx}-group-${gidx}`"
-                  >
+                    :key="`farm-${idx}-group-${gidx}`">
                     {{ groupMapping.group }}
                   </a-chip>
                 </div>

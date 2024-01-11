@@ -24,7 +24,7 @@
         <a-container class="pa-0" v-if="!hasCameraError">
           <div class="video-container" ref="videoContainerElement">
             <video ref="videoElement" />
-            <a-progress-circular v-if="isLoading" indeterminate :width="7" :size="80" color="primary" />
+            <a-progress-circular v-if="isLoading" :width="7" :size="80" />
             <div v-if="!isLoading" class="scan-region-outline" />
           </div>
         </a-container>

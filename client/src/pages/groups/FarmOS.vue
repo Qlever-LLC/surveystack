@@ -111,7 +111,7 @@
     </div>
     <a-row v-if="loading">
       <a-col>
-        <a-progress-linear indeterminate class="mb-0" />
+        <a-progress-linear class="mb-0" />
       </a-col>
     </a-row>
     <a-row v-else>

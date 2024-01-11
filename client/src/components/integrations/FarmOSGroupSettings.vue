@@ -198,7 +198,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.v-data-table /deep/ .v-data-table__wrapper {
+.v-data-table :deep(.v-data-table__wrapper) {
   overflow: unset;
 }
 

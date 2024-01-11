@@ -13,7 +13,7 @@
       <a-card>
         <a-card-text class="pa-4">
           <span>Uploading file resource</span>
-          <a-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear class="mb-0" />
         </a-card-text>
       </a-card>
     </a-dialog>
@@ -21,7 +21,7 @@
       <a-card>
         <a-card-text class="pa-4">
           <span>Downloading file resource</span>
-          <a-progress-linear indeterminate class="mb-0" />
+          <a-progress-linear class="mb-0" />
         </a-card-text>
       </a-card>
     </a-dialog>

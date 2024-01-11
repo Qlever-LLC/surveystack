@@ -14,7 +14,7 @@
       <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
     </div>
     <a-container v-if="loading" class="d-flex align-center justify-center" cssHeight100>
-      <a-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" />
     </a-container>
     <a-container fluid class="pa-0" v-else>
       <a-row dense>

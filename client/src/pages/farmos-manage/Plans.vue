@@ -3,7 +3,7 @@
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Plans</h1>
 
-      <a-progress-circular v-if="loading" indeterminate color="primary" class="my-8 align-center mt-6" />
+      <a-progress-circular v-if="loading" class="my-8 align-center mt-6" />
     </div>
 
     <a-row class="align-baseline">
