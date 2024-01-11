@@ -2,9 +2,8 @@
   <v-btn-toggle
     :density="dense ? 'compact' : 'default'"
     :mandatory="mandatory"
-    :value="value"
-    @change="$emit('input', $event)"
-  >
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)">
     <slot />
   </v-btn-toggle>
 </template>
@@ -14,9 +13,9 @@ export default {
   name: 'ABtnToggle',
   props: {
     dense: { type: Boolean, required: false },
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
     mandatory: { type: [Boolean, String], required: false },
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
 };
 </script>
