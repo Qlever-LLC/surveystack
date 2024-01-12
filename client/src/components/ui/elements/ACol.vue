@@ -19,6 +19,6 @@ export default {
 
 <style scoped lang="scss">
 .minWidth0px {
-  min-width: '0px';
+  min-width: 0px;
 }
 </style>
