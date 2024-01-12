@@ -5,7 +5,7 @@
         <a-toolbar-title id="draft-toolbar">
           <div class="infos text-grey-darken-2">
             <div class="d-flex">
-              <span class="number-chip mr-2">{{ questionNumber }}</span>
+              <span class="number-chip mx-2" style="margin-top: 2px">{{ questionNumber }}</span>
             </div>
           </div>
         </a-toolbar-title>
