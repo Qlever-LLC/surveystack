@@ -3,10 +3,9 @@
     :type="type"
     :value="value"
     :disabled="disabled"
-    :fixed="fixed"
+    :position="position"
     :loading="loading"
     :icon="icon"
-    :fab="fab"
     :size="xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
     :elevation="elevation"
     :color="color"
@@ -26,8 +25,7 @@
             ? 'min-width:40px;width:40px;min-height:40px;height:40px;'
             : 'min-width:56px;width:56px;min-height:56px;height:56px;'
     "
-    v-bind="$attrs"
-  >
+    v-bind="$attrs">
     <slot />
   </v-btn>
 </template>
@@ -47,9 +45,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    fixed: {
-      type: Boolean,
-      default: false,
+    position: {
+      type: String,
+      required: false,
     },
     loading: {
       type: Boolean,
