@@ -1,4 +1,4 @@
-import _, { cloneDeep, isError } from 'lodash';
+import _, { isError } from 'lodash';
 
 import { ObjectId } from 'mongodb';
 
@@ -8,8 +8,7 @@ import { db, mongoClient } from '../db';
 import { withTransaction, withSession } from '../db/helpers';
 import * as csvService from '../services/csv.service';
 import headerService from '../services/header.service';
-import * as farmOsService from '../services/farmos.service';
-import * as hyloService from '../services/hylo.service';
+import handleApiCompose from './utils/handleApiCompose';
 import rolesService from '../services/roles.service';
 import mailService from '../services/mail/mail.service';
 import pdfService from '../services/pdf.service';
@@ -31,6 +30,7 @@ const sanitize = async (entity) => {
   entity.meta.dateModified = new Date(entity.meta.dateModified);
   entity.meta.dateSubmitted = new Date();
   entity.meta.survey.id = new ObjectId(entity.meta.survey.id);
+  entity.meta.isDeletedDraft = false;
 
   // Delete temporal data that is used in client to render Proxy data
   delete entity.meta.submitAsUser;
@@ -695,68 +695,16 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   return { entity, survey };
 };
 
-const handleApiCompose = async (submissionEntities, user) => {
-  submissionEntities = cloneDeep(submissionEntities);
+const createSubmissionsToQSLs = async (submissionEntities) => {
+  const mapSubmissionToQSL = ({ entity, survey }) => {
+    const controls = survey.revisions.find(
+      (revision) => revision.version === entity.meta.survey.version
+    ).controls;
 
-  // HOTFIX: do hylo first because farmos handler remove all apiCompose outputs from the submission
-  // TODO: solve this in a cleaner way. Create utility functions for apiCompose handlers
-  let hyloResults;
-  try {
-    hyloResults = await Promise.all(
-      submissionEntities.map(async ({ entity, prevEntity, survey }) => {
-        const results = await hyloService.handle({
-          submission: entity,
-          prevSubmission: prevEntity,
-          survey,
-          user,
-        });
-        // Save the results of the Hylo handler in the submission
-        const permanentResults = results.map((r) => r.permanent).filter(Boolean);
-        entity.meta.permanentResults = [
-          ...(Array.isArray(entity.meta.permanentResults) ? entity.meta.permanentResults : []),
-          ...permanentResults,
-        ];
-        return results;
-      })
-    );
-  } catch (error) {
-    console.log('error handling hylo', error);
-    throw {
-      message: `error submitting to hylo ${error}`,
-      hylo: error,
-      logs: error.logs || [],
-    };
-  }
-
-  let farmOsResults;
-  try {
-    farmOsResults = await Promise.all(
-      submissionEntities.map(({ entity, survey }) =>
-        farmOsService.handle({
-          submission: entity,
-          survey,
-          user, //todo
-        })
-      )
-    );
-  } catch (error) {
-    // TODO what should we do if something internal fails?
-    // need to let the user somehow know
-    console.log('error handling farmos', error);
-    throw {
-      message: `error submitting to farmos ${error}`,
-      farmos: error.messages,
-      logs: error.logs || [],
-    };
-  }
-
-  return {
-    results: {
-      farmos: farmOsResults.flat(),
-      hylo: hyloResults.flat(),
-    },
-    entities: submissionEntities,
+    return prepareSubmissionsToQSLs(controls, entity);
   };
+  const submissionsToQSLs = (await Promise.all(submissionEntities.map(mapSubmissionToQSL))).flat();
+  return submissionsToQSLs;
 };
 
 const createSubmission = async (req, res) => {
@@ -775,14 +723,7 @@ const createSubmission = async (req, res) => {
     return res.status(503).send(errorObject);
   }
 
-  const mapSubmissionToQSL = ({ entity, survey }) => {
-    const controls = survey.revisions.find(
-      (revision) => revision.version === entity.meta.survey.version
-    ).controls;
-
-    return prepareSubmissionsToQSLs(controls, entity);
-  };
-  const submissionsToQSLs = (await Promise.all(submissionEntities.map(mapSubmissionToQSL))).flat();
+  const submissionsToQSLs = await createSubmissionsToQSLs(submissionEntities);
 
   const results = await withSession(mongoClient, async (session) => {
     try {
@@ -1392,7 +1333,7 @@ const sendPdfLink = async (req, res) => {
   return res.send({ success: true });
 };
 
-export { sanitize };
+export { sanitize, createSubmissionsToQSLs };
 
 export default {
   getSubmissions,

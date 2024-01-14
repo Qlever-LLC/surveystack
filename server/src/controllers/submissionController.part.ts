@@ -1,18 +1,26 @@
 import boom from '@hapi/boom';
 import { Request, Response } from 'express';
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
-import { db } from '../db';
-import { sanitize } from './submissionController.js';
+import { db, mongoClient } from '../db';
+import { withTransaction, withSession } from '../db/helpers';
+import { sanitize, createSubmissionsToQSLs } from './submissionController.js';
+import handleApiCompose from './utils/handleApiCompose';
 import { type ObjectId } from 'mongodb';
+import { hasSubmissionRights } from '../handlers/assertions.js';
 
+type SubmissionStatusType =
+  | 'READY_TO_SUBMIT'
+  | 'READY_TO_DELETE'
+  | 'UNAUTHORIZED_TO_SUBMIT'
+  | 'FAILED_TO_SUBMIT';
 type SubmissionStatus = {
-  type: string;
+  type: SubmissionStatusType;
   value: {
     at: string;
   };
 };
 
-// TODO: replace this type with one generated from the open api spec
+// TODO: replace this type with one generated from the open api spec or a mongo schema.
 type Submission = {
   _id: ObjectId;
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -22,6 +30,7 @@ type Submission = {
     dateModified: Date;
     dateSubmitted?: Date;
     isDraft: boolean;
+    isDeletedDraft: boolean;
     survey: {
       id: string;
       name: string;
@@ -75,29 +84,110 @@ const syncDraft = async (req: Request, res: Response) => {
     throw boom.unauthorized();
   }
 
-  if (!existingSubmission) {
-    await db.collection('submissions').insertOne(submission);
+  if (existingSubmission && !existingSubmission.meta.isDraft) {
     return res.status(200).send();
   }
 
-  if (!existingSubmission.meta.isDraft) {
+  if (existingSubmission && !isRequestSubmissionLatest(submission, existingSubmission)) {
     return res.status(200).send();
   }
 
-  if (!isRequestSubmissionLatest(submission, existingSubmission)) {
+  if (submission.meta.status.some((status) => status.type === 'READY_TO_DELETE')) {
+    if (existingSubmission) {
+      submission.meta.status = submission.meta.status.filter(
+        (status) => status.type !== 'READY_TO_DELETE'
+      );
+      submission.meta.isDeletedDraft = true;
+      await db.collection('submissions').replaceOne({ _id: submission._id }, submission);
+    }
     return res.status(200).send();
   }
 
   if (submission.meta.status.some((status) => status.type === 'READY_TO_SUBMIT')) {
+    let isAuthorizedToSubmit: boolean;
+    try {
+      isAuthorizedToSubmit = await hasSubmissionRights(submission, res);
+    } catch (error) {
+      isAuthorizedToSubmit = false;
+    }
+    if (!isAuthorizedToSubmit) {
+      submission.meta.status = [
+        ...submission.meta.status.filter((status) => status.type !== 'READY_TO_SUBMIT'),
+        {
+          type: 'UNAUTHORIZED_TO_SUBMIT',
+          value: { at: new Date().toISOString() },
+        },
+      ];
+      await db
+        .collection('submissions')
+        .replaceOne({ _id: submission._id }, submission, { upsert: true });
+      return res.status(200).send();
+    }
+
+    try {
+      await handleApiCompose();
+    } catch (error) {
+      submission.meta.status = [
+        ...submission.meta.status.filter((status) => status.type !== 'READY_TO_SUBMIT'),
+        {
+          type: 'FAILED_TO_SUBMIT',
+          value: { at: new Date().toISOString() },
+        },
+      ];
+      await db
+        .collection('submissions')
+        .replaceOne({ _id: submission._id }, submission, { upsert: true });
+      return res.status(200).send();
+    }
+
+    // prepare qsl submissions
+    const survey = await db.collection('surveys').findOne({ _id: submission.meta.survey.id });
+    const submissionsToQSLs = await createSubmissionsToQSLs([{ entity: submission, survey }]);
+
+    // prepare draft to be submitted
     submission.meta.isDraft = false;
     submission.meta.status = submission.meta.status.filter(
       (status) => status.type !== 'READY_TO_SUBMIT'
     );
+
+    // submit draft and qsl submissions in a transaction
+    const result = await withSession(mongoClient, async (session) => {
+      try {
+        return await withTransaction(session, async () => {
+          if (submissionsToQSLs.length > 0) {
+            const insertResult = await db.collection('submissions').insertMany(submissionsToQSLs);
+            if (insertResult.insertedCount !== submissionsToQSLs.length) {
+              await session.abortTransaction();
+              return;
+            }
+          }
+
+          const replaceResult = await db
+            .collection('submissions')
+            .replaceOne({ _id: submission._id }, submission, { upsert: true });
+          if (!replaceResult.acknowledged) {
+            await session.abortTransaction();
+            return;
+          }
+
+          return replaceResult;
+        });
+      } catch {
+        throw boom.internal();
+      }
+    });
+
+    if (!result) {
+      throw boom.internal();
+    }
+
+    return res.status(200).send();
+  } else {
+    await db
+      .collection('submissions')
+      .replaceOne({ _id: submission._id }, submission, { upsert: true });
+    return res.status(200).send();
   }
-
-  await db.collection('submissions').replaceOne({ _id: submission._id }, submission);
-
-  return res.status(200).send();
 };
 
 const paths: OpenAPIV3.PathsObject = {

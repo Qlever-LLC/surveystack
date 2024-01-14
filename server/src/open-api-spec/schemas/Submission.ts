@@ -18,6 +18,7 @@ const Submission: OpenAPIV3.SchemaObject = {
       type: 'object',
       required: ['dateCreated', 'dateModified', 'isDraft'],
       properties: {
+        isDeletedDraft: { type: 'boolean' },
         isDraft: { type: 'boolean' },
         dateCreated: { type: 'string', format: 'date-time' },
         dateModified: { type: 'string', format: 'date-time' },
