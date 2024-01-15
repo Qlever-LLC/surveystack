@@ -1,141 +1,132 @@
 <template>
-  <div>
-    <a-card varaint="outlined" class="tiptap-editor" style="overflow: initial; z-index: initial">
-      <a-card-title class="pa-0">
-        <!-- <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }"> -->
-        <div v-if="editor">
-          <a-toolbar color="grey-lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
-            <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey-lighten-3">
-              <div>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('paragraph') }"
-                  @click="editor.chain().focus().setParagraph().run()"
-                  :disabled="disabled">
-                  <a-icon>mdi-format-pilcrow</a-icon>
-                </a-btn>
+  <a-card class="tiptap-editor">
+    <a-card-title class="pa-0">
+      <div v-if="editor">
+        <a-toolbar color="grey-lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
+          <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey-lighten-3">
+            <div>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('paragraph') }"
+                @click="editor.chain().focus().setParagraph().run()"
+                :disabled="disabled">
+                <a-icon>mdi-format-pilcrow</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('heading', { level: 1 }) }"
-                  @click="editor.chain().focus().toggleHeading({ level: 1 }).run()">
-                  <a-icon>mdi-format-header-1</a-icon>
-                </a-btn>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('heading', { level: 1 }) }"
+                @click="editor.chain().focus().toggleHeading({ level: 1 }).run()">
+                <a-icon>mdi-format-header-1</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('heading', { level: 2 }) }"
-                  @click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
-                  <a-icon>mdi-format-header-2</a-icon>
-                </a-btn>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('heading', { level: 2 }) }"
+                @click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
+                <a-icon>mdi-format-header-2</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('heading', { level: 3 }) }"
-                  @click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
-                  <a-icon>mdi-format-header-3</a-icon>
-                </a-btn>
-              </div>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('heading', { level: 3 }) }"
+                @click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
+                <a-icon>mdi-format-header-3</a-icon>
+              </a-btn>
+            </div>
 
-              <div class="ml-2">
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('blockquote') }"
-                  @click="editor.chain().focus().toggleBlockquote().run()">
-                  <a-icon>mdi-format-quote-close</a-icon>
-                </a-btn>
+            <div class="ml-2">
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('blockquote') }"
+                @click="editor.chain().focus().toggleBlockquote().run()">
+                <a-icon>mdi-format-quote-close</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('bulletList') }"
-                  @click="editor.chain().focus().toggleBulletList().run()">
-                  <a-icon>mdi-format-list-bulleted</a-icon>
-                </a-btn>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('bulletList') }"
+                @click="editor.chain().focus().toggleBulletList().run()">
+                <a-icon>mdi-format-list-bulleted</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('orderedList') }"
-                  @click="editor.chain().focus().toggleOrderedList().run()">
-                  <a-icon>mdi-format-list-numbered</a-icon>
-                </a-btn>
-              </div>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('orderedList') }"
+                @click="editor.chain().focus().toggleOrderedList().run()">
+                <a-icon>mdi-format-list-numbered</a-icon>
+              </a-btn>
+            </div>
 
-              <div>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('bold') }"
-                  @click="editor.chain().focus().toggleBold().run()">
-                  <a-icon>mdi-format-bold</a-icon>
-                </a-btn>
+            <div>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('bold') }"
+                @click="editor.chain().focus().toggleBold().run()">
+                <a-icon>mdi-format-bold</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('italic') }"
-                  @click="editor.chain().focus().toggleItalic().run()">
-                  <a-icon>mdi-format-italic</a-icon>
-                </a-btn>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('italic') }"
+                @click="editor.chain().focus().toggleItalic().run()">
+                <a-icon>mdi-format-italic</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('strike') }"
-                  @click="editor.chain().focus().toggleStrike().run()">
-                  <a-icon>mdi-format-strikethrough</a-icon>
-                </a-btn>
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('strike') }"
+                @click="editor.chain().focus().toggleStrike().run()">
+                <a-icon>mdi-format-strikethrough</a-icon>
+              </a-btn>
 
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': editor.isActive('underline') }"
-                  @click="editor.chain().focus().toggleUnderline().run()">
-                  <a-icon>mdi-format-underline</a-icon>
-                </a-btn>
-              </div>
-            </a-toolbar-items>
-          </a-toolbar>
-        </div>
-        <!-- </editor-menu-bar> -->
-      </a-card-title>
-      <a-card-text class="pa-0">
-        <!-- v-slot="{ commands, isActive, getMarkAttrs, menu }" -->
-        <!-- class="menububble" @hide="hideLinkMenu" -->
-        <bubble-menu :editor="editor" v-if="editor" :tippy-options="{ duration: 100 }">
-          <div>hello</div>
-          <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
-            bold
-          </button>
-          <button
-            @click="editor.chain().focus().toggleItalic().run()"
-            :class="{ 'is-active': editor.isActive('italic') }">
-            italic
-          </button>
-          <button
-            @click="editor.chain().focus().toggleStrike().run()"
-            :class="{ 'is-active': editor.isActive('strike') }">
-            strike
-          </button>
-          <!-- :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`" -->
-          <!-- <div class="menububble" :class="{ 'is-active': editor.isActive('link') }">
+              <a-btn
+                icon
+                small
+                class="menubar__button"
+                :class="{ 'v-btn--active': editor.isActive('underline') }"
+                @click="editor.chain().focus().toggleUnderline().run()">
+                <a-icon>mdi-format-underline</a-icon>
+              </a-btn>
+            </div>
+          </a-toolbar-items>
+        </a-toolbar>
+      </div>
+    </a-card-title>
+    <a-card-text class="pa-0">
+      <!-- v-slot="{ commands, isActive, getMarkAttrs, menu }" -->
+      <!-- class="menububble" @hide="hideLinkMenu" -->
+      <bubble-menu :editor="editor" v-if="editor" :tippy-options="{ duration: 100 }">
+        <a-btn @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
+          bold
+        </a-btn>
+        <a-btn @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
+          italic
+        </a-btn>
+        <a-btn @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
+          strike
+        </a-btn>
+        <!-- <div class="menububble" :class="{ 'is-active': editor.isActive('link') }">
           <a-card class="pa-0">
             <a-card-text class="pa-0">
               <form class="menububble__form" v-if="linkMenuIsActive" @submit.prevent="setLinkUrl(linkUrl)">
@@ -167,39 +158,14 @@
             </a-card-text>
           </a-card>
         </div> -->
-        </bubble-menu>
-        <!-- <editor-content
-          :disabled="!disabled"
-          :editor="editor"
-          class="tiptap-editor"
-          style="width: 100%; height: 100%" /> -->
-      </a-card-text>
-    </a-card>
-    <p>------test------</p>
-    <div>
-      <bubble-menu :editor="editor" v-if="editor" :tippy-options="{ duration: 100 }">
-        <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
-          bold
-        </button>
-        <button
-          @click="editor.chain().focus().toggleItalic().run()"
-          :class="{ 'is-active': editor.isActive('italic') }">
-          italic
-        </button>
-        <button
-          @click="editor.chain().focus().toggleStrike().run()"
-          :class="{ 'is-active': editor.isActive('strike') }">
-          strike
-        </button>
       </bubble-menu>
-      <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 500px; height: 50px" />
-    </div>
-  </div>
+      <editor-content :editable="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%" />
+    </a-card-text>
+  </a-card>
 </template>
 
 <script>
-import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3'; /*EditorMenuBar, TODO EditorMenuBubble */
-// import BubbleMenu from '@tiptap/extension-bubble-menu';
+import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 
@@ -210,11 +176,9 @@ export default {
   components: {
     EditorContent,
     BubbleMenu,
-    // EditorMenuBar,
-    // EditorMenuBubble,
   },
   props: {
-    value: {
+    modelValue: {
       type: String,
       required: true,
     },
@@ -233,7 +197,7 @@ export default {
         Link.configure({ openOnClick: true }),
       ],
       content: 'I amm running Tiptap with Vue.js',
-      // content: this.value,
+      // content: this.modelValue,
       onUpdate: ({ editor }) => {
         this.emitAfterOnUpdate = true;
         this.$emit('update:modelValue', editor.getHTML());
@@ -252,7 +216,7 @@ export default {
     };
   },
   watch: {
-    value(val) {
+    modelValue(val) {
       if (this.emitAfterOnUpdate) {
         this.emitAfterOnUpdate = false;
         return;
@@ -292,10 +256,6 @@ export default {
   padding: 16px;
   font-size: 16px;
   color: rgba(0, 0, 0, 0.87);
-}
-
-.content {
-  border-color: red !important;
 }
 
 .tiptap-editor :deep(.ProseMirror) blockquote {
