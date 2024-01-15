@@ -38,13 +38,14 @@
         :rules="[isValidNumber]"
         clearable
         @click:clear="setToNull" />
-      <instructions-editor
+      <!-- <instructions-editor
         v-if="isInstructions"
         v-model="controlInProgress.options.source"
         class="mt-6"
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
-        " />
+        " /> -->
+      <tip-tap-test />
       <instructions-image-split-editor
         v-if="isInstructionsImageSplit"
         v-model="controlInProgress.options.source"
@@ -539,6 +540,8 @@ import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
 
+import TipTapTest from './TipTapTest.vue';
+
 export default {
   components: {
     SelectItems,
@@ -551,6 +554,7 @@ export default {
     Date,
 
     MarkdownEditor,
+    TipTapTest,
   },
   props: {
     control: {
