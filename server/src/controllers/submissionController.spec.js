@@ -20,6 +20,7 @@ import boom from '@hapi/boom';
 jest.mock('./utils/handleApiCompose');
 jest.mock('../services/mail/mail.service');
 jest.mock('../db/helpers.ts');
+jest.mock('../services/featureToggle.service.js');
 
 const { ObjectId } = jest.requireActual('mongodb');
 
