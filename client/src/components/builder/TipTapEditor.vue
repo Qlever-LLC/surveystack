@@ -55,35 +55,6 @@
                   <a-icon>mdi-format-quote-close</a-icon>
                 </a-btn>
 
-                <!-- <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  :class="{ 'v-btn--active': isActive.code() }"
-                  @click="commands.code"
-                >
-                  <a-icon>mdi-code-tags</a-icon>
-                </a-btn> -->
-
-                <!--
-                WARNING: Is not up to date as it is a comment
-                <a-select
-                  :items="getParagraphStyles(isActive, commands)"
-                >
-                  <template v-slot:selection="{ item, index }">
-                    <a-btn
-                      icon
-                      small
-                      class="menubar__button"
-                      :class="{ 'v-btn--active': condition }"
-                      @click="item.action"
-                    >
-                      <a-icon>{{ item.icon }}</a-icon>
-                    </a-btn>
-                  </template>
-
-                </a-select> -->
-
                 <a-btn
                   icon
                   small
@@ -102,24 +73,6 @@
                   <a-icon>mdi-format-list-numbered</a-icon>
                 </a-btn>
               </div>
-
-              <!-- <a-btn
-                icon
-                small
-                class="menubar__button"
-                @click="commands.undo"
-              >
-                <a-icon>mdi-undo</a-icon>
-              </a-btn>
-
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                @click="commands.redo"
-              >
-                <a-icon>mdi-redo</a-icon>
-              </a-btn> -->
 
               <div>
                 <a-btn
@@ -158,109 +111,8 @@
                   <a-icon>mdi-format-underline</a-icon>
                 </a-btn>
               </div>
-
-              <!-- <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.code_block() }"
-                @click="commands.code_block"
-              >
-                <a-icon>mdi-code-braces</a-icon>
-              </a-btn> -->
-
-              <!-- <a-btn
-                icon
-                small
-                class="menubar__button"
-                @click="commands.horizontal_rule"
-              >
-                <a-icon>mdi-minus</a-icon>
-              </a-btn> -->
             </a-toolbar-items>
           </a-toolbar>
-          <!--
-          <a-toolbar dense class="pa-0">
-            <a-toolbar-items class="pa-0">
-
-
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })"
-              >
-                <a-icon>mdi-table</a-icon>
-              </a-btn>
-
-              <span v-if="isActive.table()">
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.deleteTable"
-                >
-                  <a-icon>mdi-delete_table</a-icon>
-                </a-btn>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.addColumnBefore"
-                >
-                  <a-icon>mdi-add_col_before</a-icon>
-                </a-btn>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.addColumnAfter"
-                >
-                  <a-icon>mdi-add_col_after</a-icon>
-                </a-btn>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.deleteColumn"
-                >
-                  <a-icon>mdi-delete_col</a-icon>
-                </a-btn>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.addRowBefore"
-                >
-                  <a-icon>mdi-add_row_before</a-icon>
-                </a-btn>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.addRowAfter"
-                >
-                  <a-icon>mdi-add_row_after</a-icon>
-                </a-btn>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.deleteRow"
-                >
-                  <a-icon>mdi-delete_row</a-icon>
-                </a-btn>
-                <a-btn
-                  icon
-                  small
-                  class="menubar__button"
-                  @click="commands.toggleCellMerge"
-                >
-                  <a-icon>mdi-combine_cells</a-icon>
-                </a-btn>
-              </span>
-            </a-toolbar-items>
-          </a-toolbar>  -->
         </div>
         <!-- </editor-menu-bar> -->
       </a-card-title>
@@ -350,29 +202,6 @@ import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3'; /*EditorMenuB
 // import BubbleMenu from '@tiptap/extension-bubble-menu';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
-// TODO remove all commented type
-// import {
-//   Blockquote, => in StarterKit
-//   Bold, => in StarterKit
-//   BulletList, => in StarterKit
-//   Code,
-//   CodeBlock, => in StarterKit
-//   HardBreak,
-//   Heading,
-//   History,
-//   HorizontalRule,
-//   Italic, => in StarterKit
-//   ListItem,
-//   OrderedList, => in StarterKit
-//   Strike, => in StarterKit
-//   Table,
-//   TableCell,
-//   TableHeader,
-//   TableRow,
-//   TodoItem,
-//   TodoList,
-//   Underline, => in /extension-underline
-// } from 'tiptap-extensions';
 
 // import CustomLink from '@/utils/TipTapCustomLink';
 import Link from '@tiptap/extension-link';
@@ -398,29 +227,6 @@ export default {
     this.editor = new Editor({
       editable: !this.disabled,
       extensions: [
-        // new Blockquote(),
-        // new BulletList(),
-        // new CodeBlock(),
-        // new HardBreak(),
-        // new Heading({ levels: [1, 2, 3] }),
-        // new HorizontalRule(),
-        // new ListItem(),
-        // new OrderedList(),
-        // new TodoItem(),
-        // new TodoList(),
-        // new CustomLink(),
-        // new Bold(),
-        // new Code(),
-        // new Italic(),
-        // new Strike(),
-        // new Underline(),
-        // new History(),
-        // new Table({
-        //   resizable: true,
-        // }),
-        // new TableHeader(),
-        // new TableCell(),
-        // new TableRow(),
         StarterKit,
         Underline,
         // CustomLink,
@@ -443,30 +249,6 @@ export default {
       emitAfterOnUpdate: false,
       linkUrl: null,
       linkMenuIsActive: false,
-      // getParagraphStyles(isActive, commands) {
-      //   return [
-      //     {
-      //       condition: isActive.paragraph(),
-      //       action: commands.paragraph,
-      //       icon: 'mdi-format-pilcrow',
-      //     },
-      //     {
-      //       condition: isActive.heading({ level: 1 }),
-      //       action: commands.heading({ level: 1 }),
-      //       icon: 'mdi-format-header-1',
-      //     },
-      //     {
-      //       condition: isActive.heading({ level: 2 }),
-      //       action: commands.heading({ level: 2 }),
-      //       icon: 'mdi-format-header-2',
-      //     },
-      //     {
-      //       condition: isActive.heading({ level: 3 }),
-      //       action: commands.heading({ level: 3 }),
-      //       icon: 'mdi-format-header-3',
-      //     },
-      //   ];
-      // },
     };
   },
   watch: {
