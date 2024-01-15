@@ -3,7 +3,7 @@
     :class="{ fullWidth: cssFullWidth, backgroundCream: cssBackgroundCream }"
     :color="color"
     :dark="dark"
-    :dense="dense"
+    :density="dense ? 'compact' : 'default'"
     :flat="flat"
     :tile="tile">
     <slot />
@@ -27,16 +27,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.fullWidth >>> .v-toolbar__items {
+.fullWidth :deep(.v-toolbar__items) {
   width: 100%;
 }
-.fullWidth >>> .v-toolbar__content {
-  padding-left: 40px;
+.fullWidth :deep(.v-toolbar__content) {
+  padding-left: 4px;
   padding-right: 4px;
   width: 100%;
+  display: block;
 }
 
-.backgroundCream >>> .v-toolbar__content {
+.backgroundCream :deep(.v-toolbar__content) {
   background: #f5f5f5 !important;
 }
 </style>

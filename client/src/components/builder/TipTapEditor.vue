@@ -1,60 +1,61 @@
-<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
-  <a-card varaint="outlined" class="tiptap-editor">
-    <a-card-title class="pa-0">
-      <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-        <a-toolbar color="grey-lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
-          <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey-lighten-3">
-            <div>
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.paragraph() }"
-                @click="commands.paragraph"
-                :disabled="disabled">
-                <a-icon>mdi-format-pilcrow</a-icon>
-              </a-btn>
+  <div>
+    <a-card varaint="outlined" class="tiptap-editor" style="overflow: initial; z-index: initial">
+      <a-card-title class="pa-0">
+        <!-- <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }"> -->
+        <div v-if="editor">
+          <a-toolbar color="grey-lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" cssFullWidth class="pa-0">
+            <a-toolbar-items class="pa-0 align-center justify-space-between" color="grey-lighten-3">
+              <div>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('paragraph') }"
+                  @click="editor.chain().focus().setParagraph().run()"
+                  :disabled="disabled">
+                  <a-icon>mdi-format-pilcrow</a-icon>
+                </a-btn>
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.heading({ level: 1 }) }"
-                @click="commands.heading({ level: 1 })">
-                <a-icon>mdi-format-header-1</a-icon>
-              </a-btn>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('heading', { level: 1 }) }"
+                  @click="editor.chain().focus().toggleHeading({ level: 1 }).run()">
+                  <a-icon>mdi-format-header-1</a-icon>
+                </a-btn>
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.heading({ level: 2 }) }"
-                @click="commands.heading({ level: 2 })">
-                <a-icon>mdi-format-header-2</a-icon>
-              </a-btn>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('heading', { level: 2 }) }"
+                  @click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
+                  <a-icon>mdi-format-header-2</a-icon>
+                </a-btn>
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.heading({ level: 3 }) }"
-                @click="commands.heading({ level: 3 })">
-                <a-icon>mdi-format-header-3</a-icon>
-              </a-btn>
-            </div>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('heading', { level: 3 }) }"
+                  @click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
+                  <a-icon>mdi-format-header-3</a-icon>
+                </a-btn>
+              </div>
 
-            <div class="ml-2">
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.blockquote() }"
-                @click="commands.blockquote">
-                <a-icon>mdi-format-quote-close</a-icon>
-              </a-btn>
+              <div class="ml-2">
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('blockquote') }"
+                  @click="editor.chain().focus().toggleBlockquote().run()">
+                  <a-icon>mdi-format-quote-close</a-icon>
+                </a-btn>
 
-              <!-- <a-btn
+                <!-- <a-btn
                   icon
                   small
                   class="menubar__button"
@@ -64,7 +65,7 @@
                   <a-icon>mdi-code-tags</a-icon>
                 </a-btn> -->
 
-              <!--
+                <!--
                 WARNING: Is not up to date as it is a comment
                 <a-select
                   :items="getParagraphStyles(isActive, commands)"
@@ -83,26 +84,26 @@
 
                 </a-select> -->
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.bullet_list() }"
-                @click="commands.bullet_list">
-                <a-icon>mdi-format-list-bulleted</a-icon>
-              </a-btn>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('bulletList') }"
+                  @click="editor.chain().focus().toggleBulletList().run()">
+                  <a-icon>mdi-format-list-bulleted</a-icon>
+                </a-btn>
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.ordered_list() }"
-                @click="commands.ordered_list">
-                <a-icon>mdi-format-list-numbered</a-icon>
-              </a-btn>
-            </div>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('orderedList') }"
+                  @click="editor.chain().focus().toggleOrderedList().run()">
+                  <a-icon>mdi-format-list-numbered</a-icon>
+                </a-btn>
+              </div>
 
-            <!-- <a-btn
+              <!-- <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -120,45 +121,45 @@
                 <a-icon>mdi-redo</a-icon>
               </a-btn> -->
 
-            <div>
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.bold() }"
-                @click="commands.bold">
-                <a-icon>mdi-format-bold</a-icon>
-              </a-btn>
+              <div>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('bold') }"
+                  @click="editor.chain().focus().toggleBold().run()">
+                  <a-icon>mdi-format-bold</a-icon>
+                </a-btn>
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.italic() }"
-                @click="commands.italic">
-                <a-icon>mdi-format-italic</a-icon>
-              </a-btn>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('italic') }"
+                  @click="editor.chain().focus().toggleItalic().run()">
+                  <a-icon>mdi-format-italic</a-icon>
+                </a-btn>
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.strike() }"
-                @click="commands.strike">
-                <a-icon>mdi-format-strikethrough</a-icon>
-              </a-btn>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('strike') }"
+                  @click="editor.chain().focus().toggleStrike().run()">
+                  <a-icon>mdi-format-strikethrough</a-icon>
+                </a-btn>
 
-              <a-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.underline() }"
-                @click="commands.underline">
-                <a-icon>mdi-format-underline</a-icon>
-              </a-btn>
-            </div>
+                <a-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': editor.isActive('underline') }"
+                  @click="editor.chain().focus().toggleUnderline().run()">
+                  <a-icon>mdi-format-underline</a-icon>
+                </a-btn>
+              </div>
 
-            <!-- <a-btn
+              <!-- <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -168,7 +169,7 @@
                 <a-icon>mdi-code-braces</a-icon>
               </a-btn> -->
 
-            <!-- <a-btn
+              <!-- <a-btn
                 icon
                 small
                 class="menubar__button"
@@ -176,9 +177,9 @@
               >
                 <a-icon>mdi-minus</a-icon>
               </a-btn> -->
-          </a-toolbar-items>
-        </a-toolbar>
-        <!--
+            </a-toolbar-items>
+          </a-toolbar>
+          <!--
           <a-toolbar dense class="pa-0">
             <a-toolbar-items class="pa-0">
 
@@ -259,25 +260,33 @@
                 </a-btn>
               </span>
             </a-toolbar-items>
-          </a-toolbar> -->
-      </editor-menu-bar>
-    </a-card-title>
-    <a-card-text class="pa-0">
-      <editor-menu-bubble
-        class="menububble"
-        :editor="editor"
-        @hide="hideLinkMenu"
-        v-slot="{ commands, isActive, getMarkAttrs, menu }">
-        <div
-          class="menububble"
-          :class="{ 'is-active': menu.isActive }"
-          :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`">
+          </a-toolbar>  -->
+        </div>
+        <!-- </editor-menu-bar> -->
+      </a-card-title>
+      <a-card-text class="pa-0">
+        <!-- v-slot="{ commands, isActive, getMarkAttrs, menu }" -->
+        <!-- class="menububble" @hide="hideLinkMenu" -->
+        <bubble-menu :editor="editor" v-if="editor" :tippy-options="{ duration: 100 }">
+          <div>hello</div>
+          <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
+            bold
+          </button>
+          <button
+            @click="editor.chain().focus().toggleItalic().run()"
+            :class="{ 'is-active': editor.isActive('italic') }">
+            italic
+          </button>
+          <button
+            @click="editor.chain().focus().toggleStrike().run()"
+            :class="{ 'is-active': editor.isActive('strike') }">
+            strike
+          </button>
+          <!-- :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`" -->
+          <!-- <div class="menububble" :class="{ 'is-active': editor.isActive('link') }">
           <a-card class="pa-0">
             <a-card-text class="pa-0">
-              <form
-                class="menububble__form"
-                v-if="linkMenuIsActive"
-                @submit.prevent="setLinkUrl(commands.link, linkUrl)">
+              <form class="menububble__form" v-if="linkMenuIsActive" @submit.prevent="setLinkUrl(linkUrl)">
                 <a-text-field
                   class="menububble__input ml-4"
                   dense
@@ -285,10 +294,10 @@
                   placeholder="https://"
                   ref="linkInput"
                   @keydown.esc="hideLinkMenu" />
-                <a-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
+                <a-btn small class="menububble__button" @click="setLinkUrl(linkUrl)" icon>
                   <a-icon>mdi-check</a-icon>
                 </a-btn>
-                <a-btn small class="menububble__button mr-1" @click="setLinkUrl(commands.link, null)" icon>
+                <a-btn small class="menububble__button mr-1" @click="setLinkUrl(null)" icon>
                   <a-icon>mdi-close</a-icon>
                 </a-btn>
               </form>
@@ -296,54 +305,84 @@
               <template v-else>
                 <a-btn
                   class="menububble__button"
-                  @click="showLinkMenu(getMarkAttrs('link'))"
-                  :class="{ 'is-active': isActive.link() }"
+                  @click="showLinkMenu(editor.getAttributes('link'))"
+                  :class="{ 'is-active': editor.isActive('link') }"
                   icon>
-                  <span>{{ isActive.link() ? 'Update Link' : 'Add Link' }}</span>
+                  <span>{{ editor.isActive('link') ? 'Update Link' : 'Add Link' }}</span>
                   <a-icon>mdi-link</a-icon>
                 </a-btn>
               </template>
             </a-card-text>
           </a-card>
-        </div>
-      </editor-menu-bubble>
-      <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%" />
-    </a-card-text>
-  </a-card>
+        </div> -->
+        </bubble-menu>
+        <!-- <editor-content
+          :disabled="!disabled"
+          :editor="editor"
+          class="tiptap-editor"
+          style="width: 100%; height: 100%" /> -->
+      </a-card-text>
+    </a-card>
+    <p>------test------</p>
+    <div>
+      <bubble-menu :editor="editor" v-if="editor" :tippy-options="{ duration: 100 }">
+        <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
+          bold
+        </button>
+        <button
+          @click="editor.chain().focus().toggleItalic().run()"
+          :class="{ 'is-active': editor.isActive('italic') }">
+          italic
+        </button>
+        <button
+          @click="editor.chain().focus().toggleStrike().run()"
+          :class="{ 'is-active': editor.isActive('strike') }">
+          strike
+        </button>
+      </bubble-menu>
+      <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 500px; height: 50px" />
+    </div>
+  </div>
 </template>
 
 <script>
-import { Editor, EditorContent, EditorMenuBar, EditorMenuBubble } from 'tiptap';
-import {
-  Blockquote,
-  Bold,
-  BulletList,
-  Code,
-  CodeBlock,
-  HardBreak,
-  Heading,
-  History,
-  HorizontalRule,
-  Italic,
-  ListItem,
-  OrderedList,
-  Strike,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-  TodoItem,
-  TodoList,
-  Underline,
-} from 'tiptap-extensions';
+import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3'; /*EditorMenuBar, TODO EditorMenuBubble */
+// import BubbleMenu from '@tiptap/extension-bubble-menu';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+// TODO remove all commented type
+// import {
+//   Blockquote, => in StarterKit
+//   Bold, => in StarterKit
+//   BulletList, => in StarterKit
+//   Code,
+//   CodeBlock, => in StarterKit
+//   HardBreak,
+//   Heading,
+//   History,
+//   HorizontalRule,
+//   Italic, => in StarterKit
+//   ListItem,
+//   OrderedList, => in StarterKit
+//   Strike, => in StarterKit
+//   Table,
+//   TableCell,
+//   TableHeader,
+//   TableRow,
+//   TodoItem,
+//   TodoList,
+//   Underline, => in /extension-underline
+// } from 'tiptap-extensions';
 
-import CustomLink from '@/utils/TipTapCustomLink';
+// import CustomLink from '@/utils/TipTapCustomLink';
+import Link from '@tiptap/extension-link';
 
 export default {
   components: {
     EditorContent,
-    EditorMenuBar,
-    EditorMenuBubble,
+    BubbleMenu,
+    // EditorMenuBar,
+    // EditorMenuBubble,
   },
   props: {
     value: {
@@ -359,34 +398,39 @@ export default {
     this.editor = new Editor({
       editable: !this.disabled,
       extensions: [
-        new Blockquote(),
-        new BulletList(),
-        new CodeBlock(),
-        new HardBreak(),
-        new Heading({ levels: [1, 2, 3] }),
-        new HorizontalRule(),
-        new ListItem(),
-        new OrderedList(),
-        new TodoItem(),
-        new TodoList(),
-        new CustomLink(),
-        new Bold(),
-        new Code(),
-        new Italic(),
-        new Strike(),
-        new Underline(),
-        new History(),
-        new Table({
-          resizable: true,
-        }),
-        new TableHeader(),
-        new TableCell(),
-        new TableRow(),
+        // new Blockquote(),
+        // new BulletList(),
+        // new CodeBlock(),
+        // new HardBreak(),
+        // new Heading({ levels: [1, 2, 3] }),
+        // new HorizontalRule(),
+        // new ListItem(),
+        // new OrderedList(),
+        // new TodoItem(),
+        // new TodoList(),
+        // new CustomLink(),
+        // new Bold(),
+        // new Code(),
+        // new Italic(),
+        // new Strike(),
+        // new Underline(),
+        // new History(),
+        // new Table({
+        //   resizable: true,
+        // }),
+        // new TableHeader(),
+        // new TableCell(),
+        // new TableRow(),
+        StarterKit,
+        Underline,
+        // CustomLink,
+        Link.configure({ openOnClick: true }),
       ],
-      content: this.value,
-      onUpdate: ({ getHTML }) => {
+      content: 'I amm running Tiptap with Vue.js',
+      // content: this.value,
+      onUpdate: ({ editor }) => {
         this.emitAfterOnUpdate = true;
-        this.$emit('input', getHTML());
+        this.$emit('update:modelValue', editor.getHTML());
       },
     });
   },
@@ -448,8 +492,9 @@ export default {
       this.linkUrl = null;
       this.linkMenuIsActive = false;
     },
-    setLinkUrl(command, url) {
-      command({ href: url });
+    setLinkUrl(url) {
+      // command.setLink({ href: url });
+      this.editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
       this.hideLinkMenu();
     },
   },
@@ -457,7 +502,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.tiptap-editor >>> .ProseMirror {
+.tiptap-editor :deep(.ProseMirror) {
   /* background-color: blue; */
   width: 100%;
   height: 100%;
@@ -471,11 +516,16 @@ export default {
   border-color: red !important;
 }
 
-.tiptap-editor >>> .ProseMirror blockquote {
+.tiptap-editor :deep(.ProseMirror) blockquote {
   border-left: 0.25em solid #dfe2e5;
   padding-left: 1em;
   color: #6a737d;
   margin: 20px 0;
+}
+
+.tiptap-editor :deep(.ProseMirror) ul,
+.tiptap-editor :deep(.ProseMirror) ol {
+  padding-left: 24px;
 }
 
 :root {
