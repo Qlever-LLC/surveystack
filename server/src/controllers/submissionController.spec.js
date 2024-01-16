@@ -80,6 +80,40 @@ describe('submissionController', () => {
         .expect(400);
     });
 
+    it('returns 400 if the submission in the request has a null creator', async () => {
+      const { createRequestSubmission } = await createSurvey(['string']);
+      const nullCreatorSubmission = createRequestSubmission({
+        _id: ObjectId().toString(),
+        meta: createRequestSubmissionMeta({
+          isDraft: true,
+          creator: null,
+        }),
+      });
+
+      return request(app)
+        .post('/api/submissions/sync-draft')
+        .set('Authorization', authHeaderValue)
+        .send(nullCreatorSubmission)
+        .expect(400);
+    });
+
+    it('returns 400 if the submission in the request does not have a creator', async () => {
+      const { createRequestSubmission } = await createSurvey(['string']);
+      const requestSubmission = createRequestSubmission({
+        _id: ObjectId().toString(),
+        meta: createRequestSubmissionMeta({
+          isDraft: true,
+        }),
+      });
+      delete requestSubmission.meta.creator;
+
+      return request(app)
+        .post('/api/submissions/sync-draft')
+        .set('Authorization', authHeaderValue)
+        .send(requestSubmission)
+        .expect(400);
+    });
+
     describe('when the draft being synced is not in the database yet', () => {
       it('returns 401 if the requesting user is not the owner of the submission in the request', async () => {
         const { createRequestSubmission } = await createSurvey(['string']);

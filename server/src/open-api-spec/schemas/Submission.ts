@@ -76,9 +76,14 @@ const DraftSubmission: OpenAPIV3.SchemaObject = {
     ...Submission.properties,
     meta: {
       ...Submission.properties?.meta,
+      required: [
+        ...((Submission.properties?.meta as OpenAPIV3.SchemaObject).required as string[]),
+        'creator',
+      ],
       properties: {
         ...(Submission.properties?.meta as OpenAPIV3.SchemaObject)?.properties,
         isDraft: { type: 'boolean', enum: [true] },
+        creator: { type: 'string', nullable: false },
       },
     },
   },
