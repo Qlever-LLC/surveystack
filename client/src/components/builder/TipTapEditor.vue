@@ -114,19 +114,8 @@
       </div>
     </a-card-title>
     <a-card-text class="pa-0">
-      <!-- v-slot="{ commands, isActive, getMarkAttrs, menu }" -->
-      <!-- class="menububble" @hide="hideLinkMenu" -->
-      <bubble-menu :editor="editor" v-if="editor" :tippy-options="{ duration: 100 }">
-        <a-btn @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
-          bold
-        </a-btn>
-        <a-btn @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
-          italic
-        </a-btn>
-        <a-btn @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
-          strike
-        </a-btn>
-        <!-- <div class="menububble" :class="{ 'is-active': editor.isActive('link') }">
+      <bubble-menu :editor="editor" v-if="editor" :tippy-options="{ duration: 100 }" @hide="hideLinkMenu">
+        <div :class="{ 'is-active': editor.isActive('link') }">
           <a-card class="pa-0">
             <a-card-text class="pa-0">
               <form class="menububble__form" v-if="linkMenuIsActive" @submit.prevent="setLinkUrl(linkUrl)">
@@ -140,7 +129,7 @@
                 <a-btn small class="menububble__button" @click="setLinkUrl(linkUrl)" icon>
                   <a-icon>mdi-check</a-icon>
                 </a-btn>
-                <a-btn small class="menububble__button mr-1" @click="setLinkUrl(null)" icon>
+                <a-btn small class="menububble__button mr-1" @click="unsetLinkUrl()" icon>
                   <a-icon>mdi-close</a-icon>
                 </a-btn>
               </form>
@@ -157,7 +146,7 @@
               </template>
             </a-card-text>
           </a-card>
-        </div> -->
+        </div>
       </bubble-menu>
       <editor-content :editable="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%" />
     </a-card-text>
@@ -169,6 +158,7 @@ import { Editor, EditorContent, BubbleMenu } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 
+// TODO see if CustomLink is still needed or if tiptap's Link is suitable
 // import CustomLink from '@/utils/TipTapCustomLink';
 import Link from '@tiptap/extension-link';
 
@@ -194,10 +184,14 @@ export default {
         StarterKit,
         Underline,
         // CustomLink,
-        Link.configure({ openOnClick: true }),
+        Link.configure({
+          HTMLAttributes: {
+            rel: 'noopener noreferrer nofollow',
+            target: '__blank',
+          },
+        }),
       ],
-      content: 'I amm running Tiptap with Vue.js',
-      // content: this.modelValue,
+      content: this.modelValue,
       onUpdate: ({ editor }) => {
         this.emitAfterOnUpdate = true;
         this.$emit('update:modelValue', editor.getHTML());
@@ -239,8 +233,11 @@ export default {
       this.linkMenuIsActive = false;
     },
     setLinkUrl(url) {
-      // command.setLink({ href: url });
-      this.editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+      this.editor.commands.setLink({ href: url });
+      this.hideLinkMenu();
+    },
+    unsetLinkUrl() {
+      this.editor.commands.unsetLink();
       this.hideLinkMenu();
     },
   },
@@ -249,7 +246,6 @@ export default {
 
 <style scoped lang="scss">
 .tiptap-editor :deep(.ProseMirror) {
-  /* background-color: blue; */
   width: 100%;
   height: 100%;
   min-height: 120px;
@@ -275,27 +271,6 @@ export default {
   --color-white: #eee;
 }
 
-.menububble {
-  position: absolute;
-  display: flex;
-  z-index: 20;
-  background: var(--color-black);
-  border-radius: 5px;
-  padding: 0.3rem;
-  margin-bottom: 0.5rem;
-  transform: translateX(-50%);
-  visibility: hidden;
-  opacity: 0;
-  transition:
-    opacity 0.2s,
-    visibility 0.2s;
-}
-
-.menububble.is-active {
-  opacity: 1;
-  visibility: visible;
-}
-
 .menububble__button {
   display: inline-flex;
   background: transparent;
@@ -305,6 +280,7 @@ export default {
   margin-right: 0.2rem;
   border-radius: 3px;
   cursor: pointer;
+  width: auto;
 }
 
 .menububble__button:last-child {
@@ -322,6 +298,7 @@ export default {
 .menububble__form {
   display: flex;
   align-items: center;
+  width: 15em;
 }
 
 .menububble__input {
