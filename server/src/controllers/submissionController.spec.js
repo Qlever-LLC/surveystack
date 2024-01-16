@@ -42,6 +42,14 @@ const {
 } = submissionController;
 
 describe('submissionController', () => {
+  const handleApiComposeHappyPathImplementation = (submissionEntities) => ({
+    results: {
+      farmos: [],
+      hylo: [],
+    },
+    entities: submissionEntities,
+  });
+
   describe('syncDraft', () => {
     const app = createApp();
     const token = '1234';
@@ -288,13 +296,7 @@ describe('submissionController', () => {
               ],
             }),
           });
-          handleApiCompose.mockResolvedValueOnce({
-            results: {
-              farmos: [],
-              hylo: [],
-            },
-            entities: [],
-          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
           await request(app)
             .post('/api/submissions/sync-draft')
@@ -324,13 +326,7 @@ describe('submissionController', () => {
               ],
             }),
           });
-          handleApiCompose.mockResolvedValueOnce({
-            results: {
-              farmos: [],
-              hylo: [],
-            },
-            entities: [],
-          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
           await request(app)
             .post('/api/submissions/sync-draft')
@@ -359,13 +355,7 @@ describe('submissionController', () => {
               ],
             }),
           });
-          handleApiCompose.mockResolvedValueOnce({
-            results: {
-              farmos: [],
-              hylo: [],
-            },
-            entities: [],
-          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
           await request(app)
             .post('/api/submissions/sync-draft')
@@ -403,13 +393,7 @@ describe('submissionController', () => {
               ],
             }),
           });
-          handleApiCompose.mockResolvedValueOnce({
-            results: {
-              farmos: [],
-              hylo: [],
-            },
-            entities: [],
-          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
           await request(app)
             .post('/api/submissions/sync-draft')
@@ -589,6 +573,7 @@ describe('submissionController', () => {
                     ],
                   }),
                 });
+                handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
                 await request(app)
                   .post('/api/submissions/sync-draft')
@@ -874,13 +859,7 @@ describe('submissionController', () => {
                   ],
                 }),
               });
-              handleApiCompose.mockResolvedValueOnce({
-                results: {
-                  farmos: [],
-                  hylo: [],
-                },
-                entities: [],
-              });
+              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
               await request(app)
                 .post('/api/submissions/sync-draft')
@@ -912,13 +891,7 @@ describe('submissionController', () => {
                   ],
                 }),
               });
-              handleApiCompose.mockResolvedValueOnce({
-                results: {
-                  farmos: [],
-                  hylo: [],
-                },
-                entities: [],
-              });
+              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
               await request(app)
                 .post('/api/submissions/sync-draft')
@@ -950,13 +923,7 @@ describe('submissionController', () => {
                   ],
                 }),
               });
-              handleApiCompose.mockResolvedValueOnce({
-                results: {
-                  farmos: [],
-                  hylo: [],
-                },
-                entities: [],
-              });
+              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
               await request(app)
                 .post('/api/submissions/sync-draft')

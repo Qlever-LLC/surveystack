@@ -70,7 +70,7 @@ const isRequestSubmissionLatest = (
   getLatestSubmissionTimestamp(databaseSubmission);
 
 const syncDraft = async (req: Request, res: Response) => {
-  const submission: Submission = await sanitize(req.body);
+  let submission: Submission = await sanitize(req.body);
 
   const existingSubmission = await db.collection('submissions').findOne({ _id: submission._id });
 
@@ -124,8 +124,12 @@ const syncDraft = async (req: Request, res: Response) => {
       return res.status(200).send();
     }
 
+    let survey;
     try {
-      await handleApiCompose();
+      survey = await db.collection('surveys').findOne({ _id: submission.meta.survey.id });
+      ({
+        entities: [{ entity: submission }],
+      } = await handleApiCompose([{ entity: submission, survey }], res.locals.auth.user));
     } catch (error) {
       submission.meta.status = [
         ...submission.meta.status.filter((status) => status.type !== 'READY_TO_SUBMIT'),
@@ -141,7 +145,6 @@ const syncDraft = async (req: Request, res: Response) => {
     }
 
     // prepare qsl submissions
-    const survey = await db.collection('surveys').findOne({ _id: submission.meta.survey.id });
     const submissionsToQSLs = await createSubmissionsToQSLs([{ entity: submission, survey }]);
 
     // prepare draft to be submitted
