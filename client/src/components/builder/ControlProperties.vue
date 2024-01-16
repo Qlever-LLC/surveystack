@@ -202,7 +202,7 @@
       <date
         v-if="isDate && controlInProgress.options.subtype"
         v-model="controlInProgress.defaultValue"
-        @update:modelValue="() => $forceUpdate()"
+        @update:modelValue="$forceUpdate()"
         @blur="handleDefaultValueTrim"
         :type="controlInProgress.options.subtype"
         class="mt-3" />

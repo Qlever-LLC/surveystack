@@ -177,14 +177,9 @@
           @click:clear="setToNull" />
       </template>
       <a-date-picker
-        :value="value"
+        :modelValue="value"
         ref="datepickerRef"
-        @input="
-          (v) => {
-            onDateInput(v);
-            menus[`${index}_${header.value}`] = false;
-          }
-        "
+        @update:modelValue="onDateInput($event, index, header)"
         no-title />
     </a-menu>
   </div>
@@ -297,16 +292,17 @@ export default {
       this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
       this.$emit('changed');
     },
-    onDateInput(value) {
+    onDateInput(value, index, header) {
       const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
       let date = new Date(value);
 
-      if (!isValidFormat || !isValid(date)) {
-        return;
+      if (isValidFormat && isValid(date)) {
+        // remove 'Z'
+        this.value = date.toISOString().slice(0, -1);
+        this.$emit('changed');
       }
-      // remove 'Z'
-      this.value = date.toISOString().slice(0, -1);
-      this.$emit('changed');
+
+      this.menus[`${index}_${header.value}`] = false;
     },
     onFarmOsInput(value) {
       if (!this.value || this.value.name !== value) {

@@ -2,23 +2,20 @@
   <a-select
     v-if="type === 'date-year'"
     label="Default value"
-    v-model="year"
-    :modelValue="getYear"
+    :modelValue="modelValue ? Number(modelValue.substring(0, 4)) : null"
     @update:modelValue="setYear"
     :items="years"
     :menu-props="{ offsetY: true }"
     :dense="dense"
     clearable
-    hide-details
-  />
+    hide-details />
   <a-menu
     v-else
     v-model="menuIsOpen"
     :close-on-content-click="false"
     transition="scale-transition"
     location="bottom"
-    min-width="auto"
-  >
+    min-width="auto">
     <template v-slot:activator="{ props }">
       <a-text-field
         v-bind="props"
@@ -30,23 +27,19 @@
         :dense="dense"
         readonly
         clearable
-        hide-details
-      />
+        hide-details />
     </template>
     <a-date-picker
-      v-model="date"
-      @input="menuIsOpen = false"
+      :modelValue="new Date(date)"
+      @update:modelValue="updateDatePicker"
       :type="type === 'date-month-year' ? 'month' : 'date'"
       :range="type === 'date-week-month-year'"
       show-adjacent-months
-      no-title
-      scrollable
-    />
+      no-title />
   </a-menu>
 </template>
 
 <script>
-import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
@@ -56,9 +49,10 @@ import endOfWeek from 'date-fns/endOfWeek';
 import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';
 import getWeekOfMonth from 'date-fns/getWeekOfMonth';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 export default {
-  emits: ['blur', 'input'],
+  emits: ['blur', 'input', 'update:modelValue'],
   props: {
     modelValue: { type: String },
     type: { type: String },
@@ -67,13 +61,12 @@ export default {
 
   data() {
     return {
-      value: this.modelValue,
       menuIsOpen: false,
     };
   },
   computed: {
     dateValue() {
-      const parsedDate = parseISO(this.value);
+      const parsedDate = parseISO(this.modelValue);
       return isValid(parsedDate) ? parsedDate : new Date();
     },
     formatter() {
@@ -130,7 +123,7 @@ export default {
       return years;
     },
     formattedDate() {
-      if (!isValid(parseISO(this.value))) {
+      if (!isValid(parseISO(this.modelValue))) {
         return '';
       } else if (this.type === 'date') {
         return format(this.dateValue, 'yyyy-MM-dd');
@@ -145,12 +138,18 @@ export default {
     },
   },
   methods: {
-    getYear() {
-      return this.value ? Number(this.value.substring(0, 4)) : null;
+    updateDatePicker(date) {
+      if (date === null) {
+        this.$emit('update:modelValue', null);
+      } else {
+        this.menuIsOpen = false;
+        const utcDateStr = zonedTimeToUtc(date).toISOString();
+        this.$emit('update:modelValue', utcDateStr);
+      }
     },
     setYear(year) {
       if (typeof year === 'number') {
-        this.$emit('update:modelValue', new Date(year, 1, 0).toISOString());
+        this.$emit('update:modelValue', new Date(Date.UTC(year, 0, 1)).toISOString());
       } else {
         this.$emit('update:modelValue', null);
       }

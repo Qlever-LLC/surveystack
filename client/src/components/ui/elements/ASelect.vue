@@ -41,6 +41,7 @@
     :return-object="returnObject"
     :rounded="rounded"
     :rules="rules"
+    :type="type"
     :single-line="singleLine">
     <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
       <slot name="selection" :props="props" :item="item" :index="index" />
@@ -97,7 +98,8 @@
     :multiple="multiple"
     :variant="variant"
     :placeholder="placeholder"
-    :return-object="returnObject">
+    :return-object="returnObject"
+    :type="type">
     <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
       <slot name="selection" :props="props" :item="item" :index="index" />
     </template>
@@ -123,7 +125,7 @@
 
 <script>
 export default {
-  emits: ['blur', 'click:append', 'focus', 'update:search'],
+  emits: ['blur', 'click:append', 'focus', 'update:modelValue', 'update:search'],
   props: {
     //Don't use v-select because its just autocomplete without text input, we could always offer text input and remove v-select here
     //combobox is just autocomplete with manual input of a not-yet-existing item
@@ -177,6 +179,7 @@ export default {
     rounded: { type: [String, Number, Boolean], required: false },
     rules: { type: Array, required: false },
     singleLine: { type: Boolean, required: false },
+    type: { type: String, required: false }, //sets input type, default 'text', alternatives may be 'number', 'date', ...
     variant: {
       type: String,
       validator: function (value) {
