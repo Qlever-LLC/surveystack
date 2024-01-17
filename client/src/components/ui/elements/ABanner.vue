@@ -1,5 +1,5 @@
 <template>
-  <v-banner :color="color" :dark="dark" :rounded="rounded">
+  <v-banner :bg-color="bgColor" :rounded="rounded">
     <slot />
   </v-banner>
 </template>
@@ -8,8 +8,7 @@
 export default {
   props: {
     //vuetify props
-    color: { type: String, required: false },
-    dark: { type: Boolean, required: false },
+    bgColor: { type: String, required: false },
     rounded: { type: [Boolean, String], required: false },
   },
 };

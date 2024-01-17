@@ -80,8 +80,8 @@
         {{ getLabelForItemValue(item.value) }}
       </template>
     </a-select>
-    <a-banner v-else-if="isLoading"> <a-icon class="mr-2 mdi-spin">mdi-loading</a-icon>Loading !</a-banner>
-    <a-banner v-else color="red-lighten-2" dark>
+    <a-banner v-else-if="isLoading"> <a-icon class="mr-2 mdi-spin">mdi-loading</a-icon>Loading</a-banner>
+    <a-banner v-else bgColor="red-lighten-2">
       <a-icon class="mr-2">mdi-alert</a-icon>Invalid select options, please update Survey Definition
     </a-banner>
     <app-control-more-info :value="control.moreInfo" />

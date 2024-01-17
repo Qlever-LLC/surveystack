@@ -1,6 +1,6 @@
 <template>
   <a-container class="wrapper">
-    <a-banner class="my-2" v-if="errors" color="red" dark rounded>
+    <a-banner class="my-2" v-if="errors" bgColor="red" rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in errors" :key="i">
         <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
