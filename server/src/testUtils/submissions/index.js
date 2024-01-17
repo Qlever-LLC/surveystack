@@ -2,33 +2,62 @@ import getSubmissionDataGenerator from './dataGenerators';
 const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../../db');
 
-const createSubmissionMeta = () => (survey) => {
-  const now = new Date();
-  return {
-    dateCreated: now,
-    dateModified: now,
-    dateSubmitted: now,
-    survey: {
-      id: survey._id,
-      name: survey.name,
-      version: 2,
-    },
-    revision: 1,
-    permissions: [],
-    status: [
-      {
-        type: 'READY_TO_SUBMIT',
-        value: { at: now },
+const createSubmissionMeta =
+  ({ isDraft = false, creator = new ObjectId(), dateModified = new Date() } = {}) =>
+  (survey) => {
+    return {
+      isDraft,
+      dateCreated: new Date(),
+      dateModified,
+      dateSubmitted: new Date(),
+      survey: {
+        id: survey._id,
+        name: survey.name,
+        version: 2,
       },
-    ],
-    group: survey.meta.group,
-    specVersion: 4,
-    creator: new ObjectId(),
-    permanentResults: [],
+      revision: 1,
+      permissions: [],
+      status: [],
+      group: survey.meta.group,
+      specVersion: 4,
+      creator,
+      permanentResults: [],
+    };
   };
-};
 
-const createSubmissionData = (survey) => {
+const createRequestSubmissionMeta =
+  ({
+    isDraft = false,
+    creator = new ObjectId().toString(),
+    dateModified = new Date().toISOString(),
+    dateSubmitted = null,
+    status = [],
+  } = {}) =>
+  (survey) => {
+    return {
+      isDraft,
+      dateCreated: new Date().toISOString(),
+      dateModified,
+      dateSubmitted,
+      survey: {
+        id: survey._id.toString(),
+        name: survey.name,
+        version: 2,
+      },
+      revision: 1,
+      permissions: [],
+      status,
+      group: {
+        id: survey.meta.group.id.toString(),
+        path: survey.meta.group.path,
+      },
+      specVersion: 4,
+      creator,
+      permanentResults: [],
+    };
+  };
+
+const createSubmissionData = (survey, inRequestFormat = false) => {
   let data = {};
 
   const controls = survey.revisions
@@ -38,12 +67,24 @@ const createSubmissionData = (survey) => {
   controls.forEach((ctrl, index) => {
     const dataGenerator = getSubmissionDataGenerator(ctrl);
     if (typeof dataGenerator === 'function') {
-      data = { ...data, ...dataGenerator({}, index + 1) };
+      data = { ...data, ...dataGenerator({}, index + 1, inRequestFormat) };
     }
   });
 
   return data;
 };
+
+const createRequestSubmissionFor =
+  (survey) =>
+  ({
+    _id,
+    data = createSubmissionData(survey, true),
+    meta = createRequestSubmissionMeta(),
+  } = {}) => ({
+    ...(_id ? { _id } : {}),
+    meta: meta(survey),
+    data,
+  });
 
 const createSubmissionDocFor =
   (survey) =>
@@ -66,8 +107,10 @@ const createSubmissionWith =
   };
 
 export {
+  createRequestSubmissionMeta,
   createSubmissionMeta,
   createSubmissionData,
+  createRequestSubmissionFor,
   createSubmissionDocFor,
   createSubmissionWith,
   getSubmissionDataGenerator,
