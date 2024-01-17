@@ -27,7 +27,7 @@
     </app-dialog>
 
     <div class="d-flex justify-space-between align-center">
-      <a-breadcrumbs :path="entity.path" />
+      <a-breadcrumbs :path="entity.path" enableAll />
     </div>
 
     <div class="d-flex justify-space-between">

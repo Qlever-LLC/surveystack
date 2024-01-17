@@ -1,9 +1,9 @@
 <template>
-  <v-simple-table :fixed-header="fixedHeader" :dense="dense" :height="height">
+  <v-table :fixed-header="fixedHeader" :density="dense ? 'compact' : 'default'" :height="height">
     <template v-slot:default>
       <slot name="default" />
     </template>
-  </v-simple-table>
+  </v-table>
 </template>
 
 <script>

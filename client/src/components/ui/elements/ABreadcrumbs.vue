@@ -17,6 +17,10 @@ export default {
       type: String,
       default: null,
     },
+    enableAll: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     links() {
@@ -34,23 +38,25 @@ export default {
 
       links.reverse();
 
-      // create text
+      // create title
       links.forEach((link) => {
         /* eslint-disable no-param-reassign */
-        link.text = link.to.split('/').pop() || '/';
+        link.title = link.to.split('/').pop() || '/';
         link.exact = true;
+        if (this.enableAll) {
+          link.disabled = false;
+        }
       });
 
       links[0] = {
         to: '/groups',
         exact: true,
-        text: 'groups',
+        title: 'groups',
       };
 
       if (this.disabledSuffix) {
-        links.push({ disabled: true, exact: true, text: this.disabledSuffix });
+        links.push({ disabled: true, exact: true, title: this.disabledSuffix });
       }
-
       return links;
     },
   },
