@@ -1,5 +1,5 @@
 <template>
-  <a-sheet outlined class="pa-8">
+  <a-sheet :border="true" class="pa-8">
     <div class="text-h1">
       KML Importer
       <a-icon color="primary"

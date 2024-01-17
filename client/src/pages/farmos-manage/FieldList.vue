@@ -1,5 +1,5 @@
 <template>
-  <a-sheet outlined>
+  <a-sheet :border="true">
     <a-list subheader>
       <a-list-subheader>Fields added to Farmos Instance</a-list-subheader>
 
