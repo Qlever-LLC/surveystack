@@ -28,7 +28,7 @@ export default {
     noTitle: { type: Boolean, required: false },
     range: { type: Boolean, required: false }, //TODO IN DEVELOPMENT https://github.com/vuetifyjs/vuetify/issues/18701
     showAdjacentMonths: { type: Boolean, required: false },
-    type: { type: String, default: 'date' }, //TODO https://github.com/vuetifyjs/vuetify/issues/17950
+    type: { type: String, default: 'date' }, //TODO not implemented in V3, see https://github.com/vuetifyjs/vuetify/issues/17950
     modelValue: { type: undefined, required: false },
   },
   methods: {
