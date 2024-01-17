@@ -139,7 +139,7 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
   throw boom.unauthorized(`No entity rights on: ${entity.id}`);
 });
 
-const hasSubmissionRights = async (submission, res) => {
+export const hasSubmissionRights = async (submission, res) => {
   const survey = await db
     .collection('surveys')
     .findOne({ _id: new ObjectId(submission.meta.survey.id) });

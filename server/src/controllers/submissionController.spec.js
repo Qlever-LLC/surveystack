@@ -1,16 +1,37 @@
+import request from 'supertest';
 import submissionController, { buildPipeline } from './submissionController';
 import {
   createReq,
   createRes,
   createSurvey,
   createUser,
+  createGroup,
   getControlGenerator,
   getSubmissionDataGenerator,
+  createRequestSubmissionMeta,
+  createSubmissionMeta,
 } from '../testUtils';
 import mailService from '../services/mail/mail.service';
+import createApp from '../app.js';
+import { db } from '../db';
+import handleApiCompose from './utils/handleApiCompose';
+import boom from '@hapi/boom';
+
+jest.mock('./utils/handleApiCompose');
+jest.mock('../services/mail/mail.service');
+jest.mock('../db/helpers.ts');
+jest.mock('../services/featureToggle.service.js');
+
 const { ObjectId } = jest.requireActual('mongodb');
 
-jest.mock('../services/mail/mail.service');
+import { withSession, withTransaction } from '../db/helpers.ts';
+const { withSession: actualWithSession, withTransaction: actualWithTransaction } =
+  jest.requireActual('../db/helpers.ts');
+// by default, for each test, setup withSession and withTransaction to behave as normal (that is, use their actual implementation), but also set them up as mocks so their functionality can be overridden in individual tests, spyed on, etc.
+beforeEach(() => {
+  withSession.mockImplementation(actualWithSession);
+  withTransaction.mockImplementation(actualWithTransaction);
+});
 
 const {
   getSubmissionsCsv,
@@ -20,53 +41,997 @@ const {
   sendPdfLink,
 } = submissionController;
 
-async function mockControlsAndSubmission() {
-  const { survey, createSubmission } = await createSurvey(['string', 'number']);
-  const { submission: _submission } = await createSubmission();
-
-  const controls = survey.revisions[survey.latestVersion - 1].controls;
-  const libraryId = new ObjectId();
-  const libraryVersion = 3;
-  const groupOverride = {
-    children: [
-      getControlGenerator('string')({ libraryId, libraryVersion, libraryIsInherited: true }),
-    ],
-    isLibraryRoot: true,
-    libraryId,
-    libraryVersion,
-  };
-  controls.push(
-    getControlGenerator('page')({
-      children: [getControlGenerator('group')(groupOverride)],
-    }),
-    getControlGenerator('group')(
-      {
-        ...groupOverride,
-        options: { ...getControlGenerator('string')().options, redacted: true },
-      },
-      2
-    ),
-    getControlGenerator('group')(groupOverride, 3)
-  );
-
-  const submission = {
-    ..._submission,
-    data: {
-      ..._submission.data,
-      ...getSubmissionDataGenerator('page')(
-        getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')())
-      ),
-      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 2),
-      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 3),
-    },
-  };
-
-  submission.data.group_3.text_1.meta.permissions = ['admin'];
-
-  return { controls, submission };
-}
-
 describe('submissionController', () => {
+  const handleApiComposeHappyPathImplementation = (submissionEntities) => ({
+    results: {
+      farmos: [],
+      hylo: [],
+    },
+    entities: submissionEntities,
+  });
+
+  describe('syncDraft', () => {
+    const app = createApp();
+    const token = '1234';
+    let authHeaderValue;
+    let group;
+    let user;
+    beforeEach(async () => {
+      group = await createGroup();
+      ({ user } = await group.createUserMember({
+        userOverrides: { token },
+      }));
+      authHeaderValue = `${user.email} ${token}`;
+    });
+
+    it('returns 401 if the request is not authenticated', async () => {
+      const { createRequestSubmission } = await createSurvey(['string']);
+      const draftSubmission = createRequestSubmission({
+        _id: ObjectId().toString(),
+        meta: createRequestSubmissionMeta({ isDraft: true }),
+      });
+
+      return request(app).post('/api/submissions/sync-draft').send(draftSubmission).expect(401);
+    });
+
+    it('returns 400 if the submission in the request is not a draft', async () => {
+      const { createRequestSubmission } = await createSurvey(['string']);
+      const nonDraftSubmission = createRequestSubmission({
+        _id: ObjectId().toString(),
+        meta: createRequestSubmissionMeta({ isDraft: false, creator: user._id.toString() }),
+      });
+
+      return request(app)
+        .post('/api/submissions/sync-draft')
+        .set('Authorization', authHeaderValue)
+        .send(nonDraftSubmission)
+        .expect(400);
+    });
+
+    it('returns 400 if the submission in the request has a null creator', async () => {
+      const { createRequestSubmission } = await createSurvey(['string']);
+      const nullCreatorSubmission = createRequestSubmission({
+        _id: ObjectId().toString(),
+        meta: createRequestSubmissionMeta({
+          isDraft: true,
+          creator: null,
+        }),
+      });
+
+      return request(app)
+        .post('/api/submissions/sync-draft')
+        .set('Authorization', authHeaderValue)
+        .send(nullCreatorSubmission)
+        .expect(400);
+    });
+
+    it('returns 400 if the submission in the request does not have a creator', async () => {
+      const { createRequestSubmission } = await createSurvey(['string']);
+      const requestSubmission = createRequestSubmission({
+        _id: ObjectId().toString(),
+        meta: createRequestSubmissionMeta({
+          isDraft: true,
+        }),
+      });
+      delete requestSubmission.meta.creator;
+
+      return request(app)
+        .post('/api/submissions/sync-draft')
+        .set('Authorization', authHeaderValue)
+        .send(requestSubmission)
+        .expect(400);
+    });
+
+    describe('when the draft being synced is not in the database yet', () => {
+      it('returns 401 if the requesting user is not the owner of the submission in the request', async () => {
+        const { createRequestSubmission } = await createSurvey(['string']);
+        const submissionNotOwnedByRequestingUser = createRequestSubmission({
+          _id: ObjectId().toString(),
+          meta: createRequestSubmissionMeta({ isDraft: true }),
+        });
+
+        return request(app)
+          .post('/api/submissions/sync-draft')
+          .set('Authorization', authHeaderValue)
+          .send(submissionNotOwnedByRequestingUser)
+          .expect(401);
+      });
+
+      describe('when the draft in the request has no meta.status', () => {
+        it('returns 200 and puts the draft in the database', async () => {
+          const { createRequestSubmission } = await createSurvey(['string']);
+          const draftSubmission = createRequestSubmission({
+            _id: ObjectId().toString(),
+            meta: createRequestSubmissionMeta({ isDraft: true, creator: user._id.toString() }),
+          });
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(draftSubmission)
+            .expect(200);
+
+          const submission = await db
+            .collection('submissions')
+            .findOne({ _id: ObjectId(draftSubmission._id) });
+          expect(submission).not.toBeNull();
+        });
+      });
+
+      describe('when the draft in the request has meta.status READY_TO_SUBMIT', () => {
+        it("when survey doesn't exist, updates the submission, sets UNAUTHORIZED_TO_SUBMIT status, removes READY_TO_SUBMIT status, keeps isDraft true, and returns 200", async () => {
+          const submissionId = ObjectId();
+          const { createRequestSubmission, survey } = await createSurvey(['string']);
+          await db.collection('surveys').deleteOne({ _id: survey._id });
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-02').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+          expect(submission.meta.dateModified.toISOString()).toEqual(
+            requestSubmission.meta.dateModified
+          );
+          expect(submission.meta.status).not.toContainEqual(
+            expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+          );
+          expect(submission.meta.status).toContainEqual(
+            expect.objectContaining({ type: 'UNAUTHORIZED_TO_SUBMIT' })
+          );
+          expect(submission.meta.isDraft).toBe(true);
+        });
+
+        it('when survey.meta.submissions is "group" and requesting user is not a member of the group, inserts the submissions in the db, sets UNAUTHORIZED_TO_SUBMIT status, keeps isDraft true, and returns 200', async () => {
+          const submissionId = ObjectId();
+          const { createRequestSubmission, survey } = await createSurvey(['string']);
+          await db
+            .collection('surveys')
+            .updateOne({ _id: survey._id }, { $set: { 'meta.submissions': 'group' } });
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-02').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+          expect(submission.meta.dateModified.toISOString()).toEqual(
+            requestSubmission.meta.dateModified
+          );
+          expect(submission.meta.status).not.toContainEqual(
+            expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+          );
+          expect(submission.meta.status).toContainEqual(
+            expect.objectContaining({ type: 'UNAUTHORIZED_TO_SUBMIT' })
+          );
+          expect(submission.meta.isDraft).toBe(true);
+        });
+
+        it('when handleApiCompose fails, it sets FAILED_TO_SUBMIT status, keeps isDraft true, inserts the submission in the database, and returns 200', async () => {
+          const submissionId = ObjectId();
+          const { createRequestSubmission } = await createSurvey(['string']);
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-02').toISOString() },
+                },
+              ],
+            }),
+          });
+          handleApiCompose.mockRejectedValueOnce({});
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+          expect(submission.meta.dateModified.toISOString()).toEqual(
+            requestSubmission.meta.dateModified
+          );
+          expect(submission.meta.status).not.toContainEqual(
+            expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+          );
+          expect(submission.meta.status).toContainEqual(
+            expect.objectContaining({ type: 'FAILED_TO_SUBMIT' })
+          );
+          expect(submission.meta.isDraft).toBe(true);
+        });
+
+        it('when the mongodb transaction is aborted, returns 500 and does not update the database', async () => {
+          withTransaction.mockResolvedValueOnce(undefined);
+          const submissionId = ObjectId();
+          const { createRequestSubmission } = await createSurvey(['string']);
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-02').toISOString() },
+                },
+              ],
+            }),
+          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(500);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('when the mongodb transaction throws an error, returns 500 and does not update the database', async () => {
+          withTransaction.mockRejectedValueOnce(boom.internal());
+          const submissionId = ObjectId();
+          const { createRequestSubmission } = await createSurvey(['string']);
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-02').toISOString() },
+                },
+              ],
+            }),
+          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(500);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('runs handleApiCompose, inserts the request submission into the db, removing READY_TO_SUBMIT and setting isDraft to false, and returns 200 when authorized', async () => {
+          const submissionId = ObjectId();
+          const { createRequestSubmission } = await createSurvey(['string']);
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-02').toISOString() },
+                },
+              ],
+            }),
+          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+          expect(submission.meta.dateModified.toISOString()).toEqual(
+            requestSubmission.meta.dateModified
+          );
+          expect(submission.meta.status).not.toContainEqual(
+            expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+          );
+          expect(submission.meta.isDraft).toBe(false);
+        });
+      });
+
+      describe('when the draft in the request has meta.status READY_TO_DELETE', () => {
+        it('returns 200, and saves nothing to the database', async () => {
+          const submissionId = ObjectId();
+          const { createRequestSubmission } = await createSurvey(['string']);
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              status: [
+                {
+                  type: 'READY_TO_DELETE',
+                  value: { at: new Date('2021-01-02').toISOString() },
+                },
+              ],
+            }),
+          });
+          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+      });
+    });
+
+    describe('when a version of the draft being synced is already in the database (the submission in the request shares an id with a submission in the database)', () => {
+      it('returns 401 when the requesting user is not the owner of the submission in the database', async () => {
+        const submissionId = new ObjectId();
+        const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
+        await createSubmission({
+          _id: submissionId,
+          meta: createSubmissionMeta({ isDraft: true, creator: new ObjectId() }),
+        });
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({ isDraft: true, creator: user._id.toString() }),
+        });
+
+        return request(app)
+          .post('/api/submissions/sync-draft')
+          .set('Authorization', authHeaderValue)
+          .send(requestSubmission)
+          .expect(401);
+      });
+
+      it('returns 401 when the requesting user is not the owner of the submission in the request', async () => {
+        const submissionId = new ObjectId();
+        const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
+        await createSubmission({
+          _id: submissionId,
+          meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+        });
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({ isDraft: true, creator: new ObjectId().toString() }),
+        });
+
+        return request(app)
+          .post('/api/submissions/sync-draft')
+          .set('Authorization', authHeaderValue)
+          .send(requestSubmission)
+          .expect(401);
+      });
+
+      describe('when the database copy is not a draft (already submitted)', () => {
+        it('returns 200 and discards the draft in the request, even if it is newer and has meta.status READY_TO_SUBMIT', async () => {
+          const submissionId = new ObjectId();
+          const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
+          const { submission: databaseSubmission } = await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              isDraft: false,
+              creator: user._id,
+              dateModified: new Date('2021-01-01'),
+            }),
+          });
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              status: [{ type: 'READY_TO_SUBMIT', value: { at: new Date().toISOString() } }],
+              dateModified: new Date('2021-01-02').toISOString(),
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions/sync-draft')
+            .set('Authorization', authHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+          expect(submission.meta.isDraft).toBe(false);
+          expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
+        });
+      });
+
+      describe('when the database copy is a draft', () => {
+        const setupDraftInDatabase = async (dateModified) => {
+          const submissionId = new ObjectId();
+          const { createRequestSubmission, createSubmission, survey } = await createSurvey([
+            'string',
+          ]);
+          const { submission: databaseSubmission } = await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({ isDraft: true, creator: user._id, dateModified }),
+          });
+
+          return {
+            survey,
+            submissionId,
+            createRequestSubmission,
+            databaseSubmission,
+          };
+        };
+        describe('when the submission in the request has more recent changes than the submission in the database', () => {
+          describe('when the database copy has isDeletedDraft true', () => {
+            describe('when the request submission has no meta.status', () => {
+              it('updates the database (un-deletes) using the request submission and returns 200', async () => {
+                const submissionId = new ObjectId();
+                const dateModified = new Date('2021-01-01');
+                const { createRequestSubmission, createSubmission } = await createSurvey([
+                  'string',
+                ]);
+                await createSubmission({
+                  _id: submissionId,
+                  meta: createSubmissionMeta({
+                    isDraft: true,
+                    isDeletedDraft: true,
+                    creator: user._id,
+                    dateModified: dateModified,
+                  }),
+                });
+                const requestSubmission = createRequestSubmission({
+                  _id: submissionId.toString(),
+                  meta: createRequestSubmissionMeta({
+                    isDraft: true,
+                    creator: user._id.toString(),
+                    dateModified: new Date('2021-01-02').toISOString(),
+                  }),
+                });
+
+                await request(app)
+                  .post('/api/submissions/sync-draft')
+                  .set('Authorization', authHeaderValue)
+                  .send(requestSubmission)
+                  .expect(200);
+
+                const submission = await db
+                  .collection('submissions')
+                  .findOne({ _id: submissionId });
+                expect(submission).not.toBeNull();
+                expect(submission.meta.dateModified.toISOString()).toEqual(
+                  requestSubmission.meta.dateModified
+                );
+                expect(submission.meta.isDeletedDraft).toBe(false);
+              });
+            });
+
+            describe('when the request submission has meta.status READY_TO_SUBMIT', () => {
+              it('updates the database (un-deletes) using the request submission and returns 200', async () => {
+                const submissionId = new ObjectId();
+                const dateModified = new Date('2021-01-01');
+                const { createRequestSubmission, createSubmission } = await createSurvey([
+                  'string',
+                ]);
+                await createSubmission({
+                  _id: submissionId,
+                  meta: createSubmissionMeta({
+                    isDraft: true,
+                    isDeletedDraft: true,
+                    creator: user._id,
+                    dateModified: dateModified,
+                  }),
+                });
+                const requestSubmission = createRequestSubmission({
+                  _id: submissionId.toString(),
+                  meta: createRequestSubmissionMeta({
+                    isDraft: true,
+                    creator: user._id.toString(),
+                    dateModified: new Date('2021-01-02').toISOString(),
+                    status: [
+                      {
+                        type: 'READY_TO_SUBMIT',
+                        value: { at: new Date('2021-01-02').toISOString() },
+                      },
+                    ],
+                  }),
+                });
+                handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+                await request(app)
+                  .post('/api/submissions/sync-draft')
+                  .set('Authorization', authHeaderValue)
+                  .send(requestSubmission)
+                  .expect(200);
+
+                const submission = await db
+                  .collection('submissions')
+                  .findOne({ _id: submissionId });
+                expect(submission).not.toBeNull();
+                expect(submission.meta.dateModified.toISOString()).toEqual(
+                  requestSubmission.meta.dateModified
+                );
+                expect(submission.meta.isDeletedDraft).toBe(false);
+                expect(submission.meta.isDraft).toBe(false);
+                expect(submission.meta.status).not.toContainEqual(
+                  expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+                );
+              });
+            });
+
+            describe('when the request submission has meta.status READY_TO_DELETE', () => {
+              it('updates the database using the request submission and returns 200, leaving the draft deleted but updating dateModified', async () => {
+                const submissionId = new ObjectId();
+                const dateModified = new Date('2021-01-01');
+                const { createRequestSubmission, createSubmission } = await createSurvey([
+                  'string',
+                ]);
+                await createSubmission({
+                  _id: submissionId,
+                  meta: createSubmissionMeta({
+                    isDraft: true,
+                    isDeletedDraft: true,
+                    creator: user._id,
+                    dateModified: dateModified,
+                  }),
+                });
+                const requestSubmission = createRequestSubmission({
+                  _id: submissionId.toString(),
+                  meta: createRequestSubmissionMeta({
+                    isDraft: true,
+                    creator: user._id.toString(),
+                    dateModified: new Date('2021-01-02').toISOString(),
+                    status: [
+                      {
+                        type: 'READY_TO_DELETE',
+                        value: { at: new Date('2021-01-02').toISOString() },
+                      },
+                    ],
+                  }),
+                });
+
+                await request(app)
+                  .post('/api/submissions/sync-draft')
+                  .set('Authorization', authHeaderValue)
+                  .send(requestSubmission)
+                  .expect(200);
+
+                const submission = await db
+                  .collection('submissions')
+                  .findOne({ _id: submissionId });
+                expect(submission).not.toBeNull();
+                expect(submission.meta.dateModified.toISOString()).toEqual(
+                  requestSubmission.meta.dateModified
+                );
+                expect(submission.meta.isDeletedDraft).toBe(true);
+              });
+            });
+          });
+
+          describe('when the request submission has meta.status READY_TO_DELETE', () => {
+            it('returns 200, updates the submission in the database to be "soft deleted", removing READY_TO_DELETE, setting isDeletedDraft to true, and keeping isDraft true,', async () => {
+              const { submissionId, createRequestSubmission } = await setupDraftInDatabase(
+                new Date('2021-01-01')
+              );
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                  status: [
+                    {
+                      type: 'READY_TO_DELETE',
+                      value: { at: new Date('2021-01-02').toISOString() },
+                    },
+                  ],
+                }),
+              });
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(200);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified.toISOString()).toEqual(
+                requestSubmission.meta.dateModified
+              );
+              expect(submission.meta.status).not.toContainEqual(
+                expect.objectContaining({ type: 'READY_TO_DELETE' })
+              );
+              expect(submission.meta.isDraft).toBe(true);
+              expect(submission.meta.isDeletedDraft).toBe(true);
+            });
+          });
+
+          describe('when the request submission has no meta.status', () => {
+            it('updates the database using the request submission and returns 200', async () => {
+              const { submissionId, createRequestSubmission } = await setupDraftInDatabase(
+                new Date('2021-01-01')
+              );
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                }),
+              });
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(200);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified.toISOString()).toEqual(
+                requestSubmission.meta.dateModified
+              );
+            });
+          });
+
+          describe('when the request submission has meta.status READY_TO_SUBMIT', () => {
+            it("when survey doesn't exist, updates the submission, sets UNAUTHORIZED_TO_SUBMIT status, removes READY_TO_SUBMIT status, keeps isDraft true, and returns 200", async () => {
+              const { submissionId, createRequestSubmission, survey } = await setupDraftInDatabase(
+                new Date('2021-01-01')
+              );
+              await db.collection('surveys').deleteOne({ _id: survey._id });
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                  status: [
+                    {
+                      type: 'READY_TO_SUBMIT',
+                      value: { at: new Date('2021-01-02').toISOString() },
+                    },
+                  ],
+                }),
+              });
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(200);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified.toISOString()).toEqual(
+                requestSubmission.meta.dateModified
+              );
+              expect(submission.meta.status).not.toContainEqual(
+                expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+              );
+              expect(submission.meta.status).toContainEqual(
+                expect.objectContaining({ type: 'UNAUTHORIZED_TO_SUBMIT' })
+              );
+              expect(submission.meta.isDraft).toBe(true);
+            });
+
+            it('when survey.meta.submissions is "group" and requesting user is not a member of the group, sets UNAUTHORIZED_TO_SUBMIT status, keeps isDraft true, and returns 200', async () => {
+              const { submissionId, createRequestSubmission, survey } = await setupDraftInDatabase(
+                new Date('2021-01-01')
+              );
+              await db
+                .collection('surveys')
+                .updateOne({ _id: survey._id }, { $set: { 'meta.submissions': 'group' } });
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                  status: [
+                    {
+                      type: 'READY_TO_SUBMIT',
+                      value: { at: new Date('2021-01-02').toISOString() },
+                    },
+                  ],
+                }),
+              });
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(200);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified.toISOString()).toEqual(
+                requestSubmission.meta.dateModified
+              );
+              expect(submission.meta.status).not.toContainEqual(
+                expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+              );
+              expect(submission.meta.status).toContainEqual(
+                expect.objectContaining({ type: 'UNAUTHORIZED_TO_SUBMIT' })
+              );
+              expect(submission.meta.isDraft).toBe(true);
+            });
+
+            it('when handleApiCompose fails, it sets FAILED_TO_SUBMIT status, keeps isDraft true, updates the submission in the database, and returns 200', async () => {
+              const { submissionId, createRequestSubmission } = await setupDraftInDatabase(
+                new Date('2021-01-01')
+              );
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                  status: [
+                    {
+                      type: 'READY_TO_SUBMIT',
+                      value: { at: new Date('2021-01-02').toISOString() },
+                    },
+                  ],
+                }),
+              });
+              handleApiCompose.mockRejectedValueOnce({});
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(200);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified.toISOString()).toEqual(
+                requestSubmission.meta.dateModified
+              );
+              expect(submission.meta.status).not.toContainEqual(
+                expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+              );
+              expect(submission.meta.status).toContainEqual(
+                expect.objectContaining({ type: 'FAILED_TO_SUBMIT' })
+              );
+              expect(submission.meta.isDraft).toBe(true);
+            });
+
+            /* TODO: to implement this test, we need to update the createSurvey and createSubmission test utils
+            to allow us to create a survey with a QSL and a submission with answers to the QSL. */
+            it.todo(
+              'with a survey containing a QSL and a READY_TO_SUBMIT draft containing answers to the QSL, assert that the QSL submissions are saved to the database'
+            );
+
+            it('when the mongodb transaction is aborted, returns 500 and does not update the database', async () => {
+              withTransaction.mockResolvedValueOnce(undefined);
+              const { submissionId, createRequestSubmission, databaseSubmission } =
+                await setupDraftInDatabase(new Date('2021-01-01'));
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                  status: [
+                    {
+                      type: 'READY_TO_SUBMIT',
+                      value: { at: new Date('2021-01-02').toISOString() },
+                    },
+                  ],
+                }),
+              });
+              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(500);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
+              expect(submission.meta.isDraft).toBe(true);
+            });
+
+            it('when the mongodb transaction throws an error, returns 500 and does not update the database', async () => {
+              withTransaction.mockRejectedValueOnce(boom.internal());
+              const { submissionId, createRequestSubmission, databaseSubmission } =
+                await setupDraftInDatabase(new Date('2021-01-01'));
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                  status: [
+                    {
+                      type: 'READY_TO_SUBMIT',
+                      value: { at: new Date('2021-01-02').toISOString() },
+                    },
+                  ],
+                }),
+              });
+              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(500);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
+              expect(submission.meta.isDraft).toBe(true);
+            });
+
+            it('runs handleApiCompose, updates the database using the request submission, removing READY_TO_SUBMIT and setting isDraft to false, and returns 200 when authorized', async () => {
+              const { submissionId, createRequestSubmission } = await setupDraftInDatabase(
+                new Date('2021-01-01')
+              );
+              const requestSubmission = createRequestSubmission({
+                _id: submissionId.toString(),
+                meta: createRequestSubmissionMeta({
+                  isDraft: true,
+                  creator: user._id.toString(),
+                  dateModified: new Date('2021-01-02').toISOString(),
+                  status: [
+                    {
+                      type: 'READY_TO_SUBMIT',
+                      value: { at: new Date('2021-01-02').toISOString() },
+                    },
+                  ],
+                }),
+              });
+              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+              await request(app)
+                .post('/api/submissions/sync-draft')
+                .set('Authorization', authHeaderValue)
+                .send(requestSubmission)
+                .expect(200);
+
+              const submission = await db.collection('submissions').findOne({ _id: submissionId });
+              expect(submission).not.toBeNull();
+              expect(submission.meta.dateModified.toISOString()).toEqual(
+                requestSubmission.meta.dateModified
+              );
+              expect(submission.meta.status).not.toContainEqual(
+                expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+              );
+              expect(submission.meta.isDraft).toBe(false);
+            });
+          });
+        });
+
+        describe('when the submission in the database has more recent changes than the submission in the request (or a tie)', () => {
+          let submissionId;
+          let createRequestSubmission;
+          let databaseSubmission;
+          beforeEach(async () => {
+            ({ submissionId, createRequestSubmission, databaseSubmission } =
+              await setupDraftInDatabase(new Date('2021-01-02')));
+          });
+
+          it('when the request submission has meta.status READY_TO_DELETE, returns 200 and does not update the database', async () => {
+            const requestSubmission = createRequestSubmission({
+              _id: submissionId.toString(),
+              meta: createRequestSubmissionMeta({
+                isDraft: true,
+                creator: user._id.toString(),
+                dateModified: new Date('2021-01-01').toISOString(),
+                status: [
+                  {
+                    type: 'READY_TO_DELETE',
+                    value: { at: new Date('2021-01-01').toISOString() },
+                  },
+                ],
+              }),
+            });
+
+            await request(app)
+              .post('/api/submissions/sync-draft')
+              .set('Authorization', authHeaderValue)
+              .send(requestSubmission)
+              .expect(200);
+
+            const submission = await db.collection('submissions').findOne({ _id: submissionId });
+            expect(submission).not.toBeNull();
+            expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
+          });
+
+          it('when the request submission has meta.status READY_TO_SUBMIT, returns 200 and does not update the database', async () => {
+            const requestSubmission = createRequestSubmission({
+              _id: submissionId.toString(),
+              meta: createRequestSubmissionMeta({
+                isDraft: true,
+                creator: user._id.toString(),
+                dateModified: new Date('2021-01-01').toISOString(),
+                status: [
+                  {
+                    type: 'READY_TO_SUBMIT',
+                    value: { at: new Date('2021-01-01').toISOString() },
+                  },
+                ],
+              }),
+            });
+
+            await request(app)
+              .post('/api/submissions/sync-draft')
+              .set('Authorization', authHeaderValue)
+              .send(requestSubmission)
+              .expect(200);
+
+            const submission = await db.collection('submissions').findOne({ _id: submissionId });
+            expect(submission).not.toBeNull();
+            expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
+          });
+
+          it('when no meta.status is present on the request submission, returns 200 and does not update the database', async () => {
+            const requestSubmission = createRequestSubmission({
+              _id: submissionId.toString(),
+              meta: createRequestSubmissionMeta({
+                isDraft: true,
+                creator: user._id.toString(),
+                dateModified: new Date('2021-01-01').toISOString(),
+              }),
+            });
+
+            await request(app)
+              .post('/api/submissions/sync-draft')
+              .set('Authorization', authHeaderValue)
+              .send(requestSubmission)
+              .expect(200);
+
+            const submission = await db.collection('submissions').findOne({ _id: submissionId });
+            expect(submission).not.toBeNull();
+            expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
+          });
+        });
+      });
+    });
+  });
+
   describe('getSubmissionsCsv', () => {
     it('returns expected CSV for geojson question type', async () => {
       const { survey, createSubmission } = await createSurvey(['geoJSON']);
@@ -75,14 +1040,14 @@ describe('submissionController', () => {
       const mockRes = await createRes();
       await getSubmissionsCsv(mockReq, mockRes);
       const expected =
-        '_id,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.name,meta.survey.version,meta.revision,meta.permissions,meta.status.0.type,meta.status.0.value.at,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
+        '_id,meta.isDraft,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.name,meta.survey.version,meta.revision,meta.permissions,meta.status,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
         `${submission._id},` +
+        `false,` +
         `${new Date(submission.meta.dateCreated).toISOString()},` +
         `${new Date(submission.meta.dateModified).toISOString()},` +
         `${new Date(submission.meta.dateSubmitted).toISOString()},` +
         `${submission.meta.survey.id},Mock Survey Name,` +
-        `2,1,,READY_TO_SUBMIT,` +
-        `${submission.meta.status[0].value.at.toISOString()},` +
+        `2,1,,,` +
         `${submission.meta.group.id},` +
         `${submission.meta.group.path},4,` +
         `${submission.meta.creator},` +
@@ -92,6 +1057,52 @@ describe('submissionController', () => {
   });
 
   describe('prepareSubmissionsToQSLs', () => {
+    async function mockControlsAndSubmission() {
+      const { survey, createSubmission } = await createSurvey(['string', 'number']);
+      const { submission: _submission } = await createSubmission();
+
+      const controls = survey.revisions[survey.latestVersion - 1].controls;
+      const libraryId = new ObjectId();
+      const libraryVersion = 3;
+      const groupOverride = {
+        children: [
+          getControlGenerator('string')({ libraryId, libraryVersion, libraryIsInherited: true }),
+        ],
+        isLibraryRoot: true,
+        libraryId,
+        libraryVersion,
+      };
+      controls.push(
+        getControlGenerator('page')({
+          children: [getControlGenerator('group')(groupOverride)],
+        }),
+        getControlGenerator('group')(
+          {
+            ...groupOverride,
+            options: { ...getControlGenerator('string')().options, redacted: true },
+          },
+          2
+        ),
+        getControlGenerator('group')(groupOverride, 3)
+      );
+
+      const submission = {
+        ..._submission,
+        data: {
+          ..._submission.data,
+          ...getSubmissionDataGenerator('page')(
+            getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')())
+          ),
+          ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 2),
+          ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 3),
+        },
+      };
+
+      submission.data.group_3.text_1.meta.permissions = ['admin'];
+
+      return { controls, submission };
+    }
+
     it('returns no submission for empty params', async () => {
       const controls = [];
       const submission = {};
