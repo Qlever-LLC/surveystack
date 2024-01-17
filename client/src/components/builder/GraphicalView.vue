@@ -5,22 +5,20 @@
     vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props
   -->
   <VueDraggable
-    v-if="draggableControls.length !== 0 || index.length !== 0"
+    v-if="state.draggableControls?.length !== 0 || index.length !== 0"
     class="draggable"
-    :class="controls"
-    :style="scaleStyles()"
     :disabled="readOnly"
     tag="div"
-    v-model="draggableControls"
+    v-model="state.draggableControls"
     :invertSwap="true"
     @start="startHandler"
     @end="endHandler"
     @update="onUpdate"
     draggable=".draggable-item"
-    :group="draggableGroup"
+    :group="state.draggableGroup"
     ref="rootDraggable">
     <a-card
-      v-for="(el, idx) in draggableControls"
+      v-for="(el, idx) in state.draggableControls"
       class="control-item py-3"
       :class="[
         { 'control-item-selected': el === selected },
@@ -32,19 +30,19 @@
       @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
-      :data-control-contains-page="descendantHasPage(el)">
+      :data-control-contains-page="state.descendantHasPage(el)">
       <div
         class="d-flex justify-space-between align-center"
         @mouseover.stop="handleCardHoverChange({ control: el, isHovering: true })"
         @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })">
         <control-card-header
           v-if="!el.options.hidden"
-          :index="displayIndex(createIndex(index, idx + 1))"
+          :index="getDisplayIndex(createIndex(index, idx + 1))"
           :title="getDisplay(el)"
           :type="el.type"
           :dataName="el.name" />
         <div class="text-grey-darken-1" v-if="el.options.hidden">
-          {{ displayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
+          {{ getDisplayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="context-actions">
           <a-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
@@ -111,7 +109,7 @@
         </div>
       </div>
 
-      <nested-draggable
+      <GraphicalView
         v-if="el.type == 'group' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
@@ -130,9 +128,9 @@
         @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
         :data-control-type="el.type"
-        :data-control-contains-page="descendantHasPage(el)" />
+        :data-control-contains-page="state.descendantHasPage(el)" />
 
-      <nested-draggable
+      <GraphicalView
         v-if="el.type == 'page' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
@@ -150,17 +148,17 @@
         @hide-control="$emit('hide-control', $event)"
         @unhide-control="$emit('unhide-control', $event)"
         :data-control-type="el.type"
-        :data-control-contains-page="descendantHasPage(el)"
+        :data-control-contains-page="state.descendantHasPage(el)"
         :index="createIndex(index, idx + 1)" />
     </a-card>
 
-    <a-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
+    <a-dialog v-if="state.deleteQuestionModalIsVisible" v-model="state.deleteQuestionModalIsVisible" max-width="290">
       <a-card>
         <a-card-title> Delete Question</a-card-title>
         <a-card-text class="mt-4"> Are you sure you want to remove this question?</a-card-text>
         <a-card-actions>
           <a-spacer />
-          <a-btn variant="text" @click.stop="deleteQuestionModalIsVisible = false"> Cancel</a-btn>
+          <a-btn variant="text" @click.stop="state.deleteQuestionModalIsVisible = false"> Cancel</a-btn>
           <a-btn variant="text" color="red" @click.stop="handleConfirmDelete"> Remove</a-btn>
         </a-card-actions>
       </a-card>
@@ -179,171 +177,156 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { VueDraggable } from 'vue-draggable-plus';
 import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
+import { reactive } from 'vue';
 
-export default {
-  name: 'nested-draggable',
-  components: {
-    VueDraggable,
-    ControlCardHeader,
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: false,
   },
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      draggableControls: this.modelValue,
-      drag: false,
-      deleteQuestionModalIsVisible: false,
-      deleteQuestionIndex: null,
-      hoveredControl: null,
-      pageInPageHintIsVisible: false,
-      draggableGroup: {
-        name: 'g1',
-        // put ::: String | String[] | (to, from, el, event) => Boolean
-        // to: the sortablejs instance which will be `put` into
-        // from: the sortablejs instance which will be `put` from
-        // el: the active element which is being `put` from `from` into `to`
-        // ev: the sortablejs event
-        // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
-        put(to, _, el) {
-          if (el.dataset.controlContainsPage === 'true' && to.el.dataset.controlType === 'page') {
-            return false;
-          }
-          return true;
-        },
-      },
-      descendantHasPage: utils.descendantHasPage,
-    };
+  selected: Object,
+  index: {
+    type: Array,
+    default: [],
   },
-  props: {
-    modelValue: {
-      required: false,
-      type: Array,
-    },
-    selected: Object,
-    index: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    readOnly: {
-      type: Boolean,
-      default: false,
-    },
-    availableLibraryUpdates: {
-      required: false,
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    scale: {
-      type: Number,
-      default: 1.0,
-    },
-    libraryId: {
-      type: String,
-      default: null,
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+  availableLibraryUpdates: {
+    required: false,
+    type: Object,
+    default() {
+      return {};
     },
   },
-  computed: {
-    displayIndex() {
-      return (value) => value.join('.');
-    },
+  scale: {
+    type: Number,
+    default: 1.0,
   },
-  methods: {
-    onUpdate() {
-      this.$emit('update:modelValue', this.draggableControls);
-    },
-    scaleStyles() {
-      if (this.$refs.rootDraggable) {
-        const height = this.$refs.rootDraggable.clientHeight;
-        const width = this.$refs.rootDraggable.clientWidth;
-        return this.style === 1.0
-          ? {}
-          : {
-              transform: `scale(${this.scale})`,
-              transformOrigin: 'top left',
-              marginRight: `-${width * (1.0 - this.scale)}px`,
-              marginBottom: `-${height * (1.0 - this.scale)}px`,
-            };
-      } else return {};
-    },
-    startHandler(ev) {
-      if (ev.item.dataset.controlType === 'page') {
-        this.pageInPageHintIsVisible = true;
+  libraryId: {
+    type: String,
+    default: null,
+  },
+});
+
+const emit = defineEmits([
+  'update:modelValue',
+  'control-selected',
+  'control-removed',
+  'duplicate-control',
+  'open-library',
+  'update-library-control',
+  'hide-control',
+  'unhide-control',
+]);
+
+const state = reactive({
+  draggableControls: props.modelValue,
+  drag: false,
+  deleteQuestionModalIsVisible: false,
+  deleteQuestionIndex: null,
+  hoveredControl: null,
+  pageInPageHintIsVisible: false,
+  draggableGroup: {
+    name: 'g1',
+    // put ::: String | String[] | (to, from, el, event) => Boolean
+    // to: the sortablejs instance which will be `put` into
+    // from: the sortablejs instance which will be `put` from
+    // el: the active element which is being `put` from `from` into `to`
+    // ev: the sortablejs event
+    // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
+    put(to, _, el) {
+      if (el.dataset.controlContainsPage === 'true' && to.el.dataset.controlType === 'page') {
+        return false;
       }
-      this.drag = true;
-    },
-    endHandler() {
-      this.drag = false;
-      this.pageInPageHintIsVisible = false;
-    },
-    getIconForType(type) {
-      const control = availableControls.find((c) => c.type === type);
-      return control && control.icon;
-    },
-    getDisplay(control) {
-      return control.label || control.hint || control.type;
-    },
-    showDeleteModal(index) {
-      this.deleteQuestionModalIsVisible = true;
-      this.deleteQuestionIndex = index;
-    },
-    handleConfirmDelete() {
-      this.removeAt(this.deleteQuestionIndex);
-      this.deleteQuestionModalIsVisible = false;
-    },
-    log(name) {
-      console.log(name);
-    },
-    removeAt(idx) {
-      this.draggableControls.splice(idx, 1);
-      this.$emit('control-removed');
-    },
-    createIndex(current, idx) {
-      const newIndex = [...current];
-      newIndex.push(idx);
-      return newIndex;
-    },
-    duplicateControl(el) {
-      const copy = {
-        ...cloneDeep(el),
-        name: `${el.name}_copy`,
-        label: `${el.label} copy`,
-        id: new ObjectID().toString(),
-      };
-
-      utils.changeRecursive(copy, (control) => {
-        control.id = new ObjectID().toString();
-      });
-
-      this.$emit('duplicate-control', copy);
-    },
-    toggleLibrary(libraryId) {
-      this.$emit('toggle-library', libraryId);
-    },
-    getLibraryIconColor(libraryId) {
-      return `${this.libraryId && this.libraryId === libraryId ? 'green-lighten-1' : 'grey-lighten-1'}`;
-    },
-    handleCardHoverChange({ control, isHovering }) {
-      if (isHovering) {
-        this.hoveredControl = control;
-      } else if (this.hoveredControl === control) {
-        this.hoveredControl = null;
-      }
-    },
-    areActionsVisible(control) {
-      return !this.readOnly && this.hoveredControl === control;
+      return true;
     },
   },
-};
+  descendantHasPage: utils.descendantHasPage,
+});
+
+function getDisplayIndex(value) {
+  return value.join('.');
+}
+
+function onUpdate() {
+  emit('update:modelValue', state.draggableControls);
+}
+function startHandler(ev) {
+  if (ev.item.dataset.controlType === 'page') {
+    state.pageInPageHintIsVisible = true;
+  }
+  state.drag = true;
+}
+function endHandler() {
+  state.drag = false;
+  state.pageInPageHintIsVisible = false;
+}
+function getIconForType(type) {
+  const control = availableControls.find((c) => c.type === type);
+  return control && control.icon;
+}
+function getDisplay(control) {
+  return control.label || control.hint || control.type;
+}
+function showDeleteModal(index) {
+  state.deleteQuestionModalIsVisible = true;
+  state.deleteQuestionIndex = index;
+}
+function handleConfirmDelete() {
+  removeAt(state.deleteQuestionIndex);
+  state.deleteQuestionModalIsVisible = false;
+}
+function log(name) {
+  console.log(name);
+}
+function removeAt(idx) {
+  state.draggableControls.splice(idx, 1);
+  emit('control-removed');
+}
+function createIndex(current, idx) {
+  const newIndex = [...current];
+  newIndex.push(idx);
+  return newIndex;
+}
+function duplicateControl(el) {
+  const copy = {
+    ...cloneDeep(el),
+    name: `${el.name}_copy`,
+    label: `${el.label} copy`,
+    id: new ObjectID().toString(),
+  };
+
+  utils.changeRecursive(copy, (control) => {
+    control.id = new ObjectID().toString();
+  });
+
+  emit('duplicate-control', copy);
+}
+function toggleLibrary(libraryId) {
+  emit('toggle-library', libraryId);
+}
+function getLibraryIconColor(libraryId) {
+  return `${props.libraryId && props.libraryId === libraryId ? 'green-lighten-1' : 'grey-lighten-1'}`;
+}
+function handleCardHoverChange({ control, isHovering }) {
+  if (isHovering) {
+    state.hoveredControl = control;
+  } else if (state.hoveredControl === control) {
+    state.hoveredControl = null;
+  }
+}
+function areActionsVisible(control) {
+  return !props.readOnly && state.hoveredControl === control;
+}
 </script>
 <style scoped lang="scss">
 .drop-area {
