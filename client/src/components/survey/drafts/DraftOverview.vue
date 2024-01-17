@@ -33,7 +33,7 @@
         <a-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :icon="display.icon"
-          :color="display.color"
+          :dotColor="display.color"
           :hide-dot="display.hidden">
           <a-card
             v-if="display.relevant || !display.hidden"

@@ -1,5 +1,5 @@
 <template>
-  <v-timeline :dense="dense"> <slot /> </v-timeline>
+  <v-timeline :density="dense ? 'compact' : 'default'"> <slot /> </v-timeline>
 </template>
 
 <script>
