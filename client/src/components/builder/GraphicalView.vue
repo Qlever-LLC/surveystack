@@ -7,7 +7,7 @@
   <VueDraggable
     v-if="draggableControls.length !== 0 || index.length !== 0"
     class="draggable"
-    :class="controls"
+    :class="draggableControls"
     :style="scaleStyles()"
     :disabled="readOnly"
     tag="div"
@@ -193,7 +193,16 @@ export default {
     VueDraggable,
     ControlCardHeader,
   },
-  emits: ['update:modelValue'],
+  emits: [
+    'update:modelValue',
+    'control-selected',
+    'control-removed',
+    'duplicate-control',
+    'open-library',
+    'update-library-control',
+    'hide-control',
+    'unhide-control',
+  ],
   data() {
     return {
       draggableControls: this.modelValue,
@@ -265,14 +274,12 @@ export default {
       if (this.$refs.rootDraggable) {
         const height = this.$refs.rootDraggable.clientHeight;
         const width = this.$refs.rootDraggable.clientWidth;
-        return this.style === 1.0
-          ? {}
-          : {
-              transform: `scale(${this.scale})`,
-              transformOrigin: 'top left',
-              marginRight: `-${width * (1.0 - this.scale)}px`,
-              marginBottom: `-${height * (1.0 - this.scale)}px`,
-            };
+        return {
+          transform: `scale(${this.scale})`,
+          transformOrigin: 'top left',
+          marginRight: `-${width * (1.0 - this.scale)}px`,
+          marginBottom: `-${height * (1.0 - this.scale)}px`,
+        };
       } else return {};
     },
     startHandler(ev) {
