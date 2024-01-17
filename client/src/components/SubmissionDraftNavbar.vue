@@ -1,7 +1,7 @@
 <template>
   <nav class="app-navbar">
     <navbar-drawer v-model="drawerIsVisible" />
-    <a-app-bar app clipped-left color="appbar" absolute>
+    <a-app-bar color="appbar" absolute>
       <a-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <a-toolbar-title class="flex-column flex-grow-1">
         <draft-toolbar
