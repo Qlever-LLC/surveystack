@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <!--
     WARNING: this component renders recursively, be careful!
@@ -194,7 +193,9 @@ const props = defineProps({
   selected: Object,
   index: {
     type: Array,
-    default: [],
+    default() {
+      return [];
+    },
   },
   readOnly: {
     type: Boolean,
