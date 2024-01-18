@@ -20,8 +20,8 @@
       <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
           <a-btn-toggle v-model="viewMode" mandatory="force" dense>
-            <a-btn>Edit</a-btn>
-            <a-btn>Preview</a-btn>
+            <a-btn variant="outlined">Edit</a-btn>
+            <a-btn variant="outlined">Preview</a-btn>
           </a-btn-toggle>
         </div>
 
@@ -267,23 +267,24 @@ export default {
 </script>
 
 <style scoped lang="scss">
->>> .toolbar label button {
+.toolbar label button {
   pointer-events: none !important;
 }
 
->>> .editor {
+.editor {
   position: relative;
   flex: 1 1 0%;
+  height: 100% !important;
 }
 
->>> .editor > .overlap {
+.editor > .overlap {
   position: absolute;
   inset: 0px;
   background-color: rgba(255, 255, 255, 0.5);
   pointer-events: none;
 }
 
->>> .editor .preview {
+.editor .preview {
   width: 100%;
   height: 100%;
   min-height: 160px;
@@ -293,7 +294,7 @@ export default {
   outline: none;
 }
 
->>> .editor .preview img {
+.editor .preview img {
   max-width: 100%;
 }
 
@@ -303,7 +304,7 @@ export default {
   margin-left: 12px;
 }
 
->>> .resource-panel {
+.resource-panel {
   height: 100%;
   min-height: 300px;
   max-height: 465px;
@@ -312,7 +313,7 @@ export default {
   overflow-y: auto;
 }
 
->>> .resource-panel > * {
+.resource-panel > * {
   border-bottom: 1px solid #eee;
 }
 </style>
