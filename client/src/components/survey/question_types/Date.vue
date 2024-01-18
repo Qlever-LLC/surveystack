@@ -79,44 +79,20 @@ export default {
       return this.localValue ? this.formatDate(new Date(this.value).toISOString().substring(0, 10)) : null;
     },
     dateForPicker() {
-      let substrLength;
-      switch (this.control.options.subtype) {
-        case 'date-month-year':
-          substrLength = 7;
-          break;
-        // case 'date-week-month-year':
-        default:
-          substrLength = 10;
-          break;
-      }
-
       if (this.control.options.subtype === 'date-week-month-year') {
         if (this.value) {
           const date = new Date(this.value);
-          // // const start = date.getDate() - date.getDay() - 1; // First day is the day of the month - the day of the week
-          // const start = date.getDate();
-          // const end = start + 6; // last day is the first day + 6
-          // // const end = date.getDate() + 6; // last day is the first day + 6
-          // const startDay = new Date(date.setDate(start)).toISOString().substring(0, 10);
-          // const endDay = new Date(date.setDate(end)).toISOString().substring(0, 10);
-          // console.log(startDay, endDay);
-          // return [
-          //   new Date(date.setDate(start)).toISOString().substring(0, 10),
-          //   new Date(date.setDate(end)).toISOString().substring(0, 10),
-          // ];
-          return [
-            date.toISOString().substring(0, 10),
-            new Date(date.setDate(date.getDate() + 6)).toISOString().substring(0, 10),
-          ];
+          return [date, new Date(date.setDate(date.getDate() + 6))];
+        } else {
+          return [];
         }
-        return [];
+      } else {
+        if (this.value) {
+          return new Date(this.value);
+        } else {
+          return null;
+        }
       }
-
-      if (this.value) {
-        return new Date(this.value); //.toISOString().substring(0, substrLength);
-      }
-
-      return null;
     },
     dateType() {
       return (this.control && this.control.options && this.control.options.subtype) || 'date';
