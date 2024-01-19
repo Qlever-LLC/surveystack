@@ -111,7 +111,7 @@
       v-if="surveys.content.length > 0 && !selectedSurvey"
       v-model="page"
       :length="activeTabPaginationLength"
-      @input="() => fetchData()" />
+      @update:modelValue="() => fetchData()" />
   </div>
 </template>
 <script>
