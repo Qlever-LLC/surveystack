@@ -2,10 +2,8 @@
   <v-toolbar
     :class="{ fullWidth: cssFullWidth, backgroundCream: cssBackgroundCream }"
     :color="color"
-    :dark="dark"
     :density="dense ? 'compact' : 'default'"
-    :flat="flat"
-    :tile="tile">
+    :flat="flat">
     <slot />
   </v-toolbar>
 </template>
@@ -18,10 +16,8 @@ export default {
     cssBackgroundCream: { type: Boolean, required: false },
     //vuetify props
     color: { type: String, required: false },
-    dark: { type: Boolean, required: false },
     dense: { type: Boolean, required: false },
     flat: { type: Boolean, required: false },
-    tile: { type: Boolean, required: false },
   },
 };
 </script>

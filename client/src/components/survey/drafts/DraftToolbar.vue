@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-toolbar color="grey-lighten-4" flat tile>
+    <a-toolbar color="grey-lighten-4" flat>
       <div class="flex-grow-1 d-flex flex-row justify-space-between maxw-60 mx-auto">
         <a-toolbar-title id="draft-toolbar">
           <div class="infos text-grey-darken-2">
