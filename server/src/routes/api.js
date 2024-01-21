@@ -1,5 +1,4 @@
 import { Router } from 'express';
-
 import debugController from '../controllers/debugController';
 import authController from '../controllers/authController';
 import groupController from '../controllers/groupController';
@@ -11,17 +10,13 @@ import * as scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import * as farmosController from '../controllers/farmosController';
 import * as hyloController from '../controllers/hyloController';
-
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
 import resourceController from '../controllers/resourceController';
-
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
 import { unleashProxyApp } from '../services/featureToggle.service';
-
 import cfsController from '../controllers/cfsController';
-
 import {
   assertAuthenticated,
   assertIsSuperAdmin,
@@ -39,9 +34,9 @@ import {
   assertIsAtLeastOnceOwner,
   assertIsOwnerOfInstance,
 } from '../handlers/assertions';
-
 import { catchErrors } from '../handlers/errorHandlers';
 import { handleDelegates } from '../handlers/headerHandlers';
+import submissionMigration from '../middleware/submissionMigration';
 
 const router = Router();
 
@@ -135,12 +130,16 @@ router.get(
 router.post('/submissions/pdf', catchErrors(submissionController.postSubmissionPdf));
 router.post(
   '/submissions',
-  [assertSubmissionRights],
+  [
+    catchErrors(submissionMigration),
+    assertSubmissionRights
+  ],
   catchErrors(handleDelegates(submissionController.createSubmission))
 );
 router.put(
   '/submissions/:id',
   [
+    catchErrors(submissionMigration),
     assertAuthenticated,
     assertIdsMatch,
     assertEntityExists({ collection: 'submissions' }),

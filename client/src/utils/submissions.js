@@ -93,6 +93,8 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
     dateCreated: dateNow,
     dateModified: dateNow,
     dateSubmitted: null,
+    isDraft: true,
+    isDeletedDraft: false,
     survey: { id: survey._id, name: survey.name, version: version },
     revision: 1,
     permissions: [],

@@ -674,6 +674,15 @@ const getSubmission = async (req, res) => {
 const prepareCreateSubmissionEntity = async (submission, res) => {
   const entity = await sanitize(submission);
 
+  /*
+    Clear all existing statuses. At the time of this comment, none of the possible statuses
+    make sense to be on submitted submissions, and this function is responsible for preparing
+    submitted submission (not draft submissions). This could change in the future, at which point
+    we should update this logic to only clear some statuses. The current statuses are:
+    'READY_TO_SUBMIT', 'READY_TO_DELETE', 'UNAUTHORIZED_TO_SUBMIT' and 'FAILED_TO_SUBMIT'
+  */
+  entity.meta.status = [];
+
   const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
   if (!survey) {
     throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
@@ -831,17 +840,6 @@ const updateSubmission = async (req, res) => {
   newSubmission.meta.revision = oldSubmission.meta.revision + 1;
   newSubmission.meta.resubmitter = new ObjectId(res.locals.auth.user._id);
 
-  const updateOperation = {
-    data: newSubmission.data,
-    'meta.group': newSubmission.meta.group,
-    'meta.revision': newSubmission.meta.revision,
-    'meta.resubmitter': newSubmission.meta.resubmitter,
-    'meta.dateModified': newSubmission.meta.dateModified,
-    'meta.dateSubmitted': newSubmission.meta.dateSubmitted,
-    'meta.specVersion': newSubmission.meta.specVersion,
-    'meta.status': newSubmission.meta.status,
-  };
-
   // re-insert old submission version with a new _id
   oldSubmission._id = new ObjectId();
   oldSubmission.meta.original = new ObjectId(id);
@@ -867,26 +865,16 @@ const updateSubmission = async (req, res) => {
     return res.status(503).send(errorObject);
   }
 
-  // const farmosResults = [];
-  // try {
-  //   // re-run with original creator user
-  //   const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
-  //   const results = await farmOsService.handle({
-  //     submission: newSubmission,
-  //     survey,
-  //     user: creator,
-  //   });
-  //   farmosResults.push(...results);
-  //   // could contain errors, need to pass these on to the user
-  // } catch (error) {
-  //   // TODO what should we do if something internal fails?
-  //   // need to let the user somehow know
-  //   console.log('error handling farmos', error);
-  //   return res.status(503).send({
-  //     message: `error submitting to farmos ${error}`,
-  //     farmos: error.messages,
-  //   });
-  // }
+  const updateOperation = {
+    data: newSubmission.data,
+    'meta.group': newSubmission.meta.group,
+    'meta.revision': newSubmission.meta.revision,
+    'meta.resubmitter': newSubmission.meta.resubmitter,
+    'meta.dateModified': newSubmission.meta.dateModified,
+    'meta.dateSubmitted': newSubmission.meta.dateSubmitted,
+    'meta.specVersion': newSubmission.meta.specVersion, 
+    'meta.status': [], // there are no statuses relevant to submitted (non draft) submissions, so we clear statuses if there happen to be any
+  };
 
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },

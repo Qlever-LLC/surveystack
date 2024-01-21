@@ -3,10 +3,19 @@ const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../../db');
 
 const createSubmissionMeta =
-  ({ isDraft = false, creator = new ObjectId(), dateModified = new Date() } = {}) =>
+  ({
+    isDraft = false,
+    creator = new ObjectId(),
+    dateModified = new Date(),
+    specVersion = 4,
+    archived = false,
+    archivedReason = undefined,
+    status = [],
+  } = {}) =>
   (survey) => {
     return {
       isDraft,
+      isDeletedDraft: false,
       dateCreated: new Date(),
       dateModified,
       dateSubmitted: new Date(),
@@ -16,10 +25,12 @@ const createSubmissionMeta =
         version: 2,
       },
       revision: 1,
+      archived,
+      ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
-      status: [],
+      status,
       group: survey.meta.group,
-      specVersion: 4,
+      specVersion,
       creator,
       permanentResults: [],
     };
@@ -31,11 +42,13 @@ const createRequestSubmissionMeta =
     creator = new ObjectId().toString(),
     dateModified = new Date().toISOString(),
     dateSubmitted = null,
+    specVersion = 4,
     status = [],
   } = {}) =>
   (survey) => {
     return {
       isDraft,
+      isDeletedDraft: false,
       dateCreated: new Date().toISOString(),
       dateModified,
       dateSubmitted,
@@ -51,7 +64,7 @@ const createRequestSubmissionMeta =
         id: survey.meta.group.id.toString(),
         path: survey.meta.group.path,
       },
-      specVersion: 4,
+      specVersion,
       creator,
       permanentResults: [],
     };
