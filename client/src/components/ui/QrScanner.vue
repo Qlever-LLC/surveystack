@@ -13,7 +13,7 @@
 
     <a-dialog v-model="isScannerOpen" fullscreen>
       <a-card>
-        <a-toolbar dark color="primary">
+        <a-toolbar color="primary">
           <a-btn aria-label="Close QR Scanner" icon @click="isScannerOpen = false">
             <a-icon>mdi-close</a-icon>
           </a-btn>

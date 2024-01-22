@@ -61,7 +61,7 @@
             v-if="surveys.content.length > 0"
             v-model="page"
             :length="activeTabPaginationLength"
-            @input="() => getDataForTab(activeTab)" />
+            @update:modelValue="() => getDataForTab(activeTab)" />
         </a-card-actions>
       </a-card>
     </a-container>
