@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <a-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
+    <a-form v-model="valid" class="mt-8" :disabled="localViewModel.loading">
       <a-select
         v-if="!!localViewModel.groups"
         variant="outlined"
