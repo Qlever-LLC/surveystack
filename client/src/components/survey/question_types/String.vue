@@ -7,29 +7,26 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled && value"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <div style="display: flex">
       <div style="flex: 1">
         <a-text-field
           variant="outlined"
           :label="control.hint"
-          :modelValue="value"
+          :modelValue="modelValue"
           @update:modelValue="onInput"
           @keyup.enter.prevent="submit"
           ref="textField"
           class="full-width"
           :disabled="!relevant"
           hide-details
-          color="focus"
-        />
+          color="focus" />
       </div>
       <app-qr-scanner
         style="flex: 0"
         class="ml-4"
         v-if="control.options.enableQr"
-        @codeDetected="onQrCodeScanned"
-      ></app-qr-scanner>
+        @codeDetected="onQrCodeScanned"></app-qr-scanner>
     </div>
 
     <app-control-more-info :value="control.moreInfo" />
@@ -54,7 +51,7 @@ export default {
   },
   methods: {
     submit() {
-      this.onInput(this.value);
+      this.onInput(this.modelValue);
       this.$emit('next');
     },
     onQrCodeScanned(code) {
@@ -62,7 +59,7 @@ export default {
     },
     onInput(v) {
       const newValue = getValueOrNull(v);
-      if (this.value !== newValue) {
+      if (this.modelValue !== newValue) {
         this.changed(newValue);
       }
     },

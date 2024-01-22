@@ -31,19 +31,19 @@
           location="bottom">
           <template v-slot:activator="{ props }">
             <a-text-field
-              style="min-width: 290px"
-              v-bind="props"
-              @change="updateDate"
-              @update:modelValue="datePickerIsVisible = false"
-              :modelValue="dateFormatted"
               :label="getLabel()"
+              :modelValue="dateFormatted"
+              clearable
+              color="focus"
               persistent-hint
               prepend-inner-icon="mdi-calendar"
               readonly
+              style="min-width: 290px"
+              v-bind="props"
               variant="outlined"
-              color="focus"
-              clearable
-              @click:clear="setToNull" />
+              @change="updateDate"
+              @click:clear="setToNull"
+              @update:modelValue="datePickerIsVisible = false" />
           </template>
           <a-date-picker
             ref="picker"
@@ -71,24 +71,24 @@ export default {
   data() {
     return {
       datePickerIsVisible: false,
-      localValue: this.value,
+      localValue: this.modelValue,
     };
   },
   computed: {
     dateFormatted() {
-      return this.localValue ? this.formatDate(new Date(this.value).toISOString().substring(0, 10)) : null;
+      return this.localValue ? this.formatDate(new Date(this.modelValue).toISOString().substring(0, 10)) : null;
     },
     dateForPicker() {
       if (this.control.options.subtype === 'date-week-month-year') {
-        if (this.value) {
-          const date = new Date(this.value);
+        if (this.modelValue) {
+          const date = new Date(this.modelValue);
           return [date, new Date(date.setDate(date.getDate() + 6))];
         } else {
           return [];
         }
       } else {
-        if (this.value) {
-          return new Date(this.value);
+        if (this.modelValue) {
+          return new Date(this.modelValue);
         } else {
           return null;
         }
@@ -154,7 +154,7 @@ export default {
         this.changed(null);
       } else {
         this.datePickerIsVisible = false;
-        if (this.control.options.subtype === 'date') {
+        if (this.control.options.subtype === 'date' || !this.control.options.subtype) {
           this.changed(zonedTimeToUtc(date).toISOString());
         } else if (this.control.options.subtype === 'date-year') {
           const newDate = new Date(Date.UTC(date, 0, 1)); // set to first day of year

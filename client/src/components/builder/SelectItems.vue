@@ -52,12 +52,12 @@ function getArrayValue(source) {
 
 export default {
   props: {
-    value: { type: [String, Array] },
+    modelValue: { type: [String, Array] },
     items: { type: Array, default: () => [] },
     custom: { type: Boolean },
     multiple: { type: Boolean },
   },
-
+  emits: ['update:modelValue'],
   data() {
     return {
       open: false,
@@ -92,23 +92,23 @@ export default {
       this.open = false;
     },
     cancel() {
-      this.selected = getArrayValue(this.value);
+      this.selected = getArrayValue(this.modelValue);
       this.close();
     },
     save() {
-      this.$emit('input', this.selected);
+      this.$emit('update:modelValue', this.selected);
       this.close();
     },
   },
   watch: {
     open(val) {
       if (val) {
-        this.selected = getArrayValue(this.value);
+        this.selected = getArrayValue(this.modelValue);
       }
     },
   },
   created() {
-    this.selected = getArrayValue(this.value);
+    this.selected = getArrayValue(this.modelValue);
   },
 };
 </script>

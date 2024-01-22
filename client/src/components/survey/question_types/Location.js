@@ -151,16 +151,16 @@ export default {
 
       this.map.addControl(this.ctrl);
 
-      if (this.value) {
-        this.marker = new mapboxgl.Marker().setLngLat(this.value.geometry.coordinates).addTo(this.map);
+      if (this.modelValue) {
+        this.marker = new mapboxgl.Marker().setLngLat(this.modelValue.geometry.coordinates).addTo(this.map);
 
         this.map.jumpTo({
-          center: this.value.geometry.coordinates,
+          center: this.modelValue.geometry.coordinates,
         });
       }
 
       this.map.on('load', () => {
-        if (!this.value) {
+        if (!this.modelValue) {
           this.startGpsTimer();
         }
         this.map.resize();
@@ -191,11 +191,11 @@ export default {
   },
   computed: {
     currentLocation() {
-      if (this.value) {
+      if (this.modelValue) {
         return {
-          location: this.value,
-          // label: `used ${this.value.acc ? ' GPS' : 'Map Center'}`,
-          label: `${this.value.properties ? 'Saved Location' : 'Current Map Center'}`,
+          location: this.modelValue,
+          // label: `used ${this.modelValue.acc ? ' GPS' : 'Map Center'}`,
+          label: `${this.modelValue.properties ? 'Saved Location' : 'Current Map Center'}`,
         };
       }
 
@@ -227,7 +227,7 @@ export default {
   },
   created() {
     mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
-    this.location = this.value;
+    this.location = this.modelValue;
   },
   mounted() {
     this.startMap();

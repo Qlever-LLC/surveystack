@@ -21,7 +21,7 @@
       </a-btn>
 
       <div style="background-color: #000" :id="`map-question-${index}`" class="map-question" v-if="!mapError">
-        <img v-if="!value" id="map-marker" :src="require('@/assets/marker.svg')" alt="marker" />
+        <img v-if="!modelValue" id="map-marker" :src="require('@/assets/marker.svg')" alt="marker" />
         <div class="selection-controls d-flex justify-center">
           <div v-if="!location">
             <a-btn
@@ -70,7 +70,7 @@
       </app-gps>
     </div>
 
-    <a-overlay class="text-center" :modelValue="!value && !gpsLocation && !mapError && !geolocationError" absolute>
+    <a-overlay class="text-center" :modelValue="!modelValue && !gpsLocation && !mapError && !geolocationError" absolute>
       <a-card>
         <a-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>

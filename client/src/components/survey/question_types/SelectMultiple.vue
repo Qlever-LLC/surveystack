@@ -12,24 +12,19 @@
     <div v-if="sourceIsValid" class="py-2">
       <div class="select-multiple-source">
         <div v-for="item in selections" :key="item.value">
-          <a-checkbox
-            v-model="item.selected"
-            :label="item.label"
-            @input="onChange"
-            hide-details
-            class="my-1"
-            color="focus" />
+          <a-checkbox v-model="item.selected" :label="item.label" @input="onChange" hide-details color="focus" dense />
         </div>
       </div>
 
-      <div v-if="control.options.allowCustomSelection" class="select-multiple-custom mt-3 d-flex align-center">
+      <div v-if="control.options.allowCustomSelection" class="select-multiple-custom d-flex align-center">
         <a-checkbox
           v-model="customSelected"
           @input="onChange"
           hide-details
-          class="mt-0"
+          class="mt-0 flex-grow-0"
           :disabled="!customValue"
-          color="focus" />
+          color="focus"
+          dense />
         <a-text-field
           label="other"
           v-model="customValue"
@@ -87,9 +82,9 @@ export default {
     initSelections() {
       // fill pre-defined
       this.selections.forEach((s) => {
-        if (this.value && Array.isArray(this.value)) {
-          console.log(this.value);
-          const valueFound = this.value.find((v) => s.value === v);
+        if (this.modelValue && Array.isArray(this.modelValue)) {
+          console.log(this.modelValue);
+          const valueFound = this.modelValue.find((v) => s.value === v);
           s.selected = !!valueFound;
         } else {
           s.selected = false;
@@ -98,7 +93,7 @@ export default {
 
       // fill custom
       if (this.control.options.allowCustomSelection && this.valueIncludesCustom) {
-        [this.customValue] = this.value.filter((x) => !this.findSource(x));
+        [this.customValue] = this.modelValue.filter((x) => !this.findSource(x));
         if (this.customValue) {
           this.customSelected = true;
         }
@@ -119,9 +114,9 @@ export default {
     },
     valueIncludesCustom() {
       return (
-        Array.isArray(this.value) &&
+        Array.isArray(this.modelValue) &&
         Array.isArray(this.control.options.source) &&
-        !this.value.every(this.sourceContains)
+        !this.modelValue.every(this.sourceContains)
       );
     },
   },
@@ -136,10 +131,10 @@ export default {
       selected: false,
     }));
 
-    if (!Array.isArray(this.value)) {
+    if (!Array.isArray(this.modelValue)) {
       return;
     }
-    console.log(this.value);
+    console.log(this.modelValue);
     this.initSelections();
   },
   watch: {

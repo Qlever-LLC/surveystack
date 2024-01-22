@@ -69,7 +69,7 @@
       <select-items-editor
         v-if="isSelect"
         v-model="controlInProgress.options.source"
-        @set-control-source="() => (controlInProgress.defaultValue = null)"
+        @update:modelValue="controlInProgress.defaultValue = null"
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "

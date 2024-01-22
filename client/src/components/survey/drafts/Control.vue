@@ -44,11 +44,11 @@
         <component
           :is="getComponentName(control)"
           :control="control"
-          :value="value"
+          :modelValue="value"
           :index="path"
           :key="path"
           :resources="survey.resources"
-          @changed="setProperty"
+          @update:modelValue="setProperty"
           :meta="meta"
           :submission="submission"
           @setStatus="setStatus"

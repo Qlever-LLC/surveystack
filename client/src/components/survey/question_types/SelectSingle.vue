@@ -10,40 +10,39 @@
     <app-control-hint :value="control.hint" />
     <div class="py-2">
       <a-radio-group
-        :modelValue="Array.isArray(value) ? value[0] : value"
+        :modelValue="Array.isArray(modelValue) ? modelValue[0] : modelValue"
         @update:modelValue="onChange"
         v-if="sourceIsValid"
         class="mt-0"
         data-test-id="radio-group"
         hide-details>
-        <template>
-          <a-radio
-            v-for="(item, index) in filteredSource"
-            :label="item.label"
-            :value="item.value"
-            :key="index"
-            color="focus" />
-          <a-radio
-            :value="customSelection || 'other'"
-            v-if="control.options.allowCustomSelection"
-            class="mt-1"
-            @change="customSelection = customSelection || 'other'"
-            data-test-id="custom-input-radio"
-            color="focus">
-            <template v-slot:label>
-              <a-text-field
-                class="text-field-other"
-                :modelValue="customSelection"
-                @update:modelValue="handleCustomSelectionInput"
-                data-test-id="custom-input"
-                hide-details
-                variant="outlined"
-                dense
-                label="other"
-                color="focus" />
-            </template>
-          </a-radio>
-        </template>
+        <a-radio
+          v-for="(item, index) in filteredSource"
+          :label="item.label"
+          :value="item.value"
+          :key="index"
+          color="focus" />
+        <a-radio
+          :value="customSelection || 'other'"
+          v-if="control.options.allowCustomSelection"
+          class="mt-1 custom-input-radio"
+          @change="customSelection = customSelection || 'other'"
+          data-test-id="custom-input-radio"
+          color="focus"
+          labelSlot>
+          <template v-slot:label>
+            <a-text-field
+              class="text-field-other flex-fill"
+              :modelValue="customSelection"
+              @update:modelValue="handleCustomSelectionInput"
+              data-test-id="custom-input"
+              hide-details
+              variant="outlined"
+              dense
+              label="other"
+              color="focus" />
+          </template>
+        </a-radio>
       </a-radio-group>
       <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     </div>
@@ -81,7 +80,7 @@ export default {
   methods: {
     getValueOrNull,
     onChange(v) {
-      if (this.value !== v) {
+      if (this.modelValue !== v) {
         this.changed(getNextValue(v));
       }
     },
@@ -116,17 +115,17 @@ export default {
     },
     valueIsCustom() {
       // Submission question value is not present in the list of entries in `control.options.source`
-      return !this.control.options.source.some((item) => this.value && item.value === this.value[0]);
+      return !this.control.options.source.some((item) => this.modelValue && item.value === this.modelValue[0]);
     },
   },
   created() {
     // set `customSelection` value to submission question value if we allow the user to enter custom selections
     // and the current question value is set to a value that is not in entries of `control.options.source`
     if (this.control.options.allowCustomSelection && this.valueIsCustom) {
-      if (Array.isArray(this.value) && this.value[0]) {
-        this.customSelection = this.value[0];
-      } else if (this.value) {
-        this.customSelection = this.value;
+      if (Array.isArray(this.modelValue) && this.modelValue[0]) {
+        this.customSelection = this.modelValue[0];
+      } else if (this.modelValue) {
+        this.customSelection = this.modelValue;
       }
     }
   },
@@ -134,12 +133,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.top-10 {
-  top: 10px;
+:deep(.custom-input-radio .v-label) {
+  margin-top: 10px;
+  width: 100% !important;
 }
-
-.v-input .text-field-other >>> label {
-  top: 10px;
-  line-height: 24px;
+:deep(.v-field--active .v-label.v-field-label) {
+  visibility: visible;
+  color: rgb(var(--v-theme-focus));
+  margin-top: -10px;
+  font-size: 14px;
 }
 </style>

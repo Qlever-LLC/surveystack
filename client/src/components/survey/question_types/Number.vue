@@ -7,13 +7,12 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <a-text-field
       variant="outlined"
       type="number"
       :label="control.hint"
-      :modelValue="value"
+      :modelValue="modelValue"
       @update:modelValue="onInput"
       @keyup.enter.prevent="submit"
       ref="textField"
@@ -23,8 +22,7 @@
       :rules="[isValidNumber]"
       data-test-id="input"
       clearable
-      @click:clear="setToNull"
-    />
+      @click:clear="setToNull" />
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -46,7 +44,7 @@ export default {
       console.log('key: ', ev);
     },
     submit() {
-      this.onInput(this.value);
+      this.onInput(this.modelValue);
       this.$emit('next');
     },
     tryAutofocus() {
