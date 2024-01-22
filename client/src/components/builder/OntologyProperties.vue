@@ -2,14 +2,13 @@
   <div class="text-center d-flex align-center mt-6">
     <resource-selector
       :resources="filteredResources"
-      :value="value"
+      :modelValue="value"
       placeholder="Add Options"
       :disabled="disableSelection"
       @on-new="createResourceHandler"
       @on-select="selectResourceHandler"
       :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
-      outlined
-    />
+      outlined />
     <a-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
       <a-icon>mdi-pencil</a-icon>
     </a-btn>
@@ -22,8 +21,7 @@
         :disabled="!!resource.libraryId"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="closeTableDialog"
-      />
+        @close-dialog="closeTableDialog" />
     </a-dialog>
     <a-dialog v-model="referenceDialogIsVisible" max-width="50%">
       <ontology-reference-editor
@@ -32,8 +30,7 @@
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="closeReferenceDialog"
-      />
+        @close-dialog="closeReferenceDialog" />
     </a-dialog>
   </div>
 </template>

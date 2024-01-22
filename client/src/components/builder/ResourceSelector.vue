@@ -9,8 +9,7 @@
     item-value="id"
     :disabled="disabled"
     hide-details
-    :variant="outlined ? 'outlined' : ''"
-  />
+    :variant="outlined ? 'outlined' : ''" />
 </template>
 
 <script>
@@ -45,12 +44,10 @@ export default {
       type: Boolean,
     },
   },
-  data() {
-    return {
-      value: this.modelValue,
-    };
-  },
   computed: {
+    value() {
+      return this.modelValue;
+    },
     filteredResources() {
       return this.resourceTypes.length === 0
         ? this.resources

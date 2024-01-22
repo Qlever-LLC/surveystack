@@ -16,31 +16,27 @@
           (resource.name || resource.name === '') &&
           (resource.content || resource.content === '')
         "
-        ref="form"
-      >
+        ref="form">
         <a-text-field
           :modelValue="resource.label"
           @update:modelValue="handleUpdateLabel"
           label="Image Label"
           :rules="[nameHasValidLength]"
           persistent-hint
-          variant="outlined"
-        />
+          variant="outlined" />
         <a-text-field
           :modelValue="resource.name"
           @update:modelValue="handleUpdateName"
           label="Image Data Name"
           persistent-hint
           variant="outlined"
-          :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
-        />
+          :rules="[nameIsUnique(resourceNames, props.resource), nameHasValidCharacters, nameHasValidLength]" />
         <a-text-field
           :modelValue="resource.content"
           @update:modelValue="handleUpdateContent"
           label="Image URL"
           persistent-hint
-          variant="outlined"
-        />
+          variant="outlined" />
       </a-form>
     </a-card-text>
     <a-card-actions class="d-flex justify-space-between px-6 pb-4">
@@ -50,66 +46,63 @@
   </a-card>
 </template>
 
-<script>
+<script setup>
 import { nameHasValidCharacters, nameHasValidLength, nameIsUnique } from '@/utils/resources';
+import { ref, computed } from 'vue';
 
-export default {
-  data() {
-    return {};
+const props = defineProps({
+  resources: {
+    type: Array,
   },
-  props: {
-    resources: {
-      type: Array,
-    },
-    resource: {
-      type: Object,
-    },
+  resource: {
+    type: Object,
   },
-  computed: {
-    resourceNames() {
-      return this.resources.map(({ name, id }) => ({ name, id }));
-    },
-  },
-  methods: {
-    nameIsUnique,
-    nameHasValidCharacters,
-    nameHasValidLength,
-    validate() {
-      return this.$refs.form.validate();
-    },
-    deleteResource() {
-      this.closeDialog();
-      this.$emit('delete', this.resource.id);
-    },
-    updateResource() {
-      if (this.validate()) {
-        this.$emit('close-dialog');
-      }
-    },
-    closeDialog() {
-      if (!this.resource || this.validate()) {
-        this.$emit('close-dialog');
-      }
-    },
-    // TODO: refactor to use internal data for resource, then only update resource on survey when button is clicked
-    handleUpdateLabel(label) {
-      this.$emit('change', {
-        ...this.resource,
-        label,
-      });
-    },
-    handleUpdateName(name) {
-      this.$emit('change', {
-        ...this.resource,
-        name,
-      });
-    },
-    handleUpdateContent(content) {
-      this.$emit('change', {
-        ...this.resource,
-        content,
-      });
-    },
-  },
-};
+});
+
+const emit = defineEmits(['delete', 'close-dialog', 'change']);
+
+const resourceNames = computed(() => {
+  return props.resources.map(({ name, id }) => ({ name, id }));
+});
+
+const form = ref(null);
+
+async function validate() {
+  return await form.value.validate();
+}
+function deleteResource() {
+  closeDialog();
+  if (props.resource.id) {
+    emit('delete', props.resource.id);
+  }
+}
+async function updateResource() {
+  if (await validate()) {
+    emit('close-dialog');
+  }
+}
+async function closeDialog() {
+  if (!props.resource || (await validate())) {
+    emit('close-dialog');
+  }
+}
+// TODO: refactor to use internal data for resource, then only update resource on survey when button is clicked
+function handleUpdateLabel(label) {
+  emit('change', {
+    ...props.resource,
+    label,
+  });
+}
+function handleUpdateName(name) {
+  emit('change', {
+    ...props.resource,
+    name,
+  });
+}
+function handleUpdateContent(content) {
+  emit('change', {
+    ...props.resource,
+    content,
+  });
+}
 </script>

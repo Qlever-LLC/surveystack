@@ -3,7 +3,7 @@
     <div class="text-center d-flex">
       <resource-selector
         :resources="filteredResources"
-        :value="(value && value.images && value.images[0]) || null"
+        :modelValue="(modelValue && modelValue.images && modelValue.images[0]) || null"
         :disabled="disabled"
         :newResourceTypes="[resourceTypes.IMAGE]"
         @on-new="createResourceHandler"
@@ -12,7 +12,7 @@
         icon
         @click.stop="openDialog"
         :disabled="disabled"
-        :class="{ 'd-none': !value }"
+        :class="{ 'd-none': !modelValue }"
         class="ml-2 mt-3"
         v-if="resource">
         <a-icon>mdi-pencil</a-icon>
@@ -21,7 +21,7 @@
     <a-textarea
       class="mt-3"
       label="Instructions Body (Markdown)"
-      :value="value.body"
+      :value="modelValue.body"
       @input="handleBodyChange"
       :disabled="disabled"
       hide-details />
@@ -61,7 +61,7 @@ export default {
     ImageResourceEditor,
   },
   props: {
-    value: {
+    modelValue: {
       type: Object,
       default: () => ({
         images: [],
@@ -81,20 +81,22 @@ export default {
       return this.resources.filter((resource) => resource.type === resourceTypes.IMAGE);
     },
     resource() {
-      return this.resources.find((resource) => resource.id === this.value.images[0]);
+      return this.resources.find(
+        (resource) => resource && resource.id !== undefined && resource.id === this.modelValue.images[0]
+      );
     },
   },
   methods: {
     handleBodyChange(body) {
-      this.$emit('set-control-source', { body, images: this.value.images });
+      this.$emit('set-control-source', { body, images: this.modelValue.images });
     },
     removeResource(id) {
       const newResources = removeResource(this.resources, id);
       this.$emit('set-survey-resources', newResources);
 
-      const newImages = this.value.images.filter((imageId) => imageId !== id);
+      const newImages = this.modelValue.images.filter((imageId) => imageId !== id);
       this.$emit('set-control-source', {
-        body: this.value.body,
+        body: this.modelValue.body,
         images: newImages,
       });
 
@@ -111,14 +113,14 @@ export default {
       });
       this.$emit('set-survey-resources', appendResource(this.resources, newResource));
       this.$emit('set-control-source', {
-        body: this.value.body,
+        body: this.modelValue.body,
         images: [newResource.id],
       });
       this.openDialog();
     },
     selectResourceHandler(id) {
       this.$emit('set-control-source', {
-        body: this.value.body,
+        body: this.modelValue.body,
         images: [id],
       });
     },
