@@ -18,10 +18,5 @@ export default {
     disabled: { type: Boolean, required: false },
     hideDetails: { type: [Boolean, String], required: false },
   },
-  computed: {
-    value() {
-      return this.modelValue;
-    },
-  },
 };
 </script>
