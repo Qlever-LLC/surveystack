@@ -1,6 +1,6 @@
 <template>
   <v-radio-group
-    :modelValue="value"
+    :modelValue="modelValue"
     @update:modelValue="$emit('update:modelValue', $event)"
     :name="name"
     :disabled="disabled"
