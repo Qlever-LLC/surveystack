@@ -3,20 +3,25 @@
     <a-card-title class="d-flex pa-4">
       Documentation Links
       <a-spacer />
-      <a-btn color="primary" variant="text" @click="showAddDialog = true">New.. </a-btn>
+      <a-btn color="primary" variant="text" @click="state.showAddDialog = true">New.. </a-btn>
     </a-card-title>
     <a-card-subtitle>Custom links which appear in the side menu when logged into your group</a-card-subtitle>
     <VueDraggable
-      v-if="group.docs && group.docs.length !== 0"
+      v-if="props.group.docs && props.group.docs.length !== 0"
       class="draggable list-group"
       tag="div"
-      :list="group.docs"
+      :list="props.group.docs"
       :group="{ name: 'g1' }"
       :invertSwap="true"
       :dragOptions="{ animation: 200 }"
-      @start="drag = true"
-      @end="drag = false">
-      <a-card v-for="(el, idx) in group.docs" :key="el.link + idx" class="ma-2 mx-6" elevation="1" variant="outlined">
+      @start="state.drag = true"
+      @end="state.drag = false">
+      <a-card
+        v-for="(el, idx) in props.group.docs"
+        :key="el.link + idx"
+        class="ma-2 mx-6"
+        elevation="1"
+        variant="outlined">
         <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -41,12 +46,12 @@
         >
       </a-card-text>
     </a-card>
-    <a-dialog v-model="deleteModalIsVisible" max-width="290">
+    <a-dialog v-model="state.deleteModalIsVisible" max-width="290">
       <a-card>
         <a-card-title> Remove Documentation </a-card-title>
         <a-card-text class="mt-4">
           <a-checkbox
-            v-model="removeFromDescendants"
+            v-model="state.removeFromDescendants"
             label="Also remove this documentation link from all descendant groups"
             hide-details />
         </a-card-text>
@@ -59,29 +64,29 @@
       </a-card>
     </a-dialog>
 
-    <a-dialog v-model="showAddDialog" max-width="500">
+    <a-dialog v-model="state.showAddDialog" max-width="500">
       <a-card>
         <a-card-title>Add documentation link</a-card-title>
         <a-card-text>
-          <a-form v-model="newIsValid" ref="form">
+          <a-form v-model="state.newIsValid" ref="form">
             <a-text-field
               class="mt-3"
-              v-model="newDoc.label"
+              v-model="state.newDoc.label"
               label="Label"
               variant="outlined"
               required
-              :rules="labelRules" />
+              :rules="state.labelRules" />
 
             <a-text-field
               class="mt-3"
-              v-model="newDoc.link"
+              v-model="state.newDoc.link"
               label="Link"
               variant="outlined"
               required
-              :rules="linkRules" />
+              :rules="state.linkRules" />
 
             <a-checkbox
-              v-model="addToDescendants"
+              v-model="state.addToDescendants"
               label="Also add this documentation link to all descendant groups"
               hide-details />
           </a-form>
@@ -100,98 +105,90 @@
   </a-card>
 </template>
 
-<script>
+<script setup>
 import { VueDraggable } from 'vue-draggable-plus';
 import api from '@/services/api.service';
+import { ref, reactive } from 'vue';
 
-export default {
-  name: 'nested-draggable',
-  components: {
-    VueDraggable,
+const props = defineProps({
+  group: {
+    required: true,
+    type: Object,
   },
-  data() {
-    return {
-      drag: false,
-      deleteModalIsVisible: false,
-      deleteIndex: null,
-      showAddDialog: false,
-      newDoc: {
-        label: null,
-        link: null,
-      },
-      addToDescendants: false,
-      removeFromDescendants: false,
-      newIsValid: false,
-      labelRules: [(v) => !!v || 'Label is required'],
-      linkRules: [
-        (v) => !!v || 'Link is required',
-        (v) =>
-          /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi.test(v) ||
-          'Invalid URL',
-        (v) =>
-          !v || v.startsWith('https://') || v.startsWith('http://') || 'URL needs to start with https:// or http://',
-      ],
+});
+
+const state = reactive({
+  drag: false,
+  deleteModalIsVisible: false,
+  deleteIndex: null,
+  showAddDialog: false,
+  newDoc: {
+    label: null,
+    link: null,
+  },
+  addToDescendants: false,
+  removeFromDescendants: false,
+  newIsValid: false,
+  labelRules: [(v) => !!v || 'Label is required'],
+  linkRules: [
+    (v) => !!v || 'Link is required',
+    (v) =>
+      /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi.test(v) || 'Invalid URL',
+    (v) => !v || v.startsWith('https://') || v.startsWith('http://') || 'URL needs to start with https:// or http://',
+  ],
+});
+
+const form = ref(null);
+
+async function addEntry() {
+  await form.value.validate();
+  if (state.newIsValid) {
+    await api.post('/groups/add-doc-link', {
+      groupid: props.group._id,
+      doc: state.newDoc,
+      addToDescendants: state.addToDescendants,
+    });
+    if (!props.group.docs) {
+      props.group.docs = [];
+    }
+    props.group.docs.push(state.newDoc);
+    state.showAddDialog = false;
+    state.newDoc = {
+      label: null,
+      link: null,
     };
-  },
-  props: {
-    group: {
-      required: true,
-      type: Object,
-    },
-  },
-  mounted() {},
-  methods: {
-    async addEntry() {
-      this.$refs.form.validate();
-      if (this.newIsValid) {
-        await api.post('/groups/add-doc-link', {
-          groupid: this.group._id,
-          doc: this.newDoc,
-          addToDescendants: this.addToDescendants,
-        });
-        if (!this.group.docs) {
-          this.group.docs = [];
-        }
-        this.group.docs.push(this.newDoc);
-        this.showAddDialog = false;
-        this.newDoc = {
-          label: null,
-          link: null,
-        };
-        this.addToDescendants = false;
-        this.$refs.form.resetValidation();
-      }
-    },
-    cancelAddEntry() {
-      this.showAddDialog = false;
-      this.newDoc = {
-        label: null,
-        link: null,
-      };
-      this.addToDescendants = false;
-      this.$refs.form.resetValidation();
-    },
-    cancelDeleteEntry() {
-      this.deleteModalIsVisible = false;
-      this.removeFromDescendants = false;
-    },
-    showDeleteModal(index) {
-      this.deleteModalIsVisible = true;
-      this.deleteIndex = index;
-    },
-    handleConfirmDelete() {
-      this.removeAt(this.deleteIndex);
-      this.deleteModalIsVisible = false;
-    },
-    async removeAt(idx) {
-      await api.post('/groups/remove-doc-link', {
-        groupid: this.group._id,
-        doc: this.group.docs[idx],
-        removeFromDescendants: this.removeFromDescendants,
-      });
-      this.group.docs.splice(idx, 1);
-      this.removeFromDescendants = false;
-    },
-  },
-};
+    state.addToDescendants = false;
+    await form.value.validate();
+  }
+}
+async function cancelAddEntry() {
+  state.showAddDialog = false;
+  state.newDoc = {
+    label: null,
+    link: null,
+  };
+  state.addToDescendants = false;
+  await form.value.validate();
+}
+function cancelDeleteEntry() {
+  state.deleteModalIsVisible = false;
+  state.removeFromDescendants = false;
+}
+function showDeleteModal(index) {
+  state.deleteModalIsVisible = true;
+  state.deleteIndex = index;
+}
+function handleConfirmDelete() {
+  removeAt(state.deleteIndex);
+  state.deleteModalIsVisible = false;
+}
+async function removeAt(idx) {
+  await api.post('/groups/remove-doc-link', {
+    groupid: props.group._id,
+    doc: props.group.docs[idx],
+    removeFromDescendants: state.removeFromDescendants,
+  });
+  props.group.docs.splice(idx, 1);
+  state.removeFromDescendants = false;
+}
 </script>
