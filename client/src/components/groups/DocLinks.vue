@@ -158,7 +158,7 @@ async function addEntry() {
       link: null,
     };
     state.addToDescendants = false;
-    await form.value.validate();
+    await form.value.resetValidation();
   }
 }
 async function cancelAddEntry() {
@@ -168,7 +168,7 @@ async function cancelAddEntry() {
     link: null,
   };
   state.addToDescendants = false;
-  await form.value.validate();
+  await form.value.resetValidation();
 }
 function cancelDeleteEntry() {
   state.deleteModalIsVisible = false;
