@@ -1,6 +1,36 @@
 <template>
   <v-text-field
     ref="refAnchor"
+    :append-inner-icon="appendInnerIcon"
+    :autocomplete="autocomplete"
+    :autofocus="autofocus"
+    :class="{ noBorder: disabled }"
+    :clear-icon="clearIcon"
+    :clearable="clearable"
+    :color="color"
+    :data-test-id="dataTestId"
+    :density="dense ? 'compact' : 'default'"
+    :disabled="disabled"
+    :error-messages="errorMessages"
+    :hide-details="hideDetails"
+    :hint="hint"
+    :id="id"
+    :label="label"
+    :loading="loading"
+    :modelValue="modelValue"
+    :persistent-hint="persistentHint"
+    :placeholder="placeholder"
+    :prepend-inner-icon="prependInnerIcon"
+    :primary="primary"
+    :readonly="readonly"
+    :required="required"
+    :rules="rules"
+    :single-line="singleLine"
+    :suffix="suffix"
+    :tabindex="tabindex"
+    :type="type"
+    :validate-on-blur="validateOnBlur"
+    :variant="variant"
     @blur="$emit('blur')"
     @click="$emit('click', $event)"
     @click:appendInner="$emit('click:appendInner', $event)"
@@ -8,37 +38,7 @@
     @focusout="$emit('focusout')"
     @keydown.esc="$emit('keydown.esc')"
     @keyup.enter="$emit('keyup.enter')"
-    @update:modelValue="$emit('update:modelValue', $event)"
-    :autocomplete="autocomplete"
-    :class="{ noBorder: disabled }"
-    :data-test-id="dataTestId"
-    :id="id"
-    :primary="primary"
-    :required="required"
-    :tabindex="tabindex"
-    :append-inner-icon="appendInnerIcon"
-    :autofocus="autofocus"
-    :clear-icon="clearIcon"
-    :clearable="clearable"
-    :color="color"
-    :density="dense ? 'compact' : 'default'"
-    :disabled="disabled"
-    :error-messages="errorMessages"
-    :hide-details="hideDetails"
-    :hint="hint"
-    :label="label"
-    :loading="loading"
-    :modelValue="modelValue"
-    :persistent-hint="persistentHint"
-    :placeholder="placeholder"
-    :prepend-inner-icon="prependInnerIcon"
-    :readonly="readonly"
-    :rules="rules"
-    :single-line="singleLine"
-    :suffix="suffix"
-    :type="type"
-    :validate-on-blur="validateOnBlur"
-    :variant="variant">
+    @update:modelValue="$emit('update:modelValue', $event)">
     <template v-if="appendSlot" v-slot:append>
       <slot name="append" />
     </template>
@@ -102,7 +102,7 @@ export default {
       default: 'underlined',
       required: false,
     },
-    modelValue: { type: String, required: false },
+    modelValue: { type: undefined, required: false },
   },
   methods: {
     focus() {
