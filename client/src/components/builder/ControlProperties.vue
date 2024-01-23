@@ -144,7 +144,7 @@
       <a-textarea
         v-if="isScript"
         v-model="scriptParams"
-        @input="handleScriptParamsChange"
+        @update:modelValue="handleScriptParamsChange"
         label="Parameters"
         :rules="[validateScriptParams]"
         :disabled="
