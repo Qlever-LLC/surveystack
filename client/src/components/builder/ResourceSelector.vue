@@ -9,7 +9,7 @@
     item-value="id"
     :disabled="disabled"
     hide-details
-    :variant="outlined ? 'outlined' : ''" />
+    :variant="outlined ? 'outlined' : null" />
 </template>
 
 <script>
@@ -42,6 +42,7 @@ export default {
     },
     outlined: {
       type: Boolean,
+      default: false,
     },
   },
   computed: {
