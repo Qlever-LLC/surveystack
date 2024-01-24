@@ -2,7 +2,7 @@
   <a-select
     label="Resource"
     :placeholder="placeholder"
-    :modelValue="value"
+    :modelValue="modelValue"
     @update:modelValue="handleSelect"
     :items="items"
     item-title="label"

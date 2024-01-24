@@ -1,5 +1,9 @@
 <template>
-  <v-expansion-panels :multiple="multiple" :modelValue="modelValue" :variant="variant" @change="$emit('input', $event)">
+  <v-expansion-panels
+    :multiple="multiple"
+    :modelValue="modelValue"
+    :variant="variant"
+    @update:modelValue="$emit('update:modelValue', $event)">
     <slot />
   </v-expansion-panels>
 </template>
@@ -20,7 +24,7 @@ export default {
       required: false,
     },
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
 };
 </script>
 

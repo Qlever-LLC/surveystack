@@ -138,7 +138,7 @@ export default {
     this.initSelections();
   },
   watch: {
-    value() {
+    modelValue() {
       this.initSelections();
     },
   },
