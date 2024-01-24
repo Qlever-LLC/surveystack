@@ -5,11 +5,10 @@
       <a-card-text>
         <active-group-selector
           v-if="!fixedGroupId"
-          :value="selectedGroupId"
+          :modelValue="selectedGroupId"
           :admin-groups-only="true"
           label="Group"
-          @input="setGroup"
-        />
+          @update:modelValue="setGroup" />
         <a-text-field v-model="q" append-inner-icon="mdi-magnify" label="Search members" />
         <a-list>
           <a-list-item
@@ -19,8 +18,7 @@
             @click="
               $emit('selected', member);
               dialog = false;
-            "
-          >
+            ">
             <div v-if="member.meta && member.meta.status === 'pending'">
               <a-list-item-title class="text-secondary"
                 >[Pending] {{ member.meta.invitationEmail

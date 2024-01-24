@@ -1,23 +1,13 @@
 <template>
   <!-- v-if="state.isEditing" -->
   <a-text-field
-    :modelValue="value"
-    @update:modelValue="$emit('input', $event)"
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
     class="full-width"
     :rules="[rules.hasOnlyValidCharacters, rules.hasValidLength]"
-    :autofocus="value === ''" />
-  <!-- <div
-    v-else
-    @click="() => setIsEditing(true)"
-    @focus="() => setIsEditing(true)"
-    class="text-h1 mb-4 mt-3 d-flex"
-    :style="{ borderBottom: '2px solid transparent', letterSpacing: 'normal !important', }"
-  >
-    <div v-if="value">{{ value }}</div>
-    <div v-else class="grey--text lighten-4">Untitled Survey</div>
-  </div> -->
+    :autofocus="modelValue === ''" />
 </template>
 
 <script>
@@ -25,8 +15,9 @@ import { reactive } from 'vue';
 
 export default {
   props: {
-    value: String,
+    modelValue: String,
   },
+  emits: ['update:modelValue'],
   data: () => ({
     rules: {
       hasOnlyValidCharacters(val) {
@@ -39,7 +30,7 @@ export default {
   }),
   setup(props) {
     const state = reactive({
-      isEditing: !props.value || false,
+      isEditing: !props.modelValue || false,
     });
 
     function setIsEditing(val) {

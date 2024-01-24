@@ -52,7 +52,7 @@ import getWeekOfMonth from 'date-fns/getWeekOfMonth';
 import { zonedTimeToUtc } from 'date-fns-tz';
 
 export default {
-  emits: ['blur', 'input', 'update:modelValue'],
+  emits: ['blur', 'update:modelValue'],
   props: {
     modelValue: { type: String },
     type: { type: String },

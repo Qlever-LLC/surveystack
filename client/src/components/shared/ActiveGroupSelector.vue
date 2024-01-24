@@ -66,6 +66,7 @@ export default {
       default: false,
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       value: this.modelValue,
@@ -118,7 +119,7 @@ export default {
   methods: {
     handleInput(val) {
       this.value = val;
-      this.$emit('input', val);
+      this.$emit('update:modelValue', val);
     },
     getMargin(lvl) {
       const pixels = Math.max(0, lvl - 1) * 16;
