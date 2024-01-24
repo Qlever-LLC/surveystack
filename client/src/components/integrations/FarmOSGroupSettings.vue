@@ -57,7 +57,7 @@
               :ripple="false"
               :disabled="!canAddCoffeeShop"
               hide-details
-              @input="$emit('addGrpCoffeeShop', $event)">
+              @update:modelValue="$emit('addGrpCoffeeShop', $event)">
               <a-tooltip bottom activator="parent">
                 Talk to your parent group administrator to enable this option
               </a-tooltip>
@@ -68,14 +68,14 @@
               hide-details
               :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-              @input="$emit('allowSbGrpsJoinCoffeeShop', $event)"
+              @update:modelValue="$emit('allowSbGrpsJoinCoffeeShop', $event)"
               :label="`Allow subgroups to join the Coffee Shop`" />
             <a-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
-              @input="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
+              @update:modelValue="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack" />
           </a-container>
         </div>
