@@ -170,23 +170,17 @@
         v-model="controlInProgress.options.hasMultipleSelections"
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
-        "
-        dense />
+        " />
       <a-checkbox
         v-if="isSelect || isOntology"
         class="ml-2 align-center align-self-start"
         color="grey-darken-1"
         label="Allow custom answer"
         v-model="controlInProgress.options.allowCustomSelection"
-        @input="
-          () => {
-            controlInProgress.defaultValue = null;
-          }
-        "
+        @update:modelValue="controlInProgress.defaultValue = null"
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
-        "
-        dense>
+        ">
         <template v-slot:helper-text>
           Allows the user to input answers that do not exist within the provided items.
           <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
@@ -226,8 +220,7 @@
         "
         helper-text="Make this a required field"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         label="Private"
         v-model="controlInProgress.options.redacted"
@@ -236,48 +229,42 @@
         "
         helper-text="Only admins and original submitters can see this field"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="isPage"
         label="Compact"
         v-model="controlInProgress.options.compact"
         helper-text="Reduce the spaces and combine fields into one card"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="isText"
         label="QR Code"
         v-model="controlInProgress.options.enableQr"
         :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow modify"
         v-model="controlInProgress.options.allowModify"
         helper-text="Allow users of this question set to modify this question"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow hide"
         v-model="controlInProgress.options.allowHide"
         helper-text="Allow users of this question set to hide this question"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="controlInProgress.libraryId && controlInProgress.options.allowHide"
         label="Hidden"
         v-model="controlInProgress.options.hidden"
         helper-text="Submitters can not see this field. This option is intentionally allowed by the question set designer"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="
           controlInProgress.type === 'farmOsPlanting' ||
@@ -290,16 +277,14 @@
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         "
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="isFile"
         label="Multiple upload"
         v-model="controlInProgress.options.source.allowMultiple"
         helper-text="Allow user to upload multiple files"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <a-checkbox
         v-if="controlInProgress.type === 'script'"
         label="Native Script"
@@ -307,8 +292,7 @@
         :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         helper-text="Show Download Link for Surveystack Kit APK"
         color="grey-darken-1"
-        class="align-center align-self-start"
-        dense />
+        class="align-center align-self-start" />
       <template v-if="isGeoJSON">
         <a-checkbox
           v-for="opt in geoJsonOptions"
@@ -316,8 +300,7 @@
           :label="opt.text"
           v-model="controlInProgress.options.geoJSON[opt.key]"
           color="grey-darken-1"
-          class="align-center align-self-start"
-          dense />
+          class="align-center align-self-start" />
       </template>
 
       <!-- Advanced properties -->
@@ -347,8 +330,7 @@
               !controlInProgress.isLibraryRoot
             "
             color="grey-darken-1"
-            class="align-center align-self-start"
-            dense />
+            class="align-center align-self-start" />
           <a-icon color="grey-darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
@@ -362,8 +344,7 @@
               !controlInProgress.isLibraryRoot
             "
             color="grey-darken-1"
-            class="align-center align-self-start"
-            dense />
+            class="align-center align-self-start" />
           <a-icon color="grey-darken-1" @click="$emit('code-initialize')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
@@ -407,8 +388,7 @@
               !controlInProgress.isLibraryRoot
             "
             color="grey-darken-1"
-            class="align-center align-self-start"
-            dense />
+            class="align-center align-self-start" />
           <a-icon color="grey-darken-1" @click="$emit('code-api-compose')" size="20"> mdi-open-in-new </a-icon>
         </div>
       </div>
@@ -437,8 +417,7 @@
               v-model="controlInProgress.options.printLayout.table"
               helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
               color="grey-darken-1"
-              class="align-center align-self-start"
-              dense />
+              class="align-center align-self-start" />
           </div>
 
           <div v-if="isFile">
@@ -447,8 +426,7 @@
               v-model="controlInProgress.options.printLayout.preview"
               helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
               color="grey-darken-1"
-              class="align-center align-self-start"
-              dense />
+              class="align-center align-self-start" />
           </div>
 
           <template v-if="isSelect || isOntology">
@@ -459,8 +437,7 @@
                 v-model="controlInProgress.options.printLayout.showAllOptionsPrintable"
                 helper-text="Show the complete list of possible options when printing a fresh survey"
                 color="grey-darken-1"
-                class="align-center align-self-start"
-                dense />
+                class="align-center align-self-start" />
             </div>
 
             <div>Filled Submission</div>
@@ -470,8 +447,7 @@
                 v-model="controlInProgress.options.printLayout.showAllOptions"
                 helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
                 color="grey-darken-1"
-                class="align-center align-self-start"
-                dense />
+                class="align-center align-self-start" />
             </div>
 
             <a-select

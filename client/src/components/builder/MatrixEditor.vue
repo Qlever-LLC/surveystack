@@ -109,14 +109,12 @@
                         v-model="item.multiple"
                         label="Multi-select"
                         hide-details
-                        dense
                         color="grey-darken-1"
                         class="mt-0 ml-2 align-center align-self-start" />
                       <a-checkbox
                         v-model="item.custom"
                         label="Allow custom answer"
                         hide-details
-                        dense
                         color="grey-darken-1"
                         class="mt-0 ml-2 align-center align-self-start">
                         <template v-slot:helper-text>
@@ -171,11 +169,7 @@
 
                     <a-checkbox
                       v-model="item.required"
-                      @input="
-                        (v) => {
-                          v && $emit('set-control-required');
-                        }
-                      "
+                      @update:modelValue="$event && $emit('set-control-required')"
                       label="Required"
                       helper-text="Make this a required field"
                       hide-details

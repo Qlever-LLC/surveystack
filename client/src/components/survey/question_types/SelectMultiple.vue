@@ -12,19 +12,23 @@
     <div v-if="sourceIsValid" class="py-2">
       <div class="select-multiple-source">
         <div v-for="item in selections" :key="item.value">
-          <a-checkbox v-model="item.selected" :label="item.label" @input="onChange" hide-details color="focus" dense />
+          <a-checkbox
+            v-model="item.selected"
+            :label="item.label"
+            @update:modelValue="onChange"
+            hide-details
+            color="focus" />
         </div>
       </div>
 
       <div v-if="control.options.allowCustomSelection" class="select-multiple-custom d-flex align-center">
         <a-checkbox
           v-model="customSelected"
-          @input="onChange"
+          @update:modelValue="onChange"
           hide-details
           class="mt-0 flex-grow-0"
           :disabled="!customValue"
-          color="focus"
-          dense />
+          color="focus" />
         <a-text-field
           label="other"
           v-model="customValue"
