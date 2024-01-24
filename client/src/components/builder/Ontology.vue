@@ -78,7 +78,7 @@ import { fetchSubmissionUniqueItems } from '@/utils/submissions';
 
 export default {
   props: {
-    value: { required: true },
+    modelValue: { required: true },
     multiple: { type: Boolean, default: false },
     customAnswer: { type: Boolean, default: false },
     dense: { type: Boolean, default: false },
@@ -91,7 +91,7 @@ export default {
       isLoading: false,
       comboboxSearch: null,
       submissionItems: [],
-      values: this.value,
+      values: this.modelValue,
     };
   },
   methods: {
@@ -146,7 +146,7 @@ export default {
         color: 'focus',
       };
 
-      if (this.$vuetify.display.smAndDown || this.forceMobile) {
+      if (this.$vuetify.display.smAndDown) {
         defaultProps.maxHeight = 130;
         defaultProps.top = true;
         defaultProps.closeOnContentClick = true;

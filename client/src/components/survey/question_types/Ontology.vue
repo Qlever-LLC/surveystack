@@ -117,7 +117,7 @@ export default {
     },
     onChange(value) {
       this.comboboxSearch = null;
-      if (this.value !== value) {
+      if (this.modelValue !== value) {
         if (Array.isArray(value)) {
           this.changed(getValueOrNull(value.map(getValueOrNull)));
         } else {
@@ -127,10 +127,10 @@ export default {
       }
     },
     remove(item) {
-      this.changed(getValueOrNull(this.value.filter((v) => v !== item.value)));
+      this.changed(getValueOrNull(this.modelValue.filter((v) => v !== item.value)));
     },
     removeValue(value) {
-      this.changed(getValueOrNull(this.value.filter((v) => v !== value)));
+      this.changed(getValueOrNull(this.modelValue.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);
@@ -145,10 +145,10 @@ export default {
   },
   computed: {
     getArrayValue() {
-      return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      return Array.isArray(this.modelValue) ? this.modelValue : this.modelValue ? [this.modelValue] : [];
     },
     getValue() {
-      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.value;
+      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.modelValue;
     },
     resource() {
       return this.resources.find((r) => r.id === this.control.options.source);
