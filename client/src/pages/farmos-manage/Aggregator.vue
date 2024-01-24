@@ -18,12 +18,7 @@
 
     <div class="d-flex flex-column mb-5" v-if="!!selectedInstance">
       <h3>Notes</h3>
-      <textarea
-        readonly
-        rows="3"
-        style="border-style: dotted"
-        class="pa-1 w-100"
-        v-model="selectedInstanceNote"></textarea>
+      <a-textarea readonly rows="3" class="pa-1 w-100" v-model="selectedInstanceNote" />
     </div>
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">

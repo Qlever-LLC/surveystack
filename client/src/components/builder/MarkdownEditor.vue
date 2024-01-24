@@ -208,39 +208,6 @@ export default {
       await this.createFileResource(file);
     },
 
-    /*<a-text-field
-      label="Image URL"
-      hide-details
-      clearable
-      class="mr-2"
-      v-model="imageUrl"
-      @click:clear="onClearImageUrl"
-    />
-    <a-btn dense @click="importImageFromUrl">insert</a-btn>
-
-    secureUrl(url) {
-      const indexInterrogation = url.indexOf('?');
-      if (indexInterrogation !== -1) {
-        return url.slice(0, indexInterrogation);
-      } else {
-        return url;
-      }
-    },
-    async importImageFromUrl() {
-      const imageUrl = this.secureUrl(this.imageUrl);
-
-      const fileExtension = imageUrl.split('.').pop().toLowerCase();
-
-      try {
-        await fetch(imageUrl).then(async (response) => {
-          const blob = await response.blob();
-          const file = new File([blob], imageUrl, { type: `image/${fileExtension}` });
-          await this.createFileResource(file);
-        });
-      } catch (error) {
-        this.UrlErrorState = 1;
-      }
-    },*/
     close() {
       this.open = false;
     },

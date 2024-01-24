@@ -5,7 +5,6 @@
     @dragleave="$emit('dragleave', $event)"
     @dragover="$emit('dragover', $event)"
     @drop="$emit('drop', $event)"
-    @input="$emit('input', $event)"
     @update:modelValue="$emit('update:modelValue', $event)"
     :class="{ fontMonospace: cssFontMonospace, markdown: cssMarkdown }"
     :auto-grow="autoGrow"
@@ -19,37 +18,41 @@
     :variant="variant" />
 </template>
 
-<script>
-export default {
-  emits: ['blur', 'dragleave', 'dragover', 'drop', 'input', 'update:modelValue'],
-  props: {
-    //non vuetify props
-    cssFontMonospace: { type: Boolean, required: false },
-    cssMarkdown: { type: Boolean, required: false },
-    // //vuetify props
-    autoGrow: { type: Boolean, required: false },
-    disabled: { type: Boolean, required: false },
-    hideDetails: { type: [Boolean, String], required: false },
-    label: { type: String, required: false },
-    modelValue: { type: undefined, required: false },
-    readonly: { type: Boolean, required: false },
-    rows: { type: [Number, String], required: false },
-    rules: { type: Array, required: false },
-    variant: {
-      type: String,
-      validator: function (value) {
-        return ['underlined', 'outlined', 'filled', 'solo', 'solo-inverted', 'solo-filled', 'plain'].includes(value);
-      },
-      required: false,
-      default: 'filled',
+<script setup>
+import { ref } from 'vue';
+
+const emit = defineEmits(['blur', 'dragleave', 'dragover', 'drop', 'update:modelValue']);
+
+const props = defineProps({
+  //non vuetify props
+  cssFontMonospace: { type: Boolean, required: false },
+  cssMarkdown: { type: Boolean, required: false },
+  // //vuetify props
+  autoGrow: { type: Boolean, required: false },
+  disabled: { type: Boolean, required: false },
+  hideDetails: { type: [Boolean, String], required: false },
+  label: { type: String, required: false },
+  modelValue: { type: undefined, required: false },
+  readonly: { type: Boolean, required: false },
+  rows: { type: [Number, String], required: false },
+  rules: { type: Array, required: false },
+  variant: {
+    type: String,
+    validator: function (value) {
+      return ['underlined', 'outlined', 'filled', 'solo', 'solo-inverted', 'solo-filled', 'plain'].includes(value);
     },
+    required: false,
+    default: 'filled',
   },
-  methods: {
-    inputSelectionStart() {
-      return this.$refs.refTextarea.$el.querySelector('textarea').selectionStart;
-    },
-  },
-};
+});
+
+const refTextarea = ref(null);
+
+function inputSelectionStart() {
+  return refTextarea.value.$el.querySelector('textarea').selectionStart;
+}
+
+defineExpose({ inputSelectionStart });
 </script>
 
 <style scoped lang="scss">

@@ -22,7 +22,7 @@
       class="mt-3"
       label="Instructions Body (Markdown)"
       :value="modelValue.body"
-      @input="handleBodyChange"
+      @update:modelValue="handleBodyChange"
       :disabled="disabled"
       hide-details />
 
