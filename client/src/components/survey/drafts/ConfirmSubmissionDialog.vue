@@ -8,7 +8,11 @@
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
         <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
-          <active-group-selector label="Group" class="d-inline-block" :value="groupId" @input="setGroup" />
+          <active-group-selector
+            label="Group"
+            class="d-inline-block"
+            :modelValue="groupId"
+            @update:modelValue="setGroup" />
           <a-btn icon @click="handleCloseGroupEditor">
             <a-icon>mdi-close</a-icon>
           </a-btn>
