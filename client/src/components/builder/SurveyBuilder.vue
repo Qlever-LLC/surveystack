@@ -1,5 +1,5 @@
 <template>
-  <div class="screen-root">
+  <div class="screen-root bg-white">
     <a-dialog v-model="viewCode">
       <app-code-view v-model="surveyUnderWork" style="height: 80vh" />
     </a-dialog>
