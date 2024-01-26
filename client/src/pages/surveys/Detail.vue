@@ -1,5 +1,5 @@
 <template>
-  <a-container v-if="entity && show" class="survey-detail">
+  <a-container v-if="entity && show" class="survey-detail bg-white" style="max-width: 100% !important">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
       <a-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <a-icon>mdi-pencil</a-icon>
@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <div class="pt-8 pb-4 d-flex justify-center start-button-container">
+    <div class="pt-8 pb-4 d-flex justify-center start-button-container bg-white">
       <div>
         <btn-dropdown
           :label="'Start Survey'"
@@ -296,6 +296,11 @@ export default {
 </script>
 ,
 <style scoped lang="scss">
+.survey-detail {
+  width: 100%;
+  height: 100%;
+}
+
 .survey-description {
   margin: 16px 0px;
   white-space: pre-wrap;
