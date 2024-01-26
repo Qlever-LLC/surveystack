@@ -43,8 +43,8 @@
     :rules="rules"
     :type="type"
     :single-line="singleLine">
-    <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
-      <slot name="selection" :props="props" :item="item" :index="index" />
+    <template v-if="selectionSlot" v-slot:selection="{ item, index }">
+      <slot name="selection" :item="item" :index="index" />
     </template>
 
     <template v-if="multiple" v-slot:chip="{ props, item, index }">
@@ -100,8 +100,8 @@
     :placeholder="placeholder"
     :return-object="returnObject"
     :type="type">
-    <template v-if="selectionSlot" v-slot:selection="{ props, item, index }">
-      <slot name="selection" :props="props" :item="item" :index="index" />
+    <template v-if="selectionSlot" v-slot:selection="{ item, index }">
+      <slot name="selection" :item="item" :index="index" />
     </template>
 
     <template v-if="multiple" v-slot:chip="{ props, item, index }">
@@ -134,7 +134,7 @@ export default {
     /* Named slot set to true to render slot
       Example:
       <a-select ... selectionSlot>
-        <template v-slot:selection="{ props, item, index }">
+        <template v-slot:selection="{ item, index }">
       </a-select>
     */
     selectionSlot: { type: Boolean, required: false },

@@ -131,8 +131,8 @@
         item-value="_id"
         label="Script Source"
         selectionSlot>
-        <template v-slot:selection="{ props, item }">
-          <div v-bind="props">{{ item.title }}</div>
+        <template v-slot:selection="{ item }">
+          <div>{{ item.title }}</div>
         </template>
       </a-select>
       <a-text-field
