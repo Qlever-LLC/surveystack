@@ -154,15 +154,15 @@
           {{ view.tab }}
         </a-tab>
       </a-tabs>
-      <a-window v-model="tab" touchless>
+      <a-window v-model="tab" :touch="false">
         <a-window-item>
           <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
           <app-submissions-table-client-csv
             :submissions="submissions"
             v-if="submissions"
-            :selected.sync="selected"
+            v-model:selected="selected"
             :archived="filter.showArchived"
-            :dataTableProps="dateTableProps"
+            :sortBy="sortBy"
             @onDataTablePropsChanged="onDataTablePropsChanged"
             @excludeMetaChange="filter.showCsvMeta = $event"
             :excludeMeta="!filter.showCsvMeta"
@@ -198,7 +198,11 @@
             @update:modelValue="changedPaginationSize" />
         </a-col>
         <a-col cols="10">
-          <a-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
+          <a-pagination
+            class="ml-0"
+            v-model="page"
+            :length="paginationTotalPages"
+            @update:modelValue="changedPaginationPage" />
         </a-col>
         <a-col cols="1">
           <div class="body-2 text-secondary mt-1 d-flex align-center justify-end" style="height: 100%">
@@ -307,10 +311,7 @@ export default {
       search: '',
       showArchiveModal: false,
       showDeleteModal: false,
-      dateTableProps: {
-        sortBy: [],
-        sortDesc: [],
-      },
+      sortBy: [],
       loading: false,
       reassignment: {
         showModal: false,
@@ -527,13 +528,15 @@ export default {
       this.fetchData();
     },
     onDataTablePropsChanged(props) {
-      const { sortBy, sortDesc } = props;
       const sort = {};
 
-      if (sortBy.length > 0 && sortDesc.length > 0 && sortBy.length === sortDesc.length) {
+      if (props.length === 0) {
+        this.filter.sort = JSON.stringify(sort);
+        this.fetchData();
+      } else if (props.length > 0) {
         try {
-          for (let i = 0; i < sortBy.length; i++) {
-            sort[sortBy[i]] = sortDesc[i] ? -1 : 1;
+          for (let i = 0; i < props.length; i++) {
+            sort[props[i].key] = props[i].order === 'desc' ? -1 : 1;
           }
           this.filter.sort = JSON.stringify(sort);
           this.fetchData();
@@ -542,12 +545,7 @@ export default {
         }
       }
 
-      if (sortBy.length === 0 && sortDesc.length === 0) {
-        this.filter.sort = JSON.stringify(sort);
-        this.fetchData();
-      }
-
-      this.dateTableProps = props;
+      this.sortBy = props;
     },
     async startDownload() {
       downloadExternal(this.apiDownloadUrl, `${this.surveyEntity.name}.${this.apiDownloadFormat}`);

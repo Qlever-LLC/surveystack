@@ -81,7 +81,7 @@
                 <a-pagination
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
-                  @input="fetchRemoteSubmissions"
+                  @update:modelValue="fetchRemoteSubmissions"
                   color="grey-darken-1" />
               </template>
               <div v-else>

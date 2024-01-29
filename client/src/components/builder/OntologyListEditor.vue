@@ -74,25 +74,27 @@
         </div>
       </div>
 
-      <v-data-table
+      <a-data-table
         :headers="tableHeaders"
         :items="resource.content"
-        show-select
+        showSelect
         v-model="selectedItems"
         :search="search"
-        item-key="id"
-        disable-sort
-        :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }">
-        <template v-slot:item.label="{ item }">
+        itemKey="id"
+        labelSlot
+        valueSlot
+        tagsSlot
+        actionsSlot>
+        <template v-slot:label="{ item }">
           <a-text-field v-model="item.label" :disabled="disabled" variant="solo" dense hide-details />
         </template>
-        <template v-slot:item.value="{ item }">
+        <template v-slot:value="{ item }">
           <a-text-field v-model="item.value" :disabled="disabled" variant="solo" dense hide-details />
         </template>
-        <template v-slot:item.tags="{ item }">
+        <template v-slot:tags="{ item }">
           <a-text-field v-model="item.tags" :disabled="disabled" variant="solo" dense hide-details />
         </template>
-        <template v-slot:item.actions="{ item }">
+        <template v-slot:actions="{ item }">
           <div class="d-flex">
             <a-btn @click="moveItemUp(item)" tabindex="-1" :disabled="disabled" icon small>
               <a-icon icon="mdi-arrow-up" />
@@ -115,7 +117,7 @@
             </a-btn>
           </div>
         </template>
-      </v-data-table>
+      </a-data-table>
     </a-card-text>
     <a-spacer />
     <a-card-actions class="d-flex justify-end mr-3 align-start">
@@ -177,20 +179,24 @@ export default {
       editItemDialogIsVisible: false,
       tableHeaders: [
         {
-          text: 'Label',
+          title: 'Label',
           value: 'label',
+          sortable: false,
         },
         {
-          text: 'Value',
+          title: 'Value',
           value: 'value',
+          sortable: false,
         },
         {
-          text: 'Tags',
+          title: 'Tags',
           value: 'tags',
+          sortable: false,
         },
         {
-          text: 'Actions',
+          title: 'Actions',
           value: 'actions',
+          sortable: false,
           width: 1,
         },
       ],
@@ -263,7 +269,7 @@ export default {
       }
     },
     deleteSelectedItems() {
-      const isNotSelectedItem = (item) => !this.selectedItems.some((s) => s.id === item.id);
+      const isNotSelectedItem = (item) => !this.selectedItems.some((s) => s === item.id);
       const newItems = this.resource.content.filter(isNotSelectedItem);
       this.selectedItems = [];
       this.$emit('change', {
