@@ -132,7 +132,7 @@
   <v-combobox
     v-else-if="allowCustomItem"
     ref="selectRef"
-    :modelValue="value"
+    :modelValue="modelValue"
     @update:modelValue="updateValue"
     :search="searchInput"
     @update:search="updateSearch"
@@ -259,7 +259,6 @@ export default {
     return {
       MAX_ITEMS: 15,
       internalSearch: null,
-      value: this.modelValue,
       inputSearch: this.searchInput,
     };
   },
@@ -274,7 +273,6 @@ export default {
       this.$emit('update:modelValue', ev);
     },
     updateValue(val) {
-      this.value = val;
       this.$emit('update:modelValue', val);
     },
     updateSearch(val) {
