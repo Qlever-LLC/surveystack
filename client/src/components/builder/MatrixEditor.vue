@@ -95,13 +95,13 @@
                           style="max-width: 10rem" />
                         <a-btn
                           @click="createOntology(i)"
-                          small
+                          x-small
                           icon
                           :color="!item.resource ? 'primary' : ''"
                           class="ml-auto">
                           <a-icon>mdi-plus</a-icon>
                         </a-btn>
-                        <a-btn @click="openOntologyEditor(item.resource)" small :disabled="!item.resource" icon>
+                        <a-btn @click="openOntologyEditor(item.resource)" x-small :disabled="!item.resource" icon>
                           <a-icon>mdi-pencil</a-icon>
                         </a-btn>
                       </div>
@@ -110,13 +110,13 @@
                         label="Multi-select"
                         hide-details
                         color="grey-darken-1"
-                        class="mt-0 ml-2 align-center align-self-start" />
+                        class="align-center align-self-start" />
                       <a-checkbox
                         v-model="item.custom"
                         label="Allow custom answer"
                         hide-details
                         color="grey-darken-1"
-                        class="mt-0 ml-2 align-center align-self-start">
+                        class="align-center align-self-start">
                         <template v-slot:helper-text>
                           Allows the user to input answers that do not exist within the provided items.
                         </template>
@@ -153,7 +153,7 @@
                     <date
                       v-if="item.type === 'date'"
                       v-model="item.defaultValue"
-                      @blur="() => handleDefaultValueTrim(i)"
+                      @blur="handleDefaultValueTrim(i)"
                       type="date"
                       dense />
 
@@ -283,6 +283,7 @@ export default {
       required: true,
     },
   },
+  emits: ['set-survey-resources', 'set-control-required', 'close-dialog'],
   data() {
     return {
       deleteDialogIsVisible: false,
@@ -308,6 +309,7 @@ export default {
         return columns;
       },
       set(columns) {
+        //TODO refactor illegal prop mutation
         this.modelValue.config.fixedColumns = Math.max(
           0,
           columns.findIndex((c) => c.isFixedUntilMarker === true)
@@ -386,6 +388,7 @@ export default {
       this.columns = columns;
     },
     addColumn() {
+      //TODO refactor illegal prop mutation
       this.modelValue.content = [...this.modelValue.content, this.createEmptyColumn()];
     },
     onChanged(item, value) {

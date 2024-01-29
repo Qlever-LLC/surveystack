@@ -15,22 +15,24 @@
       v-if="!loading"
       :disabled="loading"
       style="overflow: auto"
-      v-model:selected="listSelection"
-      :selectStrategy="!!control.options.hasMultipleSelections ? 'classic' : 'single-leaft'"
+      :selected="listSelection"
+      :selectStrategy="!!control.options.hasMultipleSelections ? 'classic' : 'single-leaf'"
       @update:selected="localChange">
       <a-list-item
         v-for="(item, idx) in transformed"
         :value="hashItem(item)"
         :key="`item_${idx}`"
+        dense
         :disabled="!control.options.hasMultipleSelections && item.value.isField">
-        <template v-slot:default="{ active }">
+        <template v-slot:prepend="{ isSelected }">
           <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
             <a-checkbox
               v-if="control.options.hasMultipleSelections"
-              :modelValue="active"
+              :modelValue="isSelected"
               :true-value="hashItem(item)"
-              color="focus" />
-            <a-radio-group v-else :modelValue="active">
+              color="focus"
+              hide-details />
+            <a-radio-group v-else :modelValue="isSelected" hide-details>
               <a-radio :value="true" color="focus" />
             </a-radio-group>
           </a-list-item-action>
@@ -152,26 +154,24 @@ const transform = (assets) => {
 };
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
-  data() {
-    return {
-      transformed: [],
-    };
-  },
+  mixins: [baseQuestionComponent, farmosBase],
+  data: () => ({
+    transformed: [],
+  }),
   async created() {
     await this.fetchAssets();
     this.transformed = transform(this.assets);
   },
   computed: {
     listSelection() {
-      if (this.value === null && this.control.options.hasMultipleSelections) {
+      if (this.modelValue === null && this.control.options.hasMultipleSelections) {
         return [];
       }
-      if (this.value !== null && !this.control.options.hasMultipleSelections) {
-        return hashItem({ value: this.value[0] });
+      if (this.modelValue !== null && !this.control.options.hasMultipleSelections) {
+        return [hashItem({ value: this.modelValue[0] })];
       }
-      if (this.control.options.hasMultipleSelections && Array.isArray(this.value)) {
-        return this.value.map((v) => hashItem({ value: v }));
+      if (this.control.options.hasMultipleSelections && Array.isArray(this.modelValue)) {
+        return this.modelValue.map((v) => hashItem({ value: v }));
       }
       return null;
     },
@@ -195,7 +195,9 @@ export default {
         if (typeof h !== 'string') {
           return h;
         }
-        return this.transformed.find((t) => t.value.hash === h).value;
+
+        const foundTransformed = this.transformed.find((t) => t.value.hash === h);
+        return foundTransformed.value;
       });
 
       const fields = selectedItems.filter((item) => !!item.isField);
@@ -235,9 +237,7 @@ export default {
   white-space: nowrap;
 }
 
-.farm-os-planting >>> .v-list-item__title .orange-chip,
-.farm-os-planting >>> .v-list-item__title .green-chip,
-.farm-os-planting >>> .v-list-item__title .blue-chip {
+:deep(.blue-chip, .orange-chip, .green-chip) {
   display: inline-flex;
   border: 1px rgb(var(--v-theme-focus)) solid;
   background-color: white;
@@ -251,12 +251,12 @@ export default {
   vertical-align: middle;
 }
 
-.farm-os-planting >>> .v-list-item__title .green-chip {
+:deep(.green-chip) {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-.farm-os-planting >>> .v-list-item__title .orange-chip {
+:deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
 }

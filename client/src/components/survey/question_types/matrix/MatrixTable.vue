@@ -11,7 +11,7 @@
         }"
         :style="cellWidthStyles[colIdx]"
         :key="colIdx">
-        <div ref="headerCells" class="white px-4 d-flex flex-nowrap mt-cell" :style="{ position: 'relative' }">
+        <div ref="headerCells" class="bg-white px-4 d-flex flex-nowrap mt-cell" :style="{ position: 'relative' }">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
@@ -31,7 +31,7 @@
           :key="colIdx"
           :class="{ 'mt-elevation-shadow': isLeftFloating && colIdx === fixedColumns - 1 }"
           :style="leftFixStyles[colIdx]">
-          <div class="mt-cell d-flex align-center white px-1">
+          <div class="mt-cell d-flex align-center bg-white px-1">
             <slot
               v-if="shouldRenderCell(rowIdx, colIdx)"
               name="row-cell"
@@ -43,7 +43,7 @@
         </div>
         <div
           v-if="$slots.rowActions"
-          class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 white"
+          class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 bg-white"
           :class="{ 'mt-elevation-shadow': isRightFloating }">
           <div class="mt-actions d-flex align-center">
             <slot name="rowActions" v-bind:rowIdx="rowIdx"></slot>

@@ -138,7 +138,7 @@ export default {
   },
   data() {
     return {
-      fileResourceKeys: this.value || [],
+      fileResourceKeys: this.modelValue || [],
       isDragging: false,
       alertMessageVisible: false,
       alertMessage: null,

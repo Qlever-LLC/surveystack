@@ -42,7 +42,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
+  mixins: [baseQuestionComponent, farmosBase],
 
   async created() {
     await this.fetchFarms();

@@ -20,16 +20,18 @@
       @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
+      selectionSlot
       itemSlot
       cssFlexWrap>
-      <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
-        <a-chip v-bind="props" closable>
-          {{ item.title }}
-        </a-chip>
+      <template v-slot:selection="{ item, index }">
+        <span v-html="item.props.title" />
+      </template>
+      <template v-slot:chip="{ props, item }">
+        <a-chip v-bind="props" closable v-html="item.title" style="height: 50px" />
       </template>
       <template v-slot:item="{ props, item }">
-        <a-list-item v-bind="props">
-          <a-list-item-title>{{ item.label }} </a-list-item-title>
+        <a-list-item v-bind="props" :title="undefined">
+          <a-list-item-title v-html="item.raw.label" />
         </a-list-item>
       </template>
     </a-select>
@@ -43,7 +45,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
+  mixins: [baseQuestionComponent, farmosBase],
 
   async created() {
     await this.fetchAreas();
@@ -52,9 +54,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-div >>> .blue-chip,
-div >>> .orange-chip,
-div >>> .green-chip {
+:deep(.blue-chip, .orange-chip, .green-chip) {
   display: inline-flex;
   border: 1px rgb(var(--v-theme-focus)) solid;
   color: rgb(var(--v-theme-focus));
@@ -70,17 +70,17 @@ div >>> .green-chip {
   margin-right: 0.2rem !important;
 }
 
-div >>> .green-chip {
+:deep(.green-chip) {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-div >>> .orange-chip {
+:deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
 }
 
->>> .v-list-item.v-list-item--active {
+:deep(.v-list-item.v-list-item--active) {
   color: rgb(var(--v-theme-focus)) !important;
 }
 </style>

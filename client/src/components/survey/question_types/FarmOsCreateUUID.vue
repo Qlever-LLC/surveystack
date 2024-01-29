@@ -7,8 +7,7 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <div style="display: flex">
       <div style="flex: 1">
         <a-text-field
@@ -21,8 +20,7 @@
           class="full-width"
           :disabled="!relevant"
           hide-details
-          color="focus"
-        />
+          color="focus" />
       </div>
     </div>
 
@@ -47,7 +45,7 @@ export default {
       this.$emit('next');
     },
     onInput(v) {
-      if (!this.value || this.value.value !== v) {
+      if (!this.modelValue || this.modelValue.value !== v) {
         const val = getValueOrNull(v);
         this.changed({
           name: val,
@@ -67,10 +65,10 @@ export default {
   },
   computed: {
     localValue() {
-      if (this.value == null) {
+      if (this.modelValue == null) {
         return '';
       } else {
-        return this.value && this.value.name ? this.value.name : '';
+        return this.modelValue && this.modelValue.name ? this.modelValue.name : '';
       }
     },
   },

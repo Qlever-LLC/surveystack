@@ -41,7 +41,7 @@
     <div v-if="this.source">
       <iframe src="" frameborder="0" ref="iframe" sandbox="allow-scripts allow-same-origin allow-popups" />
 
-      <div class="android-button-container" v-if="!this.value">
+      <div class="android-button-container" v-if="!this.modelValue">
         <a-btn
           v-if="control.options.isNativeScript"
           class=""
@@ -129,7 +129,7 @@ export default {
         {
           type: 'REQUEST_RUN_SCRIPT',
           payload: {
-            value: this.value,
+            value: this.modelValue,
             context: this.meta.context || {},
             status: this.status || { type: null, message: null },
           },
@@ -142,7 +142,7 @@ export default {
         {
           type: 'REQUEST_RENDER_SCRIPT',
           payload: {
-            value: this.value,
+            value: this.modelValue,
             context: this.meta.context || {},
           },
         },
@@ -150,7 +150,7 @@ export default {
       );
     },
     handleScriptHasLoaded() {
-      if (this.value) {
+      if (this.modelValue) {
         this.requestRenderScript();
       }
     },
@@ -245,7 +245,7 @@ export default {
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
       const parentJSON = JSON.stringify(this.parent);
-      const valueJSON = JSON.stringify(this.value);
+      const valueJSON = JSON.stringify(this.modelValue);
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});

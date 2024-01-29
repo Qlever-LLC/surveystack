@@ -57,10 +57,10 @@
             </a-form>
           </a-card-text>
           <a-card-actions class="d-flex justify-space-between">
-            <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
-              <a-icon left>mdi-trash-can-outline</a-icon>Delete
+            <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error" dense>
+              <a-icon left>mdi-trash-can-outline</a-icon>
             </a-btn>
-            <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2">
+            <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2" dense>
               Close <a-icon right>mdi-close</a-icon>
             </a-btn>
           </a-card-actions>
@@ -110,15 +110,13 @@
         </a-form>
       </template>
       <template v-if="!isMobile" v-slot:rowActions="{ rowIdx }">
-        <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
-          <div class="d-flex">
-            <a-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
-              <a-icon>mdi-trash-can-outline</a-icon>
-            </a-btn>
-            <a-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
-              <a-icon>mdi-content-copy</a-icon>
-            </a-btn>
-          </div>
+        <div class="d-flex flex-grow-1" style="padding-left: 4px !important; padding-right: 0px">
+          <a-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" dense>
+            <a-icon>mdi-trash-can-outline</a-icon>
+          </a-btn>
+          <a-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" dense>
+            <a-icon>mdi-content-copy</a-icon>
+          </a-btn>
         </div>
       </template>
     </app-matrix-table>
@@ -247,7 +245,7 @@ const transform = (assets) => {
 };
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
+  mixins: [baseQuestionComponent, farmosBase],
   components: {
     appDialog,
     appMatrixCell,
@@ -257,7 +255,7 @@ export default {
   },
   data() {
     return {
-      rows: this.value,
+      rows: this.modelValue,
       rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
       farmosTransformedPlantings: [],
@@ -390,8 +388,9 @@ export default {
     this.isFarmOsLoading = false;
   },
   watch: {
-    value() {
-      this.rows = this.value || [];
+    modelValue() {
+      //TODO CHECK
+      this.rows = this.modelValue || [];
     },
   },
 };

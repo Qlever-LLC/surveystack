@@ -57,8 +57,8 @@
     cssFlexNoWrap
     cssOneLineSpan
     selectionSlot>
-    <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
-      <matrix-cell-selection-label v-bind="props" :label="item.raw.label" :index="index" :value="value" />
+    <template v-slot:selection="{ item, index }" v-if="!header.multiple">
+      <matrix-cell-selection-label :label="item.raw.label" :index="index" :value="value" />
     </template>
     <template v-slot:chip="{ props, item, index }" v-else>
       <matrix-cell-selection-label v-bind="props" :label="item.raw.label" :index="index" :value="value" />
@@ -83,8 +83,8 @@
     selectionSlot
     cssFlexNoWrap
     cssOneLineSpan>
-    <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
-      <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
+    <template v-slot:selection="{ item, index }" v-if="!header.multiple">
+      <matrix-cell-selection-label :label="getDropdownLabel(item.value)" :index="index" :value="value" />
     </template>
     <template v-slot:chip="{ props, item, index }" v-else>
       <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
@@ -140,8 +140,8 @@
     itemSlot
     cssFlexNoWrap
     cssOneLineSpan>
-    <template v-slot:selection="{ props, item, index }" v-if="!header.multiple">
-      <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
+    <template v-slot:selection="{ item, index }" v-if="!header.multiple">
+      <matrix-cell-selection-label :html="item.raw.label" :index="index" :value="value" />
     </template>
     <template v-slot:chip="{ props, item, index }" v-else>
       <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
@@ -177,7 +177,7 @@
           @click:clear="setToNull" />
       </template>
       <a-date-picker
-        :modelValue="value"
+        :modelValue="value ? new Date(value) : null"
         ref="datepickerRef"
         @update:modelValue="onDateInput($event, index, header)"
         no-title />
@@ -192,10 +192,10 @@ import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
 import { uuidv4 } from '@/utils/surveys';
 import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
-import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 export default {
   components: {
@@ -293,12 +293,8 @@ export default {
       this.$emit('changed');
     },
     onDateInput(value, index, header) {
-      const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
-      let date = new Date(value);
-
-      if (isValidFormat && isValid(date)) {
-        // remove 'Z'
-        this.value = date.toISOString().slice(0, -1);
+      if (isValid(value)) {
+        this.value = zonedTimeToUtc(value).toISOString();
         this.$emit('changed');
       }
 

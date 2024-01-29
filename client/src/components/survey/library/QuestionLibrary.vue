@@ -1,10 +1,10 @@
 <template>
   <div>
-    <a-card-title class="pl-0">
-      <a-icon class="mr-1">mdi-library</a-icon>
+    <a-card-title class="pl-0 row">
+      <a-icon class="col-grow-1 mr-1 text-medium-emphasis">mdi-library</a-icon>
       Question Library
       <a-spacer />
-      <a-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" small tile elevation="0">
+      <a-btn icon key="library" @click="$emit('cancel')" class="col-shrink-1 mt-n5 mr-n6" small tile elevation="0">
         <a-icon> mdi-close </a-icon>
       </a-btn>
     </a-card-title>
@@ -44,7 +44,7 @@
                   color="grey"
                   key="close"
                   @click.stop="toggleCard(c._id)"
-                  class="mt-n5 mr-1 d-inline-block shadow white span-button"
+                  class="mt-n5 mr-1 d-inline-block shadow bg-white span-button"
                   outlined
                   small>
                   back

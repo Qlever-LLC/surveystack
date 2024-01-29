@@ -114,9 +114,9 @@ export async function addDrawingLayer(map, value) {
 }
 
 /**
- * Calculate the next value to assign to component's `this.value`
+ * Calculate the next value to assign to component's `this.modelValue`
  * @param {string} geojson: stringified geojson FeatureCollection emitted from map
- * @returns {string|null} next value to assign to components `this.value`
+ * @returns {string|null} next value to assign to components `this.modelValue`
  */
 export function getNextValue(geojson) {
   const parsedGeoJSON = geojson && JSON.parse(geojson);
@@ -157,7 +157,7 @@ export default {
       this.mapInstance = new MapInstanceManager().create(this.mapId);
 
       await addBaseLayer(this.mapInstance);
-      await addDrawingLayer(this.mapInstance, this.value);
+      await addDrawingLayer(this.mapInstance, this.modelValue);
 
       const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
       this.mapInstance.edit.geoJSONOn('featurechange', mapChangeHandler);
@@ -167,7 +167,7 @@ export default {
       });
 
       // If no features exist in value, run automatic behaviors
-      if (!this.value) {
+      if (!this.modelValue) {
         this.mapInstance.attachBehavior({
           attach(instance) {
             const controls = instance.map.getControls().getArray();
