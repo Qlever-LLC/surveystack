@@ -1,9 +1,9 @@
 <template>
   <div class="text-center">
     <a-btn v-bind="$attrs" @click="$emit('click', $event)" class="main-button"> {{ label }} </a-btn>
-    <a-menu v-if="showDropDown" v-model="menuIsOpen" v-bind="$attrs" location="bottom" class="pa-0 ma-0 right">
+    <a-menu v-if="showDropDown" v-model="menuIsOpen" location="bottom" class="pa-0 ma-0 right">
       <template v-slot:activator="{ props }">
-        <a-btn v-bind="props" class="dropdown-button"><a-icon>mdi-chevron-down</a-icon></a-btn>
+        <a-btn v-bind="{ ...$attrs, ...props }" class="dropdown-button"><a-icon>mdi-chevron-down</a-icon></a-btn>
       </template>
       <slot></slot>
     </a-menu>
