@@ -1,5 +1,5 @@
 <template>
-  <v-window v-model="value" @update:modelValue="$emit('update:modelValue', $event)">
+  <v-window v-model="value" @update:modelValue="$emit('update:modelValue', $event)" :touch="touch">
     <slot />
   </v-window>
 </template>
@@ -8,6 +8,7 @@
 export default {
   props: {
     modelValue: { type: undefined, required: false },
+    touch: { type: Boolean, required: false },
   },
   computed: {
     value() {

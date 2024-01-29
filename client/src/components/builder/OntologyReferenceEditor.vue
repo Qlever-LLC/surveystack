@@ -11,8 +11,7 @@
         :loading="loading"
         item-value="_id"
         item-title="name"
-        appendSlot
-      >
+        appendSlot>
         <template v-slot:append>
           <a-chip style="margin-top: -10px" color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
@@ -29,8 +28,7 @@
           @update:modelValue="updateResource"
           :loading="loading"
           item-value="path"
-          item-title="name"
-        />
+          item-title="name" />
       </template>
     </a-card-text>
     <a-spacer />
@@ -39,7 +37,7 @@
       <a-btn variant="text" @click="closeHandler"> Close </a-btn>
       <a-btn variant="text" color="green" @click="previewDialogIsVisible = true" :disabled="!path">
         Preview
-        <a-tooltip top activator="parent">No Submitted Surveys Available</a-tooltip>
+        <a-tooltip top activator="parent" :disabled="!!path">No Submitted Surveys Available</a-tooltip>
       </a-btn>
       <a-btn variant="text" color="error" @click="deleteResource"> Delete </a-btn>
       <a-btn variant="text" color="primary" @click="updateAndClose"> Save </a-btn>

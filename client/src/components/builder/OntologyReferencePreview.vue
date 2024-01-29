@@ -7,13 +7,7 @@
       </a-card-title>
 
       <a-card-text class="mt-4">
-        <v-data-table
-          :headers="tableHeaders"
-          :items="items"
-          :loading="loading"
-          item-key="id"
-          :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
-        />
+        <a-data-table :headers="tableHeaders" :items="items" :loading="loading" itemKey="id" />
       </a-card-text>
 
       <a-spacer />
@@ -37,7 +31,7 @@ export default defineComponent({
     SelectItemsDownloadButton,
   },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
     },
     resource: {
@@ -45,14 +39,14 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const items = ref([]);
     const loading = ref(false);
     const params = ref(null);
     const open = computed({
-      get: () => props.value || false,
-      set: (value) => emit('input', value),
+      get: () => props.modelValue || false,
+      set: (value) => emit('update:modelValue', value),
     });
 
     const fetchSubmissions = async (surveyId, path) => {
@@ -93,7 +87,7 @@ export default defineComponent({
       const key = id + path;
 
       // Skip fetching if dialog is closed or already fetchced items
-      if (!props.value || params.value === key) {
+      if (!props.modelValue || params.value === key) {
         return;
       }
 
@@ -105,12 +99,14 @@ export default defineComponent({
     return {
       tableHeaders: [
         {
-          text: 'Label',
+          title: 'Label',
           value: 'label',
+          sortable: true,
         },
         {
-          text: 'Value',
+          title: 'Value',
           value: 'value',
+          sortable: true,
         },
       ],
       open,

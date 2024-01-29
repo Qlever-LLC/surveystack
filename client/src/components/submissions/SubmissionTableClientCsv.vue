@@ -1,25 +1,20 @@
 <template>
   <a-card>
-    <v-data-table
+    <a-data-table-server
       ref="table"
       v-model="tableSelected"
-      :class="{ archived }"
-      :mobile-breakpoint="0"
+      :headerProps="{ archived }"
       :headers="headers"
       :items="items"
-      item-key="_id"
+      itemKey="_id"
       :loading="loading"
       :search="search"
-      :server-items-length="submissions.pagination.total"
-      :sort-by="dataTableProps.sortBy"
-      :sort-desc="dataTableProps.sortDesc"
-      @update:sort-by="onUpdateSortBy"
-      @update:sort-desc="onUpdateSortDesc"
-      show-select
-      multi-sort
-      disable-pagination
-      :hide-default-header="headers.length === 0"
-      hide-default-footer>
+      :items-length="submissions.pagination.total"
+      :sortBy="sortBy"
+      @update:sortBy="onUpdateSortBy"
+      :showSelect="headers.length !== 0"
+      multiSort
+      :headerSlot="headers.length !== 0">
       <template v-slot:top>
         <a-toolbar flat class="my-5" cssBackgroundCream>
           <a-row>
@@ -93,9 +88,9 @@
         </a-toolbar>
       </template>
 
-      <template v-slot:header.data-table-select="{ props }">
+      <template v-slot:[`header.data-table-select`]>
         <a-checkbox
-          :selected-item="selected.length === selectableItems.length"
+          :modelValue="selected.length === selectableItems.length"
           :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
           @click="toggleSelectAllItems"
           color="#777"
@@ -106,21 +101,21 @@
 
       <template v-for="header in headers" :key="header.value" v-slot:[`header.${header.value}`]>
         <span
-          @click.stop="openModal($event, [header.text, -1, header.value])"
-          :class="{ activeHeader: isModalOpen([header.text, -1, header.value]) }">
+          @click.stop="openModal($event, [header.title, -1, header.value])"
+          :class="{ activeHeader: isModalOpen([header.title, -1, header.value]) }">
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
-            {{ header.text }}
+            {{ header.title }}
           </div>
         </span>
       </template>
 
-      <template v-slot:item="{ item, index, isSelected, select }">
+      <template v-slot:item="{ item, index }">
         <tr :key="item._id">
           <td :class="{ 'expand-cell': isExpandMatrix }">
             <a-checkbox
-              :modelValue="isSelected"
+              :modelValue="isSelected(item)"
               :disabled="!isSelectable(item)"
-              @click="select(!isSelected)"
+              @click="toggleSelect(item)"
               color="#777"
               class="custom-checkbox"
               hide-details
@@ -128,7 +123,7 @@
           </td>
           <td
             v-for="header in headers"
-            :key="header.text"
+            :key="header.title"
             @click.stop="openModal($event, [getCellValue(item, header.value), index, header.value], true)"
             :class="{
               active: isModalOpen([getCellValue(item, header.value), index, header.value]),
@@ -156,7 +151,7 @@
             <div
               v-else-if="item[header.value].includes('resources/')"
               :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }">
-              <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
+              <a @click.stop="openResource(item[header.key])"> {{ getLabelFromKey(item[header.value]) }}</a>
             </div>
             <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
               {{ getCellValue(item, header.value) }}
@@ -164,7 +159,7 @@
           </td>
         </tr>
       </template>
-    </v-data-table>
+    </a-data-table-server>
 
     <submission-table-cell-modal
       v-if="cellText"
@@ -276,14 +271,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    dataTableProps: {
-      type: Object,
-      default() {
-        return {
-          sortBy: [],
-          sortDesc: [],
-        };
-      },
+    sortBy: {
+      type: Array,
+      required: false,
     },
     loading: {
       type: Boolean,
@@ -440,7 +430,7 @@ export default {
         PREFERRED_HEADERS.forEach((header) => {
           if (matrixHeaders.includes(header)) {
             headers.push({
-              text: header,
+              title: header,
               value: header,
               filter: this.createCustomFilter(header),
             });
@@ -457,7 +447,7 @@ export default {
 
           if (rawHeaders.includes(header)) {
             headers.push({
-              text: header,
+              title: header,
               value: header,
               filter: this.createCustomFilter(header),
             });
@@ -465,7 +455,7 @@ export default {
             const properties = getPropertiesFromMatrix(rawHeaders, header);
             headers.push(
               ...properties.map((h) => ({
-                text: `${header}.${h}`,
+                title: `${header}.${h}`,
                 value: [header, h].join(MATRIX_SEPARATOR),
                 filter: this.createCustomFilter([header, h].join(MATRIX_SEPARATOR)),
               }))
@@ -476,10 +466,7 @@ export default {
       this.headers = headers;
     },
     onUpdateSortBy(value) {
-      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortBy: value });
-    },
-    onUpdateSortDesc(value) {
-      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortDesc: value });
+      this.$emit('onDataTablePropsChanged', value);
     },
     async fetchData() {
       if (!this.submissions) {
@@ -502,6 +489,9 @@ export default {
         this.downloadingResource = false;
       }
     },
+    isSelected(item) {
+      return this.tableSelected.some((selected) => selected._id === item._id);
+    },
     isSelectable(item) {
       //load original submission object, as item may miss meta data if excludeMeta is true
       const submission = this.submissions.content.find((s) => s._id === item._id);
@@ -513,6 +503,13 @@ export default {
       const isCreator = submission.meta.creator === this.user._id;
 
       return isAdminOfSubmissionGroup || isCreator;
+    },
+    toggleSelect(item) {
+      if (this.isSelected(item)) {
+        this.tableSelected = this.tableSelected.filter((selectedItem) => selectedItem._id !== item._id);
+      } else {
+        this.tableSelected.push(item);
+      }
     },
     toggleSelectAllItems() {
       if (this.selected.length > 0) {
@@ -531,11 +528,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.v-data-table >>> td {
+.v-data-table :deep(td) {
   font-family: monospace;
   white-space: nowrap;
 }
-.v-data-table >>> th {
+.v-data-table :deep(thead) > tr th {
+  padding: 0 16px !important;
+}
+
+.v-data-table :deep(th) {
   white-space: nowrap;
 }
 
@@ -579,20 +580,20 @@ export default {
   padding: 0.9rem 0;
 }
 
-.v-data-table >>> td.expand-cell {
+.v-data-table :deep(td.expand-cell) {
   vertical-align: top;
   padding-top: 8px;
   padding-bottom: 8px;
   height: 24px;
 }
 
-.v-data-table >>> td.matrix-cell {
+.v-data-table :deep(td.matrix-cell) {
   position: relative;
   height: 24px;
   line-height: 24px;
 }
 
-.v-data-table >>> td.expand-cell tr td.matrix-cell div::after {
+.v-data-table :deep(td.expand-cell) tr td.matrix-cell div::after {
   content: '';
   position: absolute;
   left: -16px;
@@ -602,7 +603,7 @@ export default {
   border-top: thin solid rgba(0, 0, 0, 0.12);
 }
 
-.v-data-table >>> td.expand-cell tr:not(.last-row):last-child td.matrix-cell div::after {
+.v-data-table :deep(td.expand-cell) tr:not(.last-row):last-child td.matrix-cell div::after {
   height: calc(100% + 1px);
   border-bottom: thin solid rgba(0, 0, 0, 0.12);
 }

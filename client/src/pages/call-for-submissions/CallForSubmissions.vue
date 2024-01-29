@@ -7,8 +7,7 @@
       :searchResults="searchResults"
       @hide="showSelectSurvey = false"
       @search="searchSurveys"
-      @selected="selectSurvey"
-    />
+      @selected="selectSurvey" />
     <a-card class="my-2">
       <a-card-text>
         <label>Survey</label>
@@ -34,25 +33,23 @@
       <a-card-title>Select members</a-card-title>
       <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
       <a-card-text>
-        <v-data-table
+        <a-data-table
           v-model="selectedMembers"
           :items="activeMembers"
           :headers="headers"
-          disable-pagination
-          hide-default-footer
-          show-select
-          item-key="_id"
-          loading="isLoadingMembers"
-        >
-          <template v-slot:item.actions="{ item }">
+          showSelect
+          itemKey="_id"
+          :loading="isLoadingMembers"
+          hideDefaultFooter
+          actionsSlot>
+          <template v-slot:actions="{ item }">
             <app-confirm-membership-button
               v-if="item.meta.status === 'pending'"
               :membershipId="item._id"
               :email="item.meta.invitationEmail"
-              @confirmed="loadMembers"
-            />
+              @confirmed="loadMembers" />
           </template>
-        </v-data-table>
+        </a-data-table>
       </a-card-text>
     </a-card>
 
@@ -76,8 +73,7 @@
       v-model="showSubmitResult"
       :items="submitResults"
       title="Call for Submissions"
-      @close="showSubmitResult = false"
-    />
+      @close="showSubmitResult = false" />
   </a-container>
 </template>
 
@@ -116,10 +112,10 @@ export default {
       body: defaultBody,
       copy: false,
       headers: [
-        { text: 'id', value: '_id' },
-        { text: 'name', value: 'name' },
-        { text: 'email', value: 'email' },
-        { text: 'actions', value: 'actions' },
+        { title: 'id', value: '_id', sortable: true },
+        { title: 'name', value: 'name', sortable: true },
+        { title: 'email', value: 'email', sortable: true },
+        { title: 'actions', value: 'actions', sortable: true },
       ],
       showConfirmDialog: false,
       isLoadingMembers: false,
