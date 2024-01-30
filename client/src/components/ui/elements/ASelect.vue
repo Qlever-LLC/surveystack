@@ -47,7 +47,7 @@
       <slot name="selection" :item="item" :index="index" />
     </template>
 
-    <template v-if="multiple" v-slot:chip="{ props, item, index }">
+    <template v-if="chipSlot" v-slot:chip="{ props, item, index }">
       <slot name="chip" :props="props" :item="item" :index="index" />
     </template>
 
@@ -112,7 +112,7 @@
       <slot name="selection" :item="item" :index="index" />
     </template>
 
-    <template v-if="multiple" v-slot:chip="{ props, item, index }">
+    <template v-if="chipSlot" v-slot:chip="{ props, item, index }">
       <slot name="chip" :props="props" :item="item" :index="index" />
     </template>
 
@@ -221,6 +221,7 @@ export default {
     //vuetify props
     appendIcon: { type: undefined, required: false },
     chips: { type: Boolean, required: false },
+    chipSlot: { type: Boolean, required: false },
     clearable: { type: Boolean, required: false },
     closableChips: { type: Boolean, required: false },
     color: { type: String, required: false },

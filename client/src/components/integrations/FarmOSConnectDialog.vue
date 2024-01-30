@@ -16,8 +16,8 @@
           class="mt-4"
           v-model="selectedFarms"
           prependItemSlot
-          itemSlot
-        >
+          chipSlot
+          itemSlot>
           <template v-slot:chip="{ props, item }">
             <v-chip v-bind="props">{{ item.raw.instanceName }}</v-chip>
           </template>
@@ -28,8 +28,7 @@
               :loading="loadingOwners"
               :disabled="selectedFarms.length <= 0"
               color="primary"
-              class="button--autocomplete"
-            >
+              class="button--autocomplete">
               Connect selected Farms
             </a-btn>
           </template>

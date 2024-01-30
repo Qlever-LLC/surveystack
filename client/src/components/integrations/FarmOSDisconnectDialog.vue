@@ -8,6 +8,7 @@
         <a-select
           label="Select Groups"
           multiple
+          chips
           :items="allGroups"
           :item-title="(g) => `${g.name} (${g.path})`"
           :item-value="(g) => `${g._id}`"
@@ -15,8 +16,8 @@
           v-model="selectedGroups"
           dense
           open-on-clear
-          prependItemSlot
-        >
+          chipSlot
+          prependItemSlot>
           <template v-slot:chip="{ props, item }">
             <a-chip v-bind="props" closable>
               {{ item.title }}
@@ -28,8 +29,7 @@
               :loading="loading"
               @click="updateGroups"
               color="primary"
-              class="button--autocomplete"
-            >
+              class="button--autocomplete">
               Update Groups
             </a-btn>
           </template>

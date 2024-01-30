@@ -21,6 +21,7 @@
       :loading="loading"
       color="focus"
       class="autocomplete"
+      chipSlot
       itemSlot>
       <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
         <a-chip v-bind="props" closable>

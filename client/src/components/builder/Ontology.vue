@@ -20,8 +20,10 @@ data-test-id="autocomplete" was removed-->
     label="Default value"
     :menu-props="autocompleteMenuProps"
     :multiple="multiple"
+    :chips="multiple"
     :variant="outlined ? 'outlined' : undefined"
-    :itemSlot="multiple">
+    :itemSlot="multiple"
+    chipSlot>
     <template v-slot:chip="{ props, item }">
       <a-chip v-bind="props" closable>{{ item.raw.value }}</a-chip>
     </template>
@@ -58,7 +60,8 @@ data-test-id="autocomplete" was removed-->
     :menu-props="autocompleteMenuProps"
     :multiple="multiple"
     :outlined="outlined"
-    selectionSlot>
+    selectionSlot
+    chipSlot>
     <template v-slot:chip="{ props, item }">
       <a-chip v-bind="props" closable>
         {{ getLabelForItemValue(item.value) }}

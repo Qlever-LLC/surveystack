@@ -56,6 +56,7 @@
     clearable
     cssFlexNoWrap
     cssOneLineSpan
+    chipSlot
     selectionSlot>
     <template v-slot:selection="{ item, index }" v-if="!header.multiple">
       <matrix-cell-selection-label :label="item.raw.label" :index="index" :value="value" />
@@ -80,6 +81,7 @@
     :disabled="disabled"
     hide-details
     variant="outlined"
+    :chipSlot="header.multiple"
     selectionSlot
     cssFlexNoWrap
     cssOneLineSpan>
@@ -103,6 +105,7 @@
     clearable
     variant="outlined"
     :disabled="disabled || loading"
+    :chipSlot="header.multiple"
     selectionSlot
     itemSlot
     cssFlexNoWrap
@@ -136,6 +139,7 @@
     clearable
     variant="outlined"
     :disabled="disabled || loading"
+    :chipSlot="header.multiple"
     selectionSlot
     itemSlot
     cssFlexNoWrap

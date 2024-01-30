@@ -21,6 +21,7 @@
       :loading="loading"
       color="focus"
       selectionSlot
+      chipSlot
       itemSlot
       cssFlexWrap>
       <template v-slot:selection="{ item, index }">

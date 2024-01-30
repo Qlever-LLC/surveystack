@@ -30,6 +30,7 @@
       data-test-id="dropdown"
       clearable
       cssMinHeight56px
+      :chipSlot="!!control.options.hasMultipleSelections"
       :itemSlot="!!control.options.hasMultipleSelections">
       <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
         <a-chip v-bind="props" closable>
@@ -70,6 +71,7 @@
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
       cssMinHeight56px
+      :chipSlot="!!control.options.hasMultipleSelections"
       selectionSlot>
       <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
         <a-chip v-bind="props" closable>

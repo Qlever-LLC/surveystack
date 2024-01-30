@@ -42,14 +42,14 @@
         :class="isDragging ? 'dragging' : ''"
         for="fileInput"
         @click.stop="showFileChooser">
-        <div class="col-12 pb-0">
+        <div class="col-12 mt-4">
           <a-icon color="primary" x-large>mdi-cloud-upload-outline</a-icon>
         </div>
-        <div class="col-12 font-weight-bold">
+        <div class="col-12 mb-4 font-weight-bold">
           {{ $vuetify.display.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
         </div>
         <div
-          class="col-12 pt-0"
+          class="col-12 mb-4"
           v-if="
             ($vuetify.display.mobile || forceMobile) &&
             supportsImageCapture() &&
@@ -93,24 +93,23 @@
           <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
             <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
           </a-list-item-title>
-          <a-list-item-subtitle v-if="showUploadProgressIndex === index"
-            ><a-progress-linear class="mb-0"
-          /></a-list-item-subtitle>
-          <a-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
-            <a-btn icon @click="editResourceName(fileResourceKey, index)">
-              <a-icon color="grey-lighten-1">mdi-pencil</a-icon>
-            </a-btn>
-          </a-list-item-action>
-          <a-list-item-action v-if="editIndex === index">
-            <a-btn icon @click="commitResourceName(fileResourceKey, index)">
+          <a-list-item-subtitle v-if="showUploadProgressIndex === index">
+            <a-progress-linear class="mb-0" />
+          </a-list-item-subtitle>
+          <template v-slot:append>
+            <a-btn v-if="editIndex === index" icon @click="commitResourceName(fileResourceKey, index)">
               <a-icon color="success">mdi-check</a-icon>
             </a-btn>
-          </a-list-item-action>
-          <a-list-item-action>
+            <a-btn
+              v-if="isNameEditable(fileResourceKey) && editIndex !== index"
+              icon
+              @click="editResourceName(fileResourceKey, index)">
+              <a-icon color="grey-lighten-1">mdi-pencil</a-icon>
+            </a-btn>
             <a-btn icon @click="remove(index)">
               <a-icon color="grey-lighten-1">mdi-close-circle</a-icon>
             </a-btn>
-          </a-list-item-action>
+          </template>
         </a-list-item>
       </a-list>
     </a-expand-transition>
@@ -175,13 +174,13 @@ export default {
       let selectedFiles = [];
       if (event.dataTransfer.items) {
         // Use DataTransferItemList interface to access the file(s)
-        event.dataTransfer.items.forEach((item) => {
+        for (const item of event.dataTransfer.items) {
           if (item.kind === 'file') {
             selectedFiles.push(item.getAsFile());
           } else {
             this.showTypeNotAllowedAlert = true;
           }
-        });
+        }
       } else {
         // Use DataTransfer interface to access the file(s)
         selectedFiles.push(...event.dataTransfer.files);

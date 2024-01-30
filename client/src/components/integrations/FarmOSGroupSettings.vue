@@ -31,7 +31,8 @@
             v-model="selectedPlans"
             :items="plans"
             :item-value="(p) => p._id"
-            :item-title="(p) => `${p.planName} (${p.planUrl})`">
+            :item-title="(p) => `${p.planName} (${p.planUrl})`"
+            chipSlot>
             <template v-slot:chip="{ props, item }">
               <a-chip v-bind="props" closable>
                 {{ item.title }}

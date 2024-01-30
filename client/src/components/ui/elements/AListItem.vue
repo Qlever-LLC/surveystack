@@ -11,11 +11,12 @@
     :to="to"
     :target="target"
     :value="value"
-    v-bind="$attrs"
-    @click="$emit('click', $event)"
-  >
+    v-bind="$attrs">
     <template v-if="!prependIcon" v-slot:prepend>
       <slot name="prepend" />
+    </template>
+    <template v-if="!appendIcon" v-slot:append>
+      <slot name="append" />
     </template>
     <template v-slot:default>
       <slot name="default" />
@@ -40,6 +41,6 @@ export default {
     prependIcon: { type: String, required: false },
     prependAvatar: { type: String, required: false },
   },
-  emits: ['click'],
+  //emits: ['click'], do not declare click event, this would prevent $attrs from containing that event so we would have to register @click manually but then, v-list-item would always render the component as clickable, even if the consumer of a-list-item did not want that
 };
 </script>
