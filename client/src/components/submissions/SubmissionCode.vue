@@ -1,6 +1,6 @@
 <template>
   <div class="pa-3">
-    <textarea :value="valueString" rows="30" readonly />
+    <a-textarea class="textarea" :modelValue="valueString" rows="30" readonly />
   </div>
 </template>
 <script>
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-textarea {
+.textarea {
   width: 100%;
   font-family: monospace;
   font-size: 0.75rem;

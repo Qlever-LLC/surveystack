@@ -5,7 +5,7 @@
       <a-icon @click="$emit('clear')">mdi-delete</a-icon>
     </a-card-title>
 
-    <textarea class="console-container" readonly :value="log"> </textarea>
+    <a-textarea class="console-container" readonly :modelValue="log" />
   </a-card>
 </template>
 <script>
