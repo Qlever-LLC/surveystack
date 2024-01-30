@@ -1,6 +1,71 @@
 <template>
+  <v-select
+    v-if="!allowCustomItem && items.length < MAX_ITEMS"
+    ref="selectRef"
+    :modelValue="modelValue"
+    @update:modelValue="clearSearchAndEmitAutocompleteUpdate"
+    v-model:search="internalSearch"
+    @blur="$emit('blur')"
+    @click:append="$emit('click:append', $event)"
+    @focus="$emit('focus')"
+    :class="{
+      minHeightAuto: cssMinHeightAuto,
+      minHeight56px: cssMinHeight56px,
+      flexWrap: cssFlexWrap,
+      flexNoWrap: cssFlexNoWrap,
+      oneLineSpan: cssOneLineSpan,
+    }"
+    :append-icon="appendIcon"
+    :chips="chips"
+    :clearable="clearable"
+    :closable-chips="closableChips"
+    :color="color"
+    :custom-filter="customFilter"
+    :data-test-id="dataTestId"
+    :density="dense ? 'compact' : 'default'"
+    :disabled="disabled"
+    :hide-details="hideDetails"
+    :hint="hint"
+    :items="items"
+    :item-title="itemTitle"
+    :item-value="itemValue"
+    :label="label"
+    :loading="loading"
+    :menu-props="menuProps"
+    :multiple="multiple"
+    :variant="variant"
+    :persistent-hint="persistentHint"
+    :placeholder="placeholder"
+    :primary="primary"
+    :readonly="readonly"
+    :return-object="returnObject"
+    :rounded="rounded"
+    :rules="rules"
+    :type="type"
+    :single-line="singleLine">
+    <template v-if="selectionSlot" v-slot:selection="{ item, index }">
+      <slot name="selection" :item="item" :index="index" />
+    </template>
+
+    <template v-if="multiple" v-slot:chip="{ props, item, index }">
+      <slot name="chip" :props="props" :item="item" :index="index" />
+    </template>
+
+    <template v-if="itemSlot" v-slot:item="{ props, item }">
+      <slot name="item" :props="props" :item="item" />
+    </template>
+
+    <template v-if="prependItemSlot" v-slot:prepend-item>
+      <slot name="prepend-item" />
+    </template>
+
+    <template v-if="appendSlot" v-slot:append>
+      <slot name="append" />
+    </template>
+  </v-select>
+
   <v-autocomplete
-    v-if="!allowCustomItem"
+    v-else-if="!allowCustomItem && items.length >= MAX_ITEMS"
     ref="selectRef"
     :modelValue="modelValue"
     @update:modelValue="clearSearchAndEmitAutocompleteUpdate"
@@ -67,7 +132,7 @@
   <v-combobox
     v-else-if="allowCustomItem"
     ref="selectRef"
-    :modelValue="value"
+    :modelValue="modelValue"
     @update:modelValue="updateValue"
     :search="searchInput"
     @update:search="updateSearch"
@@ -192,8 +257,8 @@ export default {
 
   data() {
     return {
+      MAX_ITEMS: 15,
       internalSearch: null,
-      value: this.modelValue,
       inputSearch: this.searchInput,
     };
   },
@@ -208,7 +273,6 @@ export default {
       this.$emit('update:modelValue', ev);
     },
     updateValue(val) {
-      this.value = val;
       this.$emit('update:modelValue', val);
     },
     updateSearch(val) {

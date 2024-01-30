@@ -71,12 +71,13 @@ data-test-id="autocomplete" was removed-->
 </template>
 
 <script>
-import { isNil, uniq, without } from 'lodash';
+import { cloneDeep, isNil, uniq, without } from 'lodash';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
 
 export default {
+  emits: ['update:modelValue'],
   props: {
     modelValue: { required: true },
     multiple: { type: Boolean, default: false },
@@ -91,13 +92,12 @@ export default {
       isLoading: false,
       comboboxSearch: null,
       submissionItems: [],
-      values: this.modelValue,
     };
   },
   methods: {
     emitValueToParent(value) {
-      this.values = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
-      this.$emit('input', this.values);
+      const val = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      this.$emit('update:modelValue', val);
     },
     updateAutocomplete(value) {
       this.emitValueToParent(value);
@@ -112,6 +112,9 @@ export default {
     },
   },
   computed: {
+    values() {
+      return cloneDeep(this.modelValue);
+    },
     getArrayValue() {
       return Array.isArray(this.values) ? this.values : this.values ? [this.values] : [];
     },
