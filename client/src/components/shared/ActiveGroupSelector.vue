@@ -1,7 +1,7 @@
 <template>
   <div class="survey-group-selector">
     <a-select
-      :modelValue="value"
+      :modelValue="modelValue"
       @update:modelValue="handleInput"
       :items="groupItems"
       item-title="text"
@@ -67,11 +67,6 @@ export default {
     },
   },
   emits: ['update:modelValue'],
-  data() {
-    return {
-      value: this.modelValue,
-    };
-  },
   computed: {
     groups() {
       if (this.isWhitelabel) {
@@ -118,7 +113,6 @@ export default {
   },
   methods: {
     handleInput(val) {
-      this.value = val;
       this.$emit('update:modelValue', val);
     },
     getMargin(lvl) {
