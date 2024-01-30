@@ -25,7 +25,7 @@ export default {
     color: { type: String, required: false },
     location: { type: String, required: false },
     modelValue: { type: undefined, required: false },
-    position: { type: String, required: false }, //location
+    position: { type: String, required: false },
     timeout: { type: [Number, String], required: false },
   },
 };
