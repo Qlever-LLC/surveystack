@@ -21,7 +21,7 @@
         </a-list-item>
         <a-divider />
         <a-list-subheader>Active Group</a-list-subheader>
-        <active-group-selector-list v-model="activeGroup" />
+        <active-group-selector-list />
         <a-divider />
         <a-list-item link @click="logout" class="mt-2" prepend-icon="mdi-logout-variant">
           <a-list-item-title> Sign Out </a-list-item-title>
@@ -52,14 +52,6 @@ export default {
     };
   },
   computed: {
-    activeGroup: {
-      get() {
-        return this.$store.getters['memberships/activeGroup'];
-      },
-      set(val) {
-        this.$store.dispatch('memberships/setActiveGroup', val);
-      },
-    },
     isLoggedIn() {
       return this.$store.getters['auth/isLoggedIn'];
     },

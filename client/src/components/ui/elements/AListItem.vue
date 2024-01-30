@@ -10,6 +10,7 @@
     :href="href"
     :to="to"
     :target="target"
+    :title="title"
     :value="value"
     v-bind="$attrs">
     <template v-if="!prependIcon" v-slot:prepend>
@@ -35,6 +36,7 @@ export default {
     href: { type: [String, Object], required: false },
     to: { type: String, required: false },
     target: { type: String, required: false },
+    title: { type: undefined, required: false },
     value: { type: undefined, required: false },
     color: { type: String, required: false },
     appendIcon: { type: String, required: false },
