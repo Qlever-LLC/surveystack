@@ -52,7 +52,7 @@ export default {
   methods: {
     submit() {
       this.onInput(this.modelValue);
-      this.$emit('next');
+      this.next();
     },
     onQrCodeScanned(code) {
       this.changed(code);

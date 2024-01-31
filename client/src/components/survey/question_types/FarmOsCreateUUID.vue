@@ -42,7 +42,7 @@ export default {
     getValueOrNull,
     submit() {
       this.onInput(this.localValue);
-      this.$emit('next');
+      this.next();
     },
     onInput(v) {
       if (!this.modelValue || this.modelValue.value !== v) {

@@ -45,7 +45,7 @@ export default {
     },
     submit() {
       this.onInput(this.modelValue);
-      this.$emit('next');
+      this.next();
     },
     tryAutofocus() {
       if (this.$refs.textField) {

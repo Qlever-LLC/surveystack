@@ -316,7 +316,7 @@ export default {
         this.rows = [];
       }
       this.rows.push(newRow);
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
       if (this.isMobile) {
         this.editItem(this.rows.length - 1);
       }
@@ -328,7 +328,7 @@ export default {
       if (this.rows.length === 0) {
         this.rows = null;
       }
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
     },
     editItem(index) {
       this.editedIndex = index;
@@ -355,13 +355,13 @@ export default {
       return [...defaultItems, ...customItems];
     },
     onInput() {
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
     },
     duplicateRow(idx) {
       this.showEditItemDialog = false;
       const clone = cloneDeep(this.rows[idx]);
       this.rows = [...this.rows, clone];
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
     },
     initializeConfirm() {
       if (this.meta && !!this.meta.dateModified) {

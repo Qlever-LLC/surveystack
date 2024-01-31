@@ -9,8 +9,7 @@
         :control="child"
         :value="child.value"
         :index="index"
-        @changed="setValue"
-      />
+        @changed="setValue" />
     </div>
     <app-control-more-info :value="control.moreInfo" />
   </a-container>
@@ -25,7 +24,7 @@ export default {
   methods: {
     setValue(newValue) {
       console.log(newValue);
-      this.$emit('changed', newValue);
+      this.changed(newValue);
     },
   },
 };
