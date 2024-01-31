@@ -1,10 +1,11 @@
 <template>
   <div>
-    <a-card-title class="pl-0 row">
-      <a-icon class="col-grow-1 mr-1 text-medium-emphasis">mdi-library</a-icon>
-      Question Library
-      <a-spacer />
-      <a-btn icon key="library" @click="$emit('cancel')" class="col-shrink-1 mt-n5 mr-n6" small tile elevation="0">
+    <a-card-title class="d-flex row pl-0">
+      <div class="col flex-grow-1">
+        <a-icon class="mr-1 text-medium-emphasis">mdi-library</a-icon>
+        Question Library
+      </div>
+      <a-btn icon key="library" @click="$emit('cancel')" class="col flex-shrink-1 mt-n2 mr-n6" small tile elevation="0">
         <a-icon> mdi-close </a-icon>
       </a-btn>
     </a-card-title>
