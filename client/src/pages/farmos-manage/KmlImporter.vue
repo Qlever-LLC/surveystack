@@ -48,7 +48,6 @@ export default {
       fields: [],
       field: null,
       name: '',
-      value: this.modelValue,
     };
   },
   methods: {

@@ -51,7 +51,6 @@ export default {
   emits: ['update:modelValue', 'confirm', 'cancel'],
   data() {
     return {
-      value: this.modelValue,
       archiveReason: this.reason,
       archiveReasonOther: '',
       availableArchiveReasons: ['TEST_DATA', 'INCORRECT_DATA', 'EQUIPMENT_ERROR', 'USER_ERROR', 'RESUBMIT', 'OTHER'],

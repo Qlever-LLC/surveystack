@@ -16,7 +16,8 @@
     <matrix-editor
       :resources="resources"
       :allowSetAllowHide="allowSetAllowHide"
-      v-model="value"
+      :modelValue="modelValue"
+      @update:modelValue="$emit('update:modelValue', $event)"
       @change="setResource"
       @delete="removeResource"
       @close-dialog="open = false"
@@ -52,19 +53,18 @@ export default {
   data() {
     return {
       open: false,
-      value: this.modelValue,
     };
   },
   computed: {
     resource() {
-      return this.resources.find((resource) => resource.id === this.value);
+      return this.resources.find((resource) => resource.id === this.modelValue);
     },
     filteredResources() {
       return this.resources.filter((resource) => resource.type === 'MATRIX');
     },
     getLabel() {
-      return this.value && Array.isArray(this.value.content)
-        ? this.value.content
+      return this.modelValue && Array.isArray(this.modelValue.content)
+        ? this.modelValue.content
             .map((item) => item.label)
             .filter(Boolean)
             .join(', ')
