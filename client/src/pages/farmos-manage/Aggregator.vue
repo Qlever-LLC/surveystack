@@ -216,6 +216,7 @@
 
 <script>
 import _ from 'lodash';
+import { useGoTo } from 'vuetify';
 
 export default {
   emits: ['addSuperAdminNote'],
@@ -242,13 +243,15 @@ export default {
     mapUser(instanceName) {
       this.selectedInstance = instanceName;
       this.$nextTick(() => {
-        this.$vuetify.goTo(this.$refs['map-user']);
+        const goTo = useGoTo();
+        goTo(this.$refs['map-user']);
       });
     },
     mapGroup(instanceName) {
       this.selectedInstance = instanceName;
       this.$nextTick(() => {
-        this.$vuetify.goTo(this.$refs['map-group']);
+        const goTo = useGoTo();
+        goTo(this.$refs['map-group']);
       });
     },
     addSuperAdminNote() {
