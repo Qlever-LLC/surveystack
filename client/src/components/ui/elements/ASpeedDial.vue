@@ -4,7 +4,7 @@
     :direction="direction"
     :fixed="fixed"
     :transition="transition"
-    :modelValue="value"
+    :modelValue="modelValue"
     v-bind="$attrs"
     @update:modelValue="$emit('update:modelValue', $event)">
     <template v-slot:activator>

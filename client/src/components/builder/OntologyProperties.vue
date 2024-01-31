@@ -47,6 +47,18 @@ export default {
     OntologyReferenceEditor,
     ResourceSelector,
   },
+  props: {
+    value: {
+      type: String,
+    },
+    resources: {
+      type: Array,
+      default: () => [],
+    },
+    disableSelection: {
+      required: false,
+    },
+  },
   data() {
     return {
       tableDialogIsVisible: false,
@@ -105,18 +117,6 @@ export default {
     },
     selectResourceHandler(id) {
       this.$emit('set-control-source', id);
-    },
-  },
-  props: {
-    value: {
-      type: String,
-    },
-    resources: {
-      type: Array,
-      default: () => [],
-    },
-    disableSelection: {
-      required: false,
     },
   },
   computed: {

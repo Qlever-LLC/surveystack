@@ -98,7 +98,7 @@
     </a-card>
     <survey-diff-dialog
       v-if="surveyDiffDialogVisible"
-      :value="surveyDiffDialogVisible"
+      v-model="surveyDiffDialogVisible"
       :revision-a="survey.revisions.find((r) => r.version === compareRevisions[0])"
       :revision-b="survey.revisions.find((r) => r.version === compareRevisions[1])"
       @cancel="surveyDiffDialogVisible = false" />

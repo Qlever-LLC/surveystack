@@ -1,6 +1,6 @@
 <template>
   <a-dialog
-    :modelValue="value"
+    :modelValue="modelValue"
     @update:modelValue="$emit('update:modelValue', $event)"
     width="700"
     max-width="75%"
@@ -35,7 +35,7 @@ export default {
     SurveyDiff,
   },
   props: {
-    value: {
+    modelValue: {
       required: true,
       type: Boolean,
     },

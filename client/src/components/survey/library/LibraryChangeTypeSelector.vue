@@ -47,12 +47,11 @@
 
 <script>
 export default {
-  name: 'library-change-type-selector',
   props: ['modelValue', 'disabled', 'label'],
   emits: ['update:modelValue'],
   data() {
     return {
-      content: this.value,
+      content: this.modelValue,
       availableLibraryChangeTypes: [
         { value: 'major', text: 'Major change' },
         { value: 'minor', text: 'Minor change' },
@@ -62,7 +61,7 @@ export default {
   },
   computed: {
     textByValue() {
-      const changeType = this.availableLibraryChangeTypes.find((type) => type.value === this.value);
+      const changeType = this.availableLibraryChangeTypes.find((type) => type.value === this.modelValue);
       return changeType ? changeType.text : 'Undefined';
     },
   },
