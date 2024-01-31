@@ -46,9 +46,6 @@ export default {
     },
   },
   computed: {
-    value() {
-      return this.modelValue;
-    },
     filteredResources() {
       return this.resourceTypes.length === 0
         ? this.resources
@@ -66,7 +63,6 @@ export default {
   },
   methods: {
     handleSelect(val) {
-      this.value = val;
       if (val.includes(NEW_RESOURCE_PREFIX)) {
         this.$emit('on-new', val.replace(NEW_RESOURCE_PREFIX, ''));
       } else {
