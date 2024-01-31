@@ -8,7 +8,7 @@
       <FarmOSRegister
         :viewModel="viewModel"
         @check-url="$emit('check-url', $event)"
-        @create-instance="$emit('create-instance', $event)"></FarmOSRegister>
+        @create-instance="$emit('create-instance', $event)" />
     </a-card>
   </a-dialog>
 </template>

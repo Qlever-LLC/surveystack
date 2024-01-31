@@ -52,7 +52,7 @@ import api from '@/services/api.service';
 import Aggregator from './Aggregator.vue';
 import Groups from './Groups.vue';
 import Users from './Users.vue';
-import FarmOSRegisterVue from './FarmOSRegister.vue';
+import FarmOSRegister from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
@@ -90,7 +90,7 @@ export default {
         {
           name: 'Create Instance',
           id: 'create-instance',
-          component: FarmOSRegisterVue,
+          component: FarmOSRegister,
           viewModel: {
             form: {
               groupId: null,
