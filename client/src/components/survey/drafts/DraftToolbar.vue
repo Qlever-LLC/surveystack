@@ -10,8 +10,6 @@
           </div>
         </a-toolbar-title>
 
-        <a-spacer />
-
         <slot name="toolbar-actions"></slot>
 
         <a-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
