@@ -68,7 +68,7 @@
     "vue": "^3.4.15",
     "vue-draggable-plus": "^0.3.5",
     "vue-router": "^4.2.5",
-    "vuetify": "^3.5.1",
+    "vuetify": "^3.5.2",
     "vuex": "^4.1.0",
     "vuex-shared-mutations": "^1.0.2",
     "webpack-plugin-vuetify": "^2.0.1",
