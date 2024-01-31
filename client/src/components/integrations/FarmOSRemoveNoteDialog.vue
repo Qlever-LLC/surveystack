@@ -1,13 +1,17 @@
 <template>
-  <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
+  <a-dialog
+    persistent
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    max-width="500"
+    max-height="1000">
     <a-card class="pa-4">
       <a-card-title class="headline"> Why is this instance being removed? </a-card-title>
       <a-card-text>
         <a-checkbox
           v-model="note"
           label="Farmer is no longer part of the projet"
-          value="Farmer is no longer part of the projet"
-        ></a-checkbox>
+          value="Farmer is no longer part of the projet"></a-checkbox>
 
         <a-checkbox v-model="note" label="Accidentally added" value="Accidentally added" />
 
@@ -28,9 +32,8 @@
 
 <script>
 export default {
-  emits: ['addNote', 'cancelNote'],
-  props: ['loading', 'value'],
-
+  props: ['loading', 'modelValue'],
+  emits: ['addNote', 'cancelNote', 'update:modelValue'],
   data() {
     return {
       note: [],
@@ -38,14 +41,6 @@ export default {
     };
   },
   computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
     btnDisabled() {
       return !(this.note.length > 0 || this.noteTF) || this.loading;
     },

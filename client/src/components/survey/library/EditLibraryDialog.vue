@@ -1,5 +1,9 @@
 <template>
-  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="700"
+    max-width="75%">
     <a-card>
       <a-card-title> Add Survey To Library </a-card-title>
       <a-card-text>
@@ -38,7 +42,7 @@ export default {
   name: 'edit-library-dialog',
   components: { LibraryChangeTypeSelector, TipTapEditor },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -47,7 +51,7 @@ export default {
       required: true,
     },
   },
-  emits: ['ok', 'cancel'],
+  emits: ['ok', 'cancel', 'update:modelValue'],
   setup(props) {
     const localLibrarySurvey = ref(props.librarySurvey);
 

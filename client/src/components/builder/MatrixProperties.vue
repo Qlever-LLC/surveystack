@@ -1,5 +1,5 @@
 <template>
-  <a-dialog v-model="open" @click:outside="open = false">
+  <a-dialog v-model="open">
     <template v-slot:activator="{ props }">
       <a-text-field
         v-bind="props"
@@ -10,8 +10,7 @@
         hide-details
         readonly
         variant="outlined"
-        :disabled="disabled"
-      />
+        :disabled="disabled" />
     </template>
 
     <matrix-editor
@@ -22,8 +21,7 @@
       @delete="removeResource"
       @close-dialog="open = false"
       @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-      @set-control-required="(val) => $emit('set-control-required')"
-    />
+      @set-control-required="(val) => $emit('set-control-required')" />
   </a-dialog>
 </template>
 

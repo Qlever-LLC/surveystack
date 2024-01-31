@@ -32,7 +32,6 @@ export default {
   },
   methods: {
     handleClose() {
-      // this.$emit('input', false);
       window.localStorage.setItem('defaultInstallBannerDismissed', true);
       this.showDefaultInstall = false;
     },

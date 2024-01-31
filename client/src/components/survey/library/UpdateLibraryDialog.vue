@@ -1,5 +1,10 @@
 <template>
-  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="700"
+    max-width="75%"
+    persistent>
     <a-card>
       <a-card-title>
         Update question set from Version
@@ -21,8 +26,7 @@
         :default-open="true"
         :showHeader="true"
         :showNoChangesText="false"
-        @discard-local-changes-changed="discardLocalChangesChanged"
-      ></survey-diff>
+        @discard-local-changes-changed="discardLocalChangesChanged"></survey-diff>
       <a-card-actions class="mr-3">
         <a-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" variant="text"
           >Learn more...
@@ -32,8 +36,7 @@
           @click="update"
           color="primary"
           text
-          :disabled="libraryRootGroup.libraryVersion === toSurvey.latestVersion"
-        >
+          :disabled="libraryRootGroup.libraryVersion === toSurvey.latestVersion">
           <span>update</span>
         </a-btn>
         <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel</a-btn>
@@ -73,7 +76,7 @@ export default {
     TipTapEditor,
   },
   props: {
-    value: {
+    modelValue: {
       required: true,
       type: Boolean,
     },
@@ -86,7 +89,7 @@ export default {
       required: true,
     },
   },
-  emits: ['update', 'cancel'],
+  emits: ['update', 'cancel', 'update:modelValue'],
   setup(props, { emit }) {
     const state = reactive({
       localRevisionControls: props.libraryRootGroup.children,

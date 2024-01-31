@@ -1,5 +1,5 @@
 <template>
-  <a-dialog v-model="open" width="500" @click:outside="cancel">
+  <a-dialog v-model="open" width="500">
     <template v-slot:activator="{ props }">
       <a-text-field
         v-bind="props"
@@ -85,7 +85,7 @@ export default {
     onChange(val) {
       if (!val) {
         this.selected = null;
-        this.$emit('input', null);
+        this.$emit('update:modelValue', null);
       }
     },
     close() {
@@ -104,6 +104,8 @@ export default {
     open(val) {
       if (val) {
         this.selected = getArrayValue(this.modelValue);
+      } else {
+        this.cancel();
       }
     },
   },

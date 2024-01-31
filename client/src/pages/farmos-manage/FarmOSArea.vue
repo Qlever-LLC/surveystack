@@ -2,12 +2,11 @@
   <div style="width: 100%">
     <a-form>
       <a-text-field
-        @update:modelValue="(val) => updateName(val)"
-        :modelValue="value"
+        :modelValue="modelValue"
         label="Name"
         placeholder="Name"
         variant="outlined"
-      />
+        @update:modelValue="updateName($event)" />
     </a-form>
     <div id="farmos-map" style="width: 100%; height: 500px"></div>
   </div>
@@ -17,8 +16,8 @@
 import { MapInstanceManager } from '@our-sci/farmos-map';
 
 export default {
-  props: ['value', 'center'],
-
+  props: ['modelValue', 'center'],
+  emits: ['update:modelValue'],
   data() {
     return {
       layer: null,
@@ -33,8 +32,8 @@ export default {
   },
   methods: {
     updateName(v) {
-      const { wkt } = this.value;
-      this.$emit('input', {
+      const { wkt } = this.modelValue;
+      this.$emit('update:modelValue', {
         name: v,
         wkt,
       });
@@ -52,13 +51,13 @@ export default {
       };
       map.addLayer('xyz', xyzOpts);
 
-      console.log('created map', this.value);
+      console.log('created map', this.modelValue);
       let layer;
       let wktOpts;
-      if (this.value.wkt) {
+      if (this.modelValue.wkt) {
         wktOpts = {
           title: 'field', // defaults to 'wkt'
-          wkt: this.value.wkt, // REQUIRED!
+          wkt: this.modelValue.wkt, // REQUIRED!
           color: 'orange', // defaults to 'orange'
           visible: true, // defaults to true
         };
@@ -84,15 +83,15 @@ export default {
           wkt: this.center,
         };
         const farmLayer = map.addLayer('wkt', wktOpts);
-        if (!this.value.wkt) {
+        if (!this.modelValue.wkt) {
           map.zoomToLayer(farmLayer);
         }
       }
 
       map.edit.wktOn('featurechange', (wkt) => {
         console.log('emitting change', wkt);
-        this.$emit('input', {
-          name: this.value.name,
+        this.$emit('update:modelValue', {
+          name: this.modelValue.name,
           wkt,
         });
       });

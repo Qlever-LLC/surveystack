@@ -1,5 +1,9 @@
 <template>
-  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="700"
+    max-width="75%">
     <a-card>
       <a-card-title>
         Publish
@@ -27,7 +31,7 @@
       <a-card-actions class="mr-3">
         <a-spacer />
         <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" variant="text">
-          <span>Publish update to library {{ value.name }}</span>
+          <span>Publish update to library {{ modelValue.name }}</span>
         </a-btn>
         <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel </a-btn>
       </a-card-actions>
@@ -48,7 +52,7 @@ export default {
     TipTapEditor,
   },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -57,7 +61,7 @@ export default {
       required: true,
     },
   },
-  emits: ['ok', 'cancel'],
+  emits: ['ok', 'cancel', 'update:modelValue'],
   setup(props) {
     const state = reactive({
       localLibrarySurvey: props.librarySurvey,

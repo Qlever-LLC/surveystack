@@ -1,5 +1,5 @@
 <template>
-  <a-dialog v-model="state.open" width="500" @click:outside="close">
+  <a-dialog v-model="state.open" width="500">
     <template v-slot:activator="{ props }">
       <a-text-field
         v-bind="props"
@@ -116,12 +116,9 @@ function addItem() {
 function deleteItem(index) {
   state.items.splice(index, 1);
 }
-function close() {
-  state.open = false;
-}
 function save() {
   emit('update:modelValue', state.validItems);
-  close();
+  state.open = false;
 }
 </script>
 

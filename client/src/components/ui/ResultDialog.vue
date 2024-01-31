@@ -1,6 +1,10 @@
 <template>
   <div>
-    <a-dialog v-model="show" max-width="350" :persistent="persistent">
+    <a-dialog
+      :modelValue="modelValue"
+      @update:modelValue="$emit('update:modelValue', $event)"
+      max-width="350"
+      :persistent="persistent">
       <a-card>
         <a-card-title v-if="title" class="headline mb-2">{{ title }}</a-card-title>
 
@@ -115,6 +119,7 @@ export default {
       default: () => null,
     },
   },
+  emits: ['update:modelValue', 'close'],
   data: () => ({
     download: {
       loading: false,
@@ -126,14 +131,6 @@ export default {
     },
   }),
   computed: {
-    show: {
-      get() {
-        return this.modelValue;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
     messages() {
       const items = [...this.items];
 
@@ -208,7 +205,6 @@ export default {
       }
     },
     onClose() {
-      this.show = null;
       this.$emit('close');
       if (!this.persistent) {
         return;

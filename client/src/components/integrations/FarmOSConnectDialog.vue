@@ -1,5 +1,9 @@
 <template>
-  <a-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
+  <a-dialog
+    :modelValue="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
+    max-width="400"
+    max-height="1000">
     <a-card class="pa-4">
       <a-card-title class="headline"> Connect Existing Farm </a-card-title>
       <a-card-text>
@@ -72,9 +76,8 @@ import { ref } from 'vue';
 import './css/button.css';
 
 export default {
-  emits: ['connect', 'addExisting', 'create'],
   props: {
-    value: Boolean,
+    modelValue: Boolean,
     farmInstances: {
       type: Array,
       required: true,
@@ -88,6 +91,7 @@ export default {
       required: true,
     },
   },
+  emits: ['connect', 'addExisting', 'create', 'update:modelValue'],
   setup(props, { emit }) {
     const selectedFarms = ref([]);
 
@@ -100,16 +104,6 @@ export default {
       selectedFarms,
       connect,
     };
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
   },
 };
 </script>

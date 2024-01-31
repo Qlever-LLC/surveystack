@@ -2,7 +2,7 @@
   <a-row class="text-center">
     <template v-if="state === states.IDLE">
       <a-col cols="12">
-        <app-kml-importer v-model="importedField" @update:modelValue="onImport"></app-kml-importer>
+        <app-kml-importer v-model="importedField" @change="onImport"></app-kml-importer>
       </a-col>
       <a-col cols="12"> OR </a-col>
       <a-col cols="12">
@@ -15,9 +15,8 @@
         <app-farm-area
           ref="farm-area"
           :center="center"
-          :value="value"
-          @input="(val) => updateArea(val)"
-        ></app-farm-area>
+          :modelValue="modelValue"
+          @update:modelValue="updateArea($event)"></app-farm-area>
       </a-col>
 
       <a-col cols="6">
@@ -51,7 +50,8 @@ export default {
     appFarmArea,
     appKmlImporter,
   },
-  props: ['value', 'center', 'loading'],
+  props: ['modelValue', 'center', 'loading'],
+  emits: ['update:modelValue', 'done', 'cancel'],
   data() {
     return {
       states,
@@ -71,20 +71,20 @@ export default {
       }
     },
     updateArea(value) {
-      this.$emit('input', value);
+      this.$emit('update:modelValue', value);
     },
     onImport() {
-      this.$emit('input', {
+      this.$emit('update:modelValue', {
         name: this.importedField.name,
         wkt: this.importedField.wkt,
       });
 
-      console.log('imported', this.value);
+      console.log('imported', this.modelValue);
 
       this.state = states.EDITING;
     },
     draw() {
-      this.$emit('input', {
+      this.$emit('update:modelValue', {
         name: 'New Field',
         wkt: null,
       });

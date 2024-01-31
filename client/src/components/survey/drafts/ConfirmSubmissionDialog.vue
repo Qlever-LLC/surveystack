@@ -1,5 +1,5 @@
 <template>
-  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="400">
+  <a-dialog :modelValue="modelValue" @update:modelValue="$emit('update:modelValue', $event)" width="400">
     <a-card>
       <a-card-title> Confirm Submission </a-card-title>
       <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>
@@ -53,7 +53,7 @@ export default {
     };
   },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -78,6 +78,7 @@ export default {
       type: String,
     },
   },
+  emits: ['update:modelValue', 'submit', 'close', 'set-group'],
   components: {
     ActiveGroupSelector,
   },
@@ -94,12 +95,12 @@ export default {
   computed: {},
   methods: {
     handleConfirm() {
-      this.$emit('input', false);
+      this.$emit('update:modelValue', false);
       this.$emit('submit');
       this.$emit('close', { done: false });
     },
     handleAbort() {
-      this.$emit('input', false);
+      this.$emit('update:modelValue', false);
       this.$emit('close', { done: true });
     },
     async setGroup(v) {

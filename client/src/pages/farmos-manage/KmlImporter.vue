@@ -38,6 +38,7 @@ import wkx from 'wkx';
 
 export default {
   props: ['modelValue'],
+  emits: ['update:modelValue', 'change'],
   data() {
     return {
       kml: '', // string of KML
@@ -67,7 +68,7 @@ export default {
       this.wkt = wktString.toWkt();
       this.name = (this.field && this.field.properties && this.field.properties.name) || '';
 
-      this.$emit('input', {
+      this.$emit('update:modelValue', {
         name: this.name,
         wkt: this.wkt,
       });

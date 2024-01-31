@@ -11,7 +11,7 @@
 <script>
 export default {
   props: {
-    value: {
+    modelValue: {
       required: true,
     },
     label: {
@@ -25,15 +25,15 @@ export default {
   },
   computed: {
     valueString() {
-      return JSON.stringify(this.value, null, 2);
+      return JSON.stringify(this.modelValue, null, 2);
     },
   },
   methods: {
     writeBack(value) {
       try {
         const obj = JSON.parse(value);
-        if (JSON.stringify(this.value) !== JSON.stringify(obj)) {
-          this.$emit('input', obj);
+        if (JSON.stringify(this.modelValue) !== JSON.stringify(obj)) {
+          this.$emit('update:modelValue', obj);
         }
       } catch (error) {
         console.log(error);

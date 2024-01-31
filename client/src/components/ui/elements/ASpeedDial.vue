@@ -4,9 +4,9 @@
     :direction="direction"
     :fixed="fixed"
     :transition="transition"
-    :value="value"
+    :modelValue="value"
     v-bind="$attrs"
-    @input="$emit('input', $event)">
+    @update:modelValue="$emit('update:modelValue', $event)">
     <template v-slot:activator>
       <slot name="activator"></slot>
     </template>
@@ -21,9 +21,9 @@ export default {
     direction: { type: String, default: 'top' },
     fixed: { type: Boolean, default: false },
     transition: { type: String, default: 'scale-transition' },
-    value: { type: undefined, required: false },
+    modelValue: { type: undefined, required: false },
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
 };
 </script>
 

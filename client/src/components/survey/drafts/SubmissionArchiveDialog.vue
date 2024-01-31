@@ -1,5 +1,10 @@
 <template>
-  <a-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="persistent">
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    :width="width"
+    :max-width="maxWidth"
+    :persistent="persistent">
     <a-card>
       <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
@@ -12,8 +17,7 @@
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
           v-model="archiveReasonOther"
-          variant="outlined"
-        />
+          variant="outlined" />
       </a-card-text>
       <a-card-actions>
         <a-spacer />
@@ -44,7 +48,7 @@ export default {
       default: 'TEST_DATA',
     },
   },
-
+  emits: ['update:modelValue', 'confirm', 'cancel'],
   data() {
     return {
       value: this.modelValue,
@@ -60,17 +64,7 @@ export default {
         reason = this.archiveReasonOther;
       }
       this.$emit('confirm', reason);
-      this.$emit('input', false);
-    },
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
+      this.$emit('update:modelValue', false);
     },
   },
 };

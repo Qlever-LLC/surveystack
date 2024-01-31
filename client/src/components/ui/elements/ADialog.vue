@@ -1,10 +1,9 @@
 <template>
-  <!-- v-bind="$attrs" => question_types/Matrix has v-bind="dialogProps" 
+  <!-- v-bind="$attrs" => question_types/Matrix has v-bind="dialogProps"
   to keep the v-dialog on the matrix box and not full screen -->
   <v-dialog
     v-bind="$attrs"
     @click:outside="$emit('click:outside', $event)"
-    @input="$emit('input', $event)"
     @update:modelValue="$emit('update:modelValue', $event)"
     :content-class="cssLoginPage ? 'loginPage' : ''"
     :role="role"
@@ -15,8 +14,7 @@
     :max-width="maxWidth"
     :modelValue="modelValue"
     :scrollable="scrollable"
-    :width="width"
-  >
+    :width="width">
     <template v-slot:activator="{ props }">
       <slot name="activator" :props="props" />
     </template>
@@ -26,7 +24,7 @@
 
 <script>
 export default {
-  emits: ['click:outside', 'input', 'update:modelValue'],
+  emits: ['click:outside', 'update:modelValue'],
   props: {
     //non vuetify props
     cssLoginPage: { type: Boolean, required: false },

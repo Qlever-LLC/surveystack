@@ -1,5 +1,5 @@
 <template>
-  <a-dialog :modelValue="modelValue" @input="(v) => $emit('input', v)" persistent width="300">
+  <a-dialog :modelValue="modelValue" @update:modelValue="$emit('update:modelValue', $event)" persistent width="300">
     <a-card>
       <a-card-text class="pa-4">
         <span>{{ message }}</span>
@@ -21,5 +21,6 @@ export default {
       default: 'Submitting Draft',
     },
   },
+  emits: ['update:modelValue'],
 };
 </script>

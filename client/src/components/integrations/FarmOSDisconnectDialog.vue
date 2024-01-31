@@ -1,5 +1,5 @@
 <template>
-  <a-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
+  <a-dialog persistent :modelValue="modelValue" max-width="500" max-height="1000" @update:modelValue="cancelUpdate">
     <a-card class="pa-4">
       <a-card-title class="headline"> Manage Groups </a-card-title>
       <a-card-text>
@@ -47,8 +47,8 @@
 import './css/button.css';
 
 export default {
-  emits: ['updateGroups', 'cancelUpdate'],
-  props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
+  emits: ['updateGroups', 'cancelUpdate', 'update:modelValue'],
+  props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'modelValue'],
   data() {
     return {
       selectedGroups: [],
@@ -59,9 +59,11 @@ export default {
       // emit instance, initial selected group Ids and selected group Ids before clicking update
       this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroupIds, this.selectedGroups]);
       this.selectedGroups = [];
+      this.$emit('update:modelValue', false);
     },
     cancelUpdate() {
       this.$emit('cancelUpdate');
+      this.$emit('update:modelValue', false);
       this.selectedGroups = [];
     },
   },
@@ -71,16 +73,6 @@ export default {
     },
     selectedGroupIds() {
       this.selectedGroups = this.selectedGroupIds;
-    },
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
     },
   },
 };

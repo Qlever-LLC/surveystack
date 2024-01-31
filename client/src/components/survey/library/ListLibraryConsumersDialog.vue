@@ -1,5 +1,9 @@
 <template>
-  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="500"
+    max-width="75%">
     <a-card>
       <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
@@ -33,7 +37,7 @@ import api from '@/services/api.service';
 export default {
   name: 'list-library-consumers-dialog',
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -42,7 +46,7 @@ export default {
       required: true,
     },
   },
-  emits: ['ok', 'cancel'],
+  emits: ['ok', 'cancel', 'update:modelValue'],
   setup(props) {
     const state = reactive({
       libraryConsumers: null,

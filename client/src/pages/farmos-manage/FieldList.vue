@@ -3,7 +3,7 @@
     <a-list subheader>
       <a-list-subheader>Fields added to Farmos Instance</a-list-subheader>
 
-      <a-list-item v-for="(field, idx) in value" :key="`field_${idx}`" prepend-avatar="mdi-map">
+      <a-list-item v-for="(field, idx) in modelValue" :key="`field_${idx}`" prepend-avatar="mdi-map">
         <a-list-item-title v-text="field.name"></a-list-item-title>
         <a-list-item-action>
           <a-btn icon>
@@ -17,12 +17,12 @@
 
 <script>
 export default {
-  props: ['value'],
-
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
   methods: {
     remove(e) {
       const arr = this.value.filter((v) => v !== e);
-      this.$emit('input', arr);
+      this.$emit('update:modelValue', arr);
     },
   },
 };

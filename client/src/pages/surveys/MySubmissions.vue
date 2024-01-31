@@ -103,19 +103,19 @@
       <confirm-submission-dialog
         ref="confirm-submission-dialog"
         v-if="confirmSubmissionIsVisible"
-        @set-group="(val) => setSubmissionGroup(activeSubmissionId, val)"
+        @setGroup="setSubmissionGroup(activeSubmissionId, $event)"
         :groupId="activeSubmission.meta.group.id"
         :id="activeSubmissionId"
         :submitAsUser="activeSubmission.meta.submitAsUser"
         :dateSubmitted="activeSubmission.meta.dateSubmitted"
         v-model="confirmSubmissionIsVisible"
         @close="handleConfirmSubmissionDialogClose"
-        @submit="() => uploadSubmission(activeSubmission)" />
+        @submit="uploadSubmission(activeSubmission)" />
       <submitting-dialog v-model="this.isSubmitting" />
       <result-dialog
         v-model="showResult"
         :items="resultItems"
-        @input="handleResultDialogInput"
+        @update:modelValue="handleResultDialogInput"
         title="Result of Submission"
         persistent />
     </a-container>

@@ -7,7 +7,7 @@
       v-model="showConfirmSubmission"
       :groupId="submission.meta.group.id"
       :submitAsUser="submission.meta.submitAsUser"
-      @submit="() => submitConfirmed(submission)"
+      @submit="submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted" />
 

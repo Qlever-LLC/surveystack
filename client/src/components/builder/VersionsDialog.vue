@@ -1,18 +1,22 @@
 <template>
-  <a-dialog :modelValue="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="500"
+    max-width="75%"
+    scrollable>
     <a-card>
       <a-card-title>Survey Versions</a-card-title>
       <a-card-text cssMaxHeight500px>
         <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
-        <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
-          <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
-            <div class="col-10 mt-1 py-0">
+        <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError" class="">
+          <div v-for="revision in survey.revisions" :key="revision.version" class="d-flex row py-0">
+            <div class="flex-grow-1 mt-1 py-0">
               <a-chip
                 small
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
-                :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'"
-              >
+                :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'">
                 Version
                 {{
                   revision.version +
@@ -34,7 +38,7 @@
                 }}
               </span>
             </div>
-            <div class="col-1 py-0">
+            <div class="flex-shrink-1 py-0">
               <a-icon
                 @click="toggleCompare(revision.version)"
                 class="mt-1"
@@ -43,15 +47,14 @@
                 >mdi-compare-horizontal</a-icon
               >
             </div>
-            <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
+            <div class="flex-shrink-1 py-0" v-if="isVersionDeletable(revision.version)">
               <a-checkbox
                 v-model="selectedVersionsToDelete"
                 :selected-item="String(revision.version)"
                 hide-details
                 title="Delete version"
                 class="mt-0"
-                color="red"
-              />
+                color="red" />
             </div>
           </div>
 
@@ -78,8 +81,7 @@
           :disabled="compareRevisions.length === 1"
           @click="surveyDiffDialogVisible = true"
           color="primary"
-          outlined
-        >
+          outlined>
           Compare {{ compareRevisions[0] }}
           {{ compareRevisions.length === 2 ? 'with ' + compareRevisions[1] : '' }}
         </a-btn>
@@ -88,8 +90,7 @@
           :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
           :loading="deleteVersionsIsLoading"
           color="error"
-          outlined
-        >
+          outlined>
           Delete {{ selectedVersionsToDelete.length }} versions
         </a-btn>
         <a-btn @click="$emit('cancel')" color="primary" variant="text"> Close </a-btn>
@@ -100,8 +101,7 @@
       :value="surveyDiffDialogVisible"
       :revision-a="survey.revisions.find((r) => r.version === compareRevisions[0])"
       :revision-b="survey.revisions.find((r) => r.version === compareRevisions[1])"
-      @cancel="surveyDiffDialogVisible = false"
-    />
+      @cancel="surveyDiffDialogVisible = false" />
   </a-dialog>
 </template>
 
@@ -114,7 +114,7 @@ import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 export default {
   components: { SurveyDiffDialog },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -123,6 +123,7 @@ export default {
       required: true,
     },
   },
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const survey = ref({});
     const cleanupInfoIsLoading = ref(false);

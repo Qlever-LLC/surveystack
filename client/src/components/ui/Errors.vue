@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-dialog v-model="show" max-width="350">
+    <a-dialog :modelValue="modelValue" @update:modelValue="$emit('update:modelValue', $event)" max-width="350">
       <a-card class="pa-4" color="red">
         <a-card-title class="headline">{{ title }}</a-card-title>
         <template v-for="(error, idx) in errors" :key="'error_' + idx">
@@ -18,19 +18,9 @@
 <script>
 export default {
   props: {
-    value: Boolean,
+    modelValue: Boolean,
     errors: Array,
     title: String,
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
   },
 };
 </script>

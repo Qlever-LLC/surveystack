@@ -14,12 +14,11 @@
           hide-details
           :readonly="disabled"
           v-model="content"
-          @update:modelValue="$emit('input', content)"
+          @update:modelValue="$emit('update:modelValue', content)"
           :label="label ? label : 'Change type'"
           :items="availableLibraryChangeTypes"
           item-title="text"
-          item-value="value"
-        />
+          item-value="value" />
       </a-col>
       <a-col cols="auto" class="pa-0 align-self-center">
         <a-icon color="grey" class="ml-3 align-center">
@@ -49,7 +48,8 @@
 <script>
 export default {
   name: 'library-change-type-selector',
-  props: ['value', 'disabled', 'label'],
+  props: ['modelValue', 'disabled', 'label'],
+  emits: ['update:modelValue'],
   data() {
     return {
       content: this.value,

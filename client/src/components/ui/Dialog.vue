@@ -1,5 +1,11 @@
 <template>
-  <a-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="modal" v-bind="$attrs">
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    :width="width"
+    :max-width="maxWidth"
+    :persistent="modal"
+    v-bind="$attrs">
     <a-card>
       <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
@@ -23,7 +29,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: Boolean,
+    modelValue: Boolean,
     labelConfirm: String,
     width: [String, Number],
     title: {
@@ -39,15 +45,6 @@ export default {
       default: false,
     },
   },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
-  },
+  emits: ['update:modelValue'],
 };
 </script>
