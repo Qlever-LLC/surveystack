@@ -1,5 +1,5 @@
 import { get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
-import flatten from 'flat';
+import { flatten } from 'flat';
 import { changeRecursive, getPosition, insertControl, replaceControl } from '@/utils/surveys';
 
 export const changeType = {
