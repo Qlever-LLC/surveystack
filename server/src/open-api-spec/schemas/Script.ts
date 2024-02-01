@@ -3,6 +3,7 @@ import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 const Script: OpenAPIV3.SchemaObject = {
   type: 'object',
   required: ['_id', 'name', 'content', 'meta'],
+  additionalProperties: false,
   properties: {
     _id: { type: 'string', format: 'objectid' },
     name: { type: 'string' },

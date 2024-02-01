@@ -1,7 +1,5 @@
 const { ObjectId } = jest.requireActual('mongodb');
 
-const now = new Date();
-
 const pageData = (overrides = {}, index = 1) => ({
   [`page_${index}`]: {
     meta: { type: 'page' },
@@ -32,40 +30,40 @@ const instructionsImageSplitData = (overrides = {}, index = 1) => ({
   },
 });
 
-const stringData = (overrides = {}, index = 1) => ({
+const stringData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`text_${index}`]: {
     value: 'Mock string',
     meta: {
       type: 'string',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const numberData = (overrides = {}, index = 1) => ({
+const numberData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`number_${index}`]: {
     value: 123,
     meta: {
       type: 'number',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const dateData = (overrides = {}, index = 1) => ({
+const dateData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`date_${index}`]: {
     value: '2022-10-01T00:00:00.000Z',
     meta: {
       type: 'date',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const locationData = (overrides = {}, index = 1) => ({
+const locationData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`location_${index}`]: {
     value: {
       type: 'Feature',
@@ -77,46 +75,46 @@ const locationData = (overrides = {}, index = 1) => ({
     },
     meta: {
       type: 'location',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const selectSingleData = (overrides = {}, index = 1) => ({
+const selectSingleData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`multiple_choice_${index}`]: {
     value: ['item_1'],
     meta: {
       type: 'selectSingle',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const selectMultipleData = (overrides = {}, index = 1) => ({
+const selectMultipleData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`checkboxes_${index}`]: {
     value: ['item_1', 'item_2'],
     meta: {
       type: 'selectMultiple',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const ontologyData = (overrides = {}, index = 1) => ({
+const ontologyData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`dropdown_${index}`]: {
     value: ['item_1', 'item_2'],
     meta: {
       type: 'ontology',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const matrixData = (overrides = {}, index = 1) => ({
+const matrixData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`matrix_${index}`]: {
     value: [
       { property_1: { value: 1 }, property_2: { value: 'ABC' } },
@@ -124,29 +122,29 @@ const matrixData = (overrides = {}, index = 1) => ({
     ],
     meta: {
       type: 'matrix',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const imageData = (overrides = {}, index = 1) => ({
+const imageData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`image_${index}`]: {
     value: ['resources/mock-resource-id/file1.jpg'],
     meta: {
       type: 'image',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const fileData = (overrides = {}, index = 1) => ({
+const fileData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`file_${index}`]: {
     value: ['resources/mock-resource-id/file1.jpg'],
     meta: {
       type: 'file',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
@@ -160,36 +158,36 @@ const scriptData = (overrides = {}, index = 1) => ({
   },
 });
 
-const farmOsFieldData = (overrides = {}, index = 1) => ({
+const farmOsFieldData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`farmos_field_${index}`]: {
     value: [
       {
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        id: new ObjectId(),
+        id: inRequestFormat ? new ObjectId().toString() : new ObjectId(),
       },
     ],
     meta: {
       type: 'farmOsField',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const farmOsPlantingData = (overrides = {}, index = 1) => ({
+const farmOsPlantingData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`farmos_planting_${index}`]: {
     value: [
       {
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        id: new ObjectId(),
+        id: inRequestFormat ? new ObjectId().toString() : new ObjectId(),
         archived: true,
         location: [
           {
-            id: new ObjectId(),
+            id: inRequestFormat ? new ObjectId().toString() : new ObjectId(),
             name: 'Mock location name',
           },
         ],
@@ -198,24 +196,24 @@ const farmOsPlantingData = (overrides = {}, index = 1) => ({
     ],
     meta: {
       type: 'farmOsPlanting',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const farmOsFarmData = (overrides = {}, index = 1) => ({
+const farmOsFarmData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`farmos_farm_${index}`]: {
     value: [{ url: 'Mock url' }],
     meta: {
       type: 'farmOsFarm',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
 });
 
-const geoJSONData = (overrides = {}, index = 1) => ({
+const geoJSONData = (overrides = {}, index = 1, inRequestFormat = false) => ({
   [`map_${index}`]: {
     value: {
       type: 'FeatureCollection',
@@ -241,7 +239,7 @@ const geoJSONData = (overrides = {}, index = 1) => ({
     },
     meta: {
       type: 'geoJSON',
-      dateModified: now,
+      dateModified: inRequestFormat ? new Date().toISOString() : new Date(),
     },
     ...overrides,
   },
