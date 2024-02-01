@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import canUser from '../helpers/canUser';

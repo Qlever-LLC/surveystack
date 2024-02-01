@@ -8,32 +8,18 @@ import mailService from './mail/mail.service';
 
 describe('membership.service', () => {
   describe('activateMembershipByAdmin', () => {
-    let group,
-      admin,
-      pendingUser,
-      origin,
-      entity,
-      invitationEmail,
-      invitationName,
-      dependencies,
-      args;
+    let group, pendingUser, origin, invitationEmail, invitationName, dependencies, args;
     beforeEach(async () => {
       origin = 'https://foo.com';
       invitationEmail = 'foo@bar.com';
       invitationName = 'Foo Bar';
       group = await createGroup();
-      admin = await group.createAdminMember();
+      await group.createAdminMember();
       pendingUser = await group.createUserMember({
         membershipOverrides: {
           meta: { status: 'pending', invitationEmail, invitationName },
         },
       });
-      entity = {
-        group: group._id.toString(),
-        meta: {
-          invitationEmail,
-        },
-      };
       createUserIfNotExist.mockResolvedValue(pendingUser);
       dependencies = { activateMembership: jest.fn() };
       args = { membershipId: pendingUser.membership._id, origin, ...dependencies };

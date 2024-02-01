@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 
 describe('handleDelegates', () => {
   it('rethrows errors from passed fn', async () => {
-    const t = async (req, res, next) => {
+    const t = async (_req, _res, _next) => {
       throw new Error();
     };
 
@@ -16,7 +16,7 @@ describe('handleDelegates', () => {
     const proxyUser = (await group.createAdminMember()).user;
     const delegateToUser = (await group.createUserMember()).user;
 
-    const t = async (req, res, next) => {
+    const t = async (_req, res, _next) => {
       expect(res.locals.auth.user._id.toString()).toStrictEqual(delegateToUser._id.toString());
       expect(res.locals.auth.delegateToUserId.toString()).toStrictEqual(
         delegateToUser._id.toString()
@@ -37,7 +37,7 @@ describe('handleDelegates', () => {
     let res = await createRes({ user: cloneDeep(proxyUser) });
     res.locals.auth.delegateToUserId = delegateToUser._id.toString();
 
-    const t = async (req, res, next) => {
+    const t = async (_req, _res, _next) => {
       console.log('t called');
     };
 

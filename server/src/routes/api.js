@@ -5,8 +5,9 @@ import authController from '../controllers/authController';
 import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
+import { syncDraft } from '../controllers/submissionController.part.ts';
 import userController from '../controllers/userController';
-import scriptController from '../controllers/scriptController';
+import * as scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import * as farmosController from '../controllers/farmosController';
 import * as hyloController from '../controllers/hyloController';
@@ -158,6 +159,11 @@ router.post(
   [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
   catchErrors(submissionController.deleteSubmissions)
 );
+router.post(
+  '/submissions/sync-draft',
+  [checkFeatureToggledOn('feature_sync_drafts'), assertAuthenticated],
+  catchErrors(syncDraft)
+);
 
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
@@ -260,14 +266,16 @@ router.put(
 );
 router.delete(
   '/memberships/:id',
-  catchErrors(membershipController.deleteMembership, async (membership, origin) => {
-    try {
-      await farmosController.removeMembershipHook(membership, origin);
-    } catch (error) {
-      // log the error, but don't escalate as it is not critical
-      console.log(error);
-    }
-  })
+  catchErrors(
+    membershipController.deleteMembership(async (membership, origin) => {
+      try {
+        await farmosController.removeMembershipHook(membership, origin);
+      } catch (error) {
+        // log the error, but don't escalate as it is not critical
+        console.log(error);
+      }
+    })
+  )
 );
 
 router.post(

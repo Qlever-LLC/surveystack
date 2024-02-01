@@ -358,7 +358,7 @@ class PdfGenerator {
   /*******************************************************************/
 
   // eslint-disable-next-line no-unused-vars
-  pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+  pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage) {
     if (currentNode.headlineLevel === LVL.section) {
       return followingNodesOnPage.length <= 2 && nodesOnNextPage.length > 2;
     }

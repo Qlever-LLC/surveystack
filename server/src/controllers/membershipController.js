@@ -254,7 +254,7 @@ const updateMembership = async (req, res) => {
   }
 };
 
-const deleteMembership = async (req, res, _, hook) => {
+const deleteMembership = (hook) => async (req, res, _) => {
   const { id } = req.params;
 
   const membership = await db.collection(col).findOne({ _id: new ObjectId(id) });

@@ -3,7 +3,7 @@ variables:
   IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
 
 image:
-  name: "node:14"
+  name: "node:16"
 
 workflow:
   rules:

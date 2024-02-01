@@ -2,6 +2,9 @@ import { createControlInstance } from '@/utils/surveyConfig';
 import { uniqueId } from 'lodash';
 
 export const addRevisionToSurvey = (survey, controls) => {
+  if (!Array.isArray(controls)) {
+    throw new Error('controls must be an array');
+  }
   const revision = {
     version: survey.revisions.length + 1,
     controls,
@@ -11,9 +14,9 @@ export const addRevisionToSurvey = (survey, controls) => {
   return revision;
 };
 
-export const createControl = ({ type, ...overrides }) => {
+export const createControl = ({ type, controlInstanceOverrides, ...overrides }) => {
   const control = {
-    ...createControlInstance({ type }),
+    ...createControlInstance({ type, ...controlInstanceOverrides }),
     name: `${type}_${uniqueId()}`,
     children: ['page', 'group'].includes(type) ? [] : undefined,
     ...overrides,

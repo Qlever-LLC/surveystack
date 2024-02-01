@@ -2,13 +2,11 @@ import { Router } from 'express';
 import { flatten } from 'flat';
 import { ObjectId } from 'mongodb';
 import papa from 'papaparse';
-import boom from '@hapi/boom';
 
 import { db } from '../db';
 
 import { uploadToS3 } from '../services/bucket.service';
 import mailService from '../services/mail/mail.service';
-import farmosService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -30,28 +28,6 @@ router.get('/s3upload', async (req, res) => {
 
   return res.send(`File has been uploaded ${filePath}`);
 });
-
-function removeKeys(obj, keys) {
-  for (var prop in obj) {
-    console.log(prop);
-    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-      switch (typeof obj[prop]) {
-        case 'object':
-          if (keys.indexOf(prop) > -1) {
-            delete obj[prop];
-          } else {
-            removeKeys(obj[prop], keys);
-          }
-          break;
-        default:
-          if (keys.indexOf(prop) > -1) {
-            delete obj[prop];
-          }
-          break;
-      }
-    }
-  }
-}
 
 function removeKeys2(obj, keys) {
   if (!obj) {
