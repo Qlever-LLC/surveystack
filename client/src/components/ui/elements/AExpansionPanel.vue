@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel :readonly="readonly">
+  <v-expansion-panel :elevation="elevation" :readonly="readonly">
     <slot />
   </v-expansion-panel>
 </template>
@@ -8,6 +8,7 @@
 export default {
   name: 'AExpansionPanel',
   props: {
+    elevation: { type: [String, Number], required: false },
     readonly: { type: Boolean, required: false },
   },
 };

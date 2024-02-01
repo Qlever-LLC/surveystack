@@ -3,7 +3,7 @@
     class="control-item d-flex flex-column"
     :data-testid="`diff-card-${diffInfo.indexPath}-${diffInfo.changeType}`">
     <button @click="isOpen = !isOpen" :disabled="!haveChangeDetails">
-      <a-row>
+      <a-row class="py-4">
         <control-card-header
           :index="diffInfo.indexPath"
           :title="diffInfo.label"

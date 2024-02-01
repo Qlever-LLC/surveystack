@@ -1,12 +1,11 @@
-<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <a-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
     <a-icon color="success" class="mr-1">mdi-check-bold</a-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </a-card-text>
   <a-expansion-panels v-else multiple v-model="mainPanelState">
-    <a-expansion-panel>
-      <a-expansion-panel-title v-if="showHeader" class="pt-0">
+    <a-expansion-panel elevation="0">
+      <a-expansion-panel-title v-if="showHeader" class="pt-0" cssTransparentOverlay>
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
         <span v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon" class="flex-grow-0 mr-2">
@@ -22,7 +21,8 @@
           v-if="isOpen"
           @click.stop=""
           v-model="showChangesOnly"
-          label="changes only" />
+          label="changes only"
+          hideDetails />
       </a-expansion-panel-title>
       <a-expansion-panel-text>
         <survey-diff-card-tree
