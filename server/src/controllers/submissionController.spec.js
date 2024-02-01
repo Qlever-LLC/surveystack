@@ -1168,7 +1168,10 @@ describe('submissionController', () => {
     });
 
     it('should throw error if PDF generate failed', async () => {
-      const req = createReq({ params: { id: submission._id }, query: { base64: '1' } });
+      const req = createReq({
+        params: { id: 'non-existing-submission-id' },
+        query: { base64: '1' },
+      });
       const res = await createRes({
         user: { _id: submission.meta.creator, permissions: [] },
       });
