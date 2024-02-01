@@ -1208,6 +1208,7 @@ describe('submissionController', () => {
         'ontology',
       ]);
       const { submission } = await createSubmission();
+      submission.meta.group = undefined; //make the pdf generation fail by removing the group information
       const req = createReq({ body: { survey, submission }, query: { base64: '1' } });
       const res = await createRes({
         user: { _id: submission.meta.creator, permissions: [] },
