@@ -40,8 +40,7 @@
             label="Password"
             :type="showPasswords ? 'text' : 'password'"
             :hint="passwordHint"
-            persistent-hint
-          />
+            persistent-hint />
 
           <a-text-field
             tabindex="4"
@@ -51,8 +50,7 @@
             label="Password (Confirmation)"
             :type="showPasswords ? 'text' : 'password'"
             :hint="passwordHint"
-            persistent-hint
-          />
+            persistent-hint />
 
           <a-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
 
@@ -65,9 +63,9 @@
     </a-card>
     <!-- <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" variant="text" :type="status.type">{{ status.message }}</a-alert> -->
     <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
-        status.message
-      }}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">
+        {{ status.message }}
+      </app-feedback>
     </transition>
   </a-container>
 </template>

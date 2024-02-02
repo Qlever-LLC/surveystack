@@ -23,9 +23,9 @@
         </a-form>
       </a-card>
       <transition name="fade">
-        <app-feedback v-if="status" class="mt-5" @closed="status = {}" :type="status.type">{{
-          status.message
-        }}</app-feedback>
+        <app-feedback v-if="status" class="mt-5" @closed="status = {}" :type="status.type">
+          {{ status.message }}
+        </app-feedback>
       </transition>
       <transition name="fade">
         <app-feedback v-if="showSuccessMessage" class="mt-5" :closeable="false" type="success">
