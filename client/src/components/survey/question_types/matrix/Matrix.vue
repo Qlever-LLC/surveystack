@@ -406,16 +406,16 @@ export default {
 }
 */
 
->>> .v-data-table__wrapper::-webkit-scrollbar {
+:deep(.v-data-table__wrapper::-webkit-scrollbar) {
   height: 12px;
 }
 
->>> .v-data-table__wrapper::-webkit-scrollbar-track {
+:deep(.v-data-table__wrapper::-webkit-scrollbar-track) {
   border-radius: 3px;
   background: #eee;
 }
 
->>> .v-data-table__wrapper::-webkit-scrollbar-thumb {
+:deep(.v-data-table__wrapper::-webkit-scrollbar-thumb) {
   border-radius: 3px;
   background: #bbb;
 }
