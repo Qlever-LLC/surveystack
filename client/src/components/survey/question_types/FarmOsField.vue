@@ -16,19 +16,21 @@
       item-value="value"
       variant="outlined"
       :label="control.hint"
-      :multiple="this.control.options.hasMultipleSelections"
+      :multiple="control.options.hasMultipleSelections"
       @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
       selectionSlot
-      chipSlot
+      :chipSlot="control.options.hasMultipleSelections"
       itemSlot
       cssFlexWrap>
-      <template v-slot:selection="{ item, index }">
-        <span v-html="item.props.title" />
+      <template v-slot:selection="{ props, item }" v-if="!control.options.hasMultipleSelections">
+        <span v-bind="props" v-html="item.raw.label" />
       </template>
-      <template v-slot:chip="{ props, item }">
-        <a-chip v-bind="props" closable v-html="item.title" style="height: 50px" />
+      <template v-slot:chip="{ props, item }" v-else>
+        <a-chip v-bind="props" closable style="height: 35px">
+          <span v-html="item.raw.label" />
+        </a-chip>
       </template>
       <template v-slot:item="{ props, item }">
         <a-list-item v-bind="props" :title="undefined">

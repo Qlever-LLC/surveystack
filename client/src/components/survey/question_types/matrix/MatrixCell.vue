@@ -105,22 +105,21 @@
     clearable
     variant="outlined"
     :disabled="disabled || loading"
+    color="focus"
     :chipSlot="header.multiple"
     selectionSlot
     itemSlot
     cssFlexNoWrap
     cssOneLineSpan>
-    <template v-slot:chip="{ props, item }" v-if="!!header.multiple">
-      <a-chip v-bind="props" closable>
-        <span v-html="item.raw.label" />
-      </a-chip>
+    <template v-slot:selection="{ item }" v-if="!header.multiple">
+      <div v-html="item.raw.label"></div>
     </template>
-    <template v-slot:selection="{ item }" v-else>
-      <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
+    <template v-slot:chip="{ props, item, index }" v-else>
+      <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
 
     <template v-slot:item="{ props, item }">
-      <a-list-item v-bind="props">
+      <a-list-item v-bind="props" :title="undefined">
         <a-list-item-title v-html="item.raw.label" />
       </a-list-item>
     </template>
@@ -139,6 +138,7 @@
     clearable
     variant="outlined"
     :disabled="disabled || loading"
+    color="focus"
     :chipSlot="header.multiple"
     selectionSlot
     itemSlot
@@ -152,7 +152,7 @@
     </template>
 
     <template v-slot:item="{ props, item }">
-      <a-list-item v-bind="props">
+      <a-list-item v-bind="props" :title="undefined">
         <a-list-item-title v-html="item.raw.label" />
       </a-list-item>
     </template>
@@ -381,9 +381,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
->>> .blue-chip,
->>> .orange-chip,
->>> .green-chip {
+:deep(.blue-chip, .orange-chip, .green-chip) {
   display: inline-flex;
   border: 1px rgb(var(--v-theme-focus)) solid;
   color: rgb(var(--v-theme-focus));
@@ -399,17 +397,13 @@ export default {
   margin-right: 0.2rem !important;
 }
 
->>> .green-chip {
+:deep(.green-chip) {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-div >>> .orange-chip {
+:deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
-}
-
->>> .v-list-item.v-list-item--active {
-  color: rgb(var(--v-theme-focus)) !important;
 }
 </style>

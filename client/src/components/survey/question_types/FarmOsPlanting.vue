@@ -23,13 +23,12 @@
         :value="hashItem(item)"
         :key="`item_${idx}`"
         dense
-        :disabled="!control.options.hasMultipleSelections && item.value.isField">
+        :disabled="(!control.options.hasMultipleSelections && item.value.isField) || item.value?.isNotClickable">
         <template v-slot:prepend="{ isSelected }">
           <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
             <a-checkbox
               v-if="control.options.hasMultipleSelections"
               :modelValue="isSelected"
-              :true-value="hashItem(item)"
               color="focus"
               hide-details />
             <a-radio-group v-else :modelValue="isSelected" hide-details>
@@ -107,6 +106,7 @@ const transform = (assets) => {
         farmName: area.farmName,
         location: area.location,
         isField: true,
+        name: '',
       },
       label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
     };
@@ -131,6 +131,8 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
   };
@@ -140,11 +142,15 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
   };
 
-  res.push(withoutAreaSection, ...withoutArea);
+  if (withoutArea.length > 0) {
+    res.push(withoutAreaSection, ...withoutArea);
+  }
 
   if (localAssets.length > 0) {
     res.unshift(localAssetSection, ...localAssets);
@@ -259,5 +265,9 @@ export default {
 :deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
+}
+
+.v-list-item--disabled {
+  opacity: 1;
 }
 </style>

@@ -285,23 +285,29 @@ export default {
 </script>
 
 <style>
-.v-select .v-select__selections > input:not(:first-child) {
+.v-select .v-select__selections > input:not(:first-child),
+.v-autocomplete .v-autocomplete__selection > input:not(:first-child) {
   margin-left: 4px;
 }
 
-.minHeightAuto .v-select__selections {
+.minHeightAuto .v-select__selections,
+.minHeightAuto .v-autocomplete__selection {
   min-height: auto !important;
 }
-.minHeight56px .v-select__selections {
+.minHeight56px .v-select__selections,
+.minHeight56px .v-autocomplete__selection {
   min-height: 56px !important;
 }
-.flexWrap .v-select__selections {
+.flexWrap .v-select__selections,
+.flexWrap .v-autocomplete__selection {
   flex-wrap: wrap !important;
 }
-.flexNoWrap .v-select__selections {
+.flexNoWrap .v-select__selections,
+.flexNoWrap .v-autocomplete__selection {
   flex-wrap: nowrap;
 }
-.oneLineSpan .v-select__selections span {
+.oneLineSpan .v-select__selections span,
+.oneLineSpan .v-autocomplete__selection span {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;

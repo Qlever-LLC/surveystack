@@ -7,7 +7,7 @@
     :hint="hint"
     :indeterminate="indeterminate"
     :label="label"
-    :modelValue="modelValue"
+    :model-value="modelValue"
     :persistent-hint="persistentHint"
     :rules="rules"
     :true-value="trueValue"

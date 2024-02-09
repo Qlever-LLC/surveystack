@@ -2,14 +2,13 @@
   <v-chip
     @click="$emit('click', $event)"
     @click:close="$emit('click:close', $event)"
-    :close="close"
+    :closable="closable"
     :color="color"
     :input-value="inputValue"
     :label="label"
     :size="xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
     :variant="variant"
-    :title="title"
-  >
+    :title="title">
     <slot />
   </v-chip>
 </template>
@@ -20,7 +19,7 @@ export default {
   emits: ['click', 'click:close'],
   props: {
     //vuetify props
-    close: { type: Boolean, required: false },
+    closable: { type: Boolean, required: false },
     color: { type: String, required: false },
     inputValue: { type: undefined, required: false },
     label: { type: Boolean, required: false },
@@ -35,6 +34,7 @@ export default {
         return ['flat', 'text', 'elevated', 'tonal', 'outlined', 'plain'].includes(value);
       },
       required: false,
+      default: 'tonal',
     },
   },
 };

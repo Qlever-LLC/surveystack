@@ -199,6 +199,7 @@ const transform = (assets) => {
         farmName: area.farmName,
         location: area.location,
         isField: true,
+        name: '',
       },
       label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
     };
@@ -223,6 +224,8 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
   };
@@ -232,11 +235,15 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
   };
 
-  res.push(withoutAreaSection, ...withoutArea);
+  if (withoutArea.length > 0) {
+    res.push(withoutAreaSection, ...withoutArea);
+  }
 
   if (localAssets.length > 0) {
     res.unshift(localAssetSection, ...localAssets);
@@ -411,5 +418,33 @@ export default {
 >>> .v-data-table__wrapper::-webkit-scrollbar-thumb {
   border-radius: 3px;
   background: #bbb;
+}
+
+.chip-no-wrap {
+  white-space: nowrap;
+}
+
+:deep(.blue-chip, .orange-chip, .green-chip) {
+  display: inline-flex;
+  border: 1px rgb(var(--v-theme-focus)) solid;
+  background-color: white;
+  color: rgb(var(--v-theme-focus));
+  border-radius: 0.4rem;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  vertical-align: middle;
+}
+
+:deep(.green-chip) {
+  color: #46b355;
+  border: 1px #46b355 solid;
+}
+
+:deep(.orange-chip) {
+  color: #f38d49;
+  border: 1px #f38d49 solid;
 }
 </style>

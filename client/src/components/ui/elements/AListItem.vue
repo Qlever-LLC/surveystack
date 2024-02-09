@@ -4,7 +4,9 @@
     :prepend-avatar="prependAvatar"
     :prepend-icon="prependIcon"
     :variant="flat ? 'flat' : 'text'"
+    :color="color"
     :density="dense ? 'compact' : 'default'"
+    :disabled="disabled"
     :link="link"
     :lines="twoLine ? 'two' : threeLine ? 'three' : 'one'"
     :href="href"
@@ -13,8 +15,8 @@
     :title="title"
     :value="value"
     v-bind="$attrs">
-    <template v-if="!prependIcon" v-slot:prepend>
-      <slot name="prepend" />
+    <template v-if="!prependIcon" v-slot:prepend="{ isSelected }">
+      <slot name="prepend" :isSelected="isSelected" />
     </template>
     <template v-if="!appendIcon" v-slot:append>
       <slot name="append" />
@@ -30,6 +32,7 @@ export default {
   props: {
     flat: { type: Boolean, required: false },
     dense: { type: Boolean, required: false },
+    disabled: { type: Boolean, required: false },
     link: { type: Boolean, default: undefined },
     twoLine: { type: Boolean, required: false },
     threeLine: { type: Boolean, required: false },
