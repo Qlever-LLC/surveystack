@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import FarmosRegister from '../pages/farmos-manage/FarmOSRegister.vue';
 
 export default {

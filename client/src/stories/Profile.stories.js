@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import TableComponent from '../components/integrations/FarmOSProfile.vue';
 import TableGroup from '../components/integrations/FarmOSGroupSettings.vue';
 import UpdatedTable from '../components/integrations/FarmOSGroupTable.vue';
