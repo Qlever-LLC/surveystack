@@ -146,8 +146,6 @@
 
 <script>
 import api from '@/services/api.service';
-// TODO: figure out why there is an import cycle from submissions.strore > router
-// eslint-disable-next-line import/no-cycle
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
@@ -200,13 +198,7 @@ export default {
     this.$store.dispatch('appui/reset');
   },
   computed: {
-    // activeSubmission() {
-    //   // return this.$store.getters['submissions/getSubmission'](this.activeSubmissionId);
-    //   return this.$store.state.submissions.submissions
-    //     .find(({ _id }) => this.activeSubmissionId === _id);
-    // },
     readyToSubmit() {
-      // return this.$store.state.readyToSubmit.readyToSubmit || [];
       return this.$store.getters['submissions/readyToSubmit'];
     },
     activeTabBody() {
@@ -239,13 +231,6 @@ export default {
           content: this.localSubmissions,
           icon: 'mdi-file-document-edit',
         },
-        // {
-        //   name: 'outbox',
-        //   title: 'Outbox',
-        //   content: this.sortSubmissions(this.$store.getters['submissions/outbox']),
-        //   icon: 'mdi-cloud-sync',
-
-        // },
         {
           name: 'sent',
           title: 'Sent',
@@ -298,9 +283,6 @@ export default {
         this.confirmSubmissionIsVisible = true;
       }
     },
-    getSubmission(id) {
-      return this.$store.getters['submissions/getSubmission'](id);
-    },
     readyToSubmitHas(id) {
       return this.readyToSubmit.indexOf(id) > -1;
     },
@@ -340,6 +322,8 @@ export default {
         await this.fetchRemoteSubmissions();
       }
     },
+    // TODO: are there still submissions in this state? If not, remove this
+    // If there are, write a database migration to add the survey metadata to the submissions, and then remove this.
     async setSurveyNames(submissions) {
       for (let submission of submissions) {
         if (!submission.meta.survey.name) {
@@ -362,17 +346,10 @@ export default {
       return survey;
     },
     async select(draft) {
-      console.log('select', draft._id, this.getSubmission(draft._id));
-      if (!this.getSubmission(draft._id)) {
-        // TODO: should we persist this submission to IDB? not doing it for now
-        // If we don't persist submission to IDB then it will throw an error if the user tries to refresh the page
-        // But by not persisting it to IDB, we're preventing the user from creating drafts unnecessarily
-        // The draft will be persisted anyways as soon as the user makes any edits to the submission.
-
-        // TODO: if implementation changes here, also adapt @/pages/submissions/List.vue's 'resubmit' method
-        await this.$store.dispatch('submissions/fetchRemoteSubmission', draft._id);
-      }
-      this.$router.push(`/submissions/drafts/${draft._id}`);
+      this.$router.push({
+        name: 'edit-submission',
+        params: { submissionId: draft._id, surveyId: draft.meta.survey.id },
+      });
     },
     sortSubmissions(submissions) {
       return [...submissions].sort(
