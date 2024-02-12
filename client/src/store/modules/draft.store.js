@@ -5,7 +5,6 @@ import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
 import { get } from 'lodash';
 import api from '@/services/api.service';
-import Vue from 'vue';
 import { isRequiredUnanswered } from '@/utils/surveyStack';
 
 const getPath = (node) =>
