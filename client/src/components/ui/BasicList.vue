@@ -20,6 +20,9 @@
             <template v-slot:prepend>
               <slot name="prepend" v-bind:entity="entity" />
             </template>
+            <template v-slot:append>
+              <slot name="append" v-bind:entity="entity" />
+            </template>
             <slot name="entity" v-bind:entity="entity">
               <a-list-item-title>Title #{{ idx }}</a-list-item-title>
               <a-list-item-subtitle>Subtitle</a-list-item-subtitle>

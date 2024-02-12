@@ -110,20 +110,7 @@
             query: { group: entity._id, role: 'user' },
           }"
           :filter="filterMembers">
-          <template v-slot:entity="{ entity }">
-            <div v-if="entity.meta && entity.meta.status === 'pending'">
-              <a-list-item-title class="text-secondary"
-                >[Pending] {{ entity.meta.invitationEmail
-                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</a-list-item-title
-              >
-              <a-list-item-subtitle>{{
-                entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
-              }}</a-list-item-subtitle>
-            </div>
-            <div v-else>
-              <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
-              <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
-            </div>
+          <template v-slot:append="{ entity }">
             <a-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
               <a-row cssGap12px>
                 <app-confirm-membership-button
@@ -141,6 +128,21 @@
                 <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
               </a-row>
             </a-list-item-action>
+          </template>
+          <template v-slot:entity="{ entity }">
+            <div v-if="entity.meta && entity.meta.status === 'pending'">
+              <a-list-item-title class="text-secondary"
+                >[Pending] {{ entity.meta.invitationEmail
+                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</a-list-item-title
+              >
+              <a-list-item-subtitle>{{
+                entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
+              }}</a-list-item-subtitle>
+            </div>
+            <div v-else>
+              <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
+            </div>
           </template>
         </app-basic-list>
       </a-col>
