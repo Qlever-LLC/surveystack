@@ -81,12 +81,14 @@
             {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
           </a-list-item-subtitle>
           <a-list-item-subtitle v-else style="user-select: text"> {{ resource.name }}</a-list-item-subtitle>
-          <a-icon v-if="resource.libraryId" color="grey-lighten-1">mdi-library</a-icon>
-          <a-list-item-action v-if="resource.type === resourceTypes.FILE">
-            <a-btn icon>
-              <a-icon color="grey-lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </a-icon>
-            </a-btn>
-          </a-list-item-action>
+          <template v-slot:append>
+            <a-icon v-if="resource.libraryId" color="grey-lighten-1">mdi-library</a-icon>
+            <a-list-item-action v-if="resource.type === resourceTypes.FILE">
+              <a-btn icon>
+                <a-icon color="grey-lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </a-icon>
+              </a-btn>
+            </a-list-item-action>
+          </template>
         </a-list-item>
       </template>
       <a-list-item v-else>
