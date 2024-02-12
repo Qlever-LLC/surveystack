@@ -6,6 +6,8 @@
   <VueDraggable
     v-if="state.draggableControls?.length !== 0 || index.length !== 0"
     class="draggable"
+    :class="{ cursorPointer: readOnly }"
+    :style="state.scaleStyles"
     :disabled="readOnly"
     tag="div"
     v-model="state.draggableControls"
@@ -183,7 +185,7 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
-import { reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -229,7 +231,10 @@ const emit = defineEmits([
   'unhide-control',
 ]);
 
+const rootDraggable = ref(null);
+
 const state = reactive({
+  scaleStyles: {},
   draggableControls: props.modelValue,
   drag: false,
   deleteQuestionModalIsVisible: false,
@@ -252,6 +257,19 @@ const state = reactive({
     },
   },
   descendantHasPage: utils.descendantHasPage,
+});
+
+onMounted(() => {
+  if (rootDraggable.value.$el) {
+    const { width, height } = rootDraggable.value.$el.getBoundingClientRect();
+    if (props.scale !== 1.0)
+      state.scaleStyles = {
+        transform: `scale(${props.scale})`,
+        transformOrigin: 'top left',
+        marginRight: `-${width * (1.0 - props.scale)}px`,
+        marginBottom: `-${height * (1.0 - props.scale)}px`,
+      };
+  }
 });
 
 function getDisplayIndex(value) {
@@ -279,15 +297,15 @@ function getDisplay(control) {
   return control.label || control.hint || control.type;
 }
 function showDeleteModal(index) {
+  if (props.readOnly) {
+    return;
+  }
   state.deleteQuestionModalIsVisible = true;
   state.deleteQuestionIndex = index;
 }
 function handleConfirmDelete() {
   removeAt(state.deleteQuestionIndex);
   state.deleteQuestionModalIsVisible = false;
-}
-function log(name) {
-  console.log(name);
 }
 function removeAt(idx) {
   state.draggableControls.splice(idx, 1);
@@ -330,6 +348,9 @@ function areActionsVisible(control) {
 }
 </script>
 <style scoped lang="scss">
+.cursorPointer {
+  cursor: pointer !important;
+}
 .drop-area {
   min-height: 4rem;
 }

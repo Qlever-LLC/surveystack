@@ -97,11 +97,11 @@
               <a-col>
                 <h4>Questions</h4>
                 <graphical-view
-                  :readOnly="true"
+                  readOnly
                   :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
-                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls" />
+                  :modelValue="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls" />
               </a-col>
             </a-row>
           </a-card>
