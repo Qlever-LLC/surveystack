@@ -37,7 +37,7 @@
               <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
             </div>
           </div>
-          <v-list>
+          <a-list>
             <div v-for="(e, i) in surveys.content" :key="e._id">
               <a-list-item :to="`/surveys/${e._id}`">
                 <template v-slot:prepend>
@@ -53,7 +53,7 @@
               </a-list-item>
               <a-divider v-if="i < surveys.content.length - 1" />
             </div>
-          </v-list>
+          </a-list>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </a-card-text>
         <a-card-actions>
