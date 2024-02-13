@@ -1,11 +1,10 @@
 <template>
   <div class="screen-root bg-white">
     <a-dialog v-model="viewCode">
-      <app-code-view v-model="surveyUnderWork" style="height: 80vh" />
+      <app-code-view :modelValue="JSON.stringify(surveyUnderWork, null, 2)" readOnly style="height: 80vh" />
     </a-dialog>
-
     <a-dialog v-model="viewSubmission">
-      <app-code-view v-model="instance" style="height: 80vh" />
+      <app-code-view :modelValue="JSON.stringify(instance, null, 2)" readOnly style="height: 80vh" />
     </a-dialog>
 
     <a-dialog v-model="showExamples">
