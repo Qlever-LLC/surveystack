@@ -24,15 +24,7 @@
         <img v-if="!modelValue" id="map-marker" :src="require('@/assets/marker.svg')" alt="marker" />
         <div class="selection-controls d-flex justify-center">
           <div v-if="!location">
-            <a-btn
-              large
-              :disabled="disablePick"
-              :dark="!disablePick"
-              class="mx-4 full"
-              color="primary"
-              @click="pickLocation">
-              Pick
-            </a-btn>
+            <a-btn large :disabled="disablePick" class="mx-4 full" color="primary" @click="pickLocation"> Pick </a-btn>
           </div>
           <div v-else>
             <a-btn large class="mx-4 full" color="gray" @click="retake"> Retake </a-btn>

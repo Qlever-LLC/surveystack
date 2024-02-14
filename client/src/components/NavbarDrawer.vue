@@ -66,7 +66,7 @@
     </a-list>
 
     <template v-slot:append>
-      <div dark class="text-grey">
+      <div class="text-grey">
         <p class="pt-4 pl-4">
           Version:
           <router-link to="/app/info" class="decoration-none">{{ lcl.shortHash }}</router-link>

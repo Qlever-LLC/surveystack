@@ -5,7 +5,6 @@
       aria-label="Open QR Scanner"
       :x-large="!small"
       :small="!!small"
-      dark
       color="primary"
       @click="isScannerOpen = true">
       <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
