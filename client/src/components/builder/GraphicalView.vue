@@ -83,7 +83,7 @@
           </a-chip>
           <a-btn
             icon
-            v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
+            v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
             @click.stop="() => showDeleteModal(idx)">
             <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey-lighten-1'">
               mdi-delete
@@ -297,9 +297,6 @@ function getDisplay(control) {
   return control.label || control.hint || control.type;
 }
 function showDeleteModal(index) {
-  if (props.readOnly) {
-    return;
-  }
   state.deleteQuestionModalIsVisible = true;
   state.deleteQuestionIndex = index;
 }
@@ -407,6 +404,7 @@ function areActionsVisible(control) {
 }
 
 .context-actions {
+  height: 48px; /* --v-btn-height = 36px + 12px */
   min-width: 108px;
   text-align: right;
 }
