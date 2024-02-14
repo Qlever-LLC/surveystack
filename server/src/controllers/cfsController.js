@@ -27,7 +27,6 @@ const send = async (req, res) => {
     ])
     .toArray();
 
-  //const promises = [];
   for (const membership of memberships) {
     const { email } = membership.user;
     const text = await createText(body, { origin, survey, group, email });

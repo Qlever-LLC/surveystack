@@ -29,8 +29,8 @@
       <div>
         <btn-dropdown
           :label="'Start Survey'"
-          :show-drop-down="isAdminOfAnyGroup && isAllowedToSubmit"
-          :disabled="!isAllowedToSubmit"
+          :show-drop-down="isAdminOfAnyGroup && isAllowedToSubmit.allowed"
+          :disabled="!isAllowedToSubmit.allowed"
           @click="startDraft(entity)"
           x-large
           color="primary"
@@ -63,8 +63,8 @@
           </v-btn>
         </div>
 
-        <div class="text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
-          {{ submissionRightsHint }}
+        <div class="text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit.allowed">
+          {{ isAllowedToSubmit.message }}
         </div>
 
         <member-selector
@@ -87,18 +87,12 @@ import { parse as parseDisposition } from 'content-disposition';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
 import BtnDropdown from '@/components/ui/BtnDropdown';
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import { checkAllowedToSubmit } from '@/utils/submissions';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
 import { get } from 'lodash';
 
 export default {
-  props: {
-    start: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   components: {
     BtnDropdown,
     MemberSelector,
@@ -117,12 +111,16 @@ export default {
   },
   methods: {
     startDraft(survey) {
-      this.$store.dispatch('submissions/startDraft', { survey });
+      this.$router.push({ name: 'new-submission', params: { surveyId: survey._id } });
     },
     startDraftAs(survey, selectedMember) {
       this.showSelectMember = false;
       if (selectedMember.user) {
-        this.$store.dispatch('submissions/startDraft', { survey, submitAsUser: selectedMember.user });
+        this.$router.push({
+          name: 'new-submission',
+          params: { surveyId: survey._id },
+          query: { submitAsUserId: selectedMember.user._id },
+        });
       }
     },
     async downloadPrintablePdf(survey) {
@@ -156,10 +154,10 @@ export default {
       return this.$store.getters['memberships/memberships'];
     },
     isAdminOfSurveyGroup() {
-      return !!this.memberships.find((m) => m.group._id === this.entity.meta.group.id && m.role === 'admin');
+      return this.memberships.some((m) => m.group._id === this.entity.meta.group.id && m.role === 'admin');
     },
     isAdminOfAnyGroup() {
-      return !!this.memberships.find((m) => m.role === 'admin');
+      return this.memberships.some((m) => m.role === 'admin');
     },
     editable() {
       if (!this.$store.getters['auth/isLoggedIn']) {
@@ -176,69 +174,13 @@ export default {
       }
 
       return this.isAdminOfSurveyGroup;
-      /*const g = this.memberships.find((m) => m.group._id === this.entity.meta.group.id);
-      if (g && g.role === 'admin') {
-        return true;
-      }
-      return false;*/
     },
     isAllowedToSubmit() {
-      const { submissions, isLibrary } = this.entity.meta;
-
-      if (isLibrary || this.isPublishedVersionEmpty) {
-        return false;
-      }
-
-      if (!submissions || submissions === 'public') {
-        // everyone may submit
-        return true;
-      }
-
-      if (submissions === 'user' && this.$store.getters['auth/isLoggedIn']) {
-        // logged in users may submit
-        return true;
-      }
-
-      if (submissions === 'group' && this.$store.getters['auth/isLoggedIn']) {
-        const groups = this.$store.getters['memberships/groups'];
-        console.log(groups);
-        const match = groups.find((group) => group._id === this.entity.meta.group.id);
-        console.log('match', match);
-        if (match) {
-          return true;
-        }
-      }
-
-      return false;
-    },
-    isPublishedVersionEmpty() {
-      const publishedVersion = this.entity.revisions.find((revision) => revision.version === this.entity.latestVersion);
-      return publishedVersion.controls.length === 0;
-    },
-    submissionRightsHint() {
-      const { submissions, isLibrary } = this.entity.meta;
-
-      if (isLibrary) {
-        return 'This is a library survey, please choose another survey to submit.';
-      }
-
-      if (this.isPublishedVersionEmpty) {
-        return 'The latest published version of this survey is empty. Please publish a new version to start a submission.';
-      }
-
-      if (!submissions || submissions === 'public') {
-        return 'Everyone may submit to this survey.';
-      }
-
-      if (submissions === 'user') {
-        return 'You must be signed in to submit to this survey.';
-      }
-
-      if (submissions === 'group') {
-        return 'Only group members may submit to this survey.';
-      }
-
-      return 'Probably no one can submit to this survey';
+      return checkAllowedToSubmit(
+        this.entity,
+        this.$store.getters['auth/isLoggedIn'],
+        this.$store.getters['memberships/groups']
+      );
     },
   },
   async created() {
@@ -280,18 +222,6 @@ export default {
       this.$store.getters['auth/isLoggedIn']
     ) {
       this.show = true;
-
-      if (this.start && this.isAllowedToSubmit) {
-        // Make sure navigating back will lead to the survey detail page
-        // Without this, pressing "back" will go to the auto start page, which pushes us back to the draft
-        // This feels hacky, but i couldn't find a better way
-        this.$router.replace({
-          name: 'surveys-detail',
-          params: this.$route.params,
-          query: this.$route.query,
-        });
-        this.startDraft(this.entity);
-      }
     } else {
       this.$router.push({
         name: 'auth-login',
