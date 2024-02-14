@@ -40,7 +40,6 @@
               </a-col>
               <a-col align="right" md="auto">
                 <a-btn
-                  dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="grey"
                   key="close"
@@ -51,7 +50,6 @@
                   back
                 </a-btn>
                 <a-btn
-                  dark
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="white"
                   key="library"

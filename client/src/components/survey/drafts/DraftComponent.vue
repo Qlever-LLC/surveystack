@@ -45,7 +45,6 @@
           v-show="overflowing"
           color="primary"
           fab
-          dark
           small
           position="fixed"
           style="bottom: 76px; right: 12px; z-index: 150"
