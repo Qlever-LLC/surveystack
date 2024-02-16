@@ -14,8 +14,8 @@
       </a-card-title>
       <a-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
-        <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mb-2" />
-        <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
+        <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mt-2" />
+        <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" class="mt-5" />
       </a-card-text>
       <survey-diff
         :controls-local-revision="localRevisionControls"

@@ -66,7 +66,15 @@
             <a-btn color="primary" variant="flat" dense :loading="download.loading" @click="downloadSubmission">
               Download Submission
             </a-btn>
-            <a-btn class="mt-3" color="primary" variant="flat" dense :loading="emailing.loading" @click="emailMe">
+            <a-btn
+              v-if="isLoggedIn"
+              class="mt-3"
+              color="primary"
+              variant="flat"
+              dense
+              :loading="emailing.loading"
+              @click="emailMe"
+            >
               Email Submission
             </a-btn>
           </div>
@@ -131,6 +139,9 @@ export default {
     },
   }),
   computed: {
+    isLoggedIn() {
+      return this.$store.getters['auth/isLoggedIn'];
+    },
     messages() {
       const items = [...this.items];
 
