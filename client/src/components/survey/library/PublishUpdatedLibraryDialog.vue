@@ -12,10 +12,13 @@
         </a-chip>
         to Library
       </a-card-title>
-      <a-card-text class="mt-5">
+      <a-card-text>
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
-        <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-2" />
-        <library-change-type-selector v-model="localLibrarySurvey.meta.libraryLastChangeType" :disabled="false" />
+        <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mt-2" />
+        <library-change-type-selector
+          v-model="localLibrarySurvey.meta.libraryLastChangeType"
+          :disabled="false"
+          class="mt-5" />
       </a-card-text>
       <survey-diff
         :controls-remote-revision-old="
@@ -27,13 +30,14 @@
         :version-name-remote-revision-old="`Version ${localLibrarySurvey.latestVersion}`"
         :version-name-remote-revision-new="`Version ${
           localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version
-        }`" />
+        }`"
+        class="mt-4" />
       <a-card-actions class="mr-3">
         <a-spacer />
         <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" variant="text">
           <span>Publish update to library {{ modelValue.name }}</span>
         </a-btn>
-        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>
