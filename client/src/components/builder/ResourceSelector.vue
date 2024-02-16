@@ -9,7 +9,7 @@
     item-value="id"
     :disabled="disabled"
     hide-details
-    :variant="outlined ? 'outlined' : null" />
+    :variant="outlined ? 'outlined' : undefined" />
 </template>
 
 <script>

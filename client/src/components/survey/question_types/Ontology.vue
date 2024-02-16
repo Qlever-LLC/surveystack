@@ -98,6 +98,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import * as constants from '@/constants';
 
 export default {
   mixins: [baseQuestionComponent],
@@ -193,11 +194,11 @@ export default {
     },
     getPlaceholder() {
       if ((this.control.hint && this.isFocus) || !this.control.hint) {
-        if (!this.control.options.allowCustomSelection) {
-          return 'Type to search';
-        } else if (this.control.options.allowCustomSelection) {
-          return 'Type to search or add custom answer';
-        }
+        return this.control.options.allowCustomSelection
+          ? 'Type to search or add custom answer'
+          : this.items.length < constants.ASELECT_MAX_ITEMS_TOBE_VSELECT
+            ? 'Search'
+            : 'Type to search';
       }
       return undefined;
     },

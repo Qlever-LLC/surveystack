@@ -19,6 +19,7 @@
     :loading="loading"
     :modelValue="modelValue"
     :persistent-hint="persistentHint"
+    :persistent-placeholder="placeholder ? true : false"
     :placeholder="placeholder"
     :prepend-inner-icon="prependInnerIcon"
     :primary="primary"

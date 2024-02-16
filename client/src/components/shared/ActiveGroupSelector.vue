@@ -7,7 +7,7 @@
       item-title="text"
       item-value="value"
       :label="label"
-      :variant="outlined ? 'outlined' : ''"
+      :variant="outlined ? 'outlined' : undefined"
       hide-details
       color="focus"
       itemSlot>

@@ -1,8 +1,8 @@
 <template>
   <v-select
-    v-if="!allowCustomItem && items.length < MAX_ITEMS"
+    v-if="renderSelect"
     ref="selectRef"
-    :modelValue="modelValue"
+    :modelValue="getModelValue"
     @update:modelValue="clearSearchAndEmitAutocompleteUpdate"
     v-model:search="internalSearch"
     @blur="$emit('blur')"
@@ -35,6 +35,7 @@
     :multiple="multiple"
     :variant="variant"
     :persistent-hint="persistentHint"
+    :persistent-placeholder="placeholder ? true : false"
     :placeholder="placeholder"
     :primary="primary"
     :readonly="readonly"
@@ -65,9 +66,9 @@
   </v-select>
 
   <v-autocomplete
-    v-else-if="!allowCustomItem && items.length >= MAX_ITEMS"
+    v-else-if="renderAutocomplete"
     ref="selectRef"
-    :modelValue="modelValue"
+    :modelValue="getModelValue"
     @update:modelValue="clearSearchAndEmitAutocompleteUpdate"
     v-model:search="internalSearch"
     @blur="$emit('blur')"
@@ -100,6 +101,7 @@
     :multiple="multiple"
     :variant="variant"
     :persistent-hint="persistentHint"
+    :persistent-placeholder="placeholder ? true : false"
     :placeholder="placeholder"
     :primary="primary"
     :readonly="readonly"
@@ -132,12 +134,14 @@
   <v-combobox
     v-else-if="allowCustomItem"
     ref="selectRef"
-    :modelValue="modelValue"
+    :modelValue="getModelValue"
     @update:modelValue="updateValue"
     :search="searchInput"
     @update:search="updateSearch"
+    v-model:menu="noDataMenu"
     @blur="$emit('blur')"
     @focus="$emit('focus', $event)"
+    @keydown.enter="closeNoDataMenu"
     :class="{
       minHeightAuto: cssMinHeightAuto,
       minHeight56px: cssMinHeight56px,
@@ -162,6 +166,7 @@
     :menu-props="menuProps"
     :multiple="multiple"
     :variant="variant"
+    :persistent-placeholder="placeholder ? true : false"
     :placeholder="placeholder"
     :return-object="returnObject"
     :type="type">
@@ -177,11 +182,12 @@
       <v-list-item>
         <v-list-item-title v-if="inputSearch">
           No results matching "<strong>{{ inputSearch }}</strong
-          >". Press <kbd>enter</kbd> <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
+          >". Press <kbd>enter</kbd> <span v-if="multiple">or<kbd>,</kbd></span
+          >to create a new one
         </v-list-item-title>
         <v-list-item-title v-else
-          >Input your own value {{ inputSearch }} and press <kbd>enter</kbd>
-          <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
+          >Input your own value {{ inputSearch }} and press <kbd>enter</kbd> <span v-if="multiple">or<kbd>,</kbd></span
+          >to create a new one
         </v-list-item-title>
       </v-list-item>
     </template>
@@ -189,6 +195,7 @@
 </template>
 
 <script>
+import * as constants from '@/constants';
 export default {
   emits: ['blur', 'click:append', 'focus', 'update:modelValue', 'update:search'],
   props: {
@@ -258,10 +265,21 @@ export default {
 
   data() {
     return {
-      MAX_ITEMS: 15,
       internalSearch: null,
       inputSearch: this.searchInput,
+      noDataMenu: null,
     };
+  },
+  computed: {
+    getModelValue() {
+      return this.modelValue && this.modelValue !== '' ? this.modelValue : null;
+    },
+    renderSelect() {
+      return !this.allowCustomItem && this.items.length < constants.ASELECT_MAX_ITEMS_TOBE_VSELECT;
+    },
+    renderAutocomplete() {
+      return !this.allowCustomItem && this.items.length >= constants.ASELECT_MAX_ITEMS_TOBE_VSELECT;
+    },
   },
   methods: {
     clearSearchAndEmitAutocompleteUpdate(ev) {
@@ -279,6 +297,11 @@ export default {
     updateSearch(val) {
       this.inputSearch = val;
       this.$emit('update:search', val);
+    },
+    closeNoDataMenu() {
+      if (!this.multiple) {
+        this.noDataMenu = null;
+      }
     },
   },
 };
