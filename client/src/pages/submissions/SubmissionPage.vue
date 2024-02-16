@@ -79,6 +79,7 @@ import { createSubmissionFromSurvey, checkAllowedToSubmit, checkAllowedToResubmi
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
+import { ARCHIVE_REASONS } from '@/constants';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -283,7 +284,13 @@ export default {
         this.loading = false;
         return;
       }
-      this.showResubmissionDialog = true;
+
+      const editSubmissionReason = this.$route.query.reason;
+      if (editSubmissionReason && ARCHIVE_REASONS.includes(editSubmissionReason)) {
+        this.submission.meta.archivedReason = editSubmissionReason;
+      } else {
+        this.showResubmissionDialog = true;
+      }
     }
 
     if (this.survey.latestVersion !== this.submission.meta.survey.version) {
