@@ -3,7 +3,7 @@ variables:
   IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
 
 image:
-  name: "node:20"
+  name: "node:20-bullseye"
 
 workflow:
   rules:
