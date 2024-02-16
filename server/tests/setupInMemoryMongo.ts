@@ -10,7 +10,6 @@ beforeAll(async () => {
   mongod = await MongoMemoryServer.create({
     binary: { version: '6.0.4' },
   });
-  // mongod = await MongoMemoryServer.create();
 
   // Prepare the env for connectDatabase
   process.env.DATABASE_URL = mongod.getUri();
