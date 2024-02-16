@@ -32,7 +32,7 @@
       cssMinHeight56px
       :chipSlot="!!control.options.hasMultipleSelections"
       :itemSlot="!!control.options.hasMultipleSelections">
-      <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
+      <template v-slot:chip="{ props, item }">
         <a-chip v-bind="props" closable>
           {{ item.title }}
         </a-chip>
@@ -72,13 +72,13 @@
       data-test-id="combobox"
       cssMinHeight56px
       :chipSlot="!!control.options.hasMultipleSelections"
-      selectionSlot>
-      <template v-slot:chip="{ props, item }" v-if="!!control.options.hasMultipleSelections">
+      :selectionSlot="!control.options.hasMultipleSelections">
+      <template v-slot:chip="{ props, item }">
         <a-chip v-bind="props" closable>
           {{ getLabelForItemValue(item.value) }}
         </a-chip>
       </template>
-      <template v-slot:selection="{ item }" v-if="!control.options.hasMultipleSelections">
+      <template v-slot:selection="{ item }">
         {{ getLabelForItemValue(item.value) }}
       </template>
     </a-select>

@@ -20,14 +20,14 @@
       @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
-      selectionSlot
+      :selectionSlot="!control.options.hasMultipleSelections"
       :chipSlot="control.options.hasMultipleSelections"
       itemSlot
       cssFlexWrap>
-      <template v-slot:selection="{ props, item }" v-if="!control.options.hasMultipleSelections">
+      <template v-slot:selection="{ props, item }">
         <span v-bind="props" v-html="item.raw.label" />
       </template>
-      <template v-slot:chip="{ props, item }" v-else>
+      <template v-slot:chip="{ props, item }">
         <a-chip v-bind="props" closable style="height: 35px">
           <span v-html="item.raw.label" />
         </a-chip>

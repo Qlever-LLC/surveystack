@@ -406,19 +406,19 @@ export default {
 }
 */
 
-:deep(.v-data-table__wrapper::-webkit-scrollbar) {
-  height: 12px;
-}
+// :deep(.v-data-table__wrapper::-webkit-scrollbar) {
+//   height: 12px;
+// }
 
-:deep(.v-data-table__wrapper::-webkit-scrollbar-track) {
-  border-radius: 3px;
-  background: #eee;
-}
+// :deep(.v-data-table__wrapper::-webkit-scrollbar-track) {
+//   border-radius: 3px;
+//   background: #eee;
+// }
 
-:deep(.v-data-table__wrapper::-webkit-scrollbar-thumb) {
-  border-radius: 3px;
-  background: #bbb;
-}
+// :deep(.v-data-table__wrapper::-webkit-scrollbar-thumb) {
+//   border-radius: 3px;
+//   background: #bbb;
+// }
 
 .chip-no-wrap {
   white-space: nowrap;

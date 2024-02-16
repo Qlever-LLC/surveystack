@@ -56,12 +56,12 @@
     clearable
     cssFlexNoWrap
     cssOneLineSpan
-    chipSlot
-    selectionSlot>
-    <template v-slot:selection="{ item, index }" v-if="!header.multiple">
+    :chipSlot="header.multiple"
+    :selectionSlot="!header.multiple">
+    <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.raw.label" :index="index" :value="value" />
     </template>
-    <template v-slot:chip="{ props, item, index }" v-else>
+    <template v-slot:chip="{ props, item, index }">
       <matrix-cell-selection-label v-bind="props" :label="item.raw.label" :index="index" :value="value" />
     </template>
   </a-select>
@@ -82,13 +82,13 @@
     hide-details
     variant="outlined"
     :chipSlot="header.multiple"
-    selectionSlot
+    :selectionSlot="!header.multiple"
     cssFlexNoWrap
     cssOneLineSpan>
-    <template v-slot:selection="{ item, index }" v-if="!header.multiple">
+    <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="getDropdownLabel(item.value)" :index="index" :value="value" />
     </template>
-    <template v-slot:chip="{ props, item, index }" v-else>
+    <template v-slot:chip="{ props, item, index }">
       <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
     </template>
   </a-select>
@@ -107,14 +107,14 @@
     :disabled="disabled || loading"
     color="focus"
     :chipSlot="header.multiple"
-    selectionSlot
+    :selectionSlot="!header.multiple"
     itemSlot
     cssFlexNoWrap
     cssOneLineSpan>
-    <template v-slot:selection="{ item }" v-if="!header.multiple">
+    <template v-slot:selection="{ item }">
       <div v-html="item.raw.label"></div>
     </template>
-    <template v-slot:chip="{ props, item, index }" v-else>
+    <template v-slot:chip="{ props, item, index }">
       <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
 
@@ -140,14 +140,14 @@
     :disabled="disabled || loading"
     color="focus"
     :chipSlot="header.multiple"
-    selectionSlot
+    :selectionSlot="!header.multiple"
     itemSlot
     cssFlexNoWrap
     cssOneLineSpan>
-    <template v-slot:selection="{ item, index }" v-if="!header.multiple">
+    <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :html="item.raw.label" :index="index" :value="value" />
     </template>
-    <template v-slot:chip="{ props, item, index }" v-else>
+    <template v-slot:chip="{ props, item, index }">
       <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
 
