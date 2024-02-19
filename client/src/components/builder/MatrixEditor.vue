@@ -26,7 +26,7 @@
         <div>
           <VueDraggable
             class="d-flex flex-row pa-2 px-4"
-            style="overflow: auto; height: 75vh"
+            style="overflow: auto; max-height: 75vh"
             v-model="columns"
             group="columns"
             @start="drag = true"
