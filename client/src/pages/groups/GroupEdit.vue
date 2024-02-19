@@ -63,7 +63,7 @@
             :readonly="!editSlug"
             :append-inner-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
             autocomplete="off"
-            @click:append="editSlug = !editSlug"
+            @click:appendInner="editSlug = !editSlug"
             hint="URL friendly version of name"
             persistent-hint
             :disabled="isWhitelabel && entity.path === whitelabelPartner.path" />

@@ -21,7 +21,7 @@
           class="form-control"
           v-model="entity.password"
           :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
+          @click:appendInner="showPasswords = !showPasswords"
           color="focus" />
 
         <div class="linkBlock d-flex justify-space-around align-center">

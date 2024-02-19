@@ -33,9 +33,8 @@
     :validate-on-blur="validateOnBlur"
     :variant="variant"
     @blur="$emit('blur')"
-    @click="$emit('click', $event)"
     @click:appendInner="$emit('click:appendInner', $event)"
-    @change="$emit('click', $event)"
+    @click:clear="$emit('click:clear', $event)"
     @focusout="$emit('focusout')"
     @keydown.esc="$emit('keydown.esc')"
     @keyup.enter="$emit('keyup.enter')"
@@ -53,16 +52,7 @@
 export default {
   name: 'ATextField',
   // click event listened to by slot:activator
-  emits: [
-    'blur',
-    'click',
-    'click:appendInner',
-    'change',
-    'focusout',
-    'keydown.esc',
-    'keyup.enter',
-    'update:modelValue',
-  ],
+  emits: ['blur', 'click:appendInner', 'click:clear', 'focusout', 'keydown.esc', 'keyup.enter', 'update:modelValue'],
   props: {
     appendSlot: { type: Boolean, required: false },
     labelSlot: { type: Boolean, required: false },

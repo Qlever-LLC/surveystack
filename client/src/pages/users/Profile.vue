@@ -5,8 +5,7 @@
         title="Shapeshift:"
         type="info"
         v-if="showFeedback && isShapeshifting"
-        @closed="showFeedback = false"
-      >
+        @closed="showFeedback = false">
         You are currently shapeshifting...
         <a href="/shapeshift?mode=off" class="text-info" @click.prevent="leaveShapeshift"
           >Click to return as '{{ shapeshiftUser.email }}'</a
@@ -53,23 +52,21 @@
               tabindex="3"
               v-model="password"
               :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append="showPasswords = !showPasswords"
+              @click:appendInner="showPasswords = !showPasswords"
               label="Password"
               :type="showPasswords ? 'text' : 'password'"
               hint="Leave blank for no change"
-              persistent-hint
-            />
+              persistent-hint />
 
             <a-text-field
               tabindex="4"
               v-model="passwordConfirmation"
               :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append="showPasswords = !showPasswords"
+              @click:appendInner="showPasswords = !showPasswords"
               label="Password (Confirmation)"
               :type="showPasswords ? 'text' : 'password'"
               hint="Leave blank for no change"
-              persistent-hint
-            />
+              persistent-hint />
 
             <div class="d-flex mt-2 justify-end">
               <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</a-btn>

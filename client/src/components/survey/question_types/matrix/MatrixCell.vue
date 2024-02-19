@@ -169,7 +169,6 @@
       <template v-slot:activator="{ props }">
         <a-text-field
           v-bind="props"
-          @click="setActivePickerMonth"
           :modelValue="getDateLabel"
           hide-details
           variant="outlined"
@@ -330,11 +329,6 @@ export default {
       const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value;
-    },
-    setActivePickerMonth() {
-      setTimeout(() => {
-        this.$refs.datepickerRef.activePicker = 'MONTH';
-      });
     },
     // copied/adapted from FarmOsPlanting.vue
     localChange(hashesArg) {

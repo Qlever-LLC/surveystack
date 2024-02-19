@@ -20,7 +20,7 @@
             v-model="seats"
             label="Max Seats"
             type="number"
-            @change="$emit('seatsChanged', seats)" />
+            @update:modelValue="$emit('seatsChanged', seats)" />
 
           <a-select
             variant="outlined"

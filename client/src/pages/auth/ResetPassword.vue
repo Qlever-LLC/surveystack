@@ -10,13 +10,13 @@
             label="Password"
             :type="passwordInputType"
             :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords" />
+            @click:appendInner="showPasswords = !showPasswords" />
           <a-text-field
             v-model="newPasswordConfirmation"
             label="Password confirmation"
             :type="passwordInputType"
             :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords" />
+            @click:appendInner="showPasswords = !showPasswords" />
           <div class="d-flex justify-end">
             <a-btn type="submit" color="primary">Set password</a-btn>
           </div>
