@@ -10,12 +10,11 @@
     <app-control-hint :value="control.hint" />
     <a-row>
       <div :class="{ 'mx-auto': centered }">
-        <a-select
+        <a-date-year
           v-if="control.options.subtype === 'date-year'"
           :label="getLabel()"
-          :modelValue="dateForPicker ? dateForPicker.substring(0, 4) : undefined"
+          :modelValue="modelValue"
           @update:modelValue="updateDatePicker"
-          :items="years"
           :menu-props="{ offsetY: true }"
           clearable
           hide-details
@@ -105,14 +104,6 @@ export default {
           return 'date';
       }
     },
-    years() {
-      const years = [];
-      const maxYear = new Date().getFullYear() + 100;
-      for (let i = 1970; i <= maxYear; i++) {
-        years.push(i);
-      }
-      return years;
-    },
   },
   watch: {
     datePickerIsVisible(val) {
@@ -149,7 +140,6 @@ export default {
       this.localValue = new Date(date).toISOString();
     },
     updateDatePicker(date) {
-      this.localValue = date;
       if (date === null) {
         this.changed(null);
       } else {
@@ -157,8 +147,7 @@ export default {
         if (this.control.options.subtype === 'date' || !this.control.options.subtype) {
           this.changed(zonedTimeToUtc(date).toISOString());
         } else if (this.control.options.subtype === 'date-year') {
-          const newDate = new Date(Date.UTC(date, 0, 1)); // set to first day of year
-          this.changed(newDate.toISOString());
+          this.changed(date);
         } else if (this.control.options.subtype === 'date-week-month-year') {
           const newDate = new Date(date);
           let offset = -1;

@@ -37,6 +37,7 @@
     :persistent-hint="persistentHint"
     :persistent-placeholder="placeholder ? true : false"
     :placeholder="placeholder"
+    :prependInnerIcon="prependInnerIcon"
     :primary="primary"
     :readonly="readonly"
     :return-object="returnObject"
@@ -103,6 +104,7 @@
     :persistent-hint="persistentHint"
     :persistent-placeholder="placeholder ? true : false"
     :placeholder="placeholder"
+    :prependInnerIcon="prependInnerIcon"
     :primary="primary"
     :readonly="readonly"
     :return-object="returnObject"
@@ -247,6 +249,7 @@ export default {
     openOnClear: { type: Boolean, required: false },
     persistentHint: { type: Boolean, required: false },
     placeholder: { type: String, required: false },
+    prependInnerIcon: { type: String, required: false },
     readonly: { type: Boolean, required: false },
     returnObject: { type: Boolean, required: false },
     rounded: { type: [String, Number, Boolean], required: false },

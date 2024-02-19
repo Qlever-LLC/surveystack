@@ -1,10 +1,9 @@
 <template>
-  <a-select
+  <a-date-year
     v-if="type === 'date-year'"
     label="Default value"
-    :modelValue="modelValue ? Number(modelValue.substring(0, 4)) : null"
-    @update:modelValue="setYear"
-    :items="years"
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
     :menu-props="{ offsetY: true }"
     :dense="dense"
     clearable
@@ -114,14 +113,6 @@ export default {
         this.$emit('update:modelValue', result);
       },
     },
-    years() {
-      const years = [];
-      const maxYear = new Date().getFullYear() + 100;
-      for (let i = 1970; i <= maxYear; i++) {
-        years.push(i);
-      }
-      return years;
-    },
     formattedDate() {
       if (!isValid(parseISO(this.modelValue))) {
         return '';
@@ -145,13 +136,6 @@ export default {
         this.menuIsOpen = false;
         const utcDateStr = zonedTimeToUtc(date).toISOString();
         this.$emit('update:modelValue', utcDateStr);
-      }
-    },
-    setYear(year) {
-      if (typeof year === 'number') {
-        this.$emit('update:modelValue', new Date(Date.UTC(year, 0, 1)).toISOString());
-      } else {
-        this.$emit('update:modelValue', null);
       }
     },
     onChange(value) {
