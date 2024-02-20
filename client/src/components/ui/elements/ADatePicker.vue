@@ -1,9 +1,7 @@
 <template>
   <v-date-picker
-    ref="refDatePicker"
     :color="color"
     :hide-header="noTitle"
-    :range="range"
     :show-adjacent-months="showAdjacentMonths"
     :viewMode="type !== 'date' ? type : undefined"
     :modelValue="modelValue"
@@ -26,16 +24,9 @@ export default {
     //vuetify props
     color: { type: String, required: false },
     noTitle: { type: Boolean, required: false },
-    range: { type: Boolean, required: false }, //TODO IN DEVELOPMENT https://github.com/vuetifyjs/vuetify/issues/18701
     showAdjacentMonths: { type: Boolean, required: false },
     type: { type: String, default: 'date' }, //TODO not implemented in V3, see https://github.com/vuetifyjs/vuetify/issues/17950
     modelValue: { type: undefined, required: false },
-  },
-  methods: {
-    setActivePickerToYear() {
-      //TODO remove  this?
-      this.$refs.refDatePicker.viewMode = 'year';
-    },
   },
 };
 </script>
