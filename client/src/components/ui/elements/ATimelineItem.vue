@@ -1,5 +1,5 @@
 <template>
-  <v-timeline-item :dot-color="dotColor !== '' ? dotColor : 'white'" :hide-dot="hideDot" :icon="icon">
+  <v-timeline-item :dot-color="dotColor !== '' ? dotColor : 'white'" :hide-dot="hideDot" :icon="icon" :width="width">
     <slot />
   </v-timeline-item>
 </template>
@@ -11,6 +11,7 @@ export default {
     dotColor: { type: String, required: false },
     hideDot: { type: Boolean, required: false },
     icon: { type: String, required: false },
+    width: { type: String, required: false },
   },
 };
 </script>

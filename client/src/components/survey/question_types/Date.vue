@@ -13,7 +13,6 @@
         <a-date
           :modelValue="modelValue"
           @update:modelValue="$emit('update:modelValue', $event)"
-          hide-details
           :label="getLabel()"
           :menu-props="{ offsetY: true }"
           prepend-inner-icon="mdi-calendar"

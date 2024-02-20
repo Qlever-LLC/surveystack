@@ -8,7 +8,7 @@
     </a-banner>
     <a-card>
       <a-card-title>{{ survey.name }}</a-card-title>
-      <a-card-subtitle class="text-grey mt-n5">
+      <a-card-subtitle class="text-grey mt-n3">
         {{ submission._id }}
         <br />
         <strong v-if="submission.meta.dateSubmitted">
@@ -34,7 +34,8 @@
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :icon="display.icon"
           :dotColor="display.color"
-          :hide-dot="display.hidden">
+          :hide-dot="display.hidden"
+          width="100%">
           <a-card
             v-if="display.relevant || !display.hidden"
             @click="$emit('goto', display.path)"
