@@ -936,10 +936,9 @@ export const getMemberInformationForDomain = async (descendants) => {
 
 /**
  * @param { ObjectId } groupId
- * @param { Boolean } isSuperAdmin
  * @returns JSON answer
  */
-export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
+export const getGroupInformation = async (groupId) => {
   const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
 
   if (!group) {

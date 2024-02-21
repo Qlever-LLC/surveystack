@@ -1,7 +1,7 @@
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const { connectDatabase, getDb, disconnect } = require('../src/db');
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { connectDatabase, getDb, disconnect } from '../src/db/index.js';
 
-let mongod;
+let mongod: MongoMemoryServer;
 
 const CREATE_DB_TIMEOUT = 60000;
 // eslint-disable-next-line no-undef

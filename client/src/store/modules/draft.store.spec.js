@@ -2,8 +2,10 @@ import draftStore from './draft.store';
 import { createSurvey } from '@/utils/surveys';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
+import { createRow } from '@/components/survey/question_types/matrix/matrixUtils';
+import { defaultControlOptions, availableControls } from '@/utils/surveyConfig';
 
-const { actions, mutations } = draftStore;
+const { actions, mutations, getters } = draftStore;
 
 // marker control ID's to setup the initial state
 const INITIAL_FIRST_CONTROL_ID = 'first-node';
@@ -11,6 +13,9 @@ const INITIAL_CURRENT_CONTROL_ID = 'current-node'; // if not set, it'll be the s
 const EXPECTED_NEXT_CONTROL_ID = 'next-node'; // if not set, commit('SHOW_OVERVIEW', true) is expected
 
 const createStateWithControls = (controls) => {
+  if (!Array.isArray(controls)) {
+    throw new Error('controls must be an array');
+  }
   const survey = {
     ...createSurvey({ group: { id: null, path: null } }),
   };
@@ -416,6 +421,141 @@ describe('draft store', () => {
         mutations.NEXT(state, {});
         expect(state.firstNode).toBe(state.firstNode);
       });
+    });
+  });
+
+  describe('getters', () => {
+    describe('hasRequiredUnanswered', () => {
+      it('returns true for a matrix with an empty row and a required column', () => {
+        const controls = [
+          createControl({
+            type: 'matrix',
+            id: INITIAL_FIRST_CONTROL_ID,
+          }),
+        ];
+        controls[0].options.source.content[0].required = true;
+        const state = createStateWithControls(controls);
+        const _getters = {
+          path: getters.path(state),
+        };
+        const pathString = `data.${controls[0].name}.value`;
+        const result = getters.hasRequiredUnanswered(state, _getters);
+        expect(result).toBe(false);
+        const fields = controls[0].options.source.content.map((f) => f.value);
+        // headers are just non-hidden fields, visibility is irrelevant for this test
+        const headers = fields;
+        mutations.SET_PROPERTY(state, {
+          path: pathString,
+          value: [createRow(fields, headers)],
+        });
+        const updatedResult = getters.hasRequiredUnanswered(state, _getters);
+        expect(updatedResult).toBe(true);
+      });
+      it('returns true for a group containing matrix with an empty row and a required column', () => {
+        const controls = [
+          createControl({
+            type: 'group',
+            children: [
+              createControl({
+                type: 'matrix',
+                id: INITIAL_FIRST_CONTROL_ID,
+              }),
+              createControl({ type: 'number' }),
+            ],
+          }),
+        ];
+        controls[0].children[0].options.source.content[0].required = true;
+        const state = createStateWithControls(controls);
+        const _getters = {
+          path: getters.path(state),
+        };
+        const pathString = `data.${controls[0].name}.${controls[0].children[0].name}.value`;
+        const result = getters.hasRequiredUnanswered(state, _getters);
+        expect(result).toBe(false);
+        const fields = controls[0].children[0].options.source.content.map((f) => f.value);
+        // headers are just non-hidden fields, visibility is irrelevant for this test
+        const headers = fields;
+        mutations.SET_PROPERTY(state, {
+          path: pathString,
+          value: [createRow(fields, headers)],
+        });
+        const updatedResult = getters.hasRequiredUnanswered(state, _getters);
+        expect(updatedResult).toBe(true);
+      });
+      it('returns true for a page containing a matrix with an empty row and a required column', () => {
+        const controls = [
+          createControl({
+            type: 'page',
+            id: INITIAL_FIRST_CONTROL_ID,
+            children: [
+              createControl({
+                type: 'matrix',
+              }),
+              createControl({ type: 'number' }),
+            ],
+          }),
+        ];
+
+        controls[0].children[0].options.source.content[0].required = true;
+        const state = createStateWithControls(controls);
+        const _getters = {
+          path: getters.path(state),
+        };
+        const pathString = `data.${controls[0].name}.${controls[0].children[0].name}.value`;
+        const result = getters.hasRequiredUnanswered(state, _getters);
+        expect(result).toBe(false);
+        const fields = controls[0].children[0].options.source.content.map((f) => f.value);
+        // headers are just non-hidden fields, visibility is irrelevant for this test
+        const headers = fields;
+        mutations.SET_PROPERTY(state, {
+          path: pathString,
+          value: [createRow(fields, headers)],
+        });
+        const updatedResult = getters.hasRequiredUnanswered(state, _getters);
+        expect(updatedResult).toBe(true);
+      });
+      it('returns true for required question inside page', () => {
+        const controls = [
+          createControl({
+            type: 'page',
+            id: INITIAL_FIRST_CONTROL_ID,
+            children: [
+              createControl({
+                type: 'text',
+                controlInstanceOverrides: { options: { ...defaultControlOptions, required: true } },
+              }),
+              createControl({ type: 'number' }),
+            ],
+          }),
+        ];
+        const state = createStateWithControls(controls);
+        const _getters = {
+          path: getters.path(state),
+        };
+        const result = getters.hasRequiredUnanswered(state, _getters);
+        expect(result).toBe(true);
+      });
+      const controlsThatCannotBeRequired = ['group', 'page', 'instructions', 'instructionsImageSplit'];
+      availableControls
+        .map((control) => control.type)
+        .filter((controlType) => !controlsThatCannotBeRequired.includes(controlType))
+        .forEach((controlType) => {
+          it(`returns true for a required ${controlType}`, () => {
+            const controls = [
+              createControl({
+                type: controlType,
+                id: INITIAL_FIRST_CONTROL_ID,
+                controlInstanceOverrides: { options: { ...defaultControlOptions, required: true } },
+              }),
+            ];
+            const state = createStateWithControls(controls);
+            const _getters = {
+              path: getters.path(state),
+            };
+            const result = getters.hasRequiredUnanswered(state, _getters);
+            expect(result).toBe(true);
+          });
+        });
     });
   });
 });

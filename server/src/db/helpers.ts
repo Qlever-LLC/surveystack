@@ -1,10 +1,19 @@
+import {
+  type MongoClient,
+  type ClientSessionOptions,
+  type ClientSession,
+  type WithSessionCallback,
+  type TransactionOptions,
+} from 'mongodb';
+
 /**
  * A wrapper around mongodb's MongoClient.withSession that returns the result of the operation instead of discarding it.
- * @param {MongoClient} client
- * @param {function} operation
- * @param {object} options
  */
-async function withSession(client, operation, options) {
+async function withSession(
+  client: MongoClient,
+  operation: WithSessionCallback,
+  options?: ClientSessionOptions
+) {
   let result;
 
   if (options) {
@@ -18,11 +27,10 @@ async function withSession(client, operation, options) {
 
 /**
  * A wrapper around mongodb's ClientSession.withTransaction that returns the result of the WithTransactionCallback instead of discarding it.
- * @param {ClientSession} session
- * @param {WithTransactionCallback} fn
- * @param {TransactionOptions} options
  */
-async function withTransaction(session, fn, options) {
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function withTransaction(session: ClientSession, fn: any, options?: TransactionOptions) {
   let result;
 
   if (options) {

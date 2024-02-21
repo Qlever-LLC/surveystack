@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import {
   createNewIntegratedHyloGroup,
   getGroupBySlug,
@@ -13,7 +12,6 @@ import { createGroup, createReq, createRes, createSuperAdmin } from '../testUtil
 import { gqlRequest } from '../services/hylo/utils';
 import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { addMember, createHyloGroup, upsertHyloUser } from '../services/hylo.service';
-import { without } from 'lodash';
 import boom from '@hapi/boom';
 
 jest.mock('../services/hylo.service');

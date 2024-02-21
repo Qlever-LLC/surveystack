@@ -303,8 +303,10 @@ class PdfGenerator {
     if (this.submission) {
       metaBody.push(
         ['Submitted to', `${this.submission.meta.group.name} (${this.submission.meta.group.path})`],
-        ['Submitted on', formatDate(this.getSubmissionDate())],
-        [
+        ['Submitted on', formatDate(this.getSubmissionDate())]
+      );
+      if (this.submission.meta.creator) {
+        metaBody.push([
           'Submitted by',
           {
             text: [
@@ -312,8 +314,8 @@ class PdfGenerator {
               { text: ` (${this.submission.meta.creator.email})`, color: colors.lightBlue },
             ],
           },
-        ]
-      );
+        ]);
+      }
     } else {
       metaBody.push(['Generated on', formatDate(new Date().toISOString())]);
     }
@@ -358,7 +360,7 @@ class PdfGenerator {
   /*******************************************************************/
 
   // eslint-disable-next-line no-unused-vars
-  pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+  pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage) {
     if (currentNode.headlineLevel === LVL.section) {
       return followingNodesOnPage.length <= 2 && nodesOnNextPage.length > 2;
     }

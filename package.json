@@ -6,6 +6,9 @@
   "author": "Our Sci",
   "license": "GPL-3.0-only",
   "private": true,
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "devDependencies": {
     "chalk": "^4.1.2",
     "cross-env": "^7.0.3",
@@ -21,6 +24,7 @@
     "client:test-watch": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run test-watch --no-prefix --stream",
     "client:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run lint --no-prefix --stream",
     "server:start": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run start --no-prefix --stream",
+    "server:debug": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run debug --no-prefix --stream",
     "server:build": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run build --no-prefix --stream",
     "build": "cross-env FORCE_COLOR=1 lerna run build --parallel --stream",
     "server:test": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run test --no-prefix --stream",

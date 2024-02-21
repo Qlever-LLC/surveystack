@@ -1,10 +1,5 @@
 import { getTerms, substitue } from './farmos.service';
 
-import {
-  plantTypeResponseSpinach,
-  plantTypeResponseNonExistant,
-} from './farmos/__mock__/farmos.asset.response';
-
 describe('farmos-service', () => {
   it('get-terms', async () => {
     const apiCompose = [
