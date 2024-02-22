@@ -8,9 +8,9 @@
         :initializable="control.options.initialize && control.options.initialize.enabled"
         :is-modified="meta && !!meta.dateModified"
         @initialize="initialize" />
-      <v-btn rounded small text color="primary" class="align-self-center mb-3" @click="clearSelection">
+      <a-btn rounded small variant="text" color="primary" class="align-self-center mb-3" @click="clearSelection">
         clear selection
-      </v-btn>
+      </a-btn>
     </div>
     <app-control-hint :value="control.hint" />
 
