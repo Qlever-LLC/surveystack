@@ -63,7 +63,7 @@
           </a-btn>
         </div>
       </div>
-      <a-expansion-panels class="mb-6">
+      <a-expansion-panels class="mb-6" v-model="isOpen">
         <a-expansion-panel>
           <a-expansion-panel-title expand-icon="mdi-menu-down">
             <span class="text-body-1">Filters</span>
@@ -275,6 +275,7 @@ export default {
   },
   data() {
     return {
+      isOpen: undefined,
       apiDownloadFormat: apiDownloadFormats[0].value,
       apiDownloadFormats,
       apiDownloadRanges,

@@ -32,7 +32,7 @@
                     </a-card-title>
 
                     <a-card-text>
-                      <a-expansion-panels variant="accordion">
+                      <a-expansion-panels variant="accordion" v-model="isOpen">
                         <a-expansion-panel
                           v-for="(item, i) in item.logs.filter(Boolean)"
                           :key="i"
@@ -73,8 +73,7 @@
               variant="flat"
               dense
               :loading="emailing.loading"
-              @click="emailMe"
-            >
+              @click="emailMe">
               Email Submission
             </a-btn>
           </div>
@@ -129,6 +128,7 @@ export default {
   },
   emits: ['update:modelValue', 'close'],
   data: () => ({
+    isOpen: undefined,
     download: {
       loading: false,
       error: null,
