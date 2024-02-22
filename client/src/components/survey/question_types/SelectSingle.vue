@@ -1,12 +1,17 @@
 <template>
   <div class="select-single question">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-      :initializable="control.options.initialize && control.options.initialize.enabled"
-      :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize" />
+    <div class="d-flex justify-space-between flex-wrap">
+      <app-control-label
+        :value="control.label"
+        :redacted="redacted"
+        :required="required"
+        :initializable="control.options.initialize && control.options.initialize.enabled"
+        :is-modified="meta && !!meta.dateModified"
+        @initialize="initialize" />
+      <v-btn rounded small text color="primary" class="align-self-center mb-3" @click="clearSelection">
+        clear selection
+      </v-btn>
+    </div>
     <app-control-hint :value="control.hint" />
     <div class="py-2">
       <a-radio-group
@@ -83,6 +88,10 @@ export default {
       if (this.modelValue !== v) {
         this.changed(getNextValue(v));
       }
+    },
+
+    clearSelection() {
+      this.changed(null);
     },
 
     handleCustomSelectionInput(value) {

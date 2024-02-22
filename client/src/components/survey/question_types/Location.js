@@ -74,7 +74,7 @@ export default {
 
       this.marker = new mapboxgl.Marker().setLngLat(this.location.geometry.coordinates).addTo(this.map);
     },
-    retake() {
+    reset() {
       this.changed(null);
       if (this.marker) {
         this.marker.remove();

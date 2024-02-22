@@ -20,6 +20,7 @@
       @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
+      clearable
       :selectionSlot="!control.options.hasMultipleSelections"
       :chipSlot="control.options.hasMultipleSelections"
       itemSlot

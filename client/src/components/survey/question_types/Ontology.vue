@@ -70,6 +70,7 @@
       hide-details
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
+      clearable
       cssMinHeight56px
       :chipSlot="!!control.options.hasMultipleSelections"
       :selectionSlot="!control.options.hasMultipleSelections">
@@ -197,8 +198,8 @@ export default {
         return this.control.options.allowCustomSelection
           ? 'Type to search or add custom answer'
           : this.items.length < constants.ASELECT_MAX_ITEMS_TOBE_VSELECT
-            ? 'Search'
-            : 'Type to search';
+          ? 'Search'
+          : 'Type to search';
       }
       return undefined;
     },

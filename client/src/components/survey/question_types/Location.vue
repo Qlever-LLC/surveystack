@@ -27,7 +27,7 @@
             <a-btn large :disabled="disablePick" class="mx-4 full" color="primary" @click="pickLocation"> Pick </a-btn>
           </div>
           <div v-else>
-            <a-btn large class="mx-4 full" color="gray" @click="retake"> Retake </a-btn>
+            <a-btn large class="mx-4 full" color="gray" @click="reset"> Reset </a-btn>
           </div>
         </div>
       </div>

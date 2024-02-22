@@ -1,12 +1,17 @@
 <template>
   <div class="farm-os-planting">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-      :initializable="control.options.initialize && control.options.initialize.enabled"
-      :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize" />
+    <div class="d-flex justify-space-between flex-wrap">
+      <app-control-label
+        :value="control.label"
+        :redacted="redacted"
+        :required="required"
+        :initializable="control.options.initialize && control.options.initialize.enabled"
+        :is-modified="meta && !!meta.dateModified"
+        @initialize="initialize" />
+      <v-btn rounded small text color="primary" class="align-self-center mb-3" @click="clearSelection">
+        clear selection
+      </v-btn>
+    </div>
     <app-control-hint :value="control.hint" />
 
     <a-progress-circular v-if="loading" color="secondary" class="my-8" />
@@ -233,6 +238,9 @@ export default {
       } else {
         this.onChange(assets);
       }
+    },
+    clearSelection() {
+      this.onChange(null);
     },
   },
 };

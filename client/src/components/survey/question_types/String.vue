@@ -20,7 +20,8 @@
           class="full-width"
           :disabled="!relevant"
           hide-details
-          color="focus" />
+          color="focus"
+          clearable />
       </div>
       <app-qr-scanner
         style="flex: 0"
