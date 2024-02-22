@@ -21,6 +21,7 @@
           :disabled="!relevant"
           hide-details
           color="focus"
+          clearable
         />
       </div>
       <app-qr-scanner

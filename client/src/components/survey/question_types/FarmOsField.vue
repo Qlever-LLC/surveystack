@@ -22,6 +22,7 @@
       @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
+      clearable
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip

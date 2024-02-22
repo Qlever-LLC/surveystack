@@ -73,6 +73,7 @@
       hide-details
       class="full-width dropdown"
       data-test-id="autocomplete"
+      clearable
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -119,6 +120,7 @@
       hide-details
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
+      clearable
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip

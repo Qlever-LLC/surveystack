@@ -21,6 +21,8 @@
           :disabled="!relevant"
           hide-details
           color="focus"
+          clearable
+          @click:clear="setToNull"
         />
       </div>
     </div>
@@ -45,12 +47,14 @@ export default {
       this.$emit('next');
     },
     onInput(v) {
-      if (!this.value || this.value.value !== v) {
+      if (v) {
         const val = getValueOrNull(v);
         this.changed({
           name: val,
           id: uuidv4(),
         });
+      } else {
+        this.setToNull();
       }
     },
     tryAutofocus() {
@@ -68,6 +72,9 @@ export default {
       // this.$nextTick(() => this.$refs.textField.$refs.input.focus());
 
       return true;
+    },
+    setToNull() {
+      this.changed(null);
     },
   },
   computed: {
