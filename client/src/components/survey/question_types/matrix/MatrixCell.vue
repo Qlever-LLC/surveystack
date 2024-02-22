@@ -6,7 +6,8 @@
     variant="outlined"
     hide-details
     autocomplete="off"
-    :disabled="disabled" />
+    :disabled="disabled"
+    clearable />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
       <a-text-field
@@ -16,7 +17,8 @@
         variant="outlined"
         hide-details
         autocomplete="off"
-        :disabled="disabled" />
+        :disabled="disabled"
+        clearable />
     </div>
     <div style="flex: 0; display: flex; align-items: center">
       <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
@@ -81,6 +83,7 @@
     :disabled="disabled"
     hide-details
     variant="outlined"
+    clearable
     :chipSlot="header.multiple"
     :selectionSlot="!header.multiple"
     cssFlexNoWrap
@@ -304,10 +307,12 @@ export default {
       this.menus[`${index}_${header.value}`] = false;
     },
     onFarmOsInput(value) {
-      if (!this.value || this.value.name !== value) {
+      if (value) {
         this.value = { id: uuidv4(), name: getValueOrNull(value) };
-        this.$emit('changed');
+      } else {
+        this.setToNull();
       }
+      this.$emit('changed');
     },
     onNumberInput(value) {
       if (value === '' || value === null || value === undefined) {
