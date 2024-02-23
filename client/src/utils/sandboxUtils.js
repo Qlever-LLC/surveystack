@@ -197,6 +197,55 @@ export function getClean(chooseOne) {
   }
 }
 
+/**
+ * getCleanNumber
+ *
+ * Output a number or a "" if it's not relevant or not a number, you may also specify precision
+ * Helpfully also removes any annoying trailing zeroes if the value is more precise than precision specified
+ * @object {num} single choice select answer root (not .value!)
+ * @number {precision} desired precision of output (if not specificied, no precision applied)
+ */
+export function getCleanNumber(num, sigFigs) {
+  let val = getClean(num);
+  // return "" if getClean returns "", removes this edge case from the if/then list
+  if (getClean(num) === '') {
+    val = '';
+    // now Number() needs to return a valid number OR it needs to return 0 (which shows up as falsey but we want to pass it anyway since it's a numnber)
+  } else if (Number(getClean(num)) || Number(getClean(num)) === 0) {
+    if (sigFigs !== undefined) {
+      val = Number(Number(val).toFixed(sigFigs)); // converts to string w/ sig figs, then back to number which removes trailing zeros
+    } else {
+      val = Number(getClean(num));
+    }
+  } else {
+    val = '';
+  }
+  return val;
+}
+
+/**
+ * prettyLog
+ *
+ * Logs messages with optional colored backgrounds based on the status parameter.
+ * Logging is controlled by the config.log flag.
+ *
+ * @param {string} label - The message to log.
+ * @param {string} [status=''] - The status of the message, which determines the background color.
+ * @param {boolean} [show=true] - Optional parameter to print.  Use as switch to show all in a script / document
+ * Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
+ */
+export function prettyLog(label, status = '', show = true) {
+  if (show) {
+    const styles = {
+      success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
+      warning: 'background-color: #de9250; padding: 0.2rem 1.5rem;',
+      info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
+    };
+    const style = styles[status] || '';
+    console.log('%c' + label, style);
+  }
+}
+
 export async function getResourceAsText(resourceKey) {
   return parseText(await getResource(resourceKey));
 }
@@ -299,35 +348,6 @@ const unstable = {
     }
   },
 
-  /**
-   * getCleanNumber
-   *
-   * Output a number or a "" if it's not relevant or not a number, you may also specify precision
-   * Helpfully also removes any annoying trailing zeroes if the value is more precise than precision specified
-   * @object {num} single choice select answer root (not .value!)
-   * @number {precision} desired precision of output (if not specificied, no precision applied)
-   */
-  getCleanNumber(num, sigFigs) {
-    //    prettyLog('in getCleanNumeber', 'success');
-    let val = utils.getClean(num);
-    // return "" if getClean returns "", removes this edge case from the if/then list
-    if (utils.getClean(num) === '') {
-      val = '';
-      // now Number() needs to return a valid number OR it needs to return 0 (which shows up as falsey but we want to pass it anyway since it's a numnber)
-    } else if (Number(utils.getClean(num)) || Number(utils.getClean(num)) === 0) {
-      if (sigFigs !== undefined) {
-        val = Number(Number(val).toFixed(sigFigs)); // converts to string w/ sig figs, then back to number which removes trailing zeros
-      } else {
-        val = Number(utils.getClean(num));
-      }
-    } else {
-      val = '';
-    }
-    // prettyLog(val);
-    // prettyLog('leaving getCleanNumeber', 'success');
-    return val;
-  },
-
   /*
    * identify object root as referencing parent or the submission
    * return parent or submission objects
@@ -363,27 +383,27 @@ const unstable = {
     try {
       // search in archived surveys first
       let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`;
-      this.prettyLog('check submission in archived url', 'info');
-      this.prettyLog(url);
+      prettyLog('check submission in archived url', 'info');
+      prettyLog(url);
       let response = await fetch(url);
       let result = await response.text();
       result = JSON.parse(result);
       // if not present, search in non-archived surveys
       if (result.length === 0 || !result[0] || !result[0].data) {
         url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
-        this.prettyLog('check submission in non archived url', 'info');
-        this.prettyLog(url);
+        prettyLog('check submission in non archived url', 'info');
+        prettyLog(url);
         response = await fetch(url);
         result = await response.text();
         result = JSON.parse(result);
       }
       if (result && result[0] && result[0].data) {
         submission = result[0]; // assign this so we can test against it
-        this.prettyLog(`found: submission id ${submissionId}`, 'success');
-        this.prettyLog(submission);
+        prettyLog(`found: submission id ${submissionId}`, 'success');
+        prettyLog(submission);
       } else {
         submission = {};
-        this.prettyLog(
+        prettyLog(
           `did not find the submission id ${submissionId}.  Try a different submission id or survey id`,
           'warning'
         );
@@ -415,7 +435,7 @@ const unstable = {
         if (resource && lookup) {
           items = resource.content.find((object) => object[lookupColumn] === lookup);
           if (typeof items === 'object' && !Array.isArray(items)) {
-            this.prettyLog(`Found ${lookup} in ${resourceName}`, 'success');
+            prettyLog(`Found ${lookup} in ${resourceName}`, 'success');
             foundFlag = 1;
             if (returnColumns && returnColumns.length) {
               let someItems = {};
@@ -423,45 +443,22 @@ const unstable = {
                 if (items && items[column]) {
                   someItems[column] = items[column];
                 } else {
-                  this.prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
+                  prettyLog(`Did not find ${column} in ${lookup}`, 'warning');
                 }
               });
               items = someItems;
             }
           } else {
-            this.prettyLog(`Did not find ${lookup} in ${resourceName}`, 'info');
+            prettyLog(`Did not find ${lookup} in ${resourceName}`, 'info');
           }
         } else {
-          if (!lookup) this.prettyLog(`Did not find Lookup field "${lookup}" in "${resourceName}" resource`, 'warning');
-          if (!resource) this.prettyLog(`Did not find "${resourceName}" resource`, 'warning');
+          if (!lookup) prettyLog(`Did not find Lookup field "${lookup}" in "${resourceName}" resource`, 'warning');
+          if (!resource) prettyLog(`Did not find "${resourceName}" resource`, 'warning');
         }
       }
     });
     // if it's empty, return null
     return items && Object.keys(items).length > 0 ? items : null;
-  },
-
-  /**
-   * prettyLog
-   *
-   * Logs messages with optional colored backgrounds based on the status parameter.
-   * Logging is controlled by the config.log flag.
-   *
-   * @param {string} label - The message to log.
-   * @param {string} [status=''] - The status of the message, which determines the background color.
-   * @param {boolean} [show=true] - Optional parameter to print.  Use as switch to show all in a script / document
-   * Valid values are 'success', 'warning', 'info', or an empty string for the default console.log style.
-   */
-  prettyLog(label, status = '', show = true) {
-    if (show) {
-      const styles = {
-        success: 'background-color: #49d65e; padding: 0.2rem 1.5rem;',
-        warning: 'background-color: #de9250; padding: 0.2rem 1.5rem;',
-        info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
-      };
-      const style = styles[status] || '';
-      console.log('%c' + label, style);
-    }
   },
 
   /*
@@ -633,7 +630,7 @@ const unstable = {
   addMaterials(quantity, ...materials) {
     // check to make sure this not empty or invalid
     if (quantity && quantity.entity && quantity.entity.type === 'quantity--material') {
-      this.prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
+      prettyLog(`adding materials to ${quantity.entity.attributes.label}`, 'info');
       if (materials) {
         if (!quantity.entity.relationships || !quantity.entity.relationships.material_type) {
           quantity.entity.relationships.material_type = {};
@@ -644,12 +641,12 @@ const unstable = {
             type: 'taxonomy_term--material_type',
             name: material,
           });
-          this.prettyLog(`Added: ${material}`, 'success');
+          prettyLog(`Added: ${material}`, 'success');
         });
       }
       return quantity;
     } else {
-      this.prettyLog(
+      prettyLog(
         'A material must be added to a "quantity--material" entity.  Please change the quantity "type" field and try again',
         'error'
       );
@@ -666,7 +663,7 @@ const unstable = {
    * @param {quantities} type of quantity (one of the accepted farmOS types)
    */
   addQuantityToLog(log, ...quantities) {
-    this.prettyLog(`trying to add quantities to ${log.entity.type}`, 'info');
+    prettyLog(`trying to add quantities to ${log.entity.type}`, 'info');
     if ((!log.entity.relationships || !log.entity.relationships.quantity) && quantities && quantities.length > 0) {
       log.entity.relationships.quantity = {};
       log.entity.relationships.quantity.data = [];
@@ -676,7 +673,7 @@ const unstable = {
         type: quantity.entity.type,
         id: quantity.entity.id,
       });
-      this.prettyLog(`Added: ${quantity.entity.type}, ${quantity.entity.id}`, 'success');
+      prettyLog(`Added: ${quantity.entity.type}, ${quantity.entity.id}`, 'success');
     });
     // prettyLog(log);
     return log;
@@ -710,13 +707,13 @@ const unstable = {
             type: type,
             [field]: name,
           });
-          this.prettyLog(`Added ${type} ${name}`, 'success');
+          prettyLog(`Added ${type} ${name}`, 'success');
         } else {
-          this.prettyLog(`'${name}' is a duplicate and was not added.`, 'info');
+          prettyLog(`'${name}' is a duplicate and was not added.`, 'info');
         }
       });
     } else {
-      this.prettyLog(`Could not add relationship data, some required information was missing`, 'warning');
+      prettyLog(`Could not add relationship data, some required information was missing`, 'warning');
     }
     return obj;
   },
@@ -740,59 +737,34 @@ const unstable = {
   },
 
   /** findUrl
-   * Find a URL to associate with this newly created asset!
-   * @submission {object} the submission object from the survey, needed to do full survey search for URLs
-   * @spreadsheet {object} the object containing all rows of the spreadsheet (matrix) question
-   * @row {object} the current row of the spreadsheet being searched
+   * Find a URL in a list of objects.
+   * Will search each object in order, starting with the first
+   * In a survey with spreadsheet (matrix) questions pass (row, spreadsheet, submission) to search from this object outward
+   * @locations {object} the object to be searchedfor URLs (could be submission, parent, row, matrix, etc.)
    */
-  findUrl(submission, spreadsheet, row) {
-    let url = null;
-    // 1. find url in the current row (stop at the 1st one)
-    let value = row ? row.planting.value : undefined; // get this rows plantings
-    for (let i = 0; i < value.length; i++) {
-      if (value[i] && value[i].url) {
-        url = value[i].url;
-        this.prettyLog(`found URL in this row: ${url}`, 'success');
-        break;
-      }
-    }
-    // 2a. get all URLs the user has entered in nearby rows (stop at the 1st one)
-    if (!url && Array.isArray(spreadsheet)) {
-      // if it's in an array (spreadsheet), otherwise skip this step
-      console.log('checking urls');
-      let urls = new Set([]);
-      spreadsheet.forEach((row) => {
-        row.planting.value.forEach((planting) => {
-          if (planting && planting.url) urls.add(planting.url);
-        });
-      });
-      urls = Array.from(urls);
-      this.prettyLog(`urls nearby: ${urls.join(' ')}`, 'info');
-      // 2b. find url in any nearby entries
-      if (!url && urls.length > 0) {
-        url = urls[0];
-        this.prettyLog(`found URL in nearby row ${url}`, 'success');
-      }
-    }
-    // 3. find a url somewhere in the submission (stop at the 1st one)
-    if (!url) {
-      let all = Object.flattenAll(submission);
-      let objectKeys = Object.keys(all);
-      for (let i = 0; i < objectKeys.length; i++) {
-        //    console.log(`${objectKeys[i]}: ${all[objectKeys[i]]} ${isValidURL(all[objectKeys[i]])}`)
-        if (
-          objectKeys[i].includes('url') &&
-          typeof all[objectKeys[i]] === 'string' &&
-          this.isValidURL(all[objectKeys[i]])
-        ) {
-          url = all[objectKeys[i]];
-          this.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
-          break;
+  findUrl(...locations) {
+    let url;
+    if (Array.isArray(locations)) {
+      for (let z = 0; z < locations.length; z++) {
+        utils.utils.unstable.prettyLog('Looking for URL...', 'info');
+        let locationFlat = utils.utils.unstable.flattenAll(locations[z]);
+        let objectKeys = Object.keys(locationFlat);
+        for (let i = 0; i < objectKeys.length; i++) {
+          if (
+            objectKeys[i].includes('url') &&
+            typeof locationFlat[objectKeys[i]] === 'string' &&
+            utils.utils.unstable.isValidURL(locationFlat[objectKeys[i]])
+          ) {
+            url = locationFlat[objectKeys[i]];
+            utils.utils.unstable.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
+            break; // found answer, exist loop
+          }
         }
-      }
+        if (url) break; // found answer, stop looking
+      };
     }
     if (!url) {
-      this.prettyLog(`no URL found.  Cannot generate apiCompose`, `warning`);
+      utils.utils.unstable.prettyLog(`no URL found.`, `warning`);
     }
     return url;
   },
@@ -807,10 +779,11 @@ const unstable = {
    * @param {value} value of the quantity
    * @param {label} label for the quantity
    * @param {units} units for te quantity
+   * @param {apiComposeType} setting to determine where this object is sent (farmos / other)
    */
-  getQuantity(url, uuid, type, value = null, label = null, units = null) {
+  getQuantity(url, uuid, type, value = null, label = null, units = null, apiComposeType = 'farmos') {
     const quantity = {
-      type: 'farmos',
+      type: apiComposeType,
       url: url,
       time: Date.now(),
       entity: {
@@ -872,6 +845,44 @@ const unstable = {
   readable(name) {
     return `${name}`.split(/_/).join(' ').split(/,/).join(', ');
   },
+
+  /**
+ * getDates
+ *
+ * @date {date_first} starting date for the events (if only 1 event, then this is the date of that 1 event)
+ * @date {date_last} ending date for the events.
+ * @number {frequency} frequency (in days) of events between the start and end date
+ */
+  getDates(date_single, date_first, date_last, frequency) {
+    let dates = [];
+    // use first/last/frequency if it exists
+    if (date_first && date_last && frequency) {
+      date_first = Math.round(new Date(date_first).getTime() / 1000, 1);
+      date_last = Math.round(new Date(date_last).getTime() / 1000, 1);
+      if (date_last > date_first) {
+        prettyLog(`dates found ${date_first} ${date_last} ${frequency}`, 'success');
+        // establish the first two dates, based on the frequency
+        dates = [date_first, date_first + Number(frequency) * 86400]; // get started with initial date
+        // keep creating new dates until the next one we create is bigger than the last date in the period
+        while ((dates[dates.length - 1] + Number(frequency) * 86400) < date_last) {
+          dates.push(dates[dates.length - 1] + Number(frequency) * 86400)
+        }
+        prettyLog(dates);
+      } else {
+        prettyLog(`last date in period is bigger than first date in period`, 'warning');
+      }
+      // otherwise, just use single date
+    } else if (date_single) {
+      date_single = Math.round(new Date(date_single).getTime() / 1000, 1);
+      prettyLog(`date found ${date_single}`, 'success');
+      dates = [date_single]; // get started with initial date
+      prettyLog(dates);
+    } else {
+      prettyLog('no dates found', 'warning');
+    }
+    return dates
+  },
+
 };
 
 export const utils = {
