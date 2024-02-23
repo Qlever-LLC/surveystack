@@ -301,7 +301,7 @@ async function parseArrayBuffer(file) {
   return result;
 }
 
-const unstable = {
+export const unstable = {
   /*
    * Find a nested item inside a JSON object.
    * Pass the object and the string referencing the location.
@@ -510,6 +510,7 @@ const unstable = {
     recurse(data, '');
     return result;
   },
+
   /**
    * flatten works for objects AND arrays.  Uses Set() to handle circular references which can throw errors in browser (more in chrome than firefox)
    * @data {object} data the object you pass
@@ -545,6 +546,7 @@ const unstable = {
     recurse(data, '');
     return result;
   },
+  
   /**
   * unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
   * @data {object} data - the flattened object you pass.
