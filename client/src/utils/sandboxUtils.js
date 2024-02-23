@@ -886,17 +886,3 @@ export const unstable = {
     return dates
   }
 };
-
-
-// export const utils = {
-//   match,
-//   checkIfAny,
-//   checkIfNone,
-//   getCleanArray,
-//   getClean,
-//   getResourceAsText,
-//   getResourceAsArrayBuffer,
-//   getResource,
-//   parseText,
-//   parseArrayBuffer
-// };
