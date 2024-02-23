@@ -746,25 +746,25 @@ const unstable = {
     let url;
     if (Array.isArray(locations)) {
       for (let z = 0; z < locations.length; z++) {
-        utils.utils.unstable.prettyLog('Looking for URL...', 'info');
-        let locationFlat = utils.utils.unstable.flattenAll(locations[z]);
+        prettyLog('Looking for URL...', 'info');
+        let locationFlat = this.flattenAll(locations[z]);
         let objectKeys = Object.keys(locationFlat);
         for (let i = 0; i < objectKeys.length; i++) {
           if (
             objectKeys[i].includes('url') &&
             typeof locationFlat[objectKeys[i]] === 'string' &&
-            utils.utils.unstable.isValidURL(locationFlat[objectKeys[i]])
+            this.isValidURL(locationFlat[objectKeys[i]])
           ) {
             url = locationFlat[objectKeys[i]];
-            utils.utils.unstable.prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
-            break; // found answer, exist loop
+            prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
+            break; // found answer, exit loop
           }
         }
         if (url) break; // found answer, stop looking
       };
     }
     if (!url) {
-      utils.utils.unstable.prettyLog(`no URL found.`, `warning`);
+      prettyLog(`no URL found.`, `warning`);
     }
     return url;
   },
