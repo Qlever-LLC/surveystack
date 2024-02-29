@@ -25,6 +25,7 @@
     :primary="primary"
     :readonly="readonly"
     :required="required"
+    :rounded="rounded"
     :rules="rules"
     :single-line="singleLine"
     :suffix="suffix"
@@ -80,6 +81,7 @@ export default {
     placeholder: { type: String, required: false },
     prependInnerIcon: { type: String, required: false },
     readonly: { type: Boolean, required: false },
+    rounded: { type: [String, Number, Boolean], required: false },
     rules: { type: Array, required: false },
     singleLine: { type: Boolean, required: false },
     suffix: { type: String, required: false },

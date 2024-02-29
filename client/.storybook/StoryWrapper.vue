@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app style="background-color: white">
     <v-main>
       <slot name="story"></slot>
     </v-main>
