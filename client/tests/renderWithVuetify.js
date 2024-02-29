@@ -72,7 +72,7 @@ import ATimeline from '../src/components/ui/elements/ATimeline.vue';
 import ATimelineItem from '../src/components/ui/elements/ATimelineItem.vue';
 import AToolbar from '../src/components/ui/elements/AToolbar.vue';
 import AToolbarItems from '../src/components/ui/elements/AToolbarItems.vue';
-import AToolbarTitle from '../src/components/ui/elements/AToolbarTitle.vue';
+import AToolbarTitle from '@/components/ui/elements/AAppBarTitle.vue';
 import ATooltip from '../src/components/ui/elements/ATooltip.vue';
 import AWindow from '../src/components/ui/elements/AWindow.vue';
 import AWindowItem from '../src/components/ui/elements/AWindowItem.vue';

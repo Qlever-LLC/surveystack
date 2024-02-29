@@ -1,3 +1,4 @@
+//TODO check if this is still needed after the ui overhaul
 const createInitialState = () => ({
   title: 'SurveyStack',
   subtitle: '',

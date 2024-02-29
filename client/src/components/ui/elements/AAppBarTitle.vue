@@ -1,7 +1,7 @@
 <template>
-  <v-toolbar-title :id="id">
+  <v-app-bar-title :id="id">
     <slot />
-  </v-toolbar-title>
+  </v-app-bar-title>
 </template>
 
 <script>

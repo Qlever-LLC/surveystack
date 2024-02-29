@@ -1,85 +1,47 @@
 <template>
-  <a-container class="home" fluid>
-    <a-row>
-      <a-col>
-        <a-img v-if="isWhitelabel" :src="whitelabelPartner.hero || whitelabelPartner.logo" class="my-3" height="128" />
-        <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
-      </a-col>
-    </a-row>
+  <a-container class="home align-center" fluid>
+    <div class="d-flex justify-center align-center">
+      <a-card color="accent" class="ma-6 pa-6 align-center" style="max-width: 300px">
+        <div class="text-center">
+          <a-icon icon="mdi-plus-circle-outline" size="100" />
+        </div>
 
-    <a-row>
-      <a-col align="center">
-        <app-basic-list
-          class="maxw-40 text-left"
-          v-if="isWhitelabel && pinnedWhitelabelSurveys.length > 0"
-          :entities="pinnedWhitelabelSurveys"
-          title="Get Started"
-          :link="(e) => `/surveys/${e.id}`"
-          :searchable="false">
-          <template v-slot:prepend="{ entity }">
-            <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
-          </template>
-          <template v-slot:entity="{ entity }">
-            <a-row no-gutters>
-              <a-col col="10" class="flex-grow-1">
-                <a-list-item-title>{{ entity.name }}</a-list-item-title>
-                <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-              </a-col>
-              <a-col col="1" class="flex-grow-0 align-self-center ml-3">
-                <a-btn color="primary" small>Take Survey</a-btn>
-              </a-col>
-            </a-row>
-          </template>
-        </app-basic-list>
-      </a-col>
-    </a-row>
-
-    <a-row>
-      <a-col align="center">
-        <app-basic-list
-          class="maxw-40 text-left"
-          v-if="pinned && pinned.length > 0"
-          :entities="pinned"
-          title="More Surveys"
-          :link="(e) => `/surveys/${e.id}`">
-          <template v-slot:prepend="{ entity }">
-            <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
-          </template>
-          <template v-slot:entity="{ entity }">
-            <a-list-item-title>{{ entity.name }}</a-list-item-title>
-            <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
-          </template>
-        </app-basic-list>
-      </a-col>
-    </a-row>
-
-    <a-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog" cssLoginPage>
-      <auth-selector />
-    </a-dialog>
-
-    <a-row>
-      <a-col align="center">
-        <a-btn x-large variant="text" :to="`/surveys/browse`">
-          <a-icon left>mdi-text-box-search-outline</a-icon>
-          Browse All Surveys
-        </a-btn>
-      </a-col>
-    </a-row>
-
-    <a-row v-if="false">
-      <a-col align="center">
-        <a-btn color="primary" x-large href="surveystack://measurement">Run Measurement</a-btn>
-      </a-col>
-    </a-row>
+        <a-card-text>Get started building surveys and getting responses by creating a group.</a-card-text>
+        <a-card-text class="ml-4">
+          <ul>
+            <li>Create surveys</li>
+            <li>Invite people to respond</li>
+            <li>Highlight important surveys</li>
+            <li>Gather Results</li>
+          </ul>
+        </a-card-text>
+      </a-card>
+      <a-card color="accent" class="ma-6 pa-6" style="max-width: 300px">
+        <div class="text-center">
+          <a-icon icon="mdi-compass-outline" size="100" />
+        </div>
+        <a-card-text>See how others are using SurveyStack to do cutting edge research.</a-card-text>
+        <a-card-text class="ml-4">
+          <ul>
+            <li>View demo surveys</li>
+            <li>Explore public groups</li>
+            <li>Participate in public surveys</li>
+            <li>Discover new question set</li>
+          </ul>
+        </a-card-text>
+      </a-card>
+    </div>
   </a-container>
 </template>
 
 <script>
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
+import ACardTitle from '@/components/ui/elements/ACardTitle.vue';
 
 export default {
   components: {
+    ACardTitle,
     AuthSelector,
     AppBasicList,
   },
@@ -134,7 +96,6 @@ export default {
 
 <style scoped lang="scss">
 .home {
-  background-color: rgb(var(--v-theme-background));
   height: 100%;
 }
 

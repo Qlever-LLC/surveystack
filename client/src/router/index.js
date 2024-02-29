@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
-import Home from '@/pages/Home.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
@@ -16,7 +15,6 @@ import UserEdit from '@/pages/users/UserEdit.vue';
 import Profile from '@/pages/users/Profile.vue';
 import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
-import Group from '@/pages/groups/Group.vue';
 import SubmissionList from '@/pages/submissions/List.vue';
 
 import ScriptList from '@/pages/scripts/ScriptList.vue';
@@ -31,11 +29,13 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
-import Navbar from '@/components/Navbar.vue';
+import AppHeader from '@/components/AppHeader.vue';
 import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import store from '@/store';
+import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
+import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 
 const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
 const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
@@ -66,8 +66,14 @@ const superGuard = async (to, from, next) => {
   }
 };
 
+const setActiveGroup = (to, from, next) => {
+  //TODO set the active group by the path param
+  //store.dispatch('memberships/setActiveGroup', groupId);
+  next();
+};
+
 const commonComponents = {
-  navbar: Navbar,
+  header: AppHeader,
 };
 
 function getComponents(component, defaultComponents = commonComponents) {
@@ -78,10 +84,43 @@ function getComponents(component, defaultComponents = commonComponents) {
 }
 
 const routes = [
+  /*{
+  //TODO in which cases does this appear?
+    path: '/',
+    name: 'home',
+    components: getComponents(Home, {
+      header: AppHeader,
+    }),
+  },*/
   {
     path: '/',
     name: 'home',
-    components: getComponents(Home),
+    components: {
+      default: AppNavigationGlobal,
+      header: AppHeader,
+    },
+    props: {
+      default: {
+        fullWidth: true,
+      },
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/g/:pathMatch(.*)',
+    name: 'groups-by-path',
+    components: {
+      header: AppHeader,
+      default: AppNavigationGroup,
+    },
+    props: {
+      default: {
+        fullWidth: true,
+      },
+    },
+    beforeEnter: setActiveGroup,
   },
   {
     path: '/about',
@@ -99,12 +138,20 @@ const routes = [
   {
     path: '/surveys/my-submissions',
     name: 'my-submissions',
-    components: getComponents(MySubmissions),
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      default: MySubmissions,
+    },
   },
   {
     path: '/surveys/browse',
     name: 'surveys-browse',
-    components: getComponents(SurveysBrowse),
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      default: SurveysBrowse,
+    },
   },
   {
     path: '/surveys/new',
@@ -142,7 +189,7 @@ const routes = [
   {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
-    components: getComponents(DraftSubmission, { navbar: SubmissionDraftNavbar }),
+    components: getComponents(DraftSubmission, { header: SubmissionDraftNavbar }),
   },
   {
     path: '/auth/login',
@@ -250,18 +297,21 @@ const routes = [
   {
     path: '/groups/edit/:id',
     name: 'groups-edit',
-    components: getComponents(GroupEdit),
-  },
-  {
-    path: '/g/:pathMatch(.*)', //TODO
-    name: 'groups-by-path',
-    components: getComponents(Group),
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      default: GroupEdit,
+    },
   },
   // scripts
   {
     path: '/scripts',
     name: 'scripts-list',
-    components: getComponents(ScriptList),
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      default: ScriptList,
+    },
   },
   {
     path: '/scripts/new',

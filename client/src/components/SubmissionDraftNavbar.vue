@@ -20,7 +20,7 @@
 
 <script>
 import DraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
-import NavbarDrawer from '@/components/NavbarDrawer.vue';
+import NavbarDrawer from '@/components/AppNavigationGlobal.vue';
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 
 import { queueAction } from '@/utils/surveyStack';
