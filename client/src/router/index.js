@@ -287,12 +287,30 @@ const routes = [
   {
     path: '/groups',
     name: 'groups-list',
-    components: getComponents(GroupList),
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGlobal,
+      default: GroupList,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
   },
   {
     path: '/groups/new',
     name: 'groups-new',
-    components: getComponents(GroupEdit),
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGlobal,
+      default: GroupEdit,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
   },
   {
     path: '/groups/edit/:id',
