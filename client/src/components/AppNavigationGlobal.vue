@@ -32,14 +32,7 @@
     <GroupDocsNavigation />
 
     <template v-slot:append>
-      <div class="text-grey">
-        <p class="pt-4 pl-4">
-          Version:
-          <router-link to="/app/info" class="text-decoration-none" style="color: grey !important"
-            >{{ lcl.shortHash }}
-          </router-link>
-        </p>
-      </div>
+      <AppVersion />
     </template>
   </a-navigation-drawer>
 </template>
@@ -47,6 +40,7 @@
 <script setup>
 import GroupNavigation from '@/components/groups/GroupNavigation.vue';
 import GroupDocsNavigation from '@/components/groups/GroupDocsNavigation.vue';
+import AppVersion from '@/components/AppVersion.vue';
 
 const props = defineProps({
   fullWidth: {
@@ -54,8 +48,6 @@ const props = defineProps({
     required: false,
   },
 });
-
-const lcl = JSON.parse(process.env.VUE_APP_LCL);
 </script>
 
 <style scoped lang="scss"></style>
