@@ -22,11 +22,11 @@ const light = {
 const dark = {
   dark: true,
   colors: {
-    primary: '#0E87CC',
+    primary: '#006CD0', //as defined in brand guide
     secondary: '#014D4E',
-    accent: '#1FA774',
-    error: '#f44336',
-    warning: '#ffc107',
+    accent: '#1F803E', //as defined in brand guide
+    error: '#D3400B', //as defined in brand guide
+    warning: '#F1B711', //as defined in brand guide
     info: '#82AF9C',
     success: '#8bc34a',
     appbar: '#212121', // Dark background for appbar
