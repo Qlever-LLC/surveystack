@@ -5,7 +5,7 @@
         class="pa-0 ma-0 no-background"
         variant="accordion"
         style="min-height: 0px !important"
-        :modelValue="docs.length > 2 ? undefined : 0">
+        v-model="expanded">
         <a-expansion-panel class="no-background">
           <a-expansion-panel-title
             class="py-0 pl-0 text-white"
@@ -48,11 +48,13 @@
 </template>
 <script setup>
 import { useGroup } from '@/components/groups/group';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 
 const { getActiveGroup } = useGroup();
 const store = useStore();
+
+const expanded = ref(false);
 
 //TODO what was this for? check master
 let groupsLink = '/groups';
