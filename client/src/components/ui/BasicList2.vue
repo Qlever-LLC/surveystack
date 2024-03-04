@@ -1,23 +1,40 @@
 <template>
-  <!-- TODO instead of a div block use a-card like in BasicList.vue -->
-  <div class="mx-4">
-    <span v-if="showSearch" class="d-flex mb-6">
-      <a-text-field
-        v-model="state.searchValue"
-        dense
-        hideDetails
-        label="Search"
-        prependInnerIcon="mdi-magnify"
-        rounded="lg"
-        variant="outlined" />
-      <a-btn class="ml-6">
-        <a-icon>mdi-24px mdi-tune</a-icon>
+  <a-card :loading="loading">
+    <a-card-title v-if="showTitle" class="text-heading d-flex pa-4">
+      <slot name="title" />
+      <a-spacer />
+      <a-btn v-if="textButtonNew" color="secondary" class="ml-4" :to="linkNew" variant="flat">
+        <a-icon class="mr-2"> mdi-plus-circle-outline </a-icon>
+        {{ textButtonNew }}
       </a-btn>
-    </span>
-    <a-list v-for="(entity, idx) in filteredEntities" :key="entity._id" dense twoLine class="pt-0">
-      <list-item-card v-if="listCard" :entity="entity" :idx="String(idx)" :enableFav="enableFav"></list-item-card>
-    </a-list>
-  </div>
+    </a-card-title>
+    <a-card-text>
+      <span v-if="showSearch" class="d-flex mb-6">
+        <a-text-field
+          v-model="state.searchValue"
+          dense
+          hideDetails
+          label="Search"
+          prependInnerIcon="mdi-magnify"
+          rounded="lg"
+          variant="outlined" />
+        <a-btn class="ml-6">
+          <a-icon>mdi-24px mdi-tune</a-icon>
+        </a-btn>
+      </span>
+      <a-list v-if="listCard" dense twoLine class="pt-0">
+        <list-item-card
+          v-for="(entity, idx) in filteredEntities"
+          :key="entity._id"
+          :entity="entity"
+          :idx="String(idx)"
+          :enableFav="enableFav"
+          :groupStyle="groupStyle"
+          :menu="menu">
+        </list-item-card>
+      </a-list>
+    </a-card-text>
+  </a-card>
 </template>
 
 <script setup>
@@ -29,6 +46,10 @@ import formatDistance from 'date-fns/formatDistance';
 import ListItemCard from './ListItemCard.vue';
 
 const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: false,
+  },
   entities: {
     type: Array,
     required: true,
@@ -43,6 +64,26 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
+  },
+  groupStyle: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  textButtonNew: {
+    type: String,
+    required: false,
+  },
+  linkNew: {
+    type: [String, Object],
+  },
+  menu: {
+    type: Array,
+    required: false,
+  },
+  showTitle: {
+    type: Boolean,
+    default: true,
   },
   showSearch: {
     type: Boolean,
@@ -60,6 +101,7 @@ const state = reactive({
 const entities = computed(() => {
   // already done for surveys in fetchData in Browse.vue
   // TODO define a unique schema for fetching for instance
+  // TODO clean/filter all props from entity
   const now = new Date();
   props.entities.forEach((e) => {
     if (e.meta) {
