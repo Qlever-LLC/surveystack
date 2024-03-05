@@ -21,7 +21,7 @@ export default {
   emits: ['update:modelValue'],
   methods: {
     remove(e) {
-      const arr = this.value.filter((v) => v !== e);
+      const arr = this.modelValue.filter((v) => v !== e);
       this.$emit('update:modelValue', arr);
     },
   },

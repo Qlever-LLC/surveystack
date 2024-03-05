@@ -12,7 +12,6 @@
 export default {
   name: 'AExpansionPanels',
   props: {
-    accordion: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
     modelValue: { type: undefined, required: false },
     variant: {

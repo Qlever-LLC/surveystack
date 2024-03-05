@@ -260,7 +260,7 @@ const state = reactive({
 });
 
 onMounted(() => {
-  if (rootDraggable.value.$el) {
+  if (rootDraggable.value?.$el) {
     const { width, height } = rootDraggable.value.$el.getBoundingClientRect();
     if (props.scale !== 1.0)
       state.scaleStyles = {

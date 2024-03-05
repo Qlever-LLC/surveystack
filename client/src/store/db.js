@@ -1,3 +1,5 @@
+import { isProxy, toRaw } from 'vue';
+
 const surveys = [];
 
 const invites = [];
@@ -117,21 +119,21 @@ function persist(storeName, obj) {
     req.onerror = () => {
       console.log('Insertion in DB Failed ', this.error);
     };
-  } catch (err) {
-    console.warn('unable to persist to IDB', err);
+  } catch (error) {
+    console.warn('unable to persist to IDB', error);
   }
 }
 
 function persistSubmission(submission) {
-  persist(stores.SUBMISSIONS, submission);
+  persist(stores.SUBMISSIONS, isProxy(submission) ? toRaw(submission) : submission);
 }
 
 function persistSurvey(survey) {
-  persist(stores.SURVEYS, survey);
+  persist(stores.SURVEYS, isProxy(survey) ? toRaw(survey) : survey);
 }
 
 function persistResource(resource) {
-  persist(stores.RESOURCES, resource);
+  persist(stores.RESOURCES, isProxy(resource) ? toRaw(resource) : resource);
 }
 
 function getResults(storeName, success) {

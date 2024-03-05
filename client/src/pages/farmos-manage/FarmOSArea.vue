@@ -2,7 +2,7 @@
   <div style="width: 100%">
     <a-form>
       <a-text-field
-        :modelValue="modelValue"
+        :modelValue="modelValue.name"
         label="Name"
         placeholder="Name"
         variant="outlined"

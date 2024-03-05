@@ -104,8 +104,7 @@
         item-value="id"
         :item-title="(item) => `${item.name} (${item.email})`"
         v-model="localViewModel.form.owner"
-        :rules="[(v) => !!v || `select at least one owner`]"
-        return-object />
+        :rules="[(v) => !!v || `select at least one owner`]" />
 
       <!-- WARNING: Is not up to date as it is a comment 
         <a-select
