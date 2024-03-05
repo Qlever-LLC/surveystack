@@ -48,7 +48,7 @@ export default {
     theme: { type: String, required: false },
     threeLine: { type: Boolean, required: false },
     title: { type: undefined, required: false },
-    to: { type: String, required: false },
+    to: { type: [String, Object], required: false },
     twoLine: { type: Boolean, required: false },
     value: { type: undefined, required: false },
   },

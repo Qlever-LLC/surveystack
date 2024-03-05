@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
 import Unauthorized from '@/pages/Unauthorized.vue';
-import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
 import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
 
@@ -14,10 +13,7 @@ import User from '@/pages/users/User.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
 import Profile from '@/pages/users/Profile.vue';
 import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
-import GroupList from '@/pages/groups/GroupList.vue';
 import SubmissionList from '@/pages/submissions/List.vue';
-
-import ScriptList from '@/pages/scripts/ScriptList.vue';
 
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
@@ -36,6 +32,9 @@ import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import store from '@/store';
 import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
+import GroupList from '@/pages/groups/GroupList.vue';
+import Browse from '@/pages/surveys/Browse.vue';
+import ScriptList from '@/pages/scripts/ScriptList.vue';
 
 const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
 const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
@@ -76,10 +75,10 @@ const commonComponents = {
   header: AppHeader,
 };
 
-function getComponents(component, defaultComponents = commonComponents) {
+function getComponents(component, mainComponents = commonComponents) {
   return {
-    default: component,
-    ...defaultComponents,
+    main: component,
+    ...mainComponents,
   };
 }
 
@@ -96,13 +95,10 @@ const routes = [
     path: '/',
     name: 'home',
     components: {
-      default: AppNavigationGlobal,
       header: AppHeader,
+      navigation: AppNavigationGlobal,
     },
     props: {
-      default: {
-        fullWidth: true,
-      },
       header: {
         showLogo: true,
       },
@@ -113,12 +109,7 @@ const routes = [
     name: 'groups-by-path',
     components: {
       header: AppHeader,
-      default: AppNavigationGroup,
-    },
-    props: {
-      default: {
-        fullWidth: true,
-      },
+      navigation: AppNavigationGroup,
     },
     beforeEnter: setActiveGroup,
   },
@@ -141,7 +132,7 @@ const routes = [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      default: MySubmissions,
+      main: MySubmissions,
     },
   },
   {
@@ -150,7 +141,7 @@ const routes = [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      default: SurveysBrowse,
+      main: Browse,
     },
   },
   {
@@ -176,7 +167,7 @@ const routes = [
     name: 'surveys-start',
     components: getComponents(SurveysDetail),
     props: {
-      default: {
+      main: {
         start: true,
       },
     },
@@ -290,7 +281,7 @@ const routes = [
     components: {
       header: AppHeader,
       navigation: AppNavigationGlobal,
-      default: GroupList,
+      main: GroupList,
     },
     props: {
       header: {
@@ -304,7 +295,7 @@ const routes = [
     components: {
       header: AppHeader,
       navigation: AppNavigationGlobal,
-      default: GroupEdit,
+      main: GroupEdit,
     },
     props: {
       header: {
@@ -318,7 +309,7 @@ const routes = [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      default: GroupEdit,
+      main: GroupEdit,
     },
   },
   // scripts
@@ -328,7 +319,7 @@ const routes = [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      default: ScriptList,
+      main: ScriptList,
     },
   },
   {

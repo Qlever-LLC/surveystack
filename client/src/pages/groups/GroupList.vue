@@ -8,7 +8,7 @@
       class="mt-3"
       :entities="entities"
       title="Groups"
-      :link="(e) => `/groups${e.path}`"
+      :link="(e) => `/g${e.path}`"
       :linkNew="{ name: 'groups-new', query: { dir: rootDir } }">
       <template v-slot:entity="{ entity }">
         <a-list-item-title>{{ entity.name }}</a-list-item-title>

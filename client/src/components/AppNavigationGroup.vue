@@ -5,8 +5,8 @@
     permanent
     color="rgba(0, 0, 0, 0)"
     :class="fullWidth ? 'w-100 align-center' : ''"
-    :style="fullWidth ? '' : 'width:300px!important'"
-    class="pt-4 pr-4">
+    :style="fullWidth ? '' : 'width:256px!important'"
+    class="pt-4 mr-4">
     <SubmissionNavigation />
     <SurveyNavigation />
     <GroupAdminNavigation />
