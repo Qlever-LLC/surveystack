@@ -17,13 +17,30 @@ export const BasicListCard_Survey = {
     setup() {
       return { args };
     },
-    template: '<basic-list v-bind="args" />',
+    template: `<basic-list v-bind="args"> 
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-cube-outline </a-icon>
+        Surveys
+      </template>
+    </basic-list>`,
   }),
   args: {
     //👇 The args you need here will depend on your component
     listCard: true,
     entities: entityType.surveys,
     enableFav: true,
+    textButtonNew: 'Create new Survey',
+    menu: [
+      { title: 'Start Survey', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
+      { title: 'Start Survey as Member', icon: 'mdi-open-in-new', action: '/url' },
+      { title: 'Call for Submissions', icon: 'mdi-bullhorn', action: '/url' },
+      { title: 'Edit', icon: 'mdi-pencil', action: '/url' },
+      { title: 'View Survey', icon: 'mdi-file-document', action: '/url' },
+      { title: 'View Results', icon: 'mdi-chart-bar', action: '/url' },
+      { title: 'Copy to new Survey', icon: 'mdi-content-copy', action: '/url' },
+      { title: 'Share', icon: 'mdi-share', action: '/url' },
+      { title: 'Delete', icon: 'mdi-delete', action: '/url', color: 'red' },
+    ],
   },
 };
 
@@ -33,11 +50,22 @@ export const BasicListCard_Scripts = {
     setup() {
       return { args };
     },
-    template: '<basic-list v-bind="args" />',
+    template: `<basic-list v-bind="args"> 
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-code-tags </a-icon>
+        Scripts
+      </template>
+    </basic-list>`,
   }),
   args: {
     listCard: true,
     entities: entityType.scripts,
+    textButtonNew: 'Create new Script',
+    menu: [
+      { title: 'Edit', icon: 'mdi-pencil', action: '/url', color: 'green' },
+      { title: 'View Surveys using this Script', icon: 'mdi-chart-bar', action: '/url' },
+      { title: 'Delete', icon: 'mdi-delete', action: '/url', color: 'red' },
+    ],
   },
 };
 
@@ -47,11 +75,50 @@ export const BasicListCard_QuestionsLibrary = {
     setup() {
       return { args };
     },
-    template: '<basic-list v-bind="args" />',
+    template: `<basic-list v-bind="args"> 
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-cube-outline </a-icon>
+        Question Sets
+      </template>
+    </basic-list>`,
   }),
   args: {
     listCard: true,
     entities: entityType.questionsLibrary,
+    textButtonNew: 'Create new Question Set',
+    menu: [
+      { title: 'Edit', icon: 'mdi-pencil', action: '/url', color: 'green' },
+      { title: 'View Results', icon: 'mdi-chart-bar', action: '/url' },
+      { title: 'Add to new Survey', icon: 'mdi-content-copy', action: '/url' },
+      { title: 'Delete', icon: 'mdi-delete', action: '/url', color: 'red' },
+    ],
+  },
+};
+
+export const BasicListCard_Groups = {
+  render: (args) => ({
+    components: { BasicList },
+    setup() {
+      return { args };
+    },
+    template: `<basic-list v-bind="args"> 
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-compass-outline </a-icon>
+        All My Groups
+      </template>
+    </basic-list>`,
+  }),
+  args: {
+    listCard: true,
+    entities: entityType.groups,
+    groupStyle: true,
+    textButtonNew: 'Create a Group',
+    menu: [
+      { title: 'Go to Group', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
+      { title: 'View Survey', icon: 'mdi-file-document', action: '/url' },
+      { title: 'Settings', icon: 'mdi-pencil', action: '/url' },
+      { title: 'Manage Members', icon: 'mdi-account-outline', action: '/url' },
+    ],
   },
 };
 

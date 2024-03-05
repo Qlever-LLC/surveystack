@@ -2,29 +2,42 @@
   <a-hover v-slot="{ isHovering, props }">
     <a-list-item
       v-bind="props"
+      :style="state.groupStyle"
       :elevation="isHovering ? 6 : 2"
       dense
-      class="bg-primary py-2 mb-1"
+      class="bg-primary py-2 mb-2"
       rounded="lg"
       @mouseover="mouseover(idx)"
       @mouseleave="mouseleave(idx)">
       <span>
-        <a-list-item-title style="display: flex; align-items: flex-end">
+        <a-list-item-title class="d-flex align-center">
           <span v-if="enableFav" @click="toogleFavorite(idx)">
             <a-icon v-if="state.favorite[idx]" class="mr-2">mdi-star</a-icon>
             <a-icon v-if="!state.favorite[idx] && state.isHover[idx]" class="mr-2"> mdi-star-outline </a-icon>
           </span>
+          <span v-if="groupStyle">
+            <a-avatar class="mr-3" color="secondary" rounded="lg" size="35"> {{ state.avatarName }} </a-avatar></span
+          >
           {{ state.entity.name }}
         </a-list-item-title>
-        <a-list-item-subtitle>created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
+        <a-list-item-subtitle v-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
       </span>
       <span>
         <a-menu location="start" v-model="state.menuIsOpen[idx]">
           <template v-slot:activator="{ props }">
             <a-icon v-bind="props">mdi-dots-horizontal</a-icon>
           </template>
-          <a-list>
-            <a-list-item class="d-flex align-center"> to do </a-list-item>
+          <a-list dense class="py-0">
+            <a-list-item
+              v-for="(itemMenu, idx) of menu"
+              :key="idx"
+              class="d-flex align-center justify-end"
+              :style="getTextColor(itemMenu)"
+              :to="itemMenu.action"
+              dense>
+              {{ itemMenu.title }}
+              <a-icon class="ml-2"> {{ itemMenu.icon }} </a-icon>
+            </a-list-item>
           </a-list>
         </a-menu>
       </span>
@@ -34,7 +47,7 @@
 
 <script setup>
 import { cloneDeep } from 'lodash';
-import { reactive } from 'vue';
+import { reactive, onMounted } from 'vue';
 
 const props = defineProps({
   entity: {
@@ -51,6 +64,15 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  groupStyle: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  menu: {
+    type: Array,
+    required: false,
+  },
 });
 
 const state = reactive({
@@ -58,7 +80,35 @@ const state = reactive({
   favorite: [],
   menuIsOpen: [],
   isHover: [],
+  groupStyle: {},
+  avatarName: '',
 });
+
+onMounted(() => {
+  if (props.groupStyle) {
+    const treeHierarchy = props.entity.dir.split('/').length - 2;
+    const defaultIndentation = 20;
+    state.groupStyle = {
+      marginLeft: `${treeHierarchy * defaultIndentation}px`,
+    };
+
+    const name = props.entity.name;
+    const names = name.split(' ');
+    if (names.length === 1) {
+      state.avatarName = name.slice(0, 2).toUpperCase();
+    } else if (names.length >= 2) {
+      const premiereLettrePremierMot = names[0].charAt(0).toUpperCase();
+      const premiereLettreDeuxiemeMot = names[1].charAt(0).toUpperCase();
+      state.avatarName = premiereLettrePremierMot + premiereLettreDeuxiemeMot;
+    } else {
+      state.avatarName = '';
+    }
+  }
+});
+
+function getTextColor(itemMenu) {
+  return { color: itemMenu.color };
+}
 
 function mouseover(idx) {
   state.isHover[idx] = true;

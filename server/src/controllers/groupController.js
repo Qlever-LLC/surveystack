@@ -118,27 +118,28 @@ const createPinnedSurveysPopulationStages = () => {
 };
 
 const getGroups = async (req, res) => {
-  const { showArchived, prefix } = req.query;
+  const { showArchived, prefix, dir, tree } = req.query;
 
   let entities;
-  let dir = '/';
 
   let archived = false;
   if (queryParam(showArchived)) {
     archived = true;
   }
 
-  if (req.query.dir) {
-    dir = req.query.dir;
-  }
+  let dirQuery;
+  if (!dir) {
+    dirQuery = { $regex: `^/` };
+  } else {
+    dirQuery = dir;
 
-  if (!dir.endsWith('/')) {
-    dir += '/';
-  }
+    if (!dir.endsWith('/')) {
+      dirQuery += '/';
+    }
 
-  let dirQuery = dir;
-  if (req.query.tree) {
-    dirQuery = { $regex: `^${dir}` };
+    if (queryParam(tree)) {
+      dirQuery = { $regex: `^${dir}` };
+    }
   }
 
   const findQuery = {
