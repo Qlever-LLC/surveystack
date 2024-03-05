@@ -74,6 +74,8 @@ export const createControlInstance = (control) => {
       showAllOptions: false,
       columns: 3,
     };
+  } else if (control.type === 'date') {
+    cloneWithDefaultOptions.options.subtype = 'date';
   } else if (control.type === 'matrix') {
     cloneWithDefaultOptions.options.source = createDefaultMatrixSource();
     cloneWithDefaultOptions.options.printLayout = {
