@@ -25,11 +25,11 @@
         :key="tab.name"
         :value="tab.name"
         class="flex-grow-1 flex-column align-center justify-center align-content-center">
-        <a-card class="d-flex flex-column justify-space-between background">
+        <a-card class="d-flex flex-column justify-space-between bg-transparent">
           <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
             <div v-for="(item, i) in activeTabPageContent" :key="i">
               <a-list-item @click="select(item)" class="cursor-pointer" two-line>
-                <a-card :elevation="3" class="py-3 px-4">
+                <a-card :elevation="3" class="py-3 px-4 my-2">
                   <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                     {{ item.meta.survey.name }}
                   </a-list-item-title>
@@ -39,12 +39,18 @@
                     {{ new Date(item.meta.dateCreated).toLocaleString() }}
                   </a-list-item-subtitle>
                 </a-card>
-                <a-list-item-action>
-                  <a-btn v-if="readyToSubmitHas(item._id)" icon @click="() => handleSubmitClick(item._id)">
-                    <a-icon> mdi-cloud-upload-outline</a-icon>
-                    <a-tooltip bottom activator="parent">Upload Submission</a-tooltip>
-                  </a-btn>
-                </a-list-item-action>
+                <template v-slot:append>
+                  <a-list-item-action>
+                    <a-btn
+                      v-if="readyToSubmitHas(item._id)"
+                      icon
+                      @click="() => handleSubmitClick(item._id)"
+                      color="primary">
+                      <a-icon> mdi-cloud-upload-outline</a-icon>
+                      <a-tooltip bottom activator="parent">Upload Submission</a-tooltip>
+                    </a-btn>
+                  </a-list-item-action>
+                </template>
               </a-list-item>
             </div>
 
@@ -53,18 +59,17 @@
               <a-pagination v-model="page" :length="activeTabPaginationLength" color="grey-darken-1" />
             </a-card-actions>
           </template>
-          <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
+          <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length <= 0">
             <a-row align="center" justify="center">
               <a-col>
-                <a-alert color="primary" class="black-text" variant="text">No Drafts</a-alert>
+                <a-alert color="primary" class="black-text bg-white" variant="text">No Drafts </a-alert>
               </a-col>
             </a-row>
           </div>
-
           <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
             <div v-for="(item, i) in tab.content" :key="i">
               <a-list-item @click="select(item)" class="cursor-pointer" two-line>
-                <a-card :elevation="3" class="py-3 px-4">
+                <a-card :elevation="3" class="py-3 px-4 my-2">
                   <a-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
                     {{ item.meta.survey.name }}
                   </a-list-item-title>
@@ -85,7 +90,7 @@
           <div v-else>
             <a-row align="center" justify="center">
               <a-col>
-                <a-alert color="primary" class="black-text" variant="text">No Submissions</a-alert>
+                <a-alert color="primary" class="black-text bg-white" variant="text">No Submissions </a-alert>
               </a-col>
             </a-row>
           </div>
@@ -213,13 +218,6 @@ export default {
           content: this.localSubmissions,
           icon: 'mdi-file-document-edit',
         },
-        // {
-        //   name: 'outbox',
-        //   title: 'Outbox',
-        //   content: this.sortSubmissions(this.$store.getters['submissions/outbox']),
-        //   icon: 'mdi-cloud-sync',
-
-        // },
         {
           name: 'sent',
           title: 'Sent',

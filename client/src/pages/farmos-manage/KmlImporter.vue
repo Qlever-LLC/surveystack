@@ -1,14 +1,13 @@
 <template>
   <a-sheet :border="true" class="pa-8">
-    <div class="text-h1">
+    <div class="text-h5">
       KML Importer
-      <a-icon color="primary"
-        >mdi-information
-        <a-tooltip bottom activator="parent"
-          >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz
-          first.</a-tooltip
-        >
-      </a-icon>
+      <a-btn color="primary" icon>
+        <a-icon class="mr-1">mdi-information</a-icon>
+        <a-tooltip activator="parent">
+          Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz irst.
+        </a-tooltip>
+      </a-btn>
     </div>
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 

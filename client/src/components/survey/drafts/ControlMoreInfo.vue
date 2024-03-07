@@ -1,5 +1,5 @@
 <template>
-  <div v-if="value" class="control-more-info" v-html="getHtml"></div>
+  <div v-if="value" class="preview" v-html="getHtml"></div>
 </template>
 
 <script>
@@ -17,12 +17,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.control-more-info {
+.preview {
   color: rgba(0, 0, 0, 0.6);
   margin-top: 12px;
 }
 
-.control-more-info >>> img {
+.preview >>> img {
   max-width: 100%;
 }
 </style>

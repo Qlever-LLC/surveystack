@@ -94,6 +94,16 @@
         </a-card-text>
         <a-card-text>
           <a-row>
+            <v-col md="2" sm="6">
+              <a-select
+                label="Format"
+                dense
+                :items="apiDownloadFormats"
+                item-title="text"
+                item-value="value"
+                hide-details
+                v-model="apiDownloadFormat" />
+            </v-col>
             <a-col md="2" sm="6">
               <a-select
                 label="Range"

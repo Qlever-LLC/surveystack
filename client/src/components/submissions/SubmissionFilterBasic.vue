@@ -6,8 +6,7 @@
       item-value="value"
       label="Field"
       v-model="selectedField"
-      hide-details
-    />
+      hide-details />
     <a-select
       :items="operators.default"
       item-title="text"
@@ -15,8 +14,7 @@
       label="Operator"
       v-model="selectedOperator"
       hide-details
-      return-object
-    />
+      return-object />
     <a-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
 
     <div class="d-flex justify-end">
@@ -33,11 +31,13 @@
             <span class="font-weight-regular text-secondary mr-1">{{ filter.operator.text }}</span>
             <span class="font-weight-boldmr-1">{{ filter.value }}</span>
           </div>
-          <a-list-item-action @click="remove(i)">
-            <a-btn icon small>
-              <a-icon>mdi-trash-can-outline</a-icon>
-            </a-btn>
-          </a-list-item-action>
+          <template v-slot:append>
+            <a-list-item-action @click="remove(i)">
+              <a-btn icon small>
+                <a-icon>mdi-trash-can-outline</a-icon>
+              </a-btn>
+            </a-list-item-action>
+          </template>
         </a-list-item>
       </a-list>
     </a-card>
