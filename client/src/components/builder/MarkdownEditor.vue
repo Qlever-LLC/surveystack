@@ -284,3 +284,11 @@ export default {
   border-bottom: 1px solid #eee;
 }
 </style>
+
+<style lang="scss">
+.preview,
+.preview * {
+  padding: revert;
+  margin: revert;
+}
+</style>
