@@ -16,11 +16,11 @@
       multiSort
       :headerSlot="headers.length !== 0">
       <template v-slot:top>
-        <a-toolbar flat class="my-5" cssBackgroundCream>
+        <a-toolbar flat class="" cssBackgroundCream>
           <a-row>
             <a-col>
               <div class="d-flex justify-space-between align-center">
-                <div class="d-flex justify-space-between align-center mt-5">
+                <div class="d-flex justify-space-between align-center mt-5 ml-5">
                   <a-switch
                     :modelValue="!excludeMeta"
                     @update:modelValue="$emit('excludeMetaChange', $event)"
