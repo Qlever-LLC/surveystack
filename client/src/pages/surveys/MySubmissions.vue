@@ -8,12 +8,12 @@
       </a-btn>
     </a-row>
     <a-tabs v-model="activeTab" grow @update:modelValue="updateActiveTab">
-      <a-tab href="#drafts" value="drafts" class="background">
+      <a-tab href="#drafts" value="drafts" class="text-white">
         <span class="d-flex flex-row align-center font-weight-regular">
           <a-icon class="mr-2">mdi-file-document-edit</a-icon>Drafts
         </span>
       </a-tab>
-      <a-tab href="#sent" value="sent" class="background">
+      <a-tab href="#sent" value="sent" class="text-white">
         <span class="d-flex flex-row align-center font-weight-regular">
           <a-icon class="mr-2">mdi-email-check</a-icon>Sent
         </span>
