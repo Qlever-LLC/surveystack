@@ -71,12 +71,13 @@
             <a-checkbox
               label="Invitation Only"
               v-model="entity.meta.invitationOnly"
+              :hideDetails="false"
               :hint="
                 entity.meta.invitationOnly
                   ? 'Users can only join through an invitation'
                   : 'Everybody may join this group'
               "
-              persistent-hint
+              persistentHint
               :disabled="!isPremium"
               class="d-inline mt-0" />
             <div class="ml-auto ml-sm-6">
