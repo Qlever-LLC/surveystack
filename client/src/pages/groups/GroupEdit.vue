@@ -11,7 +11,7 @@
         <strong>branding</strong> and <strong>color scheme</strong>. You will also benefit from more administrative
         tools to improve project and data management:
       </p>
-      <ul class="my-3">
+      <ul class="my-3 revertPadding">
         <li>Allow any user to join your group from your custom url.</li>
         <li>See all your group and pinned surveys without being logged in to your app.</li>
         <li>
@@ -397,5 +397,9 @@ export default {
 .api-border {
   border: 1px solid rgba(0, 0, 0, 0.24);
   border-radius: 4px;
+}
+
+.revertPadding {
+  padding: revert;
 }
 </style>
