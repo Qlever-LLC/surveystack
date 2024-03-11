@@ -63,7 +63,11 @@ export default {
     toggleSpeedDial() {
       this.speedDialOpen = !this.speedDialOpen;
     },
+    closeSpeedDial() {
+      this.speedDialOpen = false;
+    },
     addControl(control) {
+      this.closeSpeedDial();
       this.sequence += 1;
       const currentSequence = this.sequence;
 
@@ -79,6 +83,7 @@ export default {
       this.$emit('controlAdded', sequencedControl);
     },
     openLibrary() {
+      this.closeSpeedDial();
       this.$emit('openLibrary');
     },
   },
