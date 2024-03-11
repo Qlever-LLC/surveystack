@@ -36,7 +36,7 @@
         <a-radio-group
           v-model="state.sendEmail"
           name="sendEmail"
-          :disabled="state.invitationMethod === INVITATION_METHODS.ADD">
+          :disabled="state.invitationMethod.includes(INVITATION_METHODS.ADD)">
           <a-radio label="Send an invitation email" value="SEND_NOW" labelSlot>
             <template v-slot:label>
               <div>
@@ -57,9 +57,8 @@
 
         <div class="d-flex mt-2 justify-end">
           <a-btn variant="text" @click="cancel">Cancel</a-btn>
-
           <btn-dropdown
-            :label="state.invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'"
+            :label="state.invitationMethod.includes(INVITATION_METHODS.INVITE) ? 'Invite Member' : 'Add Member'"
             :show-drop-down="true"
             :disabled="!state.submittable"
             :loading="state.isSubmitting"
@@ -181,10 +180,9 @@ async function submit() {
     return;
   }
   const data = state.entity;
-  const url =
-    state.invitationMethod[0] === INVITATION_METHODS.INVITE
-      ? `/memberships?sendEmail=${state.sendEmail}`
-      : `/memberships/confirmed`;
+  const url = state.invitationMethod.includes(INVITATION_METHODS.INVITE)
+    ? `/memberships?sendEmail=${state.sendEmail}`
+    : `/memberships/confirmed`;
 
   try {
     state.isSubmitting = true;
