@@ -9,19 +9,19 @@
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize" />
     <a-text-field
-      variant="outlined"
-      type="number"
-      :label="control.hint"
-      :modelValue="modelValue"
-      @update:modelValue="onInput"
-      @keyup.enter.prevent="submit"
-      ref="textField"
       :disabled="!relevant"
-      hide-details="auto"
-      color="focus"
+      :label="control.hint"
       :rules="[isValidNumber]"
+      @keyup.enter.prevent="submit"
+      @update:modelValue="onInput"
+      clearable
+      color="focus"
       data-test-id="input"
-      clearable />
+      hide-details="auto"
+      ref="textField"
+      type="number"
+      v-model="localValue"
+      variant="outlined" />
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -37,6 +37,11 @@ export default {
   components: {
     appControlLabel,
     appControlMoreInfo,
+  },
+  data() {
+    return {
+      localValue: this.modelValue,
+    };
   },
   methods: {
     keyup(ev) {
