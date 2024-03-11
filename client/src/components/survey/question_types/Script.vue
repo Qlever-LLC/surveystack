@@ -12,28 +12,26 @@
       @cancel="showAndroidInstallDialog = false"
       @confirm="showAndroidInstallDialog = false">
       <template v-slot:title>Installing Android App</template>
-      <template>
-        <p class="text-primary">
-          Installing the Android Application allows to connect to Bluetooth and USB Devices for taking measurements.
+      <p class="text-primary">
+        Installing the Android Application allows to connect to Bluetooth and USB Devices for taking measurements.
 
-          <br /><br />
-          When installing you will be asked to allow installing applications from unknown sources.
-        </p>
+        <br /><br />
+        When installing you will be asked to allow installing applications from unknown sources.
+      </p>
 
-        <a-alert variant="outlined" class="pa-4" type="success" color="blue">
-          If you have already installed the Android App once, you don't need install the App again.
-        </a-alert>
+      <a-alert variant="outlined" class="pa-4" type="success" color="blue">
+        If you have already installed the Android App once, you don't need install the App again.
+      </a-alert>
 
-        <br />
-        <a-btn
-          x-large
-          color="green"
-          href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
-          outlined>
-          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
-          Download APK
-        </a-btn>
-      </template>
+      <br />
+      <a-btn
+        x-large
+        color="green"
+        href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
+        outlined>
+        <a-icon left class="mr-4" x-large>mdi-android</a-icon>
+        Download APK
+      </a-btn>
     </app-dialog>
 
     <a ref="scriptLink" :href="`surveystack://kit/${scriptId}`" style="display: none">Run Surveystack Script</a>

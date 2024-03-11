@@ -20,10 +20,8 @@
     </div>
     <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
-      <template>
-        A survey with id
-        <strong>{{ survey._id }}</strong> already exists. Do you want to generate a different id?
-      </template>
+      A survey with id
+      <strong>{{ survey._id }}</strong> already exists. Do you want to generate a different id?
     </app-dialog>
 
     <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="onDelete" width="400">

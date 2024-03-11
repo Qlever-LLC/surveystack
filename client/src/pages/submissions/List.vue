@@ -12,7 +12,7 @@
 
     <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
       <template v-slot:title>Confirm deletion</template>
-      <template> Are you sure you want to delete this submission? This can not be undone.</template>
+      Are you sure you want to delete this submission? This can not be undone.
     </app-dialog>
 
     <app-dialog
