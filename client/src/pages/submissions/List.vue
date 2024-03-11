@@ -21,27 +21,25 @@
       @confirm="reassign(selected)"
       labelConfirm="Reassign">
       <template v-slot:title>Reassign Submission</template>
-      <template>
-        <a-select
-          :items="reassignment.groups"
-          item-title="text"
-          item-value="value"
-          v-model="reassignment.group"
-          label="Group"
-          :custom-filter="reassignGroupFilter"
-          itemSlot>
-          <template v-slot:item="{ props, item }">
-            <a-list-item v-bind="props" :title="item.raw.text" :subtitle="item.raw.path"> </a-list-item>
-          </template>
-        </a-select>
-        <a-select
-          :disabled="reassignment.group === null"
-          :items="reassignment.users"
-          item-title="text"
-          item-value="value"
-          v-model="reassignment.user"
-          label="User" />
-      </template>
+      <a-select
+        :items="reassignment.groups"
+        item-title="text"
+        item-value="value"
+        v-model="reassignment.group"
+        label="Group"
+        :custom-filter="reassignGroupFilter"
+        itemSlot>
+        <template v-slot:item="{ props, item }">
+          <a-list-item v-bind="props" :title="item.raw.text" :subtitle="item.raw.path"> </a-list-item>
+        </template>
+      </a-select>
+      <a-select
+        :disabled="reassignment.group === null"
+        :items="reassignment.users"
+        item-title="text"
+        item-value="value"
+        v-model="reassignment.user"
+        label="User" />
     </app-dialog>
 
     <a-container>
