@@ -120,7 +120,9 @@
         :items="resultItems"
         @update:modelValue="handleResultDialogInput"
         title="Result of Submission"
-        persistent />
+        persistent
+        @close="showResult = false" />
+      />
     </a-container>
   </div>
 </template>

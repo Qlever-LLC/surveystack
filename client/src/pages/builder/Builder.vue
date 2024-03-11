@@ -55,7 +55,8 @@
       title="Result of Submission"
       additionalMessage="<span class='text-caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
       :survey="survey"
-      :submission="submission" />
+      :submission="submission"
+      @close="showResult = false" />
 
     <result-dialog
       v-model="showApiComposeErrors"
