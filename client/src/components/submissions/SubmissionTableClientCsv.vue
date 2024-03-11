@@ -6,7 +6,7 @@
       :headerProps="{ archived }"
       :headers="headers"
       :items="items"
-      itemKey="_id"
+      itemValue="_id"
       :loading="loading"
       :search="search"
       :items-length="submissions.pagination.total"

@@ -80,7 +80,7 @@
         showSelect
         v-model="selectedItems"
         :search="search"
-        itemKey="id"
+        itemValue="id"
         labelSlot
         valueSlot
         tagsSlot

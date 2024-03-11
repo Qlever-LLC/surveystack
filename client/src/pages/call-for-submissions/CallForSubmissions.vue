@@ -38,7 +38,7 @@
           :items="activeMembers"
           :headers="headers"
           showSelect
-          itemKey="_id"
+          itemValue="_id"
           :loading="isLoadingMembers"
           hideDefaultFooter
           actionsSlot>

@@ -7,7 +7,7 @@
       </a-card-title>
 
       <a-card-text class="mt-4">
-        <a-data-table :headers="tableHeaders" :items="items" :loading="loading" itemKey="id" />
+        <a-data-table :headers="tableHeaders" :items="items" :loading="loading" itemValue="id" />
       </a-card-text>
 
       <a-spacer />
