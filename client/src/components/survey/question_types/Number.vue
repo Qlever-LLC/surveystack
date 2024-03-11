@@ -47,7 +47,7 @@ export default {
       this.next();
     },
     tryAutofocus() {
-      if (this.$refs.textField) {
+      if (!this.isInBuilder && this.$refs.textField) {
         this.$refs.textField.focus({ preventScroll: true });
         return true;
       }
