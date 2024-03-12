@@ -25,16 +25,13 @@
       <a-divider class="my-1" />
 
       <a-list-item class="pa-0">
-        <a-expansion-panels
-          class="pa-0 ma-0 no-background"
-          variant="accordion"
-          :modelValue="docs.length > 2 ? undefined : 0">
+        <a-expansion-panels class="pa-0 ma-0" variant="accordion" :modelValue="docs.length > 2 ? undefined : 0">
           <a-expansion-panel>
-            <a-expansion-panel-title class="py-0 pl-0">
+            <a-expansion-panel-title cssTransparentOverlay class="py-0 pl-0">
               <a-list-subheader>DOCUMENTATION</a-list-subheader>
             </a-expansion-panel-title>
             <a-expansion-panel-text class="pa-0 ma-0">
-              <a-list class="pa-0 ma-0">
+              <a-list class="pa-0 ma-n2">
                 <a-list-item
                   v-for="(doc, index) in docs"
                   :key="doc.link + index"
