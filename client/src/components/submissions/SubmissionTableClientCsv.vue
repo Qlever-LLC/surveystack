@@ -188,6 +188,7 @@ import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
+import { checkAllowedToResubmit } from '@/utils/submissions';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
@@ -495,14 +496,8 @@ export default {
     isSelectable(item) {
       //load original submission object, as item may miss meta data if excludeMeta is true
       const submission = this.submissions.content.find((s) => s._id === item._id);
-      // allow submissions editing to submission creator and submission.meta.group's admins
-      const isAdminOfSubmissionGroup = this.userMemberships.find(
-        (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
-      );
-
-      const isCreator = submission.meta.creator === this.user._id;
-
-      return isAdminOfSubmissionGroup || isCreator;
+      const allowedToResubmit = checkAllowedToResubmit(submission, this.userMemberships, this.user._id);
+      return allowedToResubmit;
     },
     toggleSelect(item) {
       if (this.isSelected(item)) {

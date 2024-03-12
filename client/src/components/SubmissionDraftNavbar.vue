@@ -54,7 +54,6 @@ export default {
         return this.$store.getters['draft/showOverview'];
       },
       set(v) {
-        // this.$store.dispatch('draft/showOverview', v);
         queueAction(this.$store, 'draft/showOverview', v);
       },
     },

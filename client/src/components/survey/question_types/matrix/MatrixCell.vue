@@ -31,8 +31,11 @@
     variant="outlined"
     hide-details
     autocomplete="off"
-    :disabled="disabled" />
-  <a-text-field
+    :disabled="disabled"
+    clearable
+    @click:clear="setToNull"
+  />
+  <v-text-field
     v-else-if="header.type === 'number'"
     :modelValue="value"
     @update:modelValue="onNumberInput"
@@ -333,7 +336,7 @@ export default {
     getDropdownLabel(value) {
       const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
-      return found ? found.label : value;
+      return found ? found.label : value[0] ? value[0] : null;
     },
     // copied/adapted from FarmOsPlanting.vue
     localChange(hashesArg) {

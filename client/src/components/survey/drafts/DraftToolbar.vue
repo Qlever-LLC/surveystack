@@ -2,7 +2,7 @@
   <div>
     <a-toolbar color="grey-lighten-4" flat>
       <div class="flex-grow-1 d-flex flex-row justify-space-between maxw-60 mx-auto">
-        <a-toolbar-title id="draft-toolbar">
+        <a-toolbar-title id="draft-toolbar" v-if="questionNumber">
           <div class="infos text-grey-darken-2">
             <div class="d-flex">
               <span class="number-chip mx-2" style="margin-top: 2px">{{ questionNumber }}</span>

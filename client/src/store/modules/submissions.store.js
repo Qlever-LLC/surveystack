@@ -3,8 +3,6 @@ import api from '@/services/api.service';
 
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 
-import router from '@/router';
-
 export const types = {
   mutations: {
     SET_SUBMISSIONS: 'SET_SUBMISSIONS',
@@ -12,7 +10,6 @@ export const types = {
     GET_SUBMISSION: 'GET_SUBMISSION',
     UPDATE_SUBMISSION: 'UPDATE_SUBMISSION',
     REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
-    // SET_REMOTE_SUBMISSIONS: 'SET_REMOTE_SUBMISSIONS',
     SET_READY_TO_SUBMIT: 'SET_READY_TO_SUBMIT',
   },
   actions: {
@@ -29,7 +26,6 @@ export const types = {
 
 const createInitialState = () => ({
   submissions: [],
-  // remoteSubmissions: [],
   readyToSubmit: [],
 });
 
@@ -70,18 +66,13 @@ const mutations = {
     const index = state.submissions.findIndex(({ _id }) => _id === submission._id);
     state.submissions[index] = submission;
   },
-  // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
-  //   state.remoteSubmissions = submissions;
-  // },
 };
 
 const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async [types.actions.fetchLocalSubmissions]({ commit } /* , userId */) {
-    // const response = await api.get('/submissions');
-
+  async [types.actions.fetchLocalSubmissions]({ commit }) {
     // TODO reject if timeout here
     const response = await new Promise((resolve) => {
       db.openDb(() => {
@@ -92,7 +83,6 @@ const actions = {
     return response;
   },
   [types.actions.add]({ commit }, submission) {
-    // TODO: submissions should be a unique collection, we shouldn't just push
     commit(types.mutations.ADD_SUBMISSION, submission);
   },
   async [types.actions.remove]({ commit }, id) {
@@ -126,11 +116,7 @@ const actions = {
     }
 
     dispatch(types.actions.add, submission);
-    router.push({
-      name: 'submissions-drafts-detail',
-      params: { id: submission._id },
-      query: { minimal_ui: router.currentRoute.value.query.minimal_ui },
-    });
+    return submission._id;
   },
   async [types.actions.update]({ commit }, submission) {
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
