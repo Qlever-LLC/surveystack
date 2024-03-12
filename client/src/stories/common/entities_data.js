@@ -161,3 +161,150 @@ export const groups = [
     },
   },
 ];
+
+export const submissions = [
+  {
+    _id: '654b9f7edf4b140001505bb0',
+    meta: {
+      dateCreated: {
+        $date: '2023-11-08T14:47:26.438Z',
+      },
+      dateModified: {
+        $date: '2023-11-08T17:14:44.482Z',
+      },
+      dateSubmitted: {
+        $date: '2023-11-08T17:14:51.748Z',
+      },
+      survey: {
+        id: {
+          $oid: '653a2a3b733f5a00010fedd0',
+        },
+        name: 'test form',
+        version: 4,
+      },
+      revision: 2,
+      permissions: [],
+      status: [
+        {
+          type: 'READY_TO_SUBMIT',
+          value: {
+            at: '2023-11-08T17:14:50.397Z',
+          },
+        },
+      ],
+      group: {
+        id: {
+          $oid: '63e24fe6826a396d74d6d531',
+        },
+        path: '/group-sa/',
+      },
+      specVersion: 3,
+      creator: {
+        $oid: '63e24b3e826a396d74d6d530',
+      },
+      permanentResults: [],
+      resubmitter: {
+        $oid: '63e24b3e826a396d74d6d530',
+      },
+    },
+    data: {
+      dropdown_1: {
+        value: ['abc_bis'],
+        meta: {
+          type: 'ontology',
+          dateModified: '2023-11-08T17:14:44.482Z',
+        },
+      },
+      matrix_1: {
+        value: [
+          {
+            sample: {
+              value: 7,
+            },
+            description: {
+              value: ['abc_bis'],
+            },
+          },
+        ],
+        meta: {
+          type: 'matrix',
+          dateModified: '2023-11-08T14:47:37.260Z',
+        },
+      },
+    },
+  },
+  {
+    _id: '6556233f4988770001696ef9',
+    meta: {
+      dateCreated: {
+        $date: '2023-11-16T14:12:15.420Z',
+      },
+      dateModified: {
+        $date: '2023-11-16T14:12:24.007Z',
+      },
+      dateSubmitted: {
+        $date: '2023-11-16T14:12:37.400Z',
+      },
+      survey: {
+        id: {
+          $oid: '653a2a3b733f5a00010fedd0',
+        },
+        name: 'test form',
+        version: 6,
+      },
+      revision: 1,
+      permissions: [],
+      status: [
+        {
+          type: 'READY_TO_SUBMIT',
+          value: {
+            at: '2023-11-16T14:12:37.004Z',
+          },
+        },
+      ],
+      group: {
+        id: {
+          $oid: '63e24fe6826a396d74d6d531',
+        },
+        path: '/group-sa/',
+      },
+      specVersion: 3,
+      creator: {
+        $oid: '63e24b3e826a396d74d6d530',
+      },
+      permanentResults: [],
+    },
+    data: {
+      dropdown_1: {
+        value: ['abc'],
+        meta: {
+          type: 'ontology',
+          dateModified: '2023-11-16T14:12:17.584Z',
+        },
+      },
+      matrix_1: {
+        value: [
+          {
+            sample: {
+              value: 1,
+            },
+            description: {
+              value: ['abc_bis'],
+            },
+          },
+        ],
+        meta: {
+          type: 'matrix',
+          dateModified: '2023-11-16T14:12:24.007Z',
+        },
+      },
+      instructions_1: {
+        value: null,
+        meta: {
+          type: 'instructions',
+          dateModified: null,
+        },
+      },
+    },
+  },
+];

@@ -5,15 +5,13 @@
       :style="state.groupStyle"
       :elevation="isHovering ? 6 : 2"
       dense
-      class="bg-primary py-2 mb-2"
-      rounded="lg"
-      @mouseover="mouseover(idx)"
-      @mouseleave="mouseleave(idx)">
+      class="py-2 mb-2"
+      rounded="lg">
       <span>
         <a-list-item-title class="d-flex align-center">
           <span v-if="enableFav" @click="toogleFavorite(idx)">
             <a-icon v-if="state.favorite[idx]" class="mr-2">mdi-star</a-icon>
-            <a-icon v-if="!state.favorite[idx] && state.isHover[idx]" class="mr-2"> mdi-star-outline </a-icon>
+            <a-icon v-if="!state.favorite[idx] && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>
           <span v-if="groupStyle">
             <a-avatar class="mr-3" color="secondary" rounded="lg" size="35"> {{ state.avatarName }} </a-avatar></span
@@ -22,25 +20,23 @@
         </a-list-item-title>
         <a-list-item-subtitle v-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
       </span>
-      <span>
-        <a-menu location="start" v-model="state.menuIsOpen[idx]">
-          <template v-slot:activator="{ props }">
-            <a-icon v-bind="props">mdi-dots-horizontal</a-icon>
-          </template>
-          <a-list dense class="py-0">
-            <a-list-item
-              v-for="(itemMenu, idx) of menu"
-              :key="idx"
-              class="d-flex align-center justify-end"
-              :style="getTextColor(itemMenu)"
-              :to="itemMenu.action"
-              dense>
-              {{ itemMenu.title }}
-              <a-icon class="ml-2"> {{ itemMenu.icon }} </a-icon>
-            </a-list-item>
-          </a-list>
-        </a-menu>
-      </span>
+      <a-menu location="start" v-model="state.menuIsOpen[idx]">
+        <template v-slot:activator="{ props }">
+          <a-icon v-bind="props">mdi-dots-horizontal</a-icon>
+        </template>
+        <a-list dense class="py-0">
+          <a-list-item
+            v-for="(itemMenu, idx) of menu"
+            :key="idx"
+            class="d-flex align-center justify-end"
+            :style="getTextColor(itemMenu)"
+            :to="itemMenu.action"
+            dense>
+            {{ itemMenu.title }}
+            <a-icon class="ml-2"> {{ itemMenu.icon }} </a-icon>
+          </a-list-item>
+        </a-list>
+      </a-menu>
     </a-list-item>
   </a-hover>
 </template>
@@ -79,7 +75,6 @@ const state = reactive({
   entity: cloneDeep(props.entity),
   favorite: [],
   menuIsOpen: [],
-  isHover: [],
   groupStyle: {},
   avatarName: '',
 });
@@ -108,13 +103,6 @@ onMounted(() => {
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };
-}
-
-function mouseover(idx) {
-  state.isHover[idx] = true;
-}
-function mouseleave(idx) {
-  state.isHover[idx] = false;
 }
 
 function toogleFavorite(idx) {
