@@ -134,7 +134,7 @@ export default {
     survey: { type: Object },
     submission: { type: Object },
     persist: { type: Boolean },
-    builder: { type: Boolean },
+    builder: { type: Boolean, default: false },
     forceMobile: { type: Boolean, default: false },
   },
   data() {

@@ -5,7 +5,7 @@
     :header-props="headerProps"
     :headers="headers"
     :items="items"
-    :item-key="itemKey"
+    :itemValue="itemValue"
     :items-length="itemsLength"
     :loading="loading"
     :multi-sort="multiSort"
@@ -39,7 +39,7 @@ export default {
     headerProps: { type: undefined, required: false },
     headers: { type: undefined, required: false },
     items: { type: undefined, required: false },
-    itemKey: { type: String, required: false },
+    itemValue: { type: String, required: false },
     itemsLength: { type: [String, Number], required: false },
     loading: { type: [String, Boolean], required: false },
     multiSort: { type: Boolean, required: false },

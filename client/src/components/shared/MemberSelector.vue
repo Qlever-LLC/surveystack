@@ -1,5 +1,5 @@
 <template>
-  <a-dialog max-width="500" max-height="100" v-model="dialog">
+  <a-dialog max-width="500" max-height="50vh" v-model="dialog">
     <a-card>
       <a-card-title>Search members</a-card-title>
       <a-card-text>

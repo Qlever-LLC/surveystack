@@ -10,7 +10,7 @@
 
         <a-card-text>
           <div v-for="(item, idx) in messages" :key="idx">
-            <a-card variant="outlined" class="mb-2" :color="item.error ? 'red-darken-4' : 'green'">
+            <a-card variant="outlined" class="mb-2 text-white" :class="item.error ? 'bg-negative' : 'bg-positive'">
               <a-card-text>
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </a-card-text>
@@ -225,3 +225,12 @@ export default {
   },
 };
 </script>
+
+<style scoped lang="scss">
+.bg-positive {
+  background-color: rgb(var(--v-theme-success));
+}
+.bg-negative {
+  background-color: rgb(var(--v-theme-error));
+}
+</style>

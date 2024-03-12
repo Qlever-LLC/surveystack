@@ -7,7 +7,8 @@
           :control="child"
           :autoFocus="i === 0"
           :forceMobile="forceMobile"
-          insidePage />
+          insidePage
+          :isInBuilder="isInBuilder" />
       </div>
     </div>
 
@@ -27,7 +28,8 @@
             :control="child"
             :autoFocus="autoFocus && i === 0"
             :forceMobile="forceMobile"
-            insidePage />
+            insidePage
+            :isInBuilder="isInBuilder" />
         </div>
 
         <app-control-more-info :value="control.moreInfo" />

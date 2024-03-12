@@ -4,7 +4,7 @@
     @update:modelValue="$emit('update:modelValue', $event)"
     :headers="headers"
     :items="items"
-    :item-key="itemKey"
+    :itemValue="itemValue"
     :loading="loading"
     :search="search"
     :show-select="showSelect">
@@ -38,7 +38,7 @@ export default {
     modelValue: { type: undefined, required: false },
     headers: { type: undefined, required: false },
     items: { type: undefined, required: false },
-    itemKey: { type: String, required: false },
+    itemValue: { type: String, required: false },
     loading: { type: [String, Boolean], required: false },
     search: { type: String, required: false },
     showSelect: { type: Boolean, required: false },

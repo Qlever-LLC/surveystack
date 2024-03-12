@@ -217,7 +217,8 @@
           contained
           class="align-center justify-center"
           theme="dark"
-          scrim="black">
+          scrim="black"
+          persistent>
           <a-card>
             <a-card-text> Please Save Draft to update Survey Preview.</a-card-text>
           </a-card>

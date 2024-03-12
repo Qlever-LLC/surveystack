@@ -4,7 +4,7 @@
       <a-card-title> Confirm Submission </a-card-title>
       <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>
       <a-card-text v-else>
-        Submit this draft <strong>{{ id }}</strong> to
+        Submit this draft <strong>{{ id }}</strong> to <br />
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
         <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
