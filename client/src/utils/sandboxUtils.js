@@ -886,3 +886,17 @@ export const unstable = {
     return dates
   }
 };
+
+// this separate export allows the Scripts to see utils and unstable functions
+export const utils = {
+  checkIfAny,
+  checkIfNone,
+  getCleanArray,
+  getCleanNumber,
+  getClean,
+  prettyLog,
+  getResourceAsText,
+  getResourceAsArrayBuffer,
+  getResource,
+  unstable
+};
