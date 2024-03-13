@@ -106,6 +106,14 @@
                           <a-icon>mdi-pencil</a-icon>
                         </a-btn>
                       </div>
+                      <ontology
+                        v-model="item.defaultValue"
+                        :multiple="item.multiple"
+                        :customAnswer="item.custom"
+                        :source="item.resource"
+                        :resources="resources"
+                        dense
+                        class="mt-5" />
                     </div>
                     <a-text-field
                       v-else-if="item.type === 'text'"
@@ -125,15 +133,6 @@
                       :rules="[isValidNumber]"
                       clearable
                       @click:clear="setToNull" />
-                    <ontology
-                      v-else-if="item.type === 'dropdown'"
-                      v-model="item.defaultValue"
-                      :multiple="item.multiple"
-                      :customAnswer="item.custom"
-                      :source="item.resource"
-                      :resources="resources"
-                      dense
-                      class="mt-5" />
                     <date
                       v-else-if="item.type === 'date'"
                       v-model="item.defaultValue"
