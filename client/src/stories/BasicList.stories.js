@@ -166,7 +166,7 @@ export const BasicListRow_Drafts = {
     </basic-list>`,
   }),
   args: {
-    entities: entityType.submissions,
+    entities: entityType.drafts,
     drafts: true,
     menu: [
       { title: 'todo', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
@@ -174,5 +174,47 @@ export const BasicListRow_Drafts = {
       { title: 'todo', icon: 'mdi-pencil', action: '/url' },
       { title: 'todo', icon: 'mdi-account-outline', action: '/url' },
     ],
+  },
+};
+
+export const BasicListRow_Results = {
+  render: (args) => ({
+    components: { BasicList },
+    setup() {
+      return { args };
+    },
+    template: `<basic-list v-bind="args"> 
+    <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
+    </basic-list>`,
+  }),
+  args: {
+    entities: entityType.results,
+    showTitle: false,
+    menu: [
+      { title: 'todo', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
+      { title: 'todo', icon: 'mdi-file-document', action: '/url' },
+      { title: 'todo', icon: 'mdi-pencil', action: '/url' },
+      { title: 'todo', icon: 'mdi-account-outline', action: '/url' },
+    ],
+  },
+};
+
+export const BasicListRow_Members = {
+  render: (args) => ({
+    components: { BasicList },
+    setup() {
+      return { args };
+    },
+    template: `<basic-list v-bind="args"> 
+    <template v-slot:title>
+        <a-icon class="mr-2"> mdi-account-multiple </a-icon>
+        Members
+      </template>
+    </basic-list>`,
+  }),
+  args: {
+    entities: entityType.members,
+    buttonNew: { title: 'Invite New Members', link: '/url' },
+    members: true,
   },
 };

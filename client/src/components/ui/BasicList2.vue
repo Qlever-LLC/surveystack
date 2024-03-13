@@ -2,13 +2,11 @@
   <a-card :loading="loading">
     <a-card-title v-if="showTitle" class="text-heading d-flex pa-4">
       <slot name="title" />
-      <span v-if="buttonNew">
-        <a-spacer />
-        <a-btn v-if="buttonNew.title" color="secondary" class="ml-4" :to="buttonNew.link" variant="flat">
-          <a-icon class="mr-2"> mdi-plus-circle-outline </a-icon>
-          {{ buttonNew.title }}
-        </a-btn>
-      </span>
+      <a-spacer />
+      <a-btn v-if="buttonNew" color="secondary" class="ml-4" :to="buttonNew.link" variant="flat">
+        <a-icon class="mr-2"> mdi-plus-circle-outline </a-icon>
+        {{ buttonNew.title }}
+      </a-btn>
     </a-card-title>
     <a-card-text>
       <span v-if="showSearch" class="d-flex mb-6">
@@ -42,7 +40,8 @@
           :idx="String(idx)"
           :menu="menu"
           :submissions="submissions"
-          :drafts="drafts">
+          :drafts="drafts"
+          :members="members">
           <template v-slot:preMenu>
             <slot name="preMenu" />
           </template>
@@ -107,6 +106,10 @@ const props = defineProps({
     required: false,
   },
   drafts: {
+    type: Boolean,
+    required: false,
+  },
+  members: {
     type: Boolean,
     required: false,
   },
