@@ -162,30 +162,6 @@
         :disabled="
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         " />
-      <a-checkbox
-        v-if="controlInProgress.type === 'ontology'"
-        class="ml-2 align-center align-self-start"
-        color="grey-darken-1"
-        label="Multiple select"
-        v-model="controlInProgress.options.hasMultipleSelections"
-        :disabled="
-          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
-        " />
-      <a-checkbox
-        v-if="isSelect || isOntology"
-        class="ml-2 align-center align-self-start"
-        color="grey-darken-1"
-        label="Allow custom answer"
-        v-model="controlInProgress.options.allowCustomSelection"
-        @update:modelValue="controlInProgress.defaultValue = null"
-        :disabled="
-          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
-        ">
-        <template v-slot:helper-text>
-          Allows the user to input answers that do not exist within the provided items.
-          <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
-        </template>
-      </a-checkbox>
       <ontology
         v-if="isOntology"
         v-model="controlInProgress.defaultValue"
@@ -211,6 +187,32 @@
 
       <!-- Control options -->
       <a-spacer />
+      <a-checkbox
+        v-if="isOntology"
+        class="align-center align-self-start"
+        color="grey-darken-1"
+        hide-details="auto"
+        label="Multiple select"
+        v-model="controlInProgress.options.hasMultipleSelections"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        " />
+      <a-checkbox
+        v-if="isSelect || isOntology"
+        class="align-center align-self-start"
+        color="grey-darken-1"
+        hide-details="auto"
+        label="Allow custom answer"
+        v-model="controlInProgress.options.allowCustomSelection"
+        @update:modelValue="controlInProgress.defaultValue = null"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        ">
+        <template v-slot:helper-text>
+          Allows the user to input answers that do not exist within the provided items.
+          <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
+        </template>
+      </a-checkbox>
       <a-checkbox
         v-if="hasRequiredOption"
         label="Required"
