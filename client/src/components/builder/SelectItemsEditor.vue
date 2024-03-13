@@ -54,7 +54,7 @@
       <a-card-actions>
         <a-spacer />
         <a-btn variant="text" @click="close">Cancel</a-btn>
-        <a-btn color="primary" @click="save">Save</a-btn>
+        <a-btn color="primary" @click="save" variant="flat">Save</a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>
