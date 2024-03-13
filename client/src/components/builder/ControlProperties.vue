@@ -312,7 +312,7 @@
         class="align-self-end"
         @click="showAdvanced = true"
         small
-        text>
+        variant="text">
         advanced
       </a-btn>
       <div v-else class="extra-options">
@@ -484,12 +484,7 @@
               </template>
 
               <template #append>
-                <a-icon v-bind="props" size="20">
-                  mdi-help-circle-outline
-                  <a-tooltip max-width="400" transition="slide-x-transition" right activator="parent">
-                    Set the number of items in a row
-                  </a-tooltip>
-                </a-icon>
+                <a-icon size="20" tooltip="Set the number of items in a row">mdi-help-circle-outline</a-icon>
               </template>
             </a-select>
           </template>

@@ -1,5 +1,5 @@
 <template>
-  <a-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary-lighten-1" position="fixed" location="bottom">
+  <a-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" position="fixed" location="bottom">
     <a-btn @click="handleClose" icon class="close-button">
       <a-icon>mdi-close</a-icon>
     </a-btn>

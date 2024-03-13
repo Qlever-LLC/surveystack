@@ -1,10 +1,5 @@
 <template>
-  <a-icon small color="red-darken-2" class="ml-1">
-    mdi-asterisk
-    <a-tooltip :top="top || fallback" :right="right" :bottom="bottom" :left="left" activator="parent"
-      >Required</a-tooltip
-    ></a-icon
-  >
+  <a-icon small color="red-darken-2" class="ml-1" tooltip="Required">mdi-asterisk</a-icon>
 </template>
 
 <script>
