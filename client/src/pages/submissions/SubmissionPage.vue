@@ -10,7 +10,7 @@
       <a-progress-circular :size="50" />
     </div>
     <div v-else-if="hasError" class="text-center mt-8">
-      Error Loading Draft Submission or Survey. Click <a @click="$router.back()">here</a> to go back to Survey.
+      {{ errorMessage }} <router-link :to="`/surveys/${$route.params.surveyId}`">Back to survey.</router-link>
     </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
@@ -71,9 +71,11 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import { createSubmissionFromSurvey } from '@/utils/submissions';
+import { createSubmissionFromSurvey, checkAllowedToSubmit, checkAllowedToResubmit } from '@/utils/submissions';
+import { autoSelectActiveGroup } from '@/utils/memberships';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
+import { ARCHIVE_REASONS } from '@/constants';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -92,6 +94,7 @@ export default {
       submitting: false,
       isSubmitted: false,
       hasError: false,
+      errorMessage: '',
       showResubmissionDialog: false,
       apiComposeErrors: [],
       showApiComposeErrors: false,
@@ -170,47 +173,142 @@ export default {
   },
   async created() {
     this.loading = true;
-    const { id } = this.$route.params;
+    const { surveyId } = this.$route.params;
 
     try {
-      this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
+      this.survey = (await api.get(`/surveys/${surveyId}?version=latest`)).data;
     } catch (error) {
-      console.warn('Submission not found', id);
+      this.hasError = true;
+      this.errorMessage = 'Survey not found.';
+      this.loading = false;
+      return;
+    }
+    const isLoginRequired = this.survey.meta.submissions === 'user' || this.survey.meta.submissions === 'group';
+    if (isLoginRequired && !this.$store.getters['auth/isLoggedIn']) {
+      this.$router.push({
+        name: 'auth-login',
+        params: { redirect: this.$route.path, autoJoin: true },
+      });
+      return;
     }
 
-    if (!this.submission) {
-      console.log('Error: submission not found');
+    const surveyResourcesLoaded = this.survey.resources
+      ? this.$store.dispatch('resources/fetchResources', this.survey.resources)
+      : Promise.resolve();
+
+    const user = this.$store.getters['auth/user'];
+    try {
+      await this.$store.dispatch('memberships/getUserMemberships', user._id);
+    } catch (error) {
       this.hasError = true;
+      this.errorMessage = 'Error fetching user memberships. Please refresh to try again.';
       this.loading = false;
       return;
     }
 
-    if (this.submission && this.submission.meta && this.submission.meta.dateSubmitted) {
-      this.showResubmissionDialog = true;
+    const allowedToSubmit = checkAllowedToSubmit(
+      this.survey,
+      this.$store.getters['auth/isLoggedIn'],
+      this.$store.getters['memberships/groups']
+    );
+    if (!allowedToSubmit.allowed) {
+      this.hasError = true;
+      this.errorMessage = allowedToSubmit.message;
+      this.loading = false;
+      return;
     }
 
-    //first fetch latest version to allow cache hit on prefetched pinned survey in offline state
-    this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
-      id: this.submission.meta.survey.id,
-    });
-    //cover edge case of a submission based on an old survey version (leads to error due to cache-miss in offline state)
-    if (this.survey.latestVersion !== this.submission.meta.survey.version) {
-      this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
-        id: this.submission.meta.survey.id,
-        version: this.submission.meta.survey.version,
-      });
+    // If the user is on the new-submission route, initialize a new submission and then redirect to the edit-submission route for that submission
+    if (this.$route.name === 'new-submission') {
+      const { group, submitAsUserId } = this.$route.query;
+      if (group) {
+        // see analysis in https://gitlab.com/our-sci/software/surveystack/-/merge_requests/230#note_1286909610
+        await autoSelectActiveGroup(this.$store, group);
+      }
+
+      const startDraftConfig = { survey: this.survey };
+      if (submitAsUserId) {
+        try {
+          const { data: submitAsUser } = await api.get(`/users/${submitAsUserId}`);
+          startDraftConfig.submitAsUser = submitAsUser;
+        } catch (error) {
+          this.hasError = true;
+          this.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
+          this.loading = false;
+          return;
+        }
+      }
+      const submissionId = await this.$store.dispatch('submissions/startDraft', startDraftConfig);
+      await this.$router.replace({ name: 'edit-submission', params: { surveyId, submissionId } });
     }
+
+    if (this.$route.name === 'edit-submission') {
+      const { submissionId } = this.$route.params;
+      await this.$store.dispatch('submissions/fetchLocalSubmissions');
+      const localSubmission = this.$store.getters['submissions/getSubmission'](submissionId);
+      if (localSubmission) {
+        this.submission = localSubmission;
+      } else {
+        let remoteSubmission;
+        try {
+          remoteSubmission = await this.$store.dispatch('submissions/fetchRemoteSubmission', submissionId);
+        } catch (error) {
+          // Swallow this error for now. This case is handled below where we set a 'Submission not found.' error message if there is no submission.
+        }
+        if (remoteSubmission) {
+          this.submission = remoteSubmission;
+        }
+      }
+      if (!this.submission) {
+        this.hasError = true;
+        this.errorMessage = 'Submission not found.';
+        this.loading = false;
+        return;
+      }
+    }
+
+    const isResubmission = this.submission && this.submission.meta && this.submission.meta.dateSubmitted;
+    if (isResubmission) {
+      const allowedToResubmit = checkAllowedToResubmit(
+        this.submission,
+        this.$store.getters['memberships/memberships'],
+        user._id
+      );
+      if (!allowedToResubmit) {
+        this.hasError = true;
+        this.errorMessage = 'You are not allowed to edit this submission.';
+        this.loading = false;
+        return;
+      }
+
+      const editSubmissionReason = this.$route.query.reason;
+      if (editSubmissionReason && ARCHIVE_REASONS.includes(editSubmissionReason)) {
+        this.submission.meta.archivedReason = editSubmissionReason;
+      } else {
+        this.showResubmissionDialog = true;
+      }
+    }
+
+    if (this.survey.latestVersion !== this.submission.meta.survey.version) {
+      try {
+        this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
+          id: this.submission.meta.survey.id,
+          version: this.submission.meta.survey.version,
+        });
+      } catch (error) {
+        this.hasError = true;
+        this.errorMessage = 'Survey not found.';
+        this.loading = false;
+        return;
+      }
+    }
+
     const cleanSubmission = createSubmissionFromSurvey({
       survey: this.survey,
       version: this.submission.meta.survey.version,
     });
     // initialize data in case anything is missing from data
     defaultsDeep(this.submission.data, cleanSubmission.data);
-
-    if (!this.survey) {
-      console.log('Error: survey not found');
-      this.hasError = true;
-    }
 
     // Set proxy header if resubmit by proxy or admin.
     // Otherwise, remove it
@@ -220,6 +318,7 @@ export default {
       api.removeHeader('x-delegate-to');
     }
 
+    await surveyResourcesLoaded;
     this.loading = false;
   },
   beforeRouteLeave(to, from, next) {

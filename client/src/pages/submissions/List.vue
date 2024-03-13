@@ -55,7 +55,7 @@
             color="secondary"
             class="ml-2"
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
-            @click="startDraft(surveyEntity)">
+            :to="`/surveys/${survey}/submissions/new`">
             <a-icon left>mdi-plus</a-icon>
             New submission
           </a-btn>
@@ -223,8 +223,6 @@
 </template>
 
 <script>
-/* eslint-disable no-unused-vars */
-
 /*
  Note how the submission object to methods like archiveSubmission
  is coming from v-data-table's row and is of the flattened form:
@@ -336,9 +334,9 @@ export default {
   computed: {
     validQuery() {
       try {
-        const match = JSON.parse(this.filter.match);
-        const sort = JSON.parse(this.filter.sort);
-        const project = JSON.parse(this.filter.project);
+        JSON.parse(this.filter.match);
+        JSON.parse(this.filter.sort);
+        JSON.parse(this.filter.project);
       } catch (error) {
         return false;
       }
@@ -497,12 +495,8 @@ export default {
     onSubmissionsSelected(submissions) {
       this.selectedSubmissions = submissions;
     },
-    startDraft(survey) {
-      this.$store.dispatch('submissions/startDraft', { survey });
-    },
-    async resubmit(submission) {
-      await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);
-      this.$router.push(`/submissions/drafts/${submission._id}`);
+    resubmit(submission) {
+      this.$router.push({ name: 'edit-submission', params: { submissionId: submission._id, surveyId: this.survey } });
     },
     async reassign(submissions) {
       this.reassignment.showModal = false;
