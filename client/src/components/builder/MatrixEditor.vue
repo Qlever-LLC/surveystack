@@ -81,6 +81,7 @@
                       item-value="value"
                       dense />
 
+                    <!-- DEFAULT VALUE --->
                     <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
                         <a-select
@@ -105,33 +106,24 @@
                           <a-icon>mdi-pencil</a-icon>
                         </a-btn>
                       </div>
-                      <a-checkbox
-                        v-model="item.multiple"
-                        label="Multi-select"
-                        hide-details
-                        color="grey-darken-1"
-                        class="align-center align-self-start" />
-                      <a-checkbox
-                        v-model="item.custom"
-                        label="Allow custom answer"
-                        hide-details
-                        color="grey-darken-1"
-                        class="align-center align-self-start">
-                        <template v-slot:helper-text>
-                          Allows the user to input answers that do not exist within the provided items.
-                        </template>
-                      </a-checkbox>
+                      <ontology
+                        v-model="item.defaultValue"
+                        :multiple="item.multiple"
+                        :customAnswer="item.custom"
+                        :source="item.resource"
+                        :resources="resources"
+                        dense
+                        class="mt-5" />
                     </div>
-
                     <a-text-field
-                      v-if="item.type === 'text'"
+                      v-else-if="item.type === 'text'"
                       v-model="item.defaultValue"
                       @blur="() => handleDefaultValueTrim(i)"
                       label="Default value"
                       dense
-                      hide-details />
+                      hide-details="auto" />
                     <a-text-field
-                      v-if="item.type === 'number'"
+                      v-else-if="item.type === 'number'"
                       type="number"
                       v-model="item.defaultValue"
                       @blur="() => handleDefaultValueTrimNumber(i)"
@@ -141,23 +133,13 @@
                       :rules="[isValidNumber]"
                       clearable
                       @click:clear="setToNull" />
-                    <ontology
-                      v-if="item.type === 'dropdown'"
-                      v-model="item.defaultValue"
-                      :multiple="item.multiple"
-                      :customAnswer="item.custom"
-                      :source="item.resource"
-                      :resources="resources"
-                      dense
-                      class="mt-5" />
                     <date
-                      v-if="item.type === 'date'"
+                      v-else-if="item.type === 'date'"
                       v-model="item.defaultValue"
                       @blur="handleDefaultValueTrim(i)"
                       type="date"
                       dense />
-
-                    <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
+                    <div v-else-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
                       <a-select
                         dense
                         v-model="item.options.farmOsType"
@@ -167,39 +149,70 @@
                         style="max-width: 10rem" />
                     </div>
 
+                    <div class="mt-5"></div>
+
+                    <!-- MULTIPLE -->
+                    <a-checkbox
+                      v-if="item.type === 'dropdown'"
+                      v-model="item.multiple"
+                      label="Multi-select"
+                      hide-details
+                      color="grey-darken-1"
+                      class="align-center align-self-start" />
+
+                    <!-- ALLOW CUSTOM ANSWER -->
+                    <a-checkbox
+                      v-if="item.type === 'dropdown'"
+                      v-model="item.custom"
+                      label="Allow custom answer"
+                      hide-details
+                      color="grey-darken-1"
+                      class="align-center align-self-start">
+                      <template v-slot:helper-text>
+                        Allows the user to input answers that do not exist within the provided items.
+                      </template>
+                    </a-checkbox>
+
+                    <!-- REQUIRED -->
                     <a-checkbox
                       v-model="item.required"
                       @update:modelValue="$event && $emit('set-control-required')"
                       label="Required"
                       helper-text="Make this a required field"
                       hide-details
-                      class="mt-4 align-center align-self-start"
+                      class="align-center align-self-start"
                       color="grey-darken-1" />
+
+                    <!-- REDACTED -->
                     <a-checkbox
                       v-model="item.redacted"
                       label="Private"
                       helper-text="Visible to submitter and admins only"
-                      class="mt-2 align-center align-self-start"
+                      class="align-center align-self-start"
                       color="grey-darken-1" />
+
+                    <!-- QSL: ALLOW HIDE / HIDDEN -->
                     <a-checkbox
                       v-if="allowSetAllowHide"
                       v-model="item.allowHide"
                       label="Allow hide"
-                      class="mt-2 align-center align-self-start"
+                      class="align-center align-self-start"
                       helper-text="Allow users of this question set to hide this column"
                       color="grey-darken-1" />
                     <a-checkbox
                       v-if="!allowSetAllowHide && item.allowHide"
                       v-model="item.hidden"
                       label="Hidden"
-                      class="mt-2 align-center align-self-start"
+                      class="align-center align-self-start"
                       helper-text="Submitters can not see this column. This option is intentionally allowed by the question set designer"
                       color="grey-darken-1" />
+
+                    <!-- FARMOS FIELD -->
                     <a-checkbox
                       v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
                       v-model="item.multiple"
                       label="Multi-select"
-                      class="mt-2 align-center align-self-start"
+                      class="align-center align-self-start"
                       color="grey-darken-1" />
 
                     <h4 class="mt-6 mb-4">Display Options</h4>

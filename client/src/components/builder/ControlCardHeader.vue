@@ -1,8 +1,7 @@
 <template>
   <a-row class="text-left flex-nowrap flex-grow-0 flex-shrink-1" cssMinWidth0px>
-    <a-icon :color="iconColor" x-large class="ml-3 align-self-center">
+    <a-icon :color="iconColor" x-large class="ml-3 align-self-center" :tooltip="typeName">
       {{ icon }}
-      <a-tooltip bottom activator="parent">{{ typeName }}</a-tooltip>
     </a-icon>
     <a-col class="text-truncate">
       <div class="font-weight-light text-grey-darken-2" style="line-height: 1.5rem">

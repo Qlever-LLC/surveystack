@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
 import Unauthorized from '@/pages/Unauthorized.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
-import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
+import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
 
 import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
@@ -188,9 +188,14 @@ const routes = [
     components: getComponents(SurveysDetail),
   },
   {
-    path: '/submissions/drafts/:id',
-    name: 'submissions-drafts-detail',
-    components: getComponents(DraftSubmission, { header: SubmissionDraftNavbar }),
+    path: '/surveys/:surveyId/submissions/new',
+    name: 'new-submission',
+    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
+  },
+  {
+    path: '/surveys/:surveyId/submissions/:submissionId/edit',
+    name: 'edit-submission',
+    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
   },
   {
     path: '/auth/login',

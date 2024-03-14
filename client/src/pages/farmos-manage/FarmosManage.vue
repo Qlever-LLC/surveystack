@@ -331,7 +331,6 @@ export default {
       delete formated.plan;
       delete formated.instanceName;
       delete formated.instanceNameValid;
-      formated.owner = formated.owner._id;
 
       try {
         const r = await api.post('/farmos/create-instance', formated);

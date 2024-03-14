@@ -3,7 +3,7 @@
     :modelValue="modelValue"
     @update:modelValue="handleInput"
     :timeout="-1"
-    color="primary-lighten-1"
+    color="primary lighten-1"
     position="fixed"
     location="bottom"
     cssIosSnackbar>

@@ -94,8 +94,9 @@
             x-small
             v-if="el.options.hidden"
             @click.stop="$emit('unhide-control', el)"
-            color="grey-lighten-1"
-            style="margin-bottom: -8px">
+            color="grey"
+            class="mb-n6"
+            variant="outlined">
             unhide
           </a-btn>
           <a-btn
@@ -103,8 +104,9 @@
             x-small
             v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
             @click.stop="$emit('hide-control', el)"
-            color="grey-lighten-1"
-            class="mb-4">
+            color="grey"
+            class="mb-n6"
+            variant="outlined">
             hide
           </a-btn>
         </div>

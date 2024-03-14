@@ -29,7 +29,6 @@
         @blur="$emit('blur')"
         @click:clear="setToNull"
         :class="{
-          tFmt3: cssTFmt3,
           minWidth290px: cssminWidth290px,
         }"
         clearable
@@ -64,7 +63,6 @@ import { zonedTimeToUtc } from 'date-fns-tz';
 
 const props = defineProps({
   cssminWidth290px: { type: Boolean, required: false },
-  cssTFmt3: { type: Boolean, required: false },
   modelValue: { type: undefined, required: false },
   color: { type: String, required: false },
   dense: { type: Boolean, required: false },
@@ -175,9 +173,6 @@ const dateFormat = (type, value) => {
 </script>
 
 <style scoped lang="scss">
-.tFmt3 {
-  margin-top: 12px;
-}
 .minWidth290px {
   min-width: 290px;
 }

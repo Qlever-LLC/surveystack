@@ -9,8 +9,7 @@
     :menu-props="{ offsetY: true }"
     :type="type"
     menuMinWidth="auto"
-    readonly
-    cssTFmt3 />
+    readonly />
 </template>
 
 <script>

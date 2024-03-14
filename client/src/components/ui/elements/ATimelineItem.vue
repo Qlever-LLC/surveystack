@@ -1,5 +1,10 @@
 <template>
-  <v-timeline-item :dot-color="dotColor !== '' ? dotColor : 'white'" :hide-dot="hideDot" :icon="icon" :width="width">
+  <v-timeline-item
+    :dot-color="dotColor !== '' ? dotColor : 'white'"
+    :hide-dot="hideDot"
+    :icon="icon"
+    :width="width"
+    icon-color="white">
     <slot />
   </v-timeline-item>
 </template>

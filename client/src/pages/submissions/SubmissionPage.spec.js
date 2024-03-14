@@ -1,10 +1,13 @@
-import { renderWithVuetify, localVue } from '../../../../tests/renderWithVuetify';
-import Draft from './Draft.vue';
-import router from '@/router';
+import { createLocalVue } from '@vue/test-utils';
+import { renderWithVuetify } from '../../../tests/renderWithVuetify';
+import SubmissionPage from './SubmissionPage.vue';
 import { createSurvey } from '@/utils/surveys';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import draftStore from '@/store/modules/draft.store';
 import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
+import api from '@/services/api.service';
+
+jest.mock('@/services/api.service');
 
 function mockSurvey() {
   const survey = {
@@ -20,10 +23,6 @@ function mockSubmission(survey) {
 }
 
 describe('Draft', () => {
-  beforeEach(() => {
-    // disable console.log vor this describe block
-    jest.spyOn(console, 'log').mockImplementation(() => {});
-  });
   it('does not throw for relevance expression when submission data key is missing', async () => {
     const survey = mockSurvey();
     survey.revisions[1].controls[0].name = 'number_1';
@@ -41,16 +40,38 @@ describe('Draft', () => {
       },
     };
 
+    const localVue = createLocalVue();
     localVue.component('AppControlNumber', AppControlNumberStub);
 
-    renderWithVuetify(Draft, {
+    api.get.mockResolvedValue({ data: survey });
+
+    renderWithVuetify(SubmissionPage, {
       localVue,
-      router: router,
+      mocks: {
+        $route: {
+          params: {
+            surveyId: survey._id,
+            submissionId: badSubmission._id,
+          },
+          query: {},
+          path: '',
+          name: 'edit-submission',
+        },
+      },
       store: {
         actions: {
           'submissions/fetchLocalSubmission': jest.fn(() => ({ ...badSubmission })),
-          'appui/reset': jest.fn,
+          'submissions/fetchLocalSubmissions': jest.fn(),
+          'appui/reset': jest.fn(),
           'surveys/fetchSurvey': jest.fn(() => ({ ...survey })),
+          'resources/fetchResources': jest.fn().mockResolvedValue([]),
+          'memberships/getUserMemberships': jest.fn().mockResolvedValue([]),
+        },
+        getters: {
+          'auth/user': () => ({}),
+          'auth/isLoggedIn': () => true,
+          'memberships/groups': () => [],
+          'submissions/getSubmission': () => () => ({ ...badSubmission }),
         },
         modules: { draft: draftStore },
       },

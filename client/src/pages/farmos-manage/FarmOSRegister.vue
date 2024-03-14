@@ -22,7 +22,7 @@
         item-value="_id"
         :rules="[(v) => !!v || `select plan`]" />
 
-      <a-row class="align-baseline">
+      <a-row align="center">
         <a-col>
           <a-text-field
             :disabled="!localViewModel.form.plan"
@@ -50,6 +50,7 @@
             @click="$emit('check-url', localViewModel)"
             color="primary"
             :disabled="!localViewModel.form.plan || localViewModel.loading"
+            class="mt-n6"
             >Check URL</a-btn
           >
         </a-col>
@@ -101,12 +102,12 @@
         label="Owner of the FarmOS Instance"
         variant="outlined"
         :items="localViewModel.users"
-        item-value="id"
+        item-value="_id"
         :item-title="(item) => `${item.name} (${item.email})`"
         v-model="localViewModel.form.owner"
         :rules="[(v) => !!v || `select at least one owner`]" />
 
-      <!-- WARNING: Is not up to date as it is a comment 
+      <!-- WARNING: Is not up to date as it is a comment
         <a-select
         engineering="autocomplete"
         label="Admins with Access to Farm"
