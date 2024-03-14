@@ -29,6 +29,8 @@
 
     <GroupNavigation />
 
+    <SuperAdminNavigation />
+
     <GroupDocsNavigation />
 
     <template v-slot:append>
@@ -41,6 +43,7 @@
 import GroupNavigation from '@/components/groups/GroupNavigation.vue';
 import GroupDocsNavigation from '@/components/groups/GroupDocsNavigation.vue';
 import AppVersion from '@/components/AppVersion.vue';
+import SuperAdminNavigation from '@/components/superAdmin/SuperAdminNavigation.vue';
 
 const props = defineProps({
   fullWidth: {
