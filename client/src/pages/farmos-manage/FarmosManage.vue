@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="bg-white">
     <a-alert
       v-if="successMessage"
       class="mt-4"
