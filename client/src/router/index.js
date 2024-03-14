@@ -35,6 +35,7 @@ import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
 import Browse from '@/pages/surveys/Browse.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
+import LandingPage from '@/pages/LandingPage.vue';
 
 const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
 const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
@@ -48,6 +49,14 @@ const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
 const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
 const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
+
+const guardLanding = async (to, from, next) => {
+  if (!store.getters['auth/isLoggedIn']) {
+    next({ name: 'landing', params: { redirect: to } });
+  } else {
+    next();
+  }
+};
 
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -83,14 +92,6 @@ function getComponents(component, mainComponents = commonComponents) {
 }
 
 const routes = [
-  /*{
-  //TODO in which cases does this appear?
-    path: '/',
-    name: 'home',
-    components: getComponents(Home, {
-      header: AppHeader,
-    }),
-  },*/
   {
     path: '/',
     name: 'home',
@@ -102,6 +103,15 @@ const routes = [
       header: {
         showLogo: true,
       },
+    },
+    beforeEnter: guardLanding,
+  },
+  {
+    path: '/landing',
+    name: 'landing',
+    components: {
+      header: AppHeader,
+      main: LandingPage,
     },
   },
   {
