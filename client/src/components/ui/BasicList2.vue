@@ -3,7 +3,8 @@
     <a-card-title v-if="showTitle" class="text-heading d-flex pa-4">
       <slot name="title" />
       <a-spacer />
-      <a-btn v-if="buttonNew" color="secondary" class="ml-4" :to="buttonNew.link" variant="flat">
+      <!-- TODO set right color -->
+      <a-btn v-if="buttonNew" color="primary" class="ml-4" :to="buttonNew.link" variant="flat">
         <a-icon class="mr-2"> mdi-plus-circle-outline </a-icon>
         {{ buttonNew.title }}
       </a-btn>
@@ -22,7 +23,7 @@
           <a-icon>mdi-24px mdi-tune</a-icon>
         </a-btn>
       </span>
-      <a-list v-if="listCard" dense twoLine class="pt-0">
+      <a-list v-if="listCard && filteredEntities.length > 0" dense twoLine class="pt-0">
         <list-item-card
           v-for="(entity, idx) in filteredEntities"
           :key="entity._id"
@@ -32,7 +33,7 @@
           :groupStyle="groupStyle"
           :menu="menu" />
       </a-list>
-      <a-list v-else>
+      <a-list v-else-if="filteredEntities.length > 0">
         <list-item-row
           v-for="(entity, idx) in filteredEntities"
           :key="entity._id"
@@ -47,6 +48,9 @@
           </template>
         </list-item-row>
       </a-list>
+      <div v-else class="text-grey">
+        <slot name="noValue" />
+      </div>
     </a-card-text>
   </a-card>
 </template>

@@ -12,7 +12,7 @@
       <a-list-item-title>{{ group.name }}</a-list-item-title>
     </a-list-item>
     <a-list-item
-      :to="{ path: '/groups', query: { t: Date.now() } }"
+      :to="{ path: '/groups/all', query: { t: Date.now() } }"
       dense
       prepend-icon="mdi-account-group"
       class="text-white bg-transparent mb-2"

@@ -31,15 +31,15 @@ export const BasicListCard_Survey = {
     enableFav: true,
     buttonNew: { title: 'Create new Survey', link: '/url' },
     menu: [
-      { title: 'Start Survey', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
-      { title: 'Start Survey as Member', icon: 'mdi-open-in-new', action: '/url' },
-      { title: 'Call for Submissions', icon: 'mdi-bullhorn', action: '/url' },
-      { title: 'Edit', icon: 'mdi-pencil', action: '/url' },
-      { title: 'View Survey', icon: 'mdi-file-document', action: '/url' },
-      { title: 'View Results', icon: 'mdi-chart-bar', action: '/url' },
-      { title: 'Copy to new Survey', icon: 'mdi-content-copy', action: '/url' },
-      { title: 'Share', icon: 'mdi-share', action: '/url' },
-      { title: 'Delete', icon: 'mdi-delete', action: '/url', color: 'red' },
+      { title: 'Start Survey', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
+      { title: 'Start Survey as Member', icon: 'mdi-open-in-new', action: () => `/url` },
+      { title: 'Call for Submissions', icon: 'mdi-bullhorn', action: () => `/url` },
+      { title: 'Edit', icon: 'mdi-pencil', action: () => `/url` },
+      { title: 'View Survey', icon: 'mdi-file-document', action: () => `/url` },
+      { title: 'View Results', icon: 'mdi-chart-bar', action: () => `/url` },
+      { title: 'Copy to new Survey', icon: 'mdi-content-copy', action: () => `/url` },
+      { title: 'Share', icon: 'mdi-share', action: () => `/url` },
+      { title: 'Delete', icon: 'mdi-delete', action: () => `/url`, color: 'red' },
     ],
   },
 };
@@ -62,9 +62,9 @@ export const BasicListCard_Scripts = {
     entities: entityType.scripts,
     buttonNew: { title: 'Create new Script', link: '/url' },
     menu: [
-      { title: 'Edit', icon: 'mdi-pencil', action: '/url', color: 'green' },
-      { title: 'View Surveys using this Script', icon: 'mdi-chart-bar', action: '/url' },
-      { title: 'Delete', icon: 'mdi-delete', action: '/url', color: 'red' },
+      { title: 'Edit', icon: 'mdi-pencil', action: () => `/url`, color: 'green' },
+      { title: 'View Surveys using this Script', icon: 'mdi-chart-bar', action: () => `/url` },
+      { title: 'Delete', icon: 'mdi-delete', action: () => `/url`, color: 'red' },
     ],
   },
 };
@@ -87,10 +87,10 @@ export const BasicListCard_QuestionsLibrary = {
     entities: entityType.questionsLibrary,
     buttonNew: { title: 'Create new Question Set', link: '/url' },
     menu: [
-      { title: 'Edit', icon: 'mdi-pencil', action: '/url', color: 'green' },
-      { title: 'View Results', icon: 'mdi-chart-bar', action: '/url' },
-      { title: 'Add to new Survey', icon: 'mdi-content-copy', action: '/url' },
-      { title: 'Delete', icon: 'mdi-delete', action: '/url', color: 'red' },
+      { title: 'Edit', icon: 'mdi-pencil', action: () => `/url`, color: 'green' },
+      { title: 'View Results', icon: 'mdi-chart-bar', action: () => `/url` },
+      { title: 'Add to new Survey', icon: 'mdi-content-copy', action: () => `/url` },
+      { title: 'Delete', icon: 'mdi-delete', action: () => `/url`, color: 'red' },
     ],
   },
 };
@@ -105,7 +105,9 @@ export const BasicListCard_Groups = {
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-compass-outline </a-icon>
         All My Groups
+        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{args.entities.length}} </a-avatar>
       </template>
+      <template v-slot:noValue> No Groups yet </template>
     </basic-list>`,
   }),
   args: {
@@ -114,10 +116,10 @@ export const BasicListCard_Groups = {
     groupStyle: true,
     buttonNew: { title: 'Create a Group', link: '/url' },
     menu: [
-      { title: 'Go to Group', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
-      { title: 'View Survey', icon: 'mdi-file-document', action: '/url' },
-      { title: 'Settings', icon: 'mdi-pencil', action: '/url' },
-      { title: 'Manage Members', icon: 'mdi-account-outline', action: '/url' },
+      { title: 'Go to Group', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
+      { title: 'View Survey', icon: 'mdi-file-document', action: () => `/url` },
+      { title: 'Settings', icon: 'mdi-pencil', action: () => `/url` },
+      { title: 'Manage Members', icon: 'mdi-account-outline', action: () => `/url` },
     ],
   },
 };
@@ -140,10 +142,10 @@ export const BasicListRow_Submissions = {
     entities: entityType.submissions,
     submissions: true,
     menu: [
-      { title: 'todo', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
-      { title: 'todo', icon: 'mdi-file-document', action: '/url' },
-      { title: 'todo', icon: 'mdi-pencil', action: '/url' },
-      { title: 'todo', icon: 'mdi-account-outline', action: '/url' },
+      { title: 'todo', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
+      { title: 'todo', icon: 'mdi-file-document', action: () => `/url` },
+      { title: 'todo', icon: 'mdi-pencil', action: () => `/url` },
+      { title: 'todo', icon: 'mdi-account-outline', action: () => `/url` },
     ],
   },
 };
@@ -169,10 +171,10 @@ export const BasicListRow_Drafts = {
     entities: entityType.drafts,
     drafts: true,
     menu: [
-      { title: 'todo', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
-      { title: 'todo', icon: 'mdi-file-document', action: '/url' },
-      { title: 'todo', icon: 'mdi-pencil', action: '/url' },
-      { title: 'todo', icon: 'mdi-account-outline', action: '/url' },
+      { title: 'todo', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
+      { title: 'todo', icon: 'mdi-file-document', action: () => `/url` },
+      { title: 'todo', icon: 'mdi-pencil', action: () => `/url` },
+      { title: 'todo', icon: 'mdi-account-outline', action: () => `/url` },
     ],
   },
 };
@@ -191,10 +193,10 @@ export const BasicListRow_Results = {
     entities: entityType.results,
     showTitle: false,
     menu: [
-      { title: 'todo', icon: 'mdi-open-in-new', action: '/url', color: 'green' },
-      { title: 'todo', icon: 'mdi-file-document', action: '/url' },
-      { title: 'todo', icon: 'mdi-pencil', action: '/url' },
-      { title: 'todo', icon: 'mdi-account-outline', action: '/url' },
+      { title: 'todo', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
+      { title: 'todo', icon: 'mdi-file-document', action: () => `/url` },
+      { title: 'todo', icon: 'mdi-pencil', action: () => `/url` },
+      { title: 'todo', icon: 'mdi-account-outline', action: () => `/url` },
     ],
   },
 };

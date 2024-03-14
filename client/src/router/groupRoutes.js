@@ -45,7 +45,7 @@ export default [
     },
   },
   {
-    path: '/groups',
+    path: '/groups/all',
     name: 'groups-list',
     components: {
       header: AppHeader,

@@ -103,7 +103,9 @@ export default {
     },
     async getSubgroups() {
       try {
-        const { data } = await api.get(`/groups?showArchived=${this.showArchivedSubgroups}&dir=${this.entity.path}`);
+        const { data } = await api.get(
+          `/groups/all?showArchived=${this.showArchivedSubgroups}&dir=${this.entity.path}`
+        );
         this.subgroups = data;
       } catch (e) {
         this.status.code = e.response.status;

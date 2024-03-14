@@ -9,7 +9,7 @@
     class="pt-4 pr-4">
     <a-list dense class="px-4">
       <a-list-item
-        :to="{ path: '/groups', query: { t: Date.now() } }"
+        :to="{ path: '/groups/all', query: { t: Date.now() } }"
         dense
         prepend-icon="mdi-compass-outline"
         class="text-white bg-primary mb-2"

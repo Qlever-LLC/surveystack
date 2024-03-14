@@ -40,7 +40,7 @@
             :key="idx"
             class="d-flex align-center justify-end"
             :style="getTextColor(itemMenu)"
-            :to="itemMenu.action"
+            :to="itemMenu.action(entity)"
             dense>
             {{ itemMenu.title }}
             <a-icon class="ml-2"> {{ itemMenu.icon }} </a-icon>

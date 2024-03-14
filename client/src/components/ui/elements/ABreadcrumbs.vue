@@ -49,7 +49,7 @@ export default {
       });
 
       links[0] = {
-        to: '/groups',
+        to: '/groups/all',
         exact: true,
         title: 'groups',
       };

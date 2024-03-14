@@ -67,7 +67,7 @@ router.get('/auth/enter-with-magic-link', catchErrors(authController.enterWithMa
 router.get('/auth/invalidate-magic-link', catchErrors(authController.invalidateMagicLink));
 
 /** Group */
-router.get('/groups', catchErrors(groupController.getGroups));
+router.get('/groups/all', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));

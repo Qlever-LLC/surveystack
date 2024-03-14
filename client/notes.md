@@ -3,89 +3,85 @@
 ### Auth Routes
 
 - Login page
-	/auth/login
+  /auth/login
 - Sign-up page
-	/auth/sign-up
+  /auth/sign-up
 
 ### Account Routes
 
-- Invite view: 
-	/invites/:invite_id
-- Create Invite 
-	<!-- /invites/new?groupID=:id -->
-	/groups/:id/invites/new
+- Invite view:
+  /invites/:invite_id
+- Create Invite
+  <!-- /invites/new?groupID=:id -->
+  /groups/:id/invites/new
 - View Invites
-	/groups/:group_id/invites
-- User Account page: 
-	/users/:account_id
+  /groups/:group_id/invites
+- User Account page:
+  /users/:account_id
 
 ### Collect Routes
 
-- Survey Definition Explorer (root): 
-	/surveys 
+- Survey Definition Explorer (root):
+  /surveys
 - User's Survey Definition Explorer:
-	<!-- /surveys/browse -->
-	/my-surveys/browse
+  <!-- /surveys/browse -->
+  /my-surveys/browse
 - User's Draft/Outgoing/Sent Surveys:
-	<!-- /surveys/my-surveys -->
-	/my-submissions
-	/my-submissions/drafts
-	/my-submissions/outgoing
-	/my-submissions/sent
+  <!-- /surveys/my-surveys -->
+  /my-submissions
+  /my-submissions/drafts
+  /my-submissions/outgoing
+  /my-submissions/sent
 - View Survey definition (should have some stats about survey, list of questions, hyperlink to start new survey result for definition, hyperlink to edit in Builder)
-	<!-- /surveys/collect/:definition_id -->
-	<!-- /surveys/:definition_id/collect -->
-	/surveys/:definition_id
-	<!-- /surveys/:definition_id/edit -->
+  <!-- /surveys/collect/:definition_id -->
+  <!-- /surveys/:definition_id/collect -->
+  /surveys/:definition_id
+  <!-- /surveys/:definition_id/edit -->
 - Select a Survey Definition to create a new Result for
-	/submissions/new
+  /submissions/new
 - View Survey Result Instance overview (can be new, draft, completed/ready for review, or finished/submitted)
-	/submissions/:result_id
+  /submissions/:result_id
 - Answer Survey Result (fill out questions, continue in survey result)
-	/submissions/:result_id/edit
-
-
+  /submissions/:result_id/edit
 
 ### Builder Routes
 
 - Create a new Survey Definition
-	/surveys/new
-	<!-- /builder/new -->
+/surveys/new
+<!-- /builder/new -->
 - Edit a Survey Definition
-	/surveys/:def_id/edit
-	/surveys/:def_id/preview
-	/surveys/:def_id/preview/collect
-	/surveys/:def_id/preview/submissions
-
+  /surveys/:def_id/edit
+  /surveys/:def_id/preview
+  /surveys/:def_id/preview/collect
+  /surveys/:def_id/preview/submissions
 
 ### Group Routes
 
 - List all groups / Explore Groups
-	/groups
+  /groups/all
 - Show Group under path
-	<!-- /groups/:path/to/group/ -->
-	/groups/:id
+  <!-- /groups/:path/to/group/ -->
+  /groups/:id
 - Create new Group
-	/groups/new
-	/groups/new?path=:path
+  /groups/new
+  /groups/new?path=:path
 - Edit group
-	/groups/:id/edit
+  /groups/:id/edit
 - Edit group members
-	/groups/:id/edit/members
+  /groups/:id/edit/members
 - Group pretty links
-	/g/
-	/g/:path/to/group
-
+  /g/
+  /g/:path/to/group
 
 ### Dashboard Routes
 
 - Explore dashboards
-	/dashboards/explore
+  /dashboards/explore
 - List of user's Dashboards (for group, or pinned by user)
-	/my-dashboards/
+  /my-dashboards/
 - Create new Dashboard
-	/dashboards/new
+  /dashboards/new
 - View Dashboard
-	/dashboards/:id
+  /dashboards/:id
 - Edit Dashboard
-	/dashboards/:id/edit
+  /dashboards/:id/edit

@@ -1,6 +1,7 @@
 <template>
   <a-hover v-slot="{ isHovering, props }">
     <a-list-item
+      :to="menu[0].action(entity)"
       v-bind="props"
       :style="state.groupStyle"
       :elevation="isHovering ? 6 : 2"
@@ -14,7 +15,8 @@
             <a-icon v-if="!state.favorite[idx] && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>
           <span v-if="groupStyle">
-            <a-avatar class="mr-3" color="secondary" rounded="lg" size="35"> {{ state.avatarName }} </a-avatar></span
+            <!-- TODO set right color -->
+            <a-avatar class="mr-3" color="primary" rounded="lg" size="35"> {{ state.avatarName }} </a-avatar></span
           >
           {{ state.entity.name }}
         </a-list-item-title>
@@ -22,7 +24,7 @@
       </span>
       <a-menu location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
-          <a-icon v-bind="props">mdi-dots-horizontal</a-icon>
+          <a-icon v-bind="props" @click.prevent>mdi-dots-horizontal</a-icon>
         </template>
         <a-list dense class="py-0">
           <a-list-item
@@ -30,7 +32,7 @@
             :key="idx"
             class="d-flex align-center justify-end"
             :style="getTextColor(itemMenu)"
-            :to="itemMenu.action"
+            :to="itemMenu.action(entity)"
             dense>
             {{ itemMenu.title }}
             <a-icon class="ml-2"> {{ itemMenu.icon }} </a-icon>

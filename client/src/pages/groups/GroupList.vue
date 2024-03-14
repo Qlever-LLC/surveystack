@@ -3,28 +3,32 @@
     <div class="d-flex justify-end">
       <a-checkbox v-model="showArchived" label="View archived" dense hide-details />
     </div>
-    <app-basic-list
-      editable
-      class="mt-3"
+    <basic-list
+      listCard
       :entities="entities"
-      title="Groups"
-      :link="(e) => `/g${e.path}`"
-      :linkNew="{ name: 'groups-new', query: { dir: rootDir } }">
-      <template v-slot:entity="{ entity }">
-        <a-list-item-title>{{ entity.name }}</a-list-item-title>
-        <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
+      groupStyle
+      :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir } } }"
+      :menu="[
+        { title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/g${e.path}`, color: 'green' },
+        { title: `See Group's Surveys`, icon: 'mdi-file-document', action: (e) => `/groups/${e._id}/surveys` },
+      ]">
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-compass-outline </a-icon>
+        Find a group
+        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ entities.length }} </a-avatar>
       </template>
-    </app-basic-list>
+      <template v-slot:noValue> No Groups available </template>
+    </basic-list>
   </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
-import appBasicList from '@/components/ui/BasicList.vue';
+import BasicList from '@/components/ui/BasicList2.vue';
 
 export default {
   components: {
-    appBasicList,
+    BasicList,
   },
   data() {
     return {
@@ -36,12 +40,12 @@ export default {
     async fetchEntities() {
       if (this.isWhitelabel) {
         const { path } = this.whitelabelPartner;
-        const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=${path}`);
+        const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}&prefix=${path}`);
         this.entities = entities;
         return;
       }
 
-      const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}`);
+      const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}`);
       this.entities = entities;
     },
   },
