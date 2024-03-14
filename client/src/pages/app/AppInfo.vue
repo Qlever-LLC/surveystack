@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <h1>App Info</h1>
+    <h1>Welcome to SurveyStack</h1>
     <p>
       Current commit: <strong>{{ lcl.shortHash }}</strong>
     </p>
