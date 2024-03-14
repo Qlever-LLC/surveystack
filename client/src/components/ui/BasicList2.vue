@@ -3,9 +3,9 @@
     <a-card-title v-if="showTitle" class="text-heading d-flex pa-4">
       <slot name="title" />
       <a-spacer />
-      <a-btn v-if="textButtonNew" color="secondary" class="ml-4" :to="linkNew" variant="flat">
+      <a-btn v-if="buttonNew" color="secondary" class="ml-4" :to="buttonNew.link" variant="flat">
         <a-icon class="mr-2"> mdi-plus-circle-outline </a-icon>
-        {{ textButtonNew }}
+        {{ buttonNew.title }}
       </a-btn>
     </a-card-title>
     <a-card-text>
@@ -30,8 +30,22 @@
           :idx="String(idx)"
           :enableFav="enableFav"
           :groupStyle="groupStyle"
-          :menu="menu">
-        </list-item-card>
+          :menu="menu" />
+      </a-list>
+      <a-list v-else>
+        <list-item-row
+          v-for="(entity, idx) in filteredEntities"
+          :key="entity._id"
+          :entity="entity"
+          :idx="String(idx)"
+          :menu="menu"
+          :submissions="submissions"
+          :drafts="drafts"
+          :members="members">
+          <template v-slot:preMenu>
+            <slot name="preMenu" />
+          </template>
+        </list-item-row>
       </a-list>
     </a-card-text>
   </a-card>
@@ -44,6 +58,7 @@ import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 
 import ListItemCard from './ListItemCard.vue';
+import ListItemRow from './ListItemRow.vue';
 
 const props = defineProps({
   loading: {
@@ -70,12 +85,9 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  textButtonNew: {
-    type: String,
+  buttonNew: {
+    type: Object,
     required: false,
-  },
-  linkNew: {
-    type: [String, Object],
   },
   menu: {
     type: Array,
@@ -88,6 +100,18 @@ const props = defineProps({
   showSearch: {
     type: Boolean,
     default: true,
+  },
+  submissions: {
+    type: Boolean,
+    required: false,
+  },
+  drafts: {
+    type: Boolean,
+    required: false,
+  },
+  members: {
+    type: Boolean,
+    required: false,
   },
   filter: {
     type: Function,
@@ -125,7 +149,13 @@ function defaultFilter() {
   if (!state.searchValue) {
     return entities.value;
   }
-  return entities.value.filter((entity) => entity.name.toLowerCase().indexOf(state.searchValue.toLowerCase()) > -1);
+  if (entities.value[0].name) {
+    return entities.value.filter((entity) => entity.name.toLowerCase().indexOf(state.searchValue.toLowerCase()) > -1);
+  } else if (entities.value[0].meta.survey.name) {
+    return entities.value.filter(
+      (entity) => entity.meta.survey.name.toLowerCase().indexOf(state.searchValue.toLowerCase()) > -1
+    );
+  }
 }
 </script>
 
