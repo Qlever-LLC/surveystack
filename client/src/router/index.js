@@ -40,10 +40,6 @@ import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
 
-// integrations
-const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
-const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
-
 import Navbar from '@/components/Navbar.vue';
 import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
 
@@ -281,27 +277,6 @@ const routes = [
     path: '/scripts/:id',
     name: 'scripts-detail',
     components: getComponents(Script),
-  },
-  // integrations
-  {
-    path: '/group-integrations/new',
-    name: 'group-integrations-new',
-    components: getComponents(GroupIntegrationEdit),
-  },
-  {
-    path: '/group-integrations/:id/edit',
-    name: 'group-integrations-edit',
-    components: getComponents(GroupIntegrationEdit),
-  },
-  {
-    path: '/membership-integrations/new',
-    name: 'membership-integrations-new',
-    components: getComponents(MembershipIntegrationEdit),
-  },
-  {
-    path: '/membership-integrations/:id/edit',
-    name: 'membership-integrations-edit',
-    components: getComponents(MembershipIntegrationEdit),
   },
   // memberships
   {

@@ -275,9 +275,6 @@ const deleteMembership = (hook) => async (req, res, _) => {
     const deleteResult = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, deleteResult.deletedCount);
 
-    // delete associated integrations
-    await db.collection('integrations.memberships').deleteMany({ membership: new ObjectId(id) });
-
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });

@@ -140,7 +140,6 @@ export default {
         meta: {},
       },
       groupDetail: null,
-      integrations: [],
       dialogRemoval: false,
       dialogSent: false,
       initialInvitationEmail: null,
@@ -214,9 +213,6 @@ export default {
 
       const { data: groupDetail } = await api.get(`/groups/${this.entity.group}`);
       this.groupDetail = groupDetail;
-
-      const { data: integrations } = await api.get(`/membership-integrations?membership=${id}`);
-      this.integrations = integrations;
     } catch (e) {
       console.log('something went wrong:', e);
     }

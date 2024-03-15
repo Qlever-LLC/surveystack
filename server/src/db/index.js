@@ -12,7 +12,7 @@ let mongoClient = null;
 
 export const COLL_ACCESS_CODES = 'users.accesscodes';
 export const COLL_USERS = 'users';
-export const COLL_GROUPS_HYLO_MAPPINGS = 'groups.hylo-mappings'; // TODO rename to prural?
+export const COLL_GROUPS_HYLO_MAPPINGS = 'groups.hylo-mappings';
 
 /**
  * https://stackoverflow.com/a/33780894
