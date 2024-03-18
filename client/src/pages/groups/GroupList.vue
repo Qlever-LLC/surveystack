@@ -1,8 +1,5 @@
 <template>
   <a-container>
-    <div class="d-flex justify-end">
-      <a-checkbox v-model="showArchived" label="View archived" dense hide-details />
-    </div>
     <basic-list
       listCard
       :entities="entities"
@@ -16,6 +13,9 @@
         <a-icon class="mr-2"> mdi-compass-outline </a-icon>
         Find a group
         <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ entities.length }} </a-avatar>
+      </template>
+      <template v-slot:filter>
+        <a-checkbox v-model="showArchived" label="View archived" dense hide-details color="primary" />
       </template>
       <template v-slot:noValue> No Groups available </template>
     </basic-list>

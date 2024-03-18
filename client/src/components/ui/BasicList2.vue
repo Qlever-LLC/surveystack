@@ -20,10 +20,18 @@
           prependInnerIcon="mdi-magnify"
           rounded="lg"
           variant="solo-filled" />
-        <a-btn class="ml-6" color="accent-lighten-8-no bg-transparent" style="height: 40px">
-          <a-icon>mdi-24px mdi-tune</a-icon>
+        <a-btn
+          class="ml-6"
+          :color="state.showFilter ? 'primary' : 'accent-lighten-8-no bg-transparent'"
+          @click="state.showFilter = !state.showFilter"
+          style="height: 40px">
+          <a-icon v-if="state.showFilter">mdi-24px mdi-close</a-icon>
+          <a-icon v-else>mdi-24px mdi-tune</a-icon>
         </a-btn>
       </span>
+      <div v-if="state.showFilter" class="mt-n4 mb-6">
+        <slot name="filter" />
+      </div>
       <a-list v-if="listCard && filteredEntities.length > 0" dense twoLine class="pt-0">
         <list-item-card
           v-for="(entity, idx) in filteredEntities"
@@ -125,6 +133,7 @@ const props = defineProps({
 
 const state = reactive({
   searchValue: '',
+  showFilter: false,
 });
 
 const entities = computed(() => {
