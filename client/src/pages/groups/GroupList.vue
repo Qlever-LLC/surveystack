@@ -12,7 +12,7 @@
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-compass-outline </a-icon>
         Find a group
-        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ entities.length }} </a-avatar>
+        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ entities.length }} </a-chip>
       </template>
       <template v-slot:filter>
         <a-checkbox v-model="showArchived" label="View archived" dense hide-details color="primary" />
@@ -25,9 +25,11 @@
 <script>
 import api from '@/services/api.service';
 import BasicList from '@/components/ui/BasicList2.vue';
+import AppNavigationControl from '@/components/AppNavigationControl.vue';
 
 export default {
   components: {
+    AppNavigationControl,
     BasicList,
   },
   data() {

@@ -8,24 +8,6 @@
 
     <a-main v-if="state.showMain">
       <app-global-feedback />
-      <div class="ml-6">
-        <a-btn
-          v-if="mobile && state.showMain"
-          icon
-          @click="state.forceMobileFullscreen = false"
-          color="white"
-          variant="flat">
-          <a-icon icon="mdi-arrow-left" />
-        </a-btn>
-        <a-btn
-          v-else
-          icon
-          color="white"
-          variant="flat"
-          @click="state.forceDesktopFullscreen = !state.forceDesktopFullscreen">
-          <a-icon :icon="state.forceDesktopFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" />
-        </a-btn>
-      </div>
       <router-view name="main" :key="$route.fullPath" />
     </a-main>
     <install-banner />
@@ -43,30 +25,30 @@ import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
 import { useDisplay } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
+import { useNavigation } from '@/components/navigation';
 
 const store = useStore();
 const router = useRouter();
 const route = useRoute();
 const { mobile } = useDisplay();
+const { forceDesktopFullscreen, forceMobileFullscreen } = useNavigation();
 
 const state = reactive({
-  forceDesktopFullscreen: false,
-  forceMobileFullscreen: true,
   fullscreen: computed(() => {
     if (!state?.routeHasMain) {
       //no main section, fullscreen not available
       return false;
     } else {
       if (mobile.value) {
-        return state?.forceMobileFullscreen;
+        return forceMobileFullscreen.value;
       } else {
-        return state?.forceDesktopFullscreen;
+        return forceDesktopFullscreen.value;
       }
     }
   }),
   showHeader: computed(() => state?.routeHasHeader && !state?.fullscreen),
   showNav: computed(() => state?.routeHasHeader && !state?.fullscreen),
-  showMain: computed(() => state?.routeHasMain && (!mobile.value || state.forceMobileFullscreen)),
+  showMain: computed(() => state?.routeHasMain && (!mobile.value || forceMobileFullscreen.value)),
   routeHasHeader: computed(() => {
     return !!route?.matched?.[0]?.components?.header;
   }),
@@ -101,8 +83,8 @@ onMounted(async () => {
 watch(
   () => route,
   () => {
-    state.forceDesktopFullscreen = false;
-    state.forceMobileFullscreen = true;
+    forceDesktopFullscreen.value = false;
+    forceMobileFullscreen.value = true;
   },
   { deep: true }
 );
