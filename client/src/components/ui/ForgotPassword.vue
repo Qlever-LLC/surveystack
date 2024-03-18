@@ -12,9 +12,7 @@
       </a-form>
       <div class="text-center text-muted mt-5">
         <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">Back to login</router-link>
-        <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button"
-          >Back to login</a
-        >
+        <a v-else @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">Back to login</a>
       </div>
       <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" variant="text" :type="status.type">{{
         status.message

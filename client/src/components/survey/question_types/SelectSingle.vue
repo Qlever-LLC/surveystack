@@ -19,7 +19,6 @@
         @update:modelValue="onChange"
         v-if="sourceIsValid"
         class="mt-0"
-        data-test-id="radio-group"
         hide-details>
         <a-radio
           v-for="(item, index) in filteredSource"
@@ -32,7 +31,6 @@
           v-if="control.options.allowCustomSelection"
           class="mt-1 custom-input-radio"
           @change="customSelection = customSelection || 'other'"
-          data-test-id="custom-input-radio"
           color="focus"
           labelSlot>
           <template v-slot:label>
@@ -40,7 +38,7 @@
               class="text-field-other flex-fill"
               :modelValue="customSelection"
               @update:modelValue="handleCustomSelectionInput"
-              data-test-id="custom-input"
+              data-testid="custom-input"
               hide-details
               variant="outlined"
               dense

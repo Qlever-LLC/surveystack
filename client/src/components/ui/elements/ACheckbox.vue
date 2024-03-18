@@ -60,7 +60,7 @@ export default {
       required: false,
     },
     hideDetails: {
-      type: Boolean,
+      type: [Boolean, String],
       default: true, //yes, we usually want to hide details as there's no validation
     },
     label: {

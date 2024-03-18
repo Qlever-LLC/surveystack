@@ -1,6 +1,6 @@
 <template>
   <div class="speed-dial-container">
-    <a-btn @click="toggleSpeedDial" color="primary" fab class="speed-dial-btn">
+    <a-btn @click="toggleSpeedDial" color="primary" fab class="speed-dial-btn" data-testid="control-adder-open">
       <a-icon x-large>{{ speedDialOpen ? 'mdi-close' : 'mdi-plus' }}</a-icon>
     </a-btn>
 
@@ -92,8 +92,7 @@ export default {
       return availableControls.filter(
         (c) =>
           c.type !== 'group' &&
-          c.type !== 'library' &&
-          (this.$store.getters['toggle/isOn']['feature_resource'] || c.type !== 'file' || c.type !== 'image')
+          c.type !== 'library'
       );
     },
   },
