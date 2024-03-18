@@ -4,9 +4,9 @@
       :to="menu[0].action(entity)"
       v-bind="props"
       :style="state.groupStyle"
-      :elevation="isHovering ? 6 : 2"
+      :elevation="isHovering ? 2 : 0"
       dense
-      class="py-2 mb-2"
+      class="py-2 mb-2 bg-white"
       rounded="lg">
       <span>
         <a-list-item-title class="d-flex align-center">
@@ -15,8 +15,9 @@
             <a-icon v-if="!state.favorite[idx] && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>
           <span v-if="groupStyle">
-            <!-- TODO set right color -->
-            <a-avatar class="mr-3" color="primary" rounded="lg" size="35"> {{ state.avatarName }} </a-avatar></span
+            <a-avatar class="mr-3" color="accent-lighten-2" rounded="lg" size="35">
+              {{ state.avatarName }}
+            </a-avatar></span
           >
           {{ state.entity.name }}
         </a-list-item-title>

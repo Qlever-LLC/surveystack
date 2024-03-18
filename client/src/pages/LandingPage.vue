@@ -1,7 +1,7 @@
 <template>
   <a-container class="home align-center" fluid>
     <div class="d-flex flex-wrap justify-center align-center row">
-      <a-card color="accent" class="col ma-6 pa-6 align-center" style="max-width: 300px">
+      <a-card color="accent-lighten-1" class="col ma-6 pa-6 align-center" style="max-width: 300px">
         <div class="text-center">
           <a-icon icon="mdi-plus-circle-outline" size="100" />
         </div>
@@ -17,7 +17,7 @@
         </a-card-text>
       </a-card>
 
-      <a-card color="accent" class="col ma-6 pa-6" style="max-width: 300px">
+      <a-card color="accent-lighten-1" class="col ma-6 pa-6" style="max-width: 300px">
         <div class="text-center">
           <a-icon icon="mdi-compass-outline" size="100" />
         </div>
@@ -32,7 +32,7 @@
         </a-card-text>
       </a-card>
 
-      <a-card color="accent" class="col ma-6 pa-6">
+      <a-card color="accent-lighten-1" class="col ma-6 pa-6">
         <div class="text-center">
           <a-icon icon="mdi-login" size="100" />
         </div>

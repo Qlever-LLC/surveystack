@@ -8,12 +8,12 @@ const light = {
   colors: {
     primary: '#006CD0', //as defined in brand guide
     secondary: '#014D4E',
-    accent: '#1F803E', //as defined in brand guide
+    accent: '#225034', //as defined in brand guide
     error: '#D3400B', //as defined in brand guide
     warning: '#F1B711', //as defined in brand guide
     info: '#82AF9C',
     success: '#8bc34a',
-    background: '#d9d9d9',
+    background: '#EBEBEB', //background: linear-gradient(179.97deg, #F5F5F5 0.03%, #EBEBEB 61.81%);
     heading: '#212121',
     focus: '#0E87CC',
   },
@@ -24,7 +24,7 @@ const dark = {
   colors: {
     primary: '#006CD0', //as defined in brand guide
     secondary: '#014D4E',
-    accent: '#1F803E', //as defined in brand guide
+    accent: '#225034', //as defined in brand guide
     error: '#D3400B', //as defined in brand guide
     warning: '#F1B711', //as defined in brand guide
     info: '#82AF9C',
@@ -44,6 +44,11 @@ const vuetify = createVuetify({
     themes: {
       light,
       dark,
+    },
+    variations: {
+      colors: ['accent'],
+      lighten: 2, //add two lighten variants
+      darken: 2, //add two darken variants
     },
   },
 });

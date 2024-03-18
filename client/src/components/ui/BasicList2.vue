@@ -1,5 +1,5 @@
 <template>
-  <a-card :loading="loading">
+  <a-card :loading="loading" color="background">
     <a-card-title v-if="showTitle" class="text-heading d-flex pa-4">
       <slot name="title" />
       <a-spacer />
