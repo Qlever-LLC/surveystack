@@ -263,9 +263,8 @@ deploy to review 1:
     - build container
     - lint client
     - lint server
-    # TODO: add this job dependency back before merging
-    # - test client
-    # - test server
+    - test client
+    - test server
 
 build client:
   extends: .pull-cache-only
