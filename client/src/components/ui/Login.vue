@@ -38,7 +38,6 @@
               >
               <a
                 v-else
-                text
                 @click.stop="$emit('updateActive', 'forgot-password')"
                 class="white-space-nowrap font-weight-medium mr-4"
                 role="button"
@@ -211,7 +210,7 @@ export default {
           this.signInLinkSent = true;
           this.status = '';
         } catch (e) {
-          this.status = get(e, 'response.data.message') || 'An error occured, please try again later.';
+          this.status = get(e, 'response.data.message') || 'An error occurred, please try again later.';
         }
         return;
       }
@@ -235,7 +234,7 @@ export default {
             this.status = 'Invalid email or password'; //error.response.data.message;
             break;
           default:
-            this.status = 'An error occured'; //'Unknown error :/';
+            this.status = 'An error occurred'; //'Unknown error :/';
         }
         return;
       }

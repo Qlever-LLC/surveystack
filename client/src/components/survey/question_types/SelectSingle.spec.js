@@ -1,6 +1,6 @@
-import { mount, shallowMount } from '@vue/test-utils';
+import userEvent from '@testing-library/user-event';
 import SelectSingle, { getNextValue } from './SelectSingle.vue';
-import { localVue } from '@/../tests/renderWithVuetify';
+import { mountWithVuetify, renderWithVuetify } from '../../../../tests/renderWithVuetify';
 
 const selectSource = [
   {
@@ -20,10 +20,10 @@ const selectSource = [
 function getMountOpts(opts = {}) {
   const options = {
     allowCustomSelection: opts.allowCustomSelection || false,
-    value: opts.value || null,
+    modelValue: opts.modelValue || null,
   };
   return {
-    propsData: {
+    props: {
       control: {
         hint: '',
         id: '1',
@@ -35,58 +35,47 @@ function getMountOpts(opts = {}) {
           type: 'selectSingle',
         },
       },
-      value: options.value,
+      modelValue: options.modelValue,
       index: 'data.multiple_choice_1',
     },
-    localVue,
   };
 }
 
 describe('SelectSingle question', () => {
-  it('sets value as array', () => {
-    const wrapper = mount(SelectSingle, getMountOpts());
-    const radios = wrapper.findAll('[role="radio"]');
-    radios.at(0).setChecked();
-    expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
+  it('selects option on user click', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = renderWithVuetify(SelectSingle, getMountOpts());
+    const radio = getByRole('radio', { name: 'Dog' });
+    expect(radio).not.toBeChecked();
+
+    await user.click(radio);
+
+    expect(radio).toBeChecked();
   });
 
-  it('sets custom input value as array', () => {
-    const wrapper = mount(SelectSingle, getMountOpts({ allowCustomSelection: true }));
-    const customInput = wrapper.find('[data-test-id="custom-input"]');
+  it('sets custom input value as array', async () => {
+    const wrapper = mountWithVuetify(SelectSingle, getMountOpts({ allowCustomSelection: true }));
+    const customInput = wrapper.find('[data-testid="custom-input"] input');
     customInput.setValue('custom input');
-    // Apparently this doesn't matter?
-    // await wrapper.vm.$nextTick();
-    expect(wrapper.emitted().changed[0][0]).toEqual(['custom input']);
+    expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual(['custom input']);
   });
 
   it('sets active radio button based on value as array', () => {
-    const wrapper = shallowMount(SelectSingle, getMountOpts({ value: ['dog'] }));
-    const radioGroup = wrapper.find('[data-test-id="radio-group"]');
-    expect(radioGroup.vm.value).toBe('dog');
+    const { getByRole } = renderWithVuetify(SelectSingle, getMountOpts({ modelValue: ['dog'] }));
+    const dogRadio = getByRole('radio', { name: 'Dog' });
+    expect(dogRadio).toBeChecked();
   });
 
-  it('sets custom selection radio button as active for custom value', () => {
-    const wrapper = shallowMount(
+  it('when custom value is specified, sets custom selection radio button as active and populates text box with value', () => {
+    const { getByRole } = renderWithVuetify(
       SelectSingle,
-      getMountOpts({
-        value: ['custom'],
-        allowCustomSelection: true,
-      })
+      getMountOpts({ modelValue: ['custom'], allowCustomSelection: true })
     );
-    const customInputRadio = wrapper.find('[data-test-id="custom-input-radio"]');
-    expect(customInputRadio.vm.value).toBe('custom');
-  });
-
-  it('sets custom selection text input for custom value', () => {
-    const wrapper = mount(
-      SelectSingle,
-      getMountOpts({
-        value: ['custom'],
-        allowCustomSelection: true,
-      })
-    );
-    const customInput = wrapper.find('[data-test-id="custom-input"]');
-    expect(customInput.element.value).toBe('custom');
+    const customRadio = getByRole('radio', { name: 'other custom' });
+    const customTextBox = getByRole('textbox');
+  
+    expect(customTextBox).toHaveValue('custom');
+    expect(customRadio).toBeChecked();
   });
 
   it('getNextValue returns array for string value', () => {

@@ -1,4 +1,4 @@
-const esModules = ['ol', 'monaco-editor', '@farmos.org', '@our-sci/farmos-map'].join('|');
+const esModules = ['ol', '@farmos.org', '@our-sci/farmos-map', 'splitpanes'].join('|');
 
 module.exports = {
   preset: '@vue/cli-plugin-unit-jest',
@@ -9,7 +9,8 @@ module.exports = {
   clearMocks: true,
   resetModules: true,
   moduleNameMapper: {
-    'monaco-editor': 'monaco-editor/esm/vs/editor/editor.api.js',
     '^!!raw-loader!.*': 'jest-raw-loader',
+    'vuetify/styles': '<rootDir>/tests/styleMock.js',
+		'^vuetify$': 'vuetify/dist/vuetify.js',
   },
 };

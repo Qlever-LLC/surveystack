@@ -28,7 +28,7 @@
           <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">
             Already have an account?
           </router-link>
-          <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
+          <a v-else @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
             Already have an account?
           </a>
           <a-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </a-btn>

@@ -28,6 +28,7 @@ module.exports = {
   globals: {},
   parserOptions: {
     parser: '@babel/eslint-parser',
+    requireConfigFile: false,
   },
   overrides: [
     {

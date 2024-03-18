@@ -1,9 +1,10 @@
 import { render } from '@testing-library/vue';
-import Vuetify from 'vuetify';
-import Vuex from 'vuex';
-import VueRouter from 'vue-router';
+import { mount, shallowMount } from '@vue/test-utils';
+import { createStore } from 'vuex';
+import vuetify from '../src/plugins/vuetify';
+import { createStoreObject } from '../src/store';
+import router from '../src/router';
 
-import { createLocalVue } from '@vue/test-utils';
 import AAlert from '../src/components/ui/elements/AAlert.vue';
 import AApp from '../src/components/ui/elements/AApp.vue';
 import AAppBar from '../src/components/ui/elements/AAppBar.vue';
@@ -23,6 +24,8 @@ import ACheckbox from '../src/components/ui/elements/ACheckbox.vue';
 import AChip from '../src/components/ui/elements/AChip.vue';
 import ACol from '../src/components/ui/elements/ACol.vue';
 import AContainer from '../src/components/ui/elements/AContainer.vue';
+import ADataTableServer from '../src/components/ui/elements/ADataTableServer.vue';
+import ADate from '../src/components/ui/elements/ADate.vue';
 import ADatePicker from '../src/components/ui/elements/ADatePicker.vue';
 import ADialog from '../src/components/ui/elements/ADialog.vue';
 import ADivider from '../src/components/ui/elements/ADivider.vue';
@@ -40,7 +43,6 @@ import AImg from '../src/components/ui/elements/AImg.vue';
 import AInput from '../src/components/ui/elements/AInput.vue';
 import ALabel from '../src/components/ui/elements/ALabel.vue';
 import AList from '../src/components/ui/elements/AList.vue';
-import AListGroup from '../src/components/ui/elements/AListGroup.vue';
 import AListItem from '../src/components/ui/elements/AListItem.vue';
 import AListItemAction from '../src/components/ui/elements/AListItemAction.vue';
 import AListItemSubtitle from '../src/components/ui/elements/AListItemSubtitle.vue';
@@ -76,97 +78,136 @@ import ATooltip from '../src/components/ui/elements/ATooltip.vue';
 import AWindow from '../src/components/ui/elements/AWindow.vue';
 import AWindowItem from '../src/components/ui/elements/AWindowItem.vue';
 
-const localVue = createLocalVue();
-localVue.component('a-alert', AAlert);
-localVue.component('a-app', AApp);
-localVue.component('a-app-bar', AAppBar);
-localVue.component('a-app-bar-nav-icon', AAppBarNavIcon);
-localVue.component('a-avatar', AAvatar);
-localVue.component('a-badge', ABadge);
-localVue.component('a-banner', ABanner);
-localVue.component('a-breadcrumbs', ABreadcrumbs);
-localVue.component('a-btn', ABtn);
-localVue.component('a-btn-toggle', ABtnToggle);
-localVue.component('a-card', ACard);
-localVue.component('a-card-actions', ACardActions);
-localVue.component('a-card-subtitle', ACardSubtitle);
-localVue.component('a-card-text', ACardText);
-localVue.component('a-card-title', ACardTitle);
-localVue.component('a-checkbox', ACheckbox);
-localVue.component('a-chip', AChip);
-localVue.component('a-col', ACol);
-localVue.component('a-container', AContainer);
-localVue.component('a-date-picker', ADatePicker);
-localVue.component('a-dialog', ADialog);
-localVue.component('a-divider', ADivider);
-localVue.component('a-expand-transition', AExpandTransition);
-localVue.component('a-expansion-panel', AExpansionPanel);
-localVue.component('a-expansion-panels', AExpansionPanels);
-localVue.component('a-expansion-panel-text', AExpansionPanelText);
-localVue.component('a-expansion-panel-title', AExpansionPanelTitle);
-localVue.component('a-fab-transition', AFabTransition);
-localVue.component('a-file-input', AFileInput);
-localVue.component('a-flex', AFlex);
-localVue.component('a-form', AForm);
-localVue.component('a-icon', AIcon);
-localVue.component('a-img', AImg);
-localVue.component('a-input', AInput);
-localVue.component('a-label', ALabel);
-localVue.component('a-list', AList);
-localVue.component('a-list-group', AListGroup);
-localVue.component('a-list-item', AListItem);
-localVue.component('a-list-item-action', AListItemAction);
-localVue.component('a-list-item-subtitle', AListItemSubtitle);
-localVue.component('a-list-item-title', AListItemTitle);
-localVue.component('a-list-subheader', AListSubheader);
-localVue.component('a-main', AMain);
-localVue.component('a-menu', AMenu);
-localVue.component('a-navigation-drawer', ANavigationDrawer);
-localVue.component('a-overlay', AOverlay);
-localVue.component('a-pagination', APagination);
-localVue.component('a-progress-circular', AProgressCircular);
-localVue.component('a-progress-linear', AProgressLinear);
-localVue.component('a-radio', ARadio);
-localVue.component('a-radio-group', ARadioGroup);
-localVue.component('a-row', ARow);
-localVue.component('a-select', ASelect);
-localVue.component('a-sheet', ASheet);
-localVue.component('a-skeleton-loader', ASkeletonLoader);
-localVue.component('a-snackbar', ASnackbar);
-localVue.component('a-spacer', ASpacer);
-localVue.component('a-switch', ASwitch);
-localVue.component('a-tab', ATab);
-localVue.component('a-table', ATable);
-localVue.component('a-tabs', ATabs);
-localVue.component('a-textarea', ATextarea);
-localVue.component('a-text-field', ATextField);
-localVue.component('a-timeline', ATimeline);
-localVue.component('a-timeline-item', ATimelineItem);
-localVue.component('a-toolbar', AToolbar);
-localVue.component('a-toolbar-items', AToolbarItems);
-localVue.component('a-toolbar-title', AToolbarTitle);
-localVue.component('a-tooltip', ATooltip);
-localVue.component('a-window', AWindow);
-localVue.component('a-window-item', AWindowItem);
+import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
+import appControlHint from '@/components/survey/drafts/ControlHint.vue';
+import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
+import appControlError from '@/components/survey/drafts/ControlError.vue';
 
-localVue.use(Vuex);
-localVue.use(VueRouter);
+const components = {
+  'a-alert': AAlert,
+  'a-app': AApp,
+  'a-app-bar': AAppBar,
+  'a-app-bar-nav-icon': AAppBarNavIcon,
+  'a-avatar': AAvatar,
+  'a-badge': ABadge,
+  'a-banner': ABanner,
+  'a-breadcrumbs': ABreadcrumbs,
+  'a-btn': ABtn,
+  'a-btn-toggle': ABtnToggle,
+  'a-card': ACard,
+  'a-card-actions': ACardActions,
+  'a-card-subtitle': ACardSubtitle,
+  'a-card-text': ACardText,
+  'a-card-title': ACardTitle,
+  'a-checkbox': ACheckbox,
+  'a-chip': AChip,
+  'a-col': ACol,
+  'a-container': AContainer,
+  'a-data-table-server': ADataTableServer,
+  'a-date': ADate,
+  'a-date-picker': ADatePicker,
+  'a-dialog': ADialog,
+  'a-divider': ADivider,
+  'a-expand-transition': AExpandTransition,
+  'a-expansion-panel': AExpansionPanel,
+  'a-expansion-panels': AExpansionPanels,
+  'a-expansion-panel-text': AExpansionPanelText,
+  'a-expansion-panel-title': AExpansionPanelTitle,
+  'a-fab-transition': AFabTransition,
+  'a-file-input': AFileInput,
+  'a-flex': AFlex,
+  'a-form': AForm,
+  'a-icon': AIcon,
+  'a-img': AImg,
+  'a-input': AInput,
+  'a-label': ALabel,
+  'a-list': AList,
+  'a-list-item': AListItem,
+  'a-list-item-action': AListItemAction,
+  'a-list-item-subtitle': AListItemSubtitle,
+  'a-list-item-title': AListItemTitle,
+  'a-list-subheader': AListSubheader,
+  'a-main': AMain,
+  'a-menu': AMenu,
+  'a-navigation-drawer': ANavigationDrawer,
+  'a-overlay': AOverlay,
+  'a-pagination': APagination,
+  'a-progress-circular': AProgressCircular,
+  'a-progress-linear': AProgressLinear,
+  'a-radio': ARadio,
+  'a-radio-group': ARadioGroup,
+  'a-row': ARow,
+  'a-select': ASelect,
+  'a-sheet': ASheet,
+  'a-skeleton-loader': ASkeletonLoader,
+  'a-snackbar': ASnackbar,
+  'a-spacer': ASpacer,
+  'a-switch': ASwitch,
+  'a-tab': ATab,
+  'a-table': ATable,
+  'a-tabs': ATabs,
+  'a-textarea': ATextarea,
+  'a-text-field': ATextField,
+  'a-timeline': ATimeline,
+  'a-timeline-item': ATimelineItem,
+  'a-toolbar': AToolbar,
+  'a-toolbar-items': AToolbarItems,
+  'a-toolbar-title': AToolbarTitle,
+  'a-tooltip': ATooltip,
+  'a-window': AWindow,
+  'a-window-item': AWindowItem,
+  'app-control-label': appControlLabel,
+  'app-control-hint': appControlHint,
+  'app-control-more-info': appControlMoreInfo,
+  'app-control-error': appControlError,
+};
 
-const renderWithVuetify = function (component, options, callback) {
+
+const createTestUtilsWrapper = testUtilsMethod => function (component, options) {
+  const store = createStore(createStoreObject());
+  return testUtilsMethod(
+    component,
+    {
+      ...options,
+      global: {
+        plugins: [
+          vuetify,
+          store,
+        ],
+        components,
+        ...options?.global,
+      }
+    }
+  )
+};
+const mountWithVuetify = createTestUtilsWrapper(mount);
+const shallowMountWithVuetify = createTestUtilsWrapper(shallowMount);
+
+const renderWithVuetify = function (component, options, storeOverride) {
   const root = document.createElement('div');
   root.setAttribute('data-app', 'true');
+  const store = storeOverride ?? createStore(createStoreObject());
 
   return render(
     component,
     {
-      container: document.body.appendChild(root),
-      // for Vuetify components that use the $vuetify instance property
-      vuetify: new Vuetify(),
-      localVue,
       ...options,
-    },
-    callback
+      container: document.body.appendChild(root),
+      global: {
+        plugins: [
+          vuetify,
+          store,
+          router,
+        ],
+        components,
+        stubs: {
+          CodeEditor: { template: '<span id="CodeEditorStub" />' },
+          InstructionsEditor: { template: '<span id="InstructionsEditor" />' },
+        },
+        ...options?.global,
+      },
+    }
   );
 };
 
-export { renderWithVuetify, localVue };
+export { renderWithVuetify, mountWithVuetify, shallowMountWithVuetify };

@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const LCL = require('last-commit-log');
@@ -35,10 +34,6 @@ module.exports = {
     },
     plugins: [
       new NodePolyfillPlugin(),
-      new MonacoWebpackPlugin({
-        languages: ['javascript', 'typescript'],
-        features: [],
-      }),
       new CompressionPlugin(),
       new CopyPlugin({
         patterns: ['src/utils/sandboxUtils.js'],
@@ -46,7 +41,6 @@ module.exports = {
       new VuetifyPlugin({ autoImport: true, styles: { configFile: 'src/styles/settings.scss' } }),
     ],
   },
-  transpileDependencies: ['vuetify'],
   devServer: {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
     allowedHosts: 'all',
