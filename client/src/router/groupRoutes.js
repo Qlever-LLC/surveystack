@@ -7,6 +7,12 @@ import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 
+const setActiveGroup = (to, from, next) => {
+  //TODO set the active group by the path param
+  //store.dispatch('memberships/setActiveGroup', groupId);
+  next();
+};
+
 export default [
   {
     path: '/g/:pathMatch(.*)',
@@ -82,9 +88,3 @@ export default [
     },
   },
 ];
-
-const setActiveGroup = (to, from, next) => {
-  //TODO set the active group by the path param
-  //store.dispatch('memberships/setActiveGroup', groupId);
-  next();
-};

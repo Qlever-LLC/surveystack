@@ -7,6 +7,14 @@ import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import AppInfo from '@/pages/app/AppInfo.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
 
+const guardLanding = async (to, from, next) => {
+  if (!store.getters['auth/isLoggedIn']) {
+    next({ name: 'landing', params: { redirect: to } });
+  } else {
+    next();
+  }
+};
+
 export default [
   {
     path: '/',
@@ -67,11 +75,3 @@ export default [
         },
       ]),
 ];
-
-const guardLanding = async (to, from, next) => {
-  if (!store.getters['auth/isLoggedIn']) {
-    next({ name: 'landing', params: { redirect: to } });
-  } else {
-    next();
-  }
-};

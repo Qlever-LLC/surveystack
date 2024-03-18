@@ -4,6 +4,14 @@ import AppHeader from '@/components/AppHeader.vue';
 import FarmosManage from '@/pages/farmos-manage/FarmosManage.vue';
 import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 
+const superGuard = async (to, from, next) => {
+  if (!store.getters['auth/isSuperAdmin']) {
+    next({ name: 'unauthorized', params: { allowed: 'Super Admins', to } });
+  } else {
+    next();
+  }
+};
+
 export default [
   {
     path: '/users',
@@ -26,11 +34,3 @@ export default [
     beforeEnter: superGuard,
   },
 ];
-
-const superGuard = async (to, from, next) => {
-  if (!store.getters['auth/isSuperAdmin']) {
-    next({ name: 'unauthorized', params: { allowed: 'Super Admins', to } });
-  } else {
-    next();
-  }
-};
