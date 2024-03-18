@@ -107,7 +107,7 @@ export default {
       required: false,
     },
     rounded: {
-      type: Boolean,
+      type: [String, Number, Boolean],
       required: false,
     },
     variant: {

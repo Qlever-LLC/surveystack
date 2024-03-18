@@ -4,7 +4,7 @@
       <slot name="title" />
       <a-spacer />
       <!-- TODO set right color -->
-      <a-btn v-if="buttonNew" color="primary" class="ml-4" :to="buttonNew.link" variant="flat">
+      <a-btn v-if="buttonNew" color="accent" class="ml-4" :to="buttonNew.link" variant="flat" rounded="lg">
         <a-icon class="mr-2"> mdi-plus-circle-outline </a-icon>
         {{ buttonNew.title }}
       </a-btn>
@@ -13,13 +13,14 @@
       <span v-if="showSearch" class="d-flex mb-6">
         <a-text-field
           v-model="state.searchValue"
+          bgColor="transparent"
           dense
           hideDetails
           label="Search"
           prependInnerIcon="mdi-magnify"
           rounded="lg"
-          variant="outlined" />
-        <a-btn class="ml-6">
+          variant="solo-filled" />
+        <a-btn class="ml-6" color="accent-lighten-8-no bg-transparent" style="height: 40px">
           <a-icon>mdi-24px mdi-tune</a-icon>
         </a-btn>
       </span>

@@ -43,8 +43,8 @@ const vuetify = createVuetify({
     },
     variations: {
       colors: ['accent'],
-      lighten: 2, //add two lighten variants
-      darken: 2, //add two darken variants
+      lighten: 8, //add two lighten variants
+      darken: 8, //add two darken variants
     },
   },
 });
