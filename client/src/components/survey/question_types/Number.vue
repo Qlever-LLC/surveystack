@@ -16,7 +16,6 @@
       @update:modelValue="onInput"
       clearable
       color="focus"
-      data-test-id="input"
       hide-details="auto"
       ref="textField"
       type="number"
@@ -31,6 +30,9 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { isIos } from '@/utils/compatibility';
+
+export const isValidNumber = (value, isRequired) =>
+  isNaN(Number(value)) || (isRequired && value === null) ? 'Please enter a number' : true;
 
 export default {
   mixins: [baseQuestionComponent],
@@ -74,7 +76,7 @@ export default {
       }
     },
     isValidNumber(val) {
-      return isNaN(Number(val)) || (this.required && val === null) ? 'Please enter a number' : true;
+      return isValidNumber(val, this.required);
     },
   },
   mounted() {

@@ -167,7 +167,7 @@ export default {
         uniq(this.getArrayValue).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
-
+      
       return [...defaultItems, ...customItems];
     },
     sourceIsValid() {

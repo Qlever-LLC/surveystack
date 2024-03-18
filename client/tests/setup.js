@@ -1,11 +1,9 @@
-import Vue from 'vue';
-import Vuetify from 'vuetify';
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 
-Vue.use(Vuetify);
-
 window.scrollTo = () => {};
+
+global.ResizeObserver = require('resize-observer-polyfill');
 
 // until this gets closed https://github.com/jsdom/jsdom/issues/1721
 global.URL.createObjectURL = () => {};
