@@ -12,7 +12,9 @@
       </a-form>
       <div class="text-center text-muted mt-5">
         <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">Back to login</router-link>
-        <a v-else @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">Back to login</a>
+        <a v-else @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button"
+          >Back to login</a
+        >
       </div>
       <a-alert v-if="status.type" class="mt-4 mb-0" mode="fade" variant="text" :type="status.type">{{
         status.message
@@ -43,14 +45,9 @@ export default {
   },
   computed: {
     signInLink() {
-      const link = { name: 'auth-login', params: {} };
-
-      if (this.$route.params && this.$route.params.redirect) {
-        link.params.redirect = this.$route.params.redirect;
-      }
-
-      if (this.invitation) {
-        link.query = { invitation: this.invitation };
+      const link = { name: 'auth-login', query: {} };
+      if (this.$route.query?.redirect) {
+        link.query.redirect = this.$route.query?.redirect;
       }
       return link;
     },

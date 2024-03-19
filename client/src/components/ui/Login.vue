@@ -142,14 +142,13 @@ export default {
     registerLink() {
       const link = {
         name: 'auth-register',
-        params: {
+        query: {
           initialEmail: this.entity.email,
           initialPassword: this.entity.password,
         },
       };
-
-      if (this.$route.params && this.$route.params.redirect) {
-        link.params.redirect = this.$route.params.redirect;
+      if (this.$route.query?.redirect) {
+        link.query.redirect = this.$route.query?.redirect;
       }
 
       return link;
@@ -202,7 +201,7 @@ export default {
 
       // email sign-in link
       if (!this.usePassword) {
-        const landingPath = this.$route.params.redirect || this.$route.query.landingPath;
+        const landingPath = this.$route.query.redirect || this.$route.query.landingPath;
         const callbackUrl = this.$route.query.callbackUrl;
 
         try {
@@ -241,8 +240,8 @@ export default {
 
       this.$store.dispatch('surveys/fetchPinned');
 
-      if (this.$route.params.redirect) {
-        this.$router.push(this.$route.params.redirect);
+      if (this.$route.query.redirect) {
+        this.$router.push(this.$route.query.redirect);
       } else {
         this.$router.push('/');
       }
