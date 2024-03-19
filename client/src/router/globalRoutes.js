@@ -48,15 +48,6 @@ export default [
     },
   },
   {
-    path: '/unauthorized',
-    name: 'unauthorized',
-    components: {
-      header: AppHeader,
-      main: Unauthorized,
-    },
-    props: true,
-  },
-  {
     path: '/kit/*',
     name: 'kit',
     components: {

@@ -6,7 +6,7 @@ import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 
 const superGuard = async (to, from, next) => {
   if (!store.getters['auth/isSuperAdmin']) {
-    next({ name: 'unauthorized', params: { allowed: 'Super Admins', to } });
+    next({ name: 'unauthorized', query: { allowed: 'Super Admins', to: to.path } });
   } else {
     next();
   }

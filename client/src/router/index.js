@@ -9,7 +9,7 @@ import store from '@/store';
 
 export const authGuard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
-    next({ name: 'auth-login', params: { redirect: to } });
+    next({ name: 'auth-login', query: { redirect: to.path } });
   } else {
     next();
   }

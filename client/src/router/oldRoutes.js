@@ -24,6 +24,7 @@ import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue'
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
 import { authGuard } from '@/router/index';
 import FarmOS from '@/pages/groups/FarmOS.vue';
+import Unauthorized from '@/pages/Unauthorized.vue';
 
 const Hylo = () => import('@/pages/groups/Hylo.vue');
 
@@ -91,13 +92,13 @@ export default [
     path: '/auth/login',
     name: 'auth-login',
     components: getComponents(Login),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   {
     path: '/auth/register',
     name: 'auth-register',
     components: getComponents(Register),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   {
     path: '/auth/profile',
@@ -133,6 +134,12 @@ export default [
       landingPath = decodeURIComponent(landingPath);
       window.location.replace(`${location.origin}${landingPath}`);
     },
+  },
+  {
+    path: '/unauthorized',
+    name: 'unauthorized',
+    components: getComponents(Unauthorized),
+    props: (route) => ({ ...route.query }),
   },
   {
     path: '/farmos/profile',
