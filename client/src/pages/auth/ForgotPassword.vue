@@ -6,14 +6,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import AppForgotPassword from '@/components/ui/ForgotPassword.vue';
-
-export default {
-  components: {
-    AppForgotPassword,
-  },
-};
 </script>
 
 <style scoped lang="scss">

@@ -52,7 +52,7 @@ const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
 
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
-    next({ name: 'auth-login', params: { redirect: to } });
+    next({ name: 'auth-login', query: { redirect: to.path } });
   } else {
     next();
   }
@@ -60,7 +60,7 @@ const guard = async (to, from, next) => {
 
 const superGuard = async (to, from, next) => {
   if (!store.getters['auth/isSuperAdmin']) {
-    next({ name: 'unauthorized', params: { allowed: 'Super Admins', to } });
+    next({ name: 'unauthorized', query: { allowed: 'Super Admins', to: to.path } });
   } else {
     next();
   }
@@ -143,13 +143,13 @@ const routes = [
     path: '/auth/login',
     name: 'auth-login',
     components: getComponents(Login),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   {
     path: '/auth/register',
     name: 'auth-register',
     components: getComponents(Register),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   {
     path: '/auth/profile',
@@ -328,7 +328,7 @@ const routes = [
     path: '/unauthorized',
     name: 'unauthorized',
     components: getComponents(Unauthorized),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   // App-Info
   {

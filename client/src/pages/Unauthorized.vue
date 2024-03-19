@@ -1,7 +1,7 @@
 <template>
   <a-container>
     <h1>Access denied</h1>
-    Only {{ allowed }} are allowed on <strong>{{ to.path }}</strong
+    Only {{ allowed }} are allowed on <strong>{{ to }}</strong
     >. Goodbye!
   </a-container>
 </template>
@@ -14,10 +14,8 @@ export default {
       default: 'Super Admins',
     },
     to: {
-      type: Object,
-      default() {
-        return { path: '??' };
-      },
+      type: String,
+      default: '??',
     },
   },
 };

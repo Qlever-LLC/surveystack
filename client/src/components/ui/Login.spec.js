@@ -23,7 +23,7 @@ const renderLogin = ({ props, params, query, getters, $router, dispatchMock } = 
         },
         $router: { ...$router },
       },
-    }
+    },
   });
 
 // run the test with defaultUsePassword=false and =true
@@ -191,7 +191,7 @@ describe('Login component', () => {
               response: { status: 401 },
             });
           }
-        }
+        };
         const { getByLabelText, getByText, findByText } = renderLogin({
           dispatchMock,
           props: { defaultUsePassword: true },
@@ -217,7 +217,7 @@ describe('Login component', () => {
               response: { status: 404 },
             });
           }
-        }
+        };
         const { getByLabelText, getByText, findByText } = renderLogin({
           dispatchMock,
           props: { defaultUsePassword: true },
@@ -243,7 +243,7 @@ describe('Login component', () => {
               response: { status: 500 },
             });
           }
-        }
+        };
         const { getByLabelText, getByText, findByText } = renderLogin({
           dispatchMock,
           props: { defaultUsePassword: true },
@@ -283,8 +283,7 @@ describe('Login component', () => {
           },
         },
         dispatchMock,
-        params: { redirect: false },
-        query: {},
+        query: { redirect: false },
         $router: {
           push,
         },
@@ -330,7 +329,7 @@ describe('Login component', () => {
         $router: {
           push,
         },
-        params: { redirect: false },
+        query: { redirect: false },
       });
       const email = 'someValidMail@mail.com';
       const emailInput = getByLabelText('E-Mail');
@@ -355,7 +354,7 @@ describe('Login component', () => {
     it('submit and trying autojoin if this.isWhitelabel === false', async () => {
       const push = jest.fn();
       const login = jest.fn(() => Promise.resolve());
-      const dispatchMock = jest.fn(action => {
+      const dispatchMock = jest.fn((action) => {
         if (action === 'auth/login') {
           return Promise.resolve();
         }
@@ -370,8 +369,7 @@ describe('Login component', () => {
           'surveys/fetchPinned': jest.fn(),
         },
         dispatchMock,
-        params: { redirect: false },
-        query: {},
+        query: { redirect: false },
         $router: {
           push,
         },
@@ -404,11 +402,10 @@ describe('Login component', () => {
         getters: {
           'whitelabel/isWhitelabel': false,
         },
-        params: { redirect: false },
-        query: {},
+        query: { redirect: false },
         $router: {
           push,
-        }
+        },
       });
 
       const emailInput = getByLabelText('E-Mail');
@@ -423,13 +420,13 @@ describe('Login component', () => {
       expect(push).toHaveBeenCalledWith('/');
     });
 
-    it("submit and get the redirection 'this.$route.params.redirect = true' ", async () => {
+    it("submit and get the redirection 'this.$route.query.redirect = true' ", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderLogin({
         getters: {
           'whitelabel/isWhitelabel': false,
         },
-        params: { redirect: true },
+        query: { redirect: true },
         props: { defaultUsePassword: true },
         $router: {
           push,

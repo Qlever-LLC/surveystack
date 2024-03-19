@@ -218,7 +218,7 @@ export default {
     } else {
       this.$router.push({
         name: 'auth-login',
-        params: { redirect: this.$route.path, autoJoin: true },
+        query: { redirect: this.$route.path, autoJoin: true },
       });
     }
   },

@@ -1,17 +1,18 @@
 <template>
   <div class="wrapper">
-    <register :useLink="true" class="maxw-40" />
+    <register :initialEmail="initialEmail" :useLink="true" class="maxw-40" />
   </div>
 </template>
 
-<script>
+<script setup>
 import Register from '@/components/ui/Register.vue';
 
-export default {
-  components: {
-    Register,
+const props = defineProps({
+  initialEmail: {
+    type: String,
+    required: false,
   },
-};
+});
 </script>
 
 <style scoped lang="scss">

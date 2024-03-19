@@ -38,7 +38,7 @@
         >Your code is eligible to join <strong>{{ membership.group.name }}</strong></a-alert
       >
 
-      <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }}</a-alert>
+      <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }} </a-alert>
     </a-card>
   </a-container>
 </template>
@@ -81,12 +81,13 @@ export default {
       return this.showPasswords ? 'Hide passwords' : 'Show passwords';
     },
     signInLink() {
-      const link = { name: 'auth-login', params: {} };
-
-      if (this.$route.params && this.$route.params.redirect) {
-        link.params.redirect = this.$route.params.redirect;
+      const link = { name: 'auth-login', query: {} };
+      if (this.$route.query?.redirect) {
+        link.query.redirect = this.$route.query?.redirect;
       }
-
+      if (this.initialEmail) {
+        link.query.initialEmail = this.initialEmail;
+      }
       return link;
     },
     isWhitelabel() {
@@ -126,8 +127,8 @@ export default {
           }
         }
 
-        if (this.$route.params.redirect) {
-          this.$router.push(this.$route.params.redirect);
+        if (this.$route.query.redirect) {
+          this.$router.push(this.$route.query.redirect);
         } else {
           this.$store.dispatch('surveys/fetchPinned');
           this.$router.push('/');
@@ -165,6 +166,7 @@ a {
 .linkBlock {
   flex-direction: column-reverse;
 }
+
 .signUpCSS {
   margin-bottom: 16px;
   margin-left: 0px;

@@ -30,8 +30,8 @@
       <transition name="fade">
         <app-feedback v-if="showSuccessMessage" class="mt-5" :closeable="false" type="success">
           Your new password has been set!
-          <router-link :to="{ name: 'auth-login', params: { initialEmail: email } }"
-            >Continue to log in area</router-link
+          <router-link :to="{ name: 'auth-login', query: { initialEmail: email } }">
+            Continue to log in area </router-link
           >.
         </app-feedback>
       </transition>

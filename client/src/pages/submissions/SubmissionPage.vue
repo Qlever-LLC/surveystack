@@ -187,7 +187,7 @@ export default {
     if (isLoginRequired && !this.$store.getters['auth/isLoggedIn']) {
       this.$router.push({
         name: 'auth-login',
-        params: { redirect: this.$route.path, autoJoin: true },
+        query: { redirect: this.$route.path, autoJoin: true },
       });
       return;
     }

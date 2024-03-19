@@ -65,8 +65,7 @@ describe('Register component', () => {
               dispatch: jest.fn(),
             },
             $route: {
-              params: { redirect: false },
-              query: {},
+              query: { redirect: false },
             },
             $router: { push },
           },
@@ -108,8 +107,7 @@ describe('Register component', () => {
               dispatch: jest.fn(),
             },
             $route: {
-              params: { redirect: false },
-              query: {},
+              query: { redirect: false },
             },
             $router: { push },
           },
@@ -142,8 +140,7 @@ describe('Register component', () => {
               dispatch: jest.fn(),
             },
             $route: {
-              params: { redirect: true },
-              query: {},
+              query: { redirect: true },
             },
             $router: { push },
           },
@@ -172,8 +169,7 @@ describe('Register component', () => {
               dispatch: jest.fn(),
             },
             $route: {
-              params: { redirect: false },
-              query: {},
+              query: { redirect: false },
             },
             $router: { push },
           },
@@ -200,7 +196,7 @@ describe('Register component', () => {
               getters: {
                 'whitelabel/isWhitelabel': false,
               },
-              dispatch: action => {
+              dispatch: (action) => {
                 if (action === 'auth/login') {
                   return Promise.reject({
                     response: { status: 409, data: { message: 'error message' } },
@@ -229,7 +225,7 @@ describe('Register component', () => {
               getters: {
                 'whitelabel/isWhitelabel': false,
               },
-              dispatch: action => {
+              dispatch: (action) => {
                 if (action === 'auth/login') {
                   return Promise.reject({
                     response: { status: 400, data: { message: 'error message' } },
@@ -258,7 +254,7 @@ describe('Register component', () => {
               getters: {
                 'whitelabel/isWhitelabel': false,
               },
-              dispatch: action => {
+              dispatch: (action) => {
                 if (action === 'auth/login') {
                   return Promise.reject({
                     response: { status: 500, data: { message: 'Unknown error :/' } },
