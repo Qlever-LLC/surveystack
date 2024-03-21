@@ -60,7 +60,7 @@ export default {
 
       db.openDb(this.clearAll);
 
-      this.$router.push('/surveys/browse');
+      this.$router.push(this.$route.path + '/surveys');
     },
   },
 };

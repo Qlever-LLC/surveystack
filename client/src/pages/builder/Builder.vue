@@ -196,7 +196,7 @@ export default {
       }
       try {
         await api.delete(`/surveys/${this.survey._id}`);
-        this.$router.push('/surveys/browse');
+        this.$router.push(this.$route.path + '/surveys');
       } catch (error) {
         console.log(error);
       }
