@@ -1,7 +1,7 @@
 <template>
   <a-container v-if="entity && show" class="survey-detail bg-white" style="max-width: 100% !important">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
-      <a-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
+      <a-btn v-if="editable" class="mx-2" :to="`/groups/${$route.params.id}/surveys/${entity._id}/edit`">
         <a-icon>mdi-pencil</a-icon>
         <span class="ml-2">Edit</span>
       </a-btn>

@@ -7,8 +7,8 @@ import { authGuard } from '@/router/index';
 import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import Browse from '@/pages/surveys/Browse.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
-import GroupList from '@/pages/groups/GroupList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
+import Group from '@/pages/groups/Group.vue';
 
 export default [
   {
@@ -18,6 +18,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
+      main: Group,
     },
   },
   {
@@ -45,34 +46,6 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: ScriptList,
-    },
-  },
-  {
-    path: '/groups/all',
-    name: 'groups-list',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-      main: GroupList,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
-    },
-  },
-  {
-    path: '/groups/new',
-    name: 'groups-new',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-      main: GroupEdit,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
     },
   },
   {

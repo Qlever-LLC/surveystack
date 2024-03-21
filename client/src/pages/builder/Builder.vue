@@ -259,7 +259,7 @@ export default {
         } else {
           await api.post('/surveys', tmp);
           this.editMode = true;
-          this.$router.push(`/surveys/${tmp._id}/edit`);
+          this.$router.push(`/groups/${this.$route.params.id}/surveys/${tmp._id}/edit`);
         }
 
         this.snack(isDraft ? 'Saved Draft' : 'Published Survey');

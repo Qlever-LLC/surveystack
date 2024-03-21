@@ -55,7 +55,7 @@
             color="secondary"
             class="ml-2"
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
-            :to="`/surveys/${survey}/submissions/new`">
+            :to="`/groups/${$route.params.id}/surveys/${survey}/submissions/new`">
             <a-icon left>mdi-plus</a-icon>
             New submission
           </a-btn>

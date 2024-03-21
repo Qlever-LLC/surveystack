@@ -2,7 +2,7 @@ import globalRoutes from './globalRoutes.js';
 import groupRoutes from './groupRoutes.js';
 import superAdminRoutes from './superAdminRoutes.js';
 import legacyRoutes from './legacyRoutes.js';
-import oldRoutes from './oldRoutes.js';
+import oldRoutes from './toBeMigratedRoutes.js';
 
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '@/store';
