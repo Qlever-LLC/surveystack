@@ -49,7 +49,6 @@
             :validationErrors="surveyValidationErrors"
             @view-code-toggle="viewCode = !viewCode"
             @update="publish"
-            @cancel="onCancel"
             @saveDraft="saveDraft"
             @delete="$emit('onDelete')"
             @publish="publish"
