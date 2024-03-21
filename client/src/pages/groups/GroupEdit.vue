@@ -26,10 +26,6 @@
       </p>
     </app-dialog>
 
-    <div class="d-flex justify-space-between align-center">
-      <a-breadcrumbs :path="entity.path" enableAll />
-    </div>
-
     <div class="d-flex justify-space-between">
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
@@ -284,7 +280,7 @@ export default {
           await api.post('/groups', this.entity);
         }
 
-        this.$router.push(`/g${this.entity.dir}${this.entity.slug}/`);
+        this.$router.push(`/groups/${this.entity._id}/`);
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
         console.log(err);

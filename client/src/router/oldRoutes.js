@@ -45,49 +45,7 @@ export default [
     name: 'submissions',
     components: getComponents(SubmissionList),
   },
-  {
-    path: '/surveys/new',
-    name: 'surveys-new',
-    components: getComponents(Builder),
-    props: {
-      isNew: true,
-    },
-    beforeEnter: authGuard,
-  },
-  {
-    path: '/surveys/:id/edit',
-    name: 'surveys-edit',
-    components: getComponents(Builder),
-    props: {
-      isNew: false,
-    },
-    beforeEnter: authGuard,
-  },
-  {
-    path: '/surveys/:id/start',
-    name: 'surveys-start',
-    components: getComponents(SurveysDetail),
-    props: {
-      main: {
-        start: true,
-      },
-    },
-  },
-  {
-    path: '/surveys/:id',
-    name: 'surveys-detail',
-    components: getComponents(SurveysDetail),
-  },
-  {
-    path: '/surveys/:surveyId/submissions/new',
-    name: 'new-submission',
-    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
-  },
-  {
-    path: '/surveys/:surveyId/submissions/:submissionId/edit',
-    name: 'edit-submission',
-    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
-  },
+
   {
     path: '/auth/login',
     name: 'auth-login',

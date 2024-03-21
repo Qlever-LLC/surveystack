@@ -56,12 +56,6 @@ const store = useStore();
 
 const expanded = ref(false);
 
-//TODO what was this for? check master
-let groupsLink = '/groups';
-if (store.getters['whitelabel/isWhitelabel']) {
-  groupsLink = `/g${store.getters['whitelabel/partner'].path}`;
-}
-
 const docs = computed(() => {
   return getActiveGroup()?.docs || [];
 });

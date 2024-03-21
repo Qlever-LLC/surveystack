@@ -60,7 +60,6 @@
 - List all groups / Explore Groups
   /groups/all
 - Show Group under path
-  <!-- /groups/:path/to/group/ -->
   /groups/:id
 - Create new Group
   /groups/new
@@ -69,9 +68,6 @@
   /groups/:id/edit
 - Edit group members
   /groups/:id/edit/members
-- Group pretty links
-  /g/
-  /g/:path/to/group
 
 ### Dashboard Routes
 

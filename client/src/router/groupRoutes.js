@@ -15,76 +15,20 @@ const setActiveGroup = (to, from, next) => {
 
 export default [
   {
-    path: '/g/:pathMatch(.*)',
-    name: 'groups-by-path',
+    path: '/groups/:id',
+    name: 'group',
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
     },
-    beforeEnter: setActiveGroup,
   },
   {
-    path: '/surveys/my-submissions',
-    name: 'my-submissions',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: MySubmissions,
-    },
-  },
-  {
-    path: '/surveys/browse',
-    name: 'surveys-browse',
+    path: '/groups/:id/surveys',
+    name: 'group-surveys',
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: Browse,
-    },
-  },
-  {
-    path: '/scripts',
-    name: 'scripts-list',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: ScriptList,
-    },
-  },
-  {
-    path: '/groups/all',
-    name: 'groups-list',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-      main: GroupList,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
-    },
-  },
-  {
-    path: '/groups/new',
-    name: 'groups-new',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-      main: GroupEdit,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
-    },
-  },
-  {
-    path: '/groups/edit/:id',
-    name: 'groups-edit',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: GroupEdit,
     },
   },
 ];

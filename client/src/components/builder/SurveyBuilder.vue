@@ -732,9 +732,6 @@ export default {
         this.openLibrary(libraryId);
       }
     },
-    onCancel() {
-      this.$router.push('/surveys/browse');
-    },
     async setControlSource(value) {
       if (this.control.type === 'script') {
         const data = await this.fetchScript(value.id);

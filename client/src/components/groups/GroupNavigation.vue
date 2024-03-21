@@ -30,6 +30,6 @@ const router = useRouter();
 
 function selectGroup(group) {
   setActiveGroupId(group._id);
-  router.push(`/g${group.path}`);
+  router.push(`/groups/${group._id}`);
 }
 </script>
