@@ -12,7 +12,6 @@ import AAppBarNavIcon from '../src/components/ui/elements/AAppBarNavIcon.vue';
 import AAvatar from '../src/components/ui/elements/AAppBarNavIcon.vue';
 import ABadge from '../src/components/ui/elements/ABadge.vue';
 import ABanner from '../src/components/ui/elements/ABanner.vue';
-import ABreadcrumbs from '../src/components/ui/elements/ABreadcrumbs.vue';
 import ABtn from '../src/components/ui/elements/ABtn.vue';
 import ABtnToggle from '../src/components/ui/elements/ABtnToggle.vue';
 import ACard from '../src/components/ui/elements/ACard.vue';
@@ -91,7 +90,6 @@ const components = {
   'a-avatar': AAvatar,
   'a-badge': ABadge,
   'a-banner': ABanner,
-  'a-breadcrumbs': ABreadcrumbs,
   'a-btn': ABtn,
   'a-btn-toggle': ABtnToggle,
   'a-card': ACard,
@@ -162,24 +160,18 @@ const components = {
   'app-control-error': appControlError,
 };
 
-
-const createTestUtilsWrapper = testUtilsMethod => function (component, options) {
-  const store = createStore(createStoreObject());
-  return testUtilsMethod(
-    component,
-    {
+const createTestUtilsWrapper = (testUtilsMethod) =>
+  function (component, options) {
+    const store = createStore(createStoreObject());
+    return testUtilsMethod(component, {
       ...options,
       global: {
-        plugins: [
-          vuetify,
-          store,
-        ],
+        plugins: [vuetify, store],
         components,
         ...options?.global,
-      }
-    }
-  )
-};
+      },
+    });
+  };
 const mountWithVuetify = createTestUtilsWrapper(mount);
 const shallowMountWithVuetify = createTestUtilsWrapper(shallowMount);
 
@@ -188,26 +180,19 @@ const renderWithVuetify = function (component, options, storeOverride) {
   root.setAttribute('data-app', 'true');
   const store = storeOverride ?? createStore(createStoreObject());
 
-  return render(
-    component,
-    {
-      ...options,
-      container: document.body.appendChild(root),
-      global: {
-        plugins: [
-          vuetify,
-          store,
-          router,
-        ],
-        components,
-        stubs: {
-          CodeEditor: { template: '<span id="CodeEditorStub" />' },
-          InstructionsEditor: { template: '<span id="InstructionsEditor" />' },
-        },
-        ...options?.global,
+  return render(component, {
+    ...options,
+    container: document.body.appendChild(root),
+    global: {
+      plugins: [vuetify, store, router],
+      components,
+      stubs: {
+        CodeEditor: { template: '<span id="CodeEditorStub" />' },
+        InstructionsEditor: { template: '<span id="InstructionsEditor" />' },
       },
-    }
-  );
+      ...options?.global,
+    },
+  });
 };
 
 export { renderWithVuetify, mountWithVuetify, shallowMountWithVuetify };
