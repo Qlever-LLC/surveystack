@@ -177,7 +177,7 @@ export default {
     },
   },
   async created() {
-    const { id } = this.$route.params;
+    const { submissionId } = this.$route.params;
     const { group } = this.$route.query;
 
     if (group) {
@@ -185,7 +185,7 @@ export default {
       await autoSelectActiveGroup(this.$store, group);
     }
 
-    const { data: entity } = await api.get(`/surveys/${id}?version=latest`);
+    const { data: entity } = await api.get(`/surveys/${submissionId}?version=latest`);
 
     if (entity.resources) {
       //also fetch resources here in case survey is not pinned, so it's available if device goes offline
@@ -196,7 +196,7 @@ export default {
 
     try {
       // load date of latestSubmission and number of submissions. This is not prefetched by means, so it will throw when offline
-      const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
+      const { data: surveyInfo } = await api.get(`/surveys/info?id=${submissionId}`);
       this.surveyInfo = surveyInfo;
     } catch (error) {
       console.warn('unable to get survey stats infos. Maybe device is offline.');

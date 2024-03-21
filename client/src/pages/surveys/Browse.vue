@@ -14,7 +14,7 @@
       <a-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
         <a-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
-            <a-list-item :to="`/surveys/${e._id}`" :prepend-icon="e.pinned ? 'mdi-pin' : ''">
+            <a-list-item :to="`/groups/${$route.params.id}/surveys/${e._id}`" :prepend-icon="e.pinned ? 'mdi-pin' : ''">
               <div>
                 <a-list-item-title>{{ e.name }}</a-list-item-title>
                 <a-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
@@ -39,7 +39,7 @@
           </div>
           <a-list>
             <div v-for="(e, i) in surveys.content" :key="e._id">
-              <a-list-item :to="`/surveys/${e._id}`">
+              <a-list-item :to="`/groups/${$route.params.id}/surveys/${e._id}`">
                 <template v-slot:prepend>
                   <a-icon :icon="getIcon(e)" :title="getTitle(e)" large />
                 </template>

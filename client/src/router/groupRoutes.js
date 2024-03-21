@@ -6,7 +6,7 @@ import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Builder from '@/pages/builder/Builder.vue';
 import { authGuard } from '@/router/index';
-import SurveysDetail from '@/pages/surveys/Detail.vue';
+import Detail from '@/pages/surveys/Detail.vue';
 import List from '@/pages/submissions/List.vue';
 
 export default [
@@ -119,7 +119,7 @@ export default [
     beforeEnter: authGuard,
   },
   {
-    path: '/groups/:id/surveys/:id/submissions',
+    path: '/groups/:id/surveys/:surveyId/submissions',
     name: 'group-survey-submissions',
     components: {
       header: AppHeader,
@@ -128,12 +128,12 @@ export default [
     },
   },
   {
-    path: '/groups/:id/surveys/:id/submissions/start',
+    path: '/groups/:id/surveys/:surveyId/submissions/start',
     name: 'group-survey-submissions-start',
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: SurveysDetail, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
+      main: Detail, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
     },
     props: {
       main: {
@@ -142,12 +142,12 @@ export default [
     },
   },
   {
-    path: '/groups/:id/surveys/:id/submissions/:submissionId/edit',
+    path: '/groups/:id/surveys/:surveyId/submissions/:submissionId/edit',
     name: 'group-survey-submissions-edit',
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: SurveysDetail, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
+      main: Detail, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
     },
   },
 ];
