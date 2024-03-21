@@ -1,7 +1,9 @@
 import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
 
 export function useGroup() {
   const store = useStore();
+  const route = useRoute();
 
   const user = store.getters['auth/user'];
   store.dispatch('memberships/getUserMemberships', user._id);
@@ -28,11 +30,12 @@ export function useGroup() {
   }
 
   function getActiveGroupId() {
-    return store.getters['memberships/activeGroup'];
+    return route.params.id;
   }
   function getActiveGroup() {
+    //TODO get all groups, otherwise group name would not resolve for non-mine groups
     const groups = getMyGroups();
-    const activeGroupId = store.getters['memberships/activeGroup'];
+    const activeGroupId = getActiveGroupId();
     return groups.find((group) => group._id === activeGroupId);
   }
 

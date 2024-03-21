@@ -13,7 +13,7 @@
       <a-list-item-title class="text-white">Scripts</a-list-item-title>
     </a-list-item>
     <a-list-item
-      :to="{ path: `/groups/edit/${getActiveGroup()._id}`, query: { t: Date.now() } }"
+      :to="{ path: `/groups/edit/${getActiveGroupId()}`, query: { t: Date.now() } }"
       dense
       prepend-icon="mdi-account-group"
       class="text-white bg-transparent mb-2"
@@ -21,7 +21,7 @@
       <a-list-item-title class="text-white">Members</a-list-item-title>
     </a-list-item>
     <a-list-item
-      :to="{ path: `/groups/edit/${getActiveGroup()._id}`, query: { t: Date.now() } }"
+      :to="{ path: `/groups/edit/${getActiveGroupId()}`, query: { t: Date.now() } }"
       dense
       prepend-icon="mdi-account-group"
       class="text-white bg-transparent mb-2"
@@ -33,5 +33,5 @@
 <script setup>
 import { useGroup } from '@/components/groups/group';
 
-const { getActiveGroup } = useGroup();
+const { getActiveGroupId, getActiveGroup } = useGroup();
 </script>
