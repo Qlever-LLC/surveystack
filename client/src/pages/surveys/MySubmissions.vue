@@ -122,7 +122,6 @@
         title="Result of Submission"
         persistent
         @close="showResult = false" />
-      />
     </a-container>
   </div>
 </template>
