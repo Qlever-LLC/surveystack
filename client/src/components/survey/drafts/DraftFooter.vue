@@ -6,7 +6,7 @@
           <a-btn
             @click="$store.dispatch('draft/showOverview', false)"
             outlined
-            variant="flat"
+            variant="outlined"
             large
             color="primary"
             class="full">
