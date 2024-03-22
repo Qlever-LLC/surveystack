@@ -4,7 +4,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/question-sets`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-cube-outline"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">Question Sets</a-list-item-title>
@@ -12,7 +12,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/scripts`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-xml"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">Scripts</a-list-item-title>
@@ -20,7 +20,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/members`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-account-multiple"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">Members</a-list-item-title>
@@ -28,7 +28,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/settings`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-cog-outline"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">Settings</a-list-item-title>

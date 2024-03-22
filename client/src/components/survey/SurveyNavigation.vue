@@ -4,7 +4,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/surveys`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-list-box-outline"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">All Surveys</a-list-item-title>

@@ -4,7 +4,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/my-drafts`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-file-document-edit-outline"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">My Drafts</a-list-item-title>
@@ -12,7 +12,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/my-submissions`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-file-document-multiple-outline"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">My Submissions</a-list-item-title>
@@ -20,7 +20,7 @@
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/submissions`, query: { t: Date.now() } }"
       dense
-      prepend-icon="mdi-account-group"
+      prepend-icon="mdi-file-document-multiple"
       class="text-white bg-transparent mb-2"
       rounded="lg">
       <a-list-item-title class="text-white">Group Submissions</a-list-item-title>
