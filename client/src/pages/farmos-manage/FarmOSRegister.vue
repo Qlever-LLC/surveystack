@@ -102,7 +102,7 @@
         label="Owner of the FarmOS Instance"
         variant="outlined"
         :items="localViewModel.users"
-        item-value="_id"
+        item-value="id"
         :item-title="(item) => `${item.name} (${item.email})`"
         v-model="localViewModel.form.owner"
         :rules="[(v) => !!v || `select at least one owner`]" />
