@@ -49,7 +49,6 @@
             :validationErrors="surveyValidationErrors"
             @view-code-toggle="viewCode = !viewCode"
             @update="publish"
-            @cancel="onCancel"
             @saveDraft="saveDraft"
             @delete="$emit('onDelete')"
             @publish="publish"
@@ -731,9 +730,6 @@ export default {
       } else {
         this.openLibrary(libraryId);
       }
-    },
-    onCancel() {
-      this.$router.push('/surveys/browse');
     },
     async setControlSource(value) {
       if (this.control.type === 'script') {

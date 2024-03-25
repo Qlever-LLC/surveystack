@@ -1,8 +1,6 @@
 <template>
   <a-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
-      <a-breadcrumbs :path="entity.path" />
-
       <div v-if="editable">
         <a-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" variant="text">
           <a-icon left>mdi-cog</a-icon> Admin
@@ -29,7 +27,7 @@
           :editable="editable"
           :entities="subgroups"
           title="Subgroups"
-          :link="(e) => `/g${e.path}`"
+          :link="(e) => `/groups/${e._id}`"
           :linkNew="{ name: 'groups-new', query: { dir: entity.path } }">
           <template v-slot:entity="{ entity }">
             <a-list-item-title>{{ entity.name }}</a-list-item-title>

@@ -16,7 +16,7 @@
         <a-list-item
           v-for="membership in memberships"
           :key="membership._id"
-          :to="`/g${membership.group.path}`"
+          :to="`/groups/${membership.group._id}`"
           three-line>
           <span class="text-secondary text-caption">{{ membership.group.path }}</span>
           <a-list-item-title>{{ membership.group.name }}</a-list-item-title>

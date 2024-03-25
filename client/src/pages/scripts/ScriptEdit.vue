@@ -143,7 +143,7 @@ export function render(props, state, setState) {
           await api.put(`/scripts/${this.entity._id}`, this.entity);
         } else {
           await api.post('/scripts', this.entity);
-          this.$router.push('/scripts');
+          this.$router.push(`/groups/${this.$route.params.id}/scripts`);
         }
       } catch (err) {
         console.log(err);

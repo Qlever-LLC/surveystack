@@ -12,7 +12,6 @@ import AAppBarNavIcon from '../src/components/ui/elements/AAppBarNavIcon.vue';
 import AAvatar from '../src/components/ui/elements/AAppBarNavIcon.vue';
 import ABadge from '../src/components/ui/elements/ABadge.vue';
 import ABanner from '../src/components/ui/elements/ABanner.vue';
-import ABreadcrumbs from '../src/components/ui/elements/ABreadcrumbs.vue';
 import ABtn from '../src/components/ui/elements/ABtn.vue';
 import ABtnToggle from '../src/components/ui/elements/ABtnToggle.vue';
 import ACard from '../src/components/ui/elements/ACard.vue';
@@ -92,7 +91,6 @@ const components = {
   'a-avatar': AAvatar,
   'a-badge': ABadge,
   'a-banner': ABanner,
-  'a-breadcrumbs': ABreadcrumbs,
   'a-btn': ABtn,
   'a-btn-toggle': ABtnToggle,
   'a-card': ACard,

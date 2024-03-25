@@ -1,8 +1,5 @@
 import AppHeader from '@/components/AppHeader.vue';
 import SubmissionList from '@/pages/submissions/List.vue';
-import SurveysDetail from '@/pages/surveys/Detail.vue';
-import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
-import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
 import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
 import Profile from '@/pages/users/Profile.vue';
@@ -17,12 +14,10 @@ import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import ResourceList from '@/pages/resources/ResourceList.vue';
-import Builder from '@/pages/builder/Builder.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
-import { authGuard } from '@/router/index';
 import FarmOS from '@/pages/groups/FarmOS.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
 
@@ -45,49 +40,7 @@ export default [
     name: 'submissions',
     components: getComponents(SubmissionList),
   },
-  {
-    path: '/surveys/new',
-    name: 'surveys-new',
-    components: getComponents(Builder),
-    props: {
-      isNew: true,
-    },
-    beforeEnter: authGuard,
-  },
-  {
-    path: '/surveys/:id/edit',
-    name: 'surveys-edit',
-    components: getComponents(Builder),
-    props: {
-      isNew: false,
-    },
-    beforeEnter: authGuard,
-  },
-  {
-    path: '/surveys/:id/start',
-    name: 'surveys-start',
-    components: getComponents(SurveysDetail),
-    props: {
-      main: {
-        start: true,
-      },
-    },
-  },
-  {
-    path: '/surveys/:id',
-    name: 'surveys-detail',
-    components: getComponents(SurveysDetail),
-  },
-  {
-    path: '/surveys/:surveyId/submissions/new',
-    name: 'new-submission',
-    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
-  },
-  {
-    path: '/surveys/:surveyId/submissions/:submissionId/edit',
-    name: 'edit-submission',
-    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
-  },
+
   {
     path: '/auth/login',
     name: 'auth-login',

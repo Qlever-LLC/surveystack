@@ -5,7 +5,8 @@ import Kit from '@/pages/Kit.vue';
 import store from '@/store';
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import AppInfo from '@/pages/app/AppInfo.vue';
-import Unauthorized from '@/pages/Unauthorized.vue';
+import GroupList from '@/pages/groups/GroupList.vue';
+import GroupEdit from '@/pages/groups/GroupEdit.vue';
 
 const guardLanding = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -36,6 +37,34 @@ export default [
     components: {
       header: AppHeader,
       main: LandingPage,
+    },
+  },
+  {
+    path: '/groups/all',
+    name: 'groups-list',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGlobal,
+      main: GroupList,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/groups/new',
+    name: 'groups-new',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGlobal,
+      main: GroupEdit,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
     },
   },
   {

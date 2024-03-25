@@ -196,7 +196,7 @@ export default {
       }
       try {
         await api.delete(`/surveys/${this.survey._id}`);
-        this.$router.push('/surveys/browse');
+        this.$router.push(this.$route.path + '/surveys');
       } catch (error) {
         console.log(error);
       }
@@ -259,7 +259,7 @@ export default {
         } else {
           await api.post('/surveys', tmp);
           this.editMode = true;
-          this.$router.push(`/surveys/${tmp._id}/edit`);
+          this.$router.push(`/groups/${this.$route.params.id}/surveys/${tmp._id}/edit`);
         }
 
         this.snack(isDraft ? 'Saved Draft' : 'Published Survey');
