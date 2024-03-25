@@ -1,6 +1,6 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
-import vuetify from './../plugins/vuetify';
+import { vuetify } from './../plugins/vuetify';
 
 const partners = [];
 

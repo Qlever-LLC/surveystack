@@ -1,7 +1,7 @@
 import { render } from '@testing-library/vue';
 import { mount, shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
-import vuetify from '../src/plugins/vuetify';
+import { vuetify } from '../src/plugins/vuetify';
 import { createStoreObject } from '../src/store';
 import router from '../src/router';
 
@@ -38,6 +38,7 @@ import AFabTransition from '../src/components/ui/elements/AFabTransition.vue';
 import AFileInput from '../src/components/ui/elements/AFileInput.vue';
 import AFlex from '../src/components/ui/elements/AFlex.vue';
 import AForm from '../src/components/ui/elements/AForm.vue';
+import AHover from '../src/components/ui/elements/AHover.vue';
 import AIcon from '../src/components/ui/elements/AIcon.vue';
 import AImg from '../src/components/ui/elements/AImg.vue';
 import AInput from '../src/components/ui/elements/AInput.vue';
@@ -117,6 +118,7 @@ const components = {
   'a-file-input': AFileInput,
   'a-flex': AFlex,
   'a-form': AForm,
+  'a-hover': AHover,
   'a-icon': AIcon,
   'a-img': AImg,
   'a-input': AInput,
@@ -162,24 +164,18 @@ const components = {
   'app-control-error': appControlError,
 };
 
-
-const createTestUtilsWrapper = testUtilsMethod => function (component, options) {
-  const store = createStore(createStoreObject());
-  return testUtilsMethod(
-    component,
-    {
+const createTestUtilsWrapper = (testUtilsMethod) =>
+  function (component, options) {
+    const store = createStore(createStoreObject());
+    return testUtilsMethod(component, {
       ...options,
       global: {
-        plugins: [
-          vuetify,
-          store,
-        ],
+        plugins: [vuetify, store],
         components,
         ...options?.global,
-      }
-    }
-  )
-};
+      },
+    });
+  };
 const mountWithVuetify = createTestUtilsWrapper(mount);
 const shallowMountWithVuetify = createTestUtilsWrapper(shallowMount);
 
@@ -188,26 +184,19 @@ const renderWithVuetify = function (component, options, storeOverride) {
   root.setAttribute('data-app', 'true');
   const store = storeOverride ?? createStore(createStoreObject());
 
-  return render(
-    component,
-    {
-      ...options,
-      container: document.body.appendChild(root),
-      global: {
-        plugins: [
-          vuetify,
-          store,
-          router,
-        ],
-        components,
-        stubs: {
-          CodeEditor: { template: '<span id="CodeEditorStub" />' },
-          InstructionsEditor: { template: '<span id="InstructionsEditor" />' },
-        },
-        ...options?.global,
+  return render(component, {
+    ...options,
+    container: document.body.appendChild(root),
+    global: {
+      plugins: [vuetify, store, router],
+      components,
+      stubs: {
+        CodeEditor: { template: '<span id="CodeEditorStub" />' },
+        InstructionsEditor: { template: '<span id="InstructionsEditor" />' },
       },
-    }
-  );
+      ...options?.global,
+    },
+  });
 };
 
 export { renderWithVuetify, mountWithVuetify, shallowMountWithVuetify };

@@ -25,11 +25,9 @@
 <script>
 import api from '@/services/api.service';
 import BasicList from '@/components/ui/BasicList2.vue';
-import AppNavigationControl from '@/components/AppNavigationControl.vue';
 
 export default {
   components: {
-    AppNavigationControl,
     BasicList,
   },
   data() {

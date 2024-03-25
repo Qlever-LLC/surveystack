@@ -10,9 +10,9 @@
       rounded="lg">
       <span>
         <a-list-item-title class="d-flex align-center">
-          <span v-if="enableFav" @click="toogleFavorite(idx)">
-            <a-icon v-if="state.favorite[idx]" class="mr-2">mdi-star</a-icon>
-            <a-icon v-if="!state.favorite[idx] && isHovering" class="mr-2"> mdi-star-outline </a-icon>
+          <span v-if="enableFav" @click.prevent="toogleStar(entity)">
+            <a-icon v-if="isStarred(entity)" class="mr-2">mdi-star</a-icon>
+            <a-icon v-if="!isStarred(entity) && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>
           <span v-if="groupStyle">
             <a-avatar class="mr-3" color="accent-lighten-2" rounded="lg" size="35">
@@ -63,6 +63,10 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  pinnedSurveys: {
+    type: Array,
+    required: false,
+  },
   groupStyle: {
     type: Boolean,
     required: false,
@@ -73,6 +77,8 @@ const props = defineProps({
     required: false,
   },
 });
+
+const emit = defineEmits(['toogleStar']);
 
 const state = reactive({
   entity: cloneDeep(props.entity),
@@ -108,8 +114,12 @@ function getTextColor(itemMenu) {
   return { color: itemMenu.color };
 }
 
-function toogleFavorite(idx) {
-  state.favorite[idx] = !state.favorite[idx];
+function isStarred(entity) {
+  return props.pinnedSurveys.find((s) => s._id === entity._id);
+}
+
+function toogleStar(entity) {
+  emit('toogleStar', entity);
 }
 </script>
 

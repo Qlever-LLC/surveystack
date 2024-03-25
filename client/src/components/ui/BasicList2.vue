@@ -15,6 +15,18 @@
       </a-col>
     </a-card-title>
     <a-card-text>
+      <a-list v-if="enableFav" dense twoLine class="pt-0">
+        <list-item-card
+          v-for="(entity, idx) in pinnedSurveys"
+          :key="entity._id"
+          @toogleStar="$emit('toogleStar', entity)"
+          :entity="entity"
+          :idx="String(idx)"
+          :enableFav="enableFav"
+          :pinnedSurveys="pinnedSurveys"
+          :groupStyle="groupStyle"
+          :menu="menu" />
+      </a-list>
       <span v-if="showSearch" class="d-flex mb-6">
         <a-text-field
           v-model="state.searchValue"
@@ -24,7 +36,8 @@
           label="Search"
           prependInnerIcon="mdi-magnify"
           rounded="lg"
-          variant="solo-filled" />
+          variant="solo-filled"
+          clearable />
         <a-btn
           class="ml-6"
           :color="state.showFilter ? 'primary' : 'accent-lighten-8-no bg-transparent'"
@@ -41,9 +54,11 @@
         <list-item-card
           v-for="(entity, idx) in filteredEntities"
           :key="entity._id"
+          @toogleStar="$emit('toogleStar', entity)"
           :entity="entity"
           :idx="String(idx)"
           :enableFav="enableFav"
+          :pinnedSurveys="pinnedSurveys"
           :groupStyle="groupStyle"
           :menu="menu" />
       </a-list>
@@ -66,11 +81,14 @@
         <slot name="noValue" />
       </div>
     </a-card-text>
+    <span v-if="$slots.pagination">
+      <slot name="pagination" />
+    </span>
   </a-card>
 </template>
 
 <script setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
@@ -78,7 +96,6 @@ import formatDistance from 'date-fns/formatDistance';
 import ListItemCard from './ListItemCard.vue';
 import ListItemRow from './ListItemRow.vue';
 import { useDisplay } from 'vuetify';
-import ASpacer from '@/components/ui/elements/ASpacer.vue';
 import AppNavigationControl from '@/components/AppNavigationControl.vue';
 
 const { mobile } = useDisplay();
@@ -97,11 +114,18 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  // TODO favorite part should be linked/merge with pinned like pinned survey and not done like this
   enableFav: {
     type: Boolean,
     required: false,
     default: false,
+  },
+  pinnedSurveys: {
+    type: Array,
+    required: false,
+  },
+  page: {
+    type: Number,
+    required: false,
   },
   groupStyle: {
     type: Boolean,
@@ -141,18 +165,24 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['updateSearch', 'toogleStar']);
+
 const state = reactive({
   searchValue: '',
   showFilter: false,
 });
 
+watch(
+  () => state.searchValue,
+  (val) => {
+    emit('updateSearch', val);
+  }
+);
+
 const entities = computed(() => {
-  // already done for surveys in fetchData in Browse.vue
-  // TODO define a unique schema for fetching for instance
-  // TODO clean/filter all props from entity
   const now = new Date();
   props.entities.forEach((e) => {
-    if (e.meta) {
+    if (e.meta && !e.createdAgo) {
       const parsedDate = parseISO(e.meta.dateCreated);
       if (isValid(parsedDate)) {
         e.createdAgo = formatDistance(parsedDate, now);
@@ -170,6 +200,9 @@ const filteredEntities = computed(() => {
 });
 
 function defaultFilter() {
+  if (entities.value.length === 0) {
+    return [];
+  }
   if (!state.searchValue) {
     return entities.value;
   }
@@ -184,6 +217,9 @@ function defaultFilter() {
 </script>
 
 <style scoped>
+.v-card--variant-elevated {
+  box-shadow: none !important;
+}
 .v-list {
   background: transparent;
 }

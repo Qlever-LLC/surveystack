@@ -5,7 +5,7 @@ export const parameters = {
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 
-import vuetify from './../src/plugins/vuetify';
+import { vuetifyStorybook } from './../src/plugins/vuetify';
 import { setup } from '@storybook/vue3';
 import { withVuetify } from './withVuetifyTheme.decorator';
 
@@ -38,7 +38,7 @@ function importAComps(app) {
 }
 
 function registerPlugins(app) {
-  app.use(vuetify);
+  app.use(vuetifyStorybook);
 }
 
 setup((app) => {
