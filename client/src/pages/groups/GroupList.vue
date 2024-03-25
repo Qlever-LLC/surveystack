@@ -5,10 +5,7 @@
       :entities="entities"
       groupStyle
       :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir } } }"
-      :menu="[
-        { title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/groups/${e._id}`, color: 'green' },
-        { title: `See Group's Surveys`, icon: 'mdi-file-document', action: (e) => `/groups/${e._id}/surveys` },
-      ]">
+      :menu="[{ title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/groups/${e._id}`, color: 'green' }]">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-compass-outline </a-icon>
         Find a group
