@@ -286,12 +286,7 @@ export default {
   },
   methods: {
     clearSearchAndEmitAutocompleteUpdate(ev) {
-      if (!this.multiple) {
-        this.$refs.selectRef.blur();
-      }
-      if (this.multiple) {
-        this.internalSearch = null;
-      }
+      this.internalSearch = null;
       this.$emit('update:modelValue', ev);
     },
     updateValue(val) {
