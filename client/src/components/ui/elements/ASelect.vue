@@ -293,9 +293,6 @@ export default {
     },
     updateValue(val) {
       this.$emit('update:modelValue', val);
-      if (!this.multiple && val) {
-        this.$refs.selectRef.blur();
-      }
     },
     updateSearch(val) {
       this.inputSearch = val;
@@ -304,6 +301,7 @@ export default {
     closeNoDataMenu() {
       if (!this.multiple) {
         this.noDataMenu = null;
+        this.$refs.selectRef.blur();
       }
     },
   },
