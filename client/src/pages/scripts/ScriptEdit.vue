@@ -1,20 +1,22 @@
 <template>
   <a-container>
-    <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
-    <span class="text-secondary">{{ this.entity._id }}</span>
-    <a-text-field v-model="entity.name" label="Name" variant="outlined" hide-details />
-    <active-group-selector
-      class="my-4"
-      label="Group"
-      v-model="entity.meta.group"
-      outlined
-      returnObject
-      adminGroupsOnly />
-    <code-editor title="" class="code-editor" :code="this.entity && this.entity.content" @change="updateCode" />
-    <div class="d-flex mt-5 justify-end">
-      <a-btn variant="text" @click="cancel">Cancel</a-btn>
-      <a-btn color="primary" @click="submit">Save</a-btn>
-    </div>
+    <a-card class="pa-8" color="background">
+      <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
+      <span class="text-secondary">{{ this.entity._id }}</span>
+      <a-text-field v-model="entity.name" label="Name" variant="outlined" hide-details />
+      <active-group-selector
+        class="my-4"
+        label="Group"
+        v-model="entity.meta.group"
+        outlined
+        returnObject
+        adminGroupsOnly />
+      <code-editor title="" class="code-editor" :code="this.entity && this.entity.content" @change="updateCode" />
+      <div class="d-flex mt-5 justify-end">
+        <a-btn variant="text" @click="cancel">Cancel</a-btn>
+        <a-btn color="primary" @click="submit">Save</a-btn>
+      </div>
+    </a-card>
   </a-container>
 </template>
 
@@ -157,8 +159,8 @@ export function render(props, state, setState) {
 
     if (this.editMode) {
       try {
-        const { id } = this.$route.params;
-        const { data } = await api.get(`/scripts/${id}`);
+        const { scriptId } = this.$route.params;
+        const { data } = await api.get(`/scripts/${scriptId}`);
         this.entity = { ...this.entity, ...data };
       } catch (e) {
         console.log('something went wrong:', e);

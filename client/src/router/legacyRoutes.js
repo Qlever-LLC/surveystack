@@ -9,6 +9,8 @@ import Browse from '@/pages/surveys/Browse.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Group from '@/pages/groups/Group.vue';
+import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
+import Script from '@/pages/scripts/Script.vue';
 
 export default [
   {
@@ -46,6 +48,34 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: ScriptList,
+    },
+  },
+  // scripts
+  {
+    path: '/scripts/new',
+    name: 'scripts-new',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: ScriptEdit,
+    },
+  },
+  {
+    path: '/scripts/:id/edit',
+    name: 'scripts-edit',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: ScriptEdit,
+    },
+  },
+  {
+    path: '/scripts/:id',
+    name: 'scripts-detail',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: Script,
     },
   },
   {

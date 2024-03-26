@@ -1,43 +1,51 @@
 <template>
   <a-container>
-    <a-text-field label="Search" v-model="q" append-inner-icon="mdi-magnify" clearable />
-    <app-entity-list :entities="entities" collection="scripts" />
+    <basic-list
+      listCard
+      :entities="entities"
+      :buttonNew="{ title: 'Create new Script', link: { name: 'group-scripts-new', params: { id: $route.params.id } } }"
+      :menu="[
+        {
+          title: 'View Script',
+          icon: 'mdi-open-in-new',
+          action: (e) => `/groups/${$route.params.id}/scripts/${e._id}`,
+          color: 'green',
+        },
+        {
+          title: 'Edit Script',
+          icon: 'mdi-pencil',
+          action: (e) => `/groups/${$route.params.id}/scripts/${e._id}/edit`,
+        },
+      ]">
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-xml </a-icon>
+        Scripts
+        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ entities.length }} </a-chip>
+      </template>
+      <template v-slot:noValue> No Scripts available </template>
+    </basic-list>
   </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appEntityList from '@/components/ui/EntityList.vue';
+import BasicList from '@/components/ui/BasicList2.vue';
 
 export default {
   components: {
-    appEntityList,
+    BasicList,
   },
   data() {
     return {
       entities: [],
-      q: '',
     };
-  },
-  watch: {
-    q(newVal) {
-      // clicking on the clearable icon sets q to null
-      // but we actually want an empty string
-      if (newVal === null) {
-        this.q = '';
-        return;
-      }
-      this.fetchData();
-    },
   },
   methods: {
     async fetchData() {
-      const { data } = await api.get(`/scripts?q=${this.q}`);
+      const q = '';
+      const { data } = await api.get(`/scripts?q=${q}&groupId=${this.$route.params.id}`);
       this.entities = data;
-    },
-    clearQuery() {
-      console.log('clearQuery');
-      this.q = '';
     },
   },
   created() {

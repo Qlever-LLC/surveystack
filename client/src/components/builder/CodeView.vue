@@ -1,7 +1,6 @@
 <template>
   <vue-monaco-editor
     :value="modelValue"
-    theme="vs-dark"
     :options="MONACO_EDITOR_OPTIONS"
     language="javascript"
     @change="emit('update:modelValue', $event)"

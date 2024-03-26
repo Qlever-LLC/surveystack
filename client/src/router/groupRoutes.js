@@ -8,6 +8,8 @@ import Builder from '@/pages/builder/Builder.vue';
 import { authGuard } from '@/router/index';
 import Detail from '@/pages/surveys/Detail.vue';
 import List from '@/pages/submissions/List.vue';
+import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
+import Script from '@/pages/scripts/Script.vue';
 
 export default [
   {
@@ -64,6 +66,7 @@ export default [
       main: Browse,
     },
   },
+  //Scripts
   {
     path: '/groups/:id/scripts',
     name: 'group-scripts',
@@ -71,6 +74,33 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: ScriptList,
+    },
+  },
+  {
+    path: '/groups/:id/scripts/new',
+    name: 'group-scripts-new',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: ScriptEdit,
+    },
+  },
+  {
+    path: '/groups/:id/scripts/:scriptId/edit',
+    name: 'group-scripts-edit',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: ScriptEdit,
+    },
+  },
+  {
+    path: '/groups/:id/scripts/:scriptId',
+    name: 'group-scripts-detail',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: Script,
     },
   },
   {

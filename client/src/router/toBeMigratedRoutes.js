@@ -127,22 +127,6 @@ export default [
     name: 'users-detail',
     components: getComponents(User),
   },
-  // scripts
-  {
-    path: '/scripts/new',
-    name: 'scripts-new',
-    components: getComponents(ScriptEdit),
-  },
-  {
-    path: '/scripts/:id/edit',
-    name: 'scripts-edit',
-    components: getComponents(ScriptEdit),
-  },
-  {
-    path: '/scripts/:id',
-    name: 'scripts-detail',
-    components: getComponents(Script),
-  },
   // integrations
   {
     path: '/group-integrations/new',

@@ -43,10 +43,11 @@ const sanitize = async (entity: any) => {
 };
 
 const getScripts = async (req: Request, res: Response) => {
-  const { q } = req.query;
+  const { q, groupId } = req.query;
   const filter: {
     _id?: ObjectId;
     name?: { $regex: string; $options: string };
+    'meta.group.id'?: ObjectId;
   } = {};
   const projection = { content: 0 };
 
@@ -56,6 +57,10 @@ const getScripts = async (req: Request, res: Response) => {
     } else {
       filter.name = { $regex: q, $options: 'i' };
     }
+  }
+
+  if (typeof groupId === 'string' && ObjectId.isValid(groupId)) {
+    filter['meta.group.id'] = new ObjectId(groupId);
   }
 
   const entities = await db
