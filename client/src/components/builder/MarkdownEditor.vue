@@ -290,5 +290,6 @@ export default {
 .preview * {
   padding: revert;
   margin: revert;
+  max-width: 100%;
 }
 </style>
