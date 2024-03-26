@@ -109,7 +109,7 @@ export function isRequiredUnanswered(node, submission) {
   return value === null;
 }
 
-export function getValueOrNull(v) {
+export function getValueOrNull(v, StringTrimed = true) {
   if (typeof v === 'undefined') {
     return null;
   }
@@ -119,8 +119,12 @@ export function getValueOrNull(v) {
   }
 
   if (typeof v === 'string') {
-    const value = v.trim();
-    return value || null;
+    if (StringTrimed) {
+      const value = v.trim();
+      return value || null;
+    } else {
+      return v || null;
+    }
   }
 
   // should we also check for empty object and return null instead?
