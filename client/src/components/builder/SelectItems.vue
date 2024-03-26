@@ -70,7 +70,7 @@ export default {
         return undefined;
       }
 
-      return this.selected
+      return getArrayValue(this.modelValue)
         .map((item) => {
           const match = this.items.find((i) => i.value === item);
           return match ? match.label : item;
