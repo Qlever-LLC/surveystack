@@ -33,8 +33,7 @@
     autocomplete="off"
     :disabled="disabled"
     clearable
-    @click:clear="setToNull"
-  />
+    @click:clear="setToNull" />
   <v-text-field
     v-else-if="header.type === 'number'"
     :modelValue="value"
@@ -76,7 +75,6 @@
     placeholder="Type to search or add custom answer"
     :modelValue="value"
     @update:modelValue="onDropDownInput"
-    v-model:search="comboboxSearch"
     :items="items"
     item-title="label"
     item-value="value"
@@ -241,7 +239,6 @@ export default {
   data() {
     return {
       menus: {}, // object to hold v-models for v-menu
-      comboboxSearch: null,
     };
   },
   computed: {
@@ -331,7 +328,6 @@ export default {
     },
     onDropDownInput(value) {
       this.onInput(value);
-      this.comboboxSearch = null;
     },
     getDropdownLabel(value) {
       const dropdownItems = this.items;

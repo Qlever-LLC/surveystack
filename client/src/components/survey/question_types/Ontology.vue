@@ -55,7 +55,6 @@
       :placeholder="getPlaceholder"
       :modelValue="getValue"
       @update:modelValue="onChange"
-      v-model:search="comboboxSearch"
       @focus="onFocus"
       @blur="onBlur"
       :items="items"
@@ -110,7 +109,6 @@ export default {
   data() {
     return {
       isLoading: false,
-      comboboxSearch: null,
       submissionItems: [],
       isFocus: false,
     };
@@ -120,7 +118,6 @@ export default {
       data.select;
     },
     onChange(value) {
-      this.comboboxSearch = null;
       if (this.modelValue !== value) {
         if (Array.isArray(value)) {
           this.changed(getValueOrNull(value.map(getValueOrNull)), false);
