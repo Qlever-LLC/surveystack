@@ -120,7 +120,8 @@ const dateForPicker = computed(() => {
     }
   } else {
     if (props.modelValue) {
-      return new Date(props.modelValue);
+      // remove the Z which indicates the timezone
+      return new Date(props.modelValue.slice(0, -1));
     } else {
       return null;
     }
