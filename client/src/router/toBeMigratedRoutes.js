@@ -14,8 +14,6 @@ import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import ResourceList from '@/pages/resources/ResourceList.vue';
-import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
-import Script from '@/pages/scripts/Script.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
 import FarmOS from '@/pages/groups/FarmOS.vue';
