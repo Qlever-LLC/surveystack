@@ -138,9 +138,9 @@
     ref="selectRef"
     :modelValue="getModelValue"
     @update:modelValue="updateValue"
-    :search="searchInput"
-    @update:search="updateSearch"
-    v-model:menu="noDataMenu"
+    v-model:search="inputSearch"
+    :menu="noDataMenu"
+    @update:menu="updateMenu"
     @blur="$emit('blur')"
     @focus="$emit('focus', $event)"
     @keydown.enter="closeNoDataMenu"
@@ -159,7 +159,7 @@
     :density="dense ? 'compact' : 'default'"
     :hide-details="hideDetails"
     :hide-no-data="false"
-    :hide-selected="true"
+    :hide-selected="multiple ? false : true"
     :disabled="disabled"
     :items="items"
     :item-title="itemTitle"
@@ -226,7 +226,6 @@ export default {
     primary: { type: Boolean, required: false },
     //vuetify v-model props
     modelValue: { type: undefined, required: false },
-    searchInput: { type: undefined, required: false },
     //vuetify props
     appendIcon: { type: undefined, required: false },
     chips: { type: Boolean, required: false },
@@ -269,8 +268,8 @@ export default {
   data() {
     return {
       internalSearch: null,
-      inputSearch: this.searchInput,
-      noDataMenu: null,
+      inputSearch: null,
+      noDataMenu: false,
     };
   },
   computed: {
@@ -286,22 +285,25 @@ export default {
   },
   methods: {
     clearSearchAndEmitAutocompleteUpdate(ev) {
-      this.internalSearch = null;
-      this.$emit('update:modelValue', ev);
+      if (this.multiple) {
+        this.internalSearch = null;
+      }
+      this.updateValue(ev);
     },
     updateValue(val) {
       this.$emit('update:modelValue', val);
-      if (!this.multiple && val) {
+    },
+    updateMenu(menuState) {
+      this.noDataMenu = menuState;
+      if (!menuState) {
         this.$refs.selectRef.blur();
       }
     },
-    updateSearch(val) {
-      this.inputSearch = val;
-      this.$emit('update:search', val);
-    },
     closeNoDataMenu() {
-      if (!this.multiple) {
-        this.noDataMenu = null;
+      if (!this.multiple && this.modelValue) {
+        this.updateValue(this.modelValue ? this.modelValue.trim() : null);
+        this.noDataMenu = false;
+        this.$refs.selectRef.blur();
       }
     },
   },

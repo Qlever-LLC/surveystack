@@ -43,7 +43,6 @@ data-test-id="autocomplete" was removed-->
     allowCustomItem
     :modelValue="getValue"
     @update:modelValue="updateCombobox"
-    v-model:search="comboboxSearch"
     class="full-width custom-ontology dropdown"
     clearable
     color="focus"
@@ -93,7 +92,6 @@ export default {
   data() {
     return {
       isLoading: false,
-      comboboxSearch: null,
       submissionItems: [],
     };
   },
@@ -107,7 +105,6 @@ export default {
     },
     updateCombobox(value) {
       this.emitValueToParent(value);
-      this.comboboxSearch = null;
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);

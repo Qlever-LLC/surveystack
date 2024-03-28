@@ -55,7 +55,6 @@
       :placeholder="getPlaceholder"
       :modelValue="getValue"
       @update:modelValue="onChange"
-      v-model:search="comboboxSearch"
       @focus="onFocus"
       @blur="onBlur"
       :items="items"
@@ -110,7 +109,6 @@ export default {
   data() {
     return {
       isLoading: false,
-      comboboxSearch: null,
       submissionItems: [],
       isFocus: false,
     };
@@ -120,21 +118,14 @@ export default {
       data.select;
     },
     onChange(value) {
-      this.comboboxSearch = null;
       if (this.modelValue !== value) {
         if (Array.isArray(value)) {
-          this.changed(getValueOrNull(value.map(getValueOrNull)));
+          this.changed(getValueOrNull(value.map(getValueOrNull)), false);
         } else {
-          const nextValue = getValueOrNull(value);
+          const nextValue = getValueOrNull(value, false);
           this.changed(nextValue ? [nextValue] : nextValue);
         }
       }
-    },
-    remove(item) {
-      this.changed(getValueOrNull(this.modelValue.filter((v) => v !== item.value)));
-    },
-    removeValue(value) {
-      this.changed(getValueOrNull(this.modelValue.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);
@@ -167,7 +158,7 @@ export default {
         uniq(this.getArrayValue).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
-      
+
       return [...defaultItems, ...customItems];
     },
     sourceIsValid() {
@@ -198,8 +189,8 @@ export default {
         return this.control.options.allowCustomSelection
           ? 'Type to search or add custom answer'
           : this.items.length < constants.ASELECT_MAX_ITEMS_TOBE_VSELECT
-          ? 'Search'
-          : 'Type to search';
+            ? 'Search'
+            : 'Type to search';
       }
       return undefined;
     },

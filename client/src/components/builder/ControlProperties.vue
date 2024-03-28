@@ -163,7 +163,14 @@
           !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
         " />
       <ontology
-        v-if="isOntology"
+        v-if="isOntology && !!controlInProgress.options.hasMultipleSelections"
+        v-model="controlInProgress.defaultValue"
+        :multiple="controlInProgress.options.hasMultipleSelections"
+        :customAnswer="controlInProgress.options.allowCustomSelection"
+        :source="controlInProgress.options.source"
+        :resources="survey.resources" />
+      <ontology
+        v-if="isOntology && !controlInProgress.options.hasMultipleSelections"
         v-model="controlInProgress.defaultValue"
         :multiple="controlInProgress.options.hasMultipleSelections"
         :customAnswer="controlInProgress.options.allowCustomSelection"
