@@ -10,6 +10,7 @@ import Detail from '@/pages/surveys/Detail.vue';
 import List from '@/pages/submissions/List.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
+import DraftList from '@/pages/surveys/DraftList.vue';
 
 export default [
   {
@@ -36,7 +37,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: MySubmissions,
+      main: DraftList,
     },
   },
   {
