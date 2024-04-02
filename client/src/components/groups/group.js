@@ -43,10 +43,17 @@ export function useGroup() {
     store.dispatch('memberships/setActiveGroup', groupId);
   }
 
+  function isGroupAdmin() {
+    const memberships = store.getters['memberships/memberships'];
+    const activeGroupId = getActiveGroupId();
+    return memberships.some((m) => m.group._id === activeGroupId && m.role === 'admin');
+  }
+
   return {
     getMyGroups,
     getActiveGroupId,
     getActiveGroup,
     setActiveGroupId,
+    isGroupAdmin,
   };
 }
