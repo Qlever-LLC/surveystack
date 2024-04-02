@@ -6,7 +6,7 @@
       <component :is="Component" :fullWidth="!state.showMain" />
     </router-view>
 
-    <a-main v-if="state.showMain">
+    <a-main v-if="state.showMain" style="--v-layout-left: 300px">
       <app-global-feedback />
       <router-view name="main" :key="$route.fullPath" />
     </a-main>

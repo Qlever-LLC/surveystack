@@ -4,17 +4,15 @@
     floating
     permanent
     color="rgba(0, 0, 0, 0)"
+    width="300"
     :class="fullWidth ? 'w-100 align-center' : ''"
-    :style="fullWidth ? '' : 'width:256px!important'"
     class="pt-4 mr-4">
-    <SubmissionNavigation />
-    <SurveyNavigation />
-    <GroupAdminNavigation />
-    <GroupDocsNavigation />
-
-    <template v-slot:append>
-      <AppVersion />
-    </template>
+    <div class="content-width">
+      <SubmissionNavigation />
+      <SurveyNavigation />
+      <GroupAdminNavigation />
+      <GroupDocsNavigation />
+    </div>
   </a-navigation-drawer>
 </template>
 
@@ -24,7 +22,6 @@ import SubmissionNavigation from '@/components/submissions/SubmissionNavigation.
 import SurveyNavigation from '@/components/survey/SurveyNavigation.vue';
 import GroupAdminNavigation from '@/components/groups/GroupAdminNavigation.vue';
 import GroupDocsNavigation from '@/components/groups/GroupDocsNavigation.vue';
-import AppVersion from '@/components/AppVersion.vue';
 
 const props = defineProps({
   fullWidth: {
@@ -35,7 +32,7 @@ const props = defineProps({
 </script>
 
 <style scoped lang="scss">
-.no-background {
-  background-color: transparent;
+.content-width * {
+  width: 300px !important;
 }
 </style>

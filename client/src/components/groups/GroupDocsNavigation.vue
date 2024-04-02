@@ -39,6 +39,13 @@
                 class="pa-0 text-white">
                 <a-list-item-title class="text-white">About</a-list-item-title>
               </v-list-item>
+              <v-list-item
+                to="/app/info"
+                target="_blank"
+                prepend-icon="mdi-information-outline"
+                class="pa-0 text-white">
+                <a-list-item-title class="text-white">Version {{ lcl.shortHash }}</a-list-item-title>
+              </v-list-item>
             </a-list>
           </a-expansion-panel-text>
         </a-expansion-panel>
@@ -53,6 +60,7 @@ import { useStore } from 'vuex';
 
 const { getActiveGroup } = useGroup();
 const store = useStore();
+const lcl = JSON.parse(process.env.VUE_APP_LCL);
 
 const expanded = ref(false);
 

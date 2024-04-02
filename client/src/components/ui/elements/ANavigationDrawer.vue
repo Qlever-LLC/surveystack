@@ -1,5 +1,10 @@
 <template>
-  <v-navigation-drawer :modelValue="modelValue" :permanent="permanent" :sticky="sticky" :floating="floating">
+  <v-navigation-drawer
+    :modelValue="modelValue"
+    :permanent="permanent"
+    :sticky="sticky"
+    :floating="floating"
+    :width="width">
     <slot />
     <template v-slot:append>
       <slot name="append" />
@@ -15,6 +20,7 @@ export default {
     permanent: { type: Boolean, required: false },
     sticky: { type: Boolean, required: false },
     floating: { type: Boolean, required: false },
+    width: { type: Number, required: false },
   },
 };
 </script>
