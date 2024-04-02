@@ -106,8 +106,9 @@ const datePickerType = computed(() => {
 const dateForPicker = computed(() => {
   if (props.type === 'date-week-month-year') {
     if (props.modelValue) {
-      const start = new Date(startOfWeek(parseISO(props.modelValue)));
-      const end = new Date(endOfWeek(parseISO(props.modelValue)));
+      const date = props.modelValue.slice(0, -1);
+      const start = new Date(startOfWeek(parseISO(date)));
+      const end = new Date(endOfWeek(parseISO(date)));
       const current = start;
       const range = [];
       while (current <= end) {
@@ -120,7 +121,8 @@ const dateForPicker = computed(() => {
     }
   } else {
     if (props.modelValue) {
-      return new Date(props.modelValue);
+      // remove the Z which indicates the timezone
+      return new Date(props.modelValue.slice(0, -1));
     } else {
       return null;
     }
@@ -165,7 +167,7 @@ const dateFormat = (type, value) => {
     // case 'date-year':
     //   return format(value, 'yyyy');
     case 'date-week-month-year':
-      return format(value[0], 'yyyy-MM') + ` ${getWeekOfMonth(value[0])}w`;
+      return format(new Date(startOfWeek(value[0])), 'yyyy-MM-dd');
     case 'date':
       return format(value, 'yyyy-MM-dd');
   }
