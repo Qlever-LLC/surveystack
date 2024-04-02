@@ -4,7 +4,7 @@
     floating
     permanent
     color="rgba(0, 0, 0, 0)"
-    width="300"
+    :width="300"
     :class="fullWidth ? 'w-100 align-center' : ''"
     class="pt-4 mr-4">
     <div class="content-width">
