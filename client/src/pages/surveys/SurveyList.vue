@@ -11,9 +11,9 @@
         :buttonNew="{ title: 'Create new Survey', link: { name: 'groups-new' } }"
         :menu="[
           {
-            title: 'todo',
+            title: 'Start Survey',
             icon: 'mdi-open-in-new',
-            action: (e) => `/groups/${$route.params.id}/surveys/${e._id}`,
+            action: (e) => `/groups/${$route.params.id}/surveys/${e._id}/submissions/new`,
             color: 'green',
           },
           { title: `todo`, icon: 'mdi-file-document', action: (e) => `/groups/${$route.params.id}/surveys/${e._id}` },
