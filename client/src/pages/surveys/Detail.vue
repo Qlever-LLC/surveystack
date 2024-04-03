@@ -104,7 +104,10 @@ export default {
   },
   methods: {
     startDraft(survey) {
-      this.$router.push({ name: 'new-submission', params: { surveyId: survey._id } });
+      this.$router.push({
+        name: 'group-survey-submissions-new',
+        params: { id: this.$route.params.id, surveyId: survey._id },
+      });
     },
     startDraftAs(survey, selectedMember) {
       this.showSelectMember = false;

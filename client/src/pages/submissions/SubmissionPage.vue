@@ -10,7 +10,8 @@
       <a-progress-circular :size="50" />
     </div>
     <div v-else-if="hasError" class="text-center mt-8">
-      {{ errorMessage }} <router-link :to="`/surveys/${$route.params.surveyId}`">Back to survey.</router-link>
+      {{ errorMessage }}
+      <router-link :to="`/groups/${$route.param.id}/surveys/${$route.params.surveyId}`">Back to survey.</router-link>
     </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
@@ -219,7 +220,7 @@ export default {
     }
 
     // If the user is on the new-submission route, initialize a new submission and then redirect to the edit-submission route for that submission
-    if (this.$route.name === 'new-submission') {
+    if (this.$route.name === 'group-survey-submissions-new') {
       const { group, submitAsUserId } = this.$route.query;
       if (group) {
         // see analysis in https://gitlab.com/our-sci/software/surveystack/-/merge_requests/230#note_1286909610
@@ -239,10 +240,10 @@ export default {
         }
       }
       const submissionId = await this.$store.dispatch('submissions/startDraft', startDraftConfig);
-      await this.$router.replace({ name: 'edit-submission', params: { surveyId, submissionId } });
+      await this.$router.replace({ name: 'group-survey-submissions-edit', params: { surveyId, submissionId } });
     }
 
-    if (this.$route.name === 'edit-submission') {
+    if (this.$route.name === 'group-survey-submissions-edit') {
       const { submissionId } = this.$route.params;
       await this.$store.dispatch('submissions/fetchLocalSubmissions');
       const localSubmission = this.$store.getters['submissions/getSubmission'](submissionId);

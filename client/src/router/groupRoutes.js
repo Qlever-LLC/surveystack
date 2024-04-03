@@ -161,7 +161,7 @@ export default [
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions/new',
-    name: 'group-survey-submissions-start',
+    name: 'group-survey-submissions-new',
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
@@ -179,7 +179,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: Detail, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
+      main: SubmissionPage,
     },
   },
 ];
