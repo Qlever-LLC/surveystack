@@ -62,10 +62,6 @@
     <app-draft-footer
       class="draft-footer px-0 bg-grey-lighten-4"
       :class="{ 'show-submit': showOverview }"
-      :style="{
-        left: moveFooter ? '256px' : '0px',
-        width: moveFooter ? 'calc(100% - 256px)' : '100%',
-      }"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered'] && $store.getters['draft/enableNext']"
       :enableSubmit="!$store.getters['draft/errors']"
@@ -171,15 +167,6 @@ export default {
       set(v) {
         this.$store.dispatch('draft/showConfirmSubmission', v);
       },
-    },
-    moveFooter() {
-      if (this.builder) {
-        return false;
-      }
-      // we want a fixed footer, but this causes issues when the menu side bar is shown...
-      // Basically, we need to move the footer to the left and calculate its width if the menu is shown,
-      // However, if display breakpoint is 'md' or less, we do not move the footer
-      return this.$store.getters['appui/menu'] && !this.$vuetify.display.mdAndDown;
     },
   },
   watch: {
@@ -361,6 +348,5 @@ export default {
   width: 100%;
   position: fixed;
   bottom: 0px;
-  left: 0px;
 }
 </style>

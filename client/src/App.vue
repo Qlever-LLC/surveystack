@@ -6,7 +6,7 @@
       <component :is="Component" :fullWidth="!state.showMain" />
     </router-view>
 
-    <a-main v-if="state.showMain" style="--v-layout-left: 300px">
+    <a-main v-if="state.showMain" :style="state.showNav ? '--v-layout-left: 300px' : ''">
       <app-global-feedback />
       <router-view name="main" :key="$route.fullPath" />
     </a-main>
@@ -47,7 +47,7 @@ const state = reactive({
     }
   }),
   showHeader: computed(() => state?.routeHasHeader && !state?.fullscreen),
-  showNav: computed(() => state?.routeHasHeader && !state?.fullscreen),
+  showNav: computed(() => state?.routeHasNavigation && !state?.fullscreen),
   showMain: computed(() => state?.routeHasMain && (!mobile.value || forceMobileFullscreen.value)),
   routeHasHeader: computed(() => {
     return !!route?.matched?.[0]?.components?.header;

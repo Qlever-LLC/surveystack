@@ -28,7 +28,7 @@
         </a-list-item>
       </a-list>
       <GroupNavigation />
-      <SuperAdminNavigation />
+      <SuperAdminNavigation v-if="store.getters['auth/isSuperAdmin']" />
       <GroupDocsNavigation />
     </div>
   </a-navigation-drawer>
@@ -38,6 +38,7 @@
 import GroupNavigation from '@/components/groups/GroupNavigation.vue';
 import GroupDocsNavigation from '@/components/groups/GroupDocsNavigation.vue';
 import SuperAdminNavigation from '@/components/superAdmin/SuperAdminNavigation.vue';
+import { useStore } from 'vuex';
 
 const props = defineProps({
   fullWidth: {
@@ -45,6 +46,7 @@ const props = defineProps({
     required: false,
   },
 });
+const store = useStore();
 </script>
 
 <style scoped lang="scss">

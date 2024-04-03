@@ -5,7 +5,7 @@ import SurveysDetail from '@/pages/surveys/Detail.vue';
 import Builder from '@/pages/builder/Builder.vue';
 import { authGuard } from '@/router/index';
 import MySubmissions from '@/pages/surveys/MySubmissions.vue';
-import Browse from '@/pages/surveys/Browse.vue';
+import SurveyList from '@/pages/surveys/SurveyList.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Group from '@/pages/groups/Group.vue';
@@ -38,7 +38,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: Browse,
+      main: SurveyList,
     },
   },
   {

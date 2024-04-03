@@ -1,6 +1,6 @@
 import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
-import Browse from '@/pages/surveys/Browse.vue';
+import SurveyList from '@/pages/surveys/SurveyList.vue';
 import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
@@ -11,6 +11,7 @@ import List from '@/pages/submissions/List.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
 import DraftList from '@/pages/surveys/DraftList.vue';
+import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
 
 export default [
   {
@@ -28,7 +29,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: Browse,
+      main: SurveyList,
     },
   },
   {
@@ -64,7 +65,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: Browse,
+      main: SurveyList,
     },
   },
   //Scripts
@@ -159,12 +160,12 @@ export default [
     },
   },
   {
-    path: '/groups/:id/surveys/:surveyId/submissions/start',
-    name: 'group-survey-submissions-start',
+    path: '/groups/:id/surveys/:surveyId/submissions/new',
+    name: 'group-survey-submissions-new',
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: Detail, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
+      main: SubmissionPage, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
     },
     props: {
       main: {
@@ -178,7 +179,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: Detail, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
+      main: SubmissionPage,
     },
   },
 ];

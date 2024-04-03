@@ -1,5 +1,5 @@
 <template>
-  <a-container v-if="entity && show" class="survey-detail bg-white" style="max-width: 100% !important">
+  <a-container v-if="entity && show" class="survey-detail bg-white">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
       <a-btn v-if="editable" class="mx-2" :to="`/groups/${$route.params.id}/surveys/${entity._id}/edit`">
         <a-icon>mdi-pencil</a-icon>
@@ -104,7 +104,10 @@ export default {
   },
   methods: {
     startDraft(survey) {
-      this.$router.push({ name: 'new-submission', params: { surveyId: survey._id } });
+      this.$router.push({
+        name: 'group-survey-submissions-new',
+        params: { id: this.$route.params.id, surveyId: survey._id },
+      });
     },
     startDraftAs(survey, selectedMember) {
       this.showSelectMember = false;
@@ -177,7 +180,7 @@ export default {
     },
   },
   async created() {
-    const { submissionId } = this.$route.params;
+    const { surveyId } = this.$route.params;
     const { group } = this.$route.query;
 
     if (group) {
@@ -185,7 +188,7 @@ export default {
       await autoSelectActiveGroup(this.$store, group);
     }
 
-    const { data: entity } = await api.get(`/surveys/${submissionId}?version=latest`);
+    const { data: entity } = await api.get(`/surveys/${surveyId}?version=latest`);
 
     if (entity.resources) {
       //also fetch resources here in case survey is not pinned, so it's available if device goes offline
@@ -196,7 +199,7 @@ export default {
 
     try {
       // load date of latestSubmission and number of submissions. This is not prefetched by means, so it will throw when offline
-      const { data: surveyInfo } = await api.get(`/surveys/info?id=${submissionId}`);
+      const { data: surveyInfo } = await api.get(`/surveys/info?id=${surveyId}`);
       this.surveyInfo = surveyInfo;
     } catch (error) {
       console.warn('unable to get survey stats infos. Maybe device is offline.');
@@ -227,7 +230,6 @@ export default {
 ,
 <style scoped lang="scss">
 .survey-detail {
-  width: 100%;
   height: 100%;
 }
 
@@ -238,11 +240,8 @@ export default {
 
 .start-button-container {
   background: linear-gradient(to bottom, rgba(80, 44, 155, 0) 0%, rgba(255, 255, 255, 0.85) 50%);
-
-  position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%;
 }
 
 .survey-info {
