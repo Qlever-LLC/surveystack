@@ -29,7 +29,7 @@
         </template>
         <a-list dense class="py-0">
           <a-list-item
-            v-for="(itemMenu, idx) of menu"
+            v-for="(itemMenu, idx) of filteredMenu"
             :key="idx"
             class="d-flex align-center justify-end"
             :style="getTextColor(itemMenu)"
@@ -46,7 +46,7 @@
 
 <script setup>
 import { cloneDeep } from 'lodash';
-import { reactive, onMounted } from 'vue';
+import { reactive, computed, onMounted } from 'vue';
 
 const props = defineProps({
   entity: {
@@ -108,6 +108,10 @@ onMounted(() => {
       state.avatarName = '';
     }
   }
+});
+
+const filteredMenu = computed(() => {
+  return props.menu.filter((m) => m.render || m.render === undefined);
 });
 
 function getTextColor(itemMenu) {
