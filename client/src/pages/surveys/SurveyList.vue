@@ -31,7 +31,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { reactive, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
@@ -63,17 +63,17 @@ const state = reactive({
 });
 
 const activeTabPaginationLength = computed(() => {
-  const { total } = this.surveys.pagination;
+  const { total } = state.surveys.pagination;
   return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
 });
 const groups = computed(() => {
-  return this.$store.getters['memberships/groups'];
+  return store.getters['memberships/groups'];
 });
 const isWhitelabel = computed(() => {
-  return this.$store.getters['whitelabel/isWhitelabel'];
+  return store.getters['whitelabel/isWhitelabel'];
 });
 const whitelabelPartner = computed(() => {
-  return this.$store.getters['whitelabel/partner'];
+  return store.getters['whitelabel/partner'];
 });
 
 initData();
@@ -100,7 +100,7 @@ async function initData() {
     {
       title: 'Start Survey',
       icon: 'mdi-open-in-new',
-      action: (e) => `/groups/${$route.params.id}/surveys/${e._id}/submissions/new`,
+      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}/submissions/new`,
       color: 'green',
     },
     {
