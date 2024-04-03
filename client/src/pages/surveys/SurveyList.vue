@@ -75,7 +75,7 @@ export default {
       return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
     },
     activeGroupId() {
-      return this.$store.getters['memberships/activeGroup'];
+      return this.$route.params.id;
     },
     groups() {
       return this.$store.getters['memberships/groups'];
@@ -114,7 +114,7 @@ export default {
       await this.getDataForTab();
     },
     async getDataForTab() {
-      const activeGroupId = this.$store.getters['memberships/activeGroup'];
+      const activeGroupId = this.$route.params.id;
       // eslint-disable-next-line no-case-declarations
       const [pinnedResponse, response] = await Promise.all([
         this.fetchPinnedSurveys(activeGroupId),
