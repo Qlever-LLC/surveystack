@@ -19,10 +19,4 @@
     </a-list-item>
   </a-list>
 </template>
-<script setup>
-import { useGroup } from '@/components/groups/group';
-import { useRouter } from 'vue-router';
-
-const { getMyGroups, setActiveGroupId } = useGroup();
-const router = useRouter();
-</script>
+<script setup></script>
