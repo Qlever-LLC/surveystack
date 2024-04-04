@@ -36,8 +36,9 @@
           <template v-slot:label>
             <a-text-field
               class="text-field-other flex-fill"
-              :modelValue="customSelection"
+              v-model="customSelection"
               @update:modelValue="handleCustomSelectionInput"
+              @update:focused="handleCustomSelectionFocus"
               data-testid="custom-input"
               hide-details
               variant="outlined"
@@ -61,8 +62,8 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 
-export function getNextValue(value) {
-  const nextValue = getValueOrNull(value);
+export function getNextValue(value, StringTrimed = true) {
+  const nextValue = getValueOrNull(value, StringTrimed);
   // next value should be an array with single element for value, else null
   return nextValue ? [nextValue] : nextValue;
 }
@@ -89,11 +90,11 @@ export default {
     },
 
     clearSelection() {
+      this.customSelection = null;
       this.changed(null);
     },
 
-    handleCustomSelectionInput(value) {
-      this.customSelection = value;
+    handleCustomSelectionInput() {
       // set submission question value if the current question value doesn't match one of the entries in `control.options.source`
       // TODO: did the previous removal of this block break any functionality?
       /*
@@ -105,7 +106,18 @@ export default {
         this.changed(this.getValueOrNull(value));
       }
       */
-      this.changed(getNextValue(value));
+      this.changed(getNextValue(this.customSelection, false));
+    },
+
+    handleCustomSelectionFocus(focus) {
+      if (focus) {
+        this.handleCustomSelectionInput();
+      } else {
+        if (this.customSelection) {
+          this.customSelection = this.customSelection.trim();
+        }
+        this.changed(getNextValue(this.customSelection));
+      }
     },
   },
   computed: {
@@ -140,6 +152,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+:deep(.custom-input-radio .v-selection-control__wrapper) {
+  margin-top: 10px;
+}
 :deep(.custom-input-radio .v-label) {
   margin-top: 10px;
   width: 100% !important;
