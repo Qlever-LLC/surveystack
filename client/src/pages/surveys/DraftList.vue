@@ -21,6 +21,21 @@ const { getActiveGroupId, isGroupAdmin } = useGroup();
 
 const state = reactive({
   drafts: [],
+  menu: [
+    {
+      title: 'Continue',
+      icon: 'mdi-open-in-new',
+      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e.meta.survey.id}/submissions/${e._id}/edit`,
+      color: 'green',
+    },
+    {
+      title: 'Delete',
+      icon: 'mdi-trash-can-outline',
+      action: (e) => `/todo`,
+      color: 'red',
+      disabled: true,
+    },
+  ],
 });
 
 initData();

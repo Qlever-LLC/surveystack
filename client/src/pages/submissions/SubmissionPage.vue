@@ -11,7 +11,7 @@
     </div>
     <div v-else-if="hasError" class="text-center mt-8">
       {{ errorMessage }}
-      <router-link :to="`/groups/${$route.param.id}/surveys/${$route.params.surveyId}`">Back to survey.</router-link>
+      <router-link :to="`/groups/${$route.params.id}/surveys`">Back to survey list</router-link>
     </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
