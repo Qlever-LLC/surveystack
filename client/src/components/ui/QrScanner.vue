@@ -6,14 +6,14 @@
       :x-large="!small"
       :small="!!small"
       color="primary"
-      @click="isScannerOpen = true">
+      @click="startScanner()">
       <a-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</a-icon>
     </a-btn>
 
     <a-dialog v-model="isScannerOpen" fullscreen>
       <a-card>
         <a-toolbar color="primary">
-          <a-btn aria-label="Close QR Scanner" icon @click="isScannerOpen = false">
+          <a-btn aria-label="Close QR Scanner" icon @click="stopScanner">
             <a-icon>mdi-close</a-icon>
           </a-btn>
           <a-toolbar-title>QR Code Scanner</a-toolbar-title>
@@ -32,90 +32,90 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, onBeforeUpdate, onUnmounted, onUpdated, ref } from 'vue';
+<script setup>
+import { nextTick, ref } from 'vue';
 import QrScanner from 'qr-scanner';
-/* eslint-disable import/no-webpack-loader-syntax, import/extensions */
-// import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
 
-// QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
-
-export default defineComponent({
-  emits: ['codeDetected'],
-  props: {
-    small: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
+const props = defineProps({
+  small: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
-  setup(props, { emit }) {
-    const videoContainerElement = ref(null);
-    const videoElement = ref(null);
-    const isScannerOpen = ref(false);
-    const isLoading = ref(true);
-    const hasCameraError = ref(false);
-    let qrScanner = null;
+});
 
-    function setScanRegionSizeCSSVar() {
-      const scanRegionSize = Math.round(
-        (2 / 3) * Math.min(videoElement.value.clientWidth, videoElement.value.clientHeight)
-      );
-      videoContainerElement.value.style.setProperty('--scan-region-size', `${scanRegionSize}px`);
-    }
+const emit = defineEmits(['codeDetected']);
 
-    function handleScanSuccess(result) {
-      emit('codeDetected', result);
-      isScannerOpen.value = false;
-    }
+const videoContainerElement = ref(null);
+const videoElement = ref(null);
+const isScannerOpen = ref(false);
+const isLoading = ref(true);
+const hasCameraError = ref(false);
+let qrScanner = null;
 
-    function destroyScanner() {
-      if (qrScanner) {
-        qrScanner.destroy();
+function setScanRegionSizeCSSVar() {
+  const scanRegionSize = Math.round(
+    (2 / 3) * Math.min(videoElement.value.clientWidth, videoElement.value.clientHeight)
+  );
+  videoContainerElement.value.style.setProperty('--scan-region-size', `${scanRegionSize}px`);
+}
+
+function handleScanSuccess(result) {
+  emit('codeDetected', result);
+  isScannerOpen.value = false;
+}
+
+async function startScanner() {
+  isScannerOpen.value = true;
+
+  //wait a tick for the videoElement to load
+  await nextTick();
+
+  if (!videoElement.value) {
+    return;
+  }
+
+  videoElement.value.addEventListener(
+    'playing',
+    () => {
+      if (videoElement.value) {
+        setScanRegionSizeCSSVar();
       }
+    },
+    { once: true }
+  );
+  qrScanner = new QrScanner(videoElement.value, handleScanSuccess);
 
-      qrScanner = null;
-    }
+  try {
+    await qrScanner.start();
+    isLoading.value = false;
+  } catch (e) {
+    hasCameraError.value = true;
+    destroyScanner();
+  }
+}
 
-    async function startScanner() {
-      if (!videoElement.value) {
-        return;
-      }
+function stopScanner() {
+  if (qrScanner) {
+    qrScanner.stop();
+    destroyScanner();
+  }
 
-      videoElement.value.addEventListener(
-        'playing',
-        () => {
-          if (videoElement.value) {
-            setScanRegionSizeCSSVar();
-          }
-        },
-        { once: true }
-      );
+  isLoading.value = false;
+  isScannerOpen.value = false;
+}
 
-      if (qrScanner === null) {
-        qrScanner = new QrScanner(videoElement.value, handleScanSuccess);
-      }
+function destroyScanner() {
+  if (qrScanner) {
+    qrScanner.destroy();
+  }
 
-      try {
-        await qrScanner.start();
-        isLoading.value = false;
-      } catch (e) {
-        hasCameraError.value = true;
-        destroyScanner();
-      }
-    }
+  qrScanner = null;
+}
 
-    function stopScanner() {
-      if (qrScanner) {
-        qrScanner.stop();
-      }
-
-      isLoading.value = true;
-    }
-
-    function click() {
+/*onMounted(() => {
       isScannerOpen.value = true;
-    }
+    });
 
     onUnmounted(destroyScanner);
 
@@ -134,18 +134,7 @@ export default defineComponent({
           hasCameraError.value = true;
         }
       }
-    });
-
-    return {
-      videoElement,
-      videoContainerElement,
-      isScannerOpen,
-      isLoading,
-      hasCameraError,
-      click,
-    };
-  },
-});
+    });*/
 </script>
 
 <style scoped lang="scss">
