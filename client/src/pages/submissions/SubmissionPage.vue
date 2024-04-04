@@ -42,8 +42,8 @@
       persistent
       :to="
         survey && {
-          name: 'surveys-detail',
-          params: { id: survey._id },
+          name: 'group-my-submissions',
+          params: { id: $route.params.id },
           query: { minimal_ui: $route.query.minimal_ui },
         }
       "
