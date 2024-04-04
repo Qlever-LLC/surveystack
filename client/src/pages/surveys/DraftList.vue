@@ -3,7 +3,7 @@
     <basic-list :entities="state.drafts" :menu="state.menu">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml </a-icon>
-        Drafts
+        My Draft Submissions
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ state.drafts.length }} </a-chip>
       </template>
       <template v-slot:noValue> No Drafts available </template>
