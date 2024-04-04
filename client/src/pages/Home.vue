@@ -118,7 +118,7 @@
     <v-row>
       <v-col align="center">
         <v-btn x-large text :to="`/surveys/browse`">
-          <v-icon left>mdi-text-box-search-outline</v-icon>Browse All Surveys
+          <v-icon left>mdi-text-box-search-outline</v-icon>{{ $t('startScreen.browseAllSurveys') }}
         </v-btn>
       </v-col>
     </v-row>

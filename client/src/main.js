@@ -5,6 +5,8 @@ import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
+import VueI18n from 'vue-i18n';
+import messages from './i18n';
 import { startToggle } from './plugins/toggle';
 import { startSentry } from './plugins/sentry';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
@@ -45,10 +47,16 @@ Vue.filter('showNull', (value) => {
 
 Vue.config.productionTip = false;
 Vue.use(CompositionApi);
+Vue.use(VueI18n);
 new Vue({
   router,
   store,
   vuetify,
+  i18n: new VueI18n({
+    locale: navigator.language.split('-')[0] || navigator.userLanguage.split('-')[0],
+    fallbackLocale: 'en',
+    messages: messages,
+  }),
   render: (h) => h(App),
 }).$mount('#app');
 
