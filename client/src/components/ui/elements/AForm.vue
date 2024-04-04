@@ -16,7 +16,9 @@
 <script setup>
 import { ref } from 'vue';
 
-const props = defineProps({
+defineEmits(['submit', 'update:modelValue']);
+
+defineProps({
   disabled: { type: Boolean, default: false },
   lazyValidation: { type: Boolean, default: false },
   readOnly: { type: Boolean, default: false },
