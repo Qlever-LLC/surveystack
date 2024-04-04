@@ -38,6 +38,7 @@
     @focusout="$emit('focusout')"
     @keydown.esc="$emit('keydown.esc')"
     @keyup.enter="$emit('keyup.enter')"
+    @update:focused="$emit('update:focused', $event)"
     @update:modelValue="$emit('update:modelValue', $event)">
     <template v-if="appendSlot" v-slot:append>
       <slot name="append" />
@@ -52,7 +53,16 @@
 export default {
   name: 'ATextField',
   // click event listened to by slot:activator
-  emits: ['blur', 'click:appendInner', 'click:clear', 'focusout', 'keydown.esc', 'keyup.enter', 'update:modelValue'],
+  emits: [
+    'blur',
+    'click:appendInner',
+    'click:clear',
+    'focusout',
+    'keydown.esc',
+    'keyup.enter',
+    'update:focused',
+    'update:modelValue',
+  ],
   props: {
     appendSlot: { type: Boolean, required: false },
     labelSlot: { type: Boolean, required: false },
