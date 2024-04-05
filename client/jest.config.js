@@ -11,6 +11,7 @@ module.exports = {
   moduleNameMapper: {
     '^!!raw-loader!.*': 'jest-raw-loader',
     'vuetify/styles': '<rootDir>/tests/styleMock.js',
-		'^vuetify$': 'vuetify/dist/vuetify.js',
+    '^vuetify$': 'vuetify/dist/vuetify.js',
   },
+  silent: true,
 };
