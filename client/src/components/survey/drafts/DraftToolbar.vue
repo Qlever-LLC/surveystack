@@ -18,7 +18,17 @@
           </a-btn>
         </div>
 
+        <div class="flex-shrink-1 flex-grow-0 align-content-center mx-2">
+          <div class="infos text-grey-darken-2">
+            <div class="d-flex">
+              <span class="number-chip mx-2" style="margin-top: 2px">{{ questionNumber }}</span>
+            </div>
+          </div>
+        </div>
         <a-toolbar-title id="draft-toolbar" class="flex-grow-1 flex-shrink-0 align-content-center text-center">
+          <span class="infos text-grey-darken-2">
+            <span class="number-chip mx-2" style="margin-top: 2px">{{ questionNumber }}</span>
+          </span>
           <b>{{ surveyName }}</b>
         </a-toolbar-title>
 
@@ -50,10 +60,10 @@ export default {
   display: inline-flex;
   border: 2px solid currentColor;
   background-color: white;
-  border-radius: 2rem;
-  line-height: 2rem;
+  border-radius: 1rem;
+  line-height: 1rem;
   font-weight: bold;
-  font-size: 2rem;
+  font-size: 1rem;
   padding: 0.4rem;
   padding-left: 0.8rem;
   padding-right: 0.9rem;

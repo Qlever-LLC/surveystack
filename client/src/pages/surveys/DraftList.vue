@@ -6,6 +6,12 @@
         My Draft Submissions
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ state.drafts.length }} </a-chip>
       </template>
+      <template v-slot:entityTitle="{ entity }">
+        {{ entity.meta.survey.name }}
+      </template>
+      <template v-slot:entitySubtitle="{ entity }">
+        Submitted {{ new Date(entity.meta.dateSubmitted).toLocaleString() }}
+      </template>
       <template v-slot:noValue> No Drafts available </template>
     </basic-list>
   </a-container>
@@ -27,6 +33,7 @@ const state = reactive({
       icon: 'mdi-open-in-new',
       action: (e) => `/groups/${getActiveGroupId()}/surveys/${e.meta.survey.id}/submissions/${e._id}/edit`,
       color: 'green',
+      buttonFixed: true,
     },
     {
       title: 'Delete',
@@ -34,6 +41,7 @@ const state = reactive({
       action: (e) => `/todo`,
       color: 'red',
       disabled: true,
+      buttonHover: true,
     },
   ],
 });

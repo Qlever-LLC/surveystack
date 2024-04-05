@@ -17,12 +17,13 @@ export const BasicListCard_Survey = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
+    template: `
+      <basic-list v-bind="args">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-cube-outline </a-icon>
+        <a-icon class="mr-2"> mdi-cube-outline</a-icon>
         Surveys
       </template>
-    </basic-list>`,
+      </basic-list>`,
   }),
   args: {
     //👇 The args you need here will depend on your component
@@ -50,12 +51,13 @@ export const BasicListCard_Scripts = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
+    template: `
+      <basic-list v-bind="args">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-code-tags </a-icon>
+        <a-icon class="mr-2"> mdi-code-tags</a-icon>
         Scripts
       </template>
-    </basic-list>`,
+      </basic-list>`,
   }),
   args: {
     listCard: true,
@@ -75,12 +77,13 @@ export const BasicListCard_QuestionsLibrary = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
+    template: `
+      <basic-list v-bind="args">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-cube-outline </a-icon>
+        <a-icon class="mr-2"> mdi-cube-outline</a-icon>
         Question Sets
       </template>
-    </basic-list>`,
+      </basic-list>`,
   }),
   args: {
     listCard: true,
@@ -101,14 +104,16 @@ export const BasicListCard_Groups = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
+    template: `
+      <basic-list v-bind="args">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-compass-outline </a-icon>
+        <a-icon class="mr-2"> mdi-compass-outline</a-icon>
         All My Groups
-        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{args.entities.length}} </a-avatar>
+        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ args.entities.length }}
+        </a-avatar>
       </template>
-      <template v-slot:noValue> No Groups yet </template>
-    </basic-list>`,
+      <template v-slot:noValue> No Groups yet</template>
+      </basic-list>`,
   }),
   args: {
     listCard: true,
@@ -130,20 +135,34 @@ export const BasicListRow_Submissions = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
+    template: `
+      <basic-list v-bind="args">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-file-document </a-icon>
-        My Submissions 
-        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{args.entities.length}} </a-avatar>
+        <a-icon class="mr-2"> mdi-file-document</a-icon>
+        My Submissions
+        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ args.entities.length }}
+        </a-avatar>
       </template>
-    </basic-list>`,
+      <template v-slot:entityTitle="{ entity }">
+        {{ entity.meta.survey.name }}
+      </template>
+      <template v-slot:entitySubtitle="{ entity }">
+        Submitted {{ new Date(entity.meta.dateSubmitted).toLocaleString() }}
+      </template>
+      </basic-list>`,
   }),
   args: {
     entities: entityType.submissions,
     submissions: true,
     menu: [
-      { title: 'todo', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
-      { title: 'todo', icon: 'mdi-file-document', action: () => `/url` },
+      {
+        title: 'todo',
+        icon: 'mdi-open-in-new',
+        action: () => `/url`,
+        color: 'green',
+        buttonFixed: true,
+      },
+      { title: 'todo', icon: 'mdi-file-document', action: () => `/url`, buttonHover: true },
       { title: 'todo', icon: 'mdi-pencil', action: () => `/url` },
       { title: 'todo', icon: 'mdi-account-outline', action: () => `/url` },
     ],
@@ -156,23 +175,38 @@ export const BasicListRow_Drafts = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
+    template: `
+      <basic-list v-bind="args">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-file-document </a-icon>
-        My Submissions 
-        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{args.entities.length}} </a-avatar>
+        <a-icon class="mr-2"> mdi-file-document</a-icon>
+        My Submissions
+        <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ args.entities.length }}
+        </a-avatar>
       </template>
       <template v-slot:preMenu>
-         <a-progress-linear color="green" model-value="20" :height="10" rounded :indeterminate="false" />
+        <a-progress-linear color="green" model-value="20" :height="10" rounded
+                           :indeterminate="false"/>
       </template>
-    </basic-list>`,
+      <template v-slot:entityTitle="{ entity }">
+        {{ entity.meta.survey.name }}
+      </template>
+      <template v-slot:entitySubtitle="{ entity }">
+        Created {{ new Date(entity.meta.dateCreated).toLocaleString() }}
+      </template>
+      </basic-list>`,
   }),
   args: {
     entities: entityType.drafts,
     drafts: true,
     menu: [
-      { title: 'todo', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
-      { title: 'todo', icon: 'mdi-file-document', action: () => `/url` },
+      {
+        title: 'todo',
+        icon: 'mdi-open-in-new',
+        action: () => `/url`,
+        color: 'green',
+        buttonFixed: true,
+      },
+      { title: 'todo', icon: 'mdi-file-document', action: () => `/url`, buttonHover: true },
       { title: 'todo', icon: 'mdi-pencil', action: () => `/url` },
       { title: 'todo', icon: 'mdi-account-outline', action: () => `/url` },
     ],
@@ -185,16 +219,29 @@ export const BasicListRow_Results = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
-    <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
-    </basic-list>`,
+    template: `
+        <basic-list v-bind="args">
+          <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
+          <template v-slot:entityTitle="{ entity }">
+            {{ entity.meta.survey.name }}
+          </template>
+          <template v-slot:entitySubtitle="{ entity }">
+            Created {{ new Date(entity.meta.dateCreated).toLocaleString() }}
+          </template>
+        </basic-list>`,
   }),
   args: {
     entities: entityType.results,
     showTitle: false,
     menu: [
-      { title: 'todo', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
-      { title: 'todo', icon: 'mdi-file-document', action: () => `/url` },
+      {
+        title: 'todo',
+        icon: 'mdi-open-in-new',
+        action: () => `/url`,
+        color: 'green',
+        buttonFixed: true,
+      },
+      { title: 'todo', icon: 'mdi-file-document', action: () => `/url`, buttonHover: true },
       { title: 'todo', icon: 'mdi-pencil', action: () => `/url` },
       { title: 'todo', icon: 'mdi-account-outline', action: () => `/url` },
     ],
@@ -207,16 +254,38 @@ export const BasicListRow_Members = {
     setup() {
       return { args };
     },
-    template: `<basic-list v-bind="args"> 
-    <template v-slot:title>
-        <a-icon class="mr-2"> mdi-account-multiple </a-icon>
+    template: `
+      <basic-list v-bind="args">
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-account-multiple</a-icon>
         Members
       </template>
-    </basic-list>`,
+      <template v-slot:entityTitle="{ entity }">
+        <a-icon v-if="entity.role === 'admin'" class="mr-1">mdi-crown-outline</a-icon>
+        {{ entity.user.name }}
+        <p class="ml-2" style="color: gray">{{ entity.user.email }}</p>
+      </template>
+      <template v-slot:entitySubtitle="{ entity }">
+        <!-- TODO dateCreated or dateActivated -->
+        Joined {{ new Date(entity.meta.dateCreated).toLocaleString() }}
+      </template>
+      </basic-list>`,
   }),
   args: {
     entities: entityType.members,
     buttonNew: { title: 'Invite New Members', link: '/url' },
     members: true,
+    menu: [
+      {
+        title: 'todo',
+        icon: 'mdi-open-in-new',
+        action: () => `/url`,
+        color: 'green',
+        buttonFixed: true,
+      },
+      { title: 'todo', icon: 'mdi-file-document', action: () => `/url`, buttonHover: true },
+      { title: 'todo', icon: 'mdi-pencil', action: () => `/url` },
+      { title: 'todo', icon: 'mdi-account-outline', action: () => `/url` },
+    ],
   },
 };
