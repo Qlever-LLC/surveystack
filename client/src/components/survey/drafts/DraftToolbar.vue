@@ -26,21 +26,10 @@
           </div>
         </div>
         <a-toolbar-title id="draft-toolbar" class="flex-grow-1 flex-shrink-0 align-content-center text-center">
-          <span class="infos text-grey-darken-2">
-            <span class="number-chip mx-2" style="margin-top: 2px">{{ questionNumber }}</span>
-          </span>
           <b>{{ surveyName }}</b>
         </a-toolbar-title>
 
         <slot name="toolbar-actions"></slot>
-
-        <div class="flex-shrink-1 flex-grow-0 align-content-center mx-2">
-          <div class="infos text-grey-darken-2">
-            <div class="d-flex">
-              <span class="number-chip mx-2" style="margin-top: 2px">{{ questionNumber }}</span>
-            </div>
-          </div>
-        </div>
       </div>
     </a-toolbar>
   </div>
