@@ -22,7 +22,6 @@
       :rules="[isValidNumber]"
       data-test-id="input"
       clearable
-      @click:clear="setToNull"
     />
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -77,9 +76,6 @@ export default {
     },
     isValidNumber(val) {
       return isNaN(Number(val)) || (this.required && val === null) ? 'Please enter a number' : true;
-    },
-    setToNull(e) {
-      e.target.value = null;
     },
   },
   mounted() {

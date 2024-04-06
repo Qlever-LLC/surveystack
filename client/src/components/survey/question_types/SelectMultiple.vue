@@ -1,13 +1,18 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-      :initializable="control.options.initialize && control.options.initialize.enabled"
-      :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+    <div class="d-flex justify-space-between flex-wrap">
+      <app-control-label
+        :value="control.label"
+        :redacted="redacted"
+        :required="required"
+        :initializable="control.options.initialize && control.options.initialize.enabled"
+        :is-modified="meta && !!meta.dateModified"
+        @initialize="initialize"
+      />
+      <v-btn rounded small text color="primary" class="align-self-center mb-3" @click="clearSelection">
+        clear selection
+      </v-btn>
+    </div>
     <app-control-hint :value="control.hint" />
 
     <div v-if="sourceIsValid" class="py-2">
@@ -106,6 +111,10 @@ export default {
           this.customSelected = true;
         }
       }
+    },
+    clearSelection() {
+      this.changed(null);
+      this.customSelected = false;
     },
   },
   computed: {

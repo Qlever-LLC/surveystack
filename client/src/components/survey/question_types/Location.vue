@@ -37,7 +37,7 @@
             </v-btn>
           </div>
           <div v-else>
-            <v-btn large class="mx-4 full" color="gray" @click="retake"> Retake </v-btn>
+            <v-btn large class="mx-4 full" color="gray" @click="reset"> Reset </v-btn>
           </div>
         </div>
       </div>

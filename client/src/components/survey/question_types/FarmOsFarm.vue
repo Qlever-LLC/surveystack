@@ -24,6 +24,7 @@
       :loading="loading"
       color="focus"
       class="autocomplete"
+      clearable
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip

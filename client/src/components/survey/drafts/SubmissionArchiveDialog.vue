@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { ARCHIVE_REASONS } from '@/constants';
+
 export default {
   props: {
     persistent: Boolean,
@@ -48,7 +50,7 @@ export default {
     return {
       archiveReason: this.reason,
       archiveReasonOther: '',
-      availableArchiveReasons: ['TEST_DATA', 'INCORRECT_DATA', 'EQUIPMENT_ERROR', 'USER_ERROR', 'RESUBMIT', 'OTHER'],
+      availableArchiveReasons: ARCHIVE_REASONS,
     };
   },
   methods: {

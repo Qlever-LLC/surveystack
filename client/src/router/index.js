@@ -7,7 +7,7 @@ import Unauthorized from '@/pages/Unauthorized.vue';
 const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
-import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
+import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
 
 import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
@@ -134,24 +134,19 @@ const routes = [
     beforeEnter: guard,
   },
   {
-    path: '/surveys/:id/start',
-    name: 'surveys-start',
-    components: getComponents(SurveysDetail),
-    props: {
-      default: {
-        start: true,
-      },
-    },
-  },
-  {
     path: '/surveys/:id',
     name: 'surveys-detail',
     components: getComponents(SurveysDetail),
   },
   {
-    path: '/submissions/drafts/:id',
-    name: 'submissions-drafts-detail',
-    components: getComponents(DraftSubmission, { navbar: SubmissionDraftNavbar }),
+    path: '/surveys/:surveyId/submissions/new',
+    name: 'new-submission',
+    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
+  },
+  {
+    path: '/surveys/:surveyId/submissions/:submissionId/edit',
+    name: 'edit-submission',
+    components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
   },
   {
     path: '/auth/login',

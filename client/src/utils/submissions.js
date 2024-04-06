@@ -271,3 +271,59 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
 
   return uniqueItems;
 }
+
+export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
+  const { submissions, isLibrary } = survey.meta;
+  const publishedVersion = survey.revisions.find((revision) => revision.version === survey.latestVersion);
+  const isPublishedVersionEmpty = publishedVersion.controls.length === 0;
+
+  if (isLibrary) {
+    return {
+      allowed: false,
+      message: 'This is a library survey, please choose another survey to submit.',
+    };
+  }
+
+  if (isPublishedVersionEmpty) {
+    return {
+      allowed: false,
+      message:
+        'The latest published version of this survey is empty. Please publish a new version to start a submission.',
+    };
+  }
+
+  switch (submissions) {
+    case 'user':
+      return isLoggedIn
+        ? { allowed: true }
+        : { allowed: false, message: 'You must be logged in to submit this survey.' };
+    case 'group': {
+      if (!isLoggedIn) {
+        return { allowed: false, message: 'You must be logged in to submit this survey.' };
+      }
+      const isGroupMember = userGroups.some((group) => group._id === survey.meta.group.id);
+      return isGroupMember
+        ? {
+            allowed: true,
+          }
+        : {
+            allowed: false,
+            message: 'You must be a member of the group to submit this survey.',
+          };
+    }
+    case 'public':
+    case null:
+    case undefined:
+      return { allowed: true };
+  }
+
+  return { allowed: false, message: 'You are not authorized to submit this survey.' };
+};
+
+export const checkAllowedToResubmit = (submission, userMemberships, userId) => {
+  const isAdminOfSubmissionGroup = userMemberships.some(
+    (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
+  );
+  const isCreatorOfSubmission = submission.meta.creator === userId;
+  return isAdminOfSubmissionGroup || isCreatorOfSubmission;
+};

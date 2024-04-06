@@ -7,6 +7,7 @@
     hide-details
     autocomplete="off"
     :disabled="disabled"
+    clearable
   />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
@@ -18,6 +19,7 @@
         hide-details
         autocomplete="off"
         :disabled="disabled"
+        clearable
       />
     </div>
     <div style="flex: 0; display: flex; align-items: center">
@@ -32,6 +34,8 @@
     hide-details
     autocomplete="off"
     :disabled="disabled"
+    clearable
+    @click:clear="setToNull"
   />
   <v-text-field
     v-else-if="header.type === 'number'"
@@ -79,6 +83,7 @@
     :disabled="disabled"
     hide-details
     outlined
+    clearable
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
@@ -100,6 +105,7 @@
     :disabled="disabled"
     hide-details
     outlined
+    clearable
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
@@ -223,7 +229,6 @@ import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
 import { uuidv4 } from '@/utils/surveys';
 import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
-import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
@@ -338,10 +343,12 @@ export default {
       this.$emit('changed');
     },
     onFarmOsInput(value) {
-      if (!this.value || this.value.name !== value) {
+      if (value) {
         this.value = { id: uuidv4(), name: getValueOrNull(value) };
-        this.$emit('changed');
+      } else {
+        this.setToNull();
       }
+      this.$emit('changed');
     },
     onNumberInput(value) {
       if (value === '' || value === null || value === undefined) {
@@ -365,7 +372,7 @@ export default {
     getDropdownLabel(value) {
       const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
-      return found ? found.label : value;
+      return found ? found.label : value[0] ? value[0] : null;
     },
     setActivePickerMonth() {
       setTimeout(() => {
