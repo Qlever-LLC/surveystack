@@ -43,6 +43,8 @@ type Submission = {
       id: string;
       path: string;
     };
+    archived?: boolean;
+    archivedReason?: string;
     specVersion: number;
     creator?: ObjectId;
   };

@@ -43,6 +43,8 @@ const createRequestSubmissionMeta =
     dateModified = new Date().toISOString(),
     dateSubmitted = null,
     specVersion = 4,
+    archived = false,
+    archivedReason = undefined,
     status = [],
   } = {}) =>
   (survey) => {
@@ -58,6 +60,8 @@ const createRequestSubmissionMeta =
         version: 2,
       },
       revision: 1,
+      archived,
+      ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
       status,
       group: {

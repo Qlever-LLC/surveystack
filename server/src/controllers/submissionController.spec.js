@@ -1046,37 +1046,6 @@ describe('submissionController', () => {
       authHeaderValue = `${user.email} ${token}`;
     });
 
-    it('removes READY_TO_SUBMIT status from the submission before creating it, and returns 200', async () => {
-      const submissionId = ObjectId();
-      const { createRequestSubmission } = await createSurvey(['string']);
-      const requestSubmission = createRequestSubmission({
-        _id: submissionId.toString(),
-        meta: createRequestSubmissionMeta({
-          isDraft: true,
-          creator: user._id.toString(),
-          status: [
-            {
-              type: 'READY_TO_SUBMIT',
-              value: { at: new Date('2021-01-01').toISOString() },
-            },
-          ],
-        }),
-      });
-      handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
-
-      await request(app)
-        .post('/api/submissions')
-        .set('Authorization', authHeaderValue)
-        .send(requestSubmission)
-        .expect(200);
-
-      const submission = await db.collection('submissions').findOne({ _id: submissionId });
-      expect(submission).not.toBeNull();
-      expect(submission.meta.status).not.toContainEqual(
-        expect.objectContaining({ type: 'READY_TO_SUBMIT' })
-      );
-    });
-
     it('migrates submissions with specVersion 3 to specVersion 4 before creating', async () => {
       const submissionId = ObjectId();
       const { createRequestSubmission } = await createSurvey(['string']);
@@ -1135,6 +1104,63 @@ describe('submissionController', () => {
       const submission = await db.collection('submissions').findOne({ _id: submissionId });
       expect(submission).not.toBeNull();
       expect(submission.meta.specVersion).toBe(4);
+    });
+
+    describe('when submissions.meta.isDraft is true', () => {
+      it('returns 200 and saves submission to database, removing READY_TO_SUBMIT status and settings isDraft to false', async () => {
+        const submissionId = ObjectId();
+        const { createRequestSubmission } = await createSurvey(['string']);
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({
+            isDraft: true,
+            creator: user._id.toString(),
+            status: [
+              {
+                type: 'READY_TO_SUBMIT',
+                value: { at: new Date('2021-01-01').toISOString() },
+              },
+            ],
+          }),
+        });
+        handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+        await request(app)
+          .post('/api/submissions')
+          .set('Authorization', authHeaderValue)
+          .send(requestSubmission)
+          .expect(200);
+
+        const submission = await db.collection('submissions').findOne({ _id: submissionId });
+        expect(submission).not.toBeNull();
+        expect(submission.meta.status).not.toContainEqual(
+          expect.objectContaining({ type: 'READY_TO_SUBMIT' })
+        );
+        expect(submission.meta.isDraft).toBe(false);
+      });
+
+      it('rejects the request if the submission does not have a READY_TO_SUBMIT status', async () => {
+        const submissionId = ObjectId();
+        const { createRequestSubmission } = await createSurvey(['string']);
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({
+            isDraft: true,
+            creator: user._id.toString(),
+            status: [],
+          }),
+        });
+        handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+        await request(app)
+          .post('/api/submissions')
+          .set('Authorization', authHeaderValue)
+          .send(requestSubmission)
+          .expect(422);
+
+        const submission = await db.collection('submissions').findOne({ _id: submissionId });
+        expect(submission).toBeNull();
+      });
     });
   });
 
