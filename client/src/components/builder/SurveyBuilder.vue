@@ -804,6 +804,7 @@ export default {
         survey: this.survey,
         version,
         instance: this.instance,
+        isDraft: false,
       });
     },
   },

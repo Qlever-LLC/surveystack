@@ -82,7 +82,13 @@ const getBreadcrumbsForSubmission = (controls, position) => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-export const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
+export const createSubmissionFromSurvey = ({
+  survey,
+  version = 1,
+  instance,
+  submitAsUser = undefined,
+  isDraft = true,
+}) => {
   const submission = {};
   const dateNow = new Date().toISOString();
   const currentUser = AuthService.getUser();
@@ -93,7 +99,7 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
     dateCreated: dateNow,
     dateModified: dateNow,
     dateSubmitted: null,
-    isDraft: true,
+    isDraft,
     isDeletedDraft: false,
     survey: { id: survey._id, name: survey.name, version: version },
     revision: 1,
