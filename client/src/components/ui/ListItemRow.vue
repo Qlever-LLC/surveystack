@@ -20,7 +20,8 @@
           x-small
           class="mr-2 py-0 px-1"
           :color="button.color"
-          variant="outlined">
+          variant="outlined"
+          @click="runAction(button.action(entity))">
           {{ button.title }}
         </a-btn>
       </template>
@@ -30,7 +31,8 @@
         x-small
         class="mr-2 py-0 px-1"
         :color="button.color"
-        variant="outlined">
+        variant="outlined"
+        @click="runAction(button.action(entity))">
         {{ button.title }}
       </a-btn>
       <a-menu v-if="menu" location="start" v-model="state.menuIsOpen[idx]">
@@ -43,8 +45,8 @@
             :key="idx"
             class="d-flex align-center justify-end"
             :style="getTextColor(itemMenu)"
-            :to="itemMenu.action(entity)"
-            dense>
+            dense
+            @click="runAction(itemMenu.action(entity))">
             {{ itemMenu.title }}
             <a-icon class="ml-2"> {{ itemMenu.icon }}</a-icon>
           </a-list-item>
@@ -56,6 +58,9 @@
 
 <script setup>
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps({
   entity: {
@@ -77,19 +82,29 @@ const state = reactive({
 });
 
 const filteredMenu = computed(() => {
-  return props.menu.filter((m) => m.render || m.render === undefined);
+  return props.menu.filter((m) => m.render === undefined || m.render(props.entity));
 });
 
 const actionButtonsFixed = computed(() => {
-  return props.menu.filter((m) => m.buttonFixed === true);
+  return filteredMenu.value.filter((m) => m.buttonFixed === true);
 });
 
 const actionButtonsHover = computed(() => {
-  return props.menu.filter((m) => m.buttonHover === true);
+  return filteredMenu.value.filter((m) => m.buttonHover === true);
 });
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };
+}
+
+function runAction(action) {
+  if (typeof action == 'function') {
+    action();
+  } else if (typeof action == 'string') {
+    router.push(action);
+  } else {
+    console.error('unknown type of action: ' + action);
+  }
 }
 </script>
 

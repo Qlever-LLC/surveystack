@@ -4,13 +4,13 @@ import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
 import Builder from '@/pages/builder/Builder.vue';
 import { authGuard } from '@/router/index';
-import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import SurveyList from '@/pages/surveys/SurveyList.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Group from '@/pages/groups/Group.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
+import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
 
 export default [
   {
@@ -29,7 +29,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: MySubmissions,
+      main: SubmissionsPage,
     },
   },
   {

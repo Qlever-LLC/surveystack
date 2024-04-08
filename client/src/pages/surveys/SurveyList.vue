@@ -112,7 +112,7 @@ async function initData() {
       title: 'Call for Submissions',
       icon: 'mdi-bullhorn',
       action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
-      render: isGroupAdmin(),
+      render: (e) => isGroupAdmin(),
     },
     {
       title: 'Print Blank Survey',
@@ -128,7 +128,7 @@ async function initData() {
       title: 'Edit',
       icon: 'mdi-pencil',
       action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
-      render: isGroupAdmin(),
+      render: (e) => isGroupAdmin(),
     },
     {
       title: 'View Results',
@@ -139,7 +139,7 @@ async function initData() {
       title: 'Share',
       icon: 'mdi-share',
       action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
-      render: isGroupAdmin(),
+      render: (e) => isGroupAdmin(),
     }
   );
 
