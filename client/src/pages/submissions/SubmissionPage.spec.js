@@ -4,12 +4,13 @@ import { createSurvey } from '@/utils/surveys';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 import api from '@/services/api.service';
+import ObjectID from 'bson-objectid';
 
 jest.mock('@/services/api.service');
 
 function mockSurvey() {
   const survey = {
-    ...createSurvey({ group: { id: null, path: null } }),
+    ...createSurvey({ group: { id: new ObjectID(), path: null } }),
   };
   const controls = [createControl({ type: 'number', id: '1' }), createControl({ type: 'number', id: '2' })];
   addRevisionToSurvey(survey, controls);
@@ -39,12 +40,13 @@ describe('Draft', () => {
         mocks: {
           $route: {
             params: {
+              id: survey.meta.group.id,
               surveyId: survey._id,
               submissionId: badSubmission._id,
             },
             query: {},
             path: '',
-            name: 'edit-submission',
+            name: 'group-survey-submissions-edit',
           },
           $store: {
             actions: {

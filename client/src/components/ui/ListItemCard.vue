@@ -1,13 +1,13 @@
 <template>
   <a-hover v-slot="{ isHovering, props }">
     <a-list-item
-      :to="menu[0].action(entity)"
       v-bind="props"
       :style="state.groupStyle"
       :elevation="isHovering ? 2 : 0"
       dense
       class="py-2 mb-2 bg-white"
-      rounded="lg">
+      rounded="lg"
+      @click="runAction(menu[0].action(entity))">
       <span>
         <a-list-item-title class="d-flex align-center">
           <span v-if="enablePinned" @click.prevent="toogleStar(entity)">
@@ -33,8 +33,8 @@
             :key="idx"
             class="d-flex align-center justify-end"
             :style="getTextColor(itemMenu)"
-            :to="itemMenu.action(entity)"
-            dense>
+            dense
+            @click="runAction(itemMenu.action(entity))">
             {{ itemMenu.title }}
             <a-icon class="ml-2"> {{ itemMenu.icon }} </a-icon>
           </a-list-item>
@@ -47,6 +47,9 @@
 <script setup>
 import { cloneDeep } from 'lodash';
 import { reactive, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps({
   entity: {
@@ -106,7 +109,7 @@ onMounted(() => {
 });
 
 const filteredMenu = computed(() => {
-  return props.menu.filter((m) => m.render || m.render === undefined);
+  return props.menu.filter((m) => m.render === undefined || m.render(props.entity));
 });
 
 function getTextColor(itemMenu) {
@@ -115,6 +118,16 @@ function getTextColor(itemMenu) {
 
 function toogleStar(entity) {
   emit('toogleStar', entity);
+}
+
+function runAction(action) {
+  if (typeof action == 'function') {
+    action();
+  } else if (typeof action == 'string') {
+    router.push(action);
+  } else {
+    console.error('unknown type of action: ' + action);
+  }
 }
 </script>
 

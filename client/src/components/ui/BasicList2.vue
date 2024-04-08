@@ -55,10 +55,13 @@
           :key="entity._id"
           :entity="entity"
           :idx="String(idx)"
-          :menu="menu"
-          :submissions="submissions"
-          :drafts="drafts"
-          :members="members">
+          :menu="menu">
+          <template v-slot:entityTitle="{ entity }">
+            <slot name="entityTitle" :entity="entity" />
+          </template>
+          <template v-slot:entitySubtitle="{ entity }">
+            <slot name="entitySubtitle" :entity="entity" />
+          </template>
           <template v-slot:preMenu>
             <slot name="preMenu" />
           </template>
@@ -130,18 +133,6 @@ const props = defineProps({
   showSearch: {
     type: Boolean,
     default: true,
-  },
-  submissions: {
-    type: Boolean,
-    required: false,
-  },
-  drafts: {
-    type: Boolean,
-    required: false,
-  },
-  members: {
-    type: Boolean,
-    required: false,
   },
   filter: {
     type: Function,

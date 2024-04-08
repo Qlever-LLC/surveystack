@@ -1,17 +1,16 @@
 import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 import SurveyList from '@/pages/surveys/SurveyList.vue';
-import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Builder from '@/pages/builder/Builder.vue';
 import { authGuard } from '@/router/index';
-import Detail from '@/pages/surveys/Detail.vue';
 import List from '@/pages/submissions/List.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
-import DraftList from '@/pages/surveys/DraftList.vue';
+import DraftList from '@/pages/submissions/DraftsPage.vue';
 import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
+import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
 
 export default [
   {
@@ -47,7 +46,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: MySubmissions,
+      main: SubmissionsPage,
     },
   },
   {
@@ -56,7 +55,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: MySubmissions,
+      main: SubmissionsPage,
     },
   },
   {
@@ -165,7 +164,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: SubmissionPage, //TODO SurveyDetail should be replaced by directly using Draft.vue, but that requires Draft.vue take over some logic which is done by SurveysDetail currently
+      main: SubmissionPage,
     },
     props: {
       main: {
