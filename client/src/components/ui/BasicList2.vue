@@ -15,18 +15,6 @@
       </a-col>
     </a-card-title>
     <a-card-text>
-      <a-list v-if="enableFav" dense twoLine class="pt-0">
-        <list-item-card
-          v-for="(entity, idx) in pinnedSurveys"
-          :key="entity._id"
-          @toogleStar="$emit('toogleStar', entity)"
-          :entity="entity"
-          :idx="String(idx)"
-          :enableFav="enableFav"
-          :pinnedSurveys="pinnedSurveys"
-          :groupStyle="groupStyle"
-          :menu="menu" />
-      </a-list>
       <span v-if="showSearch" class="d-flex mb-6">
         <a-text-field
           v-model="state.searchValue"
@@ -57,8 +45,7 @@
           @toogleStar="$emit('toogleStar', entity)"
           :entity="entity"
           :idx="String(idx)"
-          :enableFav="enableFav"
-          :pinnedSurveys="pinnedSurveys"
+          :enablePinned="enablePinned"
           :groupStyle="groupStyle"
           :menu="menu" />
       </a-list>
@@ -114,14 +101,10 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  enableFav: {
+  enablePinned: {
     type: Boolean,
     required: false,
     default: false,
-  },
-  pinnedSurveys: {
-    type: Array,
-    required: false,
   },
   page: {
     type: Number,

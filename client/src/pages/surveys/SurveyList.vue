@@ -6,8 +6,7 @@
         @toogleStar="toogleStar"
         listCard
         :entities="state.surveys.content"
-        enableFav
-        :pinnedSurveys="state.pinnedSurveys"
+        enablePinned
         :buttonNew="{ title: 'Create new Survey', link: { name: 'groups-new' } }"
         :menu="state.menu"
         :page="state.page">
@@ -50,7 +49,6 @@ const PAGINATION_LIMIT = 10;
 const state = reactive({
   page: 1,
   search: '',
-  pinnedSurveys: [],
   surveys: {
     content: [],
     pagination: {
@@ -143,36 +141,34 @@ async function initData() {
     }
   );
 
-  // eslint-disable-next-line no-case-declarations
-  const [pinnedResponse, response] = await Promise.all([
-    fetchPinnedSurveys(getActiveGroupId()),
-    fetchData({ groups: [getActiveGroupId()] }),
-  ]);
+  await Promise.all([fetchData()]);
 }
-async function fetchData({ user, groups = [] } = {}) {
-  //  TODO create two lists, filter by active group and others
-  // const groupsParam = (groups || [this.activeGroupId]).map(group => `group[]=${group}`).join('&');
+async function fetchData(user = null) {
   const now = new Date();
   const queryParams = new URLSearchParams();
   if (user) {
     queryParams.append('creator', user);
   }
-  if (groups.length > 0) {
-    groups.filter((group) => group !== null).forEach((group) => queryParams.append('groups[]', group));
-  }
   if (state.search) {
     queryParams.append('q', state.search);
-    console.log(state.search);
   }
   if (isWhitelabel.value) {
     queryParams.append('prefix', whitelabelPartner.value.path);
   }
 
+  queryParams.append('groupId', getActiveGroupId());
   queryParams.append('skip', (state.page - 1) * PAGINATION_LIMIT);
   queryParams.append('limit', PAGINATION_LIMIT);
 
   try {
-    const { data } = await api.get(`/surveys/list-page?${queryParams}`);
+    const { data } = await api.get(`/surveys/list-page-prio-pinned?${queryParams}`);
+
+    data.pinned.forEach((s) => {
+      s.pinnedSurveys = true;
+      data.content.unshift(s);
+    });
+    delete data.pinned;
+
     state.surveys = data;
     state.surveys.content.forEach((s) => {
       if (s.meta) {
@@ -195,21 +191,6 @@ async function fetchData({ user, groups = [] } = {}) {
       total: 0,
     },
   };
-}
-async function fetchPinnedSurveys(groupId) {
-  // TODO replace with new store action (?)
-  try {
-    console.log('fetch pinned');
-    const { data } = await api.get(`/groups/${groupId}?populate=1`);
-    if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
-      state.pinnedSurveys = data.surveys.pinned.map((r) => ({ ...r, pinned: true }));
-      return state.pinnedSurveys.sort((a, b) => a.name.localeCompare(b.name));
-    }
-  } catch (err) {
-    console.log('Error fetching surveys:', err);
-  }
-  state.pinnedSurveys = [];
-  return [];
 }
 </script>
 

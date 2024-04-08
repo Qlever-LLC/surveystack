@@ -10,6 +10,7 @@ import rolesService from '../services/roles.service';
 import pdfService from '../services/pdf.service';
 
 const SURVEYS_COLLECTION = 'surveys';
+const GROUPS_COLLECTION = 'groups';
 const SUBMISSIONS_COLLECTION = 'submissions';
 
 const DEFAULT_LIMIT = 20;
@@ -264,6 +265,248 @@ const buildPipelineForGetSurveyPage = ({
 
   return pipeline;
 };
+const buildPipelineGetSurveyPinned = ({ q, groupId, creator, prefix }) => {
+  const match = {};
+
+  if (q) {
+    match.name = {
+      $regex: q,
+      $options: 'i',
+    };
+  }
+
+  if (creator) {
+    match['meta.creator'] = new ObjectId(creator);
+  }
+
+  if (prefix) {
+    match['meta.group.path'] = {
+      $regex: `^${prefix}`,
+    };
+  }
+
+  const pipeline = [
+    { $match: { _id: ObjectId(groupId) } },
+    { $unwind: '$surveys.pinned' },
+    {
+      $lookup: {
+        from: 'surveys',
+        localField: 'surveys.pinned',
+        foreignField: '_id',
+        as: 'pinnedSurveys',
+      },
+    },
+    {
+      $project: {
+        _id: {
+          $arrayElemAt: ['$pinnedSurveys._id', 0],
+        },
+      },
+    },
+    { $sort: { name: 1 } },
+  ];
+
+  if (Object.keys(match).length > 0) {
+    pipeline.push({ $match: match });
+  }
+
+  return pipeline;
+};
+
+const buildPipelineForGetSurveyPagePrioPinned = (
+  { q, groupId, projections, creator, skip, limit, prefix, isLibrary },
+  pinnedEntities
+) => {
+  const match = {};
+  const project = {};
+  let parsedSkip = 0;
+  let parsedLimit = DEFAULT_LIMIT;
+
+  if (q) {
+    match.name = {
+      $regex: q,
+      $options: 'i',
+    };
+  }
+
+  if (creator) {
+    match['meta.creator'] = new ObjectId(creator);
+  }
+
+  if (prefix) {
+    match['meta.group.path'] = {
+      $regex: `^${prefix}`,
+    };
+  }
+
+  if (isLibrary) {
+    match['meta.isLibrary'] = isLibrary === 'true';
+  }
+
+  const pipeline = [
+    { $match: { 'meta.group.id': ObjectId(groupId) } },
+    {
+      $addFields: {
+        lowercasedName: {
+          $toLower: '$name',
+        },
+      },
+    },
+    {
+      $addFields: {
+        isInPinnedList: {
+          $in: ['$_id', pinnedEntities],
+        },
+      },
+    },
+    {
+      $addFields: {
+        sortOrder: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: ['$isInPinnedList', true] },
+                then: 0,
+              },
+            ],
+            default: 1,
+          },
+        },
+      },
+    },
+    {
+      $sort: { sortOrder: 1, lowercasedName: 1 },
+    },
+  ];
+
+  if (Object.keys(match).length > 0) {
+    pipeline.push({ $match: match });
+  }
+
+  if (projections) {
+    projections.forEach((projection) => {
+      project[projection] = 1;
+    });
+    pipeline.push({
+      $project: { ...project, isInPinnedList: 1 },
+    });
+  }
+
+  if (isLibrary === 'true') {
+    // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
+    // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
+    // TODO also count revisions.controls.children.libraryId
+    const aggregateCounts = [
+      {
+        $match: {
+          'meta.isLibrary': true,
+        },
+      },
+      /*
+      TODO Resolve #48, then uncommet this
+       {
+        $lookup: {
+          from: 'surveys',
+          localField: '_id',
+          foreignField: 'revisions.controls.libraryId',
+          as: 'meta.libraryUsageCountSurveys',
+        },
+      },
+      {
+        $addFields: {
+          'meta.libraryUsageCountSurveys': {
+            $size: '$meta.libraryUsageCountSurveys',
+          },
+        },
+      },*/
+      {
+        $lookup: {
+          from: SUBMISSIONS_COLLECTION,
+          let: {
+            surveyId: '$_id',
+          },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$meta.survey.id', '$$surveyId'] } } },
+            { $count: 'count' },
+          ],
+          as: 'meta.libraryUsageCountSubmissions',
+        },
+      },
+      {
+        $addFields: {
+          'meta.libraryUsageCountSubmissions': {
+            $arrayElemAt: ['$meta.libraryUsageCountSubmissions.count', 0],
+          },
+        },
+      },
+      {
+        $sort: {
+          // TODO Resolve #48, then uncommet this and remove the other line
+          // 'meta.libraryUsageCountSurveys': -1,
+          'meta.libraryUsageCountSubmissions': -1,
+        },
+      },
+    ];
+    pipeline.push(...aggregateCounts);
+  }
+
+  // skip
+  if (skip) {
+    try {
+      const n = Number.parseInt(skip);
+      if (n > 0) {
+        parsedSkip = n;
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+    }
+  }
+
+  // limit
+  if (limit) {
+    try {
+      const n = Number.parseInt(limit);
+      if (n > 0) {
+        parsedLimit = n;
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+    }
+  }
+
+  // pagination stage
+  const paginationStages = [
+    {
+      $facet: {
+        content: [
+          {
+            $skip: parsedSkip,
+          },
+          {
+            $limit: parsedLimit,
+          },
+        ],
+        pagination: [
+          {
+            $count: 'total',
+          },
+          {
+            $addFields: {
+              parsedSkip,
+              parsedLimit,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: '$pagination',
+    },
+  ];
+  pipeline.push(...paginationStages);
+
+  return pipeline;
+};
 
 const getSurveyPage = async (req, res) => {
   const pipeline = buildPipelineForGetSurveyPage(req.query);
@@ -318,6 +561,61 @@ const getSurveyListPage = async (req, res) => {
       },
     });
   }
+
+  return res.send(entities);
+};
+
+const getSurveyListPagePrioPinned = async (req, res) => {
+  const query = {
+    ...req.query,
+    projections: [
+      ...(req.query.projections || []),
+      '_id',
+      'name',
+      'latestVersion',
+      'meta.dateModified',
+      'meta.dateCreated',
+      'meta.group',
+      'meta.creator',
+      'meta.submissions',
+      'meta.isLibrary',
+    ],
+  };
+
+  const pipelinePinned = buildPipelineGetSurveyPinned(query);
+  const pipelinePinnedEntities = await db
+    .collection(GROUPS_COLLECTION)
+    .aggregate(pipelinePinned)
+    .toArray();
+
+  const pinnedEntities = pipelinePinnedEntities.map((obj) => obj._id);
+
+  const pipeline = buildPipelineForGetSurveyPagePrioPinned(query, pinnedEntities);
+  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+
+  if (!entities) {
+    return res.send({
+      content: [],
+      pagination: {
+        total: 0,
+        skip: req.query.skip || 0,
+        limit: req.query.limit || DEFAULT_LIMIT,
+      },
+    });
+  }
+
+  const pinned = [];
+
+  for (let i = entities.content.length - 1; i >= 0; i--) {
+    const entity = entities.content[i];
+    if (entity.isInPinnedList) {
+      delete entity.isInPinnedList;
+      pinned.push(entity);
+      entities.content.splice(entities.content.indexOf(entity), 1);
+    }
+  }
+
+  entities.pinned = pinned;
 
   return res.send(entities);
 };
@@ -840,6 +1138,7 @@ export default {
   getSurveyPage,
   getPinned,
   getSurveyListPage,
+  getSurveyListPagePrioPinned,
   getSurvey,
   getSurveyLibraryConsumers,
   getSurveyInfo,

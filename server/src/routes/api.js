@@ -170,6 +170,10 @@ router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
 router.get(
+  '/surveys/list-page-prio-pinned',
+  catchErrors(surveyController.getSurveyListPagePrioPinned)
+);
+router.get(
   '/surveys/list-library-consumers',
   [assertAuthenticated],
   catchErrors(surveyController.getSurveyLibraryConsumers)

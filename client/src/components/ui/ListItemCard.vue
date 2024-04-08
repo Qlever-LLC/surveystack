@@ -10,9 +10,9 @@
       rounded="lg">
       <span>
         <a-list-item-title class="d-flex align-center">
-          <span v-if="enableFav" @click.prevent="toogleStar(entity)">
-            <a-icon v-if="isStarred(entity)" class="mr-2">mdi-star</a-icon>
-            <a-icon v-if="!isStarred(entity) && isHovering" class="mr-2"> mdi-star-outline </a-icon>
+          <span v-if="enablePinned" @click.prevent="toogleStar(entity)">
+            <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
+            <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>
           <span v-if="groupStyle">
             <a-avatar class="mr-3" color="accent-lighten-2" rounded="lg" size="35">
@@ -57,15 +57,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  // TODO favorite part should be linked/merge with pinned like pinned survey and not done like this
-  enableFav: {
+  enablePinned: {
     type: Boolean,
     required: false,
     default: false,
-  },
-  pinnedSurveys: {
-    type: Array,
-    required: false,
   },
   groupStyle: {
     type: Boolean,
@@ -116,10 +111,6 @@ const filteredMenu = computed(() => {
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };
-}
-
-function isStarred(entity) {
-  return props.pinnedSurveys.find((s) => s._id === entity._id);
 }
 
 function toogleStar(entity) {
