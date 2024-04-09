@@ -230,11 +230,11 @@ export default {
         await autoSelectActiveGroup(this.$store, group);
       }
 
-      const startDraftConfig = { survey: this.survey };
+      const createSubmissionConfig = { survey: this.survey, version: this.survey.latestVersion };
       if (submitAsUserId) {
         try {
           const { data: submitAsUser } = await api.get(`/users/${submitAsUserId}`);
-          startDraftConfig.submitAsUser = submitAsUser;
+          createSubmissionConfig.submitAsUser = submitAsUser;
         } catch (error) {
           this.hasError = true;
           this.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
@@ -242,11 +242,10 @@ export default {
           return;
         }
       }
-      const submissionId = await this.$store.dispatch('submissions/startDraft', startDraftConfig);
-      this.$router.replace({ name: 'edit-submission', params: { surveyId, submissionId } });
-    }
 
-    if (this.$route.name === 'edit-submission') {
+      this.submission = createSubmissionFromSurvey(createSubmissionConfig);
+      this.$router.replace({ name: 'edit-submission', params: { surveyId, submissionId: this.submission._id } });
+    } else if (this.$route.name === 'edit-submission') {
       const { submissionId } = this.$route.params;
       await this.$store.dispatch('submissions/fetchLocalSubmissions');
       const localSubmission = this.$store.getters['submissions/getSubmission'](submissionId);
@@ -326,6 +325,12 @@ export default {
     this.loading = false;
   },
   beforeRouteLeave(to, from, next) {
+    if (from.name === 'new-submission' && to.name === 'edit-submission') {
+      // This is a programmatic navigation that doesn't leave this component (the two routes share this component)
+      // We don't need the confirm leave dialog in this case.
+      return next(true);
+    }
+
     if (this.submission && this.survey && !this.isSubmitted && !this.hasError) {
       this.$refs.confirmLeaveDialog.open(next);
       return;
