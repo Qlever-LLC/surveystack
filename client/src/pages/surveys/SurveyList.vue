@@ -109,7 +109,7 @@ async function initData() {
     {
       title: 'Call for Submissions',
       icon: 'mdi-bullhorn',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
+      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}/call-for-submissions`,
       render: (e) => isGroupAdmin(),
     },
     {

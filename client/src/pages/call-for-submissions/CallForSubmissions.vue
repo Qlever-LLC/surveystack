@@ -212,9 +212,9 @@ export default {
     },
   },
   async created() {
-    const { group } = this.$route.query;
-    if (group) {
-      this.group = group;
+    const { id, surveyId } = this.$route.params;
+    if (id) {
+      this.group = id;
       await this.loadMembers();
     }
   },

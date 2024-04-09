@@ -11,6 +11,7 @@ import Script from '@/pages/scripts/Script.vue';
 import DraftList from '@/pages/submissions/DraftsPage.vue';
 import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
 import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
+import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 
 export default [
   {
@@ -148,6 +149,17 @@ export default [
       isNew: false,
     },
     beforeEnter: authGuard,
+  },
+
+  {
+    // Request submissions
+    path: '/groups/:id/surveys/:surveyId/call-for-submissions',
+    name: 'group-call-for-submissions',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: CallForSubmissions,
+    },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions',

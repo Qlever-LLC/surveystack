@@ -12,7 +12,6 @@ import User from '@/pages/users/User.vue';
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
-import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import ResourceList from '@/pages/resources/ResourceList.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
@@ -162,12 +161,6 @@ export default [
     path: '/invitations',
     name: 'invitations',
     components: getComponents(Invitation),
-  },
-  // Request submissions
-  {
-    path: '/call-for-submissions',
-    name: 'call-for-submissions',
-    components: getComponents(CallForSubmissions),
   },
   // Resources
   {
