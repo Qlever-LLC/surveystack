@@ -579,6 +579,7 @@ const getSurveyListPagePrioPinned = async (req, res) => {
       'meta.creator',
       'meta.submissions',
       'meta.isLibrary',
+      'revisions',
     ],
   };
 

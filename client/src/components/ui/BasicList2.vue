@@ -74,6 +74,7 @@
     <span v-if="$slots.pagination">
       <slot name="pagination" />
     </span>
+    <slot />
   </a-card>
 </template>
 
