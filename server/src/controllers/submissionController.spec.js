@@ -6,8 +6,6 @@ import {
   createSurvey,
   createUser,
   createGroup,
-  getControlGenerator,
-  getSubmissionDataGenerator,
   createRequestSubmissionMeta,
   createSubmissionMeta,
 } from '../testUtils';
