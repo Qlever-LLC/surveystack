@@ -33,13 +33,8 @@ beforeEach(() => {
   withTransaction.mockImplementation(actualWithTransaction);
 });
 
-const {
-  getSubmissionsCsv,
-  prepareSubmissionsToQSLs,
-  getSubmissionPdf,
-  postSubmissionPdf,
-  sendPdfLink,
-} = submissionController;
+const { getSubmissionsCsv, getSubmissionPdf, postSubmissionPdf, sendPdfLink } =
+  submissionController;
 
 describe('submissionController', () => {
   const handleApiComposeHappyPathImplementation = (submissionEntities) => ({
@@ -835,12 +830,6 @@ describe('submissionController', () => {
               expect(submission.meta.isDraft).toBe(true);
             });
 
-            /* TODO: to implement this test, we need to update the createSurvey and createSubmission test utils
-            to allow us to create a survey with a QSL and a submission with answers to the QSL. */
-            it.todo(
-              'with a survey containing a QSL and a READY_TO_SUBMIT draft containing answers to the QSL, assert that the QSL submissions are saved to the database'
-            );
-
             it('when the mongodb transaction is aborted, returns 500 and does not update the database', async () => {
               withTransaction.mockResolvedValueOnce(undefined);
               const { submissionId, createRequestSubmission, databaseSubmission } =
@@ -1053,73 +1042,6 @@ describe('submissionController', () => {
         `${submission.meta.creator},` +
         `,"{""type"":""Feature"",""geometry"":{""type"":""Polygon"",""coordinates"":[[[-79.39869321685993,43.65614580273717],[-79.39799841596073,43.6460912513611],[-79.37263818314015,43.645085703645464],[-79.3698589795434,43.657653840263464],[-79.39869321685993,43.65614580273717]]]},""properties"":null,""id"":""measureFeature0""}",FeatureCollection`;
       expect(mockRes.send).toHaveBeenCalledWith(expected);
-    });
-  });
-
-  describe('prepareSubmissionsToQSLs', () => {
-    async function mockControlsAndSubmission() {
-      const { survey, createSubmission } = await createSurvey(['string', 'number']);
-      const { submission: _submission } = await createSubmission();
-
-      const controls = survey.revisions[survey.latestVersion - 1].controls;
-      const libraryId = new ObjectId();
-      const libraryVersion = 3;
-      const groupOverride = {
-        children: [
-          getControlGenerator('string')({ libraryId, libraryVersion, libraryIsInherited: true }),
-        ],
-        isLibraryRoot: true,
-        libraryId,
-        libraryVersion,
-      };
-      controls.push(
-        getControlGenerator('page')({
-          children: [getControlGenerator('group')(groupOverride)],
-        }),
-        getControlGenerator('group')(
-          {
-            ...groupOverride,
-            options: { ...getControlGenerator('string')().options, redacted: true },
-          },
-          2
-        ),
-        getControlGenerator('group')(groupOverride, 3)
-      );
-
-      const submission = {
-        ..._submission,
-        data: {
-          ..._submission.data,
-          ...getSubmissionDataGenerator('page')(
-            getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')())
-          ),
-          ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 2),
-          ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('string')(), 3),
-        },
-      };
-
-      submission.data.group_3.text_1.meta.permissions = ['admin'];
-
-      return { controls, submission };
-    }
-
-    it('returns no submission for empty params', async () => {
-      const controls = [];
-      const submission = {};
-      const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
-      expect(QSLSubmissions.length).toBe(0);
-    });
-
-    it('returns one submission for each used question set library in controls', async () => {
-      const { controls, submission } = await mockControlsAndSubmission();
-      const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
-      expect(QSLSubmissions.length).toBe(2);
-    });
-
-    it('keeps private data marked with permissions=admin for all child submissions', async () => {
-      const { controls, submission } = await mockControlsAndSubmission();
-      const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
-      expect(QSLSubmissions[1].data.text_1.meta.permissions).toStrictEqual(['admin']);
     });
   });
 

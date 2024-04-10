@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 import { db, mongoClient } from '../db';
 import { withTransaction, withSession } from '../db/helpers';
-import { sanitize, createSubmissionsToQSLs } from './submissionController.js';
+import { sanitize } from './submissionController.js';
 import handleApiCompose from './utils/handleApiCompose';
 import { type ObjectId } from 'mongodb';
 import { hasSubmissionRights } from '../handlers/assertions.js';
@@ -144,27 +144,16 @@ const syncDraft = async (req: Request, res: Response) => {
       return res.status(200).send();
     }
 
-    // prepare qsl submissions
-    const submissionsToQSLs = await createSubmissionsToQSLs([{ entity: submission, survey }]);
-
     // prepare draft to be submitted
     submission.meta.isDraft = false;
     submission.meta.status = submission.meta.status.filter(
       (status) => status.type !== 'READY_TO_SUBMIT'
     );
 
-    // submit draft and qsl submissions in a transaction
+    // submit draft in a transaction
     const result = await withSession(mongoClient, async (session) => {
       try {
         return await withTransaction(session, async () => {
-          if (submissionsToQSLs.length > 0) {
-            const insertResult = await db.collection('submissions').insertMany(submissionsToQSLs);
-            if (insertResult.insertedCount !== submissionsToQSLs.length) {
-              await session.abortTransaction();
-              return;
-            }
-          }
-
           const replaceResult = await db
             .collection('submissions')
             .replaceOne({ _id: submission._id }, submission, { upsert: true });
