@@ -714,7 +714,7 @@ const createSubmission = async (req, res) => {
   const results = await withSession(mongoClient, async (session) => {
     try {
       return await withTransaction(session, async () => {
-        const submissionsToInsert = [...submissionEntities.map(({ entity }) => entity)];
+        const submissionsToInsert = submissionEntities.map(({ entity }) => entity);
 
         const insertResult = await db.collection(col).insertMany(submissionsToInsert);
 
