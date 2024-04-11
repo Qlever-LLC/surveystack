@@ -4,7 +4,7 @@
       v-if="!loading && !hasError"
       :survey="survey"
       :submission="submission"
-      :persist="true"
+      :persist="!isResubmission()"
       @submit="submit"
     />
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
@@ -15,6 +15,9 @@
     </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
+      <p class="font-weight-bold" v-if="isResubmission()">
+        Drafts are not saved when resubmitting a submission. Any changes will be lost if you leave.
+      </p>
       Are you sure you want to exit this draft?
     </confirm-leave-dialog>
 
@@ -105,6 +108,12 @@ export default {
     };
   },
   methods: {
+    isResubmission() {
+      return this.submission && this.submission.meta && this.submission.meta.dateSubmitted;
+    },
+    isProxySubmission() {
+      return this.submission && this.submission.meta && this.submission.meta.submitAsUser;
+    },
     abortEditSubmitted() {
       this.$store.dispatch('submissions/remove', this.submission._id);
       // TODO: should we remove the router guard in this situation? otherwise it pops up a modal asking if the user
@@ -270,8 +279,7 @@ export default {
       }
     }
 
-    const isResubmission = this.submission && this.submission.meta && this.submission.meta.dateSubmitted;
-    if (isResubmission) {
+    if (this.isResubmission()) {
       const allowedToResubmit = checkAllowedToResubmit(
         this.submission,
         this.$store.getters['memberships/memberships'],
@@ -315,7 +323,7 @@ export default {
 
     // Set proxy header if resubmit by proxy or admin.
     // Otherwise, remove it
-    if (this.submission.meta.submitAsUser) {
+    if (this.isProxySubmission()) {
       api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
     } else {
       api.removeHeader('x-delegate-to');
