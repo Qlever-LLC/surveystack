@@ -1,33 +1,31 @@
 <template>
-  <div class="wrapper">
-    <a-container>
-      <basic-list
-        @updateSearch="updateSearch"
-        @toogleStar="toogleStar"
-        listCard
-        :entities="state.surveys.content"
-        enablePinned
-        :buttonNew="{ title: 'Create new Survey', link: { name: 'groups-new' } }"
-        :menu="state.menu"
-        :page="state.page">
-        <template v-slot:title>
-          <a-icon class="mr-2"> mdi-cube-outline </a-icon>
-          Surveys
-          <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
-            {{ state.surveys.pagination.total }}
-          </a-chip>
-        </template>
-        <template v-slot:noValue> No Surveys available </template>
-        <template v-slot:pagination>
-          <a-pagination
-            v-if="state.surveys.content.length > 0"
-            v-model="state.page"
-            :length="activeTabPaginationLength"
-            @update:modelValue="() => initData()" />
-        </template>
-      </basic-list>
-    </a-container>
-  </div>
+  <a-container>
+    <basic-list
+      @updateSearch="updateSearch"
+      @toogleStar="toogleStar"
+      listCard
+      :entities="state.surveys.content"
+      enablePinned
+      :buttonNew="{ title: 'Create new Survey', link: { name: 'groups-new' } }"
+      :menu="state.menu"
+      :page="state.page">
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-cube-outline </a-icon>
+        Surveys
+        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
+          {{ state.surveys.pagination.total }}
+        </a-chip>
+      </template>
+      <template v-slot:noValue> No Surveys available </template>
+      <template v-slot:pagination>
+        <a-pagination
+          v-if="state.surveys.content.length > 0"
+          v-model="state.page"
+          :length="activeTabPaginationLength"
+          @update:modelValue="() => initData()" />
+      </template>
+    </basic-list>
+  </a-container>
 </template>
 
 <script setup>
@@ -194,10 +192,4 @@ async function fetchData(user = null) {
 }
 </script>
 
-<style scoped lang="scss">
-.wrapper {
-  background-color: rgb(var(--v-theme-background));
-  width: 100%;
-  height: 100%;
-}
-</style>
+<style scoped lang="scss"></style>
