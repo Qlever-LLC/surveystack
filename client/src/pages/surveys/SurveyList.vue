@@ -4,6 +4,7 @@
       @updateSearch="updateSearch"
       @toogleStar="toogleStar"
       listCard
+        :loading="state.loading"
       :entities="state.surveys.content"
       enablePinned
       :buttonNew="{ title: 'Create new Survey', link: { name: 'groups-new' } }"
@@ -24,6 +25,10 @@
           :length="activeTabPaginationLength"
           @update:modelValue="() => initData()" />
       </template>
+        <member-selector
+          :show="state.showSelectMember"
+          @hide="state.showSelectMember = false"
+          @selected="(selectedMemb) => startDraftAs(selectedMemb)" />
     </basic-list>
   </a-container>
 </template>
@@ -31,7 +36,12 @@
 <script setup>
 import { reactive, computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { useGroup } from '@/components/groups/group';
+import { getPermission } from '@/utils/permissions';
+import { get } from 'lodash';
+import { parse as parseDisposition } from 'content-disposition';
+import downloadExternal from '@/utils/downloadExternal';
 
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
@@ -39,9 +49,12 @@ import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 
 import BasicList from '@/components/ui/BasicList2.vue';
+import MemberSelector from '@/components/shared/MemberSelector.vue';
 
 const store = useStore();
+const router = useRouter();
 const { getActiveGroupId, isGroupAdmin } = useGroup();
+const { rightToSubmitSurvey } = getPermission();
 const PAGINATION_LIMIT = 10;
 
 const state = reactive({
@@ -56,6 +69,9 @@ const state = reactive({
     },
   },
   menu: [],
+  showSelectMember: false,
+  selectedSurvey: undefined,
+  loading: false,
 });
 
 const activeTabPaginationLength = computed(() => {
@@ -91,52 +107,89 @@ async function toogleStar(entity) {
   await api.put(`/groups/${group._id}`, group);
   await initData();
 }
+function setSelectMember(survey) {
+  state.showSelectMember = true;
+  state.selectedSurvey = survey;
+}
+function startDraftAs(selectedMember) {
+  this.showSelectMember = false;
+  if (selectedMember.user && state.selectedSurvey) {
+    const surveyId = state.selectedSurvey._id;
+    router.push(
+      `/groups/${getActiveGroupId()}/surveys/${surveyId}/submissions/new?submitAsUserId=${selectedMember.user._id}`
+    );
+  }
+  state.selectedSurvey = undefined;
+}
+async function downloadPrintablePdf(survey) {
+  state.loading = true;
+
+  try {
+    const { headers, data } = await api.get(`/surveys/${survey}/pdf`);
+    const disposition = parseDisposition(headers['content-disposition']);
+    downloadExternal(data, disposition.parameters.filename);
+  } catch (e) {
+    console.error('Failed to download printable PDF', e);
+    store.dispatch(
+      'feedback/add',
+      get(
+        e,
+        'response.data.message',
+        'Sorry, something went wrong while downloading a PDF of paper version. Try again later.'
+      )
+    );
+  } finally {
+    state.loading = false;
+  }
+}
 async function initData() {
   state.menu.push(
     {
       title: 'Start Survey',
       icon: 'mdi-open-in-new',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}/submissions/new`,
+      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`,
+      render: (s) => () => rightToSubmitSurvey(s),
       color: 'green',
     },
     {
       title: 'Start Survey as Member',
       icon: 'mdi-open-in-new',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
+      action: (s) => () => setSelectMember(s),
+      render: (s) => () => rightToSubmitSurvey(s),
     },
     {
       title: 'Call for Submissions',
       icon: 'mdi-bullhorn',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}/call-for-submissions`,
-      render: (e) => isGroupAdmin(),
+      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`,
+      render: (s) => () => isGroupAdmin(),
     },
     {
       title: 'Print Blank Survey',
       icon: 'mdi-open-in-new', //TODO use correct icon
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
+      action: (s) => () => downloadPrintablePdf(s._id),
+      render: (s) => () => rightToSubmitSurvey(s),
     },
-    {
-      title: 'View',
-      icon: 'mdi-file-document',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
-    },
+    // {
+    //   title: 'View',
+    //   icon: 'mdi-file-document',
+    //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+    // },
     {
       title: 'Edit',
       icon: 'mdi-pencil',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
-      render: (e) => isGroupAdmin(),
+      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+      render: (s) => () => isGroupAdmin(),
     },
     {
       title: 'View Results',
       icon: 'mdi-chart-bar',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
-    },
-    {
-      title: 'Share',
-      icon: 'mdi-share',
-      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e._id}`,
-      render: (e) => isGroupAdmin(),
+      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
     }
+    // {
+    //   title: 'Share',
+    //   icon: 'mdi-share',
+    //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+    // }
   );
 
   await Promise.all([fetchData()]);

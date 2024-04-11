@@ -7,7 +7,7 @@
       dense
       class="py-2 mb-2 bg-white"
       rounded="lg"
-      @click="runAction(menu[0].action(entity))">
+      @click="menu[0].render === undefined || menu[0].render(entity) ? runAction(menu[0].action(entity)) : undefined">
       <span>
         <a-list-item-title class="d-flex align-center">
           <span v-if="enablePinned" @click.prevent="toogleStar(entity)">
