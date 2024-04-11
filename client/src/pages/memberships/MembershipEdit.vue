@@ -218,14 +218,14 @@ export default {
 
   async created() {
     try {
-      const { id } = this.$route.params;
-      const { data: entity } = await api.get(`/memberships/${id}`);
+      const { membershipId } = this.$route.params;
+      const { data: entity } = await api.get(`/memberships/${membershipId}`);
       this.entity = { ...this.entity, ...entity };
 
       const { data: groupDetail } = await api.get(`/groups/${this.entity.group}`);
       this.groupDetail = groupDetail;
 
-      const { data: integrations } = await api.get(`/membership-integrations?membership=${id}`);
+      const { data: integrations } = await api.get(`/membership-integrations?membership=${membershipId}`);
       this.integrations = integrations;
     } catch (e) {
       console.log('something went wrong:', e);

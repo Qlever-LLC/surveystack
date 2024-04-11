@@ -175,6 +175,7 @@ const filteredEntities = computed(() => {
 });
 
 function defaultFilter() {
+  //TODO there should be no content specific code in this component. extract this logic by adding a prop "filterFn". If not defined, try filtering by name, otherwise call the filterFn
   if (entities.value.length === 0) {
     return [];
   }
@@ -183,9 +184,15 @@ function defaultFilter() {
   }
   if (entities.value[0].name) {
     return entities.value.filter((entity) => entity.name.toLowerCase().indexOf(state.searchValue.toLowerCase()) > -1);
-  } else if (entities.value[0].meta.survey.name) {
+  } else if (entities.value[0]?.meta?.survey?.name) {
     return entities.value.filter(
       (entity) => entity.meta.survey.name.toLowerCase().indexOf(state.searchValue.toLowerCase()) > -1
+    );
+  } else if (entities.value[0]?.user?.name) {
+    return entities.value.filter(
+      (entity) =>
+        entity.user?.name.toLowerCase().indexOf(state.searchValue.toLowerCase()) > -1 ||
+        entity.user?.email.toLowerCase().indexOf(state.searchValue.toLowerCase()) > -1
     );
   }
 }

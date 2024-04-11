@@ -9,9 +9,6 @@ import store from '@/store';
 import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
 import User from '@/pages/users/User.vue';
-import MembershipNew from '@/pages/memberships/MembershipNew.vue';
-import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
-import Invitation from '@/pages/invitations/Invitation.vue';
 import ResourceList from '@/pages/resources/ResourceList.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
@@ -144,23 +141,6 @@ export default [
     path: '/membership-integrations/:id/edit',
     name: 'membership-integrations-edit',
     components: getComponents(MembershipIntegrationEdit),
-  },
-  // memberships
-  {
-    path: '/memberships/new',
-    name: 'memberships-new',
-    components: getComponents(MembershipNew),
-  },
-  {
-    path: '/memberships/:id/edit',
-    name: 'memberships-edit',
-    components: getComponents(MembershipEdit),
-  },
-  // Invitation
-  {
-    path: '/invitations',
-    name: 'invitations',
-    components: getComponents(Invitation),
   },
   // Resources
   {

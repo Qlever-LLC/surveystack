@@ -43,15 +43,19 @@
           hideDefaultFooter
           actionsSlot>
           <template v-slot:actions="{ item }">
-            <app-confirm-membership-button
-              v-if="item.meta.status === 'pending'"
-              :membershipId="item._id"
-              :email="item.meta.invitationEmail"
-              @confirmed="loadMembers" />
+            <a-btn v-if="item.meta.status === 'pending'" @click="memberToConfirm = item">Confirm</a-btn>
           </template>
         </a-data-table>
       </a-card-text>
     </a-card>
+
+    <confirm-membership-dialog
+      v-if="memberToConfirm"
+      :membership="memberToConfirm"
+      @confirmed="
+        memberToConfirm = null;
+        loadMembers;
+      " />
 
     <a-dialog v-model="showConfirmDialog" max-width="500">
       <a-card>
@@ -79,7 +83,7 @@
 
 <script>
 import appSurveySelector from '@/components/survey/SurveySelector.vue';
-import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
+import confirmMembershipDialog from '@/components/shared/ConfirmMembershipDialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
@@ -98,7 +102,7 @@ export default {
   components: {
     resultDialog,
     appSurveySelector,
-    appConfirmMembershipButton,
+    confirmMembershipDialog,
   },
   data() {
     return {
@@ -118,6 +122,7 @@ export default {
         { title: 'actions', value: 'actions', sortable: true },
       ],
       showConfirmDialog: false,
+      memberToConfirm: null,
       isLoadingMembers: false,
       isSubmitting: false,
       showSubmitResult: false,

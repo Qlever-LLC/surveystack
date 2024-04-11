@@ -11,6 +11,7 @@ import Group from '@/pages/groups/Group.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
 import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
+import Invitation from '@/pages/invitations/Invitation.vue';
 
 export default [
   {
@@ -21,70 +22,6 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: Group,
-    },
-  },
-  {
-    path: '/surveys/my-submissions',
-    name: 'my-submissions',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: SubmissionsPage,
-    },
-  },
-  {
-    path: '/surveys/browse',
-    name: 'surveys-browse',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: SurveyList,
-    },
-  },
-  {
-    path: '/scripts',
-    name: 'scripts-list',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: ScriptList,
-    },
-  },
-  // scripts
-  {
-    path: '/scripts/new',
-    name: 'scripts-new',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: ScriptEdit,
-    },
-  },
-  {
-    path: '/scripts/:id/edit',
-    name: 'scripts-edit',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: ScriptEdit,
-    },
-  },
-  {
-    path: '/scripts/:id',
-    name: 'scripts-detail',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: Script,
-    },
-  },
-  {
-    path: '/groups/edit/:id',
-    name: 'groups-edit',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: GroupEdit,
     },
   },
   {
@@ -106,19 +43,6 @@ export default [
     },
     props: {
       isNew: true,
-    },
-    beforeEnter: authGuard,
-  },
-  {
-    path: '/surveys/:id/edit',
-    name: 'surveys-edit',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-      main: Builder,
-    },
-    props: {
-      isNew: false,
     },
     beforeEnter: authGuard,
   },

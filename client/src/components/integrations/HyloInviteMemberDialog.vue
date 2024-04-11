@@ -1,25 +1,11 @@
 <template>
-  <a-btn
-    v-if="member"
-    :disabled="loading"
-    :href="member.hyloUrl"
-    target="_blank"
-    small
-    color="#00AD87"
-    v-on:click.prevent="openProfile"
-    >See on Hylo</a-btn
-  >
-
-  <a-dialog v-else-if="hyloGroup" v-model="isConfirming" width="300">
-    <template v-slot:activator="{ props }">
-      <a-btn :disabled="loading" v-bind="props" small>Invite to Hylo</a-btn>
-    </template>
+  <a-dialog v-model="showDialog" width="300">
     <a-card>
       <a-card-title> Confirm Invitation </a-card-title>
       <a-card-text> Do you want to invite "{{ userName }}" to the group "{{ hyloGroup.name }}" on Hylo? </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <a-btn variant="text" @click="isConfirming = false"> Cancel </a-btn>
+        <a-btn variant="text" @click="showDialog = false"> Cancel </a-btn>
         <a-btn variant="text" color="primary" @click="inviteToHylo" :loading="isAddingMember"> Invite </a-btn>
       </a-card-actions>
     </a-card>
@@ -33,7 +19,7 @@ import { get } from 'lodash';
 export default {
   data() {
     return {
-      isConfirming: false,
+      showDialog: true,
       isAddingMember: false,
     };
   },
@@ -45,10 +31,6 @@ export default {
     membershipId: {
       required: true,
       type: String,
-    },
-    loading: {
-      default: false,
-      type: Boolean,
     },
     userName: {
       required: true,
@@ -74,12 +56,7 @@ export default {
         console.error(e);
       } finally {
         this.isAddingMember = false;
-        this.isConfirming = false;
-      }
-    },
-    openProfile() {
-      if (this.member) {
-        window.open(this.member.hyloUrl, '_blank');
+        this.showDialog = false;
       }
     },
   },

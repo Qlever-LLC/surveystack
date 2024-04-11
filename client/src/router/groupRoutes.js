@@ -12,6 +12,9 @@ import DraftList from '@/pages/submissions/DraftsPage.vue';
 import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
 import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
+import MembershipsPage from '@/pages/memberships/MembershipsPage.vue';
+import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
+import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 
 export default [
   {
@@ -111,7 +114,25 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: GroupEdit,
+      main: MembershipsPage,
+    },
+  },
+  {
+    path: '/groups/:id/members/new',
+    name: 'group-members-new',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: MembershipNew,
+    },
+  },
+  {
+    path: '/groups/:id/members/:membershipId/edit',
+    name: 'group-members-edit',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: MembershipEdit,
     },
   },
   {

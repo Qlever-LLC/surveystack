@@ -1,8 +1,8 @@
 <template>
   <a-container>
-    <span class="text-secondary overline">{{ state.entity._id }}</span>
-    <h2>Invite people to '{{ state.groupDetail.name }}'</h2>
-    <a-card class="pa-4 mb-4">
+    <a-card class="pa-4 mb-4" color="background">
+      <span class="text-secondary overline">{{ state.entity._id }}</span>
+      <h2>Invite people to '{{ state.groupDetail.name }}'</h2>
       <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <a-select
           class="mt-3"
@@ -89,20 +89,6 @@
         </div>
       </a-form>
     </a-card>
-
-    <a-dialog v-model="state.dialogCreateUser" max-width="500">
-      <a-card>
-        <a-card-title> User does not exist yet </a-card-title>
-        <a-card-text class="mt-4">
-          Do you want to proceed to create a new user with email {{ state.entity.meta.invitationEmail }}
-        </a-card-text>
-        <a-card-actions>
-          <a-spacer />
-          <a-btn variant="text" @click.stop="state.dialogCreateUser = false"> Cancel </a-btn>
-          <a-btn variant="text" color="red" @click.stop="proceedToUserCreation"> Proceed </a-btn>
-        </a-card-actions>
-      </a-card>
-    </a-dialog>
   </a-container>
 </template>
 
@@ -157,7 +143,6 @@ const state = reactive({
     },
   },
   groupDetail: { name: '', path: '' },
-  dialogCreateUser: false,
   sendEmail: 'SEND_NOW',
   invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
     ? [localStorage[LS_MEMBER_INVITATION_METHOD]]
@@ -171,9 +156,6 @@ const form = ref(null);
 
 function cancel() {
   router.back();
-}
-function updateCode(code) {
-  state.entity.content = code;
 }
 async function submit() {
   if (!(await form.value.validate())) {
@@ -189,24 +171,10 @@ async function submit() {
     await api.post(url, data);
     router.back();
   } catch (err) {
-    if (err.response.status === 404) {
-      // legacy (no 404 will be thrown from the server)
-      state.dialogCreateUser = true;
-    }
     await store.dispatch('feedback/add', err.response.data.message);
   } finally {
     state.isSubmitting = false;
   }
-}
-function proceedToUserCreation() {
-  router.replace({
-    name: 'users-new',
-    query: {
-      group: state.entity.group,
-      role: state.entity.role,
-      email: state.entity.meta.invitationEmail,
-    },
-  });
 }
 
 watch(state.invitationMethod, (newValue) => {
@@ -216,16 +184,15 @@ watch(state.invitationMethod, (newValue) => {
 onMounted(async () => {
   state.entity._id = new ObjectId();
 
-  const { group, role } = route.query;
-  if (!group || !role) {
+  const { id } = route.params;
+  if (!id) {
     return;
   }
 
   try {
-    const { data: groupDetailData } = await api.get(`/groups/${group}`);
+    const { data: groupDetailData } = await api.get(`/groups/${id}`);
     state.groupDetail = groupDetailData;
-    state.entity.group = group;
-    state.entity.role = role;
+    state.entity.group = id;
   } catch (e) {
     console.log('something went wrong:', e);
   }

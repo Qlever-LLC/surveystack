@@ -7,6 +7,7 @@ import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import AppInfo from '@/pages/app/AppInfo.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
+import Invitation from '@/pages/invitations/Invitation.vue';
 
 const guardLanding = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -37,6 +38,14 @@ export default [
     components: {
       header: AppHeader,
       main: LandingPage,
+    },
+  },
+  {
+    path: '/invitations',
+    name: 'invitations',
+    components: {
+      header: AppHeader,
+      main: Invitation,
     },
   },
   {

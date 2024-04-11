@@ -1,14 +1,10 @@
 <template>
   <a-dialog v-model="isVisible" width="300">
-    <template v-slot:activator="{ props }">
-      <a-btn v-bind="props" @click.prevent small> Confirm </a-btn>
-    </template>
-
     <a-card>
       <a-card-title> Confirm Membership </a-card-title>
       <a-card-text>
-        This will immediately activate the membership of the user "{{ email }}". They will receive an email with login
-        instructions. You'll be able to send "Call for Submission" links to this user.
+        This will immediately activate the membership of the user "{{ membership.meta.invitationEmail }}". They will
+        receive an email with login instructions. You'll be able to send "Call for Submission" links to this user.
       </a-card-text>
       <a-card-actions>
         <a-spacer />
@@ -26,27 +22,23 @@ import { get } from 'lodash';
 export default {
   data() {
     return {
-      isVisible: false,
+      isVisible: true,
       resolve: null,
       next: null,
       isInProgress: false,
     };
   },
   props: {
-    membershipId: {
+    membership: {
       required: true,
-      type: String,
-    },
-    email: {
-      required: true,
-      type: String,
+      type: Object,
     },
   },
   methods: {
     async send() {
       this.isInProgress = true;
       try {
-        await api.post('/memberships/activate-by-admin', { membershipId: this.membershipId });
+        await api.post('/memberships/activate-by-admin', { membershipId: this.membership._id });
         this.$emit('confirmed');
       } catch (e) {
         console.error(e);

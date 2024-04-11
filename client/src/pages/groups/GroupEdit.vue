@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="bg-background">
     <app-dialog
       v-model="learnMoreDialog"
       title="Premium Features"
@@ -94,60 +94,6 @@
     <a-row>
       <a-col cols="12" lg="12">
         <app-basic-list
-          maxHeight="500px"
-          :loading="isLoadingMembers || isLoadingHyloGroup"
-          editable
-          class="mb-4"
-          v-if="editMode"
-          :entities="members"
-          title="Members"
-          :link="(member) => `/memberships/${member._id}/edit`"
-          :linkNew="{
-            name: 'memberships-new',
-            query: { group: entity._id, role: 'user' },
-          }"
-          :filter="filterMembers">
-          <template v-slot:append="{ entity }">
-            <a-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
-              <a-row cssGap12px>
-                <app-confirm-membership-button
-                  v-if="entity.meta && entity.meta.status === 'pending'"
-                  :membershipId="entity._id"
-                  :email="entity.meta.invitationEmail"
-                  @confirmed="loadMembers" />
-                <app-member-hylo-status
-                  v-if="entity.meta && entity.meta.status === 'active' && integratedHyloGroup"
-                  :loading="isLoadingHyloGroup"
-                  :membershipId="entity._id"
-                  :hyloGroup="integratedHyloGroup"
-                  :userName="entity.user.name"
-                  @updated="loadHyloGroup" />
-                <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
-              </a-row>
-            </a-list-item-action>
-          </template>
-          <template v-slot:entity="{ entity }">
-            <div v-if="entity.meta && entity.meta.status === 'pending'">
-              <a-list-item-title class="text-secondary"
-                >[Pending] {{ entity.meta.invitationEmail
-                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</a-list-item-title
-              >
-              <a-list-item-subtitle>{{
-                entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
-              }}</a-list-item-subtitle>
-            </div>
-            <div v-else>
-              <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
-              <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
-            </div>
-          </template>
-        </app-basic-list>
-      </a-col>
-    </a-row>
-
-    <a-row>
-      <a-col cols="12" lg="12">
-        <app-basic-list
           class="mb-4"
           v-if="editMode"
           :entities="integrations"
@@ -183,11 +129,8 @@ import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
-import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
-import { get } from 'lodash';
 
 const integrations = [
   {
@@ -208,8 +151,6 @@ export default {
     appDocLinks,
     appBasicList,
     appDialog,
-    appConfirmMembershipButton,
-    appMemberHyloStatus,
   },
   data() {
     return {
@@ -230,38 +171,12 @@ export default {
         },
       },
       searchResults: [],
-      members: [],
-      integratedHyloGroup: null,
       learnMoreDialog: false,
       integrations,
-      isLoadingMembers: false,
       isLoadingGroup: false,
-      isLoadingHyloGroup: false,
     };
   },
   methods: {
-    async loadMembers() {
-      this.isLoadingMembers = true;
-      try {
-        const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
-        this.members = members;
-      } catch (e) {
-        console.error(e);
-        this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
-      } finally {
-        this.isLoadingMembers = false;
-      }
-    },
-    async loadHyloGroup() {
-      this.isLoadingHyloGroup = true;
-      try {
-        this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${this.entity._id}`)).data;
-      } catch (e) {
-        console.error(e);
-      } finally {
-        this.isLoadingHyloGroup = false;
-      }
-    },
     async onSubmit() {
       if (this.entity.name.trim() === '') {
         console.log('name must not be empty');
@@ -280,7 +195,7 @@ export default {
           await api.post('/groups', this.entity);
         }
 
-        this.$router.push(`/groups/${this.entity._id}/`);
+        this.$router.push(`/groups/${this.entity._id}/settings`);
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
         console.log(err);
@@ -294,30 +209,6 @@ export default {
         `/surveys?projections[]=name&projections[]=meta.dateModified&q=${q}`
       );
       this.searchResults = searchResults;
-    },
-    filterMembers(entities, q) {
-      if (!q) {
-        return entities;
-      }
-      const ql = q.toLowerCase();
-
-      return entities.filter((entity) => {
-        if (entity.user) {
-          if (entity.user.name.toLowerCase().indexOf(ql) > -1) {
-            return true;
-          }
-
-          if (entity.user.email.toLowerCase().startsWith(ql)) {
-            return true;
-          }
-        } else if (entity.meta.invitationEmail) {
-          if (entity.meta.invitationEmail.toLowerCase().indexOf(ql) > -1) {
-            return true;
-          }
-        }
-
-        return false;
-      });
     },
   },
   watch: {
@@ -365,20 +256,12 @@ export default {
       }
     }
 
-    // TODO is it okay to remove this?
-    // this.entity._id = new ObjectId().toString();
-
     if (this.editMode) {
       this.isLoadingGroup = true;
       try {
         const { id } = this.$route.params;
         const { data } = await api.get(`/groups/${id}?populate=true`);
         this.entity = { ...this.entity, ...data };
-
-        await Promise.all([this.loadMembers(), this.loadHyloGroup()]);
-
-        // const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
-        // this.integrations = integrations;
       } catch (e) {
         console.log('something went wrong:', e);
       } finally {
