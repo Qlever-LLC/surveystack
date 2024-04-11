@@ -9,7 +9,8 @@
         </a-chip>
       </template>
       <template v-slot:entityTitle="{ entity }">
-        {{ entity.meta.survey.name }}
+        <span v-if="entity.meta.survey.name">{{ entity.meta.survey.name }}</span>
+        <span v-else class="text-red">Missing survey</span>
       </template>
       <template v-slot:entitySubtitle="{ entity }">
         Submitted {{ new Date(entity.meta.dateSubmitted).toLocaleString() }}
@@ -110,8 +111,12 @@ async function fetchRemoteSubmissions() {
     state.submissions = data.content;
     state.submissionsPagination = data.pagination;
 
-    //load survey names where required
-    await setSurveyNames(state.submissions);
+    try {
+      //load survey names where required
+      await setSurveyNames(state.submissions);
+    } catch (err) {
+      //could'nt find the survey name, ignore
+    }
   } catch (err) {
     console.log('Could not fetch remote submissions', err);
     state.submissions = [];
