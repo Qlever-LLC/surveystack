@@ -1,5 +1,5 @@
 <template>
-  <a-dialog v-model="isVisible" width="300">
+  <a-dialog v-model="isVisible" width="300" @click:outside="cancel">
     <a-card>
       <a-card-title> Confirm Membership </a-card-title>
       <a-card-text>
@@ -8,7 +8,7 @@
       </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <a-btn variant="text" @click="isVisible = false"> Cancel </a-btn>
+        <a-btn variant="text" @click="cancel"> Cancel </a-btn>
         <a-btn variant="text" color="primary" @click="send" :loading="isInProgress"> Confirm </a-btn>
       </a-card-actions>
     </a-card>
@@ -47,6 +47,10 @@ export default {
         this.isVisible = false;
         this.isInProgress = false;
       }
+    },
+    cancel() {
+      this.isVisible = false;
+      this.$emit('cancel');
     },
   },
 };

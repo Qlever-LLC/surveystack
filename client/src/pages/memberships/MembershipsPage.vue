@@ -37,7 +37,8 @@
   <confirm-membership-dialog
     v-if="!!state.memberToConfirm"
     :membership="state.memberToConfirm"
-    @confirmed="initData()" />
+    @confirmed="initData()"
+    @cancel="state.memberToConfirm = null" />
 
   <hylo-invite-member-dialog
     v-if="state.memberToInviteToHylo"
@@ -67,7 +68,7 @@ const state = reactive({
     {
       title: 'Confirm Membership',
       icon: 'mdi-open-in-new',
-      action: (e) => (state.memberToConfirm = e),
+      action: (e) => () => (state.memberToConfirm = e),
       render: (e) => isGroupAdmin() && e.meta && e.meta.status === 'pending',
       buttonFixed: true,
     },
