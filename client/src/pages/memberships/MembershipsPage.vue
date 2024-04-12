@@ -37,7 +37,10 @@
   <confirm-membership-dialog
     v-if="!!state.memberToConfirm"
     :membership="state.memberToConfirm"
-    @confirmed="initData()"
+    @confirmed="
+      state.memberToConfirm = null;
+      initData();
+    "
     @cancel="state.memberToConfirm = null" />
 
   <hylo-invite-member-dialog
