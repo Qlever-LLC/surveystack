@@ -130,10 +130,7 @@ router.get(
 router.post('/submissions/pdf', catchErrors(submissionController.postSubmissionPdf));
 router.post(
   '/submissions',
-  [
-    catchErrors(submissionMigration),
-    assertSubmissionRights
-  ],
+  [catchErrors(submissionMigration), assertSubmissionRights],
   catchErrors(handleDelegates(submissionController.createSubmission))
 );
 router.put(

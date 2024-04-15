@@ -74,7 +74,7 @@ const connectDatabase = async () => {
   await migrateSurveyControlPrintLayout_VXtoV6();
   await migrateSurveyOntologyOptions_VXtoV7();
   await migrateSurveyControlPrintLayout_VXtoV9();
-  await migrateSubmissions_VXtoV4();  
+  await migrateSubmissions_VXtoV4();
 };
 
 /*
@@ -101,19 +101,17 @@ const connectDatabase = async () => {
   additional context.
 */
 const migrateSubmissions_VXtoV4 = async () => {
-  const updateResult = await db
-    .collection('submissions')
-    .updateMany(
-      { 'meta.specVersion': { $lte: 3 } },
-      {
-        $set: {
-          'meta.specVersion': 4,
-          'meta.isDraft': false,
-          'meta.isDeletedDraft': false,
-          'meta.status': [],
-        },
-      }
-    );
+  const updateResult = await db.collection('submissions').updateMany(
+    { 'meta.specVersion': { $lte: 3 } },
+    {
+      $set: {
+        'meta.specVersion': 4,
+        'meta.isDraft': false,
+        'meta.isDeletedDraft': false,
+        'meta.status': [],
+      },
+    }
+  );
   if (updateResult.modifiedCount) {
     console.log('migrateSubmissions_VXtoV4: Updated', updateResult.modifiedCount, 'submissions');
   }
