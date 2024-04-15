@@ -25,7 +25,7 @@ const DATABASE_NAME = 'Database';
 // Opening a Database
 function openDb(onSuccess) {
   const request = indexedDB.open(DATABASE_NAME, 8);
-  db = this.result;
+  db = null;
 
   request.onerror = (event) => {
     console.log(`Error: ${event}`);
@@ -171,43 +171,6 @@ function getAllResources(onSuccess) {
   getResults(stores.RESOURCES, onSuccess);
 }
 
-/*
-  https://stackoverflow.com/questions/41586400/using-indexeddb-asynchronously
-  Maybe we could use "idb" which is a wrapper for IndexedDB but with promises?
-  Also, we may want to add a "db" module to the Vuex store?
-*/
-function loadFromIndexedDB(storeName, id) {
-  return new Promise((resolve, reject) => {
-    const dbRequest = indexedDB.open(DATABASE_NAME);
-
-    dbRequest.onerror = (ev) => {
-      reject(Error('Error text'));
-    };
-
-    dbRequest.onupgradeneeded = (ev) => {
-      // Objectstore does not exist. Nothing to load
-      ev.target.transaction.abort();
-      reject(Error('Not found'));
-    };
-
-    dbRequest.onsuccess = (ev) => {
-      const database = ev.target.result;
-      const transaction = database.transaction([storeName]);
-      const objectStore = transaction.objectStore(storeName);
-      const objectRequest = objectStore.get(id);
-
-      objectRequest.onerror = () => {
-        reject(Error('Error text'));
-      };
-
-      objectRequest.onsuccess = () => {
-        if (objectRequest.result) resolve(objectRequest.result);
-        else reject(Error('object not found'));
-      };
-    };
-  });
-}
-
 function saveToIndexedDB(storeName, object) {
   return new Promise((resolve, reject) => {
     const dbRequest = indexedDB.open(DATABASE_NAME);
@@ -270,6 +233,29 @@ function removeFromIndexedDB(storeName, id) {
   });
 }
 
+const migrateSubmissions = async () => {
+  const drafts = await new Promise((resolve) => {
+    openDb(() => {
+      getAllSubmissions((results) => resolve(results));
+    });
+  });
+
+  const resubmissionDrafts = drafts.filter((draft) => draft.meta.dateSubmitted && !draft.meta.isDraft);
+
+  await Promise.all(resubmissionDrafts.map((draft) => removeFromIndexedDB(stores.SUBMISSIONS, draft._id)));
+
+  const upgradeSubmissionFromVXtoV4 = (submission) => {
+    submission.meta.isDraft = true;
+    submission.meta.isDeletedDraft = false;
+    submission.meta.specVersion = 4;
+    return submission;
+  };
+
+  const remainingDrafts = drafts.filter((draft) => !draft.meta.dateSubmitted);
+  remainingDrafts.map(upgradeSubmissionFromVXtoV4).forEach(persistSubmission);
+};
+migrateSubmissions();
+
 export {
   surveys,
   submissions,
@@ -288,7 +274,6 @@ export {
   clearAllSurveys,
   getAllResources,
   clearAllResources,
-  loadFromIndexedDB,
   saveToIndexedDB,
   stores,
   removeFromIndexedDB,
