@@ -4,7 +4,7 @@
       @updateSearch="updateSearch"
       @toogleStar="toogleStar"
       listCard
-        :loading="state.loading"
+      :loading="state.loading"
       :entities="state.surveys.content"
       enablePinned
       :buttonNew="{ title: 'Create new Survey', link: { name: 'groups-new' } }"
@@ -25,10 +25,10 @@
           :length="activeTabPaginationLength"
           @update:modelValue="() => initData()" />
       </template>
-        <member-selector
-          :show="state.showSelectMember"
-          @hide="state.showSelectMember = false"
-          @selected="(selectedMemb) => startDraftAs(selectedMemb)" />
+      <member-selector
+        :show="state.showSelectMember"
+        @hide="state.showSelectMember = false"
+        @selected="(selectedMemb) => startDraftAs(selectedMemb)" />
     </basic-list>
   </a-container>
 </template>
@@ -54,7 +54,7 @@ import MemberSelector from '@/components/shared/MemberSelector.vue';
 const store = useStore();
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
-const { rightToSubmitSurvey, rightToEditSurvey } = getPermission();
+const { rightToSubmitSurvey, rightToEditSurvey, rightToViewAnonymizedResults } = getPermission();
 const PAGINATION_LIMIT = 10;
 
 const state = reactive({
@@ -183,14 +183,15 @@ async function initData() {
     {
       title: 'View Results',
       icon: 'mdi-chart-bar',
-      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-    }
+      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`,
+      render: (s) => () => rightToViewAnonymizedResults(),
+    },
     // {
     //   title: 'Share',
     //   icon: 'mdi-share',
     //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
     // }
-    ];
+  ];
 
   await Promise.all([fetchData()]);
 }

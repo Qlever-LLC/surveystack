@@ -20,8 +20,13 @@ export function getPermission() {
     return isGroupAdmin();
   }
 
+  function rightToViewAnonymizedResults() {
+    return true;
+  }
+
   return {
     rightToSubmitSurvey,
     rightToEditSurvey,
+    rightToViewAnonymizedResults,
   };
 }
