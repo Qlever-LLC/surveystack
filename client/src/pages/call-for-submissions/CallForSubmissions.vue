@@ -1,29 +1,15 @@
 <template>
   <a-container>
     <h1>Call for Submissions</h1>
-
-    <app-survey-selector
-      :show="showSelectSurvey"
-      :searchResults="searchResults"
-      @hide="showSelectSurvey = false"
-      @search="searchSurveys"
-      @selected="selectSurvey" />
     <a-card class="my-2">
       <a-card-text>
-        <label>Survey</label>
-        <div class="mb-5 d-flex align-center">
-          <a-btn @click="showSelectSurvey = true" color="primary" variant="outlined">Select Survey</a-btn>
-          <span v-if="selectedSurvey" class="mx-2">{{ selectedSurvey.name }}</span>
-          <a-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</a-icon>
-        </div>
-
         <a-text-field v-model="subject" label="Subject" variant="filled" />
         <a-textarea rows="10" v-model="body" label="Message" hide-details />
         <div v-if="showMissingMagicLinkWarning" class="mt-2 text-error">
           Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
         </div>
         <div class="d-flex justify-end align-center mt-3">
-          <span v-if="!submittable" class="mr-2">Select a survey and at least one member below</span>
+          <span v-if="!submittable" class="mr-2">Select at least one member below</span>
           <a-btn variant="text" @click="cancel">Cancel</a-btn>
           <a-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</a-btn>
         </div>
@@ -82,7 +68,6 @@
 </template>
 
 <script>
-import appSurveySelector from '@/components/survey/SurveySelector.vue';
 import confirmMembershipDialog from '@/components/shared/ConfirmMembershipDialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
@@ -101,7 +86,6 @@ All the best
 export default {
   components: {
     resultDialog,
-    appSurveySelector,
     confirmMembershipDialog,
   },
   data() {
@@ -109,8 +93,6 @@ export default {
       members: [],
       group: null,
       selectedMembers: [],
-      searchResults: [],
-      showSelectSurvey: false,
       selectedSurvey: null,
       subject: defaultSubject,
       body: defaultBody,
@@ -142,25 +124,13 @@ export default {
         this.isLoadingMembers = false;
       }
     },
-    async searchSurveys(q) {
-      console.log('calling searchSurveys', q);
-      const { data: searchResults } = await api.get(
-        `/surveys?projections[]=name&projections[]=meta.dateModified&q=${q}`
-      );
-      this.searchResults = searchResults;
-    },
-    selectSurvey(survey) {
-      this.selectedSurvey = survey;
-      this.subject = `Request to submit survey '${survey.name}'`;
-      this.showSelectSurvey = false;
-    },
     cancel() {
       this.$router.back();
     },
     async submit() {
       this.isSubmitting = true;
       try {
-        const members = this.selectedMembers.map((member) => member._id);
+        const members = this.selectedMembers;
         const survey = this.selectedSurvey._id;
         await api.post('/call-for-submissions/send', {
           survey,
@@ -221,6 +191,11 @@ export default {
     if (id) {
       this.group = id;
       await this.loadMembers();
+    }
+    if(surveyId){
+      const {data} = await api.get(`/surveys/${surveyId}`)
+      this.selectedSurvey = data
+      this.subject = `Request to submit survey '${this.selectedSurvey.name}'`
     }
   },
 };

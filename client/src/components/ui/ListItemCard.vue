@@ -109,7 +109,7 @@ onMounted(() => {
 });
 
 const filteredMenu = computed(() => {
-  return props.menu.filter((m) => m.render === undefined || m.render(props.entity));
+  return props.menu.filter((m) => m.render === undefined || m.render(props.entity)());
 });
 
 function getTextColor(itemMenu) {

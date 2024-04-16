@@ -53,8 +53,8 @@ import MemberSelector from '@/components/shared/MemberSelector.vue';
 
 const store = useStore();
 const router = useRouter();
-const { getActiveGroupId, isGroupAdmin } = useGroup();
-const { rightToSubmitSurvey } = getPermission();
+const { getActiveGroupId } = useGroup();
+const { rightToSubmitSurvey, rightToEditSurvey } = getPermission();
 const PAGINATION_LIMIT = 10;
 
 const state = reactive({
@@ -143,7 +143,7 @@ async function downloadPrintablePdf(survey) {
   }
 }
 async function initData() {
-  state.menu.push(
+  state.menu = [
     {
       title: 'Start Survey',
       icon: 'mdi-open-in-new',
@@ -161,11 +161,11 @@ async function initData() {
       title: 'Call for Submissions',
       icon: 'mdi-bullhorn',
       action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`,
-      render: (s) => () => isGroupAdmin(),
+      render: (s) => () => rightToEditSurvey(),
     },
     {
       title: 'Print Blank Survey',
-      icon: 'mdi-open-in-new', //TODO use correct icon
+      icon: 'mdi-printer',
       action: (s) => () => downloadPrintablePdf(s._id),
       render: (s) => () => rightToSubmitSurvey(s),
     },
@@ -178,7 +178,7 @@ async function initData() {
       title: 'Edit',
       icon: 'mdi-pencil',
       action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-      render: (s) => () => isGroupAdmin(),
+      render: (s) => () => rightToEditSurvey(),
     },
     {
       title: 'View Results',
@@ -190,7 +190,7 @@ async function initData() {
     //   icon: 'mdi-share',
     //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
     // }
-  );
+    ];
 
   await Promise.all([fetchData()]);
 }

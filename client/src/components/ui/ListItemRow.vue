@@ -82,7 +82,7 @@ const state = reactive({
 });
 
 const filteredMenu = computed(() => {
-  return props.menu.filter((m) => m.render === undefined || m.render(props.entity));
+  return props.menu.filter((m) => m.render === undefined || m.render(props.entity)());
 });
 
 const actionButtonsFixed = computed(() => {
