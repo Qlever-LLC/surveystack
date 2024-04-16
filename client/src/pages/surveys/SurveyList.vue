@@ -177,7 +177,7 @@ async function initData() {
     {
       title: 'Edit',
       icon: 'mdi-pencil',
-      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`,
       render: (s) => () => rightToEditSurvey(),
     },
     {
