@@ -240,7 +240,9 @@ const migrateSubmissions = async () => {
     });
   });
 
-  const resubmissionDrafts = drafts.filter((draft) => draft.meta.dateSubmitted && !draft.meta.isDraft);
+  const isResubmissionDraft = (draft) => draft.meta.dateSubmitted && !draft.meta.isDraft;
+  const resubmissionDrafts = drafts.filter(isResubmissionDraft);
+  const remainingDrafts = drafts.filter((draft) => !isResubmissionDraft(draft));
 
   await Promise.all(resubmissionDrafts.map((draft) => removeFromIndexedDB(stores.SUBMISSIONS, draft._id)));
 
@@ -251,7 +253,6 @@ const migrateSubmissions = async () => {
     return submission;
   };
 
-  const remainingDrafts = drafts.filter((draft) => !draft.meta.dateSubmitted);
   remainingDrafts.map(upgradeSubmissionFromVXtoV4).forEach(persistSubmission);
 };
 migrateSubmissions();
