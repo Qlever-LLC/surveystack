@@ -841,6 +841,11 @@ const findVal = (obj, keyToFind) => {
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
+
+  if (req.body.meta.isDraft === true) {
+    throw boom.badData('Draft submissions cannot but updated with this endpoint.');
+  }
+
   let newSubmission = await sanitize(req.body);
   const oldSubmission = res.locals.existing;
 

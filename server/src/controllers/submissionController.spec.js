@@ -1220,20 +1220,23 @@ describe('submissionController', () => {
     it('migrates submissions with specVersion 3 to specVersion 4 before updating', async () => {
       const submissionId = ObjectId();
       const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
-      const submissionMeta = createSubmissionMeta({ creator: user._id });
-      delete submissionMeta.isDraft;
-      delete submissionMeta.isDeletedDraft;
-      await createSubmission({
+      const submissionMeta = createSubmissionMeta(
+        { creator: user._id, specVersion: 3 },
+        { omitIsDeletedDraft: true, omitIsDraft: true }
+      );
+      const { submission: createdSubmission } = await createSubmission({
         _id: submissionId,
         meta: submissionMeta,
       });
-      const requestSubmissionMeta = createRequestSubmissionMeta({
-        creator: user._id.toString(),
-        dateModified: new Date('2021-01-01').toISOString(),
-        specVersion: 3,
-      });
-      delete requestSubmissionMeta.isDraft;
-      delete requestSubmissionMeta.isDeletedDraft;
+      const requestSubmissionMeta = createRequestSubmissionMeta(
+        {
+          creator: user._id.toString(),
+          dateModified: new Date('2021-01-01').toISOString(),
+          dateSubmitted: createdSubmission.meta.dateSubmitted,
+          specVersion: 3,
+        },
+        { omitIsDeletedDraft: true, omitIsDraft: true }
+      );
       const requestSubmission = createRequestSubmission({
         _id: submissionId.toString(),
         meta: requestSubmissionMeta,
@@ -1252,6 +1255,32 @@ describe('submissionController', () => {
         requestSubmission.meta.dateModified
       );
       expect(submission.meta.specVersion).toBe(4);
+    });
+
+    it('rejects the request when the submission is a draft', async () => {
+      const submissionId = ObjectId();
+      const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
+      const submissionMeta = createSubmissionMeta({ creator: user._id });
+      await createSubmission({
+        _id: submissionId,
+        meta: submissionMeta,
+      });
+      const requestSubmissionMeta = createRequestSubmissionMeta({
+        creator: user._id.toString(),
+        dateModified: new Date('2021-01-01').toISOString(),
+        isDraft: true,
+      });
+      const requestSubmission = createRequestSubmission({
+        _id: submissionId.toString(),
+        meta: requestSubmissionMeta,
+      });
+      handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
+
+      await request(app)
+        .put(`/api/submissions/${submissionId.toString()}`)
+        .set('Authorization', authHeaderValue)
+        .send(requestSubmission)
+        .expect(422);
     });
   });
 

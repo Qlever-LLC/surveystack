@@ -3,19 +3,23 @@ const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../../db');
 
 const createSubmissionMeta =
-  ({
-    isDraft = false,
-    creator = new ObjectId(),
-    dateModified = new Date(),
-    specVersion = 4,
-    archived = false,
-    archivedReason = undefined,
-    status = [],
-  } = {}) =>
+  (
+    {
+      isDraft = false,
+      isDeletedDraft = false,
+      creator = new ObjectId(),
+      dateModified = new Date(),
+      specVersion = 4,
+      archived = false,
+      archivedReason = undefined,
+      status = [],
+    } = {},
+    { omitIsDraft = false, omitIsDeletedDraft = false } = {}
+  ) =>
   (survey) => {
     return {
-      isDraft,
-      isDeletedDraft: false,
+      ...(omitIsDraft ? {} : { isDraft }),
+      ...(omitIsDeletedDraft ? {} : { isDeletedDraft }),
       dateCreated: new Date(),
       dateModified,
       dateSubmitted: new Date(),
@@ -37,20 +41,24 @@ const createSubmissionMeta =
   };
 
 const createRequestSubmissionMeta =
-  ({
-    isDraft = false,
-    creator = new ObjectId().toString(),
-    dateModified = new Date().toISOString(),
-    dateSubmitted = null,
-    specVersion = 4,
-    archived = false,
-    archivedReason = undefined,
-    status = [],
-  } = {}) =>
+  (
+    {
+      isDraft = false,
+      isDeletedDraft = false,
+      creator = new ObjectId().toString(),
+      dateModified = new Date().toISOString(),
+      dateSubmitted = null,
+      specVersion = 4,
+      archived = false,
+      archivedReason = undefined,
+      status = [],
+    } = {},
+    { omitIsDraft = false, omitIsDeletedDraft = false } = {}
+  ) =>
   (survey) => {
     return {
-      isDraft,
-      isDeletedDraft: false,
+      ...(omitIsDraft ? {} : { isDraft }),
+      ...(omitIsDeletedDraft ? {} : { isDeletedDraft }),
       dateCreated: new Date().toISOString(),
       dateModified,
       dateSubmitted,
