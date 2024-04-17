@@ -209,6 +209,7 @@ async function fetchData(user = null) {
   }
 
   queryParams.append('groupId', getActiveGroupId());
+  queryParams.append('isLibrary', 'false');
   queryParams.append('skip', (state.page - 1) * PAGINATION_LIMIT);
   queryParams.append('limit', PAGINATION_LIMIT);
 
