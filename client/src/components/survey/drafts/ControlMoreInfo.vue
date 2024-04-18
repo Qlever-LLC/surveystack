@@ -16,13 +16,16 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+.preview,
+.preview * {
+  padding: revert;
+  margin: revert;
+  max-width: 100%;
+}
+
 .preview {
   color: rgba(0, 0, 0, 0.6);
   margin-top: 12px;
-}
-
-.preview >>> img {
-  max-width: 100%;
 }
 </style>
