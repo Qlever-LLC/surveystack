@@ -8,6 +8,8 @@ import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } 
 import mailService from '../../services/mail/mail.service';
 import { createMagicLink } from '../auth.service';
 
+const FARMOS_GROUP_SETTINGS = 'farmos-group-settings';
+
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
     console.log('env not set');
@@ -670,8 +672,37 @@ export const getPlans = async () => {
 };
 
 export const deletePlan = async (planId) => {
-  const filter = { _id: asMongoId(planId) };
+  const planIdToDelete = asMongoId(planId);
+
+  const filter = { _id: planIdToDelete };
   await db.collection('farmos-plans').deleteMany(filter);
+
+  const pipeline = [
+    {
+      $match: {
+        planIds: planIdToDelete,
+      },
+    },
+    {
+      $set: {
+        planIds: {
+          $filter: {
+            input: '$planIds',
+            as: 'planId',
+            cond: { $ne: ['$$planId', planIdToDelete] },
+          },
+        },
+      },
+    },
+  ];
+  await db
+    .collection(FARMOS_GROUP_SETTINGS)
+    .aggregate(pipeline)
+    .forEach(async (doc) => {
+      await db
+        .collection(FARMOS_GROUP_SETTINGS)
+        .updateOne({ _id: doc._id }, { $set: { planIds: doc.planIds } });
+    });
 };
 
 export const setPlanForGroup = async (groupId, planId) => {
