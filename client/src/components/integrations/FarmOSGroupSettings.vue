@@ -16,18 +16,23 @@
         <div class="d-flex flex-grow-1">
           <a-text-field
             class="mr-4 flex-shrink-1 flex-grow-0"
+            style="height: fit-content; min-width: 20%"
             variant="outlined"
             v-model="seats"
             label="Max Seats"
             type="number"
-            @update:modelValue="$emit('seatsChanged', seats)" />
+            @blur="$emit('seatsChanged', seats)" />
 
           <a-select
             variant="outlined"
-            class="flex-grow-1 flex-shrink-0"
+            class="flex-grow-1"
             label="Select FarmOS Plans for Group"
             multiple
-            @update:modelValue="$emit('plansChanged', selectedPlans)"
+            @update:modelValue="
+              ($event) => {
+                $emit('plansChanged', $event);
+              }
+            "
             v-model="selectedPlans"
             :items="plans"
             :item-value="(p) => p._id"

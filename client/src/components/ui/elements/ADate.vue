@@ -132,7 +132,7 @@ const dateForPicker = computed(() => {
 const years = () => {
   const years = [];
   const maxYear = new Date().getFullYear() + 100;
-  for (let i = 0; i <= maxYear; i++) {
+  for (let i = 1900; i <= maxYear; i++) {
     years.push(i);
   }
   return years;
