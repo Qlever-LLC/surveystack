@@ -7,21 +7,25 @@ export function getPermission() {
   const store = useStore();
   const { isGroupAdmin } = useGroup();
 
+  /**
+   * @param {*} survey
+   * @returns {allowed: Boolean, message: String}
+   */
   function rightToSubmitSurvey(survey) {
-    const { allowed } = checkAllowedToSubmit(
-      survey,
-      store.getters['auth/isLoggedIn'],
-      store.getters['memberships/groups']
-    );
-    return allowed;
+    return checkAllowedToSubmit(survey, store.getters['auth/isLoggedIn'], store.getters['memberships/groups']);
   }
 
   function rightToEditSurvey() {
-    return isGroupAdmin();
+    return isGroupAdmin()
+      ? { allowed: true, message: 'success' }
+      : { allowed: false, message: "Sorry you can't edit this survey" };
   }
 
   function rightToViewAnonymizedResults() {
-    return true;
+    const publicAccess = true;
+    return publicAccess
+      ? { allowed: true, message: 'success' }
+      : { allowed: false, message: "Sorry you can't see this result" };
   }
 
   return {

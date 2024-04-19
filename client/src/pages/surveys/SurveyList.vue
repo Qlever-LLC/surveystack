@@ -1,5 +1,23 @@
 <template>
   <a-container>
+    <a-alert
+      v-if="message.successMessage"
+      style="cursor: pointer"
+      mode="fade"
+      variant="text"
+      type="success"
+      @click="message.successMessage = null">
+      {{ message.successMessage }}
+    </a-alert>
+    <a-alert
+      v-if="message.errorMessage"
+      style="cursor: pointer"
+      mode="fade"
+      variant="text"
+      type="error"
+      @click="message.errorMessage = null">
+      {{ message.errorMessage }}
+    </a-alert>
     <basic-list
       @updateSearch="updateSearch"
       @toogleStar="toogleStar"
@@ -39,6 +57,7 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
+import { printAlert } from '@/utils/alertPrinter';
 import { get } from 'lodash';
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
@@ -55,6 +74,7 @@ const store = useStore();
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
 const { rightToSubmitSurvey, rightToEditSurvey, rightToViewAnonymizedResults } = getPermission();
+const { error, message } = printAlert();
 const PAGINATION_LIMIT = 10;
 
 const state = reactive({
@@ -142,32 +162,76 @@ async function downloadPrintablePdf(survey) {
     state.loading = false;
   }
 }
+
+function createAction(survey, right, output) {
+  const { allowed, message } = right(survey);
+  if (allowed) {
+    return output;
+  } else {
+    return () => error(message);
+  }
+}
+
 async function initData() {
   state.menu = [
     {
       title: 'Start Survey',
       icon: 'mdi-open-in-new',
-      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`,
-      render: (s) => () => rightToSubmitSurvey(s),
+      action: (s) =>
+        createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
+      // {
+      //   const { allowed, message } = rightToSubmitSurvey(s);
+      //   if (allowed) {
+      //     return `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`;
+      //   } else {
+      //     return () => error(message);
+      //   }
+      // }
+      render: (s) => () => rightToSubmitSurvey(s).allowed,
       color: 'green',
     },
     {
       title: 'Start Survey as Member',
       icon: 'mdi-open-in-new',
-      action: (s) => () => setSelectMember(s),
-      render: (s) => () => rightToSubmitSurvey(s),
+      action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
+      // {
+      //   const { allowed, message } = rightToSubmitSurvey(s);
+      //   if (allowed) {
+      //     return () => setSelectMember(s);
+      //   } else {
+      //     return () => error(message);
+      //   }
+      // }
+      render: (s) => () => rightToSubmitSurvey(s).allowed,
     },
     {
       title: 'Call for Submissions',
       icon: 'mdi-bullhorn',
-      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`,
-      render: (s) => () => rightToEditSurvey(),
+      action: (s) =>
+        createAction(s, rightToEditSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
+      // {
+      //   const { allowed, message } = rightToEditSurvey();
+      //   if (allowed) {
+      //     return `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`;
+      //   } else {
+      //     return () => error(message);
+      //   }
+      // },
+      render: (s) => () => rightToEditSurvey().allowed,
     },
     {
       title: 'Print Blank Survey',
       icon: 'mdi-printer',
-      action: (s) => () => downloadPrintablePdf(s._id),
-      render: (s) => () => rightToSubmitSurvey(s),
+      action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
+      // {
+      //   const { allowed, message } = rightToSubmitSurvey(s);
+      //   if (allowed) {
+      //     return () => downloadPrintablePdf(s._id);
+      //   } else {
+      //     return () => error(message);
+      //   }
+      // },
+      render: (s) => () => rightToSubmitSurvey(s).allowed,
     },
     // {
     //   title: 'View',
@@ -177,14 +241,31 @@ async function initData() {
     {
       title: 'Edit',
       icon: 'mdi-pencil',
-      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`,
-      render: (s) => () => rightToEditSurvey(),
+      action: (s) => createAction(s, rightToEditSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
+      // {
+      //   const { allowed, message } = rightToEditSurvey();
+      //   if (allowed) {
+      //     return `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`;
+      //   } else {
+      //     return () => error(message);
+      //   }
+      // },
+      render: (s) => () => rightToEditSurvey().allowed,
     },
     {
       title: 'View Results',
       icon: 'mdi-chart-bar',
-      action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`,
-      render: (s) => () => rightToViewAnonymizedResults(),
+      action: (s) =>
+        createAction(s, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`),
+      // {
+      //   const { allowed, message } = rightToViewAnonymizedResults();
+      //   if (allowed) {
+      //     return `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`;
+      //   } else {
+      //     return () => error(message);
+      //   }
+      // },
+      render: (s) => () => rightToViewAnonymizedResults().allowed,
     },
     // {
     //   title: 'Share',
