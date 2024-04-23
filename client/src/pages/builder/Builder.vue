@@ -137,7 +137,6 @@ export default {
         creator: this.$store.state.auth.user._id,
         group: this.getActiveGroupSimpleObject(),
       }),
-      groupId: null,
       submission: null,
       showSnackbar: false,
       snackbarMessage: '',
@@ -168,7 +167,7 @@ export default {
   methods: {
     getActiveGroupSimpleObject() {
       try {
-        const id =this.groupId;
+        const { id } = this.$route.params;
         const groups = this.$store.getters['memberships/groups'];
         const { path } = groups.find(({ _id }) => _id === id);
         return {
@@ -354,9 +353,8 @@ export default {
     },
     async fetchData() {
       try {
-        const { id, surveyId } = this.$route.params;
+        const { surveyId } = this.$route.params;
         this.survey._id = surveyId;
-        this.groupId = id;
         const { data } = await api.get(`/surveys/${this.survey._id}?version=latestPublishedOrDraft`);
         this.survey = { ...this.survey, ...data };
         // Fetch all resources into local storage
@@ -374,7 +372,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(({ name }) => name === 'surveys-new');
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'group-surveys-new');
 
     this.survey._id = new ObjectId();
 
