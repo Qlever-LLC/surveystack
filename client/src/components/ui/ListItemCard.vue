@@ -10,7 +10,7 @@
       @click="menu[0].render === undefined || menu[0].render(entity) ? runAction(menu[0].action(entity)) : undefined">
       <span>
         <a-list-item-title class="d-flex align-center">
-          <span v-if="enablePinned" @click.prevent="toogleStar(entity)">
+          <span v-if="enablePinned" @click.stop="toogleStar(entity)">
             <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
             <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>

@@ -226,14 +226,17 @@ async function fetchData(user = null) {
   queryParams.append('isLibrary', 'false');
   queryParams.append('skip', (state.page - 1) * PAGINATION_LIMIT);
   queryParams.append('limit', PAGINATION_LIMIT);
+  queryParams.append('prioPinned', true);
 
   try {
-    const { data } = await api.get(`/surveys/list-page-prio-pinned?${queryParams}`);
+    const { data } = await api.get(`/surveys/list-page?${queryParams}`);
 
-    data.pinned.forEach((s) => {
-      s.pinnedSurveys = true;
-      data.content.unshift(s);
-    });
+    if (data.pinned) {
+      data.pinned.forEach((s) => {
+        s.pinnedSurveys = true;
+        data.content.unshift(s);
+      });
+    }
     delete data.pinned;
 
     state.surveys = data;
