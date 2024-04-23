@@ -22,7 +22,9 @@
 
     <a-app-bar-title v-else>
       <!-- todo replace by group chooser button -->
-      <div class="text-h5 text-white font-bold">{{ getActiveGroup()?.name }}</div>
+      <div class="text-h5 text-white font-bold" style="cursor: pointer" @click="router.push('/')">
+        {{ getActiveGroup()?.name }}
+      </div>
     </a-app-bar-title>
 
     <a-spacer />
