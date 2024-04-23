@@ -1,5 +1,13 @@
 <template>
   <a-container>
+    <a-alert
+      v-if="message.errorMessage"
+      style="cursor: pointer"
+      type="error"
+      closable
+      @click:close="message.errorMessage = null">
+      {{ message.errorMessage }}
+    </a-alert>
     <basic-list
       listCard
       :entities="state.entities"
@@ -22,9 +30,13 @@
 import api from '@/services/api.service';
 import BasicList from '@/components/ui/BasicList2.vue';
 import { useGroup } from '@/components/groups/group';
+import { getPermission } from '@/utils/permissions';
+import { menuAction } from '@/utils/threeDotsMenu';
 import { reactive } from 'vue';
 
 const { getActiveGroupId, isGroupAdmin } = useGroup();
+const { rightToEdit, rightToView } = getPermission();
+const { message, createAction } = menuAction();
 
 const state = reactive({
   entities: [],
@@ -37,14 +49,16 @@ async function initData() {
   state.menu.push({
     title: 'View Script',
     icon: 'mdi-open-in-new',
-    action: (e) => `/groups/${getActiveGroupId()}/scripts/${e._id}`,
+    action: (e) => createAction(e, rightToView, `/groups/${getActiveGroupId()}/scripts/${e._id}`),
+    render: (e) => () => rightToView(e).allowed,
     color: 'green',
   });
   if (isGroupAdmin()) {
     state.menu.push({
       title: 'Edit Script',
       icon: 'mdi-pencil',
-      action: (e) => `/groups/${getActiveGroupId()}/scripts/${e._id}/edit`,
+      action: (e) => createAction(e, rightToEdit, `/groups/${getActiveGroupId()}/scripts/${e._id}/edit`),
+      render: (e) => () => rightToEdit(e).allowed,
     });
   }
 

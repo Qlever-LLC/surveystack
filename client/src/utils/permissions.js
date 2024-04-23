@@ -21,6 +21,13 @@ export function getPermission() {
       : { allowed: false, message: "Sorry you can't edit this survey" };
   }
 
+  function rightToView() {
+    const publicAccess = true;
+    return publicAccess
+      ? { allowed: true, message: 'success' }
+      : { allowed: false, message: "Sorry you can't edit this survey" };
+  }
+
   function rightToViewAnonymizedResults() {
     const publicAccess = true;
     return publicAccess
@@ -32,5 +39,6 @@ export function getPermission() {
     rightToSubmitSurvey,
     rightToEdit,
     rightToViewAnonymizedResults,
+    rightToView,
   };
 }
