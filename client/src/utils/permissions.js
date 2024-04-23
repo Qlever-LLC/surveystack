@@ -15,7 +15,7 @@ export function getPermission() {
     return checkAllowedToSubmit(survey, store.getters['auth/isLoggedIn'], store.getters['memberships/groups']);
   }
 
-  function rightToEditSurvey() {
+  function rightToEdit() {
     return isGroupAdmin()
       ? { allowed: true, message: 'success' }
       : { allowed: false, message: "Sorry you can't edit this survey" };
@@ -30,7 +30,7 @@ export function getPermission() {
 
   return {
     rightToSubmitSurvey,
-    rightToEditSurvey,
+    rightToEdit,
     rightToViewAnonymizedResults,
   };
 }

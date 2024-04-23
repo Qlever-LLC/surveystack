@@ -73,7 +73,7 @@ import MemberSelector from '@/components/shared/MemberSelector.vue';
 const store = useStore();
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
-const { rightToSubmitSurvey, rightToEditSurvey, rightToViewAnonymizedResults } = getPermission();
+const { rightToSubmitSurvey, rightToEdit, rightToViewAnonymizedResults } = getPermission();
 const { error, message } = printAlert();
 const PAGINATION_LIMIT = 10;
 
@@ -208,16 +208,16 @@ async function initData() {
       title: 'Call for Submissions',
       icon: 'mdi-bullhorn',
       action: (s) =>
-        createAction(s, rightToEditSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
+        createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
       // {
-      //   const { allowed, message } = rightToEditSurvey();
+      //   const { allowed, message } = rightToEdit();
       //   if (allowed) {
       //     return `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`;
       //   } else {
       //     return () => error(message);
       //   }
       // },
-      render: (s) => () => rightToEditSurvey().allowed,
+      render: (s) => () => rightToEdit().allowed,
     },
     {
       title: 'Print Blank Survey',
@@ -241,16 +241,16 @@ async function initData() {
     {
       title: 'Edit',
       icon: 'mdi-pencil',
-      action: (s) => createAction(s, rightToEditSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
+      action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
       // {
-      //   const { allowed, message } = rightToEditSurvey();
+      //   const { allowed, message } = rightToEdit();
       //   if (allowed) {
       //     return `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`;
       //   } else {
       //     return () => error(message);
       //   }
       // },
-      render: (s) => () => rightToEditSurvey().allowed,
+      render: (s) => () => rightToEdit().allowed,
     },
     {
       title: 'View Results',
