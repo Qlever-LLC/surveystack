@@ -1,6 +1,7 @@
 import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 import SurveyList from '@/pages/surveys/SurveyList.vue';
+import QuestionSetList from '@/pages/surveys/QuestionSetList.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Builder from '@/pages/builder/Builder.vue';
@@ -68,7 +69,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: SurveyList,
+      main: QuestionSetList,
     },
   },
   //Scripts

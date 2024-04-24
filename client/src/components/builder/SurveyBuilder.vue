@@ -1030,6 +1030,10 @@ export default {
     this.initNavbarAndDirtyFlag(this.surveyUnderWork);
     this.createInstance();
     this.checkForLibraryUpdates(this.surveyUnderWork);
+
+    // case question set to new survey from question sets list
+    const { libId } = this.$route.query;
+    if (libId) this.addQuestionsFromLibrary(libId);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue
