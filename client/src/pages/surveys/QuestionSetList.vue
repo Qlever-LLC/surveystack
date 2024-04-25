@@ -70,7 +70,6 @@ const state = reactive({
   },
   menu: [],
   showSelectMember: false,
-  selectedSurvey: undefined,
   loading: false,
 });
 
@@ -92,7 +91,7 @@ async function initData() {
     {
       title: 'Description',
       icon: 'mdi-book-open',
-      //   action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
+      action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/question-sets/${s._id}/description`),
       render: (s) => () => rightToView(s).allowed,
       color: 'green',
     },
@@ -125,6 +124,7 @@ async function initData() {
 
   await Promise.all([fetchData()]);
 }
+
 async function fetchData(user = null) {
   const now = new Date();
   const queryParams = new URLSearchParams();

@@ -2,6 +2,7 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 import SurveyList from '@/pages/surveys/SurveyList.vue';
 import QuestionSetList from '@/pages/surveys/QuestionSetList.vue';
+import QuestionSetDescription from '@/pages/surveys/QuestionSetDescription.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Builder from '@/pages/builder/Builder.vue';
@@ -70,6 +71,15 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: QuestionSetList,
+    },
+  },
+  {
+    path: '/groups/:id/question-sets/:qsId/description',
+    name: 'group-question-sets-description',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: QuestionSetDescription,
     },
   },
   //Scripts
