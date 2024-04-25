@@ -81,16 +81,16 @@
             <a-row v-if="selectedSurvey && selectedSurvey._id === c._id">
               <a-col>
                 <h4>Description</h4>
-                <small v-html="selectedSurvey.meta.libraryDescription"></small>
+                <small v-html="selectedSurvey.meta.libraryDescription" class="preview"></small>
                 <br />
                 <h4>Applications</h4>
-                <small v-html="selectedSurvey.meta.libraryApplications"></small>
+                <small v-html="selectedSurvey.meta.libraryApplications" class="preview"></small>
                 <br />
                 <h4>Maintainers</h4>
-                <small v-html="selectedSurvey.meta.libraryMaintainers"></small>
+                <small v-html="selectedSurvey.meta.libraryMaintainers" class="preview"></small>
                 <br />
                 <h4>Updates</h4>
-                <small v-html="selectedSurvey.meta.libraryHistory"></small>
+                <small v-html="selectedSurvey.meta.libraryHistory" class="preview"></small>
               </a-col>
               <a-col>
                 <h4>Questions</h4>
@@ -242,5 +242,12 @@ export default {
 
 .v-card:focus:before {
   opacity: 0 !important;
+}
+
+.preview,
+.preview * {
+  padding: revert;
+  margin: revert;
+  max-width: 100%;
 }
 </style>
