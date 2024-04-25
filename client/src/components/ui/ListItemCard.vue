@@ -10,16 +10,21 @@
       @click="menu[0].render === undefined || menu[0].render(entity) ? runAction(menu[0].action(entity)) : undefined">
       <span>
         <a-list-item-title class="d-flex align-center">
-          <span v-if="enablePinned" @click.prevent="toogleStar(entity)">
+          <span v-if="enablePinned" @click.stop="toogleStar(entity)">
             <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
             <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>
           <span v-if="groupStyle">
             <a-avatar class="mr-3" color="accent-lighten-2" rounded="lg" size="35">
               {{ state.avatarName }}
-            </a-avatar></span
-          >
+            </a-avatar>
+          </span>
           {{ state.entity.name }}
+          <span v-if="questionSetsType">
+            <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
+            {{ state.entity.meta.libraryUsageCountSubmissions ? state.entity.meta.libraryUsageCountSubmissions : 0 }}
+            <a-tooltip bottom activator="parent">Number of submission using this</a-tooltip>
+          </span>
         </a-list-item-title>
         <a-list-item-subtitle v-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
       </span>
@@ -69,6 +74,10 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
+  },
+  questionSetsType: {
+    type: Boolean,
+    required: false,
   },
   menu: {
     type: Array,
@@ -123,7 +132,7 @@ function toogleStar(entity) {
 function runAction(action) {
   if (typeof action == 'function') {
     action();
-  } else if (typeof action == 'string') {
+  } else if (typeof action == 'string' || typeof action == 'object') {
     router.push(action);
   } else {
     console.error('unknown type of action: ' + action);

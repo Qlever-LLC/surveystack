@@ -16,7 +16,6 @@ const {
   updateSurvey,
   getSurvey,
   getSurveyListPage,
-  getSurveyListPagePrioPinned,
   cleanupSurvey,
   getSurveyAndCleanupInfo,
   deleteArchivedTestSubmissions,
@@ -632,10 +631,11 @@ describe('get surveys and question set', () => {
         isLibrary: 'false',
         skip: 0,
         limit: 10,
+        prioPinned: true,
       },
     });
     const res = await createRes();
-    await getSurveyListPagePrioPinned(req, res);
+    await getSurveyListPage(req, res);
 
     const result = res.send.mock.calls[0][0];
     expect(result.pagination.total).toEqual(3);

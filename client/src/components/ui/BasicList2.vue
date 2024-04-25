@@ -47,6 +47,7 @@
           :idx="String(idx)"
           :enablePinned="enablePinned"
           :groupStyle="groupStyle"
+          :questionSetsType="questionSetsType"
           :menu="menu" />
       </a-list>
       <a-list v-else-if="filteredEntities.length > 0">
@@ -118,6 +119,10 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
+  },
+  questionSetsType: {
+    type: Boolean,
+    required: false,
   },
   buttonNew: {
     type: Object,

@@ -167,7 +167,7 @@ export default {
   methods: {
     getActiveGroupSimpleObject() {
       try {
-        const id = this.$route.params.id;
+        const { id } = this.$route.params;
         const groups = this.$store.getters['memberships/groups'];
         const { path } = groups.find(({ _id }) => _id === id);
         return {
@@ -372,7 +372,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(({ name }) => name === 'surveys-new');
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'group-surveys-new');
 
     this.survey._id = new ObjectId();
 
