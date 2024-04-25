@@ -79,7 +79,7 @@
         <h3>Group Memberships</h3>
         <p class="mt-1 mb-5 text-grey text-body-2">These are your group memberships. You can select one to leave.</p>
         <div class="d-flex align-center">
-          <active-group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
+          <group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
           <a-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
             >Leave</a-btn
           >
@@ -121,9 +121,10 @@
 
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import GroupSelector from '@/components/shared/GroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+import { autoJoinWhiteLabelGroup } from '@/utils/memberships';
 
 function findParentAdminGroup(memberships, activeMembership) {
   if (activeMembership.role === 'admin') {
@@ -138,7 +139,7 @@ function findParentAdminGroup(memberships, activeMembership) {
 export default {
   components: {
     appFeedback,
-    ActiveGroupSelector,
+    GroupSelector,
   },
   data() {
     return {
@@ -153,6 +154,7 @@ export default {
       isSubmittingEmail: false,
       isEmailDialogOpen: false,
       isLeaveDialogOpen: false,
+      activeGroup: null,
     };
   },
   computed: {
@@ -164,14 +166,6 @@ export default {
     },
     isShapeshifting() {
       return this.$store.getters['auth/isShapeshifting'];
-    },
-    activeGroup: {
-      get() {
-        return this.$store.getters['memberships/activeGroup'];
-      },
-      set(val) {
-        this.$store.dispatch('memberships/setActiveGroup', val);
-      },
     },
     activeMemebership() {
       return this.$store.getters['memberships/getMembershipByGroupId'](this.activeGroup);
@@ -238,7 +232,7 @@ export default {
       this.isLeaveDialogOpen = false;
       try {
         await api.delete(`/memberships/${this.activeMemebership._id}`);
-        this.$store.dispatch('memberships/tryAutoJoinAndSelectGroup');
+        await autoJoinWhiteLabelGroup(this.$store);
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }

@@ -101,9 +101,6 @@ export default {
         return item;
       });
     },
-    activeGroup() {
-      return this.$store.getters['memberships/activeGroup'];
-    },
     isWhitelabel() {
       return this.$store.getters['whitelabel/isWhitelabel'];
     },
@@ -113,7 +110,7 @@ export default {
   },
   methods: {
     getModelValue() {
-      return this.modelValue.id ? this.modelValue : undefined;
+      return this.modelValue?.id ? this.modelValue : undefined;
     },
     handleInput(val) {
       if (!val) {

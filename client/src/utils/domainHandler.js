@@ -70,7 +70,5 @@ export default {
     document.head.appendChild(iconElement);
     document.head.appendChild(appleTouch);
     document.head.appendChild(appBarThemeColor);
-
-    store.dispatch('memberships/tryAutoJoinAndSelectGroup');
   },
 };

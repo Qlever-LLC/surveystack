@@ -39,10 +39,6 @@ export function useGroup() {
     return groups.find((group) => group._id === activeGroupId);
   }
 
-  function setActiveGroupId(groupId) {
-    store.dispatch('memberships/setActiveGroup', groupId);
-  }
-
   function isGroupAdmin() {
     const memberships = store.getters['memberships/memberships'];
     const activeGroupId = getActiveGroupId();
@@ -53,7 +49,6 @@ export function useGroup() {
     getMyGroups,
     getActiveGroupId,
     getActiveGroup,
-    setActiveGroupId,
     isGroupAdmin,
   };
 }

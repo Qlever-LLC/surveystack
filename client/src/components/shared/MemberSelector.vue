@@ -3,7 +3,7 @@
     <a-card>
       <a-card-title>Search members</a-card-title>
       <a-card-text>
-        <active-group-selector
+        <group-selector
           v-if="!fixedGroupId"
           :modelValue="selectedGroupId"
           :admin-groups-only="true"
@@ -40,12 +40,12 @@
 </template>
 
 <script>
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
+import GroupSelector from '@/components/shared/GroupSelector.vue';
 import api from '@/services/api.service';
 
 export default {
   components: {
-    ActiveGroupSelector,
+    GroupSelector,
   },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
@@ -60,7 +60,7 @@ export default {
   },
   data() {
     return {
-      selectedGroupId: this.fixedGroupId || this.$store.getters['memberships/activeGroup'],
+      selectedGroupId: this.fixedGroupId,
       members: [],
       q: '',
     };

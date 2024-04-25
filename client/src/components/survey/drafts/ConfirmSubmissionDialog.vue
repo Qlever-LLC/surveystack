@@ -8,11 +8,7 @@
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
         <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
-          <active-group-selector
-            label="Group"
-            class="d-inline-block"
-            :modelValue="groupId"
-            @update:modelValue="setGroup" />
+          <group-selector label="Group" class="d-inline-block" :modelValue="groupId" @update:modelValue="setGroup" />
           <a-btn icon @click="handleCloseGroupEditor">
             <a-icon>mdi-close</a-icon>
           </a-btn>
@@ -41,7 +37,7 @@
 </template>
 
 <script>
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import GroupSelector from '@/components/shared/GroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
 
 export default {
@@ -80,7 +76,7 @@ export default {
   },
   emits: ['update:modelValue', 'submit', 'close', 'set-group'],
   components: {
-    ActiveGroupSelector,
+    GroupSelector,
   },
   created() {
     if (this.groupId) {

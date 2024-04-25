@@ -26,6 +26,7 @@ import InstallBanner from '@/components/ui/InstallBanner.vue';
 import { useDisplay } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
 import { useNavigation } from '@/components/navigation';
+import { autoJoinWhiteLabelGroup } from '@/utils/memberships';
 
 const store = useStore();
 const router = useRouter();
@@ -74,10 +75,8 @@ onMounted(async () => {
 
   await router.isReady();
 
-  //const routeHasNav = !!route.matched?.[0].components?.navigation;
-  //const routeHasMain = !!route.matched?.[0].components?.main;
-  //showMain.value = routeHasMain;
-  //console.log('----' + routeHasNav + '--' + routeHasMain.value);
+  //moved from domainHandler.install
+  await autoJoinWhiteLabelGroup(store);
 });
 
 watch(

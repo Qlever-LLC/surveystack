@@ -44,9 +44,7 @@
 </template>
 
 <script>
-import api from '@/services/api.service';
-
-import { autoSelectActiveGroup } from '@/utils/memberships';
+import { redirectAfterLogin, autoJoinWhiteLabelGroup } from '@/utils/memberships';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -116,23 +114,13 @@ export default {
           url: '/auth/register',
           user: this.entity,
         });
-
-        // try to auto join group if this is a whitelabel
-        if (this.isWhitelabel) {
-          try {
-            await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
-            await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
-          } catch (error) {
-            console.log(error.response.data.message);
-          }
-        }
-
-        if (this.$route.query.redirect) {
-          this.$router.push(this.$route.query.redirect);
-        } else {
-          this.$store.dispatch('surveys/fetchPinned');
-          this.$router.push('/');
-        }
+        //make sure whitelabel user is a member of its whitelabel group (this reflects legacy behaviour, though it's not clear why this had been added in the past)
+        //TODO in case of autoJoinWhiteLabelGroup throwing an error, registration should maybe reverted
+        const partnerGroupId = await autoJoinWhiteLabelGroup(this.$store);
+        //fetch pinned
+        this.$store.dispatch('surveys/fetchPinned');
+        //change route
+        await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {
         switch (error.response.status) {
           case 409:

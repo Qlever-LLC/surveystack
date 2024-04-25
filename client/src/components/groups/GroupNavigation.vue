@@ -25,11 +25,10 @@
 import { useGroup } from '@/components/groups/group';
 import { useRouter } from 'vue-router';
 
-const { getMyGroups, setActiveGroupId } = useGroup();
+const { getMyGroups } = useGroup();
 const router = useRouter();
 
 function selectGroup(group) {
-  setActiveGroupId(group._id);
   router.push(`/groups/${group._id}`);
 }
 </script>

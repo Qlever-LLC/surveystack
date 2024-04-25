@@ -2,10 +2,7 @@ import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import Register from './Register.vue';
 import mockAxios from 'axios';
-import { autoSelectActiveGroup } from '@/utils/memberships';
 import { flushPromises } from '@vue/test-utils';
-
-jest.mock('@/utils/memberships');
 
 describe('Register component', () => {
   describe('navigation links and buttons', () => {
@@ -47,6 +44,7 @@ describe('Register component', () => {
   });
 
   describe('submit form and check submit() method behaviour based on try to auto join group if this is a whitelabel', () => {
+    const WHITELABEL_GROUP_ID = 42;
     it('submit and trying autojoin if this.isWhitelabel', async () => {
       let res = { data: { meta: { invitationOnly: false } } };
       mockAxios.get.mockImplementation(() => Promise.resolve(res));
@@ -59,10 +57,24 @@ describe('Register component', () => {
               getters: {
                 'whitelabel/isWhitelabel': true,
                 'whitelabel/partner': {
-                  id: 1,
+                  id: WHITELABEL_GROUP_ID,
                 },
+                'auth/user': {
+                  _id: 2,
+                },
+                'auth/isLoggedIn': true,
               },
-              dispatch: jest.fn(),
+              dispatch: jest.fn((action) => {
+                if (action === 'memberships/getUserMemberships') {
+                  return Promise.resolve([
+                    {
+                      group: {
+                        _id: WHITELABEL_GROUP_ID,
+                      },
+                    },
+                  ]);
+                }
+              }),
             },
             $route: {
               query: { redirect: false },
@@ -81,11 +93,10 @@ describe('Register component', () => {
       await flushPromises();
 
       expect(mockAxios.post).toHaveBeenCalledTimes(1);
-      expect(autoSelectActiveGroup).toHaveBeenCalledTimes(1);
-      expect(push).toHaveBeenCalledWith('/');
+      expect(push).toHaveBeenCalledWith(`/groups/${WHITELABEL_GROUP_ID}`);
     });
 
-    it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled BUT post throw an error', async () => {
+    it('submit if this.isWhitelabel, but autojoin throws an error', async () => {
       let res = { data: { meta: { invitationOnly: false } } };
       mockAxios.get.mockImplementation(() => Promise.resolve(res));
       mockAxios.post.mockImplementation(() =>
@@ -101,10 +112,18 @@ describe('Register component', () => {
               getters: {
                 'whitelabel/isWhitelabel': true,
                 'whitelabel/partner': {
-                  id: 1,
+                  id: WHITELABEL_GROUP_ID,
                 },
+                'auth/user': {
+                  _id: 2,
+                },
+                'auth/isLoggedIn': true,
               },
-              dispatch: jest.fn(),
+              dispatch: jest.fn((action) => {
+                if (action === 'memberships/getUserMemberships') {
+                  return Promise.resolve([]);
+                }
+              }),
             },
             $route: {
               query: { redirect: false },
@@ -120,15 +139,30 @@ describe('Register component', () => {
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
+      await flushPromises();
 
       expect(mockAxios.post).toHaveBeenCalledTimes(1);
-      expect(autoSelectActiveGroup).toHaveBeenCalledTimes(0);
-      expect(push).toHaveBeenCalledWith('/');
+      expect(push).toHaveBeenCalledWith('/'); //if user could not join the whitelabel group, route to /
     });
   });
 
   describe('submit form and check submit() method behaviour based on redirection', () => {
-    it("submit and get the redirection 'this.$route.params.redirect = true' ", async () => {
+    let res = { data: { meta: { invitationOnly: false } } };
+    mockAxios.get.mockImplementation(() => Promise.resolve(res));
+    mockAxios.post.mockImplementation(() => Promise.resolve({ data: 'dummy data' }));
+    const mockDispatchFn = jest.fn((action) => {
+      if (action === 'memberships/getUserMemberships') {
+        return Promise.resolve([
+          {
+            group: {
+              _id: 2,
+            },
+          },
+        ]);
+      }
+    });
+
+    it("submit and get the redirection 'this.$route.params.redirect = 'true'' ", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderWithVuetify(Register, {
         global: {
@@ -136,8 +170,12 @@ describe('Register component', () => {
             $store: {
               getters: {
                 'whitelabel/isWhitelabel': false,
+                'auth/user': {
+                  _id: 2,
+                },
+                'auth/isLoggedIn': true,
               },
-              dispatch: jest.fn(),
+              dispatch: mockDispatchFn,
             },
             $route: {
               query: { redirect: true },
@@ -153,11 +191,12 @@ describe('Register component', () => {
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
+      await flushPromises();
 
       expect(push).toHaveBeenCalledWith(true);
     });
 
-    it("submit and get the redirection '/' ", async () => {
+    it("submit and get the redirection '/groups/2' ", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderWithVuetify(Register, {
         global: {
@@ -165,8 +204,12 @@ describe('Register component', () => {
             $store: {
               getters: {
                 'whitelabel/isWhitelabel': false,
+                'auth/user': {
+                  _id: 2,
+                },
+                'auth/isLoggedIn': true,
               },
-              dispatch: jest.fn(),
+              dispatch: mockDispatchFn,
             },
             $route: {
               query: { redirect: false },
@@ -182,8 +225,9 @@ describe('Register component', () => {
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
+      await flushPromises();
 
-      expect(push).toHaveBeenCalledWith('/');
+      expect(push).toHaveBeenCalledWith('/groups/2');
     });
   });
 

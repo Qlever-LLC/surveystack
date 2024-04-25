@@ -214,16 +214,14 @@ export default {
       this.showOverview = false;
     },
     submit() {
-      // if group is not yet set, select the user's selected group if set
+      // if group is not yet set, select the group defined by the url path
       if (!this.submission.meta.group.id) {
-        const activeGroupId = this.$store.getters['memberships/activeGroup'];
-        if (activeGroupId) {
-          const allGroups = this.$store.getters['memberships/groups'];
-          const activeGroup = allGroups.find(({ _id }) => _id === activeGroupId);
-          if (activeGroup) {
-            this.submission.meta.group.id = activeGroup._id;
-            this.submission.meta.group.path = activeGroup.path;
-          }
+        const currentGroupId = this.$route.params.id;
+        const allGroups = this.$store.getters['memberships/groups'];
+        const currentGroup = allGroups.find(({ _id }) => _id === currentGroupId);
+        if (currentGroup) {
+          this.submission.meta.group.id = currentGroup._id;
+          this.submission.meta.group.path = currentGroup.path;
         }
       }
 

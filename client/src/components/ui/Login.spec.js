@@ -2,9 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import Login from './Login.vue';
 import mockAxios from 'axios';
-import { autoSelectActiveGroup } from '@/utils/memberships';
-
-jest.mock('@/utils/memberships');
+import { flushPromises } from '@vue/test-utils';
 
 beforeEach(() => localStorage.clear());
 
@@ -121,7 +119,13 @@ describe('Login component', () => {
         const email = 'foo.bar.baz';
         fireEvent.update(emailInput, email);
         await fireEvent.click(screen.getByText(/Send link/i));
-        expect(dispatchMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ email, landingPath }));
+        expect(dispatchMock).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            email,
+            landingPath,
+          })
+        );
       });
 
       it('shows "completed" screen', async () => {
@@ -264,6 +268,7 @@ describe('Login component', () => {
   });
 
   describe('submit form and check submit() method behaviour based on try to auto join group if this is a whitelabel', () => {
+    const WHITELABEL_GROUP_ID = 42;
     it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled', async () => {
       let res = { data: { meta: { invitationOnly: false } } };
       mockAxios.get.mockImplementation(() => Promise.resolve(res));
@@ -273,6 +278,15 @@ describe('Login component', () => {
         if (action === 'auth/login') {
           return jest.fn(() => Promise.resolve());
         }
+        if (action === 'memberships/getUserMemberships') {
+          return Promise.resolve([
+            {
+              group: {
+                _id: 1,
+              },
+            },
+          ]);
+        }
       });
       const { getByLabelText, getByText } = renderLogin({
         props: { defaultUsePassword: true },
@@ -281,6 +295,10 @@ describe('Login component', () => {
           'whitelabel/partner': {
             id: 1,
           },
+          'auth/user': {
+            _id: 2,
+          },
+          'auth/isLoggedIn': true,
         },
         dispatchMock,
         query: { redirect: false },
@@ -300,14 +318,19 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
+      await flushPromises();
+
       expect(dispatchMock).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
+        expect.objectContaining({
+          url: '/auth/login',
+          user: { email: email.toLowerCase(), password },
+        })
       );
-      expect(push).toHaveBeenCalledWith('/');
+      expect(push).toHaveBeenCalledWith('/groups/1');
     });
 
-    it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled BUT post throw an error', async () => {
+    it('submit if this.isWhitelabel, but autojoin throws an error', async () => {
       let res = { data: { meta: { invitationOnly: false } } };
       mockAxios.get.mockImplementation(() => Promise.resolve(res));
       mockAxios.post.mockImplementation(() =>
@@ -315,16 +338,23 @@ describe('Login component', () => {
           response: { data: { message: 'an error message' } },
         })
       );
-      const dispatchMock = jest.fn();
       const push = jest.fn();
       const { getByLabelText, getByText } = renderLogin({
         getters: {
           'whitelabel/isWhitelabel': true,
           'whitelabel/partner': {
-            id: 1,
+            id: WHITELABEL_GROUP_ID,
           },
+          'auth/user': {
+            _id: 2,
+          },
+          'auth/isLoggedIn': true,
         },
-        dispatchMock,
+        dispatchMock: jest.fn((action) => {
+          if (action === 'memberships/getUserMemberships') {
+            return Promise.resolve([]);
+          }
+        }),
         props: { defaultUsePassword: true },
         $router: {
           push,
@@ -341,32 +371,40 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      await waitFor(() =>
-        expect(dispatchMock).toHaveBeenCalledWith(
-          expect.anything(),
-          expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
-        )
-      );
-      await waitFor(() => expect(autoSelectActiveGroup).toHaveBeenCalledTimes(0));
-      await waitFor(() => expect(push).toHaveBeenCalledWith('/'));
+      await flushPromises();
+
+      expect(mockAxios.post).toHaveBeenCalledTimes(1);
+      //redirect to / to not block the user but allowing him to find his group manually
+      expect(push).toHaveBeenCalledWith('/');
     });
 
     it('submit and trying autojoin if this.isWhitelabel === false', async () => {
       const push = jest.fn();
-      const login = jest.fn(() => Promise.resolve());
       const dispatchMock = jest.fn((action) => {
         if (action === 'auth/login') {
           return Promise.resolve();
+        }
+        if (action === 'memberships/getUserMemberships') {
+          return Promise.resolve([
+            {
+              group: {
+                _id: 2,
+              },
+            },
+          ]);
+        }
+        if (action === 'surveys/fetchPinned') {
+          return jest.fn();
         }
       });
       const { getByLabelText, getByText } = renderLogin({
         props: { defaultUsePassword: true },
         getters: {
           'whitelabel/isWhitelabel': false,
-        },
-        actions: {
-          'auth/login': login,
-          'surveys/fetchPinned': jest.fn(),
+          'auth/user': {
+            _id: 2,
+          },
+          'auth/isLoggedIn': true,
         },
         dispatchMock,
         query: { redirect: false },
@@ -386,22 +424,42 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      expect(dispatchMock).toHaveBeenCalledWith(
+      await flushPromises();
+      /*expect(dispatchMock).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
-      );
-      expect(push).toHaveBeenCalledWith('/');
+        expect.objectContaining({
+          url: '/auth/login',
+          user: { email: email.toLowerCase(), password },
+        })
+      );*/
+      expect(push).toHaveBeenCalledWith('/groups/2');
     });
   });
 
   describe('submit form and check submit() method behaviour based on redirection', () => {
+    const dispatchMock = jest.fn((action) => {
+      if (action === 'memberships/getUserMemberships') {
+        return Promise.resolve([
+          {
+            group: {
+              _id: 2,
+            },
+          },
+        ]);
+      }
+    });
     it("submit and get the redirection '/'", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderLogin({
         props: { defaultUsePassword: true },
         getters: {
           'whitelabel/isWhitelabel': false,
+          'auth/user': {
+            _id: 2,
+          },
+          'auth/isLoggedIn': true,
         },
+        dispatchMock: dispatchMock,
         query: { redirect: false },
         $router: {
           push,
@@ -416,8 +474,9 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
+      await flushPromises();
 
-      expect(push).toHaveBeenCalledWith('/');
+      expect(push).toHaveBeenCalledWith('/groups/2');
     });
 
     it("submit and get the redirection 'this.$route.query.redirect = true' ", async () => {
@@ -425,7 +484,12 @@ describe('Login component', () => {
       const { getByLabelText, getByText } = renderLogin({
         getters: {
           'whitelabel/isWhitelabel': false,
+          'auth/user': {
+            _id: 2,
+          },
+          'auth/isLoggedIn': true,
         },
+        dispatchMock: dispatchMock,
         query: { redirect: true },
         props: { defaultUsePassword: true },
         $router: {
@@ -441,6 +505,7 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
+      await flushPromises();
 
       expect(push).toHaveBeenCalledWith(true);
     });

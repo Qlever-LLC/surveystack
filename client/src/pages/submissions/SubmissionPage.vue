@@ -73,7 +73,6 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import { createSubmissionFromSurvey, checkAllowedToSubmit, checkAllowedToResubmit } from '@/utils/submissions';
-import { autoSelectActiveGroup } from '@/utils/memberships';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
@@ -222,11 +221,6 @@ export default {
     // If the user is on the new-submission route, initialize a new submission and then redirect to the edit-submission route for that submission
     if (this.$route.name === 'group-survey-submissions-new') {
       const { group, submitAsUserId } = this.$route.query;
-      if (group) {
-        // see analysis in https://gitlab.com/our-sci/software/surveystack/-/merge_requests/230#note_1286909610
-        await autoSelectActiveGroup(this.$store, group);
-      }
-
       const startDraftConfig = { survey: this.survey };
       if (submitAsUserId) {
         try {
@@ -240,7 +234,10 @@ export default {
         }
       }
       const submissionId = await this.$store.dispatch('submissions/startDraft', startDraftConfig);
-      await this.$router.replace({ name: 'group-survey-submissions-edit', params: { surveyId, submissionId } });
+      await this.$router.replace({
+        name: 'group-survey-submissions-edit',
+        params: { id: group._id, surveyId, submissionId },
+      });
     }
 
     if (this.$route.name === 'group-survey-submissions-edit') {

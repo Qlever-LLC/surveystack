@@ -84,6 +84,7 @@ export const startSentry = (app, store, router) => {
   );
 
   // Keep the sentry group context in sync with the store
+  /* TODO can we migrate this to using the route group?
   store.watch(
     (_, getters) => {
       const groups = getters['memberships/groups'];
@@ -96,4 +97,5 @@ export const startSentry = (app, store, router) => {
     },
     { immediate: true }
   );
+   */
 };

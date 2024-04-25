@@ -181,8 +181,7 @@ const renderWithVuetify = function (component, options, storeOverride) {
   const root = document.createElement('div');
   root.setAttribute('data-app', 'true');
   const store = storeOverride ?? createStore(createStoreObject());
-
-  return render(component, {
+  const renderOptions = {
     ...options,
     container: document.body.appendChild(root),
     global: {
@@ -194,7 +193,9 @@ const renderWithVuetify = function (component, options, storeOverride) {
       },
       ...options?.global,
     },
-  });
+  };
+
+  return render(component, renderOptions);
 };
 
 export { renderWithVuetify, mountWithVuetify, shallowMountWithVuetify };

@@ -45,6 +45,7 @@
       </template>
       <member-selector
         :show="state.showSelectMember"
+        :fixed-group-id="getActiveGroupId()"
         @hide="state.showSelectMember = false"
         @selected="(selectedMemb) => startDraftAs(selectedMemb)" />
     </basic-list>

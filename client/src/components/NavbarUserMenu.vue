@@ -18,9 +18,6 @@
         <a-list-item-title> FarmOS Profile </a-list-item-title>
       </a-list-item>
       <a-divider />
-      <a-list-subheader>Active Group</a-list-subheader>
-      <active-group-selector-list />
-      <a-divider />
       <a-list-item link @click="logout" class="mt-2" prepend-icon="mdi-logout-variant">
         <a-list-item-title> Sign Out </a-list-item-title>
       </a-list-item>
@@ -34,14 +31,9 @@
 </template>
 
 <script>
-import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
-
 import api from '@/services/api.service';
 
 export default {
-  components: {
-    ActiveGroupSelectorList,
-  },
   data() {
     return {
       menuIsOpen: false,

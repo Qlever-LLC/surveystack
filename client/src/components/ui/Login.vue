@@ -95,6 +95,7 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import { autoJoinWhiteLabelGroup, redirectAfterLogin } from '@/utils/memberships';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -224,6 +225,13 @@ export default {
           url: '/auth/login',
           user: this.entity,
         });
+
+        //make sure whitelabel user is a member of its whitelabel group (this reflects legacy behaviour, though it's not clear why this had been added in the past)
+        const partnerGroupId = await autoJoinWhiteLabelGroup(this.$store);
+        //fetch pinned
+        this.$store.dispatch('surveys/fetchPinned');
+        //change route
+        await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {
         switch (error.response.status) {
           case 401:
@@ -236,14 +244,6 @@ export default {
             this.status = 'An error occurred'; //'Unknown error :/';
         }
         return;
-      }
-
-      this.$store.dispatch('surveys/fetchPinned');
-
-      if (this.$route.query.redirect) {
-        this.$router.push(this.$route.query.redirect);
-      } else {
-        this.$router.push('/');
       }
     },
   },

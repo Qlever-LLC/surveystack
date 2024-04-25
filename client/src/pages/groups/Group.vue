@@ -42,7 +42,7 @@
           :editable="editable"
           :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []"
           title="Pinned Surveys"
-          :link="(e) => `/surveys/${e._id}`"
+          :link="(e) => `/groups/${entity._id}/surveys/${e._id}/description`"
           :linkNew="`/groups/edit/${entity._id}`">
           <template v-slot:entity="{ entity }">
             <a-list-item-title>{{ entity.name }}</a-list-item-title>

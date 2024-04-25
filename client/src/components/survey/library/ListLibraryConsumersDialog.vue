@@ -15,7 +15,7 @@
             <a-progress-circular :size="50" />
           </a-container>
           <template v-if="libraryConsumers !== null">
-            <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+            <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c)">
               <small class="text-grey">{{ c._id }}</small>
               <a-list-item-title>{{ c.name }}</a-list-item-title>
             </a-list-item>
@@ -58,8 +58,8 @@ export default {
       const response = await api.get(`/surveys/list-library-consumers?id=${props.librarySurvey._id}`);
       state.libraryConsumers = response.data;
     }
-    function goToSurvey(survey_id) {
-      let route = this.$router.resolve(`/surveys/${survey_id}`);
+    function goToSurvey(survey) {
+      let route = this.$router.resolve(`/group/${survey.meta.group.id}/surveys/${survey._id}/description`);
       window.open(route.href, '_blank');
     }
 

@@ -13,7 +13,7 @@
           <a-card>
             <a-card-title> Edit Survey Details</a-card-title>
             <a-card-text>
-              <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
+              <group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <a-select
                 variant="outlined"
                 v-model="value.meta.submissions"
@@ -220,7 +220,7 @@
 
 <script>
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import GroupSelector from '@/components/shared/GroupSelector.vue';
 import appResources from '@/components/builder/Resources.vue';
 import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
@@ -295,7 +295,7 @@ export default {
     EditLibraryDialog,
     PrintSettingsDialog,
     SurveyNameEditor,
-    ActiveGroupSelector,
+    GroupSelector,
     appResources,
   },
   methods: {
