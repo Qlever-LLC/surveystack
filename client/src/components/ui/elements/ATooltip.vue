@@ -13,8 +13,6 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
-
 const props = defineProps({
   // //vuetify props
   bottom: { type: Boolean, required: false },
@@ -27,22 +25,18 @@ const props = defineProps({
   transition: { type: String, required: false },
 });
 
-const state = reactive({
-  location: undefined,
-});
-
 function getLocation() {
   if (props.bottom) {
-    return (state.location = 'bottom');
+    return 'bottom';
   }
   if (props.left) {
-    return (state.location = 'start');
+    return 'start';
   }
   if (props.right) {
-    return (state.location = 'end');
+    return 'end';
   }
   if (props.top) {
-    return (state.location = 'top');
+    return 'top';
   }
 }
 </script>
