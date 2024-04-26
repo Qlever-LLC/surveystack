@@ -91,7 +91,7 @@ async function initData() {
     {
       title: 'Description',
       icon: 'mdi-book-open',
-      action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/question-sets/${s._id}/description`),
+      action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
       render: (s) => () => rightToView(s).allowed,
       color: 'green',
     },

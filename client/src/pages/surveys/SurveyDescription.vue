@@ -84,11 +84,11 @@ const state = reactive({
 fetchData();
 
 async function fetchData() {
-  const { qsId } = route.params;
+  const { sId } = route.params;
 
   try {
     state.loading = true;
-    const { data } = await api.get(`/surveys/${qsId}`);
+    const { data } = await api.get(`/surveys/${sId}`);
     state.loading = false;
     state.selectedSurvey = data;
   } catch (e) {
