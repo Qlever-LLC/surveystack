@@ -4,6 +4,7 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isOnline } from '@/utils/surveyStack';
+import { MAPBOX_ACCESS_TOKEN } from '../../../constants';;
 
 const requestWakeLock = async () => {
   try {
@@ -115,7 +116,7 @@ export default {
 
       const geocoder = new MapboxGeocoder({
         // Initialize the geocoder
-        accessToken: mapboxgl.accessToken, // Set the access token
+        accessToken: MAPBOX_ACCESS_TOKEN, // Set the access token
         mapboxgl: this.map, // Set the mapbox-gl instance
         marker: false, // Do not use the default marker style
       });
@@ -226,7 +227,7 @@ export default {
     },
   },
   created() {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
+    mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
     this.location = this.modelValue;
   },
   mounted() {
