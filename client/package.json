@@ -50,7 +50,7 @@
     "js-base64": "^3.7.2",
     "linkify-it": "^4.0.1",
     "lodash": "^4.17.15",
-    "mapbox-gl": "^1.6.1",
+    "mapbox-gl": "^3.3.0",
     "markdown-it": "^13.0.2",
     "markdown-it-container": "^3.0.0",
     "node-polyfill-webpack-plugin": "^3.0.0",
