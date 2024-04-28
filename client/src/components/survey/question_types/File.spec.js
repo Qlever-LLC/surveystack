@@ -1,4 +1,3 @@
-require('fake-indexeddb/auto');
 import { mount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import FileComp from './File.vue';
