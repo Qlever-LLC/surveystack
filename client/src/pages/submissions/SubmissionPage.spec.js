@@ -60,7 +60,6 @@ describe('Draft', () => {
       },
       store: {
         actions: {
-          'submissions/fetchLocalSubmission': jest.fn(() => ({ ...badSubmission })),
           'submissions/fetchLocalSubmissions': jest.fn(),
           'appui/reset': jest.fn(),
           'surveys/fetchSurvey': jest.fn(() => ({ ...survey })),
