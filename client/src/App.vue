@@ -17,6 +17,8 @@ import api from '@/services/api.service';
 import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
 
+db.migrateSubmissions();
+
 export default {
   name: 'App',
   components: {

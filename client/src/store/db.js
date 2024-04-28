@@ -255,7 +255,6 @@ const migrateSubmissions = async () => {
 
   remainingDrafts.map(upgradeSubmissionFromVXtoV4).forEach(persistSubmission);
 };
-migrateSubmissions();
 
 export {
   surveys,
@@ -278,4 +277,5 @@ export {
   saveToIndexedDB,
   stores,
   removeFromIndexedDB,
+  migrateSubmissions,
 };
