@@ -73,14 +73,9 @@ const actions = {
     commit('RESET');
   },
   async [types.actions.fetchLocalSubmissions]({ commit }) {
-    // TODO reject if timeout here
-    const response = await new Promise((resolve) => {
-      db.openDb(() => {
-        db.getAllSubmissions((results) => resolve(results));
-      });
-    });
-    commit(types.mutations.SET_SUBMISSIONS, response);
-    return response;
+    const submissions = await db.getAllSubmissions();
+    commit(types.mutations.SET_SUBMISSIONS, submissions);
+    return submissions;
   },
   [types.actions.add]({ commit }, submission) {
     commit(types.mutations.ADD_SUBMISSION, submission);
@@ -110,7 +105,7 @@ const actions = {
     });
 
     try {
-      await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+      await db.persistSubmission(submission);
     } catch (err) {
       console.warn('failed to save submission to IDB');
     }
@@ -119,7 +114,7 @@ const actions = {
     return submission._id;
   },
   async [types.actions.update]({ commit }, submission) {
-    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    await db.persistSubmission(submission);
     commit(types.mutations.UPDATE_SUBMISSION, submission);
     return submission;
   },

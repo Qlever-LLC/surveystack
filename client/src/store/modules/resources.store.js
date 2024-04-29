@@ -34,13 +34,8 @@ const actions = {
     commit('RESET');
   },
   async initFromIndexedDB({ commit }) {
-    //TODO maybe better initFromIndexedDB by the store itself on first access
-    const response = await new Promise((resolve) => {
-      db.openDb(() => {
-        db.getAllResources((results) => resolve(results));
-      });
-    });
-    commit('SET_RESOURCES', response);
+    const resources = await db.getAllResources();
+    commit('SET_RESOURCES', resources);
   },
   // eslint-disable-next-line no-unused-vars
   async addRemoteResource({ commit, dispatch }, file) {
@@ -68,7 +63,7 @@ const actions = {
         contentType: file.type,
         fileData: file,
       };
-      db.persistResource(resource);
+      await db.persistResource(resource);
       commit('ADD_RESOURCE', resource);
       return resource;
     } catch (error) {
@@ -83,7 +78,7 @@ const actions = {
         resource.key = replaceLabelInKey(resource.key, labelNew);
         resource.label = labelNew;
         resource.name = slugify(labelNew);
-        db.persistResource(resource);
+        await db.persistResource(resource);
         commit('REMOVE_RESOURCE', resource._id);
         commit('ADD_RESOURCE', resource);
       } else {
@@ -100,7 +95,7 @@ const actions = {
       let resource = getters['getResourceByKey'](resourceKey);
       if (resource) {
         resource.state = stateNew;
-        db.persistResource(resource);
+        await db.persistResource(resource);
         commit('REMOVE_RESOURCE', resource._id);
         commit('ADD_RESOURCE', resource);
       }
@@ -183,7 +178,7 @@ const actions = {
         resourceStored = cloneDeep(resource);
         resourceStored._id = resourceStored.id; //_id is required to be stored in idb
         resourceStored.fileData = scriptCode;
-        db.persistResource(resourceStored);
+        await db.persistResource(resourceStored);
         commit('REMOVE_RESOURCE', resource._id);
         commit('ADD_RESOURCE', resourceStored);
       }
