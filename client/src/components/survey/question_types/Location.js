@@ -107,6 +107,8 @@ export default {
       this.gpsTimer = 0;
     },
     startMap() {
+      setTimeout(() => {}, 2000);
+      mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
       this.map = new mapboxgl.Map({
         container: `map-question-${this.index}`,
         style: `mapbox://styles/mapbox/${this.mapStyle}-v9`,
@@ -226,7 +228,6 @@ export default {
     },
   },
   created() {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
     this.location = this.modelValue;
   },
   mounted() {
@@ -235,8 +236,6 @@ export default {
     if (navigator.wakeLock) {
       requestWakeLock();
     }
-
-    // TODO: this will now trigger a map error
   },
   beforeUnmount() {
     this.stopGpsTimer();
