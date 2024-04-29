@@ -84,7 +84,7 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: true,
       navigateFallback: 'index.html',
-      navigateFallbackDenylist: [/\/static\/.*$/, /\/api\/.*$/], //rename this to navigateFallbackDenylist when migrating to vue3
+      navigateFallbackDenylist: [/\/static\/.*$/, /\/api\/.*$/],
       runtimeCaching: [
         {
           urlPattern: /\/api\/.*$/,
