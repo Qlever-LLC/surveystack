@@ -56,7 +56,7 @@ export const startSentry = (app, store, router) => {
     integrations: [
       new BrowserTracing({
         routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-        tracePropagationTargets: [process.env.VUE_APP_API_URL, /^\//],
+        tracePropagationTargets: [process.env.VUE_APP_API_URL + '/', /^\//],
       }),
       new CaptureConsole({
         levels: ['error'],
