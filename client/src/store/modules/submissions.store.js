@@ -7,8 +7,10 @@ export const types = {
     ADD_SUBMISSION: 'ADD_SUBMISSION',
     UPDATE_SUBMISSION: 'UPDATE_SUBMISSION',
     REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
+    RESET: 'RESET',
   },
   actions: {
+    reset: 'reset',
     add: 'add',
     remove: 'remove',
     fetchLocalSubmissions: 'fetchLocalSubmissions',
@@ -18,14 +20,15 @@ export const types = {
   },
 };
 
-const createInitialState = () => ({
+export const createInitialState = () => ({
   submissions: [],
+  remoteDrafts: [],
+  localDrafts: [],
 });
 
 const initialState = createInitialState();
 
 const getters = {
-  // TODO should this search previously uploaded submissions
   getSubmission: (state) => (id) => state.submissions.find((submission) => submission._id === id),
   readyToSubmit: (state) =>
     state.submissions
@@ -34,7 +37,7 @@ const getters = {
 };
 
 const mutations = {
-  RESET(state) {
+  [types.mutations.RESET](state) {
     Object.assign(state, createInitialState());
   },
   [types.mutations.SET_SUBMISSIONS](state, submissions) {
@@ -60,7 +63,7 @@ const mutations = {
 };
 
 const actions = {
-  reset({ commit }) {
+  [types.actions.reset]({ commit }) {
     commit('RESET');
   },
   async [types.actions.fetchLocalSubmissions]({ commit }) {
