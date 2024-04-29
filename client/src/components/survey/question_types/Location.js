@@ -226,7 +226,7 @@ export default {
     },
   },
   created() {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWFoYTExIiwiYSI6ImNsdmtwNGVhODA2ZWIya3JyZGI1bnQxdjUifQ.xU32AY_mnwzDjAb3IEg_1w';
     this.location = this.modelValue;
   },
   mounted() {
