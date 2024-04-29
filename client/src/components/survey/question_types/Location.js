@@ -1,4 +1,4 @@
-export const geoJsonFromLngLat = ({ lng, lat }) => ({
+export const geoJsonFromLngLat = ([lng, lat]) => ({
   type: 'Feature',
   geometry: {
     type: 'Point',
