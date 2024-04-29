@@ -82,8 +82,8 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } 
 
 const MAP_STYLES = [
   'mapbox://styles/mapbox/satellite-v9',
-  'mapbox://styles/mapbox/streets-v9',
-  'mapbox://styles/mapbox/outdoors-v9',
+  'mapbox://styles/mapbox/streets-v12',
+  'mapbox://styles/mapbox/outdoors-v12',
 ];
 
 const props = defineProps(QuestionComponentProps);
