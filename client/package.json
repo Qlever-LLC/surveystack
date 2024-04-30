@@ -20,6 +20,7 @@
   "license": "GPL-3.0-only",
   "dependencies": {
     "@guolao/vue-monaco-editor": "^1.4.1",
+    "@mapbox/mapbox-gl-geocoder": "^5.0.1",
     "@mapbox/togeojson": "^0.16.0",
     "@mdi/font": "^7.3.67",
     "@our-sci/farmos-map": "2.3.7",
@@ -49,6 +50,7 @@
     "js-base64": "^3.7.2",
     "linkify-it": "^4.0.1",
     "lodash": "^4.17.15",
+    "mapbox-gl": "3.3.0",
     "markdown-it": "^13.0.2",
     "markdown-it-container": "^3.0.0",
     "node-polyfill-webpack-plugin": "^3.0.0",
@@ -62,7 +64,6 @@
     "unleash-proxy-client": "^3.2.0",
     "vue": "^3.4.15",
     "vue-draggable-plus": "^0.3.5",
-    "vue-mapbox-ts": "^0.9.10",
     "vue-router": "^4.2.5",
     "vuetify": "^3.5.2",
     "vuex": "^4.1.0",
