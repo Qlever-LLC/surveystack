@@ -236,7 +236,7 @@ export default {
       const submissionId = await this.$store.dispatch('submissions/startDraft', startDraftConfig);
       await this.$router.replace({
         name: 'group-survey-submissions-edit',
-        params: { id: group._id, surveyId, submissionId },
+        params: { id: group, surveyId, submissionId },
       });
     }
 
