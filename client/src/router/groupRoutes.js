@@ -6,7 +6,6 @@ import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupEdit from '@/pages/groups/GroupEdit.vue';
 import Builder from '@/pages/builder/Builder.vue';
-import { authGuard } from '@/router/index';
 import List from '@/pages/submissions/List.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
@@ -17,6 +16,15 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import MembershipsPage from '@/pages/memberships/MembershipsPage.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
+import store from '@/store';
+
+export const authGuard = async (to, from, next) => {
+  if (!store.getters['auth/isLoggedIn']) {
+    next({ name: 'auth-login', query: { redirect: to.path } });
+  } else {
+    next();
+  }
+};
 
 export default [
   {

@@ -2,9 +2,17 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 import Builder from '@/pages/builder/Builder.vue';
-import { authGuard } from '@/router/index';
 import Group from '@/pages/groups/Group.vue';
 import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
+import store from '@/store';
+
+export const authGuard = async (to, from, next) => {
+  if (!store.getters['auth/isLoggedIn']) {
+    next({ name: 'auth-login', query: { redirect: to.path } });
+  } else {
+    next();
+  }
+};
 
 export default [
   {

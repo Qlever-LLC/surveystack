@@ -1,13 +1,3 @@
-import store from '@/store';
-
-export const authGuard = async (to, from, next) => {
-  if (!store.getters['auth/isLoggedIn']) {
-    next({ name: 'auth-login', query: { redirect: to.path } });
-  } else {
-    next();
-  }
-};
-
 import { createRouter, createWebHistory } from 'vue-router';
 import globalRoutes from './globalRoutes.js';
 import groupRoutes from './groupRoutes.js';
