@@ -63,9 +63,9 @@
     </div>
 
     <a-overlay
-      class="text-center"
+      class="text-center align-center justify-center"
       :modelValue="!modelValue && !state.gpsLocation && !state.mapError && !state.geolocationError"
-      absolute>
+      contained>
       <a-card>
         <a-card-text>
           <div class="subtitle-1 text-center">Getting GPS Coordinates</div>
