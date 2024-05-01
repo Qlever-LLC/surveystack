@@ -149,26 +149,10 @@ const syncDraft = async (req: Request, res: Response) => {
     submission.meta.status = submission.meta.status.filter(
       (status) => status.type !== 'READY_TO_SUBMIT'
     );
-
-    // submit draft in a transaction
-    const result = await withSession(mongoClient, async (session) => {
-      try {
-        return await withTransaction(session, async () => {
-          const replaceResult = await db
-            .collection('submissions')
-            .replaceOne({ _id: submission._id }, submission, { upsert: true });
-          if (!replaceResult.acknowledged) {
-            await session.abortTransaction();
-            return;
-          }
-
-          return replaceResult;
-        });
-      } catch {
-        throw boom.internal();
-      }
-    });
-
+    // submit draft
+    const result = await db
+      .collection('submissions')
+      .replaceOne({ _id: submission._id }, submission, { upsert: true });
     if (!result) {
       throw boom.internal();
     }
