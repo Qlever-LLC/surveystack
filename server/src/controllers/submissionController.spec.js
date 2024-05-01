@@ -13,7 +13,6 @@ import mailService from '../services/mail/mail.service';
 import createApp from '../app.js';
 import { db } from '../db';
 import handleApiCompose from './utils/handleApiCompose';
-import boom from '@hapi/boom';
 
 jest.mock('./utils/handleApiCompose');
 jest.mock('../services/mail/mail.service');
