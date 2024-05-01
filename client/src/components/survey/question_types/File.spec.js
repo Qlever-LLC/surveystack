@@ -1,9 +1,20 @@
-require('fake-indexeddb/auto');
 import { mount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import FileComp from './File.vue';
 import { Blob } from 'buffer';
 import store from '@/store';
+
+/*
+  TODO: We should be able to remove this mock and exercise the actual code in `db`,
+  which is backed by `fake-indexeddb` during tests. Currently, errors are thrown
+  when trying to save Blobs to idb. It should be possible to save Blobs to idb within
+  tests once we upgrade the following dependencies:
+    - jest to >=28
+    - fake-indexeddb >=4
+    - node >= 17
+  This can be done once this MR is merged: https://gitlab.com/our-sci/software/surveystack/-/merge_requests/369
+*/
+jest.mock('../../../store/db');
 
 const vuetify = new Vuetify();
 
