@@ -22,13 +22,11 @@ jest.mock('../services/featureToggle.service.js');
 
 const { ObjectId } = jest.requireActual('mongodb');
 
-import { withSession, withTransaction } from '../db/helpers.ts';
-const { withSession: actualWithSession, withTransaction: actualWithTransaction } =
-  jest.requireActual('../db/helpers.ts');
-// by default, for each test, setup withSession and withTransaction to behave as normal (that is, use their actual implementation), but also set them up as mocks so their functionality can be overridden in individual tests, spyed on, etc.
+import { withSession } from '../db/helpers.ts';
+const { withSession: actualWithSession } = jest.requireActual('../db/helpers.ts');
+// by default, for each test, setup withSession to behave as normal (that is, use their actual implementation), but also set them up as mocks so their functionality can be overridden in individual tests, spyed on, etc.
 beforeEach(() => {
   withSession.mockImplementation(actualWithSession);
-  withTransaction.mockImplementation(actualWithTransaction);
 });
 
 const { getSubmissionsCsv, getSubmissionPdf, postSubmissionPdf, sendPdfLink } =
@@ -272,7 +270,6 @@ describe('submissionController', () => {
         });
 
         it('when the mongodb transaction is aborted, returns 500 and does not update the database', async () => {
-          withTransaction.mockResolvedValueOnce(undefined);
           const submissionId = ObjectId();
           const { createRequestSubmission } = await createSurvey(['string']);
           const requestSubmission = createRequestSubmission({
@@ -302,7 +299,6 @@ describe('submissionController', () => {
         });
 
         it('when the mongodb transaction throws an error, returns 500 and does not update the database', async () => {
-          withTransaction.mockRejectedValueOnce(boom.internal());
           const submissionId = ObjectId();
           const { createRequestSubmission } = await createSurvey(['string']);
           const requestSubmission = createRequestSubmission({
@@ -829,7 +825,6 @@ describe('submissionController', () => {
             });
 
             it('when the mongodb transaction is aborted, returns 500 and does not update the database', async () => {
-              withTransaction.mockResolvedValueOnce(undefined);
               const { submissionId, createRequestSubmission, databaseSubmission } =
                 await setupDraftInDatabase(new Date('2021-01-01'));
               const requestSubmission = createRequestSubmission({
@@ -861,7 +856,6 @@ describe('submissionController', () => {
             });
 
             it('when the mongodb transaction throws an error, returns 500 and does not update the database', async () => {
-              withTransaction.mockRejectedValueOnce(boom.internal());
               const { submissionId, createRequestSubmission, databaseSubmission } =
                 await setupDraftInDatabase(new Date('2021-01-01'));
               const requestSubmission = createRequestSubmission({

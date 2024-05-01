@@ -1,8 +1,7 @@
 import boom from '@hapi/boom';
 import { Request, Response } from 'express';
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
-import { db, mongoClient } from '../db';
-import { withTransaction, withSession } from '../db/helpers';
+import { db } from '../db';
 import { sanitize } from './submissionController.js';
 import handleApiCompose from './utils/handleApiCompose';
 import { type ObjectId } from 'mongodb';
