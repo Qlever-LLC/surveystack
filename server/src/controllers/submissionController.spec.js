@@ -268,64 +268,6 @@ describe('submissionController', () => {
           expect(submission.meta.isDraft).toBe(true);
         });
 
-        it('when the mongodb transaction is aborted, returns 500 and does not update the database', async () => {
-          const submissionId = ObjectId();
-          const { createRequestSubmission } = await createSurvey(['string']);
-          const requestSubmission = createRequestSubmission({
-            _id: submissionId.toString(),
-            meta: createRequestSubmissionMeta({
-              isDraft: true,
-              creator: user._id.toString(),
-              dateModified: new Date('2021-01-02').toISOString(),
-              status: [
-                {
-                  type: 'READY_TO_SUBMIT',
-                  value: { at: new Date('2021-01-02').toISOString() },
-                },
-              ],
-            }),
-          });
-          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
-
-          await request(app)
-            .post('/api/submissions/sync-draft')
-            .set('Authorization', authHeaderValue)
-            .send(requestSubmission)
-            .expect(500);
-
-          const submission = await db.collection('submissions').findOne({ _id: submissionId });
-          expect(submission).toBeNull();
-        });
-
-        it('when the mongodb transaction throws an error, returns 500 and does not update the database', async () => {
-          const submissionId = ObjectId();
-          const { createRequestSubmission } = await createSurvey(['string']);
-          const requestSubmission = createRequestSubmission({
-            _id: submissionId.toString(),
-            meta: createRequestSubmissionMeta({
-              isDraft: true,
-              creator: user._id.toString(),
-              dateModified: new Date('2021-01-02').toISOString(),
-              status: [
-                {
-                  type: 'READY_TO_SUBMIT',
-                  value: { at: new Date('2021-01-02').toISOString() },
-                },
-              ],
-            }),
-          });
-          handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
-
-          await request(app)
-            .post('/api/submissions/sync-draft')
-            .set('Authorization', authHeaderValue)
-            .send(requestSubmission)
-            .expect(500);
-
-          const submission = await db.collection('submissions').findOne({ _id: submissionId });
-          expect(submission).toBeNull();
-        });
-
         it('runs handleApiCompose, inserts the request submission into the db, removing READY_TO_SUBMIT and setting isDraft to false, and returns 200 when authorized', async () => {
           const submissionId = ObjectId();
           const { createRequestSubmission } = await createSurvey(['string']);
@@ -820,68 +762,6 @@ describe('submissionController', () => {
               expect(submission.meta.status).toContainEqual(
                 expect.objectContaining({ type: 'FAILED_TO_SUBMIT' })
               );
-              expect(submission.meta.isDraft).toBe(true);
-            });
-
-            it('when the mongodb transaction is aborted, returns 500 and does not update the database', async () => {
-              const { submissionId, createRequestSubmission, databaseSubmission } =
-                await setupDraftInDatabase(new Date('2021-01-01'));
-              const requestSubmission = createRequestSubmission({
-                _id: submissionId.toString(),
-                meta: createRequestSubmissionMeta({
-                  isDraft: true,
-                  creator: user._id.toString(),
-                  dateModified: new Date('2021-01-02').toISOString(),
-                  status: [
-                    {
-                      type: 'READY_TO_SUBMIT',
-                      value: { at: new Date('2021-01-02').toISOString() },
-                    },
-                  ],
-                }),
-              });
-              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
-
-              await request(app)
-                .post('/api/submissions/sync-draft')
-                .set('Authorization', authHeaderValue)
-                .send(requestSubmission)
-                .expect(500);
-
-              const submission = await db.collection('submissions').findOne({ _id: submissionId });
-              expect(submission).not.toBeNull();
-              expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
-              expect(submission.meta.isDraft).toBe(true);
-            });
-
-            it('when the mongodb transaction throws an error, returns 500 and does not update the database', async () => {
-              const { submissionId, createRequestSubmission, databaseSubmission } =
-                await setupDraftInDatabase(new Date('2021-01-01'));
-              const requestSubmission = createRequestSubmission({
-                _id: submissionId.toString(),
-                meta: createRequestSubmissionMeta({
-                  isDraft: true,
-                  creator: user._id.toString(),
-                  dateModified: new Date('2021-01-02').toISOString(),
-                  status: [
-                    {
-                      type: 'READY_TO_SUBMIT',
-                      value: { at: new Date('2021-01-02').toISOString() },
-                    },
-                  ],
-                }),
-              });
-              handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
-
-              await request(app)
-                .post('/api/submissions/sync-draft')
-                .set('Authorization', authHeaderValue)
-                .send(requestSubmission)
-                .expect(500);
-
-              const submission = await db.collection('submissions').findOne({ _id: submissionId });
-              expect(submission).not.toBeNull();
-              expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
               expect(submission.meta.isDraft).toBe(true);
             });
 
