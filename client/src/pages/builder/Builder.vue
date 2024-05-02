@@ -1,6 +1,7 @@
 <template>
-  <div v-if="!showInvalidPlatformModal" style="height: 100%">
+  <div v-if="!showInvalidPlatformModal" style="height: 100%; padding: 16px">
     <survey-builder
+      class="rounded"
       v-if="!loading.fetch"
       :key="sessionId"
       :survey="survey"

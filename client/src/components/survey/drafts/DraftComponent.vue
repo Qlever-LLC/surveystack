@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-deprecated-slot-attribute -->
 <template>
-  <div class="draft-component-wrapper draft wrapper" :class="{ builder }" v-if="control" ref="wrapper">
+  <div class="draft-component-wrapper bg-background rounded" :class="{ builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-if="showConfirmSubmission"
@@ -60,7 +60,7 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-0 bg-grey-lighten-4"
+      class="draft-footer px-0 bg-background"
       :class="{ 'show-submit': showOverview }"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered'] && $store.getters['draft/enableNext']"
@@ -317,7 +317,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0px !important;
+  padding: 4px !important;
 }
 
 .draft-overview {
