@@ -695,18 +695,6 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   return { entity, survey };
 };
 
-const createSubmissionsToQSLs = async (submissionEntities) => {
-  const mapSubmissionToQSL = ({ entity, survey }) => {
-    const controls = survey.revisions.find(
-      (revision) => revision.version === entity.meta.survey.version
-    ).controls;
-
-    return prepareSubmissionsToQSLs(controls, entity);
-  };
-  const submissionsToQSLs = (await Promise.all(submissionEntities.map(mapSubmissionToQSL))).flat();
-  return submissionsToQSLs;
-};
-
 const createSubmission = async (req, res) => {
   const submissions = Array.isArray(req.body) ? req.body : [req.body];
 
@@ -723,15 +711,10 @@ const createSubmission = async (req, res) => {
     return res.status(503).send(errorObject);
   }
 
-  const submissionsToQSLs = await createSubmissionsToQSLs(submissionEntities);
-
   const results = await withSession(mongoClient, async (session) => {
     try {
       return await withTransaction(session, async () => {
-        const submissionsToInsert = [
-          ...submissionEntities.map(({ entity }) => entity),
-          ...submissionsToQSLs,
-        ];
+        const submissionsToInsert = submissionEntities.map(({ entity }) => entity);
 
         const insertResult = await db.collection(col).insertMany(submissionsToInsert);
 
@@ -752,74 +735,6 @@ const createSubmission = async (req, res) => {
   }
 
   res.send(apiComposeResults);
-};
-
-// if submission contains question set library questions, return a submission subset for each question set library
-const prepareSubmissionsToQSLs = async (controls, submission) => {
-  const submissionsToQSLSurveys = [];
-
-  async function createSubmissionsFromControl(control, submissionCopy) {
-    // for each library root control which is not deleted
-    if (control.isLibraryRoot && !control.options.redacted) {
-      // create a copy of submission
-      submissionCopy = JSON.parse(JSON.stringify(submissionCopy));
-      // remember submission source id in original
-      submissionCopy.meta.original = new ObjectId(submission._id);
-      // set new id
-      submissionCopy._id = new ObjectId();
-      // remember source survey id in origin_id and set survey id to the qsl survey
-      submissionCopy.meta.survey.origin = new ObjectId(submission.meta.survey.id);
-      submissionCopy.meta.survey.id = new ObjectId(control.libraryId);
-      submissionCopy.meta.survey.version = control.libraryVersion; // must be version of the library survey, not the consuming survey
-      // remove libraryRoot container including meta child
-      submissionCopy.data = findVal(submissionCopy.data, control.name);
-      delete submissionCopy.data['meta'];
-
-      // do not return copy if no data is left
-      if (Object.keys(submissionCopy.data).length === 0) {
-        return;
-      }
-
-      // TODO if qsl survey is not found, we are probably on an on-premise-system, so try to find the survey on the central surveystack system
-
-      //sanitize copy (e.g. convert string id's to object id
-      submissionCopy = await sanitize(submissionCopy);
-      submissionsToQSLSurveys.push(submissionCopy);
-    }
-
-    // recursively go through the children
-    if (control.children) {
-      await Promise.all(
-        control.children.map(async (child) => {
-          await createSubmissionsFromControl(child, submissionCopy);
-        })
-      );
-    }
-  }
-
-  // for each component in survey.revisions[meta.survey.version], create submission in parallel
-  await Promise.all(
-    controls.map(async (control) => {
-      await createSubmissionsFromControl(control, submission);
-    })
-  );
-
-  return submissionsToQSLSurveys;
-};
-
-const findVal = (obj, keyToFind) => {
-  if (!obj) {
-    return false;
-  }
-  if (obj[keyToFind]) return obj[keyToFind];
-
-  for (let key in obj) {
-    if (typeof obj[key] === 'object') {
-      const value = findVal(obj[key], keyToFind);
-      if (value) return value;
-    }
-  }
-  return false;
 };
 
 const updateSubmission = async (req, res) => {
@@ -867,27 +782,6 @@ const updateSubmission = async (req, res) => {
     return res.status(503).send(errorObject);
   }
 
-  // const farmosResults = [];
-  // try {
-  //   // re-run with original creator user
-  //   const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
-  //   const results = await farmOsService.handle({
-  //     submission: newSubmission,
-  //     survey,
-  //     user: creator,
-  //   });
-  //   farmosResults.push(...results);
-  //   // could contain errors, need to pass these on to the user
-  // } catch (error) {
-  //   // TODO what should we do if something internal fails?
-  //   // need to let the user somehow know
-  //   console.log('error handling farmos', error);
-  //   return res.status(503).send({
-  //     message: `error submitting to farmos ${error}`,
-  //     farmos: error.messages,
-  //   });
-  // }
-
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },
     { $set: updateOperation },
@@ -896,37 +790,7 @@ const updateSubmission = async (req, res) => {
     }
   );
 
-  await updateSubmissionToLibrarySurveys(survey, newSubmission);
-
   return res.send({ ...updated.value, ...apiComposeResults });
-};
-
-const updateSubmissionToLibrarySurveys = async (survey, submission) => {
-  // find library submissions to be updated
-  const librarySubmissions = await db
-    .collection('submissions')
-    .find({ 'meta.original': submission._id })
-    .toArray();
-
-  // archive current library submissions
-  await librarySubmissions.forEach(function (librarySubmission) {
-    // re-insert existing submissions as archived
-    // in contrast to the general archiving function, here we don't move the old id to the new submission and we don't
-    // change the origin as this is occupied by the root submission origin, otherwise, the find above would not find
-    // this for a further resubmit
-    librarySubmission.meta.archived = true;
-    librarySubmission.meta.archivedReason = submission.meta.archivedReason || 'RESUBMIT';
-    db.collection(col).replaceOne({ _id: librarySubmission._id }, librarySubmission);
-  });
-  // create new library submissions with a new id
-  let controls = survey.revisions.find(
-    (revision) => revision.version === submission.meta.survey.version
-  ).controls;
-
-  const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
-  if (QSLSubmissions.length !== 0) {
-    await db.collection(col).insertMany(QSLSubmissions);
-  }
 };
 
 const bulkReassignSubmissions = async (req, res) => {
@@ -1136,11 +1000,7 @@ const archiveSubmissions = async (req, res) => {
   }
 
   const idSelector = { $in: ids.map(ObjectId) };
-
   await db.collection(col).updateMany({ _id: idSelector }, update);
-
-  // archive / unarchive library submissions as well
-  await db.collection(col).updateMany({ 'meta.original': idSelector }, update);
 
   return res.send({ message: 'OK' });
 };
@@ -1161,11 +1021,6 @@ const deleteSubmissions = async (req, res) => {
   }
 
   await db.collection(col).deleteMany(submissionQuery);
-
-  // delete library submissions as well
-
-  await db.collection(col).deleteMany({ 'meta.original': idSelector });
-
   return res.send({ message: 'OK' });
 };
 
@@ -1333,7 +1188,7 @@ const sendPdfLink = async (req, res) => {
   return res.send({ success: true });
 };
 
-export { sanitize, createSubmissionsToQSLs };
+export { sanitize };
 
 export default {
   getSubmissions,
@@ -1346,7 +1201,6 @@ export default {
   bulkReassignSubmissions,
   archiveSubmissions,
   deleteSubmissions,
-  prepareSubmissionsToQSLs,
   getSubmissionPdf,
   postSubmissionPdf,
   sendPdfLink,
