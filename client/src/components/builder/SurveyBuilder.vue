@@ -1032,8 +1032,15 @@ export default {
     this.checkForLibraryUpdates(this.surveyUnderWork);
 
     // case question set to new survey from question sets list
-    const { libId } = this.$route.query;
-    if (libId) this.addQuestionsFromLibrary(libId);
+    const { libId, lib } = this.$route.query;
+    if (lib) {
+      this.surveyUnderWork.meta.isLibrary = true;
+      this.surveyUnderWork.meta.libraryDescription = 'description';
+      this.surveyUnderWork.meta.libraryApplications = '';
+      this.surveyUnderWork.meta.libraryMaintainers = '';
+      this.surveyUnderWork.meta.libraryHistory = '';
+      this.surveyUnderWork.meta.libraryLastChangeType = '';
+    } else if (libId) this.addQuestionsFromLibrary(libId);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue

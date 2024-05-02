@@ -14,10 +14,14 @@
       questionSetsType
       :loading="state.loading"
       :entities="state.surveys.content"
-      :buttonNew="{
-        title: 'Create new Question Set',
-        link: { name: 'group-scripts-new', params: { id: getActiveGroupId() } }, // TODO set correct link
-      }"
+      :buttonNew="
+        rightToEdit().allowed
+          ? {
+              title: 'Create new Question Set',
+              link: { name: 'group-surveys-new', query: { lib: true } },
+            }
+          : false
+      "
       :menu="state.menu"
       :page="state.page">
       <template v-slot:title>
