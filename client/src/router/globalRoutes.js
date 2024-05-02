@@ -6,7 +6,7 @@ import store from '@/store';
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import AppInfo from '@/pages/app/AppInfo.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
-import GroupEdit from '@/pages/groups/GroupEdit.vue';
+import GroupEdit from '@/pages/groups/GroupSettingsEdit.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
 
 const guardLanding = async (to, from, next) => {

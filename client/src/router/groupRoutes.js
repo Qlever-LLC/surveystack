@@ -4,7 +4,7 @@ import SurveyList from '@/pages/surveys/SurveyList.vue';
 import QuestionSetList from '@/pages/surveys/QuestionSetList.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
-import GroupEdit from '@/pages/groups/GroupEdit.vue';
+import GroupSettingsEdit from '@/pages/groups/GroupSettingsEdit.vue';
 import Builder from '@/pages/builder/Builder.vue';
 import List from '@/pages/submissions/List.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
@@ -23,6 +23,22 @@ export const authGuard = async (to, from, next) => {
     next({ name: 'auth-login', query: { redirect: to.path } });
   } else {
     next();
+  }
+};
+
+export const groupAdminGuard = async (to, from, next) => {
+  if (!store.getters['auth/isLoggedIn']) {
+    next({ name: 'auth-login', query: { redirect: to.path } });
+  } else {
+    const memberships = store.getters['memberships/memberships'];
+    const groupId = to.params.id;
+    const isGroupAdmin = memberships.some((m) => m.group._id === groupId && m.role === 'admin');
+    if (isGroupAdmin) {
+      next(); //proceed
+    } else {
+      //redirect to the group page
+      next({ name: 'group', params: { id: groupId } });
+    }
   }
 };
 
@@ -80,6 +96,7 @@ export default [
       navigation: AppNavigationGroup,
       main: QuestionSetList,
     },
+    beforeEnter: groupAdminGuard, //TODO should non-admin users be able to view the script list?
   },
   //Scripts
   {
@@ -90,6 +107,7 @@ export default [
       navigation: AppNavigationGroup,
       main: ScriptList,
     },
+    beforeEnter: groupAdminGuard, //TODO should non-admin users be able to view the script list?
   },
   {
     path: '/groups/:id/scripts/new',
@@ -99,6 +117,7 @@ export default [
       navigation: AppNavigationGroup,
       main: ScriptEdit,
     },
+    beforeEnter: groupAdminGuard,
   },
   {
     path: '/groups/:id/scripts/:scriptId/edit',
@@ -108,6 +127,7 @@ export default [
       navigation: AppNavigationGroup,
       main: ScriptEdit,
     },
+    beforeEnter: groupAdminGuard,
   },
   {
     path: '/groups/:id/scripts/:scriptId',
@@ -117,6 +137,7 @@ export default [
       navigation: AppNavigationGroup,
       main: Script,
     },
+    //TODO beforeEnter: groupAdminGuard, <- restricts to admin, but should non-admin users be able to see the script?
   },
   {
     path: '/groups/:id/members',
@@ -126,6 +147,7 @@ export default [
       navigation: AppNavigationGroup,
       main: MembershipsPage,
     },
+    beforeEnter: groupAdminGuard,
   },
   {
     path: '/groups/:id/members/new',
@@ -135,6 +157,7 @@ export default [
       navigation: AppNavigationGroup,
       main: MembershipNew,
     },
+    beforeEnter: groupAdminGuard,
   },
   {
     path: '/groups/:id/members/:membershipId/edit',
@@ -144,6 +167,7 @@ export default [
       navigation: AppNavigationGroup,
       main: MembershipEdit,
     },
+    beforeEnter: groupAdminGuard,
   },
   {
     path: '/groups/:id/settings',
@@ -151,8 +175,9 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: GroupEdit,
+      main: GroupSettingsEdit,
     },
+    beforeEnter: groupAdminGuard,
   },
   //edit group resource
   {
@@ -166,7 +191,7 @@ export default [
     props: {
       isNew: false,
     },
-    beforeEnter: authGuard,
+    beforeEnter: groupAdminGuard,
   },
   {
     path: '/groups/:id/surveys/:surveyId/edit',
@@ -179,7 +204,7 @@ export default [
     props: {
       isNew: false,
     },
-    beforeEnter: authGuard,
+    beforeEnter: groupAdminGuard,
   },
 
   {

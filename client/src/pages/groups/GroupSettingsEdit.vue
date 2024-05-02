@@ -1,5 +1,5 @@
 <template>
-  <a-container class="bg-background">
+  <a-container>
     <app-dialog
       v-model="learnMoreDialog"
       title="Premium Features"
@@ -26,23 +26,19 @@
       </p>
     </app-dialog>
 
-    <div class="d-flex justify-space-between">
-      <h1>
-        <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
-        <a-chip v-if="isPremium" class="ml-2" color="success">
-          <a-icon small left> mdi-octagram </a-icon>Premium
-        </a-chip>
-      </h1>
-      <a-btn
-        v-if="editMode"
-        :disabled="!entity._id"
-        class="ma-2"
-        :to="`/call-for-submissions?group=${entity._id}`"
-        color="secondary">
-        <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
-      </a-btn>
-    </div>
-    <a-card :loading="isLoadingGroup" class="mb-4">
+    <a-card :loading="isLoadingGroup" color="background">
+      <a-card-title class="text-heading d-flex pa-4">
+        <a-col align="start" class="flex-grow-0">
+          <AppNavigationControl />
+        </a-col>
+        <a-col class="flex-grow-1 pl-0" :class="'text-center'">
+          <a-icon class="mr-2" :icon="editMode ? 'mdi-cog-outline' : 'mdi-account-group'" />
+          {{ editMode ? 'Edit group' : 'Create group' }}
+          <a-chip v-if="isPremium" class="ml-2" color="success" rounded="lg" variant="flat" disabled>
+            <a-icon small left> mdi-octagram </a-icon>Premium
+          </a-chip>
+        </a-col>
+      </a-card-title>
       <a-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
           <a-text-field
@@ -89,37 +85,27 @@
           </div>
         </form>
       </a-card-text>
+      <app-basic-list
+        class="ma-4"
+        v-if="editMode"
+        :entities="integrations"
+        title="Integrations"
+        :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
+        <template v-slot:entity="{ entity }">
+          <a-list-item-title>{{ entity.name }}</a-list-item-title>
+          <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
+        </template>
+      </app-basic-list>
+      <app-pinned-surveys
+        class="ma-4"
+        v-if="editMode"
+        :entities="entity.surveys.pinned"
+        :searchResults="searchResults"
+        @search="searchSurveys">
+      </app-pinned-surveys>
+
+      <app-doc-links class="ma-4" v-if="editMode" :group="entity"> </app-doc-links>
     </a-card>
-
-    <a-row>
-      <a-col cols="12" lg="12">
-        <app-basic-list
-          class="mb-4"
-          v-if="editMode"
-          :entities="integrations"
-          title="Integrations"
-          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
-          <template v-slot:entity="{ entity }">
-            <a-list-item-title>{{ entity.name }}</a-list-item-title>
-            <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
-          </template>
-        </app-basic-list>
-      </a-col>
-    </a-row>
-
-    <a-row>
-      <a-col cols="12" lg="12">
-        <app-pinned-surveys
-          class="mb-4"
-          v-if="editMode"
-          :entities="entity.surveys.pinned"
-          :searchResults="searchResults"
-          @search="searchSurveys">
-        </app-pinned-surveys>
-      </a-col>
-    </a-row>
-
-    <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
   </a-container>
 </template>
 
@@ -131,6 +117,8 @@ import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
+import AppNavigationControl from '@/components/AppNavigationControl.vue';
+import { useDisplay } from 'vuetify';
 
 const integrations = [
   {
@@ -147,6 +135,7 @@ const integrations = [
 
 export default {
   components: {
+    AppNavigationControl,
     appPinnedSurveys,
     appDocLinks,
     appBasicList,

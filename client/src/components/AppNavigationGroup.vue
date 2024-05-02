@@ -10,7 +10,7 @@
     <div class="content-width">
       <SubmissionNavigation />
       <SurveyNavigation />
-      <GroupAdminNavigation />
+      <GroupAdminNavigation v-if="rightToEdit().allowed" />
       <GroupDocsNavigation />
     </div>
   </a-navigation-drawer>
@@ -22,6 +22,9 @@ import SubmissionNavigation from '@/components/submissions/SubmissionNavigation.
 import SurveyNavigation from '@/components/survey/SurveyNavigation.vue';
 import GroupAdminNavigation from '@/components/groups/GroupAdminNavigation.vue';
 import GroupDocsNavigation from '@/components/groups/GroupDocsNavigation.vue';
+import { getPermission } from '@/utils/permissions';
+
+const { rightToEdit } = getPermission();
 
 const props = defineProps({
   fullWidth: {

@@ -15,7 +15,7 @@
       :loading="state.loading"
       :entities="state.surveys.content"
       enablePinned
-      :buttonNew="{ title: 'Create new Survey', link: { name: 'group-surveys-new' } }"
+      :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : false"
       :menu="state.menu"
       :page="state.page">
       <template v-slot:title>

@@ -2,7 +2,7 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 import Builder from '@/pages/builder/Builder.vue';
-import Group from '@/pages/groups/Group.vue';
+import GroupSettingsPage from '@/pages/groups/GroupSettingsPage.vue';
 import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
 import store from '@/store';
 
@@ -22,7 +22,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: Group,
+      main: GroupSettingsPage,
     },
   },
   {
