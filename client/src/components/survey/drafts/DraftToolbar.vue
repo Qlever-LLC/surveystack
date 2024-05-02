@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-toolbar color="grey-lighten-4" flat>
+    <a-toolbar flat class="bg-background">
       <div class="flex-grow-1 d-flex flex-row mx-4">
         <div class="flex-shrink-1 flex-grow-0 align-content-center">
           <AppNavigationControl />
