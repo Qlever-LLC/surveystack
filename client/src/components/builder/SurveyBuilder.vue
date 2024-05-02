@@ -1035,7 +1035,7 @@ export default {
     const { libId, lib } = this.$route.query;
     if (lib) {
       this.surveyUnderWork.meta.isLibrary = true;
-      this.surveyUnderWork.meta.libraryDescription = 'description';
+      this.surveyUnderWork.meta.libraryDescription = '';
       this.surveyUnderWork.meta.libraryApplications = '';
       this.surveyUnderWork.meta.libraryMaintainers = '';
       this.surveyUnderWork.meta.libraryHistory = '';
