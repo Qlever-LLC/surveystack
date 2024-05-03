@@ -31,21 +31,21 @@ export default {
     };
   },
   methods: {
-    clearAll() {
+    async clearAll() {
       try {
-        db.clearAllSubmissions();
+        await db.clearAllSubmissions();
       } catch (error) {
         console.log(error);
       }
 
       try {
-        db.clearAllSurveys();
+        await db.clearAllSurveys();
       } catch (error) {
         console.log(error);
       }
 
       try {
-        db.clearAllResources();
+        await db.clearAllResources();
       } catch (error) {
         console.log(error);
       }
@@ -58,7 +58,7 @@ export default {
         return;
       }
 
-      db.openDb(this.clearAll);
+      await this.clearAll();
 
       this.$router.push('/surveys/browse');
     },
