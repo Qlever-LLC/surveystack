@@ -157,6 +157,10 @@ body {
   display: none;
 }
 
+.minimal-ui .v-main {
+  padding-top: 0;
+}
+
 .white-space-nowrap {
   white-space: nowrap;
 }
