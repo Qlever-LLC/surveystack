@@ -1,8 +1,8 @@
 <template>
-  <v-container>
-    <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" clearable />
+  <a-container>
+    <a-text-field label="Search" v-model="q" append-inner-icon="mdi-magnify" clearable />
     <app-entity-list :entities="entities" collection="scripts" />
-  </v-container>
+  </a-container>
 </template>
 
 <script>

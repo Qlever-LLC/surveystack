@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!showInvalidPlatformModal">
+  <div v-if="!showInvalidPlatformModal" style="height: 100%">
     <survey-builder
       v-if="!loading.fetch"
       :key="sessionId"
@@ -14,17 +14,14 @@
       @onDelete="onDelete"
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
-      @show-version-dialog="versionsDialogIsVisible = true"
-    />
+      @show-version-dialog="versionsDialogIsVisible = true" />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" />
     </div>
     <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
-      <template>
-        A survey with id
-        <strong>{{ survey._id }}</strong> already exists. Do you want to generate a different id?
-      </template>
+      A survey with id
+      <strong>{{ survey._id }}</strong> already exists. Do you want to generate a different id?
     </app-dialog>
 
     <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="onDelete" width="400">
@@ -38,29 +35,28 @@
       @cancel="showOverrideModal = false"
       @confirm="onOverride"
       labelConfirm="Dismiss unpublished changes"
-      width="400"
-    >
+      width="400">
       <template v-slot:title>Confirm your action</template>
       You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
 
-    <v-dialog v-model="submitting" hide-overlay persistent width="300">
-      <v-card>
-        <v-card-text class="pa-4">
+    <a-dialog v-model="submitting" persistent width="300">
+      <a-card>
+        <a-card-text class="pa-4">
           <span>Submitting Builder</span>
-          <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+          <a-progress-linear class="mb-0" />
+        </a-card-text>
+      </a-card>
+    </a-dialog>
 
     <result-dialog
       v-model="showResult"
       :items="resultItems"
       title="Result of Submission"
-      additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      additionalMessage="<span class='text-caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
       :survey="survey"
       :submission="submission"
-    />
+      @close="showResult = false" />
 
     <result-dialog
       v-model="showApiComposeErrors"
@@ -68,40 +64,37 @@
       title="ApiCompose Errors"
       :survey="survey"
       :submission="submission"
-      @close="showApiComposeErrors = false"
-    />
+      @close="showApiComposeErrors = false" />
 
     <versions-dialog
       v-if="versionsDialogIsVisible"
       v-model="versionsDialogIsVisible"
       @cancel="versionsDialogIsVisible = false"
       :survey-id="survey._id"
-      @reload-survey="onReloadSurvey"
-    />
+      @reload-survey="onReloadSurvey" />
 
-    <v-snackbar v-model="showSnackbar" :timeout="4000">
-      {{ snackbarMessage | capitalize }}
-      <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
-    </v-snackbar>
+    <a-snackbar v-model="showSnackbar" :timeout="4000">
+      {{ capitalizeSnackbarMessage }}
+      <a-btn color="grey" variant="text" @click="showSnackbar = false">Close</a-btn>
+    </a-snackbar>
   </div>
   <div
     v-else
     class="d-flex justify-center align-center overlay-bg"
-    style="background: rgba(0, 0, 0, 0.45); height: 100%"
-  >
-    <v-card max-width="500">
-      <v-card-title>
-        <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
+    style="background: rgba(0, 0, 0, 0.45); height: 100%">
+    <a-card max-width="500">
+      <a-card-title>
+        <a-icon class="mr-2 text-error">mdi-close-octagon</a-icon>
         Unsupported browser
-      </v-card-title>
-      <!-- <v-alert type="error">
+      </a-card-title>
+      <!-- <a-alert type="error">
         Unsupported browser
-      </v-alert> -->
-      <v-card-text>
+      </a-alert> -->
+      <a-card-text>
         Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
         browser.
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </div>
 </template>
 
@@ -117,8 +110,9 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import { defineAsyncComponent } from 'vue';
 
-const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
+const SurveyBuilder = defineAsyncComponent(() => import('@/components/builder/SurveyBuilder.vue'));
 
 export default {
   components: {
@@ -162,6 +156,13 @@ export default {
     if (isIos() || isSafari()) {
       this.showInvalidPlatformModal = true;
     }
+  },
+  computed: {
+    capitalizeSnackbarMessage() {
+      if (!this.snackbarMessage) return '';
+      const v = this.snackbarMessage.toString();
+      return v.charAt(0).toUpperCase() + v.slice(1);
+    },
   },
   methods: {
     getActiveGroupSimpleObject() {
@@ -386,7 +387,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .overlay-bg {
   background-color: rgba(0, 0, 0, 0.45);
 }

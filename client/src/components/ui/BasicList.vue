@@ -1,39 +1,40 @@
 <template>
-  <v-card :loading="loading">
-    <v-card-title class="heading--text">
-      <slot name="title">
-        {{ title }}
-      </slot>
-      <v-spacer />
+  <a-card :loading="loading">
+    <a-card-title class="text-heading d-flex pa-4">
+      <slot name="title"> {{ title }} </slot>
+      <a-spacer />
       <slot name="actions" v-if="editable">
-        <v-btn color="primary" class="ml-4" :to="linkNew" text>{{ labelNew }}</v-btn>
+        <a-btn color="primary" class="ml-4" :to="linkNew" variant="text">{{ labelNew }}</a-btn>
       </slot>
-    </v-card-title>
-    <v-card-text>
-      <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
-      <v-list
+    </a-card-title>
+    <a-card-text>
+      <a-text-field label="Search" v-model="q" append-inner-icon="mdi-magnify" v-if="searchable" />
+      <a-list
         v-if="entities.length > 0"
         :style="{
           'max-height': maxHeight || 'initial',
           'overflow-y': 'auto',
-        }"
-      >
+        }">
         <div v-for="(entity, idx) in filteredEntities" :key="idx">
-          <v-list-item two-line :to="link(entity)">
+          <a-list-item two-line :to="link(entity)">
+            <template v-slot:prepend>
+              <slot name="prepend" v-bind:entity="entity" />
+            </template>
+            <template v-slot:append>
+              <slot name="append" v-bind:entity="entity" />
+            </template>
             <slot name="entity" v-bind:entity="entity">
-              <v-list-item-content>
-                <v-list-item-title>Title #{{ idx }}</v-list-item-title>
-                <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
-              </v-list-item-content>
+              <a-list-item-title>Title #{{ idx }}</a-list-item-title>
+              <a-list-item-subtitle>Subtitle</a-list-item-subtitle>
             </slot>
-          </v-list-item>
-          <v-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
+          </a-list-item>
+          <a-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
         </div>
-      </v-list>
+      </a-list>
 
-      <div v-else class="grey--text">No {{ title }} yet</div>
-    </v-card-text>
-  </v-card>
+      <div v-else class="text-grey">No {{ title }} yet</div>
+    </a-card-text>
+  </a-card>
 </template>
 
 <script>
@@ -78,6 +79,7 @@ export default {
       type: Function,
     },
   },
+
   computed: {
     filteredEntities() {
       if (this.filter) {

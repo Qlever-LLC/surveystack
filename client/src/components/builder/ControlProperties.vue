@@ -1,454 +1,509 @@
 <template>
   <div class="property-panel">
-    <v-card-title class="pl-0">Properties</v-card-title>
-    <v-form v-if="control">
+    <a-card-title class="pl-0">Properties</a-card-title>
+    <a-form v-if="controlInProgress">
       <!-- Default properties -->
-      <v-text-field v-model="control.label" label="Label" hide-details />
-      <v-text-field
-        v-model="control.name"
+      <a-text-field v-model="controlInProgress.label" label="Label" hide-details />
+      <a-text-field
+        v-model="controlInProgress.name"
         label="Value"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        hide-details
-      />
-      <v-text-field v-model="control.hint" label="Hint" hide-details />
+        hide-details />
+      <a-text-field v-model="controlInProgress.hint" label="Hint" hide-details />
       <markdown-editor
-        v-model="control.moreInfo"
+        v-model="controlInProgress.moreInfo"
         :resources="survey.resources"
         label="More info"
         placeholder="Add more info here"
         class="mt-6"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-      >
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)">
         <template #title>More info (markdown supported)</template>
       </markdown-editor>
 
       <!-- Control properties -->
-      <v-text-field
+      <a-text-field
         v-if="isText"
-        v-model="control.defaultValue"
+        v-model="controlInProgress.defaultValue"
         @blur="handleDefaultValueTrim"
         label="Default value"
-        hide-details
-      />
-      <v-text-field
+        hide-details />
+      <a-text-field
         v-if="isNumber"
         type="number"
-        v-model="control.defaultValue"
+        v-model="controlInProgress.defaultValue"
         @blur="handleDefaultValueTrimNumber"
         label="Default value"
         hide-details="auto"
         :rules="[isValidNumber]"
         clearable
-        @click:clear="setToNull"
-      />
+        @click:clear="setToNull" />
       <instructions-editor
         v-if="isInstructions"
-        v-model="control.options.source"
+        v-model="controlInProgress.options.source"
         class="mt-6"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      />
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        " />
       <instructions-image-split-editor
         v-if="isInstructionsImageSplit"
-        v-model="control.options.source"
+        v-model="controlInProgress.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        @set-control-source="(val) => $emit('set-control-source', val)"
-      />
-      <v-select
+        @set-control-source="(val) => $emit('set-control-source', val)" />
+      <a-select
         v-if="isDate"
         :items="dateTypes"
+        item-title="text"
+        item-value="value"
         label="Type"
-        v-model="control.options.subtype"
-        @input="() => (control.defaultValue = null)"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        hide-details
-      />
+        v-model="controlInProgress.options.subtype"
+        @update:modelValue="() => (controlInProgress.defaultValue = null)"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
+        hide-details />
       <select-items-editor
         v-if="isSelect"
-        v-model="control.options.source"
-        @set-control-source="() => (control.defaultValue = null)"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        class="mt-3"
-      />
+        v-model="controlInProgress.options.source"
+        @update:modelValue="controlInProgress.defaultValue = null"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
+        class="mt-3" />
       <ontology-properties
         v-if="isOntology"
-        :value="control.options.source"
+        :value="controlInProgress.options.source"
         :resources="survey.resources"
-        :disable-selection="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disable-selection="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         @set-control-source="(val) => $emit('set-control-source', val)"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-      />
-      <v-text-field
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)" />
+      <a-text-field
         v-if="isMatrix"
-        v-model="control.options.source.config.addRowLabel"
+        v-model="controlInProgress.options.source.config.addRowLabel"
         label="Add Row label"
-        hide-details
-      />
+        hide-details />
       <matrix-properties
         v-if="isMatrix"
-        v-model="control.options.source"
+        v-model="controlInProgress.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         :allowSetAllowHide="!!survey.meta.isLibrary"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        @set-control-required="control.options.required = true"
-        class="mt-3"
-      />
-      <v-select
-        v-if="this.control.type === 'file'"
+        @set-control-required="controlInProgress.options.required = true"
+        class="mt-3" />
+      <a-select
+        v-if="controlInProgress.type === 'file'"
         label="Restrict uploaded file types (.csv, .pdf, etc.)"
-        v-model="control.options.source.types"
+        v-model="controlInProgress.options.source.types"
         :items="fileTypes"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        item-title="text"
+        item-value="value"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         multiple
         chips
         clearable
-        deletable-chips
-        hide-details
-      />
-      <v-autocomplete
+        closable-chips
+        hide-details />
+      <a-select
         v-if="isScript"
-        label="Script Source"
         v-model="scriptSourceId"
-        :items="scriptSourceItems"
-        item-text="name"
-        item-value="_id"
-        append-outer-icon="mdi-open-in-new"
-        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
+        @update:modelValue="handleScriptSourceChange"
+        @click:append="() => $emit('set-script-editor-is-visible', true)"
         @focus="handleScriptSourceFocus"
-        @change="handleScriptSourceChange"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        append-icon="mdi-open-in-new"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         hide-details
-      >
+        :items="scriptSourceItems"
+        item-title="name"
+        item-value="_id"
+        label="Script Source"
+        selectionSlot>
         <template v-slot:selection="{ item }">
-          <div>{{ item.name }}</div>
+          <div>{{ item.title }}</div>
         </template>
-      </v-autocomplete>
-      <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
+      </a-select>
+      <a-text-field
+        v-if="isScript"
+        v-model="controlInProgress.options.buttonLabel"
+        label="Run Button Label"
+        hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
-      <v-textarea
+      <a-textarea
         v-if="isScript"
         v-model="scriptParams"
-        @input="handleScriptParamsChange"
+        @update:modelValue="handleScriptParamsChange"
         label="Parameters"
         :rules="[validateScriptParams]"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         class="pt-3"
-        hide-details
-      />
-      <v-combobox
+        hide-details />
+      <a-select
+        allowCustomItem
         v-if="isFarmOsUuid"
         label="FarmOS Type"
-        v-model="control.options.farmOsType"
-        @input="handleFarmOsTypeChange"
-        :items="control.options.farmOsTypes"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      />
-      <checkbox
-        v-if="control.type === 'ontology'"
-        class="ml-2"
+        v-model="controlInProgress.options.farmOsType"
+        @update:modelValue="handleFarmOsTypeChange"
+        :items="controlInProgress.options.farmOsTypes"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        " />
+      <ontology
+        v-if="isOntology && !!controlInProgress.options.hasMultipleSelections"
+        v-model="controlInProgress.defaultValue"
+        :multiple="controlInProgress.options.hasMultipleSelections"
+        :customAnswer="controlInProgress.options.allowCustomSelection"
+        :source="controlInProgress.options.source"
+        :resources="survey.resources" />
+      <ontology
+        v-if="isOntology && !controlInProgress.options.hasMultipleSelections"
+        v-model="controlInProgress.defaultValue"
+        :multiple="controlInProgress.options.hasMultipleSelections"
+        :customAnswer="controlInProgress.options.allowCustomSelection"
+        :source="controlInProgress.options.source"
+        :resources="survey.resources" />
+      <date
+        v-if="isDate && controlInProgress.options.subtype"
+        v-model="controlInProgress.defaultValue"
+        @update:modelValue="$forceUpdate()"
+        @blur="handleDefaultValueTrim"
+        :type="controlInProgress.options.subtype"
+        class="mt-3" />
+      <select-items
+        v-if="isSelect && controlInProgress.options.source"
+        v-model="controlInProgress.defaultValue"
+        @blur="handleDefaultValueTrim"
+        :items="controlInProgress.options.source"
+        :custom="controlInProgress.options.allowCustomSelection"
+        :multiple="controlInProgress.type === 'selectMultiple'"
+        class="mt-3" />
+
+      <!-- Control options -->
+      <a-spacer />
+      <a-checkbox
+        v-if="isOntology"
+        class="align-center align-self-start"
+        color="grey-darken-1"
+        hide-details="auto"
         label="Multiple select"
-        v-model="control.options.hasMultipleSelections"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        dense
-      />
-      <checkbox
+        v-model="controlInProgress.options.hasMultipleSelections"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        " />
+      <a-checkbox
         v-if="isSelect || isOntology"
-        class="ml-2"
+        class="align-center align-self-start"
+        color="grey-darken-1"
+        hide-details="auto"
         label="Allow custom answer"
-        v-model="control.options.allowCustomSelection"
-        @input="
-          () => {
-            control.options.allowAutocomplete = true;
-            control.defaultValue = null;
-          }
-        "
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        dense
-      >
-        <template slot="helper-text">
+        v-model="controlInProgress.options.allowCustomSelection"
+        @update:modelValue="controlInProgress.defaultValue = null"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        ">
+        <template v-slot:helper-text>
           Allows the user to input answers that do not exist within the provided items.
           <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
         </template>
-      </checkbox>
-      <checkbox
-        v-if="isOntology"
-        class="ml-2"
-        label="Autocomplete"
-        v-model="control.options.allowAutocomplete"
-        :disabled="
-          (!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot) ||
-          control.options.allowCustomSelection
-        "
-        helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
-        dense
-      />
-      <ontology
-        v-if="isOntology"
-        v-model="control.defaultValue"
-        :multiple="control.options.hasMultipleSelections"
-        :customAnswer="control.options.allowCustomSelection"
-        :autocomplete="control.options.allowAutocomplete"
-        :source="control.options.source"
-        :resources="survey.resources"
-      />
-      <date
-        v-if="isDate && control.options.subtype"
-        v-model="control.defaultValue"
-        @input="() => $forceUpdate()"
-        @blur="handleDefaultValueTrim"
-        :type="control.options.subtype"
-        class="mt-3"
-      />
-      <select-items
-        v-if="isSelect && control.options.source"
-        v-model="control.defaultValue"
-        @blur="handleDefaultValueTrim"
-        :items="control.options.source"
-        :custom="control.options.allowCustomSelection"
-        :multiple="control.type === 'selectMultiple'"
-        class="mt-3"
-      />
-
-      <!-- Control options -->
-      <v-spacer></v-spacer>
-      <checkbox
+      </a-checkbox>
+      <a-checkbox
         v-if="hasRequiredOption"
         label="Required"
-        v-model="control.options.required"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.required"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         helper-text="Make this a required field"
-      />
-      <checkbox
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
         label="Private"
-        v-model="control.options.redacted"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        v-model="controlInProgress.options.redacted"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
         helper-text="Only admins and original submitters can see this field"
-      />
-      <checkbox
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
         v-if="isPage"
         label="Compact"
-        v-model="control.options.compact"
+        v-model="controlInProgress.options.compact"
         helper-text="Reduce the spaces and combine fields into one card"
-      />
-      <checkbox
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
         v-if="isText"
         label="QR Code"
-        v-model="control.options.enableQr"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
-      />
-      <checkbox
-        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
+        v-model="controlInProgress.options.enableQr"
+        :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
+        v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow modify"
-        v-model="control.options.allowModify"
+        v-model="controlInProgress.options.allowModify"
         helper-text="Allow users of this question set to modify this question"
-      />
-      <checkbox
-        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
+        v-if="survey.meta.isLibrary && !controlInProgress.libraryIsInherited && !controlInProgress.libraryId"
         label="Allow hide"
-        v-model="control.options.allowHide"
+        v-model="controlInProgress.options.allowHide"
         helper-text="Allow users of this question set to hide this question"
-      />
-      <checkbox
-        v-if="control.libraryId && control.options.allowHide"
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
+        v-if="controlInProgress.libraryId && controlInProgress.options.allowHide"
         label="Hidden"
-        v-model="control.options.hidden"
+        v-model="controlInProgress.options.hidden"
         helper-text="Submitters can not see this field. This option is intentionally allowed by the question set designer"
-      />
-      <checkbox
-        v-if="control.type === 'farmOsPlanting' || control.type === 'farmOsFarm' || control.type === 'farmOsField'"
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
+        v-if="
+          controlInProgress.type === 'farmOsPlanting' ||
+          controlInProgress.type === 'farmOsFarm' ||
+          controlInProgress.type === 'farmOsField'
+        "
         label="Multiple select"
-        v-model="control.options.hasMultipleSelections"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      />
-      <checkbox
+        v-model="controlInProgress.options.hasMultipleSelections"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
         v-if="isFile"
         label="Multiple upload"
-        v-model="control.options.source.allowMultiple"
+        v-model="controlInProgress.options.source.allowMultiple"
         helper-text="Allow user to upload multiple files"
-      />
-      <checkbox
-        v-if="control.type === 'script'"
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
+        v-if="controlInProgress.type === 'script'"
         label="Native Script"
-        v-model="control.options.isNativeScript"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        v-model="controlInProgress.options.isNativeScript"
+        :disabled="!!controlInProgress.libraryId && !controlInProgress.isLibraryRoot"
         helper-text="Show Download Link for Surveystack Kit APK"
-      />
+        color="grey-darken-1"
+        class="align-center align-self-start" />
       <template v-if="isGeoJSON">
-        <checkbox
+        <a-checkbox
           v-for="opt in geoJsonOptions"
           :key="opt.key"
           :label="opt.text"
-          v-model="control.options.geoJSON[opt.key]"
-        />
+          v-model="controlInProgress.options.geoJSON[opt.key]"
+          color="grey-darken-1"
+          class="align-center align-self-start" />
       </template>
 
       <!-- Advanced properties -->
-      <v-btn
+      <a-btn
         v-if="!showAdvanced && !hasExpressionEnabled"
-        color="grey darken-1"
+        color="grey-darken-1"
         class="align-self-end"
         @click="showAdvanced = true"
         small
-        text
-      >
+        variant="text">
         advanced
-      </v-btn>
+      </a-btn>
       <div v-else class="extra-options">
-        <v-spacer></v-spacer>
+        <a-spacer />
         <div>
-          <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
-          <v-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</v-icon>
+          <a-card-title class="px-0 py-0">Advanced Options</a-card-title>
+          <a-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</a-icon>
         </div>
 
         <div>
-          <checkbox
+          <a-checkbox
             label="Relevance Expression"
             v-model="relevance.enabled"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          />
-          <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
+            :disabled="
+              !!controlInProgress.libraryId &&
+              !controlInProgress.options.allowModify &&
+              !controlInProgress.isLibraryRoot
+            "
+            color="grey-darken-1"
+            class="align-center align-self-start" />
+          <a-icon color="grey-darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
         <div v-if="isText || isNumber || isDate || isMatrix || isOntology || isSelect">
-          <checkbox
+          <a-checkbox
             label="Initialize Expression"
             v-model="initialize.enabled"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-initialize')" size="20">
-            mdi-open-in-new
-          </v-icon>
+            :disabled="
+              !!controlInProgress.libraryId &&
+              !controlInProgress.options.allowModify &&
+              !controlInProgress.isLibraryRoot
+            "
+            color="grey-darken-1"
+            class="align-center align-self-start" />
+          <a-icon color="grey-darken-1" @click="$emit('code-initialize')" size="20"> mdi-open-in-new </a-icon>
         </div>
 
         <!-- TODO not implemented yet - decide to implement or remove-->
         <!--div>
-          <checkbox
+          <a-checkbox
             label="Calculate Expression"
             v-model="calculate.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            color="grey-darken-1"
+            class="align-center align-self-start"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
+          <a-icon class="align-self-start" color="grey-darken-1" @click="$emit('code-calculate')" size="20">
             mdi-open-in-new
+          </a-icon>
+        </div>
+
+        <div>
           </v-icon>
         </div-->
         <!--div>
-          <checkbox
+          <a-checkbox
             label="Constraint Expression"
             v-model="constraint.enabled"
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+            color="grey-darken-1"
+            class="align-center align-self-start"
           />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
+          <a-icon class="align-self-start" color="grey-darken-1" @click="$emit('code-constraint')" size="20">
             mdi-open-in-new
-          </v-icon>
+          </a-icon>
         </div-->
 
         <div>
-          <checkbox
+          <a-checkbox
             label="Api Compose Expression"
             v-model="apiCompose.enabled"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')" size="20">
-            mdi-open-in-new
-          </v-icon>
+            :disabled="
+              !!controlInProgress.libraryId &&
+              !controlInProgress.options.allowModify &&
+              !controlInProgress.isLibraryRoot
+            "
+            color="grey-darken-1"
+            class="align-center align-self-start" />
+          <a-icon color="grey-darken-1" @click="$emit('code-api-compose')" size="20"> mdi-open-in-new </a-icon>
         </div>
       </div>
 
       <!-- Print layout -->
       <template v-if="hasLayoutOptions">
-        <v-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
+        <a-btn
+          v-if="!showLayout"
+          color="grey-darken-1"
+          class="align-self-end"
+          @click="showLayout = true"
+          small
+          variant="text">
           Print Layout
-        </v-btn>
+        </a-btn>
         <div v-else class="extra-options">
-          <v-spacer></v-spacer>
+          <a-spacer />
           <div>
-            <v-card-title class="px-0 py-0">Print Layout</v-card-title>
-            <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
+            <a-card-title class="px-0 py-0">Print Layout</a-card-title>
+            <a-icon @click.stop="showLayout = false">mdi-close</a-icon>
           </div>
 
           <div v-if="isMatrix">
-            <checkbox
+            <a-checkbox
               label="Table format"
-              v-model="control.options.printLayout.table"
+              v-model="controlInProgress.options.printLayout.table"
               helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
-            />
+              color="grey-darken-1"
+              class="align-center align-self-start" />
           </div>
 
           <div v-if="isFile">
-            <checkbox
+            <a-checkbox
               label="Show preview"
-              v-model="control.options.printLayout.preview"
+              v-model="controlInProgress.options.printLayout.preview"
               helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
-            />
+              color="grey-darken-1"
+              class="align-center align-self-start" />
           </div>
 
           <template v-if="isSelect || isOntology">
             <div>Blank Survey (from title page)</div>
             <div class="mt-2">
-              <checkbox
+              <a-checkbox
                 label="Show all resource list options"
-                v-model="control.options.printLayout.showAllOptionsPrintable"
+                v-model="controlInProgress.options.printLayout.showAllOptionsPrintable"
                 helper-text="Show the complete list of possible options when printing a fresh survey"
-              />
+                color="grey-darken-1"
+                class="align-center align-self-start" />
             </div>
 
             <div>Filled Submission</div>
             <div class="mt-2">
-              <checkbox
+              <a-checkbox
                 label="Show all resource list options"
-                v-model="control.options.printLayout.showAllOptions"
+                v-model="controlInProgress.options.printLayout.showAllOptions"
                 helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
-              />
+                color="grey-darken-1"
+                class="align-center align-self-start" />
             </div>
 
-            <v-select
+            <a-select
               label="Answer layout"
-              v-model="control.options.printLayout.columns"
+              v-model="controlInProgress.options.printLayout.columns"
               :items="[1, 2, 3, 4, 5]"
               color="focus"
               :menu-props="{ contentClass: 'layout-select' }"
               hide-details
-            >
-              <template v-slot:selection="{ item, index }">
-                {{ item === 1 ? '1 column' : `${item} columns` }}
+              selectionSlot
+              itemSlot
+              appendSlot>
+              <template v-slot:selection="{ item }">
+                {{ item.value === 1 ? '1 column' : `${item.value} columns` }}
               </template>
 
-              <template v-slot:item="{ item, on, attrs }">
-                <div class="d-flex align-center col">
-                  <div class="col-label">
-                    {{ item === 1 ? '1 column' : `${item} columns` }}
-                  </div>
-                  <div class="ml-2" :class="`col-item cols-${item}`" v-on="on" v-bind="attrs">
-                    <div v-for="letter in 'ABCDE'.split('')" :key="letter">
-                      {{ letter }}
+              <template v-slot:item="{ props, item }">
+                <a-list-item>
+                  <a-list-item-title v-bind="props">
+                    <div class="d-flex align-center col">
+                      <div class="col-label">
+                        {{ item.value === 1 ? '1 column' : `${item.value} columns` }}
+                      </div>
+                      <div class="ml-2" :class="`col-item cols-${item.value}`">
+                        <div v-for="letter in 'ABCDE'.split('')" :key="letter">
+                          {{ letter }}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </a-list-item-title>
+                </a-list-item>
               </template>
 
-              <template #append-outer>
-                <v-tooltip max-width="400" transition="slide-x-transition" right>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
-                  </template>
-                  Set the number of items in a row
-                </v-tooltip>
+              <template #append>
+                <a-icon size="20" tooltip="Set the number of items in a row">mdi-help-circle-outline</a-icon>
               </template>
-            </v-select>
+            </a-select>
           </template>
         </div>
       </template>
 
-      <v-spacer></v-spacer>
-    </v-form>
+      <a-spacer />
+    </a-form>
   </div>
 </template>
 <script>
-import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
+import { findParentByChildId, getAdvancedCodeTemplate } from '@/utils/surveys';
 import { nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 import SelectItems from '@/components/builder/SelectItems.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
@@ -458,8 +513,8 @@ import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/ui/Checkbox.vue';
 import MarkdownEditor from '@/components/builder/MarkdownEditor.vue';
+
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
@@ -474,7 +529,7 @@ export default {
     InstructionsImageSplitEditor,
     Ontology,
     Date,
-    Checkbox,
+
     MarkdownEditor,
   },
   props: {
@@ -554,55 +609,58 @@ export default {
     };
   },
   computed: {
+    controlInProgress() {
+      return this.control;
+    },
     controlNames() {
       return this.controls.map((control) => control.name);
     },
     isGroup() {
-      return this.control.type === 'group';
+      return this.controlInProgress.type === 'group';
     },
     isFile() {
-      return this.control.type === 'file' || this.control.type === 'image';
+      return this.controlInProgress.type === 'file' || this.controlInProgress.type === 'image';
     },
     isDate() {
-      return this.control.type === 'date';
+      return this.controlInProgress.type === 'date';
     },
     isText() {
-      return this.control.type === 'string';
+      return this.controlInProgress.type === 'string';
     },
     isNumber() {
-      return this.control.type === 'number';
+      return this.controlInProgress.type === 'number';
     },
     isScript() {
-      return this.control.type === 'script';
+      return this.controlInProgress.type === 'script';
     },
     isInstructions() {
-      return this.control.type === 'instructions';
+      return this.controlInProgress.type === 'instructions';
     },
     isSelect() {
-      return /select/i.test(this.control.type);
+      return /select/i.test(this.controlInProgress.type);
     },
     isOntology() {
-      return this.control.type === 'ontology';
+      return this.controlInProgress.type === 'ontology';
     },
     isMatrix() {
-      return this.control.type === 'matrix';
+      return this.controlInProgress.type === 'matrix';
     },
     isGeoJSON() {
-      return this.control.type === 'geoJSON';
+      return this.controlInProgress.type === 'geoJSON';
     },
     isInstructionsImageSplit() {
-      return this.control.type === 'instructionsImageSplit';
+      return this.controlInProgress.type === 'instructionsImageSplit';
     },
     isPage() {
-      return this.control.type === 'page';
+      return this.controlInProgress.type === 'page';
     },
     isFarmOsUuid() {
-      return this.control.type === 'farmOsUuid';
+      return this.controlInProgress.type === 'farmOsUuid';
     },
     hasRequiredOption() {
       return (
-        this.control.options.required ||
-        !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
+        this.controlInProgress.options.required ||
+        !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.controlInProgress.type)
       );
     },
     hasExpressionEnabled() {
@@ -621,8 +679,8 @@ export default {
   methods: {
     nameIsUnique() {
       const hasSameNameAndDifferentId = (control) =>
-        control.name === this.control.name && control.id !== this.control.id;
-      const parent = findParentByChildId(this.control.id, this.controls);
+        control.name === this.controlInProgress.name && control.id !== this.controlInProgress.id;
+      const parent = findParentByChildId(this.controlInProgress.id, this.controls);
 
       const controlsWithSameName = parent
         ? parent.children.filter(hasSameNameAndDifferentId)
@@ -673,11 +731,11 @@ export default {
       }
     },
     handleDefaultValueTrim() {
-      const value = this.control.defaultValue;
-      this.control.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+      const value = this.controlInProgress.defaultValue;
+      this.controlInProgress.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
     },
     handleFarmOsTypeChange(type) {
-      this.control.options.farmOsType = getValueOrNull(type);
+      this.controlInProgress.options.farmOsType = getValueOrNull(type);
     },
     validateScriptParams(params) {
       try {
@@ -708,31 +766,34 @@ export default {
     },
     getScriptParams() {
       return (
-        (this.control && this.control.options && JSON.stringify(this.control.options.params)) || JSON.stringify({})
+        (this.controlInProgress &&
+          this.controlInProgress.options &&
+          JSON.stringify(this.controlInProgress.options.params)) ||
+        JSON.stringify({})
       );
     },
     updateScript() {
       if (this.isScript) {
         this.fetchScripts();
       }
-      const scriptResource = this.survey.resources.find((r) => r.id === this.control.options.source);
+      const scriptResource = this.survey.resources.find((r) => r.id === this.controlInProgress.options.source);
       if (scriptResource) {
         this.scriptSourceId = scriptResource.content;
       } else {
         //fallback to directly using script id in case of legacy survey
-        this.scriptSourceId = this.control.options.source;
+        this.scriptSourceId = this.controlInProgress.options.source;
       }
       this.scriptParams = this.getScriptParams();
     },
   },
   watch: {
-    'control.name': {
+    'controlInProgress.name': {
       handler(newVal) {
         const key = convertToKey(newVal);
-        this.control.name = key;
+        this.controlInProgress.name = key;
       },
     },
-    'control.id': {
+    'controlInProgress.id': {
       handler(newVal, oldVal) {
         if (this.isScript && newVal !== oldVal) {
           this.updateScript();
@@ -746,7 +807,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .property-panel form {
   display: flex;
   flex-direction: column;
@@ -756,6 +817,9 @@ export default {
 .property-panel form > * + *,
 .property-panel form > .extra-options > * + * {
   margin-top: 16px;
+}
+.property-panel form > .v-checkbox {
+  margin-top: 0;
 }
 
 .property-panel form > .ml-2 + .ml-2 {
@@ -770,14 +834,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.property-panel form > .extra-options .v-input--selection-controls {
   margin-top: 0;
-}
-
-.property-panel .v-input--selection-controls {
-  padding-top: 0;
 }
 
 .layout-select .v-list-item > div.col {
@@ -785,40 +842,40 @@ export default {
   white-space: nowrap;
 }
 
-.layout-select .v-list-item > div.col > .col-label {
+.col-label {
   width: 80px;
 }
 
-.layout-select .v-list-item > div.col > .col-item {
+.col-item {
   flex-grow: 1;
   padding: 8px;
   display: grid;
   gap: 8px;
 }
 
-.layout-select .v-list-item > div.col > .col-item > * {
+.col-item > * {
   border: 2px solid #bdbdbd;
   text-align: center;
   padding: 2px;
 }
 
-.layout-select .v-list-item > div.col > .col-item.cols-1 {
+.col-item.cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-.layout-select .v-list-item > div.col > .col-item.cols-2 {
+.col-item.cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.layout-select .v-list-item > div.col > .col-item.cols-3 {
+.col-item.cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.layout-select .v-list-item > div.col > .col-item.cols-4 {
+.col-item.cols-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.layout-select .v-list-item > div.col > .col-item.cols-5 {
+.col-item.cols-5 {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 </style>

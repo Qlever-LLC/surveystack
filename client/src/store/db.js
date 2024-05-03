@@ -1,4 +1,5 @@
 import { openDB } from 'idb';
+import { isProxy, toRaw } from 'vue';
 
 const DATABASE_NAME = 'Database';
 const stores = {
@@ -45,7 +46,7 @@ function clearAllResources() {
 }
 
 async function persist(storeName, obj) {
-  return (await db).put(storeName, obj);
+  return (await db).put(storeName, isProxy(obj) ? toRaw(obj): obj);
 }
 function persistSubmission(submission) {
   return persist(stores.SUBMISSIONS, submission);

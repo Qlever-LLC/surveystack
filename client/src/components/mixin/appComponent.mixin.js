@@ -1,5 +1,5 @@
 export default {
-  beforeDestroy() {
+  beforeUnmount() {
     this.$store.dispatch('appui/reset');
   },
   methods: {

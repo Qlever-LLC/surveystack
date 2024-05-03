@@ -6,50 +6,39 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
-    <v-autocomplete
+      @initialize="initialize" />
+    <a-select
       :disabled="loading"
-      :value="getValue"
-      @change="onChange"
+      :modelValue="getValue"
+      @update:modelValue="onChange"
       :items="farms || []"
-      item-text="label"
+      item-title="label"
       item-value="value"
-      outlined
+      variant="outlined"
       :label="control.hint"
-      :chips="this.control.options.hasMultipleSelections"
-      :multiple="this.control.options.hasMultipleSelections"
+      :multiple="control.options.hasMultipleSelections"
       @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
       clearable
-    >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
-          close
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          @click="data.select"
-          @click:close="remove(data.item)"
-        >
-          <template v-slot:default>
-            <span v-html="data.item.label" />
-          </template>
-        </v-chip>
+      :selectionSlot="!control.options.hasMultipleSelections"
+      :chipSlot="control.options.hasMultipleSelections"
+      itemSlot
+      cssFlexWrap>
+      <template v-slot:selection="{ props, item }">
+        <span v-bind="props" v-html="item.raw.label" />
       </template>
-      <template v-slot:selection="{ item }" v-else>
-        <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
+      <template v-slot:chip="{ props, item }">
+        <a-chip v-bind="props" closable style="height: 35px">
+          <span v-html="item.raw.label" />
+        </a-chip>
       </template>
-
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-        <v-list-item-content>
-          <v-list-item-title v-html="data.item.label" />
-        </v-list-item-content>
+      <template v-slot:item="{ props, item }">
+        <a-list-item v-bind="props" :title="undefined">
+          <a-list-item-title v-html="item.raw.label" />
+        </a-list-item>
       </template>
-      <template v-slot:item="{ item }" v-else>
-        <div v-html="item.label"></div>
-      </template>
-    </v-autocomplete>
+    </a-select>
 
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -60,24 +49,19 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
+  mixins: [baseQuestionComponent, farmosBase],
+
   async created() {
     await this.fetchAreas();
   },
 };
 </script>
 
-<style scoped>
->>> .v-select__selections {
-  flex-wrap: wrap !important;
-}
-
-div >>> .blue-chip,
-div >>> .orange-chip,
-div >>> .green-chip {
+<style scoped lang="scss">
+:deep(.blue-chip, .orange-chip, .green-chip) {
   display: inline-flex;
-  border: 1px var(--v-focus-base) solid;
-  color: var(--v-focus-base);
+  border: 1px rgb(var(--v-theme-focus)) solid;
+  color: rgb(var(--v-theme-focus));
   border-radius: 0.6rem;
   font-weight: bold;
   font-size: 80%;
@@ -90,17 +74,17 @@ div >>> .green-chip {
   margin-right: 0.2rem !important;
 }
 
-div >>> .green-chip {
+:deep(.green-chip) {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-div >>> .orange-chip {
+:deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
 }
 
->>> .v-list-item.v-list-item--active {
-  color: var(--v-focus-base) !important;
+:deep(.v-list-item.v-list-item--active) {
+  color: rgb(var(--v-theme-focus)) !important;
 }
 </style>

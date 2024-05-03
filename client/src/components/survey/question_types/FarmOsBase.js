@@ -1,7 +1,7 @@
 import { getValueOrNull } from '@/utils/surveyStack';
 import { linearControls } from '@/utils/submissions';
 
-const base = () => ({
+export default {
   data() {
     return {
       loading: false,
@@ -22,7 +22,7 @@ const base = () => ({
     },
     remove(item) {
       const isNotItem = (v) => JSON.stringify(v) !== JSON.stringify(item.value);
-      this.changed(this.getValueOrNull(this.value.filter(isNotItem)));
+      this.changed(this.getValueOrNull(this.modelValue.filter(isNotItem)));
     },
     getLabelForItemValue(value) {
       const item = this.farms.find((x) => x.value === value);
@@ -203,10 +203,10 @@ const base = () => ({
   },
   computed: {
     getArrayValue() {
-      return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      return Array.isArray(this.modelValue) ? this.modelValue : this.modelValue ? [this.modelValue] : [];
     },
     getValue() {
-      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.value;
+      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.modelValue;
     },
     sourceIsValid() {
       return (
@@ -217,6 +217,4 @@ const base = () => ({
       );
     },
   },
-});
-
-export default base;
+};

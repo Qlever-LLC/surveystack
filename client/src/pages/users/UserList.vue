@@ -1,28 +1,21 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center">
       <h1>Browse Users</h1>
 
-      <v-btn to="/users/new" color="primary">ADD</v-btn>
+      <a-btn to="/users/new" color="primary">ADD</a-btn>
     </div>
 
-    <v-card>
+    <a-card>
       <div v-for="e in entities" :key="e._id">
-        <v-list-item :to="`/users/${e._id}`">
-          <v-list-item-content>
-            <v-list-item-title>{{ e.email }}</v-list-item-title>
-            <v-list-item-subtitle>{{ e.name }}</v-list-item-subtitle>
-          </v-list-item-content>
-          <v-list-item-icon>
-            <v-btn v-if="false" :to="`/users/${e._id}/edit`" text>
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </v-list-item-icon>
-        </v-list-item>
-        <v-divider />
+        <a-list-item :to="`/users/${e._id}`">
+          <a-list-item-title>{{ e.email }}</a-list-item-title>
+          <a-list-item-subtitle>{{ e.name }}</a-list-item-subtitle>
+        </a-list-item>
+        <a-divider />
       </div>
-    </v-card>
-  </v-container>
+    </a-card>
+  </a-container>
 </template>
 
 <script>

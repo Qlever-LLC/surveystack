@@ -1,71 +1,37 @@
 <template>
-  <div class="code-editor pa-0" :id="'monaco-editor-' + _uid"></div>
+  <vue-monaco-editor
+    :value="modelValue"
+    theme="vs-dark"
+    :options="MONACO_EDITOR_OPTIONS"
+    language="javascript"
+    @change="emit('update:modelValue', $event)"
+    @mount="handleMount" />
 </template>
-<script>
-import * as monaco from 'monaco-editor';
 
-export default {
-  props: {
-    value: {
-      required: true,
-    },
-    raw: {
-      required: false,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      editor: null,
-    };
-  },
-  computed: {
-    valueString() {
-      return JSON.stringify(this.value, null, 2);
-    },
-  },
-  methods: {
-    writeBack(value) {
-      try {
-        const obj = JSON.parse(value);
-        if (JSON.stringify(this.value) !== JSON.stringify(obj)) {
-          this.$emit('input', obj);
-        }
-      } catch (error) {
-        console.log('parsing failed', error);
-      }
-    },
-    refresh() {
-      console.log('value cahnged');
-      const text = this.raw ? this.value : JSON.stringify(this.value, null, 2);
-      const model = monaco.editor.createModel(text, 'javascript');
-      console.log('models', monaco.editor.getModels());
+<script setup>
+import { VueMonacoEditor } from '@guolao/vue-monaco-editor';
+import { shallowRef } from 'vue';
 
-      if (this.editor !== null) {
-        this.editor.getModel().dispose();
-        this.editor.dispose();
-      }
+const props = defineProps({
+  modelValue: {
+    type: String,
+    required: true,
+  },
+  readOnly: {
+    type: Boolean,
+    required: true,
+  },
+});
 
-      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
-        language: 'javascript',
-        automaticLayout: true,
-        readOnly: true,
-        model,
-      });
-    },
-  },
-  watch: {
-    value() {
-      this.refresh();
-    },
-  },
-  mounted() {
-    this.refresh();
-  },
+const emit = defineEmits(['update:modelValue']);
+
+const MONACO_EDITOR_OPTIONS = {
+  automaticLayout: true,
+  formatOnType: true,
+  formatOnPaste: true,
+  readOnly: props.readOnly,
 };
+
+const editorRef = shallowRef();
+const handleMount = (editor) => (editorRef.value = editor);
 </script>
-<style scoped>
-.code-editor {
-  height: 100%;
-}
-</style>

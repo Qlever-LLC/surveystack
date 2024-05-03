@@ -3,23 +3,24 @@
     WARNING: this component renders recursively, be careful!
     vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props
   -->
-  <draggable
-    v-if="controls.length !== 0 || index.length !== 0"
+  <VueDraggable
+    v-if="state.draggableControls?.length !== 0 || index.length !== 0"
     class="draggable"
-    :class="controls"
-    :style="scaleStyles"
+    :class="{ cursorPointer: readOnly }"
+    :style="state.scaleStyles"
     :disabled="readOnly"
     tag="div"
-    :list="controls"
+    v-model="state.draggableControls"
     :invertSwap="true"
     @start="startHandler"
     @end="endHandler"
+    @update="onUpdate"
     draggable=".draggable-item"
-    :group="draggableGroup"
-  >
-    <v-card
-      v-for="(el, idx) in controls"
-      class="control-item mb-2"
+    :group="state.draggableGroup"
+    ref="rootDraggable">
+    <a-card
+      v-for="(el, idx) in state.draggableControls"
+      class="control-item py-3"
       :class="[
         { 'control-item-selected': el === selected },
         { 'library-border': el.isLibraryRoot && !el.libraryIsInherited },
@@ -30,103 +31,95 @@
       @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
-      :data-control-contains-page="descendantHasPage(el)"
-    >
+      :data-control-contains-page="state.descendantHasPage(el)">
       <div
         class="d-flex justify-space-between align-center"
         @mouseover.stop="handleCardHoverChange({ control: el, isHovering: true })"
-        @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })"
-      >
+        @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })">
         <control-card-header
           v-if="!el.options.hidden"
-          :index="createIndex(index, idx + 1) | displayIndex"
+          :index="getDisplayIndex(createIndex(index, idx + 1))"
           :title="getDisplay(el)"
           :type="el.type"
-          :dataName="el.name"
-        />
-        <div class="grey--text text--darken-1" v-if="el.options.hidden">
-          {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
+          :dataName="el.name" />
+        <div class="text-grey-darken-1" v-if="el.options.hidden">
+          {{ getDisplayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
         </div>
-        <div class="mb-2 context-actions">
-          <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
-            <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
-          </v-btn>
-          <v-btn
+        <div class="context-actions">
+          <a-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
+            <a-icon color="grey-lighten-1">mdi-content-copy</a-icon>
+          </a-btn>
+          <a-btn
             icon
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-            @mousedown.stop="toggleLibrary(el.libraryId)"
-          >
-            <v-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</v-icon>
-          </v-btn>
-          <v-chip
+            @mousedown.stop="toggleLibrary(el.libraryId)">
+            <a-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</a-icon>
+          </a-btn>
+          <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
-            dark
             small
             :color="
               availableLibraryUpdates[el.libraryId] === null
                 ? 'error'
                 : availableLibraryUpdates[el.libraryId] > el.libraryVersion
-                ? 'warning'
-                : 'grey'
+                  ? 'warning'
+                  : 'grey'
             "
             :title="
               availableLibraryUpdates[el.libraryId] === null
                 ? 'question set has been deleted in the library'
                 : availableLibraryUpdates[el.libraryId]
-                ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
-                : 'newest available version'
-            "
-          >
-            <v-icon
+                  ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
+                  : 'newest available version'
+            ">
+            <a-icon
               v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
               @click.stop="$emit('update-library-control', el)"
-              left
-            >
+              left>
               mdi-refresh
-            </v-icon>
+            </a-icon>
             Version {{ el.libraryVersion }}
-          </v-chip>
-          <v-btn
+          </a-chip>
+          <a-btn
             icon
-            v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
-            @click.stop="() => showDeleteModal(idx)"
-          >
-            <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
+            v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+            @click.stop="() => showDeleteModal(idx)">
+            <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey-lighten-1'">
               mdi-delete
-            </v-icon>
-          </v-btn>
-          <v-btn
+            </a-icon>
+          </a-btn>
+          <a-btn
             text
             x-small
             v-if="el.options.hidden"
             @click.stop="$emit('unhide-control', el)"
-            color="grey lighten-1"
-            style="margin-bottom: -8px"
-          >
+            color="grey"
+            class="mb-n6"
+            variant="outlined">
             unhide
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             text
             x-small
             v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
             @click.stop="$emit('hide-control', el)"
-            color="grey lighten-1"
-            class="mb-4"
-          >
+            color="grey"
+            class="mb-n6"
+            variant="outlined">
             hide
-          </v-btn>
+          </a-btn>
         </div>
       </div>
 
-      <nested-draggable
+      <GraphicalView
         v-if="el.type == 'group' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
           { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
-        :controls="el.children"
+        v-model="el.children"
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
@@ -138,17 +131,16 @@
         @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
         :data-control-type="el.type"
-        :data-control-contains-page="descendantHasPage(el)"
-      />
+        :data-control-contains-page="state.descendantHasPage(el)" />
 
-      <nested-draggable
+      <GraphicalView
         v-if="el.type == 'page' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
           { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
-        :controls="el.children"
+        v-model="el.children"
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
@@ -159,197 +151,205 @@
         @hide-control="$emit('hide-control', $event)"
         @unhide-control="$emit('unhide-control', $event)"
         :data-control-type="el.type"
-        :data-control-contains-page="descendantHasPage(el)"
-        :index="createIndex(index, idx + 1)"
-      />
-    </v-card>
+        :data-control-contains-page="state.descendantHasPage(el)"
+        :index="createIndex(index, idx + 1)" />
+    </a-card>
 
-    <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
-      <v-card class="">
-        <v-card-title> Delete Question </v-card-title>
-        <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </draggable>
+    <a-dialog v-if="state.deleteQuestionModalIsVisible" v-model="state.deleteQuestionModalIsVisible" max-width="290">
+      <a-card>
+        <a-card-title> Delete Question</a-card-title>
+        <a-card-text class="mt-4"> Are you sure you want to remove this question?</a-card-text>
+        <a-card-actions>
+          <a-spacer />
+          <a-btn variant="text" @click.stop="state.deleteQuestionModalIsVisible = false"> Cancel</a-btn>
+          <a-btn variant="text" color="red" @click.stop="handleConfirmDelete"> Remove</a-btn>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
+  </VueDraggable>
   <div v-else>
-    <v-card class="text--secondary">
-      <v-card-title>Empty survey</v-card-title>
-      <v-card-text v-if="!readOnly">
-        <div class="text--primary">
+    <a-card class="text-secondary">
+      <a-card-title>Empty survey</a-card-title>
+      <a-card-text v-if="!readOnly">
+        <div class="text-primary">
           You can add questions by clicking the <strong>plus icon</strong>
           below.
         </div>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </div>
 </template>
 
-<script>
-import draggable from 'vuedraggable';
+<script setup>
+import { VueDraggable } from 'vue-draggable-plus';
 import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
+import { ref, reactive, onMounted } from 'vue';
 
-export default {
-  name: 'nested-draggable',
-  components: {
-    draggable,
-    ControlCardHeader,
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: false,
   },
-  data() {
-    return {
-      drag: false,
-      deleteQuestionModalIsVisible: false,
-      deleteQuestionIndex: null,
-      scaleStyles: {},
-      hoveredControl: null,
-      pageInPageHintIsVisible: false,
-      draggableGroup: {
-        name: 'g1',
-        // put ::: String | String[] | (to, from, el, event) => Boolean
-        // to: the sortablejs instance which will be `put` into
-        // from: the sortablejs instance which will be `put` from
-        // el: the active element which is being `put` from `from` into `to`
-        // ev: the sortablejs event
-        // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
-        put(to, _, el) {
-          if (el.dataset.controlContainsPage === 'true' && to.el.dataset.controlType === 'page') {
-            return false;
-          }
-          return true;
-        },
-      },
-      descendantHasPage: utils.descendantHasPage,
-    };
-  },
-  props: {
-    controls: {
-      required: false,
-      type: Array,
-    },
-    selected: Object,
-    index: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    readOnly: {
-      type: Boolean,
-      default: false,
-    },
-    availableLibraryUpdates: {
-      required: false,
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    scale: {
-      type: Number,
-      default: 1.0,
-    },
-    libraryId: {
-      type: String,
-      default: null,
+  selected: Object,
+  index: {
+    type: Array,
+    default() {
+      return [];
     },
   },
-  filters: {
-    displayIndex(value) {
-      return value.join('.');
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+  availableLibraryUpdates: {
+    required: false,
+    type: Object,
+    default() {
+      return {};
     },
   },
-  methods: {
-    startHandler(ev) {
-      if (ev.item.dataset.controlType === 'page') {
-        this.pageInPageHintIsVisible = true;
+  scale: {
+    type: Number,
+    default: 1.0,
+  },
+  libraryId: {
+    type: String,
+    default: null,
+  },
+});
+
+const emit = defineEmits([
+  'update:modelValue',
+  'control-selected',
+  'control-removed',
+  'duplicate-control',
+  'open-library',
+  'update-library-control',
+  'hide-control',
+  'unhide-control',
+]);
+
+const rootDraggable = ref(null);
+
+const state = reactive({
+  scaleStyles: {},
+  draggableControls: props.modelValue,
+  drag: false,
+  deleteQuestionModalIsVisible: false,
+  deleteQuestionIndex: null,
+  hoveredControl: null,
+  pageInPageHintIsVisible: false,
+  draggableGroup: {
+    name: 'g1',
+    // put ::: String | String[] | (to, from, el, event) => Boolean
+    // to: the sortablejs instance which will be `put` into
+    // from: the sortablejs instance which will be `put` from
+    // el: the active element which is being `put` from `from` into `to`
+    // ev: the sortablejs event
+    // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
+    put(to, _, el) {
+      if (el.dataset.controlContainsPage === 'true' && to.el.dataset.controlType === 'page') {
+        return false;
       }
-      this.drag = true;
+      return true;
     },
-    endHandler() {
-      this.drag = false;
-      this.pageInPageHintIsVisible = false;
-    },
-    getIconForType(type) {
-      const control = availableControls.find((c) => c.type === type);
-      return control && control.icon;
-    },
-    getDisplay(control) {
-      return control.label || control.hint || control.type;
-    },
-    showDeleteModal(index) {
-      this.deleteQuestionModalIsVisible = true;
-      this.deleteQuestionIndex = index;
-    },
-    handleConfirmDelete() {
-      this.removeAt(this.deleteQuestionIndex);
-      this.deleteQuestionModalIsVisible = false;
-    },
-    log(name) {
-      console.log(name);
-    },
-    removeAt(idx) {
-      this.controls.splice(idx, 1);
-      this.$emit('control-removed');
-    },
-    createIndex(current, idx) {
-      const newIndex = [...current];
-      newIndex.push(idx);
-      return newIndex;
-    },
-    duplicateControl(el) {
-      const copy = {
-        ...cloneDeep(el),
-        name: `${el.name}_copy`,
-        label: `${el.label} copy`,
-        id: new ObjectID().toString(),
+  },
+  descendantHasPage: utils.descendantHasPage,
+});
+
+onMounted(() => {
+  if (rootDraggable.value?.$el) {
+    const { width, height } = rootDraggable.value.$el.getBoundingClientRect();
+    if (props.scale !== 1.0)
+      state.scaleStyles = {
+        transform: `scale(${props.scale})`,
+        transformOrigin: 'top left',
+        marginRight: `-${width * (1.0 - props.scale)}px`,
+        marginBottom: `-${height * (1.0 - props.scale)}px`,
       };
+  }
+});
 
-      utils.changeRecursive(copy, (control) => {
-        control.id = new ObjectID().toString();
-      });
+function getDisplayIndex(value) {
+  return value.join('.');
+}
 
-      this.$emit('duplicate-control', copy);
-    },
-    toggleLibrary(libraryId) {
-      this.$emit('toggle-library', libraryId);
-    },
-    getLibraryIconColor(libraryId) {
-      return `${this.libraryId && this.libraryId === libraryId ? 'green' : 'grey'} lighten-1`;
-    },
-    handleCardHoverChange({ control, isHovering }) {
-      if (isHovering) {
-        this.hoveredControl = control;
-      } else if (this.hoveredControl === control) {
-        this.hoveredControl = null;
-      }
-    },
-    areActionsVisible(control) {
-      return !this.readOnly && this.hoveredControl === control;
-    },
-  },
-  mounted() {
-    const { width, height } = this.$el.getBoundingClientRect();
-    this.scaleStyles =
-      this.style === 1.0
-        ? {}
-        : {
-            transform: `scale(${this.scale})`,
-            transformOrigin: 'top left',
-            marginRight: `-${width * (1.0 - this.scale)}px`,
-            marginBottom: `-${height * (1.0 - this.scale)}px`,
-          };
-  },
-};
+function onUpdate() {
+  emit('update:modelValue', state.draggableControls);
+}
+function startHandler(ev) {
+  if (ev.item.dataset.controlType === 'page') {
+    state.pageInPageHintIsVisible = true;
+  }
+  state.drag = true;
+}
+function endHandler() {
+  state.drag = false;
+  state.pageInPageHintIsVisible = false;
+}
+function getIconForType(type) {
+  const control = availableControls.find((c) => c.type === type);
+  return control && control.icon;
+}
+function getDisplay(control) {
+  return control.label || control.hint || control.type;
+}
+function showDeleteModal(index) {
+  state.deleteQuestionModalIsVisible = true;
+  state.deleteQuestionIndex = index;
+}
+function handleConfirmDelete() {
+  removeAt(state.deleteQuestionIndex);
+  state.deleteQuestionModalIsVisible = false;
+}
+function removeAt(idx) {
+  state.draggableControls.splice(idx, 1);
+  emit('control-removed');
+}
+function createIndex(current, idx) {
+  const newIndex = [...current];
+  newIndex.push(idx);
+  return newIndex;
+}
+function duplicateControl(el) {
+  const copy = {
+    ...cloneDeep(el),
+    name: `${el.name}_copy`,
+    label: `${el.label} copy`,
+    id: new ObjectID().toString(),
+  };
+
+  utils.changeRecursive(copy, (control) => {
+    control.id = new ObjectID().toString();
+  });
+
+  emit('duplicate-control', copy);
+}
+function toggleLibrary(libraryId) {
+  emit('toggle-library', libraryId);
+}
+function getLibraryIconColor(libraryId) {
+  return `${props.libraryId && props.libraryId === libraryId ? 'green-lighten-1' : 'grey-lighten-1'}`;
+}
+function handleCardHoverChange({ control, isHovering }) {
+  if (isHovering) {
+    state.hoveredControl = control;
+  } else if (state.hoveredControl === control) {
+    state.hoveredControl = null;
+  }
+}
+function areActionsVisible(control) {
+  return !props.readOnly && state.hoveredControl === control;
+}
 </script>
-<style scoped>
+<style scoped lang="scss">
+.cursorPointer {
+  cursor: pointer !important;
+}
 .drop-area {
   min-height: 4rem;
 }
@@ -379,7 +379,7 @@ export default {
 .control-item {
   padding: 0.25rem 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
-  margin-bottom: -1px;
+  margin-bottom: 8px;
   /* border-left: 2px solid transparent; */
   border-left-width: 2px;
   position: relative;
@@ -402,10 +402,11 @@ export default {
 }
 
 .control-item-selected {
-  border-left: 2px solid var(--v-primary-base);
+  border-left: 2px solid rgb(var(--v-theme-primary));
 }
 
 .context-actions {
+  height: 48px; /* --v-btn-height = 36px + 12px */
   min-width: 108px;
   text-align: right;
 }
@@ -418,7 +419,7 @@ export default {
   left: 0;
   top: 100%;
   margin-top: 13px;
-  background-color: var(--v-info-base);
+  background-color: rgb(var(--v-theme-info));
   padding: 0.75rem 1.5rem;
   border-radius: 3px;
 }
@@ -431,7 +432,7 @@ export default {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid var(--v-info-base);
+  border-bottom: 7px solid rgb(var(--v-theme-info));
   top: 100%;
   margin-top: 3px;
   left: 50%;

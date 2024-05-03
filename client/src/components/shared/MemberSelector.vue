@@ -1,51 +1,52 @@
 <template>
-  <v-dialog max-width="500" max-height="100" v-model="dialog">
-    <v-card>
-      <v-card-title>Search members</v-card-title>
-      <v-card-text>
+  <a-dialog max-width="500" max-height="50vh" v-model="dialog">
+    <a-card>
+      <a-card-title>Search members</a-card-title>
+      <a-card-text>
         <active-group-selector
           v-if="!fixedGroupId"
-          :value="selectedGroupId"
+          :modelValue="selectedGroupId"
           :admin-groups-only="true"
           label="Group"
-          @input="setGroup"
-        />
-        <v-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
-        <v-list>
-          <v-list-item
+          @update:modelValue="setGroup" />
+        <a-text-field v-model="q" append-inner-icon="mdi-magnify" label="Search members" />
+        <a-list>
+          <a-list-item
             v-for="member in filteredMembers"
             :key="member._id"
             :disabled="member.meta.status === 'pending'"
             @click="
               $emit('selected', member);
               dialog = false;
-            "
-          >
-            <v-list-item-content v-if="member.meta && member.meta.status === 'pending'">
-              <v-list-item-title class="text--secondary"
+            ">
+            <div v-if="member.meta && member.meta.status === 'pending'">
+              <a-list-item-title class="text-secondary"
                 >[Pending] {{ member.meta.invitationEmail
-                }}{{ member.meta.invitationName ? ` - ${member.meta.invitationName}` : '' }}</v-list-item-title
+                }}{{ member.meta.invitationName ? ` - ${member.meta.invitationName}` : '' }}</a-list-item-title
               >
-              <v-list-item-subtitle>{{
+              <a-list-item-subtitle>{{
                 member.meta.dateSent ? `sent ${member.meta.dateSent}` : 'Invitation not sent yet'
-              }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-content v-else>
-              <v-list-item-title>{{ member.user.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ member.user.email }}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+              }}</a-list-item-subtitle>
+            </div>
+            <div v-else>
+              <a-list-item-title>{{ member.user.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ member.user.email }}</a-list-item-subtitle>
+            </div>
+          </a-list-item>
+        </a-list>
+      </a-card-text>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
 import api from '@/services/api.service';
+
 export default {
-  components: { ActiveGroupSelector },
+  components: {
+    ActiveGroupSelector,
+  },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
     fixedGroupId: {

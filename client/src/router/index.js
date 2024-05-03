@@ -1,10 +1,7 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
-
-const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
 import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
@@ -18,13 +15,8 @@ import User from '@/pages/users/User.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
 import Profile from '@/pages/users/Profile.vue';
 import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
-
-const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
-
 import GroupList from '@/pages/groups/GroupList.vue';
 import Group from '@/pages/groups/Group.vue';
-const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
-
 import SubmissionList from '@/pages/submissions/List.vue';
 
 import ScriptList from '@/pages/scripts/ScriptList.vue';
@@ -39,29 +31,28 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
-
-// integrations
-const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
-const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
-
 import Navbar from '@/components/Navbar.vue';
 import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
-const Kit = () => import('@/pages/Kit.vue');
 import store from '@/store';
 
+const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
+const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
+const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
+// integrations
+const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
+const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
+const Kit = () => import('@/pages/Kit.vue');
 const Builder = () => import('@/pages/builder/Builder.vue');
 const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
 const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
 const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
 
-Vue.use(VueRouter);
-
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
-    next({ name: 'auth-login', params: { redirect: to } });
+    next({ name: 'auth-login', query: { redirect: to.path } });
   } else {
     next();
   }
@@ -69,7 +60,7 @@ const guard = async (to, from, next) => {
 
 const superGuard = async (to, from, next) => {
   if (!store.getters['auth/isSuperAdmin']) {
-    next({ name: 'unauthorized', params: { allowed: 'Super Admins', to } });
+    next({ name: 'unauthorized', query: { allowed: 'Super Admins', to: to.path } });
   } else {
     next();
   }
@@ -152,13 +143,13 @@ const routes = [
     path: '/auth/login',
     name: 'auth-login',
     components: getComponents(Login),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   {
     path: '/auth/register',
     name: 'auth-register',
     components: getComponents(Register),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   {
     path: '/auth/profile',
@@ -257,7 +248,7 @@ const routes = [
     components: getComponents(GroupEdit),
   },
   {
-    path: '/g/*',
+    path: '/g/:pathMatch(.*)', //TODO
     name: 'groups-by-path',
     components: getComponents(Group),
   },
@@ -337,7 +328,7 @@ const routes = [
     path: '/unauthorized',
     name: 'unauthorized',
     components: getComponents(Unauthorized),
-    props: true,
+    props: (route) => ({ ...route.query }),
   },
   // App-Info
   {
@@ -362,14 +353,13 @@ const routes = [
   },
 ];
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
     return {
-      x: 0,
-      y: 0,
+      left: 0,
+      top: 0,
     };
   },
 });

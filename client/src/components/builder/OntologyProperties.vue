@@ -2,19 +2,18 @@
   <div class="text-center d-flex align-center mt-6">
     <resource-selector
       :resources="filteredResources"
-      :value="value"
+      :modelValue="value"
       placeholder="Add Options"
       :disabled="disableSelection"
       @on-new="createResourceHandler"
       @on-select="selectResourceHandler"
       :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
-      outlined
-    />
-    <v-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
-      <v-icon>mdi-pencil</v-icon>
-    </v-btn>
+      outlined />
+    <a-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
+      <a-icon>mdi-pencil</a-icon>
+    </a-btn>
 
-    <v-dialog v-model="tableDialogIsVisible">
+    <a-dialog v-model="tableDialogIsVisible">
       <ontology-list-editor
         v-if="tableDialogIsVisible && resource && resource.type === resourceTypes.ONTOLOGY_LIST"
         :resources="resources"
@@ -22,19 +21,17 @@
         :disabled="!!resource.libraryId"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="closeTableDialog"
-      />
-    </v-dialog>
-    <v-dialog v-model="referenceDialogIsVisible" max-width="50%">
+        @close-dialog="closeTableDialog" />
+    </a-dialog>
+    <a-dialog v-model="referenceDialogIsVisible" max-width="50%">
       <ontology-reference-editor
         v-if="referenceDialogIsVisible && resource && resource.type === resourceTypes.SURVEY_REFERENCE"
         :resources="resources"
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="closeReferenceDialog"
-      />
-    </v-dialog>
+        @close-dialog="closeReferenceDialog" />
+    </a-dialog>
   </div>
 </template>
 
@@ -42,13 +39,25 @@
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
-import { createResource, resourceTypes, resourceLocations, setResource, removeResource } from '@/utils/resources';
+import { createResource, removeResource, resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 
 export default {
   components: {
     OntologyListEditor,
     OntologyReferenceEditor,
     ResourceSelector,
+  },
+  props: {
+    value: {
+      type: String,
+    },
+    resources: {
+      type: Array,
+      default: () => [],
+    },
+    disableSelection: {
+      required: false,
+    },
   },
   data() {
     return {
@@ -108,18 +117,6 @@ export default {
     },
     selectResourceHandler(id) {
       this.$emit('set-control-source', id);
-    },
-  },
-  props: {
-    value: {
-      type: String,
-    },
-    resources: {
-      type: Array,
-      default: () => [],
-    },
-    disableSelection: {
-      required: false,
     },
   },
   computed: {

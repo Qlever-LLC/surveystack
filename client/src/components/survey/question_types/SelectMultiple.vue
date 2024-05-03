@@ -7,46 +7,41 @@
         :required="required"
         :initializable="control.options.initialize && control.options.initialize.enabled"
         :is-modified="meta && !!meta.dateModified"
-        @initialize="initialize"
-      />
-      <v-btn rounded small text color="primary" class="align-self-center mb-3" @click="clearSelection">
+        @initialize="initialize" />
+      <a-btn rounded small variant="text" color="primary" class="align-self-center mb-3" @click="clearSelection">
         clear selection
-      </v-btn>
+      </a-btn>
     </div>
     <app-control-hint :value="control.hint" />
 
     <div v-if="sourceIsValid" class="py-2">
       <div class="select-multiple-source">
         <div v-for="item in selections" :key="item.value">
-          <v-checkbox
+          <a-checkbox
             v-model="item.selected"
             :label="item.label"
-            @change="onChange"
+            @update:modelValue="onChange"
             hide-details
-            class="my-1"
-            color="focus"
-          />
+            color="focus" />
         </div>
       </div>
 
-      <div v-if="control.options.allowCustomSelection" class="select-multiple-custom mt-3 d-flex align-center">
-        <v-checkbox
+      <div v-if="control.options.allowCustomSelection" class="select-multiple-custom d-flex align-center">
+        <a-checkbox
           v-model="customSelected"
-          @change="onChange"
+          @update:modelValue="onChange"
           hide-details
-          class="mt-0"
+          class="mt-0 flex-grow-0"
           :disabled="!customValue"
-          color="focus"
-        />
-        <v-text-field
+          color="focus" />
+        <a-text-field
           label="other"
           v-model="customValue"
-          outlined
+          variant="outlined"
           dense
           hide-details
-          @input="onCustomChange"
-          color="focus"
-        />
+          @update:modelValue="onCustomChange"
+          color="focus" />
       </div>
     </div>
 
@@ -62,6 +57,7 @@ import { getValueOrNull } from '@/utils/surveyStack';
 
 export default {
   mixins: [baseQuestionComponent],
+
   data() {
     return {
       customSelection: 'other',
@@ -95,9 +91,9 @@ export default {
     initSelections() {
       // fill pre-defined
       this.selections.forEach((s) => {
-        if (this.value && Array.isArray(this.value)) {
-          console.log(this.value);
-          const valueFound = this.value.find((v) => s.value === v);
+        if (this.modelValue && Array.isArray(this.modelValue)) {
+          console.log(this.modelValue);
+          const valueFound = this.modelValue.find((v) => s.value === v);
           s.selected = !!valueFound;
         } else {
           s.selected = false;
@@ -106,7 +102,7 @@ export default {
 
       // fill custom
       if (this.control.options.allowCustomSelection && this.valueIncludesCustom) {
-        [this.customValue] = this.value.filter((x) => !this.findSource(x));
+        [this.customValue] = this.modelValue.filter((x) => !this.findSource(x));
         if (this.customValue) {
           this.customSelected = true;
         }
@@ -131,9 +127,9 @@ export default {
     },
     valueIncludesCustom() {
       return (
-        Array.isArray(this.value) &&
+        Array.isArray(this.modelValue) &&
         Array.isArray(this.control.options.source) &&
-        !this.value.every(this.sourceContains)
+        !this.modelValue.every(this.sourceContains)
       );
     },
   },
@@ -148,31 +144,18 @@ export default {
       selected: false,
     }));
 
-    if (!Array.isArray(this.value)) {
+    if (!Array.isArray(this.modelValue)) {
       return;
     }
-    console.log(this.value);
+    console.log(this.modelValue);
     this.initSelections();
   },
   watch: {
-    value() {
+    modelValue() {
       this.initSelections();
     },
   },
 };
 </script>
 
-<style scoped>
->>> .v-list-item {
-  min-height: initial;
-  padding: 0px;
-}
-
->>> .v-list-item__content {
-  padding: 0px;
-}
-
->>> .v-list-item__action {
-  margin: 4px 8px 4px 0px !important;
-}
-</style>
+<style scoped lang="scss"></style>

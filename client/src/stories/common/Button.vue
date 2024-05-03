@@ -1,5 +1,5 @@
 <template>
-  <v-btn :class="classes" @click="onClick($event)" outlined>{{ label }}</v-btn>
+  <a-btn :class="classes" @click="onClick($event)" variant="outlined">{{ label }}</a-btn>
 </template>
 
 <script>

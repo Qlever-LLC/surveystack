@@ -1,121 +1,115 @@
 <template>
-  <v-container>
-    <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
-      <v-autocomplete
-        outlined
+  <a-container>
+    <a-form v-model="valid" class="mt-8" :disabled="localViewModel.loading">
+      <a-select
+        v-if="!!localViewModel.groups"
+        variant="outlined"
         primary
         label="Select Group"
         v-model="localViewModel.form.groupId"
-        v-if="!!localViewModel.groups"
-        :item-text="(g) => `${g.name} (${g.path})`"
+        :item-title="(g) => `${g.name} (${g.path})`"
         item-value="_id"
         :items="localViewModel.groups"
-        :rules="[(v) => !!v || `select group`]"
-      ></v-autocomplete>
+        :rules="[(v) => !!v || `select group`]" />
 
-      <v-autocomplete
-        outlined
+      <a-select
+        variant="outlined"
         primary
         label="Select Plan"
         v-model="localViewModel.form.plan"
         :items="localViewModel.plans"
-        :item-text="(p) => `${p.planName}, ${p.planUrl}`"
+        :item-title="(p) => `${p.planName}, ${p.planUrl}`"
         item-value="_id"
-        :rules="[(v) => !!v || `select plan`]"
-      ></v-autocomplete>
+        :rules="[(v) => !!v || `select plan`]" />
 
-      <v-row class="align-baseline">
-        <v-col>
-          <v-text-field
+      <a-row align="center">
+        <a-col>
+          <a-text-field
             :disabled="!localViewModel.form.plan"
             v-model.trim="localViewModel.form.instanceName"
             label="Instance URL"
             placeholder="Enter Subdomain"
             :suffix="'.' + planUrl"
             :loading="localViewModel.loading"
-            outlined
-          >
-            <template v-slot:append-outer>
-              <v-icon
+            variant="outlined"
+            appendSlot>
+            <template v-slot:append>
+              <a-icon
                 style="margin-top: -8px"
                 v-if="viewModel.form.instanceNameValid === true || viewModel.form.instanceNameValid === false"
                 :color="viewModel.form.instanceNameValid === true ? 'green' : 'red'"
                 large
-                >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
+                >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</a-icon
               >
             </template>
-          </v-text-field>
-        </v-col>
+          </a-text-field>
+        </a-col>
 
-        <v-col>
-          <v-btn
+        <a-col>
+          <a-btn
             @click="$emit('check-url', localViewModel)"
             color="primary"
             :disabled="!localViewModel.form.plan || localViewModel.loading"
-            >Check URL</v-btn
+            class="mt-n6"
+            >Check URL</a-btn
           >
-        </v-col>
-      </v-row>
+        </a-col>
+      </a-row>
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.email"
         label="E-Mail Address of Primary User"
         placeholder="Farmer's E-Mail"
-        outlined
-        :rules="emailRules"
-      />
+        variant="outlined"
+        :rules="emailRules" />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.fullName"
         label="Full Name of the Farmer"
         placeholder="Farmer's Name"
-        outlined
-        :rules="nameRules"
-      />
+        variant="outlined"
+        :rules="nameRules" />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmName"
         label="Name of the Farm"
         placeholder="Farm Name"
-        outlined
-        :rules="nameRules"
-      />
+        variant="outlined"
+        :rules="nameRules" />
 
-      <v-text-field
+      <a-text-field
         v-model="localViewModel.form.farmAddress"
         label="Farm Address / Location"
         placeholder="123 Fake Street, Exampletown, NY"
-        outlined
-        :rules="addressRules"
-      />
+        variant="outlined"
+        :rules="addressRules" />
 
-      <v-autocomplete
+      <a-select
         label="Timezone"
-        outlined
+        variant="outlined"
         :items="timezones"
         v-model="localViewModel.form.timezone"
         :rules="[(v) => !!v || `select time zone`]"
-        return-object
-      />
+        return-object />
 
-      <div class="text-left text--secondary">Unit System to use</div>
-      <v-radio-group v-model="localViewModel.form.units" col>
-        <v-radio label="Metric" value="metric"></v-radio>
-        <v-radio label="US" value="us"></v-radio>
-      </v-radio-group>
+      <div class="text-left text-secondary">Unit System to use</div>
+      <a-radio-group v-model="localViewModel.form.units">
+        <a-radio label="Metric" value="metric" />
+        <a-radio label="US" value="us" />
+      </a-radio-group>
 
-      <v-autocomplete
+      <a-select
         label="Owner of the FarmOS Instance"
-        outlined
+        variant="outlined"
         :items="localViewModel.users"
         item-value="id"
-        :item-text="(item) => `${item.name} (${item.email})`"
+        :item-title="(item) => `${item.name} (${item.email})`"
         v-model="localViewModel.form.owner"
-        :rules="[(v) => !!v || `select at least one owner`]"
-        return-object
-      />
+        :rules="[(v) => !!v || `select at least one owner`]" />
 
-      <!-- <v-autocomplete
+      <!-- WARNING: Is not up to date as it is a comment
+        <a-select
+        engineering="autocomplete"
         label="Admins with Access to Farm"
         v-model="localViewModel.form.admins"
         :items="localViewModel.users"
@@ -128,19 +122,22 @@
         return-object
         :loading="localViewModel.loading"
         ref="members"
+        itemSlot
+        prependItemSlot
+        appendOuterSlot
       >
         <template v-slot:item="{ item }">
           <div v-if="item.userExists">
             {{ item.name }}
-            <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
+            <a-chip color="grey--darken-2" dark>{{ item.email }}</a-chip>
           </div>
           <div v-else>
-            <v-icon left>mdi-account-clock</v-icon>
+            <a-icon left>mdi-account-clock</a-icon>
             {{ item.email }}
           </div>
         </template>
         <template v-slot:prepend-item>
-          <v-btn
+          <a-btn
             color="primary"
             class="ma-4"
             outlined
@@ -148,25 +145,24 @@
             @click="onInvite"
             target="_blank"
           >
-            <v-icon left>mdi-account-plus</v-icon>Invite Member to Organization
-          </v-btn>
-          <v-divider />
+            <a-icon left>mdi-account-plus</a-icon>Invite Member to Organization
+          </a-btn>
+          <a-divider />
         </template>
         <template v-slot:append-outer>
-          <v-btn fab color="primary" style="margin-top: -16px">
-            <v-icon>mdi-refresh</v-icon>
-          </v-btn>
+          <a-btn fab color="primary" style="margin-top: -16px">
+            <a-icon>mdi-refresh</a-icon>
+          </a-btn>
         </template>
-      </v-autocomplete> -->
+      </a-select> -->
 
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
 
       <app-field-list
         v-if="localViewModel.form.fields.length > 0"
-        v-model="localViewModel.form.fields"
-      ></app-field-list>
+        v-model="localViewModel.form.fields"></app-field-list>
 
-      <v-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</v-btn>
+      <a-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</a-btn>
 
       <app-field-creator
         v-show="importFields"
@@ -174,27 +170,23 @@
         ref="field-creator"
         v-model="field"
         @done="fieldImported"
-        @cancel="cancelFieldImport"
-      ></app-field-creator>
+        @cancel="cancelFieldImport"></app-field-creator>
 
-      <v-divider class="my-4"></v-divider>
+      <a-divider class="my-4" />
 
       <app-dialog
         labelConfirm="Refresh Members"
-        class="primary--text mx-4"
+        class="text-primary mx-4"
         v-model="invite"
         @cancel="invite = false"
         width="400"
         >To show new members in the dropdown, please press refresh.</app-dialog
       >
 
-      <v-checkbox
+      <a-checkbox
         :rules="agreeRules"
         v-model="localViewModel.form.agree"
-        label="Agree to Terms of Serviceand  Privacy Policy of Farmos"
-      >
-        <template v-slot:label></template>
-      </v-checkbox>
+        label="Agree to Terms of Serviceand  Privacy Policy of Farmos" />
       <div class="text-left mb-4">
         Visit
         <a href="https://farmier.com/terms" target="blank">Terms of Service</a>
@@ -202,21 +194,21 @@
         <a href="https://farmier.com/privacy" target="blank">Privacy Policy</a>.
       </div>
 
-      <v-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
-        >Register FarmOS Instance</v-btn
+      <a-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
+        >Register FarmOS Instance</a-btn
       >
-    </v-form>
+    </a-form>
     <app-dialog
       title="Field Import"
       labelConfirm="OK"
-      class="primary--text mx-4"
+      class="text-primary mx-4"
       v-model="successDialog"
       @cancel="successDialog = false"
       @confirm="successDialog = false"
       width="400"
       >{{ successMessage }}</app-dialog
     >
-  </v-container>
+  </a-container>
 </template>
 
 <script>

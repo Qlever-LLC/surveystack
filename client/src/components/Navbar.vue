@@ -1,26 +1,33 @@
 <template>
   <nav class="app-navbar">
-    <v-app-bar app clipped-left color="appbar" absolute>
-      <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column">
+    <a-app-bar color="appbar" absolute>
+      <a-app-bar-nav-icon @click="toggleDrawer" />
+      <a-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
         </div>
         <div class="app-bar-subtitle subtitle py-0 my-0" v-html="appSubtitle" />
-      </v-toolbar-title>
+      </a-toolbar-title>
 
-      <v-spacer />
+      <a-spacer />
       <offline-indicator />
-      <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
-        <v-icon size="22">mdi-help-circle-outline</v-icon>
-      </v-btn>
+      <a-btn
+        class="help-btn"
+        variant="text"
+        href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
+        target="_blank">
+        <a-icon size="22">mdi-help-circle-outline</a-icon>
+      </a-btn>
       <navbar-user-menu />
-    </v-app-bar>
+    </a-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />
   </nav>
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
@@ -31,25 +38,56 @@ export default {
     NavbarUserMenu,
     NavbarDrawer,
   },
-  computed: {
-    drawerIsVisible: {
+  setup() {
+    const store = useStore();
+
+    const drawerIsVisible = computed({
       get() {
-        return this.$store.getters['appui/menu'];
+        return store.getters['appui/menu'];
       },
       set(value) {
-        this.$store.dispatch('appui/setMenu', value);
+        store.dispatch('appui/setMenu', value);
       },
-    },
-    appTitle() {
-      return this.$store.getters['appui/title'];
-    },
-    appSubtitle() {
-      return this.$store.getters['appui/subtitle'];
-    },
+    });
+
+    const appTitle = computed(() => {
+      return store.getters['appui/title'];
+    });
+
+    const appSubtitle = computed(() => {
+      return store.getters['appui/subtitle'];
+    });
+
+    const toggleDrawer = () => {
+      drawerIsVisible.value = !drawerIsVisible.value;
+    };
+
+    return {
+      drawerIsVisible,
+      appTitle,
+      appSubtitle,
+      toggleDrawer,
+    };
   },
+  // computed: {
+  //   drawerIsVisible: {
+  //     get () {
+  //       return this.$store.getters['appui/menu'];
+  //     },
+  //     set (value) {
+  //       this.$store.dispatch('appui/setMenu', value);
+  //     },
+  //   },
+  //   appTitle () {
+  //     return this.$store.getters['appui/title'];
+  //   },
+  //   appSubtitle () {
+  //     return this.$store.getters['appui/subtitle'];
+  //   },
+  // },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .title {
   font-size: 1rem !important;
 }

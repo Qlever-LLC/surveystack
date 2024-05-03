@@ -157,14 +157,14 @@ body {
   display: none;
 }
 
+.minimal-ui .v-main {
+  padding-top: 0;
+}
+
 .white-space-nowrap {
   white-space: nowrap;
 }
 
 ::placeholder {
   color: rgba(0, 0, 0, 0.6) !important;
-}
-
-.v-select .v-select__selections > input:not(:first-child) {
-  margin-left: 4px;
 }

@@ -2,8 +2,6 @@ import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import SubmissionPage from './SubmissionPage.vue';
 import { createSurvey } from '@/utils/surveys';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
-import draftStore from '@/store/modules/draft.store';
-import { createLocalVue } from '@vue/test-utils';
 import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 import api from '@/services/api.service';
 
@@ -34,46 +32,38 @@ describe('Draft', () => {
       data: {},
     };
 
-    const AppControlNumberStub = {
-      render(h) {
-        return h('span', this.$slots.default);
-      },
-    };
-
-    const localVue = createLocalVue();
-    localVue.component('AppControlNumber', AppControlNumberStub);
-
     api.get.mockResolvedValue({ data: survey });
 
     renderWithVuetify(SubmissionPage, {
-      localVue,
-      mocks: {
-        $route: {
-          params: {
-            surveyId: survey._id,
-            submissionId: badSubmission._id,
+      global: {
+        mocks: {
+          $route: {
+            params: {
+              surveyId: survey._id,
+              submissionId: badSubmission._id,
+            },
+            query: {},
+            path: '',
+            name: 'edit-submission',
           },
-          query: {},
-          path: '',
-          name: 'edit-submission',
+          $store: {
+            actions: {
+              'submissions/fetchLocalSubmission': jest.fn(() => ({ ...badSubmission })),
+              'submissions/fetchLocalSubmissions': jest.fn(),
+              'appui/reset': jest.fn(),
+              'surveys/fetchSurvey': jest.fn(() => ({ ...survey })),
+              'resources/fetchResources': jest.fn().mockResolvedValue([]),
+              'memberships/getUserMemberships': jest.fn().mockResolvedValue([]),
+            },
+            getters: {
+              'auth/user': {},
+              'auth/isLoggedIn': true,
+              'memberships/groups': [],
+              'submissions/getSubmission': () => ({ ...badSubmission }),
+            },
+            dispatch: jest.fn(),
+          },
         },
-      },
-      store: {
-        actions: {
-          'submissions/fetchLocalSubmission': jest.fn(() => ({ ...badSubmission })),
-          'submissions/fetchLocalSubmissions': jest.fn(),
-          'appui/reset': jest.fn(),
-          'surveys/fetchSurvey': jest.fn(() => ({ ...survey })),
-          'resources/fetchResources': jest.fn().mockResolvedValue([]),
-          'memberships/getUserMemberships': jest.fn().mockResolvedValue([]),
-        },
-        getters: {
-          'auth/user': () => ({}),
-          'auth/isLoggedIn': () => true,
-          'memberships/groups': () => [],
-          'submissions/getSubmission': () => () => ({ ...badSubmission }),
-        },
-        modules: { draft: draftStore },
       },
     });
     // This test doesn't fail correctly without setTimeout

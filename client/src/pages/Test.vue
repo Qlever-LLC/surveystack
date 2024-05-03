@@ -2,8 +2,8 @@
   <div>
     <h2>Hi</h2>
     Add Feedback to store
-    <v-text-field v-model="message" @keyup.enter="addFeedback(message)" placeholder="Feedback..." />
-    <v-btn @click="addFeedback(message)">ADD</v-btn>
+    <a-text-field v-model="message" @keyup.enter="addFeedback(message)" placeholder="Feedback..." />
+    <a-btn @click="addFeedback(message)">ADD</a-btn>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* This works if style is not scoped! */
 
 :root {

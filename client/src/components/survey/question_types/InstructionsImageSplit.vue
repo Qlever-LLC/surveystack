@@ -10,14 +10,13 @@
               :src="image.content"
               :alt="image.label"
               class="full-width"
-              style="max-height: 80vh; object-fit: contain"
-            />
+              style="max-height: 80vh; object-fit: contain" />
           </div>
         </div>
       </div>
 
       <div class="right">
-        <div v-if="control.options.source && control.options.source.body" v-html="renderedBody" class="md" />
+        <div v-if="control.options.source && control.options.source.body" v-html="renderedBody" class="md preview" />
       </div>
     </div>
 
@@ -182,7 +181,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .instructions-image-split .wrapper {
   display: block;
 }

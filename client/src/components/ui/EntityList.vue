@@ -2,22 +2,20 @@
   <div>
     <div class="d-flex justify-space-between align-center">
       <slot v-if="!disableHeader" name="header">
-        <h1>Browse {{ collection | capitalize }}</h1>
+        <h1>Browse {{ capitalizedCollection }}</h1>
       </slot>
 
-      <v-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</v-btn>
+      <a-btn v-if="enableAddButton" :to="`/${collection}/new`" color="primary">ADD</a-btn>
     </div>
-    <v-card>
+    <a-card>
       <div v-for="e in entities" :key="e._id">
-        <v-list-item :to="`/${collection}/${e._id}`">
-          <v-list-item-content>
-            <v-list-item-title>{{ e.name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ e._id }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-        <v-divider />
+        <a-list-item :to="`/${collection}/${e._id}`">
+          <a-list-item-title>{{ e.name }}</a-list-item-title>
+          <a-list-item-subtitle>{{ e._id }}</a-list-item-subtitle>
+        </a-list-item>
+        <a-divider />
       </div>
-    </v-card>
+    </a-card>
   </div>
 </template>
 
@@ -38,6 +36,13 @@ export default {
     enableAddButton: {
       type: Boolean,
       default: true,
+    },
+  },
+  computed: {
+    capitalizedCollection() {
+      if (!this.collection) return '';
+      const v = this.collection.toString();
+      return v.charAt(0).toUpperCase() + v.slice(1);
     },
   },
 };

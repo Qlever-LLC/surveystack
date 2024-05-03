@@ -1,75 +1,83 @@
 <template>
-  <v-dialog v-model="show" max-width="400" max-height="1000" @input="(v) => v || (selectedFarms = [])">
-    <v-card class="pa-4">
-      <v-card-title class="headline"> Connect Existing Farm </v-card-title>
-      <v-card-text>
+  <a-dialog
+    :modelValue="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
+    max-width="400"
+    max-height="1000">
+    <a-card class="pa-4">
+      <a-card-title class="headline"> Connect Existing Farm </a-card-title>
+      <a-card-text>
         Select Farm from this Member's profile to include in this group.
 
         <br />
-        <v-autocomplete
+        <a-select
           label="Select Farms"
           multiple
           chips
-          deletable-chips
+          closable-chips
           :items="farmInstances"
-          :item-text="(i) => `${i.instanceName}`"
+          :item-title="(i) => `${i.instanceName}`"
           class="mt-4"
           v-model="selectedFarms"
-        >
-          <template slot="prepend-item">
-            <v-btn
+          prependItemSlot
+          chipSlot
+          itemSlot>
+          <template v-slot:chip="{ props, item }">
+            <v-chip v-bind="props">{{ item.raw.instanceName }}</v-chip>
+          </template>
+
+          <template v-slot:prepend-item>
+            <a-btn
               @click="connect"
               :loading="loadingOwners"
               :disabled="selectedFarms.length <= 0"
               color="primary"
-              class="button--autocomplete"
-            >
+              class="button--autocomplete">
               Connect selected Farms
-            </v-btn>
+            </a-btn>
           </template>
 
-          <template v-slot:item="{ item }">
-            <v-list-item-content style="width: min-content">
-              <v-list-item-title>{{ item.instanceName }}</v-list-item-title>
-              <v-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
-                >owner(s):</v-list-item-subtitle
+          <template v-slot:item="{ props, item }">
+            <a-list-item v-bind="props">
+              <a-list-item-title>{{ item.instanceName }}</a-list-item-title>
+              <a-list-item-subtitle v-if="item.raw.owners.length > 0" class="d-flex justify-end"
+                >owner(s):</a-list-item-subtitle
               >
-              <v-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
+              <a-list-item-subtitle class="d-flex justify-end" v-for="owner in item.raw.owners" :key="owner.email">
                 {{ owner.name }}({{ owner.email }})
-              </v-list-item-subtitle>
-            </v-list-item-content>
+              </a-list-item-subtitle>
+            </a-list-item>
           </template>
-        </v-autocomplete>
-        <v-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
+        </a-select>
+        <a-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
           Connect selected Farms
-        </v-btn>
-      </v-card-text>
+        </a-btn>
+      </a-card-text>
 
       <template v-if="allowCreate">
-        <v-card-title class="headline"> Connect New Farm </v-card-title>
+        <a-card-title class="headline"> Connect New Farm </a-card-title>
 
-        <v-card-text>
+        <a-card-text>
           Add a new farm to the member's profile.
           <br />
-          <v-btn block class="mt-4" color="primary" @click="$emit('create')">Create Farm</v-btn>
-        </v-card-text>
+          <a-btn block class="mt-4" color="primary" @click="$emit('create')">Create Farm</a-btn>
+        </a-card-text>
       </template>
 
-      <v-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
+      <a-card-text class="text-center text-grey" @click="$emit('addExisting')" disabled>
         or add existing farmOS instance (currently in development)
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+      </a-card-text>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
-import { ref } from '@vue/composition-api';
+import { ref } from 'vue';
 import './css/button.css';
 
 export default {
-  emits: ['connect', 'addExisting', 'create'],
   props: {
-    value: Boolean,
+    modelValue: Boolean,
     farmInstances: {
       type: Array,
       required: true,
@@ -83,6 +91,7 @@ export default {
       required: true,
     },
   },
+  emits: ['connect', 'addExisting', 'create', 'update:modelValue'],
   setup(props, { emit }) {
     const selectedFarms = ref([]);
 
@@ -95,16 +104,6 @@ export default {
       selectedFarms,
       connect,
     };
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
   },
 };
 </script>

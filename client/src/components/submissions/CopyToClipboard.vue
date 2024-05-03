@@ -1,7 +1,7 @@
 <template>
-  <v-btn @click.stop="copyText" icon class="button">
-    <v-icon>mdi-content-copy</v-icon>
-  </v-btn>
+  <a-btn @click.stop="copyText" icon class="button">
+    <a-icon>mdi-content-copy</a-icon>
+  </a-btn>
 </template>
 
 <script>
@@ -25,7 +25,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .button {
   display: inline-block;
   margin: -5px 0;

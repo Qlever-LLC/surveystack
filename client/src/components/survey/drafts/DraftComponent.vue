@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-slot-attribute -->
 <template>
   <div class="draft-component-wrapper draft wrapper" :class="{ builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
@@ -6,10 +7,9 @@
       v-model="showConfirmSubmission"
       :groupId="submission.meta.group.id"
       :submitAsUser="submission.meta.submitAsUser"
-      @submit="() => submitConfirmed(submission)"
+      @submit="submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
-      :dateSubmitted="submission.meta.dateSubmitted"
-    />
+      :dateSubmitted="submission.meta.dateSubmitted" />
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
@@ -17,12 +17,13 @@
       :required="control && control.options && control.options.required"
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
-      :questionNumber="$store.getters['draft/questionNumber']"
+      :questionNumber="questionNumber"
       @showOverviewClicked="showOverview = !showOverview"
-      v-if="builder"
-    >
+      v-if="builder">
       <!-- forward all the slots -->
-      <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
+      <template v-for="(_, name) in $slots" v-slot:[name]="{ props }">
+        <slot :name="name" :props="props" />
+      </template>
     </app-draft-toolbar>
 
     <!-- Overview -->
@@ -34,35 +35,32 @@
         :groupPath="groupPath"
         :overviews="$store.getters['draft/overviews']"
         @goto="goto"
-        class="maxw-60 mx-auto"
-      />
+        class="maxw-60 mx-auto" />
     </div>
 
     <!-- Content with questions -->
     <div class="draft-content" v-else>
-      <v-fab-transition>
-        <v-btn
+      <a-fab-transition>
+        <a-btn
           v-show="overflowing"
           color="primary"
           fab
-          dark
           small
-          fixed
+          position="fixed"
           style="bottom: 76px; right: 12px; z-index: 150"
           @click="
             scrollY(500);
             overflowing = false;
-          "
-        >
-          <v-icon>mdi-arrow-down</v-icon>
-        </v-btn>
-      </v-fab-transition>
+          ">
+          <a-icon>mdi-arrow-down</a-icon>
+        </a-btn>
+      </a-fab-transition>
       <app-control class="pb-1" :path="path" :control="control" :forceMobile="forceMobile" :isInBuilder="builder" />
     </div>
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-0 grey lighten-4"
+      class="draft-footer px-0 bg-grey-lighten-4"
       :class="{ 'show-submit': showOverview }"
       :style="{
         left: moveFooter ? '256px' : '0px',
@@ -75,45 +73,44 @@
       :showNav="true"
       @next="next"
       @prev="prev"
-      @submit="submit"
-    />
+      @submit="submit" />
   </div>
   <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
-    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
+    <a-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
       <div class="text-body-1 my-4 text-center">
         Click on the
-        <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+        <a-btn fab x-small elevation="4" color="blue-darken-2" style="pointer-events: none; border-radius: 50%">
+          <a-icon large>mdi-plus</a-icon>
+        </a-btn>
         to add questions to your survey
       </div>
       <div class="text-body-1 my-4 text-center">
-        <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events: none">
-          <v-icon class="mr-1">mdi-content-save</v-icon>
+        <a-btn small color="primary" class="my-1 mr-1" style="pointer-events: none">
+          <a-icon class="mr-1">mdi-content-save</a-icon>
           Save
-        </v-btn>
+        </a-btn>
         to create a draft
       </div>
       <div class="text-body-1 my-4 text-center">
-        <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events: none">
-          <v-icon class="mr-1">mdi-cloud-upload</v-icon>
+        <a-btn small class="my-1 mr-1" color="green" style="pointer-events: none">
+          <a-icon class="mr-1">mdi-cloud-upload</a-icon>
           Publish
-        </v-btn>
+        </a-btn>
         to allow users to submit to your survey
       </div>
-    </v-sheet>
+    </a-sheet>
   </div>
-  <v-alert v-else border="left" prominent text type="error">
-    <v-row align="center">
-      <v-col class="grow">
+  <a-alert v-else border="start" prominent variant="text" type="error">
+    <a-row align="center">
+      <a-col class="grow">
         This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
         editor.
-      </v-col>
-      <v-col class="shrink">
-        <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
-      </v-col>
-    </v-row>
-  </v-alert>
+      </a-col>
+      <a-col class="shrink">
+        <a-btn :to="`/surveys/${survey._id}`">back</a-btn>
+      </a-col>
+    </a-row>
+  </a-alert>
 </template>
 
 <script>
@@ -137,7 +134,7 @@ export default {
     survey: { type: Object },
     submission: { type: Object },
     persist: { type: Boolean },
-    builder: { type: Boolean },
+    builder: { type: Boolean, default: false },
     forceMobile: { type: Boolean, default: false },
   },
   data() {
@@ -154,6 +151,9 @@ export default {
     },
     groupPath() {
       return this.$store.getters['draft/groupPath'];
+    },
+    questionNumber() {
+      return this.$store.getters['draft/questionNumber'];
     },
     showOverview: {
       get() {
@@ -179,7 +179,7 @@ export default {
       // we want a fixed footer, but this causes issues when the menu side bar is shown...
       // Basically, we need to move the footer to the left and calculate its width if the menu is shown,
       // However, if display breakpoint is 'md' or less, we do not move the footer
-      return this.$store.getters['appui/menu'] && !this.$vuetify.breakpoint.mdAndDown;
+      return this.$store.getters['appui/menu'] && !this.$vuetify.display.mdAndDown;
     },
   },
   watch: {
@@ -281,7 +281,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .draft-component-wrapper.builder >>> .draft-footer.show-submit .full {
   position: relative;
 }
@@ -303,6 +303,7 @@ export default {
   font-size: 14px;
   opacity: 0;
 }
+
 .draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
   position: absolute;
   content: '';
@@ -340,7 +341,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
 }
 
 .draft-content {
@@ -351,7 +352,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
 }
 
 .draft-footer {

@@ -1,20 +1,27 @@
 <template>
-  <v-container class="maxw-4">
+  <a-container class="maxw-4">
     <template v-if="isLoggedIn">
-      <v-alert
+      <a-alert
         v-if="successMessage"
         class="mt-4"
         style="cursor: pointer"
         mode="fade"
-        text
+        variant="text"
         type="success"
         @click="successMessage = null"
-        >{{ successMessage }}</v-alert
-      >
+        >{{ successMessage }}
+      </a-alert>
 
-      <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
-        errorMessage
-      }}</v-alert>
+      <a-alert
+        v-if="errorMessage"
+        style="cursor: pointer"
+        class="mt-4 cursor-pointer"
+        mode="fade"
+        variant="text"
+        type="error"
+      >
+        {{ errorMessage }}
+      </a-alert>
 
       <p class="mt-4 mb-6">
         You are logged in as
@@ -35,19 +42,19 @@
         <div class="my-8">
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
-            <v-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details></v-text-field>
-            <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
+            <a-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details />
+            <a-checkbox v-model="userIsOwner" label="this user will be an owner too" />
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
-            text
+            variant="text"
             type="error"
-            >{{ errorDialogMessage }}</v-alert
-          >
-          <v-btn block @click="addUser" color="primary" target="_blank"> Add </v-btn>
+            >{{ errorDialogMessage }}
+          </a-alert>
+          <a-btn block @click="addUser" color="primary" target="_blank"> Add</a-btn>
         </div>
       </app-dialog>
       <!-- add confirmation Dialog -->
@@ -63,7 +70,7 @@
       >
         <div class="my-8" style="color: black">
           <p class="mb-4">Are you sure you want to add this user {{ newAddedUserEmail }} to your instance?<br /></p>
-          <v-btn block @click="confirmaddUser" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmaddUser" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -81,18 +88,18 @@
         <div class="my-8">
           <p>To whom do you wish to transfer the ownership of this farm?</p>
           <div class="d-flex mb-4">
-            <v-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details></v-text-field>
+            <a-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details />
           </div>
-          <v-alert
+          <a-alert
             v-if="errorDialogMessage"
             style="cursor: pointer"
             class="mt-4 cursor-pointer"
             mode="fade"
-            text
+            variant="text"
             type="error"
-            >{{ errorDialogMessage }}</v-alert
-          >
-          <v-btn block @click="changeOwner" color="primary" target="_blank"> Update</v-btn>
+            >{{ errorDialogMessage }}
+          </a-alert>
+          <a-btn block @click="changeOwner" color="primary" target="_blank"> Update</a-btn>
         </div>
       </app-dialog>
       <!-- move confirmation Dialog -->
@@ -119,7 +126,7 @@
             You will still be able to see fields, plantings and logs in your Survey Stack surveys and push surveys to
             that farm.
           </p>
-          <v-btn block @click="confirmChangeOwner" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmChangeOwner" color="primary" target="_blank"> Confirm</a-btn>
         </div>
       </app-dialog>
 
@@ -144,7 +151,7 @@
             <li>See this farm's fields or plantings when filling out surveys.</li>
             <li>Push data from Survey Stack surveys into this farmOS farm.</li>
           </ol>
-          <v-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -179,7 +186,7 @@
             wish to continue access your farmOS farm you should sign up with hosting through Farmier at that point.
           </p>
           <p>If you want to transfer ownership of this farm to someone else, press the 'move' button instead.</p>
-          <v-btn block @click="confirmDeleteInstance" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmDeleteInstance" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -205,7 +212,7 @@
             member of this group.
           </p>
           <p>This will also affect anyone else linked to this farm through Survey Stack.</p>
-          <v-btn block @click="confirmRemoveInstFromGrpDialog" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmRemoveInstFromGrpDialog" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -225,7 +232,7 @@
             Are you sure? Removing this users access means they can no longer see your farmOS instance or access your
             fields, plantings or logs through in their surveys.
           </p>
-          <v-btn block @click="confirmRemoveInstFromOthUsrDialog" color="primary" target="_blank"> Confirm</v-btn>
+          <a-btn block @click="confirmRemoveInstFromOthUsrDialog" color="primary" target="_blank"> Confirm </a-btn>
         </div>
       </app-dialog>
 
@@ -233,7 +240,7 @@
         <h2>FarmOS Integrations</h2>
       </div>
 
-      <v-simple-table class="mt-8">
+      <a-table class="mt-8">
         <template v-slot>
           <thead>
             <tr>
@@ -248,151 +255,119 @@
                 <div class="pt-3" style="white-space: nowrap">{{ instance.instanceName }}</div>
                 <div class="pb-3">
                   <span v-if="instance.isOwner">
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="blue"
-                          :href="getInstanceLink(instance.instanceName)"
-                          target="_blank"
-                        >
-                          access
-                        </v-btn>
-                      </template>
-                      <span>Access FarmOS instance</span>
-                    </v-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="blue"
+                      :href="getInstanceLink(instance.instanceName)"
+                      target="_blank"
+                    >
+                      access
+                      <a-tooltip top activator="parent">Access FarmOS instance</a-tooltip>
+                    </a-btn>
 
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="black"
-                          @click="addUserToInstance(instance.instanceName)"
-                        >
-                          add
-                        </v-btn>
-                      </template>
-                      <span>Add a user to your instance</span>
-                    </v-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="black"
+                      @click="addUserToInstance(instance.instanceName)"
+                    >
+                      add
+                      <a-tooltip top activator="parent">Add a user to your instance</a-tooltip>
+                    </a-btn>
 
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="black"
-                          @click="moveInstance(instance.instanceName)"
-                        >
-                          re-assign
-                        </v-btn>
-                      </template>
-                      <span>Re-assign the instance's ownership</span>
-                    </v-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="black"
+                      @click="moveInstance(instance.instanceName)"
+                    >
+                      re-assign
+                      <a-tooltip top activator="parent">Re-assign the instance's ownership</a-tooltip>
+                    </a-btn>
 
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="red"
-                          @click="deleteInstance(instance.instanceName)"
-                        >
-                          delete
-                        </v-btn>
-                      </template>
-                      <span>Delete this instance</span>
-                    </v-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="red"
+                      @click="deleteInstance(instance.instanceName)"
+                    >
+                      delete
+                      <a-tooltip top activator="parent">Delete this instance</a-tooltip>
+                    </a-btn>
                   </span>
                   <span v-else>
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="blue"
-                          :href="getInstanceLink(instance.instanceName)"
-                          target="_blank"
-                        >
-                          access
-                        </v-btn>
-                      </template>
-                      <span>Access FarmOS instance</span>
-                    </v-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="blue"
+                      :href="getInstanceLink(instance.instanceName)"
+                      target="_blank"
+                    >
+                      access
+                      <a-tooltip top activator="parent">Access FarmOS instance</a-tooltip>
+                    </a-btn>
 
-                    <v-tooltip top>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          v-on="on"
-                          text
-                          x-small
-                          class="px-1 mx-1"
-                          style="min-width: 0px"
-                          color="red"
-                          @click="removeInstance(instance.instanceName)"
-                        >
-                          remove
-                        </v-btn>
-                      </template>
-                      <span>Remove this instance</span>
-                    </v-tooltip>
+                    <a-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="red"
+                      @click="removeInstance(instance.instanceName)"
+                    >
+                      remove
+                      <a-tooltip top activator="parent">Remove this instance</a-tooltip>
+                    </a-btn>
                   </span>
                 </div>
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
-                    dark
                     color="green"
                     v-for="(group, uidx) in instance.groups"
                     :key="`instance-${idx}-group-${uidx}`"
                     @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
                   >
                     {{ group.groupName }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>
               <td>
                 <div class="py-3" v-if="instance.isOwner">
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
                     close
-                    dark
                     color="blue"
                     v-for="(user, uidx) in getEmailsWithoutMySelf(instance.otherUsers)"
                     :key="`instance-${idx}-user-${uidx}`"
                     @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
                     ><span v-if="user.owner" class="mdi mdi-crown pr-1"></span>
                     {{ user.userEmail }}
-                  </v-chip>
+                  </a-chip>
                 </div>
                 <div v-else>only owners may view this information</div>
               </td>
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
 
       <div style="margin-top: 100px !important">
         <p><b>If you have questions or need support reach out to your group admin or email info@our-sci.net.</b></p>
@@ -400,9 +375,10 @@
     </template>
     <template v-else>
       <h1>FarmOS Profile</h1>
-      You are not logged in... <router-link to="/auth/login">Go to Login</router-link>
+      You are not logged in...
+      <router-link to="/auth/login">Go to Login</router-link>
     </template>
-  </v-container>
+  </a-container>
 </template>
 
 <script>

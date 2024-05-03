@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/vue';
-import { BrowserTracing } from '@sentry/tracing';
+import { BrowserTracing } from '@sentry/browser';
 import { CaptureConsole } from '@sentry/integrations';
 
 // NOTE: you can send traces from your localhost by adding these variables to client/.env.local
@@ -7,7 +7,7 @@ import { CaptureConsole } from '@sentry/integrations';
 //  VUE_APP_SENTRY_ENV="YOURNAME-development"
 
 // Start error tracking and performance monitoring with Sentry.io
-export const startSentry = (Vue, store, router) => {
+export const startSentry = (app, store, router) => {
   // TODO remove feature flag after we verified it's stable
   // Wait until toggle states are loaded
   if (!store.getters['toggle/isLoaded']) {
@@ -16,7 +16,7 @@ export const startSentry = (Vue, store, router) => {
       (togglesLoaded) => {
         if (togglesLoaded) {
           stopWatch();
-          startSentry(Vue, store, router);
+          startSentry(app, store, router);
         }
       },
       { immediate: true }
@@ -49,14 +49,14 @@ export const startSentry = (Vue, store, router) => {
   }
 
   Sentry.init({
-    Vue,
+    app,
     environment,
     release,
     dsn,
     integrations: [
       new BrowserTracing({
         routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-        tracingOrigins: [process.env.VUE_APP_API_URL, /^\//],
+        tracePropagationTargets: [process.env.VUE_APP_API_URL + '/', /^\//],
       }),
       new CaptureConsole({
         levels: ['error'],

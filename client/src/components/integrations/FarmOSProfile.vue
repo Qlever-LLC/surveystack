@@ -20,17 +20,16 @@
           </div>
         </td>
         <td v-if="Array.isArray(item.grpAccess) && item.grpAccess.length" class="box">
-          <v-chip
+          <a-chip
             v-for="(group, id) in item.grpAccess"
             :key="id"
             class="ma-2"
             color="white"
             close
             @click:close="onCloseGrpAccess(item, group.id)"
-            label
-          >
+            label>
             {{ group.value }}
-          </v-chip>
+          </a-chip>
         </td>
         <td v-else class="box">
           <p>
@@ -38,17 +37,16 @@
           </p>
         </td>
         <td v-if="Object.entries(item.othAccess) && Object.entries(item.othAccess).length" class="box">
-          <v-chip
+          <a-chip
             v-for="(other, id) in item.othAccess"
             :key="id"
             class="ma-2"
             color="white"
             close
             @click:close="onCloseOthAccess(item, other.id)"
-            label
-          >
+            label>
             {{ other.value }}
-          </v-chip>
+          </a-chip>
         </td>
         <td v-else class="box">
           <p>
@@ -61,7 +59,6 @@
 </template>
 
 <script>
-import {} from '@vue/composition-api';
 import MyButton from './common/Button.vue';
 
 export default {
@@ -93,7 +90,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .backGroundGrey {
   background-color: rgb(143, 142, 142) !important;
 }

@@ -184,7 +184,6 @@ const ontologyControl = (overrides = {}, index = 1, source = uniqueId()) => ({
       showAllOptions: false,
       columns: 3,
     },
-    allowAutocomplete: false,
     hasMultipleSelections: true,
   },
   hint: '',

@@ -1,12 +1,12 @@
 <template>
-  <v-card dark background-color="dark-blue" class="mt-4">
-    <v-card-title color="blue-grey"
-      >Console Log<v-spacer></v-spacer>
-      <v-icon @click="$emit('clear')">mdi-delete</v-icon>
-    </v-card-title>
+  <a-card class="mt-4">
+    <a-card-title>
+      Console Log<a-spacer />
+      <a-icon @click="$emit('clear')">mdi-delete</a-icon>
+    </a-card-title>
 
-    <textarea class="console-container" readonly :value="log"> </textarea>
-  </v-card>
+    <a-textarea class="console-container" readonly :modelValue="log" />
+  </a-card>
 </template>
 <script>
 export default {
@@ -18,7 +18,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .console-container {
   background-color: #0004;
   padding: 12px;

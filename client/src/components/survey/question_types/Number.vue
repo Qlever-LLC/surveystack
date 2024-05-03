@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <div>
     <app-control-label
@@ -6,23 +7,20 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
-    <v-text-field
-      outlined
-      type="number"
-      :label="control.hint"
-      v-bind:value="value"
-      v-on:input="onInput"
-      @keyup.enter.prevent="submit"
-      ref="textField"
+      @initialize="initialize" />
+    <a-text-field
       :disabled="!relevant"
-      hide-details="auto"
-      color="focus"
+      :label="control.hint"
       :rules="[isValidNumber]"
-      data-test-id="input"
+      @keyup.enter.prevent="submit"
+      @update:modelValue="onInput"
       clearable
-    />
+      color="focus"
+      hide-details="auto"
+      ref="textField"
+      type="number"
+      v-model="localValue"
+      variant="outlined" />
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -33,31 +31,34 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { isIos } from '@/utils/compatibility';
 
+export const isValidNumber = (value, isRequired) =>
+  isNaN(Number(value)) || (isRequired && value === null) ? 'Please enter a number' : true;
+
 export default {
   mixins: [baseQuestionComponent],
   components: {
     appControlLabel,
     appControlMoreInfo,
   },
+  data() {
+    return {
+      localValue: this.modelValue,
+    };
+  },
   methods: {
     keyup(ev) {
       console.log('key: ', ev);
     },
     submit() {
-      this.onInput(this.value);
-      this.$emit('next');
+      this.onInput(this.modelValue);
+      this.next();
     },
     tryAutofocus() {
-      if (
-        typeof document === 'undefined' ||
-        !this.$refs.textField.$refs.input ||
-        document.activeElement === this.$refs.input
-      ) {
-        return false;
+      if (!this.isInBuilder && this.$refs.textField) {
+        this.$refs.textField.focus({ preventScroll: true });
+        return true;
       }
-      this.$refs.textField.$refs.input.focus({ preventScroll: true });
-
-      return true;
+      return false;
     },
     onInput(value) {
       // TODO: implicitly parse as Integer or Float?
@@ -75,7 +76,7 @@ export default {
       }
     },
     isValidNumber(val) {
-      return isNaN(Number(val)) || (this.required && val === null) ? 'Please enter a number' : true;
+      return isValidNumber(val, this.required);
     },
   },
   mounted() {

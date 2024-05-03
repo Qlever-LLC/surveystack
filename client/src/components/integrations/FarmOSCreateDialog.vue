@@ -1,37 +1,30 @@
 <template>
-  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
-    <v-card class="pa-4">
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    max-width="800"
+    max-height="1000">
+    <a-card class="pa-4">
       <FarmOSRegister
         :viewModel="viewModel"
-        @check-url="(f) => $emit('check-url', f)"
-        @create-instance="(f) => $emit('create-instance', f)"
-      ></FarmOSRegister>
-    </v-card>
-  </v-dialog>
+        @check-url="$emit('check-url', $event)"
+        @create-instance="$emit('create-instance', $event)" />
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
 import FarmOSRegister from '@/pages/farmos-manage/FarmOSRegister.vue';
 
 export default {
-  emits: ['create', 'createInstance', 'checkUrl'],
   props: {
-    value: Boolean,
+    modelValue: Boolean,
     viewModel: {
       type: Object,
       required: true,
     },
   },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
-  },
+  emits: ['check-url', 'create-instance', 'update:modelValue'],
   components: { FarmOSRegister },
 };
 </script>

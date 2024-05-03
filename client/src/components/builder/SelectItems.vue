@@ -1,52 +1,48 @@
 <template>
-  <v-dialog v-model="open" width="500" @click:outside="cancel">
-    <template v-slot:activator="{ on, attrs }">
-      <v-text-field
-        ref="anchorRef"
+  <a-dialog v-model="open" width="500">
+    <template v-slot:activator="{ props }">
+      <a-text-field
+        v-bind="props"
+        :modelValue="getLabel"
+        @update:modelValue="onChange"
         label="Default value"
-        :value="getLabel"
-        @input="onChange"
-        :class="$vnode.data.staticClass"
+        class="mt-3"
         clearable
         hide-details
         readonly
-        :disabled="getDisabled"
-        v-on="on"
-        v-bind="attrs"
-      />
+        :disabled="getDisabled" />
     </template>
 
-    <v-card>
-      <v-card-title class="grey--text text--darken-2"> Default value </v-card-title>
+    <a-card>
+      <a-card-title class="text-grey-darken-2"> Default value </a-card-title>
 
-      <v-card-text class="dialog-content">
+      <a-card-text cssDialogContent>
         <div v-if="multiple" class="checkbox-group">
-          <v-checkbox
+          <a-checkbox
             v-for="(item, index) in items"
             :key="index"
             v-model="selected"
             :label="item.label"
-            :value="item.value"
+            :selected-item="item.value"
             class="mt-2"
-            hide-details
-          />
-          <v-checkbox v-if="custom" v-model="selected" label="other" value="other" class="mt-2" hide-details />
+            hide-details />
+          <a-checkbox v-if="custom" v-model="selected" label="other" selected-item="other" class="mt-2" hide-details />
         </div>
-        <v-radio-group v-else :value="selected ? selected[0] : null" @change="selected = [$event]">
-          <v-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
-          <v-radio v-if="custom" label="other" value="other" />
-        </v-radio-group>
-      </v-card-text>
+        <a-radio-group v-else :modelValue="selected ? selected[0] : null" @update:modelValue="selected = [$event]">
+          <a-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />
+          <a-radio v-if="custom" label="other" value="other" />
+        </a-radio-group>
+      </a-card-text>
 
-      <v-divider></v-divider>
+      <a-divider />
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="cancel">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      <a-card-actions>
+        <a-spacer />
+        <a-btn variant="text" @click="cancel">Cancel</a-btn>
+        <a-btn color="primary" @click="save">Save</a-btn>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
@@ -56,11 +52,12 @@ function getArrayValue(source) {
 
 export default {
   props: {
-    value: { type: [String, Array] },
+    modelValue: { type: [String, Array] },
     items: { type: Array, default: () => [] },
     custom: { type: Boolean },
     multiple: { type: Boolean },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       open: false,
@@ -73,7 +70,7 @@ export default {
         return undefined;
       }
 
-      return this.selected
+      return getArrayValue(this.modelValue)
         .map((item) => {
           const match = this.items.find((i) => i.value === item);
           return match ? match.label : item;
@@ -88,36 +85,37 @@ export default {
     onChange(val) {
       if (!val) {
         this.selected = null;
-        this.$emit('input', null);
+        this.$emit('update:modelValue', null);
       }
     },
     close() {
       this.open = false;
-      this.$refs.anchorRef.blur();
     },
     cancel() {
-      this.selected = getArrayValue(this.value);
+      this.selected = getArrayValue(this.modelValue);
       this.close();
     },
     save() {
-      this.$emit('input', this.selected);
+      this.$emit('update:modelValue', this.selected);
       this.close();
     },
   },
   watch: {
     open(val) {
       if (val) {
-        this.selected = getArrayValue(this.value);
+        this.selected = getArrayValue(this.modelValue);
+      } else {
+        this.cancel();
       }
     },
   },
   created() {
-    this.selected = getArrayValue(this.value);
+    this.selected = getArrayValue(this.modelValue);
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .checkbox-group >>> .v-input--selection-controls {
   margin-top: 4px;
 }

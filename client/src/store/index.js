@@ -1,15 +1,11 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-
+import { createStore } from 'vuex';
 import createMutationSharer from 'vuex-shared-mutations';
 
 import modules from './modules';
 
-Vue.use(Vuex);
-
 function createStoreObject() {
   return {
-    modules,
+    modules: modules,
     state: {},
     actions: {
       reset({ dispatch }) {
@@ -27,10 +23,6 @@ function createStoreObject() {
   };
 }
 
-function createStore() {
-  return new Vuex.Store(createStoreObject());
-}
-
-export default createStore();
+export default createStore(createStoreObject());
 
 export { createStoreObject };

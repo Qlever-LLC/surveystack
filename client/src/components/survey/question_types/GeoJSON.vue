@@ -6,23 +6,21 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <app-control-hint :value="control.hint" />
-    <v-snackbar top light v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1">
+    <a-snackbar v-model="keepOpenNotificationIsVisible" class="keep-open-alert" :timeout="-1" location="top">
       Keep this window open while tracing your area or field. If you switch applications you may lose the area you have
       traced.
-      <v-btn
+      <a-btn
         v-bind="$attrs"
         @click="keepOpenNotificationIsVisible = false"
         rounded
-        depressed
+        variant="flat"
         color="primary"
-        class="d-block ml-auto"
-      >
+        class="d-block ml-auto">
         Dismiss
-      </v-btn>
-    </v-snackbar>
+      </a-btn>
+    </a-snackbar>
     <div
       :id="mapId"
       :class="{
@@ -35,12 +33,11 @@
         'hide-modify': !hasSomeDrawControl,
         'hide-geotrace': !control.options.geoJSON.showGeoTrace,
       }"
-      role="application"
-    />
+      role="application" />
 
     <div class="fields-table mt-6 d-none">
-      <v-btn class="ml-auto" color="primary" @click="handleAddField">Add field</v-btn>
-      <v-simple-table class="mt-2" height="300" fixed-header dense>
+      <a-btn class="ml-auto" color="primary" @click="handleAddField">Add field</a-btn>
+      <a-table class="mt-2" height="300" fixed-header dense>
         <thead>
           <tr>
             <th class="text-left">Visible</th>
@@ -52,16 +49,16 @@
         </thead>
         <tbody>
           <tr v-for="(field, i) in fields" :key="i">
-            <td><v-switch v-model="fields[i].visible" class="my-3 pt-0" hide-details></v-switch></td>
+            <td><a-switch v-model="fields[i].visible" class="my-3 pt-0" hide-details /></td>
             <td><img v-if="field.preview" height="48" :src="field.preview" /></td>
             <td><input v-model="fields[i].name" placeholder="Enter field name ..." /></td>
             <td><input v-model="fields[i].type" placeholder="Enter field type ..." /></td>
             <td align="right">
-              <v-btn icon outlined small><v-icon>mdi-delete</v-icon></v-btn>
+              <a-btn icon variant="outlined" small><a-icon>mdi-delete</a-icon></a-btn>
             </td>
           </tr>
         </tbody>
-      </v-simple-table>
+      </a-table>
     </div>
 
     <app-control-more-info :value="control.moreInfo" />
@@ -117,9 +114,9 @@ export async function addDrawingLayer(map, value) {
 }
 
 /**
- * Calculate the next value to assign to component's `this.value`
+ * Calculate the next value to assign to component's `this.modelValue`
  * @param {string} geojson: stringified geojson FeatureCollection emitted from map
- * @returns {string|null} next value to assign to components `this.value`
+ * @returns {string|null} next value to assign to components `this.modelValue`
  */
 export function getNextValue(geojson) {
   const parsedGeoJSON = geojson && JSON.parse(geojson);
@@ -151,7 +148,7 @@ export default {
   mounted() {
     this.load();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     new MapInstanceManager().destroy(this.mapId);
     this.mapInstance = null;
   },
@@ -160,7 +157,7 @@ export default {
       this.mapInstance = new MapInstanceManager().create(this.mapId);
 
       await addBaseLayer(this.mapInstance);
-      await addDrawingLayer(this.mapInstance, this.value);
+      await addDrawingLayer(this.mapInstance, this.modelValue);
 
       const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
       this.mapInstance.edit.geoJSONOn('featurechange', mapChangeHandler);
@@ -170,7 +167,7 @@ export default {
       });
 
       // If no features exist in value, run automatic behaviors
-      if (!this.value) {
+      if (!this.modelValue) {
         this.mapInstance.attachBehavior({
           attach(instance) {
             const controls = instance.map.getControls().getArray();
