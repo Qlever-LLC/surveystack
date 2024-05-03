@@ -168,7 +168,7 @@ const actions = {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
       try {
-        db.persistSubmission(state.submission);
+        await db.persistSubmission(state.submission);
       } catch (err) {
         console.warn('unable to persist submission to IDB');
       }
