@@ -1,5 +1,6 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
+import vuetify from './../plugins/vuetify';
 
 const partners = [];
 
@@ -13,7 +14,7 @@ function importAll(r) {
 importAll(require.context('@/partners/', false, /\.js$/));
 
 export default {
-  install(vue) {
+  install(store) {
     const appBarThemeColor = document.createElement('meta');
     appBarThemeColor.setAttribute('name', 'theme-color');
     appBarThemeColor.setAttribute('content', '#444444');
@@ -38,19 +39,20 @@ export default {
 
       if (activePartner) {
         // every property needs to be set manually to force a reactive update
-        vue.$vuetify.theme.themes.light.primary = activePartner.themes.light.primary;
-        vue.$vuetify.theme.themes.light.secondary = activePartner.themes.light.secondary;
-        vue.$vuetify.theme.themes.light.accent = activePartner.themes.light.accent;
-        vue.$vuetify.theme.themes.light.error = activePartner.themes.light.error;
-        vue.$vuetify.theme.themes.light.warning = activePartner.themes.light.warning;
-        vue.$vuetify.theme.themes.light.info = activePartner.themes.light.info;
-        vue.$vuetify.theme.themes.light.success = activePartner.themes.light.success;
-        vue.$vuetify.theme.themes.light.appbar = activePartner.themes.light.appbar;
-        vue.$vuetify.theme.themes.light.background =
-          activePartner.themes.light.background || vue.$vuetify.theme.themes.light.background;
-        vue.$vuetify.theme.themes.light.focus = activePartner.themes.light.focus || activePartner.themes.light.primary;
-        vue.$vuetify.theme.themes.light.heading =
-          activePartner.themes.light.heading || vue.$vuetify.theme.themes.light.heading;
+        vuetify.theme.themes.value.light.colors.primary = activePartner.themes.light.primary;
+        vuetify.theme.themes.value.light.colors.secondary = activePartner.themes.light.secondary;
+        vuetify.theme.themes.value.light.colors.accent = activePartner.themes.light.accent;
+        vuetify.theme.themes.value.light.colors.error = activePartner.themes.light.error;
+        vuetify.theme.themes.value.light.colors.warning = activePartner.themes.light.warning;
+        vuetify.theme.themes.value.light.colors.info = activePartner.themes.light.info;
+        vuetify.theme.themes.value.light.colors.success = activePartner.themes.light.success;
+        vuetify.theme.themes.value.light.colors.appbar = activePartner.themes.light.appbar;
+        vuetify.theme.themes.value.light.colors.background =
+          activePartner.themes.light.background || vuetify.theme.themes.value.light.colors.background;
+        vuetify.theme.themes.value.light.colors.focus =
+          activePartner.themes.light.focus || activePartner.themes.light.primary;
+        vuetify.theme.themes.value.light.colors.heading =
+          activePartner.themes.light.heading || vuetify.theme.themes.value.light.colors.heading;
 
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);
@@ -60,7 +62,7 @@ export default {
         document.title = activePartner.name;
 
         // set whitelabel
-        vue.$store.dispatch('whitelabel/setPartner', activePartner);
+        store.dispatch('whitelabel/setPartner', activePartner);
       }
     }
 
@@ -69,6 +71,6 @@ export default {
     document.head.appendChild(appleTouch);
     document.head.appendChild(appBarThemeColor);
 
-    vue.$store.dispatch('memberships/tryAutoJoinAndSelectGroup');
+    store.dispatch('memberships/tryAutoJoinAndSelectGroup');
   },
 };

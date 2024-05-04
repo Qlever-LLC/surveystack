@@ -1,18 +1,18 @@
 <template>
-  <v-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
-    <v-btn @click="handleClose" icon class="close-button">
-      <v-icon>mdi-close</v-icon>
-    </v-btn>
+  <a-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" position="fixed" location="bottom">
+    <a-btn @click="handleClose" icon class="close-button">
+      <a-icon>mdi-close</a-icon>
+    </a-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center pt-2">
-        <v-btn outlined @click="install" large>
-          <v-icon class="ml-n2 mr-1" small>mdi-plus</v-icon>
+        <a-btn variant="outlined" @click="install" large>
+          <a-icon class="ml-n2 mr-1" small>mdi-plus</a-icon>
           Add to Homescreen
-        </v-btn>
+        </a-btn>
       </div>
     </div>
-  </v-snackbar>
+  </a-snackbar>
 </template>
 
 <script>
@@ -32,7 +32,6 @@ export default {
   },
   methods: {
     handleClose() {
-      // this.$emit('input', false);
       window.localStorage.setItem('defaultInstallBannerDismissed', true);
       this.showDefaultInstall = false;
     },
@@ -61,7 +60,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .close-button {
   position: absolute;
   right: 10px;

@@ -1,13 +1,19 @@
 <template>
-  <v-container>
-    <v-card class="pa-4 mb-4">
-      <span class="text--secondary overline">{{ this.entity._id }}</span>
+  <a-container>
+    <a-card class="pa-4 mb-4">
+      <span class="text-secondary overline">{{ this.entity._id }}</span>
       <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
 
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
+        <a-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" variant="outlined" />
 
-        <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
+        <a-select
+          :items="integrationTypes"
+          item-title="text"
+          item-value="value"
+          v-model="entity.type"
+          label="Type"
+          variant="outlined" />
 
         <app-farmos-farm-picker
           v-if="entity.type === 'farmos-farm'"
@@ -18,20 +24,19 @@
               entity.data = ev;
               entity.name = ev.name;
             }
-          "
-        />
+          " />
         <app-json-editor v-model="entity.data" class="mt-3" />
 
         <div class="d-flex ma-2">
-          <v-btn v-if="editMode" color="error" outlined @click="deleteEntity">
-            <v-icon left>mdi-trash-can-outline</v-icon> Delete
-          </v-btn>
-          <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit">Submit</v-btn>
+          <a-btn v-if="editMode" color="error" variant="outlined" @click="deleteEntity">
+            <a-icon left>mdi-trash-can-outline</a-icon> Delete
+          </a-btn>
+          <a-btn class="ml-auto" variant="text" @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" @click="submit">Submit</a-btn>
         </div>
-      </v-form>
-    </v-card>
-  </v-container>
+      </a-form>
+    </a-card>
+  </a-container>
 </template>
 
 <script>
@@ -154,7 +159,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .code-editor {
   height: 77vh;
 }

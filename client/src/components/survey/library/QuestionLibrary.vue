@@ -1,130 +1,116 @@
 <template>
   <div>
-    <v-card-title class="pl-0">
-      <v-icon class="mr-1">mdi-library</v-icon>
-      Question Library
-      <v-spacer></v-spacer>
-      <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
-        <v-icon> mdi-close </v-icon>
-      </v-btn>
-    </v-card-title>
+    <a-card-title class="d-flex row pl-0">
+      <div class="col flex-grow-1">
+        <a-icon class="mr-1 text-medium-emphasis">mdi-library</a-icon>
+        Question Library
+      </div>
+      <a-btn icon key="library" @click="$emit('cancel')" class="col flex-shrink-1 mt-n2 mr-n6" small tile elevation="0">
+        <a-icon> mdi-close </a-icon>
+      </a-btn>
+    </a-card-title>
 
-    <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+    <a-text-field v-model="search" label="Search" append-inner-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
-      <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
+      <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
     </div>
-    <v-container v-if="loading" class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
-    </v-container>
-    <v-container fluid class="pa-0" v-else>
-      <v-row dense>
-        <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
-          <v-card
+    <a-container v-if="loading" class="d-flex align-center justify-center" cssHeight100>
+      <a-progress-circular :size="50" />
+    </a-container>
+    <a-container fluid class="pa-0" v-else>
+      <a-row dense>
+        <a-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
+          <a-card
             @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
             class="control-item mb-2"
-            elevation="7"
-          >
-            <v-row style="min-height: 96px">
-              <v-col :style="{ minWidth: '0px' }">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
-                  </template>
-                  <span>{{ c.name }}</span>
-                </v-tooltip>
-                <div>
-                  <small class="grey--text">{{ c._id }}</small>
+            elevation="7">
+            <a-row cssMinHeight96px>
+              <a-col cssMinWidth0px>
+                <div class="title text-truncate">
+                  {{ c.name }}
+                  <a-tooltip bottom activator="parent">{{ c.name }}</a-tooltip>
                 </div>
-                <v-chip dark small outlined color="grey" class="font-weight-medium mt-1">
+                <div>
+                  <small class="text-grey">{{ c._id }}</small>
+                </div>
+                <a-chip small variant="outlined" color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
-                </v-chip>
-              </v-col>
-              <v-col align="right" md="auto">
-                <v-btn
-                  dark
+                </a-chip>
+              </a-col>
+              <a-col align="right" md="auto">
+                <a-btn
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="grey"
                   key="close"
                   @click.stop="toggleCard(c._id)"
-                  class="mt-n5 mr-1 d-inline-block shadow white span-button"
+                  class="mt-n5 mr-1 d-inline-block shadow bg-white span-button"
                   outlined
-                  small
-                >
+                  small>
                   back
-                </v-btn>
-                <v-btn
-                  dark
+                </a-btn>
+                <a-btn
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="white"
                   key="library"
                   @click="addToSurvey(c._id)"
-                  class="mt-n5 d-inline-block shadow green span-button"
+                  class="mt-n5 d-inline-block shadow bg-green span-button"
                   outlined
-                  small
-                >
+                  small>
                   add to survey
-                </v-btn>
+                </a-btn>
                 <!--TODO Resolve #48, then uncomment this
                 div>
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <div v-bind="attrs" v-on="on">
-                        <v-icon class="mr-1 pb-1">mdi-account-group</v-icon>
+                  <a-tooltip bottom>
+                    <template v-slot:activator="{ props }">
+                      <div v-bind="props">
+                        <a-icon class="mr-1 pb-1">mdi-account-group</a-icon>
                         {{ c.meta.libraryUsageCountSurveys ? c.meta.libraryUsageCountSurveys : 0 }}
                       </div>
                     </template>
                     <span>Number of surveys using this</span>
-                  </v-tooltip>
+                  </a-tooltip>
                 </div-->
                 <div>
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <div v-bind="attrs" v-on="on">
-                        <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
-                        {{ c.meta.libraryUsageCountSubmissions ? c.meta.libraryUsageCountSubmissions : 0 }}
-                      </div>
-                    </template>
-                    <span>Number of submission using this</span>
-                  </v-tooltip>
+                  <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
+                  {{ c.meta.libraryUsageCountSubmissions ? c.meta.libraryUsageCountSubmissions : 0 }}
+                  <a-tooltip bottom activator="parent">Number of submission using this</a-tooltip>
                 </div>
-              </v-col>
-            </v-row>
-            <v-row v-if="selectedSurvey && selectedSurvey._id === c._id">
-              <v-col>
+              </a-col>
+            </a-row>
+            <a-row v-if="selectedSurvey && selectedSurvey._id === c._id">
+              <a-col>
                 <h4>Description</h4>
-                <small v-html="selectedSurvey.meta.libraryDescription"></small>
+                <small v-html="selectedSurvey.meta.libraryDescription" class="preview"></small>
                 <br />
                 <h4>Applications</h4>
-                <small v-html="selectedSurvey.meta.libraryApplications"></small>
+                <small v-html="selectedSurvey.meta.libraryApplications" class="preview"></small>
                 <br />
                 <h4>Maintainers</h4>
-                <small v-html="selectedSurvey.meta.libraryMaintainers"></small>
+                <small v-html="selectedSurvey.meta.libraryMaintainers" class="preview"></small>
                 <br />
                 <h4>Updates</h4>
-                <small v-html="selectedSurvey.meta.libraryHistory"></small>
-              </v-col>
-              <v-col>
+                <small v-html="selectedSurvey.meta.libraryHistory" class="preview"></small>
+              </a-col>
+              <a-col>
                 <h4>Questions</h4>
                 <graphical-view
-                  :readOnly="true"
+                  readOnly
                   :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
-                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
-                />
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-    <v-pagination
+                  :modelValue="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls" />
+              </a-col>
+            </a-row>
+          </a-card>
+        </a-col>
+      </a-row>
+    </a-container>
+    <a-pagination
       v-if="surveys.content.length > 0 && !selectedSurvey"
       v-model="page"
       :length="activeTabPaginationLength"
-      @input="() => fetchData()"
-    />
+      @update:modelValue="() => fetchData()" />
   </div>
 </template>
 <script>
@@ -229,7 +215,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .control-item:first-child {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
@@ -248,15 +234,20 @@ export default {
 .control-item-selected::before {
   border-color: #4caf50 !important;
 }
-/*
-.control-item-selected {
-border-left: 2px solid var(--v-primary-base);
-}*/
+
 .graphical-view {
   overflow: auto;
   margin-top: 6px;
 }
+
 .v-card:focus:before {
   opacity: 0 !important;
+}
+
+.preview,
+.preview * {
+  padding: revert;
+  margin: revert;
+  max-width: 100%;
 }
 </style>

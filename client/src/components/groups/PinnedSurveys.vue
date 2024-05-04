@@ -1,11 +1,11 @@
 <template>
-  <v-card class="pb-2">
-    <v-card-title
-      >Pinned Surveys
-      <v-spacer />
-      <v-btn color="primary" text @click="openSearchDialog">New..</v-btn>
-    </v-card-title>
-    <draggable
+  <a-card class="pb-2">
+    <a-card-title class="d-flex pa-4">
+      Pinned Surveys
+      <a-spacer />
+      <a-btn color="primary" variant="text" @click="openSearchDialog">New..</a-btn>
+    </a-card-title>
+    <VueDraggable
       v-if="entities.length !== 0"
       class="draggable list-group"
       tag="div"
@@ -14,77 +14,77 @@
       :invertSwap="true"
       :dragOptions="{ animation: 200 }"
       @start="drag = true"
-      @end="drag = false"
-    >
-      <v-card v-for="(el, idx) in entities" :key="`${idx}-survey-${el._id}`" class="ma-2 mx-6" elevation="1" outlined>
-        <v-card-text>
+      @end="drag = false">
+      <a-card
+        v-for="(el, idx) in entities"
+        :key="`${idx}-survey-${el._id}`"
+        class="ma-2 mx-6"
+        elevation="1"
+        variant="outlined">
+        <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
-              <span class="caption grey--text text--darken-1">{{ el._id }}</span>
+              <span class="text-caption text-grey-darken-1">{{ el._id }}</span>
               <br />
               <span class="title">{{ el.name }}</span>
               <br />
-              <span class="font-weight-light grey--text text--darken-2" v-if="el.meta">
+              <span class="font-weight-light text-grey-darken-2" v-if="el.meta">
                 last modified {{ renderDateFromNow(el.meta.dateModified) }}
               </span>
             </div>
             <div class="d-flex">
-              <v-btn icon @click.stop="() => showDeleteModal(idx)">
-                <v-icon color="grey lighten-1">mdi-delete</v-icon>
-              </v-btn>
+              <a-btn icon @click.stop="() => showDeleteModal(idx)">
+                <a-icon color="grey-lighten-1">mdi-delete</a-icon>
+              </a-btn>
             </div>
           </div>
-        </v-card-text>
-      </v-card>
-    </draggable>
-    <v-card class="ma-2" outlined elevation="1" v-else>
-      <v-card-text>
-        <span class="title text--secondary">No pinned surveys yet</span><br />
-        <span class="font-weight-light grey--text text--darken-2"
-          >You can add surveys from the menu in the top right</span
-        >
-      </v-card-text>
-    </v-card>
-    <v-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
-      <v-card>
-        <v-card-title> Remove Pinned Survey </v-card-title>
-        <v-card-text class="mt-4">
+        </a-card-text>
+      </a-card>
+    </VueDraggable>
+    <a-card class="ma-2" variant="outlined" elevation="1" v-else>
+      <a-card-text>
+        <span class="title text-secondary">No pinned surveys yet</span><br />
+        <span class="font-weight-light text-grey-darken-2">You can add surveys from the menu in the top right</span>
+      </a-card-text>
+    </a-card>
+    <a-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
+      <a-card>
+        <a-card-title> Remove Pinned Survey </a-card-title>
+        <a-card-text class="mt-4">
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        </a-card-text>
+        <a-card-actions>
+          <a-spacer />
+          <a-btn variant="text" @click.stop="deleteQuestionModalIsVisible = false"> Cancel </a-btn>
+          <a-btn variant="text" color="red" @click.stop="handleConfirmDelete"> Remove </a-btn>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
 
-    <v-dialog v-model="showSearchDialog" max-width="500">
-      <v-card>
-        <v-card-title>Search surveys</v-card-title>
-        <v-card-text>
-          <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
-          <v-list>
-            <v-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
-              <v-list-item-content>
-                <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
-                <v-list-item-subtitle v-if="searchResult.meta">
-                  last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <a-dialog v-model="showSearchDialog" max-width="500">
+      <a-card>
+        <a-card-title>Search surveys</a-card-title>
+        <a-card-text>
+          <a-text-field v-model="q" append-inner-icon="mdi-magnify" @update:modelValue="(e) => $emit('search', e)" />
+          <a-list>
+            <a-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
+              <a-list-item-title>{{ searchResult.name }}</a-list-item-title>
+              <a-list-item-subtitle v-if="searchResult.meta">
+                last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}
+              </a-list-item-subtitle>
+            </a-list-item>
+          </a-list>
+        </a-card-text>
+      </a-card>
+    </a-dialog>
     <slot name="footer">
       <div></div>
     </slot>
-  </v-card>
+  </a-card>
 </template>
 
 <script>
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
@@ -92,7 +92,7 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 export default {
   name: 'nested-draggable',
   components: {
-    draggable,
+    VueDraggable,
   },
   data() {
     return {

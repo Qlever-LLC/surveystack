@@ -3,7 +3,7 @@ variables:
   IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
 
 image:
-  name: "node:16"
+  name: "node:20-bullseye"
 
 workflow:
   rules:
@@ -176,8 +176,8 @@ deploy to stage:
   environment:
     name: staging
     url: http://18.206.205.172:3000
-  only:
-    - master
+  #only:
+   # - master
   image: docker:19.03.12
   services:
     - docker:19.03.12-dind

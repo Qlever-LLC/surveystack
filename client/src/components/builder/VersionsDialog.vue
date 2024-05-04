@@ -1,29 +1,32 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%" scrollable>
-    <v-card>
-      <v-card-title>Survey Versions</v-card-title>
-      <v-card-text style="max-height: 500px">
-        <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="500"
+    max-width="75%"
+    scrollable>
+    <a-card>
+      <a-card-title>Survey Versions</a-card-title>
+      <a-card-text cssMaxHeight500px>
+        <a-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
-        <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
-          <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
-            <div class="col-10 mt-1 py-0">
-              <v-chip
-                dark
+        <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError" class="">
+          <div v-for="revision in survey.revisions" :key="revision.version" class="d-flex row py-0">
+            <div class="flex-grow-1 mt-1 py-0">
+              <a-chip
                 small
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
-                :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'"
-              >
+                :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'">
                 Version
                 {{
                   revision.version +
                   (revision.version > survey.latestVersion
                     ? ' (draft)'
                     : revision.version === survey.latestVersion
-                    ? ' (published) '
-                    : '')
-                }}</v-chip
-              >
+                      ? ' (published) '
+                      : '')
+                }}
+              </a-chip>
               <span class="ml-2"
                 >{{ getSubmissionCount(revision.version) || 'no' }} submission{{
                   getSubmissionCount(revision.version) > 1 ? 's' : ''
@@ -35,24 +38,23 @@
                 }}
               </span>
             </div>
-            <div class="col-1 py-0">
-              <v-icon
+            <div class="flex-shrink-1 py-0">
+              <a-icon
                 @click="toggleCompare(revision.version)"
                 class="mt-1"
                 title="Compare version"
                 :color="compareRevisions.includes(revision.version) ? 'primary' : ''"
-                >mdi-compare-horizontal</v-icon
+                >mdi-compare-horizontal</a-icon
               >
             </div>
-            <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
-              <v-checkbox
+            <div class="flex-shrink-1 py-0" v-if="isVersionDeletable(revision.version)">
+              <a-checkbox
                 v-model="selectedVersionsToDelete"
-                :value="String(revision.version)"
+                :selected-item="String(revision.version)"
                 hide-details
                 title="Delete version"
                 class="mt-0"
-                color="red"
-              />
+                color="red" />
             </div>
           </div>
 
@@ -64,50 +66,47 @@
             <span v-else> none </span>
           </p>
         </div>
-        <v-alert v-if="deleteVersionsHasError" type="error" class="mt-1" dismissible>
+        <a-alert v-if="deleteVersionsHasError" type="error" class="mt-1" closable>
           An error occurred deleting survey versions.
-        </v-alert>
-        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" dismissible>
+        </a-alert>
+        <a-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" closable>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
-        </v-alert>
-      </v-card-text>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn
+        </a-alert>
+      </a-card-text>
+      <a-divider />
+      <a-card-actions>
+        <a-spacer />
+        <a-btn
           v-if="compareRevisions.length > 0"
           :disabled="compareRevisions.length === 1"
           @click="surveyDiffDialogVisible = true"
           color="primary"
-          outlined
-        >
+          outlined>
           Compare {{ compareRevisions[0] }}
           {{ compareRevisions.length === 2 ? 'with ' + compareRevisions[1] : '' }}
-        </v-btn>
-        <v-btn
+        </a-btn>
+        <a-btn
           @click="deleteVersions"
           :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
           :loading="deleteVersionsIsLoading"
           color="error"
-          outlined
-        >
+          outlined>
           Delete {{ selectedVersionsToDelete.length }} versions
-        </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
-    </v-card>
+        </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Close </a-btn>
+      </a-card-actions>
+    </a-card>
     <survey-diff-dialog
       v-if="surveyDiffDialogVisible"
-      :value="surveyDiffDialogVisible"
+      v-model="surveyDiffDialogVisible"
       :revision-a="survey.revisions.find((r) => r.version === compareRevisions[0])"
       :revision-b="survey.revisions.find((r) => r.version === compareRevisions[1])"
-      @cancel="surveyDiffDialogVisible = false"
-    />
-  </v-dialog>
+      @cancel="surveyDiffDialogVisible = false" />
+  </a-dialog>
 </template>
 
 <script>
-import { ref } from '@vue/composition-api';
+import { ref } from 'vue';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
@@ -115,7 +114,7 @@ import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 export default {
   components: { SurveyDiffDialog },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -124,6 +123,7 @@ export default {
       required: true,
     },
   },
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const survey = ref({});
     const cleanupInfoIsLoading = ref(false);

@@ -1,10 +1,11 @@
 /* eslint-disable no-param-reassign */
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const LCL = require('last-commit-log');
+const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 
 const fs = require('fs');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 const lcl = new LCL('../');
 const commit = lcl.getLastCommitSync();
@@ -26,23 +27,27 @@ module.exports = {
       alias: {
         'monaco-editor': 'monaco-editor/esm/vs/editor/editor.api.js',
       },
+      fallback: {
+        path: require.resolve('path-browserify'),
+        //buffer: require.resolve('buffer-browserify'),
+      },
     },
     plugins: [
-      new MonacoWebpackPlugin({
-        languages: ['javascript', 'typescript'],
-        features: [],
-      }),
+      new NodePolyfillPlugin(),
       new CompressionPlugin(),
       new CopyPlugin({
         patterns: ['src/utils/sandboxUtils.js'],
       }),
+      new VuetifyPlugin({ autoImport: true, styles: { configFile: 'src/styles/settings.scss' } }),
     ],
   },
-  transpileDependencies: ['vuetify'],
   devServer: {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
-    disableHostCheck: true,
+    allowedHosts: 'all',
     compress: true,
+    client: {
+      overlay: false,
+    },
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
@@ -79,7 +84,7 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: true,
       navigateFallback: 'index.html',
-      navigateFallbackBlacklist: [/\/static\/.*$/, /\/api\/.*$/], //rename this to navigateFallbackDenylist when migrating to vue3
+      navigateFallbackDenylist: [/\/static\/.*$/, /\/api\/.*$/],
       runtimeCaching: [
         {
           urlPattern: /\/api\/.*$/,

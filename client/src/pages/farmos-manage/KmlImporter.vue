@@ -1,44 +1,43 @@
 <template>
-  <v-sheet outlined class="pa-8">
-    <div class="display-1">
+  <a-sheet :border="true" class="pa-8">
+    <div class="text-h5">
       KML Importer
-      <app-tooltip
-        >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz
-        first.</app-tooltip
-      >
+      <a-btn color="primary" icon>
+        <a-icon class="mr-1">mdi-information</a-icon>
+        <a-tooltip activator="parent">
+          Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz irst.
+        </a-tooltip>
+      </a-btn>
     </div>
     <!-- TODO add small piece of info describing that kml often come in kmz -->
 
-    <v-row>
-      <v-file-input label="Upload KML file" @change="getFile"></v-file-input>
-    </v-row>
+    <a-row>
+      <a-file-input label="Upload KML file" @change="getFile" />
+    </a-row>
     <template v-if="kml !== ''">
-      <v-row>
-        <v-autocomplete
+      <a-row>
+        <a-select
           v-model="field"
           :items="fields"
-          outlined
+          item-title="text"
+          item-value="value"
+          variant="outlined"
           label="Select Field"
-          @change="selected"
-        ></v-autocomplete>
-      </v-row>
-      <v-row class="text-center">
-        <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
-      </v-row>
+          @update:modelValue="selected" />
+      </a-row>
+      <a-row class="text-center">
+        <a-col><a-btn @click="$emit('change')" color="primary">Import</a-btn></a-col>
+      </a-row>
     </template>
-  </v-sheet>
+  </a-sheet>
 </template>
 <script>
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
-import appTooltip from '@/components/ui/Tooltip.vue';
-
 export default {
-  components: {
-    appTooltip,
-  },
-  props: ['value'],
+  props: ['modelValue'],
+  emits: ['update:modelValue', 'change'],
   data() {
     return {
       kml: '', // string of KML
@@ -67,13 +66,17 @@ export default {
       this.wkt = wktString.toWkt();
       this.name = (this.field && this.field.properties && this.field.properties.name) || '';
 
-      this.$emit('input', {
+      this.$emit('update:modelValue', {
         name: this.name,
         wkt: this.wkt,
       });
       console.log(wktString);
     },
-    async getFile(e) {
+    async getFile(files) {
+      const e = files[0];
+      if (!e) {
+        return;
+      }
       const holder = await e.text();
       this.kml = holder;
       this.importKml();

@@ -1,7 +1,7 @@
 export default {
   props: {
     control: { type: Object, required: true },
-    value: { required: true },
+    modelValue: { required: true },
     meta: { type: Object, required: false },
     index: { required: true },
     autoFocus: { type: Boolean, default: true },
@@ -16,14 +16,14 @@ export default {
   },
   methods: {
     submit() {
-      this.changed(this.value);
+      this.changed(this.modelValue);
       this.next();
     },
     eval() {
       this.$emit('eval');
     },
     changed(value) {
-      this.$emit('changed', value);
+      this.$emit('update:modelValue', value);
     },
     showNav() {
       this.$emit('show-nav');

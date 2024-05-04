@@ -1,50 +1,48 @@
 <template>
-  <v-container>
-    <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
+  <a-container>
+    <a-alert v-if="success" class="mt-4" mode="fade" variant="text" type="success" @click="success = null">{{
+      success
+    }}</a-alert>
 
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage Groups</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" class="my-8 align-center mt-6" />
     </div>
 
-    <v-autocomplete
-      outlined
+    <a-select
+      v-if="!loading && !!groups"
+      variant="outlined"
       primary
       label="Select Group"
       v-model="selectedGroup"
-      v-if="!loading && !!groups"
-      :item-text="(g) => `${g.name} (${g.path})`"
+      :item-title="(g) => `${g.name} (${g.path})`"
       item-value="_id"
-      :items="groups"
-    ></v-autocomplete>
+      :items="groups" />
 
-    <!-- <v-row class="align-baseline">
-      <v-col>
-        <v-autocomplete
+    <!-- <a-row class="align-baseline">
+      <a-col>
+        WARNING: Is not up to date as it is a comment 
+        <a-select
+          engineering="autocomplete"
+          v-if="!loading && !!groups"
           outlined
           primary
           label="Select Group Plan"
           v-model="selectedPlan"
-          v-if="!loading && !!groups"
           :items="plans"
-        ></v-autocomplete>
-      </v-col>
-      <v-col>
-        <v-btn color="primary" @click="$emit('save-plan', selectedPlan)">Save Plan</v-btn>
-      </v-col>
-    </v-row> -->
+        />
+      </a-col>
+      <a-col>
+        <a-btn color="primary" @click="$emit('save-plan', selectedPlan)">Save Plan</a-btn>
+      </a-col>
+    </a-row> -->
 
     <div v-if="!loading && !!selectedGroup" class="px-3">{{ amountMappedInstances }}</div>
 
-    <v-divider class="my-4"></v-divider>
+    <a-divider class="my-4" />
 
-    <v-simple-table v-if="!loading">
+    <a-table v-if="!loading">
       <template v-slot:default>
         <thead>
           <tr>
@@ -56,21 +54,20 @@
         <tbody>
           <tr>
             <td>
-              <v-autocomplete
+              <a-select
+                v-if="!loading && !!mappings"
                 class="mt-6"
-                outlined
+                variant="outlined"
                 primary
                 label="Select FarmOS Instance"
                 v-model="selectedInstance"
-                v-if="!loading && !!mappings"
                 item-value="instanceName"
-                item-text="instanceName"
-                :items="instances"
-              ></v-autocomplete>
+                item-title="instanceName"
+                :items="instances" />
             </td>
             <td></td>
             <td>
-              <v-btn color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)">Map</v-btn>
+              <a-btn color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)">Map</a-btn>
             </td>
           </tr>
 
@@ -78,39 +75,35 @@
             <td>{{ instance.instanceName }}</td>
             <td>
               <div>
-                <v-chip
+                <a-chip
                   small
                   class="ma-1"
-                  dark
                   color="blue"
                   v-for="(userMapping, uidx) in instance.userMappings"
-                  :key="`instance-${idx}-user-${uidx}`"
-                >
+                  :key="`instance-${idx}-user-${uidx}`">
                   {{ userMapping.user }}
-                </v-chip>
+                </a-chip>
               </div>
 
               <div>
-                <v-chip
+                <a-chip
                   class="ma-1"
                   small
-                  dark
                   color="green"
                   v-for="(groupMapping, gidx) in instance.groupMappings"
-                  :key="`instance-${idx}-group-${gidx}`"
-                >
+                  :key="`instance-${idx}-group-${gidx}`">
                   {{ groupMapping.group }}
-                </v-chip>
+                </a-chip>
               </div>
             </td>
             <td>
-              <v-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</v-btn>
+              <a-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)">Unmap</a-btn>
             </td>
           </tr>
         </tbody>
       </template>
-    </v-simple-table>
-  </v-container>
+    </a-table>
+  </a-container>
 </template>
 
 <script>

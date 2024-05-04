@@ -2,7 +2,7 @@
   <ul v-if="item">
     <li>
       <div @click="toggle" @dblclick="makeFolder">
-        <span class="grey--text text--darken-2">{{ name }}:</span> <strong>{{ item.value }}</strong>
+        <span class="text-grey-darken-2">{{ name }}:</span> <strong>{{ item.value }}</strong>
         <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
       </div>
       <ul v-show="isOpen" v-if="isFolder">
@@ -13,8 +13,7 @@
           :name="name"
           :item="child"
           @make-folder="$emit('make-folder', $event)"
-          @add-item="$emit('add-item', $event)"
-        ></tree-item>
+          @add-item="$emit('add-item', $event)"></tree-item>
       </ul>
     </li>
   </ul>
@@ -71,17 +70,20 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 body {
   font-family: Menlo, Consolas, monospace;
   color: #444;
 }
+
 .item {
   cursor: pointer;
 }
+
 .bold {
   font-weight: bold;
 }
+
 ul {
   padding-left: 1em;
   line-height: 1.5em;

@@ -1,141 +1,149 @@
 <template>
-  <v-card min-height="70vh" class="d-flex flex-column">
-    <v-card-title class="d-block">
+  <a-card min-height="70vh" class="d-flex flex-column">
+    <a-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
-        <div class="grey--text text--darken-2">Ontology List Editor</div>
+        <div class="text-grey-darken-2">Ontology List Editor</div>
         <div class="d-flex align-center ml-auto mr-2">
-          <v-btn
+          <a-btn
             color="primary"
             style="margin-top: 2px"
             @click="
               editedItem = createEmptyItem();
               editItemDialogIsVisible = true;
             "
-            :disabled="disabled"
-          >
-            <v-icon left>mdi-plus</v-icon>Add Row
-          </v-btn>
+            :disabled="disabled">
+            <a-icon left>mdi-plus</a-icon>Add Row
+          </a-btn>
         </div>
         <div class="d-flex align-center">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled" />
-              </div>
-            </template>
-            CSV must have column headers 'label', 'value', and optionally 'tags'
-          </v-tooltip>
+          <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled">
+            <a-tooltip bottom activator="parent"
+              >CSV must have column headers 'label', 'value', and optionally 'tags'</a-tooltip
+            >
+          </select-items-upload-button>
           <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
-          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
-            <template v-slot:activator="{ on }">
-              <v-btn icon v-on="on" class="ml-2" :disabled="disabled">
-                <v-icon>mdi-delete</v-icon>
+          <a-dialog v-model="deleteDialogIsVisible" max-width="290">
+            <template v-slot:activator="{ props }">
+              <a-btn icon v-bind="props" class="ml-2" :disabled="disabled">
+                <a-icon>mdi-delete</a-icon>
                 <!-- Delete List -->
-              </v-btn>
+              </a-btn>
             </template>
-            <v-card>
-              <v-card-title>Delete List</v-card-title>
-              <v-card-text>
+            <a-card>
+              <a-card-title>Delete List</a-card-title>
+              <a-card-text>
                 Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer />
-                <v-btn text color="red" @click="deleteResult">Delete</v-btn>
-                <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+              </a-card-text>
+              <a-card-actions>
+                <a-spacer />
+                <a-btn variant="text" color="red" @click="deleteResult">Delete</a-btn>
+                <a-btn variant="text" @click="closeDeleteDialog">Cancel</a-btn>
+              </a-card-actions>
+            </a-card>
+          </a-dialog>
         </div>
       </div>
-      <v-divider />
-    </v-card-title>
+      <a-divider />
+    </a-card-title>
 
-    <v-card-text class="pt-4">
+    <a-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
-        <v-text-field
-          :value="resource.label"
+        <a-text-field
+          :modelValue="resource.label"
+          @update:modelValue="handleUpdateLabel"
           :disabled="disabled"
-          @input="handleUpdateLabel"
           label="List Label"
           persistent-hint
-          class="mx-2"
-        />
+          class="mx-2" />
         <!-- TODO: validate unique data name -->
-        <v-text-field
-          :value="resource.name"
+        <a-text-field
+          :modelValue="resource.name"
+          @update:modelValue="handleUpdateName"
           :disabled="disabled"
-          @input="handleUpdateName"
           label="List Data Name"
           persistent-hint
           class="mx-2"
-          :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        />
+          :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]" />
 
-        <v-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
+        <a-text-field v-model="search" append-inner-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
-          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+          <a-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
+            <a-icon>mdi-delete</a-icon>
+          </a-btn>
         </div>
       </div>
 
-      <v-data-table
+      <a-data-table
         :headers="tableHeaders"
         :items="resource.content"
-        show-select
+        showSelect
         v-model="selectedItems"
         :search="search"
-        item-key="id"
-        disable-sort
-        :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
-      >
-        <template v-slot:item.label="{ item }">
-          <v-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
+        itemValue="id"
+        labelSlot
+        valueSlot
+        tagsSlot
+        actionsSlot>
+        <template v-slot:label="{ item }">
+          <a-text-field v-model="item.label" :disabled="disabled" variant="solo" dense hide-details />
         </template>
-        <template v-slot:item.value="{ item }">
-          <v-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
+        <template v-slot:value="{ item }">
+          <a-text-field v-model="item.value" :disabled="disabled" variant="solo" dense hide-details />
         </template>
-        <template v-slot:item.tags="{ item }">
-          <v-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
+        <template v-slot:tags="{ item }">
+          <a-text-field v-model="item.tags" :disabled="disabled" variant="solo" dense hide-details />
         </template>
-        <template v-slot:item.actions="{ item }">
+        <template v-slot:actions="{ item }">
           <div class="d-flex">
-            <v-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</v-icon>
-            <v-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</v-icon>
-            <v-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</v-icon>
-            <v-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled">
-              mdi-trash-can-outline
-            </v-icon>
+            <a-btn @click="moveItemUp(item)" tabindex="-1" :disabled="disabled" icon small>
+              <a-icon icon="mdi-arrow-up" />
+            </a-btn>
+            <a-btn
+              class="ml-2"
+              @click="moveItemDown(item)"
+              tabindex="-1"
+              :disabled="disabled"
+              icon
+              variant="flat"
+              small>
+              <a-icon icon="mdi-arrow-down" />
+            </a-btn>
+            <a-btn class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled" icon small>
+              <a-icon icon="mdi-content-copy" />
+            </a-btn>
+            <a-btn class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled" icon small>
+              <a-icon icon="mdi-trash-can-outline" />
+            </a-btn>
           </div>
         </template>
-      </v-data-table>
-    </v-card-text>
-    <v-spacer />
-    <v-card-actions class="d-flex justify-end mr-3 align-start">
-      <v-btn text class="ml-4" @click="close">Close</v-btn>
-    </v-card-actions>
+      </a-data-table>
+    </a-card-text>
+    <a-spacer />
+    <a-card-actions class="d-flex justify-end mr-3 align-start">
+      <a-btn variant="text" class="ml-4" @click="close">Close</a-btn>
+    </a-card-actions>
 
-    <v-dialog v-model="editItemDialogIsVisible" max-width="350">
-      <v-card>
-        <v-card-title>Edit Item</v-card-title>
-        <v-card-text>
-          <v-text-field v-model="editedItem.label" label="Label" />
-          <v-text-field v-model="editedItem.value" label="Value" />
-          <v-text-field v-model="editedItem.tags" label="Tags" />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
-          <v-btn text color="primary" @click="saveItem">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+    <a-dialog v-model="editItemDialogIsVisible" max-width="350">
+      <a-card>
+        <a-card-title>Edit Item</a-card-title>
+        <a-card-text>
+          <a-text-field v-model="editedItem.label" label="Label" />
+          <a-text-field v-model="editedItem.value" label="Value" />
+          <a-text-field v-model="editedItem.tags" label="Tags" />
+        </a-card-text>
+        <a-card-actions>
+          <a-spacer />
+          <a-btn variant="text" @click="editItemDialogIsVisible = false">Cancel</a-btn>
+          <a-btn variant="text" color="primary" @click="saveItem">Save</a-btn>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
+  </a-card>
 </template>
 
 <script>
-import { uniqWith, isEqual } from 'lodash';
+import { isEqual, uniqWith } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
@@ -171,20 +179,24 @@ export default {
       editItemDialogIsVisible: false,
       tableHeaders: [
         {
-          text: 'Label',
+          title: 'Label',
           value: 'label',
+          sortable: false,
         },
         {
-          text: 'Value',
+          title: 'Value',
           value: 'value',
+          sortable: false,
         },
         {
-          text: 'Tags',
+          title: 'Tags',
           value: 'tags',
+          sortable: false,
         },
         {
-          text: 'Actions',
+          title: 'Actions',
           value: 'actions',
+          sortable: false,
           width: 1,
         },
       ],
@@ -257,7 +269,7 @@ export default {
       }
     },
     deleteSelectedItems() {
-      const isNotSelectedItem = (item) => !this.selectedItems.some((s) => s.id === item.id);
+      const isNotSelectedItem = (item) => !this.selectedItems.some((s) => s === item.id);
       const newItems = this.resource.content.filter(isNotSelectedItem);
       this.selectedItems = [];
       this.$emit('change', {
@@ -360,10 +372,11 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .v-data-table >>> tbody > tr > td.text-start {
   padding: 0px 4px;
 }
+
 .v-data-table >>> tbody > tr > td > .v-simple-checkbox {
   margin-left: 12px;
 }

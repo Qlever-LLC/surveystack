@@ -1,70 +1,66 @@
+<!-- eslint-disable vue/no-deprecated-dollar-scopedslots-api -->
 <template>
   <div class="mt-wrap mt-vars" :style="cssVariables">
     <div ref="header" class="mt-heading mt-divider" :class="{ 'mt-elevation-shadow': isHeaderFloating }">
       <div
         v-for="(header, colIdx) in headers"
-        class="caption font-weight-bold text--secondary mt-cell-wrap"
+        class="text-caption font-weight-bold text-secondary mt-cell-wrap"
         :class="{
           'mt-fixed': fixColMask[colIdx],
           'mt-elevation-shadow': isLeftFloating && colIdx === fixedColumns - 1,
         }"
         :style="cellWidthStyles[colIdx]"
-        :key="colIdx"
-      >
-        <div ref="headerCells" class="white px-4 d-flex flex-nowrap mt-cell" :style="{ position: 'relative' }">
+        :key="colIdx">
+        <div ref="headerCells" class="bg-white px-4 d-flex flex-nowrap mt-cell" :style="{ position: 'relative' }">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
         </div>
       </div>
-      <div v-if="$scopedSlots['row-actions']" class="mt-header-left-spacer" />
+      <div v-if="$slots.rowActions" class="mt-header-left-spacer" />
     </div>
     <div ref="body" class="mt-body pb-1" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div
         class="mt-row"
         v-for="(item, rowIdx) in rows"
         :key="rowIdx"
-        @click="isMobile && $emit('showEditDialog', rowIdx)"
-      >
+        @click="isMobile && $emit('showEditDialog', rowIdx)">
         <div
           class="mt-cell-wrap"
           v-for="(header, colIdx) in headers"
           :key="colIdx"
           :class="{ 'mt-elevation-shadow': isLeftFloating && colIdx === fixedColumns - 1 }"
-          :style="leftFixStyles[colIdx]"
-        >
-          <div class="mt-cell d-flex align-center white px-1">
+          :style="leftFixStyles[colIdx]">
+          <div class="mt-cell d-flex align-center bg-white px-1">
             <slot
               v-if="shouldRenderCell(rowIdx, colIdx)"
               name="row-cell"
               v-bind:header="header"
               v-bind:row="item"
-              v-bind:colIdx="colIdx"
-            >
+              v-bind:colIdx="colIdx">
             </slot>
           </div>
         </div>
         <div
-          v-if="$scopedSlots['row-actions']"
-          class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 white"
-          :class="{ 'mt-elevation-shadow': isRightFloating }"
-        >
+          v-if="$slots.rowActions"
+          class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 bg-white"
+          :class="{ 'mt-elevation-shadow': isRightFloating }">
           <div class="mt-actions d-flex align-center">
-            <slot name="row-actions" v-bind:rowIdx="rowIdx"></slot>
+            <slot name="rowActions" v-bind:rowIdx="rowIdx"></slot>
           </div>
         </div>
       </div>
     </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
-      <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
-        <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
-      </v-btn>
+      <a-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
+        <a-icon left>mdi-plus</a-icon>{{ addRowLabel }}
+      </a-btn>
     </div>
   </div>
 </template>
 
 <script>
-import { sum, debounce } from 'lodash';
+import { debounce, sum } from 'lodash';
 
 function defaultColumnWidth(type) {
   switch (type) {
@@ -273,13 +269,13 @@ export default {
     this.onScrollY();
     document.addEventListener('scroll', this.onScrollY);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('scroll', this.onScrollY);
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .mt-wrap {
   position: relative;
 }

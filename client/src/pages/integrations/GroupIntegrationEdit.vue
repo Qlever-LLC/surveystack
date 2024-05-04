@@ -1,29 +1,35 @@
 <template>
-  <v-container>
-    <v-card class="pa-4 mb-4">
-      <span class="text--secondary overline">{{ this.entity._id }}</span>
+  <a-container>
+    <a-card class="pa-4 mb-4">
+      <span class="text-secondary overline">{{ this.entity._id }}</span>
 
       <h1>{{ editMode ? 'Edit Group Integration' : 'Create Group Integration' }}</h1>
 
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
-        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
+      <a-form class="mt-3" @keydown.enter.prevent="submit">
+        <a-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" variant="outlined" />
 
-        <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
+        <a-select
+          :items="integrationTypes"
+          item-title="text"
+          item-value="value"
+          v-model="entity.type"
+          label="Type"
+          variant="outlined" />
 
         <app-json-editor v-model="entity.data" />
         <div class="d-flex ma-2">
-          <v-btn color="error" outlined class="mr-auto" @click="deleteEntity">
-            <v-icon left>mdi-trash-can-outline</v-icon> Delete
-          </v-btn>
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit">Submit</v-btn>
+          <a-btn color="error" variant="outlined" class="mr-auto" @click="deleteEntity">
+            <a-icon left>mdi-trash-can-outline</a-icon> Delete
+          </a-btn>
+          <a-btn variant="text" @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" @click="submit">Submit</a-btn>
         </div>
-      </v-form>
-    </v-card>
+      </a-form>
+    </a-card>
     <transition name="fade">
       <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -128,7 +134,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .code-editor {
   height: 77vh;
 }

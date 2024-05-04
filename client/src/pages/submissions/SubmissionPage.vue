@@ -8,7 +8,7 @@
       @submit="submit"
     />
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+      <a-progress-circular :size="50" />
     </div>
     <div v-else-if="hasError" class="text-center mt-8">
       {{ errorMessage }} <router-link :to="`/surveys/${$route.params.surveyId}`">Back to survey.</router-link>
@@ -29,8 +29,7 @@
       @cancel="abortEditSubmitted"
       @confirm="(reason) => (submission.meta.archivedReason = reason)"
       reason="RESUBMIT"
-      persistent
-    >
+      persistent>
       <template v-slot:title>Confirm Submission Edit</template>
       <template>
         This draft has previously been submitted. Are you sure you want to edit it? Submitting again will archive the
@@ -53,8 +52,7 @@
       "
       :survey="survey"
       :submission="submission"
-      @close="onCloseResultDialog"
-    />
+      @close="onCloseResultDialog" />
 
     <result-dialog
       v-model="showApiComposeErrors"
@@ -62,8 +60,7 @@
       title="ApiCompose Errors"
       :survey="survey"
       :submission="submission"
-      @close="showApiComposeErrors = false"
-    />
+      @close="showApiComposeErrors = false" />
   </div>
 </template>
 
@@ -200,7 +197,7 @@ export default {
     if (isLoginRequired && !this.$store.getters['auth/isLoggedIn']) {
       this.$router.push({
         name: 'auth-login',
-        params: { redirect: this.$route.path, autoJoin: true },
+        query: { redirect: this.$route.path, autoJoin: true },
       });
       return;
     }

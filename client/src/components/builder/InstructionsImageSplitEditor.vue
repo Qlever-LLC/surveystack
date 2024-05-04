@@ -3,41 +3,37 @@
     <div class="text-center d-flex">
       <resource-selector
         :resources="filteredResources"
-        :value="(value && value.images && value.images[0]) || null"
+        :modelValue="(modelValue && modelValue.images && modelValue.images[0]) || null"
         :disabled="disabled"
         :newResourceTypes="[resourceTypes.IMAGE]"
         @on-new="createResourceHandler"
-        @on-select="selectResourceHandler"
-      />
-      <v-btn
+        @on-select="selectResourceHandler" />
+      <a-btn
         icon
         @click.stop="openDialog"
         :disabled="disabled"
-        :class="{ 'd-none': !value }"
+        :class="{ 'd-none': !modelValue }"
         class="ml-2 mt-3"
-        v-if="resource"
-      >
-        <v-icon>mdi-pencil</v-icon>
-      </v-btn>
+        v-if="resource">
+        <a-icon>mdi-pencil</a-icon>
+      </a-btn>
     </div>
-    <v-textarea
+    <a-textarea
       class="mt-3"
       label="Instructions Body (Markdown)"
-      :value="value.body"
-      @input="handleBodyChange"
+      :value="modelValue.body"
+      @update:modelValue="handleBodyChange"
       :disabled="disabled"
-      hide-details
-    />
+      hide-details />
 
-    <v-dialog v-model="imageDialogIsVisible" width="500">
+    <a-dialog v-model="imageDialogIsVisible" width="500">
       <image-resource-editor
         :resources="filteredResources"
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="closeDialog"
-      />
-    </v-dialog>
+        @close-dialog="closeDialog" />
+    </a-dialog>
   </div>
 </template>
 
@@ -45,12 +41,12 @@
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import ImageResourceEditor from '@/components/builder/ImageResourceEditor.vue';
 import {
-  removeResource,
-  setResource,
-  createResource,
-  resourceTypes,
-  resourceLocations,
   appendResource,
+  createResource,
+  removeResource,
+  resourceLocations,
+  resourceTypes,
+  setResource,
 } from '@/utils/resources';
 
 export default {
@@ -65,7 +61,7 @@ export default {
     ImageResourceEditor,
   },
   props: {
-    value: {
+    modelValue: {
       type: Object,
       default: () => ({
         images: [],
@@ -85,20 +81,22 @@ export default {
       return this.resources.filter((resource) => resource.type === resourceTypes.IMAGE);
     },
     resource() {
-      return this.resources.find((resource) => resource.id === this.value.images[0]);
+      return this.resources.find(
+        (resource) => resource && resource.id !== undefined && resource.id === this.modelValue.images[0]
+      );
     },
   },
   methods: {
     handleBodyChange(body) {
-      this.$emit('set-control-source', { body, images: this.value.images });
+      this.$emit('set-control-source', { body, images: this.modelValue.images });
     },
     removeResource(id) {
       const newResources = removeResource(this.resources, id);
       this.$emit('set-survey-resources', newResources);
 
-      const newImages = this.value.images.filter((imageId) => imageId !== id);
+      const newImages = this.modelValue.images.filter((imageId) => imageId !== id);
       this.$emit('set-control-source', {
-        body: this.value.body,
+        body: this.modelValue.body,
         images: newImages,
       });
 
@@ -115,14 +113,14 @@ export default {
       });
       this.$emit('set-survey-resources', appendResource(this.resources, newResource));
       this.$emit('set-control-source', {
-        body: this.value.body,
+        body: this.modelValue.body,
         images: [newResource.id],
       });
       this.openDialog();
     },
     selectResourceHandler(id) {
       this.$emit('set-control-source', {
-        body: this.value.body,
+        body: this.modelValue.body,
         images: [id],
       });
     },
@@ -136,4 +134,4 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

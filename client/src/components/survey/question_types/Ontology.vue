@@ -1,3 +1,6 @@
+<!-- TODO in unit test before v-select and v-autocomplete were different
+  data-test-id="dropdown" exists
+  data-test-id="autocomplete" was removed-->
 <template>
   <div class="ontology question">
     <app-control-label
@@ -6,152 +9,83 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
-    <v-select
-      v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
+      @initialize="initialize" />
+    <a-select
+      v-if="sourceIsValid && !control.options.allowCustomSelection"
       :label="control.hint"
       :placeholder="getPlaceholder"
-      :value="getValue"
-      @change="onChange"
+      :modelValue="getValue"
+      @update:modelValue="onChange"
       @focus="onFocus"
       @blur="onBlur"
       :items="items"
-      item-text="label"
+      item-title="label"
       item-value="value"
       :menu-props="autocompleteMenuProps"
-      :chips="!!control.options.hasMultipleSelections"
       :multiple="!!control.options.hasMultipleSelections"
       color="focus"
       hide-details
-      outlined
+      variant="outlined"
       class="full-width dropdown"
       data-test-id="dropdown"
       clearable
-    >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          @click="data.select"
-          @click:close="remove(data.item)"
-        >
-          {{ data.item.label }}
-        </v-chip>
+      cssMinHeight56px
+      :chipSlot="!!control.options.hasMultipleSelections"
+      :itemSlot="!!control.options.hasMultipleSelections">
+      <template v-slot:chip="{ props, item }">
+        <a-chip v-bind="props" closable>
+          {{ item.title }}
+        </a-chip>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ data.item.label }}
-            <v-chip v-if="data.item.count" small class="ma-2">
-              {{ data.item.count }}
-            </v-chip>
-          </v-list-item-title>
-        </v-list-item-content>
+      <template v-slot:item="{ props, item }">
+        <a-list-item v-bind="props">
+          <a-list-item-title>
+            {{ item.label }}
+            <a-chip v-if="item.count" small class="ma-2">
+              {{ item.count }}
+            </a-chip>
+          </a-list-item-title>
+        </a-list-item>
       </template>
-    </v-select>
-    <v-autocomplete
-      v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
-      ref="dropdownRef"
-      :label="control.hint"
-      :placeholder="getPlaceholder"
-      :value="getValue"
-      @change="onChange"
-      @focus="onFocus"
-      @blur="onBlur"
-      :search-input.sync="comboboxSearch"
-      :items="items"
-      item-text="label"
-      item-value="value"
-      :delimiters="[',']"
-      :menu-props="autocompleteMenuProps"
-      :chips="!!control.options.hasMultipleSelections"
-      :multiple="!!control.options.hasMultipleSelections"
-      color="focus"
-      outlined
-      hide-details
-      class="full-width dropdown"
-      data-test-id="autocomplete"
-      clearable
-    >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          @click="data.select"
-          @click:close="remove(data.item)"
-        >
-          {{ data.item.label }}
-        </v-chip>
-      </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ data.item.label }}
-            <v-chip v-if="data.item.count" small class="ma-2">
-              {{ data.item.count }}
-            </v-chip>
-          </v-list-item-title>
-        </v-list-item-content>
-      </template>
-    </v-autocomplete>
-    <v-combobox
+    </a-select>
+    <a-select
+      allowCustomItem
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
-      ref="dropdownRef"
       :label="control.hint"
       :placeholder="getPlaceholder"
-      :value="getValue"
-      @change="onChange"
+      :modelValue="getValue"
+      @update:modelValue="onChange"
       @focus="onFocus"
       @blur="onBlur"
       :items="items"
-      item-text="label"
+      item-title="label"
       item-value="value"
       :menu-props="autocompleteMenuProps"
       :delimiters="[',']"
       :return-object="false"
-      :search-input.sync="comboboxSearch"
-      :chips="!!control.options.hasMultipleSelections"
       :multiple="!!control.options.hasMultipleSelections"
       color="focus"
-      outlined
+      variant="outlined"
       hide-details
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
       clearable
-    >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          @click="data.select"
-          @click:close="removeValue(data.item)"
-        >
-          {{ getLabelForItemValue(data.item) }}
-        </v-chip>
+      cssMinHeight56px
+      :chipSlot="!!control.options.hasMultipleSelections"
+      :selectionSlot="!control.options.hasMultipleSelections">
+      <template v-slot:chip="{ props, item }">
+        <a-chip v-bind="props" closable>
+          {{ getLabelForItemValue(item.value) }}
+        </a-chip>
       </template>
-      <template v-slot:selection="data" v-else>
-        {{ getLabelForItemValue(data.item) }}
+      <template v-slot:selection="{ item }">
+        {{ getLabelForItemValue(item.value) }}
       </template>
-      <template v-slot:no-data>
-        <v-list-item>
-          <v-list-item-content>
-            <v-list-item-title>
-              No values matching "<strong>{{ comboboxSearch }}</strong
-              >". Press <kbd>enter</kbd> <span v-if="!!control.options.hasMultipleSelections">or <kbd>,</kbd></span> to
-              create a new one
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-    </v-combobox>
-    <v-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading </v-banner>
-    <v-banner v-else color="red lighten-2" dark>
-      <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Survey Definition
-    </v-banner>
+    </a-select>
+    <a-banner v-else-if="isLoading"> <a-icon class="mr-2 mdi-spin">mdi-loading</a-icon>Loading</a-banner>
+    <a-banner v-else bgColor="red-lighten-2">
+      <a-icon class="mr-2">mdi-alert</a-icon>Invalid select options, please update Survey Definition
+    </a-banner>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -164,6 +98,7 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import { fetchSubmissionUniqueItems } from '@/utils/submissions';
+import * as constants from '@/constants';
 
 export default {
   mixins: [baseQuestionComponent],
@@ -174,31 +109,23 @@ export default {
   data() {
     return {
       isLoading: false,
-      comboboxSearch: null,
       submissionItems: [],
       isFocus: false,
     };
   },
   methods: {
+    clickOnChip(data) {
+      data.select;
+    },
     onChange(value) {
-      this.comboboxSearch = null;
-      if (this.$refs.dropdownRef && !this.control.options.hasMultipleSelections) {
-        this.$refs.dropdownRef.isMenuActive = false;
-      }
-      if (this.value !== value) {
+      if (this.modelValue !== value) {
         if (Array.isArray(value)) {
-          this.changed(getValueOrNull(value.map(getValueOrNull)));
+          this.changed(getValueOrNull(value.map(getValueOrNull)), false);
         } else {
-          const nextValue = getValueOrNull(value);
+          const nextValue = getValueOrNull(value, false);
           this.changed(nextValue ? [nextValue] : nextValue);
         }
       }
-    },
-    remove(item) {
-      this.changed(getValueOrNull(this.value.filter((v) => v !== item.value)));
-    },
-    removeValue(value) {
-      this.changed(getValueOrNull(this.value.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);
@@ -213,10 +140,10 @@ export default {
   },
   computed: {
     getArrayValue() {
-      return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      return Array.isArray(this.modelValue) ? this.modelValue : this.modelValue ? [this.modelValue] : [];
     },
     getValue() {
-      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.value;
+      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.modelValue;
     },
     resource() {
       return this.resources.find((r) => r.id === this.control.options.source);
@@ -245,7 +172,7 @@ export default {
         color: 'focus',
       };
 
-      if (this.$vuetify.breakpoint.smAndDown || this.forceMobile) {
+      if (this.$vuetify.display.smAndDown || this.forceMobile) {
         defaultProps.maxHeight = 130;
         defaultProps.top = true;
         defaultProps.closeOnContentClick = true;
@@ -259,25 +186,13 @@ export default {
     },
     getPlaceholder() {
       if ((this.control.hint && this.isFocus) || !this.control.hint) {
-        if (!this.control.options.allowCustomSelection && !this.control.options.allowAutocomplete) {
-          return this.control.options.hasMultipleSelections ? 'Select answers' : 'Select answer';
-        } else if (!this.control.options.allowCustomSelection && this.control.options.allowAutocomplete) {
-          return 'Type to search';
-        } else if (this.control.options.allowCustomSelection) {
-          return 'Type to search or add custom answer';
-        }
+        return this.control.options.allowCustomSelection
+          ? 'Type to search or add custom answer'
+          : this.items.length < constants.ASELECT_MAX_ITEMS_TOBE_VSELECT
+            ? 'Search'
+            : 'Type to search';
       }
       return undefined;
-    },
-  },
-  watch: {
-    comboboxSearch(newVal) {
-      const match = newVal
-        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
-        : undefined;
-      if (!match && this.$refs.dropdownRef) {
-        this.$refs.dropdownRef.setMenuIndex(-1);
-      }
     },
   },
   async mounted() {
@@ -294,16 +209,12 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .full-width {
   width: 100%;
 }
 
 .dropdown >>> .v-list-item.v-list-item--active {
-  color: var(--v-focus-base) !important;
-}
-
-.dropdown >>> .v-select__selections {
-  min-height: 56px !important;
+  color: rgb(var(--v-theme-focus)) !important;
 }
 </style>

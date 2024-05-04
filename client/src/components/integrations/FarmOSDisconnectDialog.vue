@@ -1,49 +1,54 @@
 <template>
-  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
-    <v-card class="pa-4">
-      <v-card-title class="headline"> Manage Groups </v-card-title>
-      <v-card-text>
+  <a-dialog persistent :modelValue="modelValue" max-width="500" max-height="1000" @update:modelValue="cancelUpdate">
+    <a-card class="pa-4">
+      <a-card-title class="headline"> Manage Groups </a-card-title>
+      <a-card-text>
         Update Groups with Access to Farm Instance
         <br />
-        <v-autocomplete
+        <a-select
           label="Select Groups"
           multiple
           chips
           :items="allGroups"
-          :item-text="(g) => `${g.name} (${g.path})`"
+          :item-title="(g) => `${g.name} (${g.path})`"
           :item-value="(g) => `${g._id}`"
           class="mt-4"
           v-model="selectedGroups"
           dense
           open-on-clear
-        >
-          <template slot="prepend-item">
-            <v-btn
+          chipSlot
+          prependItemSlot>
+          <template v-slot:chip="{ props, item }">
+            <a-chip v-bind="props" closable>
+              {{ item.title }}
+            </a-chip>
+          </template>
+          <template v-slot:prepend-item>
+            <a-btn
               :disabled="loading"
               :loading="loading"
               @click="updateGroups"
               color="primary"
-              class="button--autocomplete"
-            >
+              class="button--autocomplete">
               Update Groups
-            </v-btn>
+            </a-btn>
           </template>
-        </v-autocomplete>
+        </a-select>
         <div class="d-flex justify-space-around">
-          <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
-          <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
+          <a-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</a-btn>
+          <a-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </a-btn>
         </div>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+      </a-card-text>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
 import './css/button.css';
 
 export default {
-  emits: ['updateGroups', 'cancelUpdate'],
-  props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
+  emits: ['updateGroups', 'cancelUpdate', 'update:modelValue'],
+  props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'modelValue'],
   data() {
     return {
       selectedGroups: [],
@@ -54,9 +59,11 @@ export default {
       // emit instance, initial selected group Ids and selected group Ids before clicking update
       this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroupIds, this.selectedGroups]);
       this.selectedGroups = [];
+      this.$emit('update:modelValue', false);
     },
     cancelUpdate() {
       this.$emit('cancelUpdate');
+      this.$emit('update:modelValue', false);
       this.selectedGroups = [];
     },
   },
@@ -66,16 +73,6 @@ export default {
     },
     selectedGroupIds() {
       this.selectedGroups = this.selectedGroupIds;
-    },
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
     },
   },
 };

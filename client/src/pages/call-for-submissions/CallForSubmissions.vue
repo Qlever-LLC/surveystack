@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <a-container>
     <h1>Call for Submissions</h1>
 
     <app-survey-selector
@@ -7,78 +7,74 @@
       :searchResults="searchResults"
       @hide="showSelectSurvey = false"
       @search="searchSurveys"
-      @selected="selectSurvey"
-    />
-    <v-card class="my-2">
-      <v-card-text>
+      @selected="selectSurvey" />
+    <a-card class="my-2">
+      <a-card-text>
         <label>Survey</label>
         <div class="mb-5 d-flex align-center">
-          <v-btn @click="showSelectSurvey = true" color="primary" outlined>Select Survey</v-btn>
+          <a-btn @click="showSelectSurvey = true" color="primary" variant="outlined">Select Survey</a-btn>
           <span v-if="selectedSurvey" class="mx-2">{{ selectedSurvey.name }}</span>
-          <v-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</v-icon>
+          <a-icon v-if="selectedSurvey" @click="selectedSurvey = null">mdi-close</a-icon>
         </div>
 
-        <v-text-field v-model="subject" label="Subject" filled />
-        <v-textarea rows="10" v-model="body" label="Message" filled hide-details />
-        <div v-if="showMissingMagicLinkWarning" class="mt-2 error--text">
+        <a-text-field v-model="subject" label="Subject" variant="filled" />
+        <a-textarea rows="10" v-model="body" label="Message" hide-details />
+        <div v-if="showMissingMagicLinkWarning" class="mt-2 text-error">
           Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
         </div>
         <div class="d-flex justify-end align-center mt-3">
           <span v-if="!submittable" class="mr-2">Select a survey and at least one member below</span>
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</v-btn>
+          <a-btn variant="text" @click="cancel">Cancel</a-btn>
+          <a-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</a-btn>
         </div>
-      </v-card-text>
-    </v-card>
-    <v-card>
-      <v-card-title>Select members</v-card-title>
-      <v-card-subtitle>{{ selectedMembers.length }} selected</v-card-subtitle>
-      <v-card-text>
-        <v-data-table
+      </a-card-text>
+    </a-card>
+    <a-card>
+      <a-card-title>Select members</a-card-title>
+      <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
+      <a-card-text>
+        <a-data-table
           v-model="selectedMembers"
           :items="activeMembers"
           :headers="headers"
-          disable-pagination
-          hide-default-footer
-          show-select
-          item-key="_id"
-          loading="isLoadingMembers"
-        >
-          <template v-slot:item.actions="{ item }">
+          showSelect
+          itemValue="_id"
+          :loading="isLoadingMembers"
+          hideDefaultFooter
+          actionsSlot>
+          <template v-slot:actions="{ item }">
             <app-confirm-membership-button
               v-if="item.meta.status === 'pending'"
               :membershipId="item._id"
               :email="item.meta.invitationEmail"
-              @confirmed="loadMembers"
-            />
+              @confirmed="loadMembers" />
           </template>
-        </v-data-table>
-      </v-card-text>
-    </v-card>
+        </a-data-table>
+      </a-card-text>
+    </a-card>
 
-    <v-dialog v-model="showConfirmDialog" max-width="500">
-      <v-card>
-        <v-card-title class="headline">Confirmation</v-card-title>
-        <v-card-text>
+    <a-dialog v-model="showConfirmDialog" max-width="500">
+      <a-card>
+        <a-card-title class="headline">Confirmation</a-card-title>
+        <a-card-text>
           <p class="body-1">
             You are about to send an E-mail to {{ selectedMembers.length }}
             {{ selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
           </p>
-          <v-checkbox label="Also send a copy to myself" v-model="copy" />
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
-          <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          <a-checkbox label="Also send a copy to myself" v-model="copy" />
+        </a-card-text>
+        <a-card-actions class="d-flex justify-end">
+          <a-btn @click="showConfirmDialog = false" variant="text">Cancel</a-btn>
+          <a-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</a-btn>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
     <result-dialog
       v-model="showSubmitResult"
       :items="submitResults"
       title="Call for Submissions"
-      @close="showSubmitResult = false"
-    />
-  </v-container>
+      @close="showSubmitResult = false" />
+  </a-container>
 </template>
 
 <script>
@@ -116,10 +112,10 @@ export default {
       body: defaultBody,
       copy: false,
       headers: [
-        { text: 'id', value: '_id' },
-        { text: 'name', value: 'name' },
-        { text: 'email', value: 'email' },
-        { text: 'actions', value: 'actions' },
+        { title: 'id', value: '_id', sortable: true },
+        { title: 'name', value: 'name', sortable: true },
+        { title: 'email', value: 'email', sortable: true },
+        { title: 'actions', value: 'actions', sortable: true },
       ],
       showConfirmDialog: false,
       isLoadingMembers: false,

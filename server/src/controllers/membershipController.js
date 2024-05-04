@@ -11,7 +11,7 @@ import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
 import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
 import { pick } from 'lodash';
-import flatten from 'flat';
+import { flatten } from 'flat';
 
 const col = 'memberships';
 

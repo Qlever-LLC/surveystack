@@ -7,7 +7,7 @@
   "license": "GPL-3.0-only",
   "private": true,
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.0.0"
   },
   "devDependencies": {
     "chalk": "^4.1.2",
@@ -31,6 +31,6 @@
     "server:test-watch": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run test-watch --no-prefix --stream",
     "server:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run lint-all --no-prefix --stream",
     "client:scaffold-partner": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run scaffold-partner --no-prefix --stream",
-    "client:chromatic" : "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run chromatic --no-prefix --stream"
+    "client:chromatic": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run chromatic --no-prefix --stream"
   }
 }

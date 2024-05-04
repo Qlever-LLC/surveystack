@@ -7,49 +7,43 @@
         :required="required"
         :initializable="control.options.initialize && control.options.initialize.enabled"
         :is-modified="meta && !!meta.dateModified"
-        @initialize="initialize"
-      />
-      <v-btn rounded small text color="primary" class="align-self-center mb-3" @click="clearSelection">
+        @initialize="initialize" />
+      <a-btn rounded small variant="text" color="primary" class="align-self-center mb-3" @click="clearSelection">
         clear selection
-      </v-btn>
+      </a-btn>
     </div>
     <app-control-hint :value="control.hint" />
 
-    <v-progress-circular v-if="loading" indeterminate color="secondary" class="my-8"> </v-progress-circular>
+    <a-progress-circular v-if="loading" color="secondary" class="my-8" />
 
-    <v-list style="overflow: auto">
-      <v-list-item-group
-        v-if="!loading"
-        :disabled="loading"
-        :value="listSelection"
-        @change="localChange"
-        :multiple="!!control.options.hasMultipleSelections"
-      >
-        <v-list-item
-          v-for="(item, idx) in transformed"
-          :value="hashItem(item)"
-          :key="`item_${idx}`"
-          :disabled="!control.options.hasMultipleSelections && item.value.isField"
-        >
-          <template v-slot:default="{ active }">
-            <v-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
-              <v-checkbox
-                v-if="control.options.hasMultipleSelections"
-                :input-value="active"
-                :true-value="hashItem(item)"
-                color="focus"
-              />
-              <v-radio-group v-else :value="active">
-                <v-radio :value="true" color="focus" />
-              </v-radio-group>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title v-html="item.label" />
-            </v-list-item-content>
-          </template>
-        </v-list-item>
-      </v-list-item-group>
-    </v-list>
+    <a-list
+      v-if="!loading"
+      :disabled="loading"
+      style="overflow: auto"
+      :selected="listSelection"
+      :selectStrategy="!!control.options.hasMultipleSelections ? 'classic' : 'single-leaf'"
+      @update:selected="localChange">
+      <a-list-item
+        v-for="(item, idx) in transformed"
+        :value="hashItem(item)"
+        :key="`item_${idx}`"
+        dense
+        :disabled="(!control.options.hasMultipleSelections && item.value.isField) || item.value?.isNotClickable">
+        <template v-slot:prepend="{ isSelected }">
+          <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
+            <a-checkbox
+              v-if="control.options.hasMultipleSelections"
+              :modelValue="isSelected"
+              color="focus"
+              hide-details />
+            <a-radio-group v-else :modelValue="isSelected" hide-details>
+              <a-radio :value="true" color="focus" />
+            </a-radio-group>
+          </a-list-item-action>
+          <a-list-item-title v-html="item.label" />
+        </template>
+      </a-list-item>
+    </a-list>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -117,6 +111,7 @@ const transform = (assets) => {
         farmName: area.farmName,
         location: area.location,
         isField: true,
+        name: '',
       },
       label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
     };
@@ -141,6 +136,8 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
   };
@@ -150,11 +147,15 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
   };
 
-  res.push(withoutAreaSection, ...withoutArea);
+  if (withoutArea.length > 0) {
+    res.push(withoutAreaSection, ...withoutArea);
+  }
 
   if (localAssets.length > 0) {
     res.unshift(localAssetSection, ...localAssets);
@@ -164,26 +165,24 @@ const transform = (assets) => {
 };
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
-  data() {
-    return {
-      transformed: [],
-    };
-  },
+  mixins: [baseQuestionComponent, farmosBase],
+  data: () => ({
+    transformed: [],
+  }),
   async created() {
     await this.fetchAssets();
     this.transformed = transform(this.assets);
   },
   computed: {
     listSelection() {
-      if (this.value === null && this.control.options.hasMultipleSelections) {
+      if (this.modelValue === null && this.control.options.hasMultipleSelections) {
         return [];
       }
-      if (this.value !== null && !this.control.options.hasMultipleSelections) {
-        return hashItem({ value: this.value[0] });
+      if (this.modelValue !== null && !this.control.options.hasMultipleSelections) {
+        return [hashItem({ value: this.modelValue[0] })];
       }
-      if (this.control.options.hasMultipleSelections && Array.isArray(this.value)) {
-        return this.value.map((v) => hashItem({ value: v }));
+      if (this.control.options.hasMultipleSelections && Array.isArray(this.modelValue)) {
+        return this.modelValue.map((v) => hashItem({ value: v }));
       }
       return null;
     },
@@ -207,7 +206,9 @@ export default {
         if (typeof h !== 'string') {
           return h;
         }
-        return this.transformed.find((t) => t.value.hash === h).value;
+
+        const foundTransformed = this.transformed.find((t) => t.value.hash === h);
+        return foundTransformed.value;
       });
 
       const fields = selectedItems.filter((item) => !!item.isField);
@@ -245,18 +246,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .chip-no-wrap {
   white-space: nowrap;
 }
 
-.farm-os-planting >>> .v-list-item__title .orange-chip,
-.farm-os-planting >>> .v-list-item__title .green-chip,
-.farm-os-planting >>> .v-list-item__title .blue-chip {
+:deep(.blue-chip, .orange-chip, .green-chip) {
   display: inline-flex;
-  border: 1px var(--v-focus-base) solid;
+  border: 1px rgb(var(--v-theme-focus)) solid;
   background-color: white;
-  color: var(--v-focus-base);
+  color: rgb(var(--v-theme-focus));
   border-radius: 0.4rem;
   font-weight: bold;
   font-size: 80%;
@@ -266,13 +265,17 @@ export default {
   vertical-align: middle;
 }
 
-.farm-os-planting >>> .v-list-item__title .green-chip {
+:deep(.green-chip) {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-.farm-os-planting >>> .v-list-item__title .orange-chip {
+:deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
+}
+
+.v-list-item--disabled {
+  opacity: 1;
 }
 </style>

@@ -1,24 +1,18 @@
 <template>
   <div class="wrapper">
-    <v-container class="maxw-40">
+    <a-container class="maxw-40">
       <app-forgot-password :useLink="true" />
-    </v-container>
+    </a-container>
   </div>
 </template>
 
-<script>
+<script setup>
 import AppForgotPassword from '@/components/ui/ForgotPassword.vue';
-
-export default {
-  components: {
-    AppForgotPassword,
-  },
-};
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .wrapper {
   height: 100%;
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
 }
 </style>

@@ -1,33 +1,46 @@
 <template>
   <div>
-    <v-autocomplete :items="fieldItems" label="Field" v-model="selectedField" hide-details />
-    <v-select :items="operators.default" label="Operator" v-model="selectedOperator" hide-details return-object />
-    <v-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
+    <a-select
+      :items="fieldItems"
+      item-title="text"
+      item-value="value"
+      label="Field"
+      v-model="selectedField"
+      hide-details />
+    <a-select
+      :items="operators.default"
+      item-title="text"
+      item-value="value"
+      label="Operator"
+      v-model="selectedOperator"
+      hide-details
+      return-object />
+    <a-text-field label="Value" v-model="selectedValue" @keyup.enter="add" />
 
     <div class="d-flex justify-end">
-      <v-btn class="ma-2" @click="$emit('show-advanced', true)" text>Advanced</v-btn>
-      <v-btn class="ma-2" outlined @click="reset">Reset</v-btn>
-      <v-btn class="ma-2" @click="add" color="primary">Apply</v-btn>
+      <a-btn class="ma-2" @click="$emit('show-advanced', true)" variant="text">Advanced</a-btn>
+      <a-btn class="ma-2" variant="outlined" @click="reset">Reset</a-btn>
+      <a-btn class="ma-2" @click="add" color="primary">Apply</a-btn>
     </div>
 
-    <v-card outlined v-if="filters.length > 0">
-      <v-list dense>
-        <v-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
-          <v-list-item-content>
-            <div>
-              <span class="font-weight-medium mr-1">{{ filter.field }}</span>
-              <span class="font-weight-regular text--secondary mr-1">{{ filter.operator.text }}</span>
-              <span class="font-weight-boldmr-1">{{ filter.value }}</span>
-            </div>
-          </v-list-item-content>
-          <v-list-item-action @click="remove(i)">
-            <v-btn icon small>
-              <v-icon>mdi-trash-can-outline</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
-    </v-card>
+    <a-card variant="outlined" v-if="filters.length > 0">
+      <a-list dense>
+        <a-list-item v-for="(filter, i) in filters" :key="i" @click="select(filter)" dense>
+          <div>
+            <span class="font-weight-medium mr-1">{{ filter.field }}</span>
+            <span class="font-weight-regular text-secondary mr-1">{{ filter.operator.text }}</span>
+            <span class="font-weight-boldmr-1">{{ filter.value }}</span>
+          </div>
+          <template v-slot:append>
+            <a-list-item-action @click="remove(i)">
+              <a-btn icon small>
+                <a-icon>mdi-trash-can-outline</a-icon>
+              </a-btn>
+            </a-list-item-action>
+          </template>
+        </a-list-item>
+      </a-list>
+    </a-card>
   </div>
 </template>
 
@@ -43,6 +56,7 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
       selectedField: null,

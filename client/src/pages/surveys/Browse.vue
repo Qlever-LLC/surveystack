@@ -1,102 +1,70 @@
 <template>
   <div class="wrapper">
-    <v-container>
-      <v-tabs v-model="activeTab" fixed-tabs>
-        <v-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
+    <a-container>
+      <a-tabs v-model="activeTab" fixed-tabs>
+        <a-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name" :value="tab.name">
           <span v-if="tab.name === 'active-group'" class="text-no-wrap">
             {{ activeGroupName }}
           </span>
           <span v-else class="text-no-wrap">
             {{ tab.label }}
           </span>
-        </v-tab>
-      </v-tabs>
-      <v-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
-        <v-card-text>
+        </a-tab>
+      </a-tabs>
+      <a-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
+        <a-card-text>
           <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
-            <v-list-item :to="`/surveys/${e._id}`">
-              <v-list-item-icon>
-                <v-icon v-if="e.pinned">mdi-pin</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <div>
-                  <v-list-item-title>{{ e.name }}</v-list-item-title>
-                  <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
-                    {{ getGroupName(e.meta.group.id) }}
-                  </v-list-item-subtitle>
-                  <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
-                </div>
-              </v-list-item-content>
-            </v-list-item>
-            <v-divider v-if="i < pinnedSurveys.length - 1" />
+            <a-list-item :to="`/surveys/${e._id}`" :prepend-icon="e.pinned ? 'mdi-pin' : ''">
+              <div>
+                <a-list-item-title>{{ e.name }}</a-list-item-title>
+                <a-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
+                </a-list-item-subtitle>
+                <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
+              </div>
+            </a-list-item>
+            <a-divider v-if="i < pinnedSurveys.length - 1" />
           </div>
-        </v-card-text>
-      </v-card>
+        </a-card-text>
+      </a-card>
 
-      <v-card min-height="60vh" class="d-flex flex-column">
-        <v-card-title> </v-card-title>
-        <v-card-text class="flex-grow-1">
+      <a-card min-height="60vh" class="d-flex flex-column">
+        <a-card-title />
+        <a-card-text class="flex-grow-1">
           <div class="px-5 py-2">
-            <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
+            <a-text-field v-model="search" label="Search" append-inner-icon="mdi-magnify" />
             <div class="d-flex justify-end mb-4">
-              <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
+              <small class="text-secondary"> {{ surveys.pagination.total }} results </small>
             </div>
           </div>
-          <div v-for="(e, i) in surveys.content" :key="e._id">
-            <v-list-item :to="`/surveys/${e._id}`">
-              <v-list-item-icon>
-                <v-icon v-if="e.pinned">mdi-pin</v-icon>
-                <v-btn
-                  v-if="e.meta.submissions === 'public' || !e.meta.submissions"
-                  :to="`/surveys/${e._id}`"
-                  title="Everyone can submit"
-                  icon
-                >
-                  <v-icon>mdi-earth</v-icon>
-                </v-btn>
-                <v-btn
-                  v-if="e.meta.submissions === 'user'"
-                  :to="`/surveys/${e._id}`"
-                  title="Only signed-in users can submit"
-                  icon
-                >
-                  <v-icon>mdi-account</v-icon>
-                </v-btn>
-                <v-btn
-                  v-if="e.meta.submissions === 'group'"
-                  :to="`/surveys/${e._id}`"
-                  title="Everyone group members can submit"
-                  icon
-                >
-                  <v-icon>mdi-account-group</v-icon>
-                </v-btn>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <div>
-                  <v-list-item-title>{{ e.name }}</v-list-item-title>
-                  <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
-                    {{ getGroupName(e.meta.group.id) }}
-                  </v-list-item-subtitle>
-                  <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
-                  <br />
-                  <small v-if="e.createdAgo" class="grey--text">created {{ e.createdAgo }} ago</small>
-                </div>
-              </v-list-item-content>
-            </v-list-item>
-            <v-divider v-if="i < surveys.content.length - 1" />
-          </div>
+          <a-list>
+            <div v-for="(e, i) in surveys.content" :key="e._id">
+              <a-list-item :to="`/surveys/${e._id}`">
+                <template v-slot:prepend>
+                  <a-icon :icon="getIcon(e)" :title="getTitle(e)" large />
+                </template>
+                <a-list-item-title>{{ e.name }}</a-list-item-title>
+                <a-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
+                </a-list-item-subtitle>
+                <small v-if="e.latestVersion" class="text-grey">Survey Version {{ e.latestVersion }}</small>
+                <br />
+                <small v-if="e.createdAgo" class="text-grey">created {{ e.createdAgo }} ago</small>
+              </a-list-item>
+              <a-divider v-if="i < surveys.content.length - 1" />
+            </div>
+          </a-list>
           <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
-        </v-card-text>
-        <v-card-actions>
-          <v-pagination
+        </a-card-text>
+        <a-card-actions>
+          <a-pagination
             v-if="surveys.content.length > 0"
             v-model="page"
             :length="activeTabPaginationLength"
-            @input="() => getDataForTab(activeTab)"
-          />
-        </v-card-actions>
-      </v-card>
-    </v-container>
+            @update:modelValue="() => getDataForTab(activeTab)" />
+        </a-card-actions>
+      </a-card>
+    </a-container>
   </div>
 </template>
 
@@ -211,6 +179,26 @@ export default {
     },
   },
   methods: {
+    getIcon(e) {
+      if (e.pinned) {
+        return 'mdi-pin';
+      } else if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'mdi-earth';
+      } else if (e.meta.submissions === 'user') {
+        return 'mdi-account';
+      } else if (e.meta.submissions === 'group') {
+        return 'mdi-account-group';
+      }
+    },
+    getTitle(e) {
+      if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'Everyone can submit';
+      } else if (e.meta.submissions === 'user') {
+        return 'Only signed-in users can submit';
+      } else if (e.meta.submissions === 'group') {
+        return 'Everyone group members can submit';
+      }
+    },
     getGroupName(id) {
       const group = this.groups.find((item) => item._id === id);
       if (group) {
@@ -312,14 +300,14 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* fix tabs indentation on mobile */
 >>> .v-slide-group__prev {
   display: none !important;
 }
 
 .wrapper {
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
   width: 100%;
   height: 100%;
 }

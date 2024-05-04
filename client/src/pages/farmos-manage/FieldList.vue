@@ -1,35 +1,32 @@
 <template>
-  <v-sheet outlined>
-    <v-list subheader>
-      <v-subheader>Fields added to Farmos Instance</v-subheader>
-
-      <v-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
-        <v-list-item-avatar>
-          <v-icon class="primary lighten-1" dark> mdi-map </v-icon>
-        </v-list-item-avatar>
-
-        <v-list-item-content>
-          <v-list-item-title v-text="field.name"></v-list-item-title>
-        </v-list-item-content>
-
-        <v-list-item-action>
-          <v-btn icon>
-            <v-icon color="grey lighten-1" @click="remove(field)">mdi-delete</v-icon>
-          </v-btn>
-        </v-list-item-action>
-      </v-list-item>
-    </v-list>
-  </v-sheet>
+  <a-sheet :border="true">
+    <a-list subheader>
+      <a-list-subheader>Fields added to Farmos Instance</a-list-subheader>
+      <a-list-item v-for="(field, idx) in modelValue" :key="`field_${idx}`" prepend-icon="mdi-map">
+        {{ field.name }}
+        <template v-slot:append>
+          <a-list-item-action>
+            <a-btn icon>
+              <a-icon color="grey-lighten-1" @click="remove(field)">mdi-delete</a-icon>
+            </a-btn>
+          </a-list-item-action>
+        </template>
+      </a-list-item>
+    </a-list>
+  </a-sheet>
 </template>
 
-<script>
-export default {
-  props: ['value'],
-  methods: {
-    remove(e) {
-      const arr = this.value.filter((v) => v !== e);
-      this.$emit('input', arr);
-    },
+<script setup>
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: false,
   },
-};
+});
+
+const emit = defineEmits(['update:modelValue']);
+function remove(e) {
+  const arr = props.modelValue.filter((v) => v !== e);
+  emit('update:modelValue', arr);
+}
 </script>

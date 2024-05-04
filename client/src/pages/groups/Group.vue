@@ -1,12 +1,12 @@
 <template>
-  <v-container v-if="initialized && status.code === 200">
+  <a-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="entity.path" />
+      <a-breadcrumbs :path="entity.path" />
 
       <div v-if="editable">
-        <v-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
-          <v-icon left>mdi-cog</v-icon> Admin
-        </v-btn>
+        <a-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" variant="text">
+          <a-icon left>mdi-cog</a-icon> Admin
+        </a-btn>
       </div>
     </div>
 
@@ -15,68 +15,60 @@
     </div>
     <h1>
       <span>{{ entity.name }}</span>
-      <v-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </v-chip>
+      <a-chip v-if="isPremium" class="ml-2" color="success"> <a-icon small left> mdi-octagram </a-icon>Premium </a-chip>
     </h1>
-    <h3 class="text--secondary">{{ entity.path }}</h3>
-    <div class="text--secondary body-2">{{ entity._id }}</div>
+    <h3 class="text-secondary">{{ entity.path }}</h3>
+    <div class="text-secondary body-2">{{ entity._id }}</div>
 
-    <v-row>
-      <v-col>
+    <a-row>
+      <a-col>
         <div class="d-flex justify-end">
-          <v-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
+          <a-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
         </div>
         <app-basic-list
           :editable="editable"
           :entities="subgroups"
           title="Subgroups"
           :link="(e) => `/g${e.path}`"
-          :linkNew="{ name: 'groups-new', query: { dir: entity.path } }"
-        >
+          :linkNew="{ name: 'groups-new', query: { dir: entity.path } }">
           <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.path }}</v-list-item-subtitle>
-            </v-list-item-content>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity.path }}</a-list-item-subtitle>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
+      </a-col>
+    </a-row>
+    <a-row>
+      <a-col>
         <app-basic-list
           :editable="editable"
           :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []"
           title="Pinned Surveys"
           :link="(e) => `/surveys/${e._id}`"
-          :linkNew="`/groups/edit/${entity._id}`"
-        >
+          :linkNew="`/groups/edit/${entity._id}`">
           <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity._id }}</v-list-item-subtitle>
-            </v-list-item-content>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity._id }}</a-list-item-subtitle>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
-  </v-container>
-  <v-container v-else-if="status.code === 404">
+      </a-col>
+    </a-row>
+  </a-container>
+  <a-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>
     <p>
       No group under <strong>{{ $route.params.pathMatch }}</strong> was found :/
     </p>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   name: 'Group',
   components: {
-    appGroupBreadcrumbs,
     appBasicList,
   },
   data() {
@@ -174,7 +166,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .placeholder {
   display: flex;
   margin-bottom: 3rem;

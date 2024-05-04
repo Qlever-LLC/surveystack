@@ -8,7 +8,7 @@
           :autoFocus="i === 0"
           :forceMobile="forceMobile"
           insidePage
-        />
+          :isInBuilder="isInBuilder" />
       </div>
     </div>
 
@@ -18,8 +18,7 @@
         :class="{
           irrelevant: !$store.getters['draft/relevance'](path),
           hidden: !$store.getters['draft/relevance'](path) && insidePage,
-        }"
-      >
+        }">
         <app-control-label :value="control.label" :redacted="control.options && control.options.redacted" />
         <app-control-hint :value="control.hint" />
 
@@ -30,7 +29,7 @@
             :autoFocus="autoFocus && i === 0"
             :forceMobile="forceMobile"
             insidePage
-          />
+            :isInBuilder="isInBuilder" />
         </div>
 
         <app-control-more-info :value="control.moreInfo" />
@@ -43,16 +42,15 @@
         :class="{
           irrelevant: !$store.getters['draft/relevance'](path),
           hidden: !$store.getters['draft/relevance'](path) && insidePage,
-        }"
-      >
+        }">
         <component
           :is="getComponentName(control)"
           :control="control"
-          :value="value"
+          :modelValue="value"
           :index="path"
           :key="path"
           :resources="survey.resources"
-          @changed="setProperty"
+          @update:modelValue="setProperty"
           :meta="meta"
           :submission="submission"
           @setStatus="setStatus"
@@ -65,8 +63,7 @@
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
           :forceMobile="forceMobile"
           :isInBuilder="isInBuilder"
-          @initialize="initialize(control.id)"
-        />
+          @initialize="initialize(control.id)" />
       </div>
     </div>
   </div>
@@ -204,7 +201,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .control {
   margin: 8px 0px;
   padding: 1rem;
@@ -217,7 +214,7 @@ export default {
 /* On mouse-over, add a deeper shadow */
 .control:hover {
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
-  border-left: 4px solid var(--v-focus-base);
+  border-left: 4px solid rgb(var(--v-theme-focus));
 }
 
 .group {
@@ -235,7 +232,7 @@ export default {
 
 .group:hover {
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
-  border-left: 4px solid var(--v-primary-base);
+  border-left: 4px solid rgb(var(--v-theme-primary));
 }
 
 .irrelevant {

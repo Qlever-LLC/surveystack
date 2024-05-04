@@ -1,42 +1,43 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
-    <v-card>
-      <v-card-title>
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="500"
+    max-width="75%">
+    <a-card>
+      <a-card-title>
         List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
-      </v-card-title>
-      <v-divider></v-divider>
-      <v-card-text>
-        <v-list dense style="max-height: 500px" class="overflow-y-auto">
-          <v-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" style="height: 100%">
-            <v-progress-circular :size="50" color="primary" indeterminate />
-          </v-container>
+      </a-card-title>
+      <a-divider />
+      <a-card-text>
+        <a-list dense style="max-height: 500px" class="overflow-y-auto">
+          <a-container v-if="libraryConsumers === null" class="d-flex align-center justify-center" cssHeight100>
+            <a-progress-circular :size="50" />
+          </a-container>
           <template v-if="libraryConsumers !== null">
-            <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
-              <v-list-item-content>
-                <small class="grey--text">{{ c._id }}</small>
-                <v-list-item-title>{{ c.name }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+            <a-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+              <small class="text-grey">{{ c._id }}</small>
+              <a-list-item-title>{{ c.name }}</a-list-item-title>
+            </a-list-item>
           </template>
-        </v-list>
-      </v-card-text>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+        </a-list>
+      </a-card-text>
+      <a-divider />
+      <a-card-actions>
+        <a-spacer />
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Close </a-btn>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 import api from '@/services/api.service';
 
 export default {
   name: 'list-library-consumers-dialog',
-  components: {},
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -45,7 +46,7 @@ export default {
       required: true,
     },
   },
-  emits: ['ok', 'cancel'],
+  emits: ['ok', 'cancel', 'update:modelValue'],
   setup(props) {
     const state = reactive({
       libraryConsumers: null,
@@ -69,7 +70,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }

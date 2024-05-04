@@ -70,14 +70,9 @@ const actions = {
     commit('RESET');
   },
   async [types.actions.fetchLocalSubmissions]({ commit }) {
-    // TODO reject if timeout here
-    const response = await new Promise((resolve) => {
-      db.openDb(() => {
-        db.getAllSubmissions((results) => resolve(results));
-      });
-    });
-    commit(types.mutations.SET_SUBMISSIONS, response);
-    return response;
+    const submissions = await db.getAllSubmissions();
+    commit(types.mutations.SET_SUBMISSIONS, submissions);
+    return submissions;
   },
   [types.actions.add]({ commit }, submission) {
     commit(types.mutations.ADD_SUBMISSION, submission);
@@ -96,7 +91,7 @@ const actions = {
     return submissions.find((submission) => submission._id === id);
   },
   async [types.actions.update]({ commit }, submission) {
-    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    await db.persistSubmission(submission);
     commit(types.mutations.UPDATE_SUBMISSION, submission);
     return submission;
   },

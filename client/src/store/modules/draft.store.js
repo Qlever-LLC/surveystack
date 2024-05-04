@@ -5,7 +5,6 @@ import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
 import { get } from 'lodash';
 import api from '@/services/api.service';
-import Vue from 'vue';
 import { isRequiredUnanswered } from '@/utils/surveyStack';
 
 const getPath = (node) =>
@@ -169,7 +168,7 @@ const actions = {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
       try {
-        db.persistSubmission(state.submission);
+        await db.persistSubmission(state.submission);
       } catch (err) {
         console.warn('unable to persist submission to IDB');
       }
@@ -489,7 +488,7 @@ const mutations = {
       throw new Error(`Trying to set property for the invalid path: ${path}`);
     }
 
-    Vue.set(parent, childKey, value);
+    parent[childKey] = value;
   },
   SET_NEXT_ENABLE(state, enable) {
     state.enableNext = enable;
@@ -530,7 +529,7 @@ const mutations = {
     state.showConfirmSubmission = show;
   },
   SET_FARMOS_RESOURCE(state, { type, resource }) {
-    Vue.set(state.farmOsCache, type, resource);
+    state.farmOsCache[type] = resource;
   },
   SET_ERRORS(state, errors) {
     state.errors = errors;

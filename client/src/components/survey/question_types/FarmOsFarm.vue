@@ -6,52 +6,35 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
-    <v-autocomplete
+      @initialize="initialize" />
+    <a-select
       :disabled="loading"
-      :value="getValue"
-      @change="onChange"
+      :modelValue="getValue"
+      @update:modelValue="onChange"
       :items="farms || []"
-      item-text="label"
+      item-title="label"
       item-value="value"
-      outlined
+      variant="outlined"
       :label="control.hint"
-      :chips="control.options.hasMultipleSelections"
       :multiple="control.options.hasMultipleSelections"
-      :deletable-chips="control.options.hasMultipleSelections"
       @keyup.enter.prevent="submit"
       :loading="loading"
       color="focus"
       class="autocomplete"
       clearable
-    >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-        <v-chip
-          close
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          @click="data.select"
-          @click:close="remove(data.item)"
-        >
-          <template v-slot:default>
-            <span v-html="data.item.label" />
-          </template>
-        </v-chip>
+      :chipSlot="!!control.options.hasMultipleSelections"
+      itemSlot>
+      <template v-slot:chip="{ props, item }">
+        <a-chip v-bind="props" closable>
+          {{ item.title }}
+        </a-chip>
       </template>
-      <template v-slot:selection="{ item }" v-else>
-        <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
+      <template v-slot:item="{ props, item }">
+        <a-list-item v-bind="props">
+          <a-list-item-title>{{ item.label }} </a-list-item-title>
+        </a-list-item>
       </template>
-
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-        <v-list-item-content>
-          <v-list-item-title v-html="data.item.label" />
-        </v-list-item-content>
-      </template>
-      <template v-slot:item="{ item }" v-else>
-        <div v-html="item.label"></div>
-      </template>
-    </v-autocomplete>
+    </a-select>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -61,15 +44,16 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
+  mixins: [baseQuestionComponent, farmosBase],
+
   async created() {
     await this.fetchFarms();
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 >>> .v-list-item.v-list-item--active {
-  color: var(--v-focus-base) !important;
+  color: rgb(var(--v-theme-focus)) !important;
 }
 </style>

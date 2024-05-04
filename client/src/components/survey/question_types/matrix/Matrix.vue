@@ -8,8 +8,7 @@
       @cancel="rowToBeDeleted = -1"
       title="Confirm Deletion"
       labelConfirm="DELETE"
-      :maxWidth="400"
-    >
+      :maxWidth="400">
       Do you want to delete this row?
     </app-dialog>
 
@@ -23,32 +22,23 @@
       @cancel="showConfirmInitializeDialog = false"
       title="Confirm Reset"
       labelConfirm="RESET"
-      :maxWidth="400"
-    >
+      :maxWidth="400">
       Do you want to reset this spreadsheet based on the previous answers in your survey? You will have to re-enter any
       custom information you have entered.
     </app-dialog>
 
-    <v-dialog
-      v-model="showEditItemDialog"
-      v-bind="dialogProps"
-      v-if="showEditItemDialog"
-      title="Edit"
-      hideCancel
-      @confirm="showEditItemDialog = false"
-      max-width="800px"
-    >
+    <a-dialog v-model="showEditItemDialog" v-bind="dialogProps" v-if="showEditItemDialog" max-width="800px">
       <div style="background: #1867c0; padding: 4px 0px">
-        <v-card>
-          <v-card-title>
-            <v-btn @click="duplicateRow(editedIndex)" text color="primary">
-              <v-icon left>mdi-content-copy</v-icon>Duplicate
-            </v-btn>
-            <v-spacer />
-            <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
-          </v-card-title>
-          <v-card-text>
-            <v-form autocomplete="off" @submit.prevent="">
+        <a-card>
+          <a-card-title>
+            <a-btn @click="duplicateRow(editedIndex)" variant="text" color="primary">
+              <a-icon left>mdi-content-copy</a-icon>Duplicate
+            </a-btn>
+            <a-spacer />
+            <a-btn variant="text" @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
+          </a-card-title>
+          <a-card-text>
+            <a-form autocomplete="off" @submit.prevent="">
               <div v-for="(header, idx) in headers" :key="header.value">
                 <div class="d-flex align-center">
                   <h4>{{ header.label }}</h4>
@@ -62,22 +52,21 @@
                   :farmos="farmos"
                   :index="idx"
                   @changed="onInput"
-                  class="my-2"
-                />
+                  class="my-2" />
               </div>
-            </v-form>
-          </v-card-text>
-          <v-card-actions class="d-flex justify-space-between">
-            <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
-              <v-icon left>mdi-trash-can-outline</v-icon>Delete
-            </v-btn>
-            <v-btn text @click="showEditItemDialog = false" class="ma-2">
-              Close <v-icon right>mdi-close</v-icon>
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+            </a-form>
+          </a-card-text>
+          <a-card-actions class="d-flex justify-space-between">
+            <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error" dense>
+              <a-icon left>mdi-trash-can-outline</a-icon>
+            </a-btn>
+            <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2" dense>
+              Close <a-icon right>mdi-close</a-icon>
+            </a-btn>
+          </a-card-actions>
+        </a-card>
       </div>
-    </v-dialog>
+    </a-dialog>
     <app-control-label
       :value="control.label"
       :redacted="redacted"
@@ -85,8 +74,7 @@
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
       initializeTooltip="Reset rows"
-      @initialize="initializeConfirm"
-    />
+      @initialize="initializeConfirm" />
     <app-control-hint :value="control.hint" />
 
     <app-matrix-table
@@ -98,20 +86,17 @@
       :floatingFooterSize="isInBuilder ? 0 : 64"
       :addRowLabel="addRowLabel"
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
-      @addRow="add"
-    >
+      @addRow="add">
       <template v-slot:header-cell="{ header }">
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <span class="flex-grow-1 text-truncate" v-on="on">{{ header.label }}</span>
-          </template>
-          <span>{{ header.type }}: {{ header.label }}</span>
-        </v-tooltip>
+        <span class="flex-grow-1 text-truncate">
+          {{ header.label }}
+          <a-tooltip top activator="parent">{{ header.type }}: {{ header.label }}</a-tooltip>
+        </span>
         <app-redacted v-if="header.redacted" />
         <app-required v-if="header.required" />
       </template>
       <template v-slot:row-cell="{ header, row, colIdx }">
-        <v-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
+        <a-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
           <app-matrix-cell
             :header="header"
             :item="row"
@@ -121,28 +106,25 @@
             @changed="onInput"
             :disabled="isMobile"
             class="mt-2"
-            :loading="isFarmOsLoading"
-          />
-        </v-form>
+            :loading="isFarmOsLoading" />
+        </a-form>
       </template>
-      <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
-        <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
-          <div class="d-flex">
-            <v-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
-              <v-icon>mdi-trash-can-outline</v-icon>
-            </v-btn>
-            <v-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
-              <v-icon>mdi-content-copy</v-icon>
-            </v-btn>
-          </div>
+      <template v-if="!isMobile" v-slot:rowActions="{ rowIdx }">
+        <div class="d-flex flex-grow-1" style="padding-left: 4px !important; padding-right: 0px">
+          <a-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" dense>
+            <a-icon>mdi-trash-can-outline</a-icon>
+          </a-btn>
+          <a-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" dense>
+            <a-icon>mdi-content-copy</a-icon>
+          </a-btn>
         </div>
       </template>
     </app-matrix-table>
     <app-control-more-info :value="control.moreInfo" />
 
     <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
-      <v-progress-circular indeterminate color="primary" size="24" />
-      <div class="ml-2 text--secondary">Loading farmOS data</div>
+      <a-progress-circular size="24" />
+      <div class="ml-2 text-secondary">Loading farmOS data</div>
     </div>
   </div>
 </template>
@@ -217,6 +199,7 @@ const transform = (assets) => {
         farmName: area.farmName,
         location: area.location,
         isField: true,
+        name: '',
       },
       label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
     };
@@ -241,6 +224,8 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
   };
@@ -250,11 +235,15 @@ const transform = (assets) => {
       farmName: null,
       location: null,
       isField: true,
+      isNotClickable: true,
+      name: '',
     },
     label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
   };
 
-  res.push(withoutAreaSection, ...withoutArea);
+  if (withoutArea.length > 0) {
+    res.push(withoutAreaSection, ...withoutArea);
+  }
 
   if (localAssets.length > 0) {
     res.unshift(localAssetSection, ...localAssets);
@@ -264,7 +253,7 @@ const transform = (assets) => {
 };
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase()],
+  mixins: [baseQuestionComponent, farmosBase],
   components: {
     appDialog,
     appMatrixCell,
@@ -274,7 +263,7 @@ export default {
   },
   data() {
     return {
-      rows: this.value,
+      rows: this.modelValue,
       rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
       farmosTransformedPlantings: [],
@@ -311,7 +300,7 @@ export default {
       },
     },
     isMobile() {
-      return !this.$vuetify.breakpoint.smAndUp || this.forceMobile;
+      return !this.$vuetify.display.smAndUp || this.forceMobile;
     },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };
@@ -324,7 +313,7 @@ export default {
         this.rows = [];
       }
       this.rows.push(newRow);
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
       if (this.isMobile) {
         this.editItem(this.rows.length - 1);
       }
@@ -336,7 +325,7 @@ export default {
       if (this.rows.length === 0) {
         this.rows = null;
       }
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
     },
     editItem(index) {
       this.editedIndex = index;
@@ -363,13 +352,13 @@ export default {
       return [...defaultItems, ...customItems];
     },
     onInput() {
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
     },
     duplicateRow(idx) {
       this.showEditItemDialog = false;
       const clone = cloneDeep(this.rows[idx]);
       this.rows = [...this.rows, clone];
-      this.$emit('changed', this.rows);
+      this.changed(this.rows);
     },
     initializeConfirm() {
       if (this.meta && !!this.meta.dateModified) {
@@ -396,14 +385,15 @@ export default {
     this.isFarmOsLoading = false;
   },
   watch: {
-    value() {
-      this.rows = this.value || [];
+    modelValue() {
+      //TODO CHECK
+      this.rows = this.modelValue || [];
     },
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /*
   'scrollbar-color' and 'scrollbar-width' should be working on Firefox Android since version 64
   https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Scrollbars#Browser_compatibility
@@ -416,17 +406,45 @@ export default {
 }
 */
 
->>> .v-data-table__wrapper::-webkit-scrollbar {
-  height: 12px;
+// :deep(.v-data-table__wrapper::-webkit-scrollbar) {
+//   height: 12px;
+// }
+
+// :deep(.v-data-table__wrapper::-webkit-scrollbar-track) {
+//   border-radius: 3px;
+//   background: #eee;
+// }
+
+// :deep(.v-data-table__wrapper::-webkit-scrollbar-thumb) {
+//   border-radius: 3px;
+//   background: #bbb;
+// }
+
+.chip-no-wrap {
+  white-space: nowrap;
 }
 
->>> .v-data-table__wrapper::-webkit-scrollbar-track {
-  border-radius: 3px;
-  background: #eee;
+:deep(.blue-chip, .orange-chip, .green-chip) {
+  display: inline-flex;
+  border: 1px rgb(var(--v-theme-focus)) solid;
+  background-color: white;
+  color: rgb(var(--v-theme-focus));
+  border-radius: 0.4rem;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  vertical-align: middle;
 }
 
->>> .v-data-table__wrapper::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background: #bbb;
+:deep(.green-chip) {
+  color: #46b355;
+  border: 1px #46b355 solid;
+}
+
+:deep(.orange-chip) {
+  color: #f38d49;
+  border: 1px #f38d49 solid;
 }
 </style>

@@ -1,33 +1,29 @@
 <template>
-  <v-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
-    <template v-slot:activator="{ on, attrs }">
-      <v-text-field
-        v-on="on"
-        v-bind="attrs"
-        ref="anchorRef"
+  <a-dialog v-model="open">
+    <template v-slot:activator="{ props }">
+      <a-text-field
+        v-bind="props"
         label="Resource"
-        :value="getLabel"
+        :modelValue="getLabel"
         placeholder="Add Columns"
         class="mt-6"
-        :class="$vnode.data.staticClass"
         hide-details
         readonly
-        outlined
-        :disabled="disabled"
-      />
+        variant="outlined"
+        :disabled="disabled" />
     </template>
 
     <matrix-editor
       :resources="resources"
       :allowSetAllowHide="allowSetAllowHide"
-      v-model="value"
+      :modelValue="modelValue"
+      @update:modelValue="$emit('update:modelValue', $event)"
       @change="setResource"
       @delete="removeResource"
       @close-dialog="open = false"
       @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-      @set-control-required="(val) => $emit('set-control-required')"
-    />
-  </v-dialog>
+      @set-control-required="(val) => $emit('set-control-required')" />
+  </a-dialog>
 </template>
 
 <script>
@@ -38,7 +34,7 @@ export default {
     MatrixEditor,
   },
   props: {
-    value: {
+    modelValue: {
       type: Object,
     },
     resources: {
@@ -61,14 +57,14 @@ export default {
   },
   computed: {
     resource() {
-      return this.resources.find((resource) => resource.id === this.value);
+      return this.resources.find((resource) => resource.id === this.modelValue);
     },
     filteredResources() {
       return this.resources.filter((resource) => resource.type === 'MATRIX');
     },
     getLabel() {
-      return this.value && Array.isArray(this.value.content)
-        ? this.value.content
+      return this.modelValue && Array.isArray(this.modelValue.content)
+        ? this.modelValue.content
             .map((item) => item.label)
             .filter(Boolean)
             .join(', ')

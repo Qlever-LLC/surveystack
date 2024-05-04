@@ -1,134 +1,77 @@
 <template>
-  <v-container class="home" :fluid="true">
-    <v-row>
-      <v-col>
-        <v-img
-          v-if="isWhitelabel"
-          :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
-          class="my-3"
-          contain
-          height="128"
-        ></v-img>
-        <v-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128"></v-img>
-      </v-col>
-    </v-row>
+  <a-container class="home" fluid>
+    <a-row>
+      <a-col>
+        <a-img v-if="isWhitelabel" :src="whitelabelPartner.hero || whitelabelPartner.logo" class="my-3" height="128" />
+        <a-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128" />
+      </a-col>
+    </a-row>
 
-    <v-row>
-      <v-col align="center">
+    <a-row>
+      <a-col align="center">
         <app-basic-list
           class="maxw-40 text-left"
           v-if="isWhitelabel && pinnedWhitelabelSurveys.length > 0"
           :entities="pinnedWhitelabelSurveys"
           title="Get Started"
           :link="(e) => `/surveys/${e.id}`"
-          :searchable="false"
-        >
+          :searchable="false">
+          <template v-slot:prepend="{ entity }">
+            <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
+          </template>
           <template v-slot:entity="{ entity }">
-            <v-list-item-icon class="mr-2 d-flex align-center mb-2">
-              <v-btn
-                v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
-                :to="`/surveys/${entity.id}`"
-                title="Everyone can submit"
-                icon
-              >
-                <v-icon>mdi-earth</v-icon>
-              </v-btn>
-              <v-btn
-                v-if="entity.meta.submissions === 'user'"
-                :to="`/surveys/${entity.id}`"
-                title="Only signed-in users can submit"
-                icon
-              >
-                <v-icon>mdi-account</v-icon>
-              </v-btn>
-              <v-btn
-                v-if="entity.meta.submissions === 'group'"
-                :to="`/surveys/${entity.id}`"
-                title="Everyone group members can submit"
-                icon
-              >
-                <v-icon>mdi-account-group</v-icon>
-              </v-btn>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <div class="d-flex align-center ml-3">
-              <v-btn color="primary" small>Take Survey</v-btn>
-            </div>
+            <a-row no-gutters>
+              <a-col col="10" class="flex-grow-1">
+                <a-list-item-title>{{ entity.name }}</a-list-item-title>
+                <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
+              </a-col>
+              <a-col col="1" class="flex-grow-0 align-self-center ml-3">
+                <a-btn color="primary" small>Take Survey</a-btn>
+              </a-col>
+            </a-row>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
+      </a-col>
+    </a-row>
 
-    <v-row>
-      <v-col align="center">
+    <a-row>
+      <a-col align="center">
         <app-basic-list
           class="maxw-40 text-left"
           v-if="pinned && pinned.length > 0"
           :entities="pinned"
           title="More Surveys"
-          :link="(e) => `/surveys/${e.id}`"
-        >
+          :link="(e) => `/surveys/${e.id}`">
+          <template v-slot:prepend="{ entity }">
+            <a-icon :icon="getIcon(entity)" :title="getTitle(entity)" large />
+          </template>
           <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <div class="d-flex">
-                <div class="mr-2">
-                  <v-btn
-                    v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
-                    :to="`/surveys/${entity.id}`"
-                    title="Everyone can submit"
-                    icon
-                  >
-                    <v-icon>mdi-earth</v-icon>
-                  </v-btn>
-                  <v-btn
-                    v-if="entity.meta.submissions === 'user'"
-                    :to="`/surveys/${entity.id}`"
-                    title="Only signed-in users can submit"
-                    icon
-                  >
-                    <v-icon>mdi-account</v-icon>
-                  </v-btn>
-                  <v-btn
-                    v-if="entity.meta.submissions === 'group'"
-                    :to="`/surveys/${entity.id}`"
-                    title="Everyone group members can submit"
-                    icon
-                  >
-                    <v-icon>mdi-account-group</v-icon>
-                  </v-btn>
-                </div>
-                <div>
-                  <v-list-item-title>{{ entity.name }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
-                </div>
-              </div>
-            </v-list-item-content>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity.group }}</a-list-item-subtitle>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
+      </a-col>
+    </a-row>
 
-    <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
+    <a-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog" cssLoginPage>
       <auth-selector />
-    </v-dialog>
+    </a-dialog>
 
-    <v-row>
-      <v-col align="center">
-        <v-btn x-large text :to="`/surveys/browse`">
-          <v-icon left>mdi-text-box-search-outline</v-icon>Browse All Surveys
-        </v-btn>
-      </v-col>
-    </v-row>
+    <a-row>
+      <a-col align="center">
+        <a-btn x-large variant="text" :to="`/surveys/browse`">
+          <a-icon left>mdi-text-box-search-outline</a-icon>
+          Browse All Surveys
+        </a-btn>
+      </a-col>
+    </a-row>
 
-    <v-row v-if="false">
-      <v-col align="center">
-        <v-btn color="primary" x-large href="surveystack://measurement">Run Measurement</v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+    <a-row v-if="false">
+      <a-col align="center">
+        <a-btn color="primary" x-large href="surveystack://measurement">Run Measurement</a-btn>
+      </a-col>
+    </a-row>
+  </a-container>
 </template>
 
 <script>
@@ -145,6 +88,28 @@ export default {
     return {
       loginIsVisible: this.$store.getters['auth/isLoggedIn'] || true,
     };
+  },
+  methods: {
+    getIcon(e) {
+      if (e.pinned) {
+        return 'mdi-pin';
+      } else if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'mdi-earth';
+      } else if (e.meta.submissions === 'user') {
+        return 'mdi-account';
+      } else if (e.meta.submissions === 'group') {
+        return 'mdi-account-group';
+      }
+    },
+    getTitle(e) {
+      if (e.meta.submissions === 'public' || !e.meta.submissions) {
+        return 'Everyone can submit';
+      } else if (e.meta.submissions === 'user') {
+        return 'Only signed-in users can submit';
+      } else if (e.meta.submissions === 'group') {
+        return 'Everyone group members can submit';
+      }
+    },
   },
   computed: {
     isLoggedIn() {
@@ -167,16 +132,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .home {
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
   height: 100%;
-}
-
->>> .v-dialog {
-  height: auto;
-  width: auto;
-  max-width: 40rem;
 }
 
 >>> .container {

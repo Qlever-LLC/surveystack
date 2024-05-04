@@ -10,32 +10,28 @@
       v-model="showAndroidInstallDialog"
       v-bind="dialogProps"
       @cancel="showAndroidInstallDialog = false"
-      @confirm="showAndroidInstallDialog = false"
-    >
+      @confirm="showAndroidInstallDialog = false">
       <template v-slot:title>Installing Android App</template>
-      <template>
-        <p class="text--primary">
-          Installing the Android Application allows to connect to Bluetooth and USB Devices for taking measurements.
+      <p class="text-primary">
+        Installing the Android Application allows to connect to Bluetooth and USB Devices for taking measurements.
 
-          <br /><br />
-          When installing you will be asked to allow installing applications from unknown sources.
-        </p>
+        <br /><br />
+        When installing you will be asked to allow installing applications from unknown sources.
+      </p>
 
-        <v-alert outlined class="pa-4" type="success" color="blue">
-          If you have already installed the Android App once, you don't need install the App again.
-        </v-alert>
+      <a-alert variant="outlined" class="pa-4" type="success" color="blue">
+        If you have already installed the Android App once, you don't need install the App again.
+      </a-alert>
 
-        <br />
-        <v-btn
-          x-large
-          color="green"
-          href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
-          outlined
-        >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
-          Download APK
-        </v-btn>
-      </template>
+      <br />
+      <a-btn
+        x-large
+        color="green"
+        href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
+        outlined>
+        <a-icon left class="mr-4" x-large>mdi-android</a-icon>
+        Download APK
+      </a-btn>
     </app-dialog>
 
     <a ref="scriptLink" :href="`surveystack://kit/${scriptId}`" style="display: none">Run Surveystack Script</a>
@@ -43,37 +39,36 @@
     <div v-if="this.source">
       <iframe src="" frameborder="0" ref="iframe" sandbox="allow-scripts allow-same-origin allow-popups" />
 
-      <div class="android-button-container" v-if="!this.value">
-        <v-btn
+      <div class="android-button-container" v-if="!this.modelValue">
+        <a-btn
           v-if="control.options.isNativeScript"
           class=""
           x-large
           color="green"
           outlined
-          @click="showAndroidInstallDialog = true"
-        >
-          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          @click="showAndroidInstallDialog = true">
+          <a-icon left class="mr-4" x-large>mdi-android</a-icon>
           Install Android App
-        </v-btn>
+        </a-btn>
       </div>
 
-      <v-btn @click="requestRunScript" class="full center-button mt-4" depressed large color="primary">
+      <a-btn @click="requestRunScript" class="full center-button mt-4" variant="flat" large color="primary">
         {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
-      </v-btn>
+      </a-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">
-        <v-chip dark> {{ meta && meta.status }}</v-chip>
+        <a-chip> {{ meta && meta.status }}</a-chip>
         <br />
-        <v-chip dark class="mt-1">
-          <v-icon small left>mdi-message-bulleted</v-icon>
-          {{ meta && meta.statusMessage }}</v-chip
+        <a-chip class="mt-1">
+          <a-icon small left>mdi-message-bulleted</a-icon>
+          {{ meta && meta.statusMessage }}</a-chip
         >
       </p>
     </div>
     <div v-else-if="isLoading" class="d-flex align-center justify-center">
-      <v-progress-circular indeterminate color="primary" class="ma-5" />
+      <a-progress-circular class="ma-5" />
     </div>
     <div v-else-if="loadingSourceFailed" class="text-center">
-      <v-icon color="red">mdi-close-thick</v-icon>
+      <a-icon color="red">mdi-close-thick</a-icon>
       There was an error loading the script.
     </div>
     <app-control-more-info :value="control.moreInfo" />
@@ -111,7 +106,7 @@ export default {
       };
     },
     parent() {
-      const parentPath = getParentPath(this.$vnode.key);
+      const parentPath = getParentPath(this.$.vnode.key);
       const parentData = get(this.submission, parentPath);
       return parentData;
     },
@@ -132,7 +127,7 @@ export default {
         {
           type: 'REQUEST_RUN_SCRIPT',
           payload: {
-            value: this.value,
+            value: this.modelValue,
             context: this.meta.context || {},
             status: this.status || { type: null, message: null },
           },
@@ -145,7 +140,7 @@ export default {
         {
           type: 'REQUEST_RENDER_SCRIPT',
           payload: {
-            value: this.value,
+            value: this.modelValue,
             context: this.meta.context || {},
           },
         },
@@ -153,7 +148,7 @@ export default {
       );
     },
     handleScriptHasLoaded() {
-      if (this.value) {
+      if (this.modelValue) {
         this.requestRenderScript();
       }
     },
@@ -248,7 +243,7 @@ export default {
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
       const parentJSON = JSON.stringify(this.parent);
-      const valueJSON = JSON.stringify(this.value);
+      const valueJSON = JSON.stringify(this.modelValue);
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
@@ -321,13 +316,13 @@ export default {
       this.loadingSourceFailed = true;
     }
   },
-  destroyed() {
+  unmounted() {
     this.messageEventListeners.forEach((handler) => window.removeEventListener('message', handler));
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 iframe {
   width: 100%;
   display: block;

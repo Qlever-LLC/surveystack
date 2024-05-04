@@ -1,31 +1,29 @@
 <template>
-  <v-card v-if="!signInLinkSent" class="pa-6 card-width">
+  <a-card v-if="!signInLinkSent" class="pa-6 card-width">
     <div class="d-sm-flex justify-center">
       <div class="pl-sm-5 pr-sm-10 py-6">
-        <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
-        <h1 class="heading--text" v-else>Welcome Back!</h1>
-        <v-form>
-          <v-text-field
+        <h1 class="text-heading text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
+        <h1 class="text-heading" v-else>Welcome Back!</h1>
+        <a-form>
+          <a-text-field
             label="E-Mail"
             type="text"
             class="form-control"
-            :value="entity.email"
-            @input="entity.email = $event.toLowerCase()"
-            color="focus"
-          />
+            v-model="entity.email"
+            @update:model-value="entity.email = $event.toLowerCase()"
+            color="focus" />
           <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
             We'll send you an email to sign you in - no password needed! <b>Click send</b> then <b>check your email</b>.
           </div>
-          <v-text-field
+          <a-text-field
             v-if="usePassword"
             label="Password"
             :type="passwordInputType"
             class="form-control"
             v-model="entity.password"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords"
-            color="focus"
-          />
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:appendInner="showPasswords = !showPasswords"
+            color="focus" />
           <div class="d-flex justify-space-around align-center">
             <template v-if="usePassword">
               <router-link
@@ -40,31 +38,21 @@
               >
               <a
                 v-else
-                text
                 @click.stop="$emit('updateActive', 'forgot-password')"
                 class="white-space-nowrap font-weight-medium mr-4"
                 role="button"
                 >Forgot password?</a
               >
             </template>
-            <v-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
+            <a-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
               usePassword ? 'Login' : 'Send Link'
-            }}</v-btn>
+            }}</a-btn>
           </div>
-        </v-form>
+        </a-form>
         <div class="text-center text-muted mt-5">
-          <v-btn
-            text
-            small
-            color="primary"
-            @click="
-              usePassword = !usePassword;
-              status = null;
-            "
-            data-testid="toggle-method"
-          >
+          <a-btn variant="text" small color="primary" @click="switchSignInMode" data-testid="toggle-method">
             {{ usePassword ? 'email me a sign in link instead' : 'sign in with password instead' }}
-          </v-btn>
+          </a-btn>
         </div>
       </div>
       <template v-if="registrationEnabled">
@@ -75,34 +63,33 @@
         </div>
         <div class="d-flex justify-center pr-sm-5 pl-sm-10 py-6 d-flex flex-column align-center flex-wrap">
           <p class="white-space-nowrap">Don't have an account?</p>
-          <v-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link"> Register now </v-btn>
-          <v-btn v-else @click.stop="$emit('updateActive', 'register')" color="primary" class="px-8" role="button">
+          <a-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link"> Register now </a-btn>
+          <a-btn v-else @click.stop="$emit('updateActive', 'register')" color="primary" class="px-8" role="button">
             Register now
-          </v-btn>
+          </a-btn>
         </div>
       </template>
     </div>
 
-    <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
-  </v-card>
-  <v-alert
+    <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }}</a-alert>
+  </a-card>
+  <a-alert
     v-else
     icon="mdi-email-fast"
     prominent
-    colored-border
+    border-color="success"
     color="success"
-    border="left"
+    border="start"
     elevation="2"
-    class="card-width mb-0"
-  >
+    class="card-width mb-0">
     <h1>Magic link sent!</h1>
     <p class="body-1 my-6">
       Follow the link we sent you at <span class="font-weight-medium">{{ entity.email }}</span> to finish logging in!
     </p>
     <div class="text-right text-muted mt-5">
-      <v-btn text small @click="signInLinkSent = false"> Back to login </v-btn>
+      <a-btn variant="text" small @click="signInLinkSent = false"> Back to login </a-btn>
     </div>
-  </v-alert>
+  </a-alert>
 </template>
 
 <script>
@@ -133,6 +120,7 @@ export default {
       default: true,
     },
   },
+
   data() {
     return {
       status: '',
@@ -154,14 +142,13 @@ export default {
     registerLink() {
       const link = {
         name: 'auth-register',
-        params: {
+        query: {
           initialEmail: this.entity.email,
           initialPassword: this.entity.password,
         },
       };
-
-      if (this.$route.params && this.$route.params.redirect) {
-        link.params.redirect = this.$route.params.redirect;
+      if (this.$route.query?.redirect) {
+        link.query.redirect = this.$route.query?.redirect;
       }
 
       return link;
@@ -194,6 +181,10 @@ export default {
     }
   },
   methods: {
+    switchSignInMode() {
+      this.usePassword = !this.usePassword;
+      this.status = null;
+    },
     async handleSubmitClick() {
       this.isSubmitting = true;
       try {
@@ -210,7 +201,7 @@ export default {
 
       // email sign-in link
       if (!this.usePassword) {
-        const landingPath = this.$route.params.redirect || this.$route.query.landingPath;
+        const landingPath = this.$route.query.redirect || this.$route.query.landingPath;
         const callbackUrl = this.$route.query.callbackUrl;
 
         try {
@@ -218,7 +209,7 @@ export default {
           this.signInLinkSent = true;
           this.status = '';
         } catch (e) {
-          this.status = get(e, 'response.data.message') || 'An error occured, please try again later.';
+          this.status = get(e, 'response.data.message') || 'An error occurred, please try again later.';
         }
         return;
       }
@@ -242,15 +233,15 @@ export default {
             this.status = 'Invalid email or password'; //error.response.data.message;
             break;
           default:
-            this.status = 'An error occured'; //'Unknown error :/';
+            this.status = 'An error occurred'; //'Unknown error :/';
         }
         return;
       }
 
       this.$store.dispatch('surveys/fetchPinned');
 
-      if (this.$route.params.redirect) {
-        this.$router.push(this.$route.params.redirect);
+      if (this.$route.query.redirect) {
+        this.$router.push(this.$route.query.redirect);
       } else {
         this.$router.push('/');
       }
@@ -264,7 +255,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 a {
   text-decoration: none;
 }

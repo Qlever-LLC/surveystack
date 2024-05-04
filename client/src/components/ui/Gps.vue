@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-menu offset-y>
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" v-on="on" class="button">
-          <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
+    <a-menu v-model="menuIsOpen" location="bottom">
+      <template v-slot:activator="{ props }">
+        <a-btn v-bind="props" class="button">
+          <a-icon>mdi-dots-vertical</a-icon>
+        </a-btn>
       </template>
       <div class="menu">
         <div>
@@ -19,14 +19,14 @@
             <span v-if="location.properties.accuracy"> acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }} </span>
           </samp>
         </div>
-        <v-btn @click="clipboard" outlined class="mt-1"> <v-icon left>mdi-content-copy</v-icon>Copy </v-btn>
+        <a-btn @click="clipboard" variant="outlined" class="mt-1"> <a-icon left>mdi-content-copy</a-icon>Copy </a-btn>
       </div>
-    </v-menu>
+    </a-menu>
     <!-- TODO: fix copied snack notification -->
-    <v-snackbar v-model="snackbar">
+    <a-snackbar v-model="snackbar">
       {{ snackbarText }}
-      <v-btn color="pink" text @click="snackbar = false"> Close </v-btn>
-    </v-snackbar>
+      <a-btn color="pink" variant="text" @click="snackbar = false"> Close </a-btn>
+    </a-snackbar>
   </div>
 </template>
 
@@ -37,6 +37,7 @@ export default {
       snackbar: false,
       snackbarText: '',
       expandedVal: this.expanded ? 0 : null,
+      menuIsOpen: false,
     };
   },
   props: {
@@ -76,7 +77,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 /* .map-container {
   font-family: monospace;
   justify-content: left;

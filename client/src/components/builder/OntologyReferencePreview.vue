@@ -1,33 +1,28 @@
 <template>
-  <v-dialog v-model="open" max-width="50%" hide-overlay>
-    <v-card min-height="50vh" class="d-flex flex-column">
-      <v-card-title class="justify-space-between align-center">
+  <a-dialog v-model="open" max-width="50%">
+    <a-card min-height="50vh" class="d-flex flex-column">
+      <a-card-title class="justify-space-between align-center">
         <p>Survey Reference Preview</p>
         <select-items-download-button :resourceName="resource.name" :items="items" />
-      </v-card-title>
+      </a-card-title>
 
-      <v-card-text class="mt-4">
-        <v-data-table
-          :headers="tableHeaders"
-          :items="items"
-          :loading="loading"
-          item-key="id"
-          :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
-        />
-      </v-card-text>
+      <a-card-text class="mt-4">
+        <a-data-table :headers="tableHeaders" :items="items" :loading="loading" itemValue="id" />
+      </a-card-text>
 
-      <v-spacer />
+      <a-spacer />
 
-      <v-card-actions class="mr-3 d-flex justify-end">
-        <v-btn text @click="open = false">Close</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      <a-card-actions class="mr-3 d-flex justify-end">
+        <a-btn variant="text" @click="open = false">Close</a-btn>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
-import { computed, defineComponent, ref, watchEffect } from '@vue/composition-api';
+import { computed, defineComponent, ref, watchEffect } from 'vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
+
 import { get, groupBy } from 'lodash';
 import api from '@/services/api.service';
 
@@ -36,7 +31,7 @@ export default defineComponent({
     SelectItemsDownloadButton,
   },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
     },
     resource: {
@@ -44,14 +39,14 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const items = ref([]);
     const loading = ref(false);
     const params = ref(null);
     const open = computed({
-      get: () => props.value || false,
-      set: (value) => emit('input', value),
+      get: () => props.modelValue || false,
+      set: (value) => emit('update:modelValue', value),
     });
 
     const fetchSubmissions = async (surveyId, path) => {
@@ -92,7 +87,7 @@ export default defineComponent({
       const key = id + path;
 
       // Skip fetching if dialog is closed or already fetchced items
-      if (!props.value || params.value === key) {
+      if (!props.modelValue || params.value === key) {
         return;
       }
 
@@ -104,12 +99,14 @@ export default defineComponent({
     return {
       tableHeaders: [
         {
-          text: 'Label',
+          title: 'Label',
           value: 'label',
+          sortable: true,
         },
         {
-          text: 'Value',
+          title: 'Value',
           value: 'value',
+          sortable: true,
         },
       ],
       open,

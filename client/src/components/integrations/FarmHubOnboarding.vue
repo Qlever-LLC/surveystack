@@ -1,16 +1,16 @@
 <template>
   <div>
-    <v-card>
-      <v-card-title>
+    <a-card>
+      <a-card-title>
         Farm Hub Onboarding
-        <v-spacer />
-      </v-card-title>
-      <v-card-text class="d-flex justify-center">
+        <a-spacer />
+      </a-card-title>
+      <a-card-text class="d-flex justify-center">
         <div class="pa-8">
-          <v-btn class="center-text" color="primary" priominent x-large :to="newRoute">Manage FarmOS Farms</v-btn>
+          <a-btn class="center-text" color="primary" priominent x-large :to="newRoute">Manage FarmOS Farms</a-btn>
         </div>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
   </div>
 </template>
 

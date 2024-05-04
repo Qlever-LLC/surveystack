@@ -1,8 +1,7 @@
 .map {
   width: 100%;
   height: 450px;
-  --farmos-map-accent-color: var(--v-primary-base);
-
+  --farmos-map-accent-color: rgb(var(--v-theme-primary));
 }
 
 .map >>> .layer-switcher ul {
@@ -28,7 +27,6 @@
 .map >>> .geotrace-ctrl button.play:active {
   filter: brightness(0.75);
 }
-
 
 .map >>> .geotrace-ctrl button.play svg path {
   fill: white;
@@ -67,7 +65,5 @@ but jest doesn't understand the deep selector (>>>)
   outline: none;
 }
 
-
 .keep-open-alert {
-  
 }
