@@ -208,7 +208,7 @@ export default [
   },
 
   {
-    path: '/groups/:id/surveys/:sId/description',
+    path: '/groups/:id/surveys/:surveyId/description',
     name: 'group-surveys-description',
     components: {
       header: AppHeader,

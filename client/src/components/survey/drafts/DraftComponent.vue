@@ -103,7 +103,13 @@
         editor.
       </a-col>
       <a-col class="shrink">
-        <a-btn :to="`/surveys/${survey._id}`">back</a-btn>
+        <a-btn
+          :to="{
+            name: 'group-surveys-description',
+            params: { surveyId: survey._id },
+          }"
+          >back</a-btn
+        >
       </a-col>
     </a-row>
   </a-alert>

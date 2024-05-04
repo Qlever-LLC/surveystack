@@ -220,7 +220,7 @@ export default {
 
     // If the user is on the new-submission route, initialize a new submission and then redirect to the edit-submission route for that submission
     if (this.$route.name === 'group-survey-submissions-new') {
-      const { group, submitAsUserId } = this.$route.query;
+      const { submitAsUserId } = this.$route.query;
       const startDraftConfig = { survey: this.survey };
       if (submitAsUserId) {
         try {
@@ -236,7 +236,7 @@ export default {
       const submissionId = await this.$store.dispatch('submissions/startDraft', startDraftConfig);
       await this.$router.replace({
         name: 'group-survey-submissions-edit',
-        params: { id: group, surveyId, submissionId },
+        params: { submissionId },
       });
     }
 

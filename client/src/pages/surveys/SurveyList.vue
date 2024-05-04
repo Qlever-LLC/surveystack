@@ -64,7 +64,7 @@ import MemberSelector from '@/components/shared/MemberSelector.vue';
 const store = useStore();
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
-const { rightToSubmitSurvey, rightToEdit, rightToViewAnonymizedResults } = getPermission();
+const { rightToSubmitSurvey, rightToEdit, rightToViewAnonymizedResults, rightToView } = getPermission();
 const { message, createAction } = menuAction();
 const PAGINATION_LIMIT = 10;
 
@@ -176,6 +176,12 @@ async function initData() {
       action: (s) =>
         createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
       render: (s) => () => rightToEdit().allowed,
+    },
+    {
+      title: 'Description',
+      icon: 'mdi-book-open',
+      action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
+      render: (s) => () => rightToView(s).allowed,
     },
     {
       title: 'Print Blank Survey',

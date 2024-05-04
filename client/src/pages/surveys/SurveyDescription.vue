@@ -25,8 +25,9 @@
             Version {{ state.selectedSurvey.latestVersion }}
           </a-chip>
         </a-col>
-        <a-col>
+        <a-col v-if="state.selectedSurvey.meta.isLibrary">
           <a-btn
+            v-if="rightToView().allowed"
             color="white"
             key="library"
             :to="{ name: 'group-surveys-new', query: { libId: state.selectedSurvey._id } }"
@@ -36,10 +37,24 @@
             add to new survey
           </a-btn>
         </a-col>
+        <a-col v-else>
+          <a-btn
+            v-if="rightToSubmitSurvey(state.selectedSurvey).allowed"
+            color="white"
+            key="survey"
+            :to="{
+              name: 'group-survey-submissions-new',
+            }"
+            class="d-inline-block shadow bg-green span-button align-content-center"
+            outlined
+            small>
+            start survey
+          </a-btn>
+        </a-col>
       </a-row>
 
       <a-row>
-        <a-col>
+        <a-col v-if="state.selectedSurvey.meta.isLibrary">
           <h4>Description</h4>
           <small v-html="state.selectedSurvey.meta.libraryDescription" class="preview"></small>
           <br />
@@ -51,6 +66,10 @@
           <br />
           <h4>Updates</h4>
           <small v-html="state.selectedSurvey.meta.libraryHistory" class="preview"></small>
+        </a-col>
+        <a-col v-else>
+          <h4>Description</h4>
+          <small v-html="state.selectedSurvey?.description" class="preview"></small>
         </a-col>
         <a-col>
           <h4>Questions</h4>
@@ -69,10 +88,13 @@
 <script setup>
 import { reactive } from 'vue';
 import { useRoute } from 'vue-router';
+import { getPermission } from '@/utils/permissions';
 
 import api from '@/services/api.service';
 
 import graphicalView from '@/components/builder/GraphicalView.vue';
+
+const { rightToSubmitSurvey, rightToView } = getPermission();
 
 const route = useRoute();
 
@@ -84,11 +106,11 @@ const state = reactive({
 fetchData();
 
 async function fetchData() {
-  const { sId } = route.params;
+  const { surveyId } = route.params;
 
   try {
     state.loading = true;
-    const { data } = await api.get(`/surveys/${sId}`);
+    const { data } = await api.get(`/surveys/${surveyId}`);
     state.loading = false;
     state.selectedSurvey = data;
   } catch (e) {
