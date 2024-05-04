@@ -21,7 +21,6 @@ import { useStore } from 'vuex';
 import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
-import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
 import { useDisplay } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
@@ -63,9 +62,6 @@ const state = reactive({
 
 onMounted(async () => {
   domainHandler.install(store);
-  // Testing: http://gm.localhost:9020/surveys/5ec83ee6c4431b000146046e
-  // TODO: figure out whether we need openDb?
-  db.openDb(() => {});
 
   fetchPinnedSurveys();
   fetchFarmOsAssets();
