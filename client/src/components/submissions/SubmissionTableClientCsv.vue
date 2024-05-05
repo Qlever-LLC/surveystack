@@ -1,163 +1,147 @@
 <template>
-  <v-card>
-    <v-data-table
+  <a-card>
+    <a-data-table-server
       ref="table"
       v-model="tableSelected"
-      :class="{ archived }"
-      :mobile-breakpoint="0"
+      :headerProps="{ archived }"
       :headers="headers"
       :items="items"
-      item-key="_id"
+      itemValue="_id"
       :loading="loading"
       :search="search"
-      :server-items-length="submissions.pagination.total"
-      :sort-by="dataTableProps.sortBy"
-      :sort-desc="dataTableProps.sortDesc"
-      @update:sort-by="onUpdateSortBy"
-      @update:sort-desc="onUpdateSortDesc"
-      show-select
-      multi-sort
-      disable-pagination
-      :hide-default-header="headers.length === 0"
-      hide-default-footer
-    >
+      :items-length="submissions.pagination.total"
+      :sortBy="sortBy"
+      @update:sortBy="onUpdateSortBy"
+      :showSelect="headers.length !== 0"
+      multiSort
+      :headerSlot="headers.length !== 0">
       <template v-slot:top>
-        <v-toolbar flat class="my-5">
-          <v-row>
-            <v-col>
+        <a-toolbar flat class="" cssBackgroundCream>
+          <a-row>
+            <a-col>
               <div class="d-flex justify-space-between align-center">
-                <div class="d-flex justify-space-between align-center mt-5">
-                  <v-switch
-                    :input-value="!excludeMeta"
-                    @change="$emit('excludeMetaChange', $event)"
+                <div class="d-flex justify-space-between align-center mt-5 ml-5">
+                  <a-switch
+                    :modelValue="!excludeMeta"
+                    @update:modelValue="$emit('excludeMetaChange', $event)"
                     label="Show metadata"
-                    class="mt-2"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="archived"
-                    @change="$emit('showArchived', $event)"
+                    class="mt-2" />
+                  <a-switch
+                    :modelValue="archived"
+                    @update:modelValue="$emit('showArchived', $event)"
                     label="View archived only"
-                    class="mt-2 ml-5"
-                  ></v-switch>
-                  <v-switch
-                    :input-value="isExpandMatrix"
-                    @change="isExpandMatrix = $event"
+                    class="mt-2 ml-5" />
+                  <a-switch
+                    :modelValue="isExpandMatrix"
+                    @update:modelValue="isExpandMatrix = $event"
                     label="Expand matrix questions"
-                    class="mt-2 ml-5"
-                  ></v-switch>
+                    class="mt-2 ml-5" />
                 </div>
                 <div class="d-flex align-center" v-if="selected.length > 0">
                   <div>
                     {{ `${selected.length} ${selected.length === 1 ? 'submission' : 'submissions'} selected` }}
                   </div>
                   <div class="ml-auto d-flex flex-column flex-sm-row">
-                    <v-btn
+                    <a-btn
                       v-if="selected[0]['meta.archived'] === 'true'"
                       :disabled="actionsAreDisabled"
                       color="error"
                       text
-                      @click="$emit('showDeleteModal', $event)"
-                    >
+                      @click="$emit('showDeleteModal', $event)">
                       DELETE
-                    </v-btn>
-                    <v-btn
+                    </a-btn>
+                    <a-btn
                       v-if="selected[0]['meta.archived'] === 'true'"
                       :disabled="actionsAreDisabled"
                       text
-                      @click="$emit('archiveSubmissions', $event)"
-                    >
+                      @click="$emit('archiveSubmissions', $event)">
                       RESTORE
-                    </v-btn>
-                    <v-btn
+                    </a-btn>
+                    <a-btn
                       v-if="selected[0]['meta.archived'] !== 'true'"
                       :disabled="actionsAreDisabled"
                       color="error"
                       text
-                      @click="$emit('showArchiveModal', $event)"
-                    >
+                      @click="$emit('showArchiveModal', $event)">
                       ARCHIVE
-                    </v-btn>
-                    <v-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
-                      >REASSIGN</v-btn
+                    </a-btn>
+                    <a-btn
+                      @click="$emit('reassignment', $event)"
+                      :disabled="actionsAreDisabled"
+                      variant="text"
+                      color="secondary"
+                      >REASSIGN</a-btn
                     >
-                    <v-btn
+                    <a-btn
                       v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
                       :disabled="actionsAreDisabled"
                       text
                       color="primary"
-                      @click="$emit('resubmit', $event)"
-                    >
+                      @click="$emit('resubmit', $event)">
                       RESUBMIT
-                    </v-btn>
+                    </a-btn>
                   </div>
                 </div>
               </div>
-            </v-col>
-          </v-row>
-        </v-toolbar>
+            </a-col>
+          </a-row>
+        </a-toolbar>
       </template>
 
-      <template v-slot:header.data-table-select="{ props }">
-        <v-checkbox
-          :value="selected.length === selectableItems.length"
+      <template v-slot:[`header.data-table-select`]>
+        <a-checkbox
+          :modelValue="selected.length === selectableItems.length"
           :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
           @click="toggleSelectAllItems"
           color="#777"
           class="custom-checkbox"
           hide-details
-          role="checkbox"
-        />
+          role="checkbox" />
       </template>
 
-      <template v-for="header in headers" v-slot:[`header.${header.value}`]>
+      <template v-for="header in headers" :key="header.value" v-slot:[`header.${header.value}`]>
         <span
-          :key="header.value"
-          @click.stop="openModal($event, [header.text, -1, header.value])"
-          :class="{ activeHeader: isModalOpen([header.text, -1, header.value]) }"
-        >
+          @click.stop="openModal($event, [header.title, -1, header.value])"
+          :class="{ activeHeader: isModalOpen([header.title, -1, header.value]) }">
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
-            {{ header.text }}
+            {{ header.title }}
           </div>
         </span>
       </template>
 
-      <template v-slot:item="{ item, index, isSelected, select }">
+      <template v-slot:item="{ item, index }">
         <tr :key="item._id">
           <td :class="{ 'expand-cell': isExpandMatrix }">
-            <v-checkbox
-              :value="isSelected"
+            <a-checkbox
+              :modelValue="isSelected(item)"
               :disabled="!isSelectable(item)"
-              @click="select(!isSelected)"
+              @click="toggleSelect(item)"
               color="#777"
               class="custom-checkbox"
               hide-details
-              role="checkbox"
-            />
+              role="checkbox" />
           </td>
           <td
             v-for="header in headers"
-            :key="header.text"
+            :key="header.title"
             @click.stop="openModal($event, [getCellValue(item, header.value), index, header.value], true)"
             :class="{
               active: isModalOpen([getCellValue(item, header.value), index, header.value]),
               'expand-cell': isExpandMatrix,
-            }"
-          >
+            }">
             <table v-if="Array.isArray(item[header.value])" width="100%" cellSpacing="0" class="mt-6">
               <tr
                 v-for="(child, i) in item[header.value]"
                 :key="i"
                 :class="{
                   'last-row': item[header.value].length === item.count,
-                }"
-              >
+                }">
                 <td
                   class="matrix-cell"
                   :class="{
                     active: isModalOpen([child, index, header.value, i]),
                   }"
-                  @click.stop="openModal($event, [getCellValue(child), index, header.value, i], true)"
-                >
+                  @click.stop="openModal($event, [getCellValue(child), index, header.value, i], true)">
                   <div :class="{ truncate: shouldTruncate(child) }">
                     {{ getCellValue(child) }}
                   </div>
@@ -166,9 +150,8 @@
             </table>
             <div
               v-else-if="item[header.value].includes('resources/')"
-              :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
-            >
-              <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
+              :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }">
+              <a @click.stop="openResource(item[header.key])"> {{ getLabelFromKey(item[header.value]) }}</a>
             </div>
             <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
               {{ getCellValue(item, header.value) }}
@@ -176,7 +159,7 @@
           </td>
         </tr>
       </template>
-    </v-data-table>
+    </a-data-table-server>
 
     <submission-table-cell-modal
       v-if="cellText"
@@ -184,22 +167,21 @@
       :left="modalLeftPosition"
       :top="modalTopPosition"
       :showCopyButton="modalShowCopyButton"
-      @close="closeModal"
-    />
+      @close="closeModal" />
 
-    <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
-      <v-card>
-        <v-card-text class="pa-4">
+    <a-dialog :modelValue="downloadingResource" persistent width="300" role="downloadingResourceProgressDialog">
+      <a-card>
+        <a-card-text class="pa-4">
           <span>Downloading file resource</span>
-          <v-progress-linear indeterminate class="mb-0" />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+          <a-progress-linear class="mb-0" />
+        </a-card-text>
+      </a-card>
+    </a-dialog>
 
-    <v-alert v-if="openResourceError" type="warning" dismissible>
+    <a-alert v-if="openResourceError" type="warning" closable>
       {{ openResourceError }}
-    </v-alert>
-  </v-card>
+    </a-alert>
+  </a-card>
 </template>
 <script>
 import papa from 'papaparse';
@@ -290,14 +272,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    dataTableProps: {
-      type: Object,
-      default() {
-        return {
-          sortBy: [],
-          sortDesc: [],
-        };
-      },
+    sortBy: {
+      type: Array,
+      required: false,
     },
     loading: {
       type: Boolean,
@@ -454,7 +431,7 @@ export default {
         PREFERRED_HEADERS.forEach((header) => {
           if (matrixHeaders.includes(header)) {
             headers.push({
-              text: header,
+              title: header,
               value: header,
               filter: this.createCustomFilter(header),
             });
@@ -467,11 +444,11 @@ export default {
           ) {
             return;
           }
-          this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
+          this.searchFields[header] = ''; // v-data-table search/filter is not used at this moment
 
           if (rawHeaders.includes(header)) {
             headers.push({
-              text: header,
+              title: header,
               value: header,
               filter: this.createCustomFilter(header),
             });
@@ -479,7 +456,7 @@ export default {
             const properties = getPropertiesFromMatrix(rawHeaders, header);
             headers.push(
               ...properties.map((h) => ({
-                text: `${header}.${h}`,
+                title: `${header}.${h}`,
                 value: [header, h].join(MATRIX_SEPARATOR),
                 filter: this.createCustomFilter([header, h].join(MATRIX_SEPARATOR)),
               }))
@@ -490,10 +467,7 @@ export default {
       this.headers = headers;
     },
     onUpdateSortBy(value) {
-      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortBy: value });
-    },
-    onUpdateSortDesc(value) {
-      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortDesc: value });
+      this.$emit('onDataTablePropsChanged', value);
     },
     async fetchData() {
       if (!this.submissions) {
@@ -516,11 +490,21 @@ export default {
         this.downloadingResource = false;
       }
     },
+    isSelected(item) {
+      return this.tableSelected.some((selected) => selected._id === item._id);
+    },
     isSelectable(item) {
       //load original submission object, as item may miss meta data if excludeMeta is true
       const submission = this.submissions.content.find((s) => s._id === item._id);
       const allowedToResubmit = checkAllowedToResubmit(submission, this.userMemberships, this.user._id);
       return allowedToResubmit;
+    },
+    toggleSelect(item) {
+      if (this.isSelected(item)) {
+        this.tableSelected = this.tableSelected.filter((selectedItem) => selectedItem._id !== item._id);
+      } else {
+        this.tableSelected.push(item);
+      }
     },
     toggleSelectAllItems() {
       if (this.selected.length > 0) {
@@ -538,15 +522,16 @@ export default {
 };
 </script>
 
-<style scoped>
->>> .v-toolbar__content {
-  background: #f5f5f5 !important;
-}
-.v-data-table >>> td {
+<style scoped lang="scss">
+.v-data-table :deep(td) {
   font-family: monospace;
   white-space: nowrap;
 }
-.v-data-table >>> th {
+.v-data-table :deep(thead) > tr th {
+  padding: 0 16px !important;
+}
+
+.v-data-table :deep(th) {
   white-space: nowrap;
 }
 
@@ -590,20 +575,20 @@ export default {
   padding: 0.9rem 0;
 }
 
-.v-data-table >>> td.expand-cell {
+.v-data-table :deep(td.expand-cell) {
   vertical-align: top;
   padding-top: 8px;
   padding-bottom: 8px;
   height: 24px;
 }
 
-.v-data-table >>> td.matrix-cell {
+.v-data-table :deep(td.matrix-cell) {
   position: relative;
   height: 24px;
   line-height: 24px;
 }
 
-.v-data-table >>> td.expand-cell tr td.matrix-cell div::after {
+.v-data-table :deep(td.expand-cell) tr td.matrix-cell div::after {
   content: '';
   position: absolute;
   left: -16px;
@@ -613,7 +598,7 @@ export default {
   border-top: thin solid rgba(0, 0, 0, 0.12);
 }
 
-.v-data-table >>> td.expand-cell tr:not(.last-row):last-child td.matrix-cell div::after {
+.v-data-table :deep(td.expand-cell) tr:not(.last-row):last-child td.matrix-cell div::after {
   height: calc(100% + 1px);
   border-bottom: thin solid rgba(0, 0, 0, 0.12);
 }

@@ -1,227 +1,197 @@
 <template>
-  <v-text-field
+  <a-text-field
     v-if="header.type === 'text'"
-    :value="value"
-    @input="onInput"
-    outlined
+    :modelValue="value"
+    @update:modelValue="onInput"
+    variant="outlined"
     hide-details
     autocomplete="off"
     :disabled="disabled"
-    clearable
-  />
+    clearable />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
-      <v-text-field
+      <a-text-field
         ref="text-qrcode"
-        :value="value"
-        @input="onInput"
-        outlined
+        :modelValue="value"
+        @update:modelValue="onInput"
+        variant="outlined"
         hide-details
         autocomplete="off"
         :disabled="disabled"
-        clearable
-      />
+        clearable />
     </div>
     <div style="flex: 0; display: flex; align-items: center">
       <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
     </div>
   </div>
-  <v-text-field
+  <a-text-field
     v-else-if="header.type === 'farmos_uuid'"
-    :value="localValue"
-    @input="onFarmOsInput"
-    outlined
+    :modelValue="localValue"
+    @update:modelValue="onFarmOsInput"
+    variant="outlined"
     hide-details
     autocomplete="off"
     :disabled="disabled"
     clearable
-    @click:clear="setToNull"
-  />
+    @click:clear="setToNull" />
   <v-text-field
     v-else-if="header.type === 'number'"
-    :value="value"
-    @input="onNumberInput"
+    :modelValue="value"
+    @update:modelValue="onNumberInput"
     type="number"
-    outlined
+    variant="outlined"
     hide-details="auto"
     :disabled="disabled"
     :rules="[isValidNumber]"
     clearable
-    @click:clear="setToNull"
-  />
-  <v-select
-    v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
+    @click:clear="setToNull" />
+  <a-select
+    v-else-if="header.type === 'dropdown' && !header.custom"
     :placeholder="header.multiple ? 'Select answers' : 'Select answer'"
-    :value="value"
-    @input="onInput"
+    :modelValue="value"
+    @update:modelValue="onInput"
     :items="items"
-    item-text="label"
+    item-title="label"
     item-value="value"
     :multiple="header.multiple"
     :disabled="disabled"
     hide-details
-    outlined
+    variant="outlined"
     clearable
-  >
+    cssFlexNoWrap
+    cssOneLineSpan
+    :chipSlot="header.multiple"
+    :selectionSlot="!header.multiple">
     <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+      <matrix-cell-selection-label :label="item.raw.label" :index="index" :value="value" />
     </template>
-  </v-select>
-  <v-autocomplete
-    v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
-    ref="dropdownRef"
-    placeholder="Type to search"
-    :value="value"
-    @input="onDropDownInput"
-    :search-input.sync="comboboxSearch"
-    :items="items"
-    item-text="label"
-    item-value="value"
-    :delimiters="[',']"
-    :return-object="false"
-    :multiple="header.multiple"
-    :disabled="disabled"
-    hide-details
-    outlined
-    clearable
-  >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    <template v-slot:chip="{ props, item, index }">
+      <matrix-cell-selection-label v-bind="props" :label="item.raw.label" :index="index" :value="value" />
     </template>
-  </v-autocomplete>
-  <v-combobox
+  </a-select>
+  <a-select
+    allowCustomItem
     v-else-if="header.type === 'dropdown' && header.custom"
-    ref="dropdownRef"
     placeholder="Type to search or add custom answer"
-    :value="value"
-    @input="onDropDownInput"
-    :search-input.sync="comboboxSearch"
+    :modelValue="value"
+    @update:modelValue="onDropDownInput"
     :items="items"
-    item-text="label"
+    item-title="label"
     item-value="value"
     :delimiters="[',']"
     :return-object="false"
     :multiple="header.multiple"
     :disabled="disabled"
     hide-details
-    outlined
+    variant="outlined"
     clearable
-  >
+    :chipSlot="header.multiple"
+    :selectionSlot="!header.multiple"
+    cssFlexNoWrap
+    cssOneLineSpan>
     <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
+      <matrix-cell-selection-label :label="getDropdownLabel(item.value)" :index="index" :value="value" />
     </template>
-    <template v-slot:no-data>
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title>
-            No values matching "<strong>{{ comboboxSearch }}</strong
-            >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+    <template v-slot:chip="{ props, item, index }">
+      <matrix-cell-selection-label v-bind="props" :label="getDropdownLabel(item.value)" :index="index" :value="value" />
     </template>
-  </v-combobox>
-  <v-autocomplete
+  </a-select>
+  <a-select
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
     :multiple="header.multiple"
-    :value="value"
-    @input="onInput"
+    :modelValue="value"
+    @update:modelValue="onInput"
     :label="value ? value.farmName : null"
-    item-text="value.name"
+    item-title="value.name"
     item-value="value"
     hide-details
     clearable
-    outlined
+    variant="outlined"
     :disabled="disabled || loading"
-  >
-    <template v-slot:selection="data" v-if="!!header.multiple">
-      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
-        <span v-html="data.item.label" />
-      </v-chip>
+    color="focus"
+    :chipSlot="header.multiple"
+    :selectionSlot="!header.multiple"
+    itemSlot
+    cssFlexNoWrap
+    cssOneLineSpan>
+    <template v-slot:selection="{ item }">
+      <div v-html="item.raw.label"></div>
     </template>
-    <template v-slot:selection="{ item }" v-else>
-      <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
+    <template v-slot:chip="{ props, item, index }">
+      <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
 
-    <template v-slot:item="data" v-if="!!header.multiple">
-      <v-list-item-content>
-        <v-list-item-title v-html="data.item.label" />
-      </v-list-item-content>
+    <template v-slot:item="{ props, item }">
+      <a-list-item v-bind="props" :title="undefined">
+        <a-list-item-title v-html="item.raw.label" />
+      </a-list-item>
     </template>
-    <template v-slot:item="{ item }" v-else>
-      <div v-html="item.label"></div>
-    </template>
-  </v-autocomplete>
+  </a-select>
 
-  <v-autocomplete
+  <a-select
     v-else-if="header.type === 'farmos_planting'"
     :multiple="header.multiple"
-    :value="value"
-    @input="(v) => onInput(localChange(v))"
+    :modelValue="value"
+    @update:modelValue="(v) => onInput(localChange(v))"
     :items="farmos.plantings || []"
     :label="value ? value.farmName : null"
-    item-text="value.name"
+    item-title="value.name"
     item-value="value"
     hide-details
     clearable
-    outlined
+    variant="outlined"
     :disabled="disabled || loading"
-  >
+    color="focus"
+    :chipSlot="header.multiple"
+    :selectionSlot="!header.multiple"
+    itemSlot
+    cssFlexNoWrap
+    cssOneLineSpan>
     <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :html="item.label" :index="index" :value="value" />
+      <matrix-cell-selection-label :html="item.raw.label" :index="index" :value="value" />
+    </template>
+    <template v-slot:chip="{ props, item, index }">
+      <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
 
-    <template v-slot:item="data" v-if="!!header.multiple">
-      <v-list-item-content>
-        <v-list-item-title v-html="data.item.label" />
-      </v-list-item-content>
+    <template v-slot:item="{ props, item }">
+      <a-list-item v-bind="props" :title="undefined">
+        <a-list-item-title v-html="item.raw.label" />
+      </a-list-item>
     </template>
-    <template v-slot:item="{ item }" v-else>
-      <div v-html="item.label"></div>
-    </template>
-  </v-autocomplete>
+  </a-select>
   <div v-else-if="header.type === 'date'">
-    <v-menu
+    <a-menu
       :close-on-content-click="false"
       v-model="menus[`${index}_${header.value}`]"
       transition="scale-transition"
-      offset-y
+      location="bottom"
       max-width="290px"
       min-width="290px"
-      ref="datepickerRef"
-      :disabled="disabled"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <v-text-field
-          :value="getDateLabel"
-          @click="setActivePickerMonth"
+      :disabled="disabled">
+      <template v-slot:activator="{ props }">
+        <a-text-field
+          v-bind="props"
+          :modelValue="getDateLabel"
           hide-details
-          v-bind="attrs"
-          v-on="on"
-          outlined
+          variant="outlined"
           autocomplete="off"
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
           clearable
-          @click:clear="setToNull"
-        />
+          @click:clear="setToNull" />
       </template>
-      <v-date-picker
-        :value="value"
-        @input="
-          (v) => {
-            onDateInput(v);
-            menus[`${index}_${header.value}`] = false;
-          }
-        "
-        no-title
-      />
-    </v-menu>
+      <a-date-picker
+        :modelValue="value ? new Date(value) : null"
+        ref="datepickerRef"
+        @update:modelValue="onDateInput($event, index, header)"
+        no-title />
+    </a-menu>
   </div>
 
-  <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
+  <a-text-field v-else value="unknown cell type" variant="outlined" hide-details disabled />
 </template>
 
 <script>
@@ -232,6 +202,7 @@ import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 export default {
   components: {
@@ -239,6 +210,7 @@ export default {
     MatrixCellSelectionLabel,
   },
   props: {
+    // TODO imho remove header.autocomplete because we merged v-select and v-autocomplete
     header: {
       type: Object,
     },
@@ -267,7 +239,6 @@ export default {
   data() {
     return {
       menus: {}, // object to hold v-models for v-menu
-      comboboxSearch: null,
     };
   },
   computed: {
@@ -324,23 +295,16 @@ export default {
       this.value = null;
     },
     onInput(value) {
-      if (this.header.type === 'dropdown') {
-        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : [value]);
-      } else {
-        this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
-      }
+      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
       this.$emit('changed');
     },
-    onDateInput(value) {
-      const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
-      let date = new Date(value);
-
-      if (!isValidFormat || !isValid(date)) {
-        return;
+    onDateInput(value, index, header) {
+      if (isValid(value)) {
+        this.value = zonedTimeToUtc(value).toISOString();
+        this.$emit('changed');
       }
-      // remove 'Z'
-      this.value = date.toISOString().slice(0, -1);
-      this.$emit('changed');
+
+      this.menus[`${index}_${header.value}`] = false;
     },
     onFarmOsInput(value) {
       if (value) {
@@ -364,20 +328,11 @@ export default {
     },
     onDropDownInput(value) {
       this.onInput(value);
-      this.comboboxSearch = null;
-      if (this.$refs.dropdownRef && !this.header.multiple) {
-        this.$refs.dropdownRef.isMenuActive = false;
-      }
     },
     getDropdownLabel(value) {
       const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value[0] ? value[0] : null;
-    },
-    setActivePickerMonth() {
-      setTimeout(() => {
-        this.$refs.datepickerRef.$children[1].$children[0].activePicker = 'MONTH';
-      });
     },
     // copied/adapted from FarmOsPlanting.vue
     localChange(hashesArg) {
@@ -420,36 +375,14 @@ export default {
       return assets;
     },
   },
-  watch: {
-    comboboxSearch(newVal) {
-      const match = newVal
-        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
-        : undefined;
-      if (!match && this.$refs.dropdownRef) {
-        this.$refs.dropdownRef.setMenuIndex(-1);
-      }
-    },
-  },
 };
 </script>
 
-<style scoped>
->>> .v-select__selections {
-  flex-wrap: nowrap;
-}
-
->>> .v-select__selections span {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
->>> .blue-chip,
->>> .orange-chip,
->>> .green-chip {
+<style scoped lang="scss">
+:deep(.blue-chip, .orange-chip, .green-chip) {
   display: inline-flex;
-  border: 1px var(--v-focus-base) solid;
-  color: var(--v-focus-base);
+  border: 1px rgb(var(--v-theme-focus)) solid;
+  color: rgb(var(--v-theme-focus));
   border-radius: 0.6rem;
   font-weight: bold;
   font-size: 80%;
@@ -462,17 +395,13 @@ export default {
   margin-right: 0.2rem !important;
 }
 
->>> .green-chip {
+:deep(.green-chip) {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-div >>> .orange-chip {
+:deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
-}
-
->>> .v-list-item.v-list-item--active {
-  color: var(--v-focus-base) !important;
 }
 </style>

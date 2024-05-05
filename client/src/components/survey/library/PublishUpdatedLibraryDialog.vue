@@ -1,18 +1,25 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
-    <v-card>
-      <v-card-title>
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="700"
+    max-width="75%">
+    <a-card>
+      <a-card-title>
         Publish
-        <v-chip dark small color="green" class="mx-2">
+        <a-chip small color="green" class="mx-2">
           Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
-        </v-chip>
+        </a-chip>
         to Library
-      </v-card-title>
-      <v-card-text class="mt-5">
+      </a-card-title>
+      <a-card-text>
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
-        <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-2" />
-        <library-change-type-selector v-model="localLibrarySurvey.meta.libraryLastChangeType" :disabled="false" />
-      </v-card-text>
+        <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mt-2" />
+        <library-change-type-selector
+          v-model="localLibrarySurvey.meta.libraryLastChangeType"
+          :disabled="false"
+          class="mt-5" />
+      </a-card-text>
       <survey-diff
         :controls-remote-revision-old="
           localLibrarySurvey.revisions.find((revision) => revision.version === localLibrarySurvey.latestVersion)
@@ -24,28 +31,32 @@
         :version-name-remote-revision-new="`Version ${
           localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version
         }`"
-      />
-      <v-card-actions class="mr-3">
-        <v-spacer />
-        <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
-          <span>Publish update to library {{ value.name }}</span>
-        </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+        class="mt-4" />
+      <a-card-actions class="mr-3">
+        <a-spacer />
+        <a-btn @click="$emit('ok', localLibrarySurvey)" color="primary" variant="text">
+          <span>Publish update to library {{ modelValue.name }}</span>
+        </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel</a-btn>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 <script>
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 import SurveyDiff from '@/components/survey/SurveyDiff';
 
 export default {
   name: 'publish-updated-library-dialog',
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: {
+    SurveyDiff,
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+  },
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       required: true,
     },
@@ -54,7 +65,7 @@ export default {
       required: true,
     },
   },
-  emits: ['ok', 'cancel'],
+  emits: ['ok', 'cancel', 'update:modelValue'],
   setup(props) {
     const state = reactive({
       localLibrarySurvey: props.librarySurvey,
@@ -77,7 +88,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }

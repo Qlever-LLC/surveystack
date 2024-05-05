@@ -1,8 +1,15 @@
 <template>
-  <v-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
-    <v-btn @click="handleClose" icon class="close-button">
-      <v-icon>mdi-close</v-icon>
-    </v-btn>
+  <a-snackbar
+    :modelValue="modelValue"
+    @update:modelValue="handleInput"
+    :timeout="-1"
+    color="primary lighten-1"
+    position="fixed"
+    location="bottom"
+    cssIosSnackbar>
+    <a-btn @click="handleClose" icon class="close-button">
+      <a-icon>mdi-close</a-icon>
+    </a-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center">
@@ -12,27 +19,27 @@
         <img src="./ios-safari-add-icon.svg" alt="" class="icon" />
       </div>
     </div>
-  </v-snackbar>
+  </a-snackbar>
 </template>
 
 <script>
 export default {
   props: {
-    value: Boolean,
+    modelValue: Boolean,
   },
   methods: {
     handleInput(ev) {
-      this.$emit('input', ev);
+      this.$emit('update:modelValue', ev);
     },
     handleClose() {
-      this.$emit('input', false);
+      this.$emit('update:modelValue', false);
       localStorage.setItem('iosInstallBannerDismissed', true);
     },
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .icon {
   height: 1.5rem;
   display: inline-block;
@@ -41,27 +48,6 @@ export default {
 
 .wrapper {
   width: 100%;
-}
-
-.snackbar {
-  height: auto !important;
-}
-
-.snackbar >>> .v-snack__content {
-  position: relative;
-}
-
-.snackbar >>> .v-snack__content::after {
-  content: '';
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 8px solid var(--v-primary-lighten1);
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  margin-left: -12px;
 }
 
 .close-button {

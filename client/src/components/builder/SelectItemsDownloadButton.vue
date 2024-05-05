@@ -1,8 +1,8 @@
 <template>
-  <v-btn outlined color="primary" @click="download" style="margin-bottom: 1px">
-    <v-icon left>mdi-download</v-icon>
+  <a-btn variant="outlined" color="primary" @click="download" style="margin-bottom: 1px">
+    <a-icon left>mdi-download</a-icon>
     Export CSV
-  </v-btn>
+  </a-btn>
 </template>
 
 <script>
@@ -32,7 +32,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pointer-events-none {
   pointer-events: none !important;
 }

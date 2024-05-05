@@ -1,9 +1,9 @@
 <template>
-  <v-alert border="left" :type="type" colored-border :elevation="elevation" :color="color" :icon="icon">
+  <a-alert border="start" :type="type" :border-color="color" :elevation="elevation" :color="color" :icon="icon">
     <strong v-if="title" class="mr-1">{{ title }}</strong>
     <slot />
-    <v-icon v-if="closeable" class="float-right" @click="$emit('closed')">mdi-close-circle</v-icon>
-  </v-alert>
+    <a-icon v-if="closeable" class="float-right" @click="$emit('closed')">mdi-close-circle</a-icon>
+  </a-alert>
 </template>
 
 <script>

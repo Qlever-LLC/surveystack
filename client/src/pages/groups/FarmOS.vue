@@ -1,28 +1,34 @@
 <template>
-  <v-container v-if="farmosEnabled" class="max-800">
+  <a-container v-if="farmosEnabled" class="max-800">
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-alert
+    <a-alert
       v-if="successMessage"
       class="mt-4"
       style="cursor: pointer"
       mode="fade"
-      text
+      variant="text"
       type="success"
       @click="successMessage = null"
-      >{{ successMessage }}</v-alert
+      >{{ successMessage }}</a-alert
     >
-    <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
-      errorMessage
-    }}</v-alert>
+    <a-alert
+      v-if="errorMessage"
+      style="cursor: pointer"
+      class="mt-4 cursor-pointer"
+      mode="fade"
+      variant="text"
+      type="error"
+      >{{ errorMessage }}</a-alert
+    >
 
     <app-dialog
       modal
       title="Deactivate FarmOS"
       :maxWidth="600"
       labelConfirm="Deactivate FarmOS for Group"
-      class="primary--text mx-4"
+      class="text-primary mx-4"
       @confirm="disable"
       v-model="showDeactivateDialog"
       @cancel="showDeactivateDialog = false"
@@ -38,18 +44,16 @@
       v-model="showLinkDialog"
       @cancel="showLinkDialog = false"
       @confirm="showLinkDialog = false"
-      title="Access FarmOS Instance"
-    >
+      title="Access FarmOS Instance">
       <div class="d-flex justify-center my-8">
-        <v-btn
+        <a-btn
           :loading="!linkReady"
           :disabled="!linkReady"
           :href="adminLink"
           @click="invalidateLink"
           color="primary"
-          target="_blank"
-        >
-          {{ linkReady ? 'Access' : 'Loading' }}</v-btn
+          target="_blank">
+          {{ linkReady ? 'Access' : 'Loading' }}</a-btn
         >
       </div>
     </app-dialog>
@@ -59,8 +63,7 @@
       v-if="showCreateDialog"
       @check-url="checkUrl"
       @create-instance="createInstance"
-      :viewModel="createViewModel"
-    />
+      :viewModel="createViewModel" />
 
     <FarmOSConnectDialog
       v-model="showConnectDialog"
@@ -68,8 +71,7 @@
       :allowCreate="allowCreate"
       :loadingOwners="loadingOwners"
       @connect="connectFarms"
-      @create="createFarm"
-    />
+      @create="createFarm" />
 
     <FarmOSDisconnectDialog
       v-model="showDisonnectDialog"
@@ -78,15 +80,13 @@
       :allGroups="allGroups"
       :selectedGroupIds="selectedGroupIds"
       @updateGroups="updateGroups"
-      @cancelUpdate="cancelUpdate"
-    />
+      @cancelUpdate="cancelUpdate" />
 
     <FarmOSRemoveNoteDialog
       v-model="showRemoveNoteDialog"
       :loading="loading"
       @addNote="addNote"
-      @cancelNote="cancelNote"
-    />
+      @cancelNote="cancelNote" />
 
     <FarmOSGroupSettings
       class="ma-16"
@@ -101,38 +101,37 @@
       @deactivate="showDeactivateDialog = true"
       :plans="plans"
       :groupInfos="groupInfos"
-      :superAdmin="superAdmin"
-    >
+      :superAdmin="superAdmin">
     </FarmOSGroupSettings>
-  </v-container>
+  </a-container>
 
-  <v-container v-else>
+  <a-container v-else>
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
     </div>
-    <v-row v-if="loading">
-      <v-col>
-        <v-progress-linear indeterminate class="mb-0" />
-      </v-col>
-    </v-row>
-    <v-row v-else>
-      <v-col lg="4" class="mx-auto">
-        <v-card class="pa-8 text-center" v-if="superAdmin">
+    <a-row v-if="loading">
+      <a-col>
+        <a-progress-linear class="mb-0" />
+      </a-col>
+    </a-row>
+    <a-row v-else>
+      <a-col lg="4" class="mx-auto">
+        <a-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
-            Contact Our-Sci</v-btn
+          <a-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</a-btn>
+          <a-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
+            Contact Our-Sci</a-btn
           >
-        </v-card>
-        <v-card class="pa-8 text-center" v-else>
+        </a-card>
+        <a-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
-            >Contact Our-Sci</v-btn
+          <a-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
+            >Contact Our-Sci</a-btn
           >
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+        </a-card>
+      </a-col>
+    </a-row>
+  </a-container>
 </template>
 
 <script>
@@ -144,7 +143,6 @@ import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDiscon
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
@@ -158,7 +156,6 @@ export default {
     FarmOSDisconnectDialog,
     FarmOSRemoveNoteDialog,
     appDialog,
-    appGroupBreadcrumbs,
   },
   computed: {
     superAdmin() {
@@ -645,9 +642,6 @@ export default {
       formated.url = `${form.instanceName}.${planUrl}`;
       formated.planName = planName;
       formated.planId = form.plan;
-      if (formated.owner && formated.owner.id) {
-        formated.owner = formated.owner.id;
-      }
       delete formated.plan;
       delete formated.instanceName;
       delete formated.instanceNameValid;
@@ -706,7 +700,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .max-800 {
   max-width: 800px;
 }

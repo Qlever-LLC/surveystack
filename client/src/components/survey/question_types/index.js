@@ -1,62 +1,66 @@
-import Vue from 'vue';
-
 import _File from './File.vue';
-Vue.component('AppControlFile', _File);
-Vue.component('AppControlImage', _File);
-
 import _Date from './Date.vue';
-Vue.component('AppControlDate', _Date);
-
 import FarmOsFarm from './FarmOsFarm.vue';
-Vue.component('AppControlFarmOsFarm', FarmOsFarm);
-
 import FarmOsField from './FarmOsField.vue';
-Vue.component('AppControlFarmOsField', FarmOsField);
-
 import FarmOsPlanting from './FarmOsPlanting.vue';
-Vue.component('AppControlFarmOsPlanting', FarmOsPlanting);
-
-const GeoJSON = () => import('./GeoJSON.vue');
-Vue.component('AppControlGeoJSON', GeoJSON);
-
 import Group from './Group.vue';
-Vue.component('AppControlGroup', Group);
-
 import Instructions from './Instructions.vue';
-Vue.component('AppControlInstructions', Instructions);
-
-const InstructionsImageSplit = () => import('./InstructionsImageSplit.vue');
-Vue.component('AppControlInstructionsImageSplit', InstructionsImageSplit);
-
-const Location = () => import('./Location.vue');
-Vue.component('AppControlLocation', Location);
-
 import Matrix from './matrix/Matrix.vue';
-Vue.component('AppControlMatrix', Matrix);
-
 import MatrixCell from './matrix/MatrixCell.vue';
-Vue.component('AppControlMatrixCell', MatrixCell);
-
 import _Number from './Number.vue';
-Vue.component('AppControlNumber', _Number);
-
 import Ontology from './Ontology.vue';
-Vue.component('AppControlOntology', Ontology);
-
 import Page from './Page.vue';
-Vue.component('AppControlPage', Page);
-
 import Script from './Script.vue';
-Vue.component('AppControlScript', Script);
-
 import SelectMultiple from './SelectMultiple.vue';
-Vue.component('AppControlSelectMultiple', SelectMultiple);
-
 import SelectSingle from './SelectSingle.vue';
-Vue.component('AppControlSelectSingle', SelectSingle);
-
 import String from './String.vue';
-Vue.component('AppControlString', String);
-
 import FarmosUuid from './FarmOsCreateUUID.vue';
-Vue.component('AppControlFarmOsUuid', FarmosUuid);
+import { defineAsyncComponent } from 'vue';
+
+const GeoJSON = defineAsyncComponent(() => import('./GeoJSON.vue'));
+const InstructionsImageSplit = defineAsyncComponent(() => import('./InstructionsImageSplit.vue'));
+const Location = defineAsyncComponent(() => import('./Location.vue'));
+
+export default function addQuestionTypesComponents(app) {
+  app.component('AppControlFile', _File);
+
+  app.component('AppControlImage', _File);
+
+  app.component('AppControlDate', _Date);
+
+  app.component('AppControlFarmOsFarm', FarmOsFarm);
+
+  app.component('AppControlFarmOsField', FarmOsField);
+
+  app.component('AppControlFarmOsPlanting', FarmOsPlanting);
+
+  app.component('AppControlGeoJSON', GeoJSON);
+
+  app.component('AppControlGroup', Group);
+
+  app.component('AppControlInstructions', Instructions);
+
+  app.component('AppControlInstructionsImageSplit', InstructionsImageSplit);
+
+  app.component('AppControlLocation', Location);
+
+  app.component('AppControlMatrix', Matrix);
+
+  app.component('AppControlMatrixCell', MatrixCell);
+
+  app.component('AppControlNumber', _Number);
+
+  app.component('AppControlOntology', Ontology);
+
+  app.component('AppControlPage', Page);
+
+  app.component('AppControlScript', Script);
+
+  app.component('AppControlSelectMultiple', SelectMultiple);
+
+  app.component('AppControlSelectSingle', SelectSingle);
+
+  app.component('AppControlString', String);
+
+  app.component('AppControlFarmOsUuid', FarmosUuid);
+}

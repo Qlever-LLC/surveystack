@@ -1,16 +1,15 @@
 <template>
   <div>
-    <v-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
+    <a-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" position="fixed" location="center">
       {{ alertMessage }}
-    </v-snackbar>
+    </a-snackbar>
     <app-control-label
       :value="control.label"
       :redacted="redacted"
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <app-control-hint :value="control.hint" />
 
     <div @drop.prevent="onDrop" @dragover.prevent="onDragOver" @dragleave="onDragLeave">
@@ -27,8 +26,7 @@
             ? control.options.source.types.join()
             : ''
         "
-        data-test-id="fileInput"
-      />
+        data-test-id="fileInput" />
       <input
         name="captureImage"
         id="captureImage"
@@ -38,89 +36,83 @@
         @change="filesChanged"
         capture="environment"
         accept="image/*"
-        data-test-id="captureImage"
-      />
+        data-test-id="captureImage" />
       <div
         class="dropzone row mx-0 text-center"
         :class="isDragging ? 'dragging' : ''"
         for="fileInput"
-        @click.stop="showFileChooser"
-      >
-        <div class="col-12 pb-0">
-          <v-icon color="primary" x-large>mdi-cloud-upload-outline</v-icon>
+        @click.stop="showFileChooser">
+        <div class="col-12 mt-4">
+          <a-icon color="primary" x-large>mdi-cloud-upload-outline</a-icon>
         </div>
-        <div class="col-12 font-weight-bold">
-          {{ $vuetify.breakpoint.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
+        <div class="col-12 mb-4 font-weight-bold">
+          {{ $vuetify.display.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
         </div>
         <div
-          class="col-12 pt-0"
+          class="col-12 mb-4"
           v-if="
-            ($vuetify.breakpoint.mobile || forceMobile) &&
+            ($vuetify.display.mobile || forceMobile) &&
             supportsImageCapture() &&
             isMimeTypeAllowed(control.options.source.types, 'image')
-          "
-        >
-          <div class="col-12 pa-0 caption">--- or ----</div>
+          ">
+          <div class="col-12 pa-0 text-caption">--- or ----</div>
           <div class="col-12">
-            <v-btn
+            <a-btn
               for="captureImage"
               class="text-center align-center justify-center"
               color="default"
-              @click.stop="captureImage"
-            >
+              @click.stop="captureImage">
               take a picture
-              <v-icon right> mdi-camera-outline</v-icon>
-            </v-btn>
+              <a-icon right> mdi-camera-outline</a-icon>
+            </a-btn>
           </div>
         </div>
       </div>
     </div>
 
-    <v-expand-transition>
-      <v-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
-        <v-list-item
+    <a-expand-transition>
+      <a-list v-if="fileResourceKeys && fileResourceKeys.length > 0">
+        <a-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
           class="file-list-item my-2"
-        >
-          <v-list-item-avatar>
-            <v-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" large>mdi-image</v-icon>
-            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</v-icon>
-            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</v-icon>
-            <v-icon v-else large>mdi-file-outline</v-icon>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title
-              v-if="editIndex !== index"
-              :data-test-id="'file_' + index"
-              class="text-wrap font-bold"
-              v-text="getLabelFromKey(fileResourceKey)"
-            ></v-list-item-title>
-            <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
-              <v-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
-            </v-list-item-title>
-            <v-list-item-subtitle v-if="showUploadProgressIndex === index"
-              ><v-progress-linear indeterminate class="mb-0"
-            /></v-list-item-subtitle>
-          </v-list-item-content>
-          <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
-            <v-btn icon @click="editResourceName(fileResourceKey, index)">
-              <v-icon color="grey lighten-1">mdi-pencil</v-icon>
-            </v-btn>
-          </v-list-item-action>
-          <v-list-item-action v-if="editIndex === index">
-            <v-btn icon @click="commitResourceName(fileResourceKey, index)">
-              <v-icon color="success">mdi-check</v-icon>
-            </v-btn>
-          </v-list-item-action>
-          <v-list-item-action>
-            <v-btn icon @click="remove(index)">
-              <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
-    </v-expand-transition>
+          :prepend-avatar="
+            isResourceTypeOf(fileResourceKey, 'image')
+              ? 'mdi-image'
+              : isResourceTypeOf(fileResourceKey, 'text')
+                ? 'mdi-file-document-outline'
+                : isResourceTypeOf(fileResourceKey, 'pdf')
+                  ? 'mdi-file-document-outline'
+                  : 'mdi-file-outline'
+          ">
+          <a-list-item-title
+            v-if="editIndex !== index"
+            :data-test-id="'file_' + index"
+            class="text-wrap font-bold"
+            v-text="getLabelFromKey(fileResourceKey)"></a-list-item-title>
+          <a-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
+            <a-text-field v-model="editFileName" autofocus @focusout="commitResourceName(fileResourceKey, index)" />
+          </a-list-item-title>
+          <a-list-item-subtitle v-if="showUploadProgressIndex === index">
+            <a-progress-linear class="mb-0" />
+          </a-list-item-subtitle>
+          <template v-slot:append>
+            <a-btn v-if="editIndex === index" icon @click="commitResourceName(fileResourceKey, index)">
+              <a-icon color="success">mdi-check</a-icon>
+            </a-btn>
+            <a-btn
+              v-if="isNameEditable(fileResourceKey) && editIndex !== index"
+              icon
+              @click="editResourceName(fileResourceKey, index)">
+              <a-icon color="grey-lighten-1">mdi-pencil</a-icon>
+            </a-btn>
+            <a-btn icon @click="remove(index)">
+              <a-icon color="grey-lighten-1">mdi-close-circle</a-icon>
+            </a-btn>
+          </template>
+        </a-list-item>
+      </a-list>
+    </a-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -145,7 +137,7 @@ export default {
   },
   data() {
     return {
-      fileResourceKeys: this.value || [],
+      fileResourceKeys: this.modelValue || [],
       isDragging: false,
       alertMessageVisible: false,
       alertMessage: null,
@@ -182,13 +174,13 @@ export default {
       let selectedFiles = [];
       if (event.dataTransfer.items) {
         // Use DataTransferItemList interface to access the file(s)
-        event.dataTransfer.items.forEach((item) => {
+        for (const item of event.dataTransfer.items) {
           if (item.kind === 'file') {
             selectedFiles.push(item.getAsFile());
           } else {
             this.showTypeNotAllowedAlert = true;
           }
-        });
+        }
       } else {
         // Use DataTransfer interface to access the file(s)
         selectedFiles.push(...event.dataTransfer.files);
@@ -322,7 +314,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .dropzone {
   border-radius: 4px;
   border-collapse: collapse;
@@ -334,12 +326,12 @@ export default {
 }
 
 .dropzone:hover {
-  border-color: var(--v-primary-base);
+  border-color: rgb(var(--v-theme-primary));
   background-color: #e3f2fd;
 }
 
 .dragging {
-  border-color: var(--v-primary-base);
+  border-color: rgb(var(--v-theme-primary));
   background-color: #e3f2fd;
 }
 

@@ -1,48 +1,46 @@
 <template>
-  <v-container>
-    <v-card class="pa-6 pa-sm-12">
-      <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
-      <h1 class="heading--text" v-else>Join SurveyStack</h1>
-      <v-form>
-        <v-text-field
+  <a-container>
+    <a-card class="pa-6 pa-sm-12">
+      <h1 class="text-heading" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
+      <h1 class="text-heading" v-else>Join SurveyStack</h1>
+      <a-form>
+        <a-text-field
           label="E-Mail"
           type="text"
           class="form-control"
-          :value="entity.email.toLowerCase()"
-          @input="entity.email = $event.toLowerCase()"
+          :modelValue="entity.email.toLowerCase()"
+          @update:modelValue="entity.email = $event.toLowerCase()"
           color="focus"
-          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
-        />
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work." />
 
-        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
+        <a-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
 
-        <v-text-field
+        <a-text-field
           label="Password"
           :type="passwordInputType"
           class="form-control"
           v-model="entity.password"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
-          color="focus"
-        />
+          :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:appendInner="showPasswords = !showPasswords"
+          color="focus" />
 
         <div class="linkBlock d-flex justify-space-around align-center">
           <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">
             Already have an account?
           </router-link>
-          <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
+          <a v-else @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
             Already have an account?
           </a>
-          <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </v-btn>
+          <a-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8"> Sign up </a-btn>
         </div>
-      </v-form>
-      <v-alert class="mt-4" outlined v-if="membership" type="info"
-        >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
+      </a-form>
+      <a-alert class="mt-4" variant="outlined" v-if="membership" type="info"
+        >Your code is eligible to join <strong>{{ membership.group.name }}</strong></a-alert
       >
 
-      <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
-    </v-card>
-  </v-container>
+      <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }} </a-alert>
+    </a-card>
+  </a-container>
 </template>
 
 <script>
@@ -83,12 +81,13 @@ export default {
       return this.showPasswords ? 'Hide passwords' : 'Show passwords';
     },
     signInLink() {
-      const link = { name: 'auth-login', params: {} };
-
-      if (this.$route.params && this.$route.params.redirect) {
-        link.params.redirect = this.$route.params.redirect;
+      const link = { name: 'auth-login', query: {} };
+      if (this.$route.query?.redirect) {
+        link.query.redirect = this.$route.query?.redirect;
       }
-
+      if (this.initialEmail) {
+        link.query.initialEmail = this.initialEmail;
+      }
       return link;
     },
     isWhitelabel() {
@@ -128,8 +127,8 @@ export default {
           }
         }
 
-        if (this.$route.params.redirect) {
-          this.$router.push(this.$route.params.redirect);
+        if (this.$route.query.redirect) {
+          this.$router.push(this.$route.query.redirect);
         } else {
           this.$store.dispatch('surveys/fetchPinned');
           this.$router.push('/');
@@ -159,7 +158,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 a {
   text-decoration: none;
 }
@@ -167,6 +166,7 @@ a {
 .linkBlock {
   flex-direction: column-reverse;
 }
+
 .signUpCSS {
   margin-bottom: 16px;
   margin-left: 0px;

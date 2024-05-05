@@ -1,16 +1,15 @@
 <template>
-  <v-select
+  <a-select
     label="Resource"
     :placeholder="placeholder"
-    :value="value"
-    @input="handleSelect"
+    :modelValue="modelValue"
+    @update:modelValue="handleSelect"
     :items="items"
-    item-text="label"
+    item-title="label"
     item-value="id"
     :disabled="disabled"
     hide-details
-    :outlined="outlined"
-  />
+    :variant="outlined ? 'outlined' : undefined" />
 </template>
 
 <script>
@@ -18,7 +17,7 @@ const NEW_RESOURCE_PREFIX = 'NEW_';
 
 export default {
   props: {
-    value: {
+    modelValue: {
       required: true,
       validator: (prop) => typeof prop === 'string' || prop === null,
     },
@@ -43,6 +42,7 @@ export default {
     },
     outlined: {
       type: Boolean,
+      default: false,
     },
   },
   computed: {

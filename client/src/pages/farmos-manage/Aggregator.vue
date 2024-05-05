@@ -1,77 +1,67 @@
 <template>
-  <v-container>
+  <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
       <h1>Manage FarmOS Instances</h1>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="my-8 align-center mt-6"
-      ></v-progress-circular>
+      <a-progress-circular v-if="loading" class="my-8 align-center mt-6" />
     </div>
 
-    <v-autocomplete
-      outlined
+    <a-select
+      v-if="!loading && !!mappings"
+      variant="outlined"
       primary
       label="Select Instance from Aggregator"
-      v-model="selectedInstance"
-      v-if="!loading && !!mappings"
-      item-text="url"
+      v-model="state.selectedInstance"
+      item-title="url"
       item-value="url"
-      :items="mappings.aggregatorFarms"
-    ></v-autocomplete>
+      :items="mappings.aggregatorFarms" />
 
-    <div class="d-flex flex-column mb-5" v-if="!!selectedInstance">
+    <div class="d-flex flex-column mb-5" v-if="!!state.selectedInstance">
       <h3>Notes</h3>
-      <textarea
-        readonly
-        rows="3"
-        style="border-style: dotted"
-        class="pa-1 w-100"
-        v-model="selectedInstanceNote"
-      ></textarea>
+      <a-textarea readonly rows="3" class="pa-1 w-100" v-model="state.selectedInstanceNote" />
     </div>
 
-    <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
-      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
-      <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
+    <div class="d-flex flex-row mb-5" v-if="!!state.selectedInstance">
+      <a-text-field v-model.trim="state.updatedNote" label="Note" hide-details />
+      <a-btn color="primary" @click="addSuperAdminNote">update note</a-btn>
     </div>
 
-    <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
-      <v-label>Tags for instance on FarmOS Aggregator</v-label>
+    <div class="d-flex flex-column mt-2" v-if="!!state.selectedInstance">
+      <a-label>Tags for instance on FarmOS Aggregator</a-label>
       <div class="d-flex mt-4">
-        <v-chip v-for="(tag, idx) in tags" :key="`tag-${idx}`" green>{{ tag }}</v-chip>
-        <v-chip v-if="tags.length === 0" color="secondary">No Tags associated with instance</v-chip>
+        <a-chip v-for="(tag, idx) in state.tags" :key="`tag-${idx}`">{{ tag }}</a-chip>
+        <a-chip v-if="state.tags.length === 0" color="secondary">No Tags associated with instance</a-chip>
       </div>
     </div>
 
-    <template v-if="!!selectedInstance">
-      <v-divider class="my-4"></v-divider>
-      <h2 ref="map-group">
+    <template v-if="!!state.selectedInstance">
+      <a-divider class="my-4" />
+      <h2 ref="mapGroup">
         Group Mappings for
-        <v-chip>{{ selectedInstance }}</v-chip>
+        <a-chip>{{ state.selectedInstance }}</a-chip>
       </h2>
 
       <div class="d-flex my-2 align-baseline">
-        <v-autocomplete
-          outlined
+        <a-select
+          variant="outlined"
           primary
           label="Map Group to Instance"
-          v-model="selectedGroup"
-          :item-text="(g) => `${g.name} (${g.path})`"
+          v-model="state.selectedGroup"
+          :item-title="(g) => `${g.name} (${g.path})`"
           item-value="_id"
           :items="groups"
-          class="mt-4 mr-4"
-        ></v-autocomplete>
-        <v-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
-          >Map</v-btn
+          class="mt-4 mr-4" />
+        <a-btn
+          :disabled="!state.selectedGroup"
+          color="primary"
+          @click="$emit('map-group', state.selectedGroup, state.selectedInstance)"
+          >Map</a-btn
         >
       </div>
 
-      <v-label class="vy-4">Current Group Mappings</v-label>
+      <a-label class="vy-4">Current Group Mappings</a-label>
 
-      <v-simple-table v-if="mappedGroups.length > 0">
+      <a-table v-if="state.mappedGroups.length > 0">
         <template v-slot:default>
           <thead>
             <tr>
@@ -80,47 +70,48 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(group, idx) in mappedGroups" :key="`grp-${idx}`">
+            <tr v-for="(group, idx) in state.mappedGroups" :key="`grp-${idx}`">
               <td>{{ group.name }}</td>
               <td>
-                <v-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)" dark>Unmap</v-btn>
+                <a-btn color="red" @click="$emit('unmap-group', group._id, state.selectedInstance)">Unmap</a-btn>
               </td>
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
-      <v-alert v-else class="mt-4" mode="fade" text type="warning"
-        >No Group Mappings exist for {{ selectedInstance }}</v-alert
-      >
+      </a-table>
+      <a-alert v-else class="mt-4" mode="fade" variant="text" type="warning">
+        No Group Mappings exist for {{ state.selectedInstance }}
+      </a-alert>
 
-      <v-divider class="my-8"></v-divider>
+      <a-divider class="my-8" />
 
-      <h2 ref="map-user">
+      <h2 ref="mapUser">
         User Mappings for
-        <v-chip>{{ selectedInstance }}</v-chip>
+        <a-chip>{{ state.selectedInstance }}</a-chip>
       </h2>
 
       <div class="d-flex my-2 justify-space-between align-baseline">
-        <v-autocomplete
+        <a-select
+          v-if="!loading && !!groups"
           class="mt-4"
-          outlined
+          variant="outlined"
           primary
           hint="Select User"
           label="Map User to Instance"
-          v-model="selectedUser"
-          v-if="!loading && !!groups"
-          :item-text="(item) => `${item.name} (${item.email})`"
+          v-model="state.selectedUser"
+          :item-title="(item) => `${item.name} (${item.email})`"
           item-value="_id"
-          :items="users"
-        ></v-autocomplete>
+          :items="users" />
 
-        <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
+        <a-checkbox v-model="state.owner" label="owner" class="mx-6" />
 
-        <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
+        <a-btn color="primary" @click="$emit('map-user', state.selectedUser, state.selectedInstance, state.owner)"
+          >Map</a-btn
+        >
       </div>
 
-      <v-label class="vy-4">Current User Mappings</v-label>
-      <v-simple-table v-if="!loading">
+      <a-label class="vy-4">Current User Mappings</a-label>
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -130,22 +121,22 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(mapping, idx) in mappedUsers" :key="`user-${idx}`">
+            <tr v-for="(mapping, idx) in state.mappedUsers" :key="`user-${idx}`">
               <td>{{ `${mapping.user.name} (${mapping.user.email})` }}</td>
               <td>{{ mapping.owner }}</td>
               <td>
-                <v-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)" dark>Unmap</v-btn>
+                <a-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)">Unmap</a-btn>
               </td>
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </template>
 
-    <div v-if="farmsNotInAggregator.length > 0 && !loading">
+    <div v-if="state.farmsNotInAggregator.length > 0 && !loading">
       <h2>Farms in Surveystack which are not present on FarmOS Aggregator</h2>
-      <p class="grey--text text--darken-2">These instances have likely been removed from the aggregator.</p>
-      <v-simple-table v-if="!loading">
+      <p class="text-grey-darken-2">These instances have likely been removed from the aggregator.</p>
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -155,52 +146,46 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(farm, idx) in farmsNotInAggregator" :key="`farm-${idx}`">
+            <tr v-for="(farm, idx) in state.farmsNotInAggregator" :key="`farm-${idx}`">
               <td>{{ `${farm.instanceName}` }}</td>
               <td>
                 <div>
-                  <v-chip
+                  <a-chip
                     small
                     class="ma-1"
-                    dark
                     color="blue"
                     v-for="(userMapping, uidx) in farm.userMappings"
-                    :key="`farm-${idx}-user-${uidx}`"
-                  >
+                    :key="`farm-${idx}-user-${uidx}`">
                     {{ userMapping.user }}
-                  </v-chip>
+                  </a-chip>
                 </div>
 
                 <div>
-                  <v-chip
+                  <a-chip
                     class="ma-1"
                     small
-                    dark
                     color="green"
                     v-for="(groupMapping, gidx) in farm.groupMappings"
-                    :key="`farm-${idx}-group-${gidx}`"
-                  >
+                    :key="`farm-${idx}-group-${gidx}`">
                     {{ groupMapping.group }}
-                  </v-chip>
+                  </a-chip>
                 </div>
               </td>
               <td>
-                <v-btn x-small color="red" @click="$emit('unmap-farm', farm.instanceName)" dark
-                  >Remove all Mappings</v-btn
-                >
+                <a-btn x-small color="red" @click="$emit('unmap-farm', farm.instanceName)">Remove all Mappings</a-btn>
               </td>
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </div>
 
-    <div v-if="farmsNotInSurvestack.length > 0 && !loading">
+    <div v-if="state.farmsNotInSurvestack.length > 0 && !loading">
       <h2>Farms on FarmOS Aggregator which are not mapped to Groups in Surveystack</h2>
-      <p class="grey--text text--darken-2">
+      <p class="text-grey-darken-2">
         These instances are likely self hosted or have not been added to a payment plan of a group.
       </p>
-      <v-simple-table v-if="!loading">
+      <a-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
@@ -211,177 +196,178 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(farm, idx) in farmsNotInSurvestack" :key="`farm-${idx}`">
+            <tr v-for="(farm, idx) in state.farmsNotInSurvestack" :key="`farm-${idx}`">
               <td>{{ `${farm.instanceName}` }}</td>
               <td>
                 <div>
-                  <v-chip small class="ma-1" dark v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
+                  <a-chip small class="ma-1" v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
                     {{ tag }}
-                  </v-chip>
+                  </a-chip>
                 </div>
               </td>
               <td>
-                <v-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</v-btn>
+                <a-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)">Map to Group</a-btn>
               </td>
               <td>
-                <textarea v-if="farm.note" readonly rows="3" v-model="farm.note"></textarea>
+                <a-textarea v-if="farm.note" readonly rows="3" v-model="farm.note" />
               </td>
             </tr>
           </tbody>
         </template>
-      </v-simple-table>
+      </a-table>
     </div>
-  </v-container>
+  </a-container>
 </template>
 
-<script>
+<script setup>
 import _ from 'lodash';
+import { useGoTo } from 'vuetify';
+import { computed, nextTick, reactive, ref } from 'vue';
 
-export default {
-  emits: ['addSuperAdminNote'],
-  props: {
-    groups: Array,
-    mappings: Object,
-    notes: String,
-    loading: Boolean,
-    users: Array,
-  },
-  data() {
-    return {
-      selectedInstance: null,
-      selectedGroup: null,
-      selectedUser: null,
-      owner: false,
-      error: null,
-      success: null,
-      updatedNote: null,
-    };
-  },
-  methods: {
-    mapUser(instanceName) {
-      this.selectedInstance = instanceName;
-      this.$nextTick(() => {
-        this.$vuetify.goTo(this.$refs['map-user']);
+const goTo = useGoTo();
+const mapUserRef = ref(null);
+const mapGroupRef = ref(null);
+
+const props = defineProps({
+  groups: Array,
+  mappings: Object,
+  notes: Array,
+  loading: Boolean,
+  users: Array,
+});
+
+const emit = defineEmits(['addSuperAdminNote']);
+
+const state = reactive({
+  selectedInstance: null,
+  selectedGroup: null,
+  selectedUser: null,
+  owner: false,
+  error: null,
+  success: null,
+  updatedNote: null,
+  selectedInstanceNote: computed(() => {
+    let note = null;
+    const noteOfFarm = props.notes.find((el) => el.instanceName === state.selectedInstance);
+    if (noteOfFarm) {
+      note = noteOfFarm.note;
+    }
+    return note;
+  }),
+  selectedInstanceInfo: computed(() => {
+    return props.mappings.aggregatorFarms.find((e) => e.url === state.selectedInstance);
+  }),
+  farmsNotInAggregator: computed(() => {
+    if (!props.mappings) {
+      return [];
+    }
+    const union = [];
+    union.push(...props.mappings.surveystackUserFarms.map((f) => f.instanceName));
+    union.push(...props.mappings.surveystackFarms.map((f) => f.instanceName));
+    const farms = _.uniq(union).filter(
+      (instanceName) => !props.mappings.aggregatorFarms.some((a) => a.url === instanceName)
+    );
+    const mappings = [];
+
+    for (const farm of farms) {
+      const userMappings = props.mappings.surveystackUserFarms
+        .filter((f) => f.instanceName === farm)
+        .map((m) => ({
+          instanceName: m.instanceName,
+          user: props.users.find((u) => u._id === m.userId).email,
+        }));
+
+      const groupMappings = props.mappings.surveystackFarms
+        .filter((f) => f.instanceName === farm)
+        .map((group) => ({
+          instanceName: group.instanceName,
+          group: props.groups.find((g) => g._id === group.groupId).path,
+        }));
+
+      mappings.push({
+        instanceName: farm,
+        userMappings,
+        groupMappings,
       });
-    },
-    mapGroup(instanceName) {
-      this.selectedInstance = instanceName;
-      this.$nextTick(() => {
-        this.$vuetify.goTo(this.$refs['map-group']);
-      });
-    },
-    addSuperAdminNote() {
-      const updatedNote = this.updatedNote;
-      const selectedInstance = this.selectedInstance;
-      if (updatedNote) {
-        this.$emit('addSuperAdminNote', { updatedNote, selectedInstance });
-      }
-      this.updatedNote = null;
-    },
-  },
-  computed: {
-    selectedInstanceNote() {
+    }
+
+    return mappings;
+  }),
+  farmsNotInSurvestack: computed(() => {
+    if (!props.mappings) {
+      return [];
+    }
+    const union = [];
+    union.push(...props.mappings.surveystackFarms.map((f) => f.instanceName));
+    const surveyStackFarms = _.uniq(union);
+
+    // farms without mapping
+    const farms = props.mappings.aggregatorFarms.filter((f) => !surveyStackFarms.some((s) => f.url === s));
+
+    const mappings = [];
+
+    for (const farm of farms) {
       let note = null;
-      const noteOfFarm = this.notes.find((el) => el.instanceName === this.selectedInstance);
+      const noteOfFarm = props.notes.find((el) => el.instanceName === farm.url);
       if (noteOfFarm) {
         note = noteOfFarm.note;
       }
-      return note;
-    },
-    selectedInstanceInfo() {
-      return this.mappings.aggregatorFarms.find((e) => e.url === this.selectedInstance);
-    },
-    farmsNotInAggregator() {
-      if (!this.mappings) {
-        return [];
-      }
-      const union = [];
-      union.push(...this.mappings.surveystackUserFarms.map((f) => f.instanceName));
-      union.push(...this.mappings.surveystackFarms.map((f) => f.instanceName));
-      const farms = _.uniq(union).filter(
-        (instanceName) => !this.mappings.aggregatorFarms.some((a) => a.url === instanceName)
-      );
-      const mappings = [];
+      mappings.push({
+        instanceName: farm.url,
+        tags: farm.tags.split(' '),
+        note: note,
+      });
+    }
 
-      for (const farm of farms) {
-        const userMappings = this.mappings.surveystackUserFarms
-          .filter((f) => f.instanceName === farm)
-          .map((m) => ({
-            instanceName: m.instanceName,
-            user: this.users.find((u) => u._id === m.userId).email,
-          }));
+    return mappings;
+  }),
+  tags: computed(() => {
+    if (state?.selectedInstanceInfo.tags == '') {
+      return [];
+    }
+    return state?.selectedInstanceInfo.tags.split(' ');
+  }),
+  mappedGroups: computed(() => {
+    if (!state?.selectedInstance) {
+      return [];
+    }
+    return props.mappings.surveystackFarms
+      .filter((farm) => farm.instanceName === state.selectedInstance)
+      .map((farm) => {
+        return props.groups.find((g) => g._id === farm.groupId);
+      });
+  }),
+  mappedUsers: computed(() => {
+    console.log('mappings', props.mappings);
+    return props.mappings.surveystackUserFarms
+      .filter((farm) => farm.instanceName === state?.selectedInstance)
+      .map((farm) => ({
+        instanceName: farm.instanceName,
+        owner: farm.owner,
+        userId: farm.userId,
+        user: props.users.find((u) => u._id === farm.userId),
+      }));
+  }),
+});
 
-        const groupMappings = this.mappings.surveystackFarms
-          .filter((f) => f.instanceName === farm)
-          .map((group) => ({
-            instanceName: group.instanceName,
-            group: this.groups.find((g) => g._id === group.groupId).path,
-          }));
-
-        mappings.push({
-          instanceName: farm,
-          userMappings,
-          groupMappings,
-        });
-      }
-
-      return mappings;
-    },
-    farmsNotInSurvestack() {
-      if (!this.mappings) {
-        return [];
-      }
-      const union = [];
-      union.push(...this.mappings.surveystackFarms.map((f) => f.instanceName));
-      const surveyStackFarms = _.uniq(union);
-
-      // farms without mapping
-      const farms = this.mappings.aggregatorFarms.filter((f) => !surveyStackFarms.some((s) => f.url === s));
-
-      const mappings = [];
-
-      for (const farm of farms) {
-        let note = null;
-        const noteOfFarm = this.notes.find((el) => el.instanceName === farm.url);
-        if (noteOfFarm) {
-          note = noteOfFarm.note;
-        }
-        mappings.push({
-          instanceName: farm.url,
-          tags: farm.tags.split(' '),
-          note: note,
-        });
-      }
-
-      return mappings;
-    },
-    tags() {
-      if (this.selectedInstanceInfo.tags == '') {
-        return [];
-      }
-      return this.selectedInstanceInfo.tags.split(' ');
-    },
-    mappedGroups() {
-      if (!this.selectedInstance) {
-        return [];
-      }
-      return this.mappings.surveystackFarms
-        .filter((farm) => farm.instanceName === this.selectedInstance)
-        .map((farm) => {
-          return this.groups.find((g) => g._id === farm.groupId);
-        });
-    },
-    mappedUsers() {
-      console.log('mappings', this.mappings);
-      return this.mappings.surveystackUserFarms
-        .filter((farm) => farm.instanceName === this.selectedInstance)
-        .map((farm) => ({
-          instanceName: farm.instanceName,
-          owner: farm.owner,
-          userId: farm.userId,
-          user: this.users.find((u) => u._id === farm.userId),
-        }));
-    },
-  },
-};
+function mapUser(instanceName) {
+  state.selectedInstance = instanceName;
+  nextTick(() => {
+    goTo(mapUserRef.value);
+  });
+}
+function mapGroup(instanceName) {
+  state.selectedInstance = instanceName;
+  nextTick(() => {
+    goTo(mapGroupRef.value);
+  });
+}
+function addSuperAdminNote() {
+  const updatedNote = state.updatedNote;
+  const selectedInstance = state.selectedInstance;
+  if (updatedNote) {
+    emit('addSuperAdminNote', { updatedNote, selectedInstance });
+  }
+  state.updatedNote = null;
+}
 </script>

@@ -1,33 +1,23 @@
 <template>
   <!-- v-if="state.isEditing" -->
-  <v-text-field
-    :value="value"
-    @input="$emit('input', $event)"
+  <a-text-field
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
-    class="display-1 pt-0 mt-0"
+    class="full-width"
     :rules="[rules.hasOnlyValidCharacters, rules.hasValidLength]"
-    :autofocus="value === ''"
-  />
-  <!-- <div
-    v-else
-    @click="() => setIsEditing(true)"
-    @focus="() => setIsEditing(true)"
-    class="display-1 mb-4 mt-3 d-flex"
-    :style="{ borderBottom: '2px solid transparent', letterSpacing: 'normal !important', }"
-  >
-    <div v-if="value">{{ value }}</div>
-    <div v-else class="grey--text lighten-4">Untitled Survey</div>
-  </div> -->
+    :autofocus="modelValue === ''" />
 </template>
 
 <script>
-import { reactive } from '@vue/composition-api';
+import { reactive } from 'vue';
 
 export default {
   props: {
-    value: String,
+    modelValue: String,
   },
+  emits: ['update:modelValue'],
   data: () => ({
     rules: {
       hasOnlyValidCharacters(val) {
@@ -40,7 +30,7 @@ export default {
   }),
   setup(props) {
     const state = reactive({
-      isEditing: !props.value || false,
+      isEditing: !props.modelValue || false,
     });
 
     function setIsEditing(val) {
@@ -54,3 +44,15 @@ export default {
   },
 };
 </script>
+<style scoped lang="scss">
+.v-text-field :deep(input) {
+  font-size: 2.125rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 10px;
+  min-height: 0;
+}
+.v-text-field {
+  min-height: 0;
+}
+</style>

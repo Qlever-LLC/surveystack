@@ -1,55 +1,50 @@
 <template>
-  <v-card>
-    <v-card-title> Survey Reference Editor </v-card-title>
-    <v-card-text>
-      <v-autocomplete
+  <a-card>
+    <a-card-title> Survey Reference Editor </a-card-title>
+    <a-card-text>
+      <a-select
         label="Select Survey"
-        outlined
+        variant="outlined"
         :items="surveys"
         v-model="surveyId"
-        @change="surveyChanged()"
+        @update:modelValue="surveyChanged()"
         :loading="loading"
         item-value="_id"
-        item-text="name"
-      >
-        <template slot="append-outer">
-          <v-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
+        item-title="name"
+        appendSlot>
+        <template v-slot:append>
+          <a-chip style="margin-top: -10px" color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
-          </v-chip>
+          </a-chip>
         </template>
-      </v-autocomplete>
+      </a-select>
 
       <template v-if="surveyId">
-        <v-autocomplete
+        <a-select
           label="Select Path"
-          outlined
-          @change="updateResource"
+          variant="outlined"
           :items="paths"
           v-model="path"
+          @update:modelValue="updateResource"
           :loading="loading"
           item-value="path"
-          item-text="name"
-        />
+          item-title="name" />
       </template>
-    </v-card-text>
-    <v-spacer />
-    <v-card-actions>
-      <v-spacer />
-      <v-btn text @click="closeHandler"> Close </v-btn>
-      <v-tooltip top :disabled="!!path">
-        <template v-slot:activator="{ on }">
-          <div v-on="on">
-            <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
-          </div>
-        </template>
-        <span>No Submitted Surveys Available</span>
-      </v-tooltip>
-      <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
-      <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
-    </v-card-actions>
+    </a-card-text>
+    <a-spacer />
+    <a-card-actions>
+      <a-spacer />
+      <a-btn variant="text" @click="closeHandler"> Close </a-btn>
+      <a-btn variant="text" color="green" @click="previewDialogIsVisible = true" :disabled="!path">
+        Preview
+        <a-tooltip top activator="parent" :disabled="!!path">No Submitted Surveys Available</a-tooltip>
+      </a-btn>
+      <a-btn variant="text" color="error" @click="deleteResource"> Delete </a-btn>
+      <a-btn variant="text" color="primary" @click="updateAndClose"> Save </a-btn>
+    </a-card-actions>
 
     <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />
-  </v-card>
+  </a-card>
 </template>
 
 <script>
@@ -66,7 +61,9 @@ function getPathByPath(paths, path) {
 }
 
 export default {
-  components: { OntologyReferencePreview },
+  components: {
+    OntologyReferencePreview,
+  },
   props: {
     resource: {
       type: Object,
@@ -106,6 +103,7 @@ export default {
     updateResource() {
       const survey = getSurveyById(this.surveys, this.surveyId);
       const path = getPathByPath(this.paths, this.path);
+      if (!path) return;
       this.$emit('change', {
         ...this.resource,
         label: `${survey && survey.name} - ${path.control.label}`,
@@ -121,6 +119,7 @@ export default {
       this.$emit('close-dialog');
     },
     async surveyChanged(version) {
+      if (!this.surveyId) return;
       const versionParam = version || 'latest';
       const { data } = await api.get(`/surveys/${this.surveyId}?version=${versionParam}`);
       if (!version) {

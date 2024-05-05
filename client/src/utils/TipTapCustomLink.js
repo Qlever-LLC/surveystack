@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { Link } from 'tiptap-extensions';
+import { Link } from '@tiptap/extension-link';
 
 export default class CustomLink extends Link {
   get schema() {
@@ -16,17 +15,21 @@ export default class CustomLink extends Link {
       parseDOM: [
         {
           tag: 'a[href]',
-          getAttrs: dom => ({
+          getAttrs: (dom) => ({
             href: dom.getAttribute('href'),
             target: dom.getAttribute('target'),
           }),
         },
       ],
-      toDOM: node => ['a', {
-        ...node.attrs,
-        target: '__blank',
-        rel: 'noopener noreferrer nofollow',
-      }, 0],
+      toDOM: (node) => [
+        'a',
+        {
+          ...node.attrs,
+          target: '__blank',
+          rel: 'noopener noreferrer nofollow',
+        },
+        0,
+      ],
     };
   }
 }

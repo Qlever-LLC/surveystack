@@ -1,18 +1,17 @@
 <template>
-  <v-container>
+  <a-container>
     <app-dialog
       v-model="learnMoreDialog"
       title="Premium Features"
       @confirm="learnMoreDialog = false"
-      @cancel="learnMoreDialog = false"
-    >
+      @cancel="learnMoreDialog = false">
       <p>
         With a paid subscription you can upgrade to
         <strong>your own white-labelled app</strong> with a <strong>custom url</strong>, and your
         <strong>branding</strong> and <strong>color scheme</strong>. You will also benefit from more administrative
         tools to improve project and data management:
       </p>
-      <ul class="my-3">
+      <ul class="my-3 revertPadding">
         <li>Allow any user to join your group from your custom url.</li>
         <li>See all your group and pinned surveys without being logged in to your app.</li>
         <li>
@@ -28,79 +27,76 @@
     </app-dialog>
 
     <div class="d-flex justify-space-between align-center">
-      <app-group-breadcrumbs :path="entity.path" />
+      <a-breadcrumbs :path="entity.path" enableAll />
     </div>
 
     <div class="d-flex justify-space-between">
       <h1>
         <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
-        <v-chip v-if="isPremium" class="ml-2" color="success">
-          <v-icon small left> mdi-octagram </v-icon>Premium
-        </v-chip>
+        <a-chip v-if="isPremium" class="ml-2" color="success">
+          <a-icon small left> mdi-octagram </a-icon>Premium
+        </a-chip>
       </h1>
-      <v-btn
+      <a-btn
         v-if="editMode"
         :disabled="!entity._id"
         class="ma-2"
         :to="`/call-for-submissions?group=${entity._id}`"
-        color="secondary"
-      >
-        <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
-      </v-btn>
+        color="secondary">
+        <a-icon left>mdi-email-multiple-outline</a-icon>Call for submissions...
+      </a-btn>
     </div>
-    <v-card :loading="isLoadingGroup" class="mb-4">
-      <v-card-text>
+    <a-card :loading="isLoadingGroup" class="mb-4">
+      <a-card-text>
         <form @submit.prevent="onSubmit" autocomplete="off">
-          <v-text-field
+          <a-text-field
             label="Name"
             placeholder="Enter group name"
             id="group-name"
             autocomplete="off"
-            v-model="entity.name"
-          />
-          <v-text-field
+            v-model="entity.name" />
+          <a-text-field
             label="Slug"
             placeholder="Enter group slug or use suggested"
             id="group-slug"
             v-model="entity.slug"
             :readonly="!editSlug"
-            :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
+            :append-inner-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
             autocomplete="off"
-            @click:append="editSlug = !editSlug"
+            @click:appendInner="editSlug = !editSlug"
             hint="URL friendly version of name"
             persistent-hint
-            :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
-          />
+            :disabled="isWhitelabel && entity.path === whitelabelPartner.path" />
           <div class="d-flex align-center mt-6">
-            <v-checkbox
+            <a-checkbox
               label="Invitation Only"
               v-model="entity.meta.invitationOnly"
+              :hideDetails="false"
               :hint="
                 entity.meta.invitationOnly
                   ? 'Users can only join through an invitation'
                   : 'Everybody may join this group'
               "
-              persistent-hint
+              persistentHint
               :disabled="!isPremium"
-              class="d-inline mt-0"
-            />
+              class="d-inline mt-0" />
             <div class="ml-auto ml-sm-6">
-              <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
+              <a-btn small v-if="!isPremium" @click="learnMoreDialog = true" variant="outlined" color="primary"
                 >Learn more...
-              </v-btn>
+              </a-btn>
             </div>
           </div>
-          <v-checkbox label="Archived" v-model="entity.meta.archived" />
+          <a-checkbox label="Archived" v-model="entity.meta.archived" />
           <div class="d-flex justify-end pa-2">
-            <v-btn text @click="cancel">Cancel</v-btn>
-            <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
+            <a-btn variant="text" @click="cancel">Cancel</a-btn>
+            <a-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</a-btn>
           </div>
         </form>
-      </v-card-text>
-    </v-card>
+      </a-card-text>
+    </a-card>
 
-    <v-row>
-      <v-col cols="12" lg="12">
+    <a-row>
+      <a-col cols="12" lg="12">
         <app-basic-list
           maxHeight="500px"
           :loading="isLoadingMembers || isLoadingHyloGroup"
@@ -114,80 +110,75 @@
             name: 'memberships-new',
             query: { group: entity._id, role: 'user' },
           }"
-          :filter="filterMembers"
-        >
-          <template v-slot:entity="{ entity }">
-            <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-              <v-list-item-title class="text--secondary"
-                >[Pending] {{ entity.meta.invitationEmail
-                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title
-              >
-              <v-list-item-subtitle>{{
-                entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
-              }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-content v-else>
-              <v-list-item-title>{{ entity.user.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.user.email }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
-              <v-row style="gap: 12px">
+          :filter="filterMembers">
+          <template v-slot:append="{ entity }">
+            <a-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
+              <a-row cssGap12px>
                 <app-confirm-membership-button
                   v-if="entity.meta && entity.meta.status === 'pending'"
                   :membershipId="entity._id"
                   :email="entity.meta.invitationEmail"
-                  @confirmed="loadMembers"
-                />
+                  @confirmed="loadMembers" />
                 <app-member-hylo-status
                   v-if="entity.meta && entity.meta.status === 'active' && integratedHyloGroup"
                   :loading="isLoadingHyloGroup"
                   :membershipId="entity._id"
                   :hyloGroup="integratedHyloGroup"
                   :userName="entity.user.name"
-                  @updated="loadHyloGroup"
-                />
-                <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
-              </v-row>
-            </v-list-item-action>
+                  @updated="loadHyloGroup" />
+                <a-icon v-if="entity.role === 'admin'">mdi-crown-outline</a-icon>
+              </a-row>
+            </a-list-item-action>
+          </template>
+          <template v-slot:entity="{ entity }">
+            <div v-if="entity.meta && entity.meta.status === 'pending'">
+              <a-list-item-title class="text-secondary"
+                >[Pending] {{ entity.meta.invitationEmail
+                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</a-list-item-title
+              >
+              <a-list-item-subtitle>{{
+                entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
+              }}</a-list-item-subtitle>
+            </div>
+            <div v-else>
+              <a-list-item-title>{{ entity.user.name }}</a-list-item-title>
+              <a-list-item-subtitle>{{ entity.user.email }}</a-list-item-subtitle>
+            </div>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
+      </a-col>
+    </a-row>
 
-    <v-row>
-      <v-col cols="12" lg="12">
+    <a-row>
+      <a-col cols="12" lg="12">
         <app-basic-list
           class="mb-4"
           v-if="editMode"
           :entities="integrations"
           title="Integrations"
-          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`"
-        >
+          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
           <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
-            </v-list-item-content>
+            <a-list-item-title>{{ entity.name }}</a-list-item-title>
+            <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
           </template>
         </app-basic-list>
-      </v-col>
-    </v-row>
+      </a-col>
+    </a-row>
 
-    <v-row>
-      <v-col cols="12" lg="12">
+    <a-row>
+      <a-col cols="12" lg="12">
         <app-pinned-surveys
           class="mb-4"
           v-if="editMode"
           :entities="entity.surveys.pinned"
           :searchResults="searchResults"
-          @search="searchSurveys"
-        >
+          @search="searchSurveys">
         </app-pinned-surveys>
-      </v-col>
-    </v-row>
+      </a-col>
+    </a-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
-  </v-container>
+  </a-container>
 </template>
 
 <script>
@@ -196,7 +187,6 @@ import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
 import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
@@ -222,7 +212,6 @@ export default {
     appDocLinks,
     appBasicList,
     appDialog,
-    appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
   },
@@ -404,9 +393,13 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .api-border {
   border: 1px solid rgba(0, 0, 0, 0.24);
   border-radius: 4px;
+}
+
+.revertPadding {
+  padding: revert;
 }
 </style>

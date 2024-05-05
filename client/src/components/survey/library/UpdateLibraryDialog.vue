@@ -1,17 +1,22 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
-    <v-card>
-      <v-card-title>
+  <a-dialog
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="700"
+    max-width="75%"
+    persistent>
+    <a-card>
+      <a-card-title>
         Update question set from Version
-        <v-chip dark small color="green" class="mx-2"> Version {{ libraryRootGroup.libraryVersion }} </v-chip>
+        <a-chip small color="green" class="mx-2"> Version {{ libraryRootGroup.libraryVersion }} </a-chip>
         to
-        <v-chip dark small color="green" class="mx-2"> Version {{ toSurvey.latestVersion }} </v-chip>
-      </v-card-title>
-      <v-card-text class="mt-5">
+        <a-chip small color="green" class="mx-2"> Version {{ toSurvey.latestVersion }} </a-chip>
+      </a-card-title>
+      <a-card-text class="mt-5">
         <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
-        <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mb-2" />
-        <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
-      </v-card-text>
+        <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mt-2" />
+        <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" class="mt-5" />
+      </a-card-text>
       <survey-diff
         :controls-local-revision="localRevisionControls"
         :controls-remote-revision-old="remoteOldRevisionControls"
@@ -21,42 +26,40 @@
         :default-open="true"
         :showHeader="true"
         :showNoChangesText="false"
-        @discard-local-changes-changed="discardLocalChangesChanged"
-      ></survey-diff>
-      <v-card-actions class="mr-3">
-        <v-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
+        @discard-local-changes-changed="discardLocalChangesChanged"></survey-diff>
+      <a-card-actions class="mr-3">
+        <a-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" variant="text"
           >Learn more...
-        </v-btn>
-        <v-spacer />
-        <v-btn
+        </a-btn>
+        <a-spacer />
+        <a-btn
           @click="update"
           color="primary"
           text
-          :disabled="libraryRootGroup.libraryVersion === toSurvey.latestVersion"
-        >
+          :disabled="libraryRootGroup.libraryVersion === toSurvey.latestVersion">
           <span>update</span>
-        </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
-      </v-card-actions>
-    </v-card>
-    <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
-      <v-card class="">
-        <v-card-title>Confirm Update</v-card-title>
-        <v-card-text class="mt-4">
+        </a-btn>
+        <a-btn @click="$emit('cancel')" color="primary" variant="text"> Cancel</a-btn>
+      </a-card-actions>
+    </a-card>
+    <a-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
+      <a-card>
+        <a-card-title>Confirm Update</a-card-title>
+        <a-card-text class="mt-4">
           <b
             >You have modified this question set compared to Version
             {{ libraryRootGroup.libraryVersion }}.<br /><br />You have chosen to override
             {{ discardLocalChanges.length }} of your modified questions.<br /><br />Click update to continue.</b
           >
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</v-btn>
-          <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-dialog>
+        </a-card-text>
+        <a-card-actions>
+          <a-spacer />
+          <a-btn variant="text" @click.stop="conflictConfirmModalIsVisible = false"> Cancel</a-btn>
+          <a-btn variant="text" color="red" @click.stop="updateConfirmed"> Update</a-btn>
+        </a-card-actions>
+      </a-card>
+    </a-dialog>
+  </a-dialog>
 </template>
 
 <script>
@@ -64,12 +67,16 @@ import TipTapEditor from '@/components/builder/TipTapEditor';
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { merge } from '@/utils/surveyDiff';
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 
 export default {
-  components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
+  components: {
+    SurveyDiff,
+    LibraryChangeTypeSelector,
+    TipTapEditor,
+  },
   props: {
-    value: {
+    modelValue: {
       required: true,
       type: Boolean,
     },
@@ -82,7 +89,7 @@ export default {
       required: true,
     },
   },
-  emits: ['update', 'cancel'],
+  emits: ['update', 'cancel', 'update:modelValue'],
   setup(props, { emit }) {
     const state = reactive({
       localRevisionControls: props.libraryRootGroup.children,

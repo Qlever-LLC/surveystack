@@ -14,7 +14,6 @@ export const types = {
     add: 'add',
     remove: 'remove',
     fetchLocalSubmissions: 'fetchLocalSubmissions',
-    get: 'get',
     update: 'update',
     fetchRemoteSubmission: 'fetchRemoteSubmission',
   },
@@ -22,8 +21,6 @@ export const types = {
 
 export const createInitialState = () => ({
   submissions: [],
-  remoteDrafts: [],
-  localDrafts: [],
 });
 
 const initialState = createInitialState();
@@ -67,14 +64,9 @@ const actions = {
     commit('RESET');
   },
   async [types.actions.fetchLocalSubmissions]({ commit }) {
-    // TODO reject if timeout here
-    const response = await new Promise((resolve) => {
-      db.openDb(() => {
-        db.getAllSubmissions((results) => resolve(results));
-      });
-    });
-    commit(types.mutations.SET_SUBMISSIONS, response);
-    return response;
+    const submissions = await db.getAllSubmissions();
+    commit(types.mutations.SET_SUBMISSIONS, submissions);
+    return submissions;
   },
   [types.actions.add]({ commit }, submission) {
     commit(types.mutations.ADD_SUBMISSION, submission);
@@ -88,7 +80,7 @@ const actions = {
     commit(types.mutations.REMOVE_SUBMISSION, id);
   },
   async [types.actions.update]({ commit }, submission) {
-    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    await db.persistSubmission(submission);
     commit(types.mutations.UPDATE_SUBMISSION, submission);
     return submission;
   },

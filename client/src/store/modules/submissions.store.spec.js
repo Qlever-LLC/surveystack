@@ -1,9 +1,10 @@
 import createTestStore from '../../../tests/createTestStore';
 import { createMockSubmission } from '../../../tests/mockGenerators';
 import { createInitialState, types } from './submissions.store';
-import { removeFromIndexedDB, stores as dbStores } from '../db';
+import { getSubmission, persistSubmission, getAllSubmissions } from '../db';
+import api from '../../services/api.service';
 
-jest.mock('../db');
+jest.mock('../../services/api.service');
 
 describe('submissions store', () => {
   describe('actions', () => {
@@ -26,19 +27,19 @@ describe('submissions store', () => {
 
         await store.dispatch(`submissions/${types.actions.add}`, mockSubmission);
 
-        expect(store.state.submissions.submissions).toContain(mockSubmission);
+        expect(store.state.submissions.submissions).toContainEqual(mockSubmission);
       });
 
       it('replaces the existing submission if a submission with the same id is present', async () => {
         const store = createTestStore();
-        const mockSubmission1 = createMockSubmission();
-        const mockSubmission2 = createMockSubmission({ _id: mockSubmission1._id });
+        const mockSubmission1 = createMockSubmission({ dateModified: new Date('2024-01-01')});
+        const mockSubmission2 = createMockSubmission({ _id: mockSubmission1._id, dateModified: new Date('2024-01-02') });
         store.state.submissions.submissions = [mockSubmission1];
 
         await store.dispatch(`submissions/${types.actions.add}`, mockSubmission2);
 
-        expect(store.state.submissions.submissions).not.toContain(mockSubmission1);
-        expect(store.state.submissions.submissions).toContain(mockSubmission2);
+        expect(store.state.submissions.submissions).not.toContainEqual(mockSubmission1);
+        expect(store.state.submissions.submissions).toContainEqual(mockSubmission2);
       });
     });
 
@@ -46,31 +47,57 @@ describe('submissions store', () => {
       it('removes the submission with the specified id from state and idb', async () => {
         const store = createTestStore();
         const mockSubmission = createMockSubmission();
+        await persistSubmission(mockSubmission);
         store.state.submissions.submissions = [mockSubmission];
 
         await store.dispatch(`submissions/${types.actions.remove}`, mockSubmission._id);
 
-        expect(removeFromIndexedDB).toHaveBeenCalledWith(dbStores.SUBMISSIONS, mockSubmission._id);
-        expect(store.state.submissions.submissions).not.toContain(mockSubmission);
+        const submissionFromIDB = await getSubmission(mockSubmission._id);
+        expect(submissionFromIDB).toBeUndefined();
+        expect(store.state.submissions.submissions).not.toContainEqual(mockSubmission);
       });
     });
 
     describe(types.actions.fetchLocalSubmissions, () => {
       it('gets submissions from idb and puts them in state', async () => {
-        // the code we use to get submissions from idb is not amenable to mocking
-        // it's also not amenable to being used with fake-indexeddb to make assertions on the actual db
-        // because the idb code in stores/db.js isn't set up to wait for async things
-        // so, maybe it's time to bite the bullet and rewrite the idb helpers...
-        // Take an hour or two to look at what it would take to use https://github.com/jakearchibald/idb
-        // Maybe the existing idb code can keep the same interface, but start using that lib
-        // That way, I wouldn't have to consider all the call sites for idb code.
+        const store = createTestStore();
+        const mockSubmission = createMockSubmission();
+        await persistSubmission(mockSubmission);
+
+        await store.dispatch(`submissions/${types.actions.fetchLocalSubmissions}`);
+
+        expect(store.state.submissions.submissions).toContainEqual(mockSubmission);
       });
     });
 
-    describe(types.actions.get, () => {});
+    describe(types.actions.update, () => {
+      it('updates the submission in state and idb', async () => {
+        const store = createTestStore();
+        const mockSubmission1 = createMockSubmission({ dateModified: new Date('2024-01-01')});
+        const mockSubmission2 = createMockSubmission({ _id: mockSubmission1._id, dateModified: new Date('2024-01-02') });
+        store.state.submissions.submissions = [mockSubmission1];
+        await persistSubmission(mockSubmission1);
 
-    describe(types.actions.update, () => {});
+        await store.dispatch(`submissions/${types.actions.update}`, mockSubmission2);
 
-    describe(types.actions.fetchRemoteSubmission, () => {});
+        expect(store.state.submissions.submissions).not.toContainEqual(mockSubmission1);
+        expect(store.state.submissions.submissions).toContainEqual(mockSubmission2);
+        const idbSubmissions = await getAllSubmissions();
+        expect(idbSubmissions).toHaveLength(1);
+        expect(idbSubmissions).toContainEqual(mockSubmission2);
+      });
+    });
+
+    describe(types.actions.fetchRemoteSubmission, () => {
+      it('fetches the submission with the given id from the server and puts it in state', async () => {
+        const store = createTestStore();
+        const mockSubmission = createMockSubmission();
+        api.get.mockResolvedValueOnce({ data: mockSubmission });
+
+        await store.dispatch(`submissions/${types.actions.fetchRemoteSubmission}`, 'mock-id');
+
+        expect(store.state.submissions.submissions).toContainEqual(mockSubmission);
+      });
+    });
   });
 });

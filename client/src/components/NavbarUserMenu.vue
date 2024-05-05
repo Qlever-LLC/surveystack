@@ -1,56 +1,44 @@
 <template>
   <div>
-    <v-menu
-      left
+    <a-menu
+      v-if="isLoggedIn"
       attach="#app-menu"
-      offset-y
-      v-if="$store.getters['auth/isLoggedIn']"
       :close-on-content-click="false"
       max-height="calc(100% - 100px)"
-    >
-      <template v-slot:activator="{ on }">
-        <v-btn text v-on="on" @click="checkIsOwner">
-          <v-icon>mdi-account</v-icon>
-        </v-btn>
+      v-model="menuIsOpen"
+      location="bottom">
+      <template v-slot:activator="{ props }">
+        <a-btn variant="text" v-bind="props" @click="checkIsOwner()">
+          <a-icon large>mdi-account</a-icon>
+        </a-btn>
       </template>
-      <v-list flat>
-        <v-list-item link :to="{ name: 'auth-profile' }">
-          <v-list-item-icon>
-            <v-icon>mdi-account-circle</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Profile </v-list-item-title>
-        </v-list-item>
-        <v-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
-          <v-list-item-icon>
-            <v-icon>mdi-leaf-circle-outline</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> FarmOS Profile </v-list-item-title>
-        </v-list-item>
-        <v-divider />
-        <v-subheader>Active Group</v-subheader>
-        <active-group-selector-list v-model="activeGroup" />
-        <v-divider />
-        <v-list-item link @click="logout" class="mt-2">
-          <v-list-item-icon>
-            <v-icon>mdi-logout-variant</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Sign Out </v-list-item-title>
-        </v-list-item>
-      </v-list>
+      <a-list flat>
+        <a-list-item link to="/auth/profile" prepend-icon="mdi-account-circle">
+          <a-list-item-title> Profile </a-list-item-title>
+        </a-list-item>
+        <a-list-item v-if="isOwner" link to="/farmos/profile" prepend-icon="mdi-leaf-circle-outline">
+          <a-list-item-title> FarmOS Profile </a-list-item-title>
+        </a-list-item>
+        <a-divider />
+        <a-list-subheader>Active Group</a-list-subheader>
+        <active-group-selector-list />
+        <a-divider />
+        <a-list-item link @click="logout" class="mt-2" prepend-icon="mdi-logout-variant">
+          <a-list-item-title> Sign Out </a-list-item-title>
+        </a-list-item>
+      </a-list>
+    </a-menu>
 
-      <!-- </v-card-text> -->
-      <!-- </v-card> -->
-    </v-menu>
-
-    <v-btn v-else :to="{ name: 'auth-login' }" text>
-      <v-icon>mdi-login-variant</v-icon>
+    <a-btn v-else :to="{ name: 'auth-login' }" variant="text">
+      <a-icon>mdi-login-variant</a-icon>
       <span class="ml-2">Login</span>
-    </v-btn>
+    </a-btn>
   </div>
 </template>
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+
 import api from '@/services/api.service';
 
 export default {
@@ -59,17 +47,13 @@ export default {
   },
   data() {
     return {
+      menuIsOpen: false,
       isOwner: false,
     };
   },
   computed: {
-    activeGroup: {
-      get() {
-        return this.$store.getters['memberships/activeGroup'];
-      },
-      set(val) {
-        this.$store.dispatch('memberships/setActiveGroup', val);
-      },
+    isLoggedIn() {
+      return this.$store.getters['auth/isLoggedIn'];
     },
   },
   methods: {

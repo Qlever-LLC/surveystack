@@ -1,45 +1,42 @@
 <template>
-  <div class="screen-root">
-    <v-dialog v-model="viewCode">
-      <app-code-view v-model="survey" style="height: 80vh" />
-    </v-dialog>
+  <div class="screen-root bg-white">
+    <a-dialog v-model="viewCode">
+      <app-code-view :modelValue="JSON.stringify(surveyUnderWork, null, 2)" readOnly style="height: 80vh" />
+    </a-dialog>
+    <a-dialog v-model="viewSubmission">
+      <app-code-view :modelValue="JSON.stringify(instance, null, 2)" readOnly style="height: 80vh" />
+    </a-dialog>
 
-    <v-dialog v-model="viewSubmission">
-      <app-code-view v-model="instance" style="height: 80vh" />
-    </v-dialog>
-
-    <v-dialog v-model="showExamples">
+    <a-dialog v-model="showExamples">
       <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
-    </v-dialog>
+    </a-dialog>
 
     <update-library-dialog
       v-if="updateLibraryDialogIsVisible"
-      :value="updateLibraryDialogIsVisible"
+      v-model="updateLibraryDialogIsVisible"
       :library-root-group="updateLibraryRootGroup"
       :to-survey="updateToLibrary"
       @update="updateLibraryConfirmed"
-      @cancel="updateLibraryCancelled"
-    />
+      @cancel="updateLibraryCancelled" />
 
-    <v-alert
+    <a-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
-      text
+      variant="text"
       type="warning"
       color="orange"
       elevation="2"
-      dismissible
-    >
+      closable>
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
-    </v-alert>
+    </a-alert>
 
-    <splitpanes class="pane-root" vertical>
+    <splitpanes class="pane-root bg-white" vertical>
       <pane class="pane pane-survey">
         <div class="pane-fixed-wrapper pr-2" style="position: relative">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
             :draft="isDraft"
-            v-model="survey"
+            v-model="surveyUnderWork"
             :survey="survey"
             :isNew="!editMode"
             :isSaving="isSaving"
@@ -62,12 +59,12 @@
             @addToLibrary="addToLibrary"
             class="mb-4"
             data-testid="survey-details"
-            @show-version-dialog="$emit('show-version-dialog')"
-          />
+            @show-version-dialog="$emit('show-version-dialog')" />
           <graphical-view
             v-if="!viewCode"
             :selected="control"
-            :controls="currentControls"
+            :modelValue="currentControls"
+            @update:modelValue="updateSurvey"
             :availableLibraryUpdates="availableLibraryUpdates"
             :libraryId="showLibrary ? libraryId : null"
             @control-selected="controlSelected"
@@ -77,30 +74,26 @@
             @update-library-control="updateLibrary"
             @hide-control="hideControl"
             @unhide-control="unhideControl"
-            data-testid="graphical-view"
-          />
+            data-testid="graphical-view" />
         </div>
       </pane>
 
       <pane class="pane pane-library" v-if="showLibrary">
         <div class="px-4">
           <question-library
-            :survey="survey"
+            :survey="surveyUnderWork"
             :libraryId="libraryId"
             @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
-            data-testid="question-library"
-          />
+            data-testid="question-library" />
         </div>
       </pane>
-
       <pane class="pane pane-controls" v-if="control">
-        <v-card class="px-4 pb-3 m-2 mb-3">
-          <!-- <v-card-title class="pl-0">Details</v-card-title> -->
+        <a-card class="px-4 pb-3 m-2 mb-3">
           <control-properties
             v-if="control"
             :control="control"
-            :survey="survey"
+            :survey="surveyUnderWork"
             :initialize="optionsInitialize"
             :calculate="optionsCalculate"
             :relevance="optionsRelevance"
@@ -116,9 +109,8 @@
             @set-survey-resources="setSurveyResources"
             @set-control-params="setControlParams"
             @set-script-editor-is-visible="setScriptIsVisible"
-            data-testid="control-properties"
-          />
-        </v-card>
+            data-testid="control-properties" />
+        </a-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
         <code-editor
@@ -127,10 +119,8 @@
           @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
-          :refresh="codeRefreshCounter"
           @change="updateScriptCode"
-          @save="saveScript"
-        >
+          @save="saveScript">
         </code-editor>
       </pane>
 
@@ -138,16 +128,16 @@
         <splitpanes horizontal class="code-resizer">
           <pane size="80">
             <div style="height: 100%">
-              <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
-                <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
-                <v-tab :disabled="!control.options.initialize.enabled"> Initialize</v-tab>
-                <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
-                <v-tab :disabled="!control.options.constraint.enabled"> Constraint</v-tab>
-                <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
+              <a-tabs v-if="control.options" v-model="selectedTab">
+                <a-tab :disabled="!control.options.relevance.enabled"> Relevance</a-tab>
+                <a-tab :disabled="!control.options.initialize.enabled"> Initialize</a-tab>
+                <a-tab :disabled="!control.options.calculate.enabled"> Calculate</a-tab>
+                <a-tab :disabled="!control.options.constraint.enabled"> Constraint</a-tab>
+                <a-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
-                </v-tab>
-                <v-tab v-if="control.type === 'script'"> Script</v-tab>
-              </v-tabs>
+                </a-tab>
+                <a-tab v-if="control.type === 'script'"> Script</a-tab>
+              </a-tabs>
 
               <code-editor
                 v-if="selectedTab !== null"
@@ -155,15 +145,13 @@
                 :code="activeCode"
                 :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
                 class="main-code-editor"
-                :refresh="codeRefreshCounter"
                 runnable="true"
                 :error="codeError"
                 @run="runCode"
                 :result="evaluated"
                 @change="updateSelectedCode"
                 :examples="true"
-                @examples="showExamples = true"
-              >
+                @examples="showExamples = true">
               </code-editor>
             </div>
           </pane>
@@ -175,16 +163,14 @@
 
       <pane
         class="pane pane-submission-code pane-shared-code"
-        v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)"
-      >
+        v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)">
         <div class="code-editor">
           <code-editor
             title="Shared Code"
             v-if="survey"
             class="code-editor"
             readonly="true"
-            :code="sharedCode"
-          ></code-editor>
+            :code="sharedCode"></code-editor>
         </div>
       </pane>
 
@@ -195,43 +181,48 @@
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
             :submission="instance"
-            :survey="survey"
+            :survey="surveyUnderWork"
             :persist="false"
             class="builder-draft"
             builder
-            :forceMobile="isPreviewMobile"
-          >
+            :forceMobile="isPreviewMobile">
             <template v-slot:toolbar-actions>
-              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
-                <v-btn :value="false" dense>
+              <a-btn-toggle v-model="isPreviewMobile" style="height: 36px" class="my-auto">
+                <a-btn :value="false" dense variant="outlined">
                   <span class="hidden-sm-and-down">desktop</span>
-                  <v-icon right> mdi-monitor</v-icon>
-                </v-btn>
+                  <a-icon right>mdi-monitor</a-icon>
+                </a-btn>
 
-                <v-btn :value="true">
+                <a-btn :value="true" variant="outlined">
                   <span class="hidden-sm-and-down">mobile</span>
-                  <v-icon right> mdi-cellphone</v-icon>
-                </v-btn>
-              </v-btn-toggle>
+                  <a-icon right>mdi-cellphone</a-icon>
+                </a-btn>
+              </a-btn-toggle>
 
-              <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewCode = true" class="ma-2" variant="outlined">
                 <span class="hidden-sm-and-down">survey</span>
-                <v-icon right>mdi-code-tags</v-icon>
-              </v-btn>
+                <a-icon right>mdi-code-tags</a-icon>
+              </a-btn>
 
-              <v-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
+              <a-btn @click="viewSubmission = true" class="ma-2" variant="outlined">
                 <span class="hidden-sm-and-down">submission</span>
-                <v-icon right>mdi-code-tags</v-icon>
-              </v-btn>
+                <a-icon right>mdi-code-tags</a-icon>
+              </a-btn>
             </template>
           </app-draft-component>
         </div>
 
-        <v-overlay :value="enableSaveDraft">
-          <v-card>
-            <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
-          </v-card>
-        </v-overlay>
+        <a-overlay
+          :modelValue="enableSaveDraft"
+          contained
+          class="align-center justify-center"
+          theme="dark"
+          scrim="black"
+          persistent>
+          <a-card>
+            <a-card-text> Please Save Draft to update Survey Preview.</a-card-text>
+          </a-card>
+        </a-overlay>
       </pane>
 
       <!-- Padding pane - DO NOT DELETE -->
@@ -274,8 +265,9 @@ import api from '@/services/api.service';
 import { getParentPath } from '@/utils/surveyStack';
 import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import ObjectId from 'bson-objectid';
+import { defineAsyncComponent } from 'vue';
 
-const codeEditor = () => import('@/components/ui/CodeEditor.vue');
+const codeEditor = defineAsyncComponent(() => import('@/components/ui/CodeEditor.vue'));
 
 const initialRelevanceCode = (variable) => `\
 /**
@@ -352,7 +344,7 @@ export default {
       activeCode: '',
       scriptCode: null,
       // survey entity
-      codeRefreshCounter: 0,
+      surveyUnderWork: this.survey,
       submissionCode: '',
       instance: null,
       initialSurvey: cloneDeep(this.survey),
@@ -395,7 +387,7 @@ export default {
     saveDraft() {
       if (!this.isDraft) {
         this.createDraft();
-        this.initNavbarAndDirtyFlag(this.survey);
+        this.initNavbarAndDirtyFlag(this.surveyUnderWork);
       }
       this.$emit('onSaveDraft');
     },
@@ -405,17 +397,15 @@ export default {
       const nextVersion = latestVersion + 1;
       const date = new Date().toISOString();
 
-      const nextVersionObj = this.survey.revisions.find((revision) => revision.version === latestVersion);
+      const nextVersionObj = this.surveyUnderWork.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
-
-      this.$set(this.survey, 'revisions', cloneDeep(this.initialSurvey.revisions));
-
-      this.survey.revisions.push(nextVersionObj);
-      this.survey.meta.dateModified = date;
+      this.surveyUnderWork.revisions = cloneDeep(this.initialSurvey.revisions);
+      this.surveyUnderWork.revisions.push(nextVersionObj);
+      this.surveyUnderWork.meta.dateModified = date;
     },
     addToLibrary() {
-      this.survey.meta.isLibrary = true;
+      this.surveyUnderWork.meta.isLibrary = true;
       this.saveDraft();
     },
     async addQuestionsFromLibrary(librarySurveyId) {
@@ -462,7 +452,7 @@ export default {
         this.updateToLibrary.latestVersion,
         updatedLibraryControls,
         updatedResources,
-        this.survey.resources
+        this.surveyUnderWork.resources
       );
       // update the survey resources
       this.updateLibraryResources(updatedResources);
@@ -478,25 +468,25 @@ export default {
     },
     updateLibraryResources(newLibraryResources) {
       // add updated resources
-      this.survey.resources = this.survey.resources.concat(newLibraryResources);
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.concat(newLibraryResources);
       // remove library resources which are not used anymore (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
       this.cleanupLibraryResources();
     },
     cleanupScriptRefResources() {
-      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
-      this.survey.resources = this.survey.resources.filter(
+      const controls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.filter(
         (resource) => resource.type !== resourceTypes.SCRIPT_REFERENCE || isResourceReferenced(controls, resource.id)
       );
     },
     cleanupSurveyRefResources() {
-      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
-      this.survey.resources = this.survey.resources.filter(
+      const controls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.filter(
         (resource) => resource.type !== resourceTypes.SURVEY_REFERENCE || isResourceReferenced(controls, resource.id)
       );
     },
     cleanupLibraryResources() {
-      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
-      this.survey.resources = this.survey.resources.filter(
+      const controls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
+      this.surveyUnderWork.resources = this.surveyUnderWork.resources.filter(
         (resource) => !resource.libraryId || isResourceReferenced(controls, resource.id)
       );
     },
@@ -533,15 +523,15 @@ export default {
 
       this.version = version;
 
-      const v = this.survey.revisions[this.survey.revisions.length - 1].version;
-      const amountQuestions = getSurveyPositions(this.survey, v);
+      const v = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].version;
+      const amountQuestions = getSurveyPositions(this.surveyUnderWork, v);
       this.setNavbarContent({
-        title: this.survey.name || 'Untitled Survey',
+        title: this.surveyUnderWork.name || 'Untitled Survey',
         subtitle: `
           <span class="question-title-chip">Version ${version}</span>
           <!--<span class="ml-2">${amountQuestions.length} Question${
-          amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''
-        }</span>-->
+            amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''
+          }</span>-->
           <!--<span class="question-title-chip">${this.groupPath}</span>-->
         `,
       });
@@ -606,7 +596,7 @@ export default {
           code: this.activeCode,
           fname: tab,
           submission: this.instance,
-          survey: this.survey,
+          survey: this.surveyUnderWork,
           parent: this.parent,
           log: (arg) => {
             this.log = `${this.log}${arg}\n`;
@@ -638,7 +628,7 @@ export default {
       this.closeLibrary();
       this.control = control;
       if (control && control.type === 'script' && control.options.source) {
-        const scriptResource = this.survey.resources.find((r) => r.id === control.options.source);
+        const scriptResource = this.surveyUnderWork.resources.find((r) => r.id === control.options.source);
         let scriptId;
         if (scriptResource) {
           scriptId = scriptResource.content;
@@ -685,6 +675,9 @@ export default {
 
       this.scriptCode = data;
     },
+    updateSurvey(controls) {
+      this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls = controls;
+    },
     duplicateControl(control) {
       if (this.control && this.currentControls.length > 0) {
         const position = getPosition(this.control, this.currentControls);
@@ -701,11 +694,11 @@ export default {
     },
     hideControl(control) {
       this.controlSelected(control);
-      this.$set(this.control.options, 'hidden', true);
+      this.control.options.hidden = true;
     },
     unhideControl(control) {
       this.controlSelected(control);
-      this.$set(this.control.options, 'hidden', undefined);
+      this.control.options.hidden = undefined;
     },
     controlAdded(control) {
       if (!this.control) {
@@ -757,29 +750,32 @@ export default {
           content: value.id,
         };
         //update survey resources
-        const newResources = setResource(this.survey.resources, newResource);
+        const newResources = setResource(this.surveyUnderWork.resources, newResource);
         this.setSurveyResources(newResources);
         //store resource id to the script's source
-        this.$set(this.control.options, 'source', newResource.id);
+        this.control.options.source = newResource.id;
         //clean up unused script references
         this.cleanupScriptRefResources();
         this.cleanupSurveyRefResources();
       } else {
-        this.$set(this.control.options, 'source', value);
+        this.control.options.source = value;
       }
     },
     setSurveyResources(resources) {
-      this.$set(this.survey, 'resources', resources);
+      //TODO do not mutate survey prop
+      this.surveyUnderWork.resources = resources;
     },
     setControlParams(params) {
       this.control.options.params = params;
     },
     validateSurveyName() {
-      return !!this.survey.name && /^[\w-\s]{5,}$/.test(this.survey.name) ? true : 'Survey name is invalid';
+      return !!this.surveyUnderWork.name && /^[\w-\s]{5,}$/.test(this.surveyUnderWork.name)
+        ? true
+        : 'Survey name is invalid';
     },
     validateSurveyQuestions() {
       const namePattern = /^[\w-]{1,}$/; // one character should be ok, especially within groups
-      const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      const currentControls = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
       const uniqueNames = uniqBy(currentControls, 'name');
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
       const allNamesContainOnlyValidCharacters = !currentControls.some((control) => !namePattern.test(control.name));
@@ -798,10 +794,10 @@ export default {
         : 'Questions list contains an invalid data name';
     },
     createInstance() {
-      const { version } = this.survey.revisions[this.survey.revisions.length - 1];
+      const { version } = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1];
 
       this.instance = createSubmissionFromSurvey({
-        survey: this.survey,
+        survey: this.surveyUnderWork,
         version,
         instance: this.instance,
         isDraft: false,
@@ -821,13 +817,13 @@ export default {
       return this.isDraft;
     },
     isDraft() {
-      const len = this.survey.revisions.length;
+      const len = this.surveyUnderWork.revisions.length;
 
-      if (!this.survey.revisions || len === 0) {
+      if (!this.surveyUnderWork.revisions || len === 0) {
         return false;
       }
 
-      return this.survey.revisions[len - 1].version !== this.survey.latestVersion;
+      return this.surveyUnderWork.revisions[len - 1].version !== this.surveyUnderWork.latestVersion;
     },
     enableUpdate() {
       if (!this.surveyIsValid) {
@@ -838,9 +834,9 @@ export default {
         return false;
       }
       if (
-        this.initialSurvey.name !== this.survey.name ||
-        this.initialSurvey.description !== this.survey.description ||
-        this.initialSurvey.meta.submissions !== this.survey.meta.submissions
+        this.initialSurvey.name !== this.surveyUnderWork.name ||
+        this.initialSurvey.description !== this.surveyUnderWork.description ||
+        this.initialSurvey.meta.submissions !== this.surveyUnderWork.meta.submissions
       ) {
         return true;
       }
@@ -860,7 +856,7 @@ export default {
 
       if (!this.editMode) {
         // if survey new
-        if (this.initialSurvey.name !== this.survey.name) {
+        if (this.initialSurvey.name !== this.surveyUnderWork.name) {
           return true;
         }
       }
@@ -873,7 +869,7 @@ export default {
       }
 
       if (!this.editMode) {
-        if (this.initialSurvey.name !== this.survey.name) {
+        if (this.initialSurvey.name !== this.surveyUnderWork.name) {
           return true;
         }
       }
@@ -904,10 +900,10 @@ export default {
       return this.control.type === 'script';
     },
     currentVersion() {
-      return this.survey.revisions[this.survey.revisions.length - 1].version;
+      return this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].version;
     },
     currentControls() {
-      return this.survey.revisions[this.survey.revisions.length - 1].controls;
+      return this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls;
     },
     sharedCode() {
       if (!this.instance) {
@@ -1011,7 +1007,7 @@ export default {
     survey: {
       handler(newVal) {
         this.initNavbarAndDirtyFlag(newVal);
-        if (!this.initialSurvey || !this.survey) {
+        if (!this.initialSurvey || !this.surveyUnderWork) {
           this.surveyUnchanged = true;
         }
 
@@ -1036,9 +1032,9 @@ export default {
     },
   },
   created() {
-    this.initNavbarAndDirtyFlag(this.survey);
+    this.initNavbarAndDirtyFlag(this.surveyUnderWork);
     this.createInstance();
-    this.checkForLibraryUpdates(this.survey);
+    this.checkForLibraryUpdates(this.surveyUnderWork);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue
@@ -1059,7 +1055,7 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .screen-root {
   width: 100%;
   height: 100%;
@@ -1222,8 +1218,12 @@ export default {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  -webkit-transition: width 0.2s ease-out, height 0.2s ease-out;
-  transition: width 0.2s ease-out, height 0.2s ease-out;
+  -webkit-transition:
+    width 0.2s ease-out,
+    height 0.2s ease-out;
+  transition:
+    width 0.2s ease-out,
+    height 0.2s ease-out;
 }
 
 .splitpanes--dragging .splitpanes__pane {

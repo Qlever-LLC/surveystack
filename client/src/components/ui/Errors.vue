@@ -1,36 +1,26 @@
 <template>
   <div>
-    <v-dialog v-model="show" max-width="350">
-      <v-card class="pa-4" dark color="red">
-        <v-card-title class="headline">{{ title }}</v-card-title>
-        <template v-for="(error, idx) in errors">
-          <div :key="'error_' + idx">
-            <v-card-text
-              ><span style="font-weight: bold">{{ error.title }}</span> {{ error.body }}
-            </v-card-text>
+    <a-dialog :modelValue="modelValue" @update:modelValue="$emit('update:modelValue', $event)" max-width="350">
+      <a-card class="pa-4" color="red">
+        <a-card-title class="headline">{{ title }}</a-card-title>
+        <template v-for="(error, idx) in errors" :key="'error_' + idx">
+          <div>
+            <a-card-text>
+              <span style="font-weight: bold">{{ error.title }}</span> {{ error.body }}
+            </a-card-text>
           </div>
         </template>
-      </v-card>
-    </v-dialog>
+      </a-card>
+    </a-dialog>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    value: Boolean,
+    modelValue: Boolean,
     errors: Array,
     title: String,
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit('input', value);
-      },
-    },
   },
 };
 </script>

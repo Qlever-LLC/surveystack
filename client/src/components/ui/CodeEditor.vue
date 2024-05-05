@@ -1,53 +1,94 @@
 <template>
   <div class="full">
-    <v-card dark color="dark-blue--lighten-2" class="card-height" slot="paneL">
-      <v-card-title
+    <a-card color="dark-blue-lighten-2" class="card-height">
+      <a-card-title
         >{{ title || '' }}
 
-        <v-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
+        <a-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
           {{ result }}
-        </v-chip>
+        </a-chip>
 
-        <v-chip
+        <a-chip
           v-if="result !== null && typeof result === 'object'"
           class="mx-4"
           color="blue"
-          @click.stop="dialog = true"
-        >
+          @click.stop="dialog = true">
           Result Object (click to expand)
-        </v-chip>
+        </a-chip>
 
-        <v-dialog v-model="dialog" width="800">
-          <v-card>
-            <v-card-title class="headline">Object Created</v-card-title>
+        <a-dialog v-model="dialog" width="800">
+          <a-card>
+            <a-card-title class="headline">Object Created</a-card-title>
             <div style="width: 100%; height: 60vh">
-              <app-code-view :value="result"> </app-code-view>
+              <code-view :modelValue="result" :read-only="readonly" />
             </div>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+            <a-card-actions>
+              <a-spacer />
+              <a-btn color="green-darken-1" variant="text" @click="dialog = false"> Close </a-btn>
+            </a-card-actions>
+          </a-card>
+        </a-dialog>
 
-        <v-spacer></v-spacer>
-        <v-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</v-icon>
-        <v-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
-          <v-icon left>mdi-code-braces</v-icon>Examples
-        </v-btn>
-        <v-btn class="mr-2" outlined color="white" v-if="runnable" @click="$emit('run', model.getValue())">
-          <v-icon left>mdi-play</v-icon> Run
-        </v-btn>
-        <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
-      </v-card-title>
-      <div class="error red text--white pa-2" v-if="error">{{ error }}</div>
-      <div class="editor-height" :id="'monaco-editor-' + _uid"></div>
-    </v-card>
+        <a-spacer />
+        <a-icon v-if="saveable" class="mr-4" @click="$emit('save', code)">mdi-content-save</a-icon>
+        <a-btn class="mr-2" variant="outlined" v-if="examples" @click="$emit('examples')">
+          <a-icon left>mdi-code-braces</a-icon>Examples
+        </a-btn>
+        <a-btn class="mr-2" variant="outlined" v-if="runnable" @click="$emit('run', code)">
+          <a-icon left>mdi-play</a-icon> Run
+        </a-btn>
+        <a-icon v-if="$attrs.onClose" @click="$emit('close')">mdi-close-circle-outline</a-icon>
+      </a-card-title>
+      <div class="error text-red pa-2" v-if="error">{{ error }}</div>
+      <code-view
+        :modelValue="code"
+        :read-only="readonly"
+        @update:modelValue="$emit('change', $event)"
+        class="editor-height" />
+    </a-card>
   </div>
 </template>
 
-<style scoped>
+<script setup>
+import { ref } from 'vue';
+import CodeView from '@/components/builder/CodeView.vue';
+
+const props = defineProps({
+  error: {
+    type: undefined,
+    default: null,
+  },
+  title: {
+    type: String,
+    default: null,
+  },
+  code: {
+    type: String,
+    default: '',
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  runnable: {
+    default: false,
+  },
+  saveable: {
+    default: false,
+  },
+  result: {
+    default: null,
+  },
+  examples: {
+    default: false,
+  },
+});
+const emit = defineEmits(['save', 'change', 'close', 'examples', 'run']);
+const dialog = ref(false);
+</script>
+
+<style scoped lang="scss">
 .error {
   width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans',
@@ -67,166 +108,3 @@
   height: calc(100% - 56px);
 }
 </style>
-
-<script>
-import * as monaco from 'monaco-editor';
-import appCodeView from '@/components/builder/CodeView.vue';
-
-/*
-// TODO: make sure scripts editor still works
-// validation settings
-monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-  noSemanticValidation: true,
-  noSyntaxValidation: false,
-});
-
-// compiler options
-monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-  target: monaco.languages.typescript.ScriptTarget.ES6,
-  allowNonTsExtensions: true,
-});
-
-monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
-*/
-
-monaco.editor.createModel(
-  `
-/**
- * logs a message
- */
-function log(message){};
-`,
-  'javascript'
-);
-
-export default {
-  components: {
-    appCodeView,
-  },
-  data() {
-    return {
-      editor: null,
-      model: null,
-      viewState: null,
-      dialog: false,
-      resultEditor: null,
-      resultModel: null,
-    };
-  },
-  props: {
-    error: {
-      default: null,
-    },
-    title: {
-      default: null,
-    },
-    code: {
-      default: '',
-    },
-    readonly: {
-      default: false,
-    },
-    refresh: Number,
-    language: {
-      default: 'javascript',
-    },
-    theme: {
-      default: 'vs-dark',
-    },
-    runnable: {
-      default: false,
-    },
-    saveable: {
-      default: false,
-    },
-    result: {
-      default: null,
-    },
-    fold: {
-      default: false,
-    },
-    examples: {
-      default: false,
-    },
-  },
-  model: {
-    event: 'change',
-    prop: 'code',
-  },
-  watch: {
-    refresh() {
-      if (this.editor === null || this.model === null) {
-        return;
-      }
-
-      this.viewState = this.editor.getViewState();
-      const v = this.model.getValue();
-
-      this.model.dispose(); // this seems required to refresh intelisense
-
-      const model = monaco.editor.createModel(v, this.language);
-
-      this.editor.dispose();
-      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
-        theme: this.theme,
-        language: this.language,
-        automaticLayout: true,
-        readOnly: this.readonly,
-        model: this.model,
-      });
-
-      this.editor.onDidChangeModelContent((event) => {
-        const value = this.editor.getValue();
-        if (this.value !== value) {
-          if (!this.readonly) {
-            this.$emit('change', value, event);
-          }
-        }
-      });
-
-      this.editor.restoreViewState(this.viewState);
-      if (this.fold) {
-        this.editor.trigger('fold', 'editor.foldAll');
-      }
-
-      this.model = model;
-    },
-    code(newVal) {
-      if (this.editor) {
-        if (newVal !== this.editor.getValue()) {
-          this.editor.setValue(newVal);
-        }
-      }
-
-      // this.model.setValue(newVal);
-    },
-    result() {
-      // TODO show editor for result
-    },
-  },
-  mounted() {
-    this.model = monaco.editor.createModel(this.code, this.language);
-
-    this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
-      theme: this.theme,
-      language: this.language,
-      automaticLayout: true,
-      readOnly: this.readonly,
-      model: this.model,
-    });
-
-    if (this.fold) {
-      this.editor.trigger('fold', 'editor.foldAll');
-    }
-
-    this.editor.onDidChangeModelContent((event) => {
-      const value = this.editor.getValue();
-      if (this.value !== value) {
-        if (!this.readonly) {
-          this.$emit('change', value, event);
-        }
-      }
-    });
-  },
-};
-</script>

@@ -1,20 +1,24 @@
 <template>
   <div class="survey-group-selector">
-    <v-select
-      :value="value"
-      @input="handleInput"
+    <a-select
+      :modelValue="getModelValue()"
+      @update:modelValue="handleInput"
       :items="groupItems"
-      item-text="text"
+      item-title="text"
       item-value="value"
       :label="label"
-      :outlined="outlined"
+      :variant="outlined ? 'outlined' : undefined"
       hide-details
       color="focus"
-    >
-      <template v-slot:item="{ item }">
-        <span :class="item.className" :style="item.style">{{ item.text }}</span>
+      itemSlot>
+      <template v-slot:item="{ props, item }">
+        <a-list-item v-bind="props">
+          <a-list-item-title>
+            <span :class="item.className" :style="item.style">{{ item.text }}</span>
+          </a-list-item-title>
+        </a-list-item>
       </template>
-    </v-select>
+    </a-select>
   </div>
 </template>
 
@@ -36,7 +40,7 @@ function makeTree(groups, lvl = 1) {
 
 export default {
   props: {
-    value: {
+    modelValue: {
       type: [String, Object],
     },
     // with returnObject=true the v-model value returns an object {id: groupId, path: groupPath},
@@ -62,6 +66,7 @@ export default {
       default: false,
     },
   },
+  emits: ['update:modelValue'],
   computed: {
     groups() {
       if (this.isWhitelabel) {
@@ -107,8 +112,14 @@ export default {
     },
   },
   methods: {
+    getModelValue() {
+      return this.modelValue.id ? this.modelValue : undefined;
+    },
     handleInput(val) {
-      this.$emit('input', val);
+      if (!val) {
+        return;
+      }
+      this.$emit('update:modelValue', val);
     },
     getMargin(lvl) {
       const pixels = Math.max(0, lvl - 1) * 16;
@@ -122,7 +133,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 >>> .v-list-item > .no-parent-group::after {
   content: '';
   width: 100%;

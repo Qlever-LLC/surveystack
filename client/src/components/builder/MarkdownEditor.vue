@@ -1,39 +1,33 @@
 <template>
-  <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
-    <template v-slot:activator="{ on, attrs }">
-      <v-text-field
-        ref="anchorRef"
-        v-on="on"
-        v-bind="attrs"
+  <a-dialog v-model="open" :width="getDialogWidth" persistent>
+    <template v-slot:activator="{ props }">
+      <a-text-field
+        v-bind="props"
+        :modelValue="getText"
         :label="label"
         :placeholder="placeholder"
-        :value="getText"
-        :class="[$vnode.data.staticClass, $attrs.class]"
+        :class="$attrs.class"
         :disabled="disabled"
         hide-details
         readonly
-        outlined
-        clearable
-        @input="onTextFieldChange"
-      />
+        variant="outlined"
+        clearable />
     </template>
 
-    <v-card>
-      <v-card-title class="grey--text text--darken-2">
-        <slot name="title"></slot>
-      </v-card-title>
+    <a-card>
+      <a-card-title class="text-grey-darken-2"> <slot name="title" /> </a-card-title>
 
-      <v-card-text>
+      <a-card-text>
         <div class="toolbar d-flex align-end mb-4">
-          <v-btn-toggle v-model="viewMode" mandatory dense>
-            <v-btn>Edit</v-btn>
-            <v-btn>Preview</v-btn>
-          </v-btn-toggle>
+          <a-btn-toggle v-model="viewMode" mandatory="force" dense>
+            <a-btn variant="outlined">Edit</a-btn>
+            <a-btn variant="outlined">Preview</a-btn>
+          </a-btn-toggle>
         </div>
 
         <div class="d-flex align-stretch">
           <div class="editor">
-            <v-textarea
+            <a-textarea
               v-if="viewMode === 0"
               ref="editorRef"
               v-model="markdown"
@@ -45,11 +39,12 @@
               @dragover.prevent="showAttach = true"
               @dragleave.prevent="showAttach = false"
               @drop.prevent="onDrop"
-            ></v-textarea>
+              variant="outlined"
+              cssMarkdown />
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
             <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
-              <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
-              <v-icon v-else color="gray darken-4">mdi-paperclip</v-icon>
+              <a-progress-circular v-if="isLoading" />
+              <a-icon v-else color="gray-darken-4">mdi-paperclip</a-icon>
             </div>
           </div>
 
@@ -58,38 +53,36 @@
             v-if="viewMode === 0"
             :class="{
               'd-none': viewMode !== 0,
-            }"
-          >
+            }">
             <div class="toolbar mb-3" style="font-weight: 600; font-size: 1rem">
               <label for="fileRef">
                 <a> + Upload new image </a>
               </label>
               <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
             </div>
-            <v-list class="resource-panel">
-              <v-subheader class="px-2 py-0">Click to insert </v-subheader>
+            <a-list class="resource-panel">
+              <a-list-subheader class="px-2 py-0" cssSticky>Click to insert </a-list-subheader>
 
-              <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
-                <v-list-item-content>
-                  <v-list-item-title>{{ item.label }}</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
+              <a-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
+                <a-list-item-title>{{ item.label }}</a-list-item-title>
+              </a-list-item>
+            </a-list>
           </div>
         </div>
-      </v-card-text>
+      </a-card-text>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="close">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      <a-card-actions>
+        <a-spacer />
+        <a-btn variant="text" @click="close">Cancel</a-btn>
+        <a-btn color="primary" @click="save">Save</a-btn>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
 </template>
 
 <script>
 import { getPublicDownloadUrl, resourceLocations, resourceTypes } from '@/utils/resources';
+
 import MarkdownIt from 'markdown-it';
 
 const md = new MarkdownIt({ linkify: true });
@@ -97,12 +90,13 @@ const TEXT_LENGTH = 60;
 
 export default {
   props: {
-    value: { type: String },
+    modelValue: { type: String },
     label: { type: String },
     placeholder: { type: String },
     disabled: { type: Boolean },
     resources: { type: Array, default: () => [] },
   },
+
   data() {
     return {
       open: false,
@@ -118,7 +112,7 @@ export default {
       return 1050;
     },
     getText() {
-      const text = this.value || '';
+      const text = this.modelValue || '';
       return text.length > TEXT_LENGTH ? text.slice(0, TEXT_LENGTH) + '...' : text;
     },
     getPreview() {
@@ -178,7 +172,7 @@ export default {
     updateCaretPosition() {
       const el = this.$refs.editorRef;
       this.caretPosition =
-        el && el.$refs.input.selectionStart ? el.$refs.input.selectionStart : Math.max(this.markdown.length - 1, 0);
+        el && el.inputSelectionStart() ? el.inputSelectionStart() : Math.max(this.markdown.length - 1, 0);
     },
     onAddResource(resId) {
       // Load resource
@@ -197,11 +191,6 @@ export default {
 
       this.update(resource);
     },
-    onTextFieldChange(val) {
-      if (!val) {
-        this.$emit('input', null);
-      }
-    },
     async onFileChange(e) {
       const file = e.target.files[0];
       if (!file) {
@@ -219,45 +208,11 @@ export default {
       await this.createFileResource(file);
     },
 
-    /*<v-text-field
-      label="Image URL"
-      hide-details
-      clearable
-      class="mr-2"
-      v-model="imageUrl"
-      @click:clear="onClearImageUrl"
-    />
-    <v-btn dense @click="importImageFromUrl">insert</v-btn>
-
-    secureUrl(url) {
-      const indexInterrogation = url.indexOf('?');
-      if (indexInterrogation !== -1) {
-        return url.slice(0, indexInterrogation);
-      } else {
-        return url;
-      }
-    },
-    async importImageFromUrl() {
-      const imageUrl = this.secureUrl(this.imageUrl);
-
-      const fileExtension = imageUrl.split('.').pop().toLowerCase();
-
-      try {
-        await fetch(imageUrl).then(async (response) => {
-          const blob = await response.blob();
-          const file = new File([blob], imageUrl, { type: `image/${fileExtension}` });
-          await this.createFileResource(file);
-        });
-      } catch (error) {
-        this.UrlErrorState = 1;
-      }
-    },*/
     close() {
       this.open = false;
-      this.$refs.anchorRef.blur();
     },
     save() {
-      this.$emit('input', this.markdown);
+      this.$emit('update:modelValue', this.markdown);
       this.close();
     },
   },
@@ -268,40 +223,35 @@ export default {
       }
       this.isLoading = false;
       this.viewMode = 0;
-      this.markdown = this.value || '';
+      this.markdown = this.modelValue || '';
       this.updateCaretPosition();
     },
   },
   created() {
-    this.markdown = this.value || '';
+    this.markdown = this.modelValue || '';
   },
 };
 </script>
 
-<style scoped>
->>> .toolbar label button {
+<style scoped lang="scss">
+.toolbar label button {
   pointer-events: none !important;
 }
 
->>> .editor {
+.editor {
   position: relative;
   flex: 1 1 0%;
+  height: 100% !important;
 }
 
->>> .editor > .overlap {
+.editor > .overlap {
   position: absolute;
   inset: 0px;
   background-color: rgba(255, 255, 255, 0.5);
   pointer-events: none;
 }
 
->>> .editor .v-textarea {
-  margin: 0px;
-  padding: 0px;
-}
-
->>> .editor textarea,
->>> .editor .preview {
+.editor .preview {
   width: 100%;
   height: 100%;
   min-height: 160px;
@@ -311,27 +261,8 @@ export default {
   outline: none;
 }
 
->>> .editor .v-textarea.resource textarea {
-  min-height: 400px;
-}
-
->>> .editor textarea {
-  padding: 2px 8px;
-}
-
->>> .editor textarea:read-only {
-  border: 1.5px dashed #888;
-  border-radius: 4px;
-}
-
->>> .editor .preview img {
+.editor .preview img {
   max-width: 100%;
-}
-
->>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:before,
->>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:after {
-  border: none !important;
-  transition: none;
 }
 
 .ressourceBloc {
@@ -340,7 +271,7 @@ export default {
   margin-left: 12px;
 }
 
->>> .resource-panel {
+.resource-panel {
   height: 100%;
   min-height: 300px;
   max-height: 465px;
@@ -349,17 +280,16 @@ export default {
   overflow-y: auto;
 }
 
->>> .resource-panel > * {
+.resource-panel > * {
   border-bottom: 1px solid #eee;
 }
+</style>
 
->>> .resource-panel .v-subheader {
-  position: sticky;
-  top: 0;
-  background: white;
-  border-bottom: 2px solid #ddd;
-  font-weight: 600;
-  font-size: 1rem;
-  z-index: 1;
+<style lang="scss">
+.preview,
+.preview * {
+  padding: revert;
+  margin: revert;
+  max-width: 100%;
 }
 </style>

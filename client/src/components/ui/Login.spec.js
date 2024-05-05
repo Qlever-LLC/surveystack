@@ -1,38 +1,28 @@
 import { fireEvent, screen, waitFor } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import Login from './Login.vue';
-import { RouterLinkStub } from '@vue/test-utils';
 import mockAxios from 'axios';
-jest.mock('@/utils/memberships');
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
-const TransitionStub = {
-  render(h) {
-    return h('transition-stub', this.$slots.default);
-  },
-};
+jest.mock('@/utils/memberships');
 
 beforeEach(() => localStorage.clear());
 
-const renderLogin = ({ propsData, params, query, getters, actions, $router } = {}) =>
+const renderLogin = ({ props, params, query, getters, $router, dispatchMock } = {}) =>
   renderWithVuetify(Login, {
-    store: {
-      getters: { ...getters },
-      actions: { ...actions },
-    },
-    propsData: { ...propsData },
-    mocks: {
-      $route: {
-        params: { ...params },
-        query: { ...query },
+    props: { ...props },
+    global: {
+      mocks: {
+        $store: {
+          getters: { ...getters },
+          dispatch: dispatchMock ?? jest.fn(),
+        },
+        $route: {
+          params: { ...params },
+          query: { ...query },
+        },
+        $router: { ...$router },
       },
-      $router: {
-        ...$router,
-      },
-    },
-    stubs: {
-      RouterLink: RouterLinkStub,
-      transition: TransitionStub,
     },
   });
 
@@ -40,19 +30,19 @@ const renderLogin = ({ propsData, params, query, getters, actions, $router } = {
 const testBothSides = (description, settings, test, beforeBoth = () => {}) => {
   describe('with magic link', () => {
     beforeEach(beforeBoth);
-    const linkSettings = { ...settings, propsData: { ...settings.propsData, defaultUsePassword: false } };
+    const linkSettings = { ...settings, props: { ...settings.props, defaultUsePassword: false } };
     it(description, async () => await test(renderLogin(linkSettings), false));
   });
   describe('with user/password', () => {
     beforeEach(beforeBoth);
-    const pwSettings = { ...settings, propsData: { ...settings.propsData, defaultUsePassword: true } };
+    const pwSettings = { ...settings, props: { ...settings.props, defaultUsePassword: true } };
     it(description, async () => await test(renderLogin(pwSettings), true));
   });
 };
 
 describe('Login component', () => {
   describe('navigation links and buttons', () => {
-    testBothSides('Renders link to Register by default', { propsData: { useLink: true } }, async () => {
+    testBothSides('Renders link to Register by default', { props: { useLink: true } }, async () => {
       screen.getByRole('link', { name: /Register now/i });
     });
 
@@ -62,12 +52,12 @@ describe('Login component', () => {
           invitationOnly ? "Don't" : 'Do'
         } render the Register section when the whitelabel is "invitationOnly: ${invitationOnly}"`,
         {
-          propsData: { useLink: true },
+          props: { useLink: true },
           getters: {
-            'whitelabel/isWhitelabel': () => true,
-            'whitelabel/partner': () => ({
+            'whitelabel/isWhitelabel': true,
+            'whitelabel/partner': {
               id: 1,
-            }),
+            },
           },
         },
         async () => {
@@ -89,7 +79,7 @@ describe('Login component', () => {
 
     testBothSides(
       'Renders button to Register when useLink is false',
-      { propsData: { useLink: false } },
+      { props: { useLink: false } },
       async ({ getByRole }) => {
         getByRole('button', { name: /Register now/i });
       }
@@ -97,12 +87,12 @@ describe('Login component', () => {
 
     describe('with user/password', () => {
       it('Renders link to Forgot Password by default', async () => {
-        const { getByRole } = renderLogin({ propsData: { defaultUsePassword: true } });
+        const { getByRole } = renderLogin({ props: { defaultUsePassword: true } });
         getByRole('link', { name: 'Forgot password?' });
       });
 
       it('Renders button to Forgot Password when useLink is false', async () => {
-        const { getByRole } = renderLogin({ propsData: { defaultUsePassword: true, useLink: false } });
+        const { getByRole } = renderLogin({ props: { defaultUsePassword: true, useLink: false } });
         getByRole('button', { name: 'Forgot password?' });
       });
     });
@@ -112,7 +102,7 @@ describe('Login component', () => {
     describe('with magic link', () => {
       it('shows an error when email is empty', async () => {
         renderLogin({
-          propsData: { defaultUsePassword: false },
+          props: { defaultUsePassword: false },
         });
         expect(screen.queryByText('E-Mail must not be empty.')).toBeNull();
         await fireEvent.click(screen.getByText(/Send link/i));
@@ -120,26 +110,24 @@ describe('Login component', () => {
       });
 
       it('sends magic link', async () => {
-        const sendMagicLink = jest.fn();
         const landingPath = '/in/the/app';
+        const dispatchMock = jest.fn();
         renderLogin({
-          propsData: { defaultUsePassword: false },
-          actions: { 'auth/sendMagicLink': sendMagicLink },
+          props: { defaultUsePassword: false },
           query: { landingPath },
+          dispatchMock,
         });
         const emailInput = screen.getByLabelText('E-Mail');
         const email = 'foo.bar.baz';
         fireEvent.update(emailInput, email);
         await fireEvent.click(screen.getByText(/Send link/i));
-        expect(sendMagicLink).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ email, landingPath }));
+        expect(dispatchMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ email, landingPath }));
       });
 
       it('shows "completed" screen', async () => {
-        const sendMagicLink = jest.fn();
         const landingPath = '/in/the/app';
         renderLogin({
-          propsData: { defaultUsePassword: false },
-          actions: { 'auth/sendMagicLink': sendMagicLink },
+          props: { defaultUsePassword: false },
           query: { landingPath },
         });
         const emailInput = screen.getByLabelText('E-Mail');
@@ -152,25 +140,26 @@ describe('Login component', () => {
 
       it('displays server error', async () => {
         const errorText = 'some error from the server';
-        const sendMagicLink = jest.fn(() => {
+        const dispatchMock = jest.fn(() => {
           throw { response: { data: { message: errorText } } };
         });
         renderLogin({
-          propsData: { defaultUsePassword: false },
-          actions: { 'auth/sendMagicLink': sendMagicLink },
+          props: { defaultUsePassword: false },
+          dispatchMock,
         });
         const emailInput = screen.getByLabelText('E-Mail');
         const email = 'foo.bar.baz';
         fireEvent.update(emailInput, email);
         await fireEvent.click(screen.getByText(/Send link/i));
-        expect(sendMagicLink).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ email }));
+        expect(dispatchMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ email }));
         await waitFor(() => screen.getByText(errorText));
       });
     });
+
     describe('with user/password', () => {
       it('shows an error when email is passed without password', async () => {
         const { getByLabelText, getByText, queryByText } = renderLogin({
-          propsData: { defaultUsePassword: true },
+          props: { defaultUsePassword: true },
         });
         const emailInput = getByLabelText('E-Mail');
         fireEvent.update(emailInput, 'email.error@error.com');
@@ -183,7 +172,7 @@ describe('Login component', () => {
 
       it('shows an error when password is passed without email', async () => {
         const { getByLabelText, getByText, queryByText } = renderLogin({
-          propsData: { defaultUsePassword: true },
+          props: { defaultUsePassword: true },
         });
         const passwordInput = getByLabelText('Password');
         fireEvent.update(passwordInput, 'somePassword');
@@ -195,17 +184,17 @@ describe('Login component', () => {
       });
 
       it('displays an error when incorrect password is submitted (status 401)', async () => {
-        const authLoginMock = jest.fn();
-        authLoginMock.mockRejectedValue({
-          message: 'Invalid email or password',
-          response: { status: 401 },
-        });
+        const dispatchMock = (action) => {
+          if (action === 'auth/login') {
+            return Promise.reject({
+              message: 'Invalid email or password',
+              response: { status: 401 },
+            });
+          }
+        };
         const { getByLabelText, getByText, findByText } = renderLogin({
-          actions: {
-            'auth/login': authLoginMock,
-            'surveys/fetchPinned': jest.fn(),
-          },
-          propsData: { defaultUsePassword: true },
+          dispatchMock,
+          props: { defaultUsePassword: true },
         });
         const emailInput = getByLabelText('E-Mail');
         fireEvent.update(emailInput, 'someValidMail@mail.com');
@@ -221,17 +210,17 @@ describe('Login component', () => {
       });
 
       it('displays an error when incorrect email is submitted (status 404)', async () => {
-        const authLoginMock = jest.fn();
-        authLoginMock.mockRejectedValue({
-          message: 'Invalid email or password',
-          response: { status: 404 },
-        });
+        const dispatchMock = (action) => {
+          if (action === 'auth/login') {
+            return Promise.reject({
+              message: 'Invalid email or password',
+              response: { status: 404 },
+            });
+          }
+        };
         const { getByLabelText, getByText, findByText } = renderLogin({
-          actions: {
-            'auth/login': authLoginMock,
-            'surveys/fetchPinned': jest.fn(),
-          },
-          propsData: { defaultUsePassword: true },
+          dispatchMock,
+          props: { defaultUsePassword: true },
         });
         const emailInput = getByLabelText('E-Mail');
         fireEvent.update(emailInput, 'email.error@error.com');
@@ -247,28 +236,17 @@ describe('Login component', () => {
       });
 
       it('displays an error when an error occurred on the login, that is different to 401 and 404 (ex: status 500)', async () => {
-        const authLoginMock = jest.fn();
-        authLoginMock.mockRejectedValue({
-          message: 'An error occured',
-          response: { status: 500 },
-        });
-        const { getByLabelText, getByText, findByText } = renderWithVuetify(Login, {
-          store: {
-            actions: {
-              'auth/login': authLoginMock,
-              'surveys/fetchPinned': jest.fn(),
-            },
-          },
-          propsData: { defaultUsePassword: true },
-          mocks: {
-            $route: {
-              query: {},
-            },
-          },
-          stubs: {
-            RouterLink: RouterLinkStub,
-            transition: TransitionStub,
-          },
+        const dispatchMock = (action) => {
+          if (action === 'auth/login') {
+            return Promise.reject({
+              message: 'An error occurred',
+              response: { status: 500 },
+            });
+          }
+        };
+        const { getByLabelText, getByText, findByText } = renderLogin({
+          dispatchMock,
+          props: { defaultUsePassword: true },
         });
         const emailInput = getByLabelText('E-Mail');
         fireEvent.update(emailInput, 'email@mail.com');
@@ -280,44 +258,34 @@ describe('Login component', () => {
 
         const button = getByText('Login');
         await fireEvent.click(button);
-        await findByText('An error occured');
+        await findByText('An error occurred');
       });
     });
   });
 
   describe('submit form and check submit() method behaviour based on try to auto join group if this is a whitelabel', () => {
     it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled', async () => {
-      const login = jest.fn(() => Promise.resolve());
       let res = { data: { meta: { invitationOnly: false } } };
       mockAxios.get.mockImplementation(() => Promise.resolve(res));
       mockAxios.post.mockImplementation(() => Promise.resolve());
       const push = jest.fn();
-      const { getByLabelText, getByText } = renderWithVuetify(Login, {
-        propsData: { defaultUsePassword: true },
-        store: {
-          getters: {
-            'whitelabel/isWhitelabel': () => true,
-            'whitelabel/partner': () => ({
-              id: 1,
-            }),
-          },
-          actions: {
-            'auth/login': login,
-            'surveys/fetchPinned': jest.fn(),
-          },
-        },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
-          },
-          $router: {
-            push,
+      const dispatchMock = jest.fn((action) => {
+        if (action === 'auth/login') {
+          return jest.fn(() => Promise.resolve());
+        }
+      });
+      const { getByLabelText, getByText } = renderLogin({
+        props: { defaultUsePassword: true },
+        getters: {
+          'whitelabel/isWhitelabel': true,
+          'whitelabel/partner': {
+            id: 1,
           },
         },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
+        dispatchMock,
+        query: { redirect: false },
+        $router: {
+          push,
         },
       });
 
@@ -332,7 +300,7 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      expect(login).toHaveBeenCalledWith(
+      expect(dispatchMock).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
       );
@@ -347,24 +315,21 @@ describe('Login component', () => {
           response: { data: { message: 'an error message' } },
         })
       );
+      const dispatchMock = jest.fn();
       const push = jest.fn();
-      const login = jest.fn();
       const { getByLabelText, getByText } = renderLogin({
         getters: {
-          'whitelabel/isWhitelabel': () => true,
-          'whitelabel/partner': () => ({
+          'whitelabel/isWhitelabel': true,
+          'whitelabel/partner': {
             id: 1,
-          }),
+          },
         },
-        actions: {
-          'auth/login': login,
-          'surveys/fetchPinned': jest.fn(),
-        },
-        propsData: { defaultUsePassword: true },
+        dispatchMock,
+        props: { defaultUsePassword: true },
         $router: {
           push,
         },
-        params: { redirect: false },
+        query: { redirect: false },
       });
       const email = 'someValidMail@mail.com';
       const emailInput = getByLabelText('E-Mail');
@@ -377,7 +342,7 @@ describe('Login component', () => {
       const button = getByText('Login');
       await fireEvent.click(button);
       await waitFor(() =>
-        expect(login).toHaveBeenCalledWith(
+        expect(dispatchMock).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
         )
@@ -389,29 +354,24 @@ describe('Login component', () => {
     it('submit and trying autojoin if this.isWhitelabel === false', async () => {
       const push = jest.fn();
       const login = jest.fn(() => Promise.resolve());
-      const { getByLabelText, getByText } = renderWithVuetify(Login, {
-        propsData: { defaultUsePassword: true },
-        store: {
-          getters: {
-            'whitelabel/isWhitelabel': () => false,
-          },
-          actions: {
-            'auth/login': login,
-            'surveys/fetchPinned': jest.fn(),
-          },
+      const dispatchMock = jest.fn((action) => {
+        if (action === 'auth/login') {
+          return Promise.resolve();
+        }
+      });
+      const { getByLabelText, getByText } = renderLogin({
+        props: { defaultUsePassword: true },
+        getters: {
+          'whitelabel/isWhitelabel': false,
         },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
-          },
-          $router: {
-            push,
-          },
+        actions: {
+          'auth/login': login,
+          'surveys/fetchPinned': jest.fn(),
         },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
+        dispatchMock,
+        query: { redirect: false },
+        $router: {
+          push,
         },
       });
 
@@ -426,7 +386,7 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      expect(login).toHaveBeenCalledWith(
+      expect(dispatchMock).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
       );
@@ -435,59 +395,14 @@ describe('Login component', () => {
   });
 
   describe('submit form and check submit() method behaviour based on redirection', () => {
-    it("submit and get the redirection '/' ", async () => {
-      const push = jest.fn();
-      const { getByLabelText, getByText } = renderWithVuetify(Login, {
-        propsData: { defaultUsePassword: true },
-        store: {
-          getters: {
-            'whitelabel/isWhitelabel': () => false,
-          },
-          actions: {
-            'auth/login': jest.fn(() => Promise.resolve()),
-            'surveys/fetchPinned': jest.fn(),
-          },
-        },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
-          },
-          $router: {
-            push,
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
-        },
-      });
-
-      const emailInput = getByLabelText('E-Mail');
-      fireEvent.update(emailInput, 'someValidMail@mail.com');
-
-      const pwdInput = getByLabelText('Password');
-      fireEvent.update(pwdInput, 'aPassword');
-
-      const button = getByText('Login');
-      await fireEvent.click(button);
-      // wait for Promise for pending result
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(push).toHaveBeenCalledWith('/');
-    });
-
-    it("submit and get the redirection 'this.$route.params.redirect = true' ", async () => {
+    it("submit and get the redirection '/'", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderLogin({
+        props: { defaultUsePassword: true },
         getters: {
-          'whitelabel/isWhitelabel': () => false,
+          'whitelabel/isWhitelabel': false,
         },
-        actions: {
-          'auth/login': jest.fn(() => Promise.resolve()),
-          'surveys/fetchPinned': jest.fn(),
-        },
-        params: { redirect: true },
-        propsData: { defaultUsePassword: true },
+        query: { redirect: false },
         $router: {
           push,
         },
@@ -501,8 +416,32 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      // wait for Promise for pending result
-      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(push).toHaveBeenCalledWith('/');
+    });
+
+    it("submit and get the redirection 'this.$route.query.redirect = true' ", async () => {
+      const push = jest.fn();
+      const { getByLabelText, getByText } = renderLogin({
+        getters: {
+          'whitelabel/isWhitelabel': false,
+        },
+        query: { redirect: true },
+        props: { defaultUsePassword: true },
+        $router: {
+          push,
+        },
+      });
+
+      const emailInput = getByLabelText('E-Mail');
+      fireEvent.update(emailInput, 'someValidMail@mail.com');
+
+      const pwdInput = getByLabelText('Password');
+      fireEvent.update(pwdInput, 'aPassword');
+
+      const button = getByText('Login');
+      await fireEvent.click(button);
+
       expect(push).toHaveBeenCalledWith(true);
     });
   });

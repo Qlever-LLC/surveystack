@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-bind-sync -->
 <template>
   <div>
     <app-submission-archive-dialog
@@ -5,204 +6,219 @@
       maxWidth="50rem"
       labelConfirm="Archive"
       @cancel="showArchiveModal = false"
-      @confirm="(reason) => archiveSubmissions(selected, reason)"
-    >
+      @confirm="(reason) => archiveSubmissions(selected, reason)">
       <template v-slot:title>Confirm Submission Archiving</template>
     </app-submission-archive-dialog>
 
     <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
       <template v-slot:title>Confirm deletion</template>
-      <template> Are you sure you want to delete this submission? This can not be undone. </template>
+      Are you sure you want to delete this submission? This can not be undone.
     </app-dialog>
 
     <app-dialog
       v-model="reassignment.showModal"
       @cancel="reassignment.showModal = false"
       @confirm="reassign(selected)"
-      labelConfirm="Reassign"
-    >
+      labelConfirm="Reassign">
       <template v-slot:title>Reassign Submission</template>
-      <template>
-        <v-autocomplete
-          :items="reassignment.groups"
-          v-model="reassignment.group"
-          label="Group"
-          :filter="reassignGroupFilter"
-        >
-          <template v-slot:item="{ item }">
-            <div class="d-flex flex-column py-1">
-              <div>{{ item.text }}</div>
-              <div class="text--secondary caption">{{ item.path }}</div>
-            </div>
-          </template>
-        </v-autocomplete>
-        <v-autocomplete
-          :disabled="reassignment.group === null"
-          :items="reassignment.users"
-          v-model="reassignment.user"
-          label="User"
-        ></v-autocomplete>
-      </template>
+      <a-select
+        :items="reassignment.groups"
+        item-title="text"
+        item-value="value"
+        v-model="reassignment.group"
+        label="Group"
+        :custom-filter="reassignGroupFilter"
+        itemSlot>
+        <template v-slot:item="{ props, item }">
+          <a-list-item v-bind="props" :title="item.raw.text" :subtitle="item.raw.path"> </a-list-item>
+        </template>
+      </a-select>
+      <a-select
+        :disabled="reassignment.group === null"
+        :items="reassignment.users"
+        item-title="text"
+        item-value="value"
+        v-model="reassignment.user"
+        label="User" />
     </app-dialog>
 
-    <v-container>
+    <a-container>
       <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
         <div>
-          <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
-            <v-icon left>mdi-note-text-outline</v-icon>
+          <a-btn v-if="survey" variant="outlined" color="secondary" :to="`/surveys/${survey}`">
+            <a-icon left>mdi-note-text-outline</a-icon>
             View Survey
-          </v-btn>
-          <v-btn
+          </a-btn>
+          <a-btn
             outlined
             color="secondary"
             class="ml-2"
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
-            :to="`/surveys/${survey}/submissions/new`"
-          >
-            <v-icon left>mdi-plus</v-icon>
+            :to="`/surveys/${survey}/submissions/new`">
+            <a-icon left>mdi-plus</a-icon>
             New submission
-          </v-btn>
+          </a-btn>
         </div>
       </div>
-      <v-expansion-panels class="mb-6">
-        <v-expansion-panel>
-          <v-expansion-panel-header expand-icon="mdi-menu-down"
-            ><span class="text-body-1">Filters</span>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+      <a-expansion-panels class="mb-6" v-model="isOpen">
+        <a-expansion-panel>
+          <a-expansion-panel-title expand-icon="mdi-menu-down">
+            <span class="text-body-1">Filters</span>
+          </a-expansion-panel-title>
+          <a-expansion-panel-text>
             <app-submissions-filter-basic
               v-if="!showAdvancedFilters && queryList"
               :queryList="queryList"
               @show-advanced="(ev) => (showAdvancedFilters = ev)"
               :basicFilters="basicFilters"
               @apply-basic-filters="applyBasicFilters"
-              @reset="reset"
-            />
+              @reset="reset" />
             <app-submissions-filter-advanced
               v-if="showAdvancedFilters"
               v-model="filter"
               @show-advanced="(ev) => (showAdvancedFilters = ev)"
               @apply-advanced-filters="fetchData"
-              @reset="reset"
-            />
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-      <v-card class="my-5 px-2">
-        <v-card-title class="d-flex justify-space-between align-center">
+              @reset="reset" />
+          </a-expansion-panel-text>
+        </a-expansion-panel>
+      </a-expansion-panels>
+      <a-card class="my-5 px-2">
+        <a-card-title class="d-flex justify-space-between align-center">
           <div class="text-body-1">API</div>
-        </v-card-title>
-        <v-card-text>
+        </a-card-title>
+        <a-card-text>
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
-        </v-card-text>
-        <v-card-text>
-          <v-row>
+        </a-card-text>
+        <a-card-text>
+          <a-row>
             <v-col md="2" sm="6">
-              <v-select
+              <a-select
                 label="Format"
                 dense
                 :items="apiDownloadFormats"
+                item-title="text"
+                item-value="value"
                 hide-details
-                v-model="apiDownloadFormat"
-              /> </v-col
-            ><v-col md="2" sm="6">
-              <v-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" /></v-col
-            ><v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
-              <v-select
+                v-model="apiDownloadFormat" />
+            </v-col>
+            <a-col md="2" sm="6">
+              <a-select
+                label="Range"
+                dense
+                :items="apiDownloadRanges"
+                item-title="text"
+                item-value="value"
+                hide-details
+                v-model="apiDownloadRange" />
+            </a-col>
+            <a-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
+              <a-select
                 label="Matrix answers"
                 dense
                 :items="apiDownloadExpandAllMatricesOptions"
+                item-title="text"
+                item-value="value"
                 hide-details
-                v-model="apiDownloadExpandAllMatrices"
-              /> </v-col
-            ><v-col md="2" sm="6">
-              <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
-            </v-col></v-row
-          >
+                v-model="apiDownloadExpandAllMatrices" />
+            </a-col>
+            <a-col md="2" sm="6">
+              <a-btn @click="startDownload" color="primary"> <a-icon left>mdi-download</a-icon>Download </a-btn>
+            </a-col>
+          </a-row>
 
-          <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
-            <v-col sm="2">
-              <v-select
+          <a-row class="mt-5" v-if="apiDownloadRange === 'page'">
+            <a-col sm="2">
+              <a-select
                 label="Page Size"
                 dense
                 :items="pageSizes"
+                item-title="text"
+                item-value="value"
                 hide-details
                 v-model="pageSize"
-                @change="changedPaginationSize"
-              />
-            </v-col>
-            <v-col cols="10">
-              <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-            </v-col>
-            <v-col cols="1">
-              <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+                @update:modelValue="changedPaginationSize" />
+            </a-col>
+            <a-col cols="10">
+              <a-pagination
+                class="ml-0"
+                v-model="page"
+                :length="paginationTotalPages"
+                @update:modelValue="changedPaginationPage" />
+            </a-col>
+            <a-col cols="1">
+              <div class="body-2 text-secondary mt-1 d-flex align-center justify-end" style="height: 100%">
                 {{ submissions.pagination.total }} total
               </div>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-container>
+            </a-col>
+          </a-row>
+        </a-card-text>
+      </a-card>
+    </a-container>
 
-    <v-container>
-      <v-tabs v-model="tab">
-        <v-tab v-for="view in views" :key="view.tab">
+    <a-container>
+      <a-tabs v-model="tab">
+        <a-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
-        </v-tab>
-        <v-tabs-items v-model="tab" touchless>
-          <v-tab-item>
-            <app-submissions-table-client-csv
-              :submissions="submissions"
-              v-if="submissions"
-              :selected.sync="selected"
-              :archived="filter.showArchived"
-              :dataTableProps="dateTableProps"
-              @onDataTablePropsChanged="onDataTablePropsChanged"
-              @excludeMetaChange="filter.showCsvMeta = $event"
-              :excludeMeta="!filter.showCsvMeta"
-              :loading="loading"
-              style="margin: 3px 2px"
-              :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
-              @showDeleteModal="showDeleteModal = true"
-              @archiveSubmissions="archiveSubmissions(selected, '', false)"
-              @showArchiveModal="showArchiveModal = true"
-              @reassignment="reassignment.showModal = true"
-              @resubmit="resubmit(selected[0])"
-              @showArchived="filter.showArchived = $event"
-            />
-          </v-tab-item>
-          <v-tab-item>
-            <app-submissions-tree :submissions="submissions" />
-          </v-tab-item>
-          <v-tab-item>
-            <app-submissions-code :submissions="submissions" />
-          </v-tab-item>
-        </v-tabs-items>
-      </v-tabs>
+        </a-tab>
+      </a-tabs>
+      <a-window v-model="tab" :touch="false">
+        <a-window-item>
+          <!-- TODO '.sync' modifier on 'v-bind' directive is deprecated. Use 'v-model:propName' instead  vue/no-deprecated-v-bind-sync -->
+          <app-submissions-table-client-csv
+            :submissions="submissions"
+            v-if="submissions"
+            v-model:selected="selected"
+            :archived="filter.showArchived"
+            :sortBy="sortBy"
+            @onDataTablePropsChanged="onDataTablePropsChanged"
+            @excludeMetaChange="filter.showCsvMeta = $event"
+            :excludeMeta="!filter.showCsvMeta"
+            :loading="loading"
+            style="margin: 3px 2px"
+            :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
+            @showDeleteModal="showDeleteModal = true"
+            @archiveSubmissions="archiveSubmissions(selected, '', false)"
+            @showArchiveModal="showArchiveModal = true"
+            @reassignment="reassignment.showModal = true"
+            @resubmit="resubmit(selected[0])"
+            @showArchived="filter.showArchived = $event" />
+        </a-window-item>
+        <a-window-item>
+          <app-submissions-tree :submissions="submissions" />
+        </a-window-item>
+        <a-window-item>
+          <app-submissions-code :submissions="submissions" />
+        </a-window-item>
+      </a-window>
 
-      <v-row class="my-2">
-        <v-col cols="1">
-          <v-select
+      <a-row class="my-2">
+        <a-col cols="1">
+          <a-select
             style="max-width: 5rem; display: inline-block"
             label="Page Size"
             dense
             :items="pageSizes"
+            item-title="text"
+            item-value="value"
             hide-details
             v-model="pageSize"
-            @change="changedPaginationSize"
-          />
-        </v-col>
-        <v-col cols="10">
-          <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
-        </v-col>
-        <v-col cols="1">
-          <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+            @update:modelValue="changedPaginationSize" />
+        </a-col>
+        <a-col cols="10">
+          <a-pagination
+            class="ml-0"
+            v-model="page"
+            :length="paginationTotalPages"
+            @update:modelValue="changedPaginationPage" />
+        </a-col>
+        <a-col cols="1">
+          <div class="body-2 text-secondary mt-1 d-flex align-center justify-end" style="height: 100%">
             {{ submissions.pagination.total }} total
           </div>
-        </v-col>
-      </v-row>
-    </v-container>
+        </a-col>
+      </a-row>
+    </a-container>
   </div>
 </template>
 
@@ -265,6 +281,7 @@ export default {
   },
   data() {
     return {
+      isOpen: undefined,
       apiDownloadFormat: apiDownloadFormats[0].value,
       apiDownloadFormats,
       apiDownloadRanges,
@@ -301,10 +318,7 @@ export default {
       search: '',
       showArchiveModal: false,
       showDeleteModal: false,
-      dateTableProps: {
-        sortBy: [],
-        sortDesc: [],
-      },
+      sortBy: [],
       loading: false,
       reassignment: {
         showModal: false,
@@ -413,9 +427,17 @@ export default {
         { key: 'project', value: this.filter.project, include: this.filter.project !== '{}' },
         { key: 'skip', value: this.filter.skip, include: this.filter.skip !== 0 },
         { key: 'limit', value: this.filter.limit, include: this.filter.limit !== 0 },
-        { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
+        {
+          key: 'showIrrelevant',
+          value: this.filter.showIrrelevant,
+          include: this.filter.showIrrelevant,
+        },
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
-        { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
+        {
+          key: 'showCsvDataMeta',
+          value: this.filter.showCsvDataMeta,
+          include: this.filter.showCsvDataMeta,
+        },
         { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
         {
           key: 'expandAllMatrices',
@@ -509,13 +531,15 @@ export default {
       this.fetchData();
     },
     onDataTablePropsChanged(props) {
-      const { sortBy, sortDesc } = props;
       const sort = {};
 
-      if (sortBy.length > 0 && sortDesc.length > 0 && sortBy.length === sortDesc.length) {
+      if (props.length === 0) {
+        this.filter.sort = JSON.stringify(sort);
+        this.fetchData();
+      } else if (props.length > 0) {
         try {
-          for (let i = 0; i < sortBy.length; i++) {
-            sort[sortBy[i]] = sortDesc[i] ? -1 : 1;
+          for (let i = 0; i < props.length; i++) {
+            sort[props[i].key] = props[i].order === 'desc' ? -1 : 1;
           }
           this.filter.sort = JSON.stringify(sort);
           this.fetchData();
@@ -524,12 +548,7 @@ export default {
         }
       }
 
-      if (sortBy.length === 0 && sortDesc.length === 0) {
-        this.filter.sort = JSON.stringify(sort);
-        this.fetchData();
-      }
-
-      this.dateTableProps = props;
+      this.sortBy = props;
     },
     async startDownload() {
       downloadExternal(this.apiDownloadUrl, `${this.surveyEntity.name}.${this.apiDownloadFormat}`);
@@ -562,17 +581,20 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 body {
   font-family: Menlo, Consolas, monospace;
   color: #444;
 }
+
 .item {
   cursor: pointer;
 }
+
 .bold {
   font-weight: bold;
 }
+
 ul {
   padding-left: 1em;
   line-height: 1.5em;

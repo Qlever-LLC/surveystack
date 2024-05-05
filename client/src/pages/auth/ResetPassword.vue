@@ -1,43 +1,41 @@
 <template>
   <div class="wrapper">
-    <v-container class="maxw-40">
-      <v-card class="pa-5">
+    <a-container class="maxw-40">
+      <a-card class="pa-5">
         <h1>New password</h1>
         <p>Set a new password for {{ this.email }}</p>
-        <v-form @submit.prevent="submit">
-          <v-text-field
+        <a-form @submit.prevent="submit">
+          <a-text-field
             v-model="newPassword"
             label="Password"
             :type="passwordInputType"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords"
-          />
-          <v-text-field
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:appendInner="showPasswords = !showPasswords" />
+          <a-text-field
             v-model="newPasswordConfirmation"
             label="Password confirmation"
             :type="passwordInputType"
-            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append="showPasswords = !showPasswords"
-          />
+            :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:appendInner="showPasswords = !showPasswords" />
           <div class="d-flex justify-end">
-            <v-btn type="submit" color="primary">Set password</v-btn>
+            <a-btn type="submit" color="primary">Set password</a-btn>
           </div>
-        </v-form>
-      </v-card>
+        </a-form>
+      </a-card>
       <transition name="fade">
-        <app-feedback v-if="status" class="mt-5" @closed="status = {}" :type="status.type">{{
-          status.message
-        }}</app-feedback>
+        <app-feedback v-if="status" class="mt-5" @closed="status = {}" :type="status.type">
+          {{ status.message }}
+        </app-feedback>
       </transition>
       <transition name="fade">
         <app-feedback v-if="showSuccessMessage" class="mt-5" :closeable="false" type="success">
           Your new password has been set!
-          <router-link :to="{ name: 'auth-login', params: { initialEmail: email } }"
-            >Continue to log in area</router-link
+          <router-link :to="{ name: 'auth-login', query: { initialEmail: email } }">
+            Continue to log in area </router-link
           >.
         </app-feedback>
       </transition>
-    </v-container>
+    </a-container>
   </div>
 </template>
 
@@ -103,9 +101,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .wrapper {
   height: 100%;
-  background-color: var(--v-background-base);
+  background-color: rgb(var(--v-theme-background));
 }
 </style>

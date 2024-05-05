@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <div>
     <app-control-label
@@ -6,30 +7,27 @@
       :required="required"
       :initializable="control.options.initialize && control.options.initialize.enabled && value"
       :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize"
-    />
+      @initialize="initialize" />
     <div style="display: flex">
       <div style="flex: 1">
-        <v-text-field
-          outlined
+        <a-text-field
+          variant="outlined"
           :label="control.hint"
-          v-bind:value="value"
-          v-on:input="onInput"
+          :modelValue="modelValue"
+          @update:modelValue="onInput"
           @keyup.enter.prevent="submit"
           ref="textField"
           class="full-width"
           :disabled="!relevant"
           hide-details
           color="focus"
-          clearable
-        />
+          clearable />
       </div>
       <app-qr-scanner
         style="flex: 0"
         class="ml-4"
         v-if="control.options.enableQr"
-        @codeDetected="onQrCodeScanned"
-      ></app-qr-scanner>
+        @codeDetected="onQrCodeScanned"></app-qr-scanner>
     </div>
 
     <app-control-more-info :value="control.moreInfo" />
@@ -54,33 +52,26 @@ export default {
   },
   methods: {
     submit() {
-      this.onInput(this.value);
-      this.$emit('next');
+      this.onInput(this.modelValue);
+      this.next();
     },
     onQrCodeScanned(code) {
       this.changed(code);
     },
     onInput(v) {
       const newValue = getValueOrNull(v);
-      if (this.value !== newValue) {
+      if (this.modelValue !== newValue) {
         this.changed(newValue);
       }
     },
     tryAutofocus() {
-      if (
-        typeof document === 'undefined' ||
-        !this.$refs.textField.$refs.input ||
-        document.activeElement === this.$refs.input
-      ) {
-        return false;
+      if (!this.isInBuilder && this.$refs.textField) {
+        this.$refs.textField.focus({ preventScroll: true });
+        return true;
       }
-
-      this.$refs.textField.$refs.input.focus({ preventScroll: true });
-
+      return false;
       // could we use this instead?
-      // this.$nextTick(() => this.$refs.textField.$refs.input.focus());
-
-      return true;
+      // this.$nextTick(() => this.$refs.textField.focus());
     },
   },
   mounted() {

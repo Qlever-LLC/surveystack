@@ -1,15 +1,14 @@
 <template>
-  <v-container class="maxw-40">
+  <a-container class="maxw-40">
     <template v-if="isLoggedIn">
       <app-feedback
         title="Shapeshift:"
         type="info"
         v-if="showFeedback && isShapeshifting"
-        @closed="showFeedback = false"
-      >
+        @closed="showFeedback = false">
         You are currently shapeshifting...
-        <a href="/shapeshift?mode=off" class="text-info" @click.prevent="$store.dispatch('auth/leaveShapeshift')"
-          >Click to return as '{{ $store.state.auth.shapeshiftUser.email }}'</a
+        <a href="/shapeshift?mode=off" class="text-info" @click.prevent="leaveShapeshift"
+          >Click to return as '{{ shapeshiftUser.email }}'</a
         >
       </app-feedback>
       <h1>Profile</h1>
@@ -19,104 +18,105 @@
         >.
       </p>
 
-      <v-card outlined>
-        <v-card-text> <div>User Details</div></v-card-text>
-        <v-card-text>
-          <v-form>
-            <v-card-text>
-              <v-row>
+      <a-card variant="outlined">
+        <a-card-text> <div>User Details</div></a-card-text>
+        <a-card-text>
+          <a-form>
+            <a-card-text>
+              <a-row>
                 <div class="text-h6">{{ email }}</div>
-                <v-spacer /><v-dialog v-model="isEmailDialogOpen" max-width="500px">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn small text v-bind="attrs" v-on="on"> Change Email </v-btn>
+                <a-spacer />
+                <a-dialog v-model="isEmailDialogOpen" max-width="500px">
+                  <template v-slot:activator="{ props }">
+                    <a-btn small variant="text" v-bind="props"> Change Email </a-btn>
                   </template>
-                  <v-card>
-                    <v-card-title class="text-h5"> Change Email </v-card-title>
-                    <v-card-text>
-                      <v-text-field tabindex="1" v-model="email" label="E-Mail" />
+                  <a-card>
+                    <a-card-title class="text-h5"> Change Email </a-card-title>
+                    <a-card-text>
+                      <a-text-field tabindex="1" v-model="email" label="E-Mail" />
                       Integrations which use your email will no longer work and will need to be updated. These
                       integrations will not work properly until you have re-mapped or updated them. Are you sure?
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="primary" text @click="submitEmail" :loading="isSubmittingEmail">
+                    </a-card-text>
+                    <a-card-actions>
+                      <a-spacer />
+                      <a-btn color="primary" variant="text" @click="submitEmail" :loading="isSubmittingEmail">
                         Update email
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog></v-row
-              ></v-card-text
-            >
-            <v-text-field tabindex="2" v-model="name" label="Name" />
-            <v-text-field
+                      </a-btn>
+                    </a-card-actions>
+                  </a-card>
+                </a-dialog>
+              </a-row>
+            </a-card-text>
+            <a-text-field tabindex="2" v-model="name" label="Name" />
+            <a-text-field
               tabindex="3"
               v-model="password"
-              :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append="showPasswords = !showPasswords"
+              :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+              @click:appendInner="showPasswords = !showPasswords"
               label="Password"
               :type="showPasswords ? 'text' : 'password'"
               hint="Leave blank for no change"
-              persistent-hint
-            />
+              persistent-hint />
 
-            <v-text-field
+            <a-text-field
               tabindex="4"
               v-model="passwordConfirmation"
-              :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append="showPasswords = !showPasswords"
+              :append-inner-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+              @click:appendInner="showPasswords = !showPasswords"
               label="Password (Confirmation)"
               :type="showPasswords ? 'text' : 'password'"
               hint="Leave blank for no change"
-              persistent-hint
-            />
+              persistent-hint />
 
             <div class="d-flex mt-2 justify-end">
-              <v-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</v-btn>
+              <a-btn color="primary" @click="submitData" :loading="isSubmittingData">Save changes</a-btn>
             </div>
-          </v-form></v-card-text
-        >
-      </v-card>
+          </a-form>
+        </a-card-text>
+      </a-card>
 
       <div class="mt-8 mb-4">
         <h3>Group Memberships</h3>
-        <p class="mt-1 mb-5 grey--text text-body-2">These are your group memberships. You can select one to leave.</p>
+        <p class="mt-1 mb-5 text-grey text-body-2">These are your group memberships. You can select one to leave.</p>
         <div class="d-flex align-center">
           <active-group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
-          <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
-            >Leave</v-btn
+          <a-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
+            >Leave</a-btn
           >
         </div>
       </div>
 
-      <v-dialog v-model="isLeaveDialogOpen" max-width="290">
-        <v-card>
-          <v-card-title> Leave Group </v-card-title>
-          <v-card-text v-if="parentAdminGroup" class="mt-4">
+      <a-dialog v-model="isLeaveDialogOpen" max-width="290">
+        <a-card>
+          <a-card-title> Leave Group </a-card-title>
+          <a-card-text v-if="parentAdminGroup" class="mt-4">
             To leave <strong>{{ activeGroup.name }}</strong
             >, you must leave <strong>{{ parentAdminGroup.name }}</strong> or change status from
             <strong>Admin</strong> to <strong>Member</strong>
-          </v-card-text>
-          <v-card-text v-else>
+          </a-card-text>
+          <a-card-text v-else>
             Are you sure you want to leave
             <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
             >?
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
-            <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+          </a-card-text>
+          <a-card-actions>
+            <a-spacer />
+            <a-btn variant="text" @click.stop="isLeaveDialogOpen = false">
+              {{ parentAdminGroup ? 'Close' : 'Cancel' }}
+            </a-btn>
+            <a-btn v-if="!parentAdminGroup" variant="text" color="red" @click.stop="leaveGroup"> Leave </a-btn>
+          </a-card-actions>
+        </a-card>
+      </a-dialog>
     </template>
     <template v-else>
       <h1>Profile</h1>
       You are not logged in... <router-link to="/auth/login">Go to Login</router-link></template
     >
-    <v-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{
+    <a-alert v-if="status && status.type" class="mt-4 mb-0" mode="fade" variant="text" :type="status.type">{{
       status.message
-    }}</v-alert>
-  </v-container>
+    }}</a-alert>
+  </a-container>
 </template>
 
 <script>
@@ -186,6 +186,9 @@ export default {
       }
       return null;
     },
+    shapeshiftUser() {
+      return this.$store.state.auth.shapeshiftUser;
+    },
   },
   methods: {
     async submitData() {
@@ -253,6 +256,9 @@ export default {
           console.error('Error on loading user:', e);
         }
       }
+    },
+    leaveShapeshift() {
+      this.$store.dispatch('auth/leaveShapeshift');
     },
   },
   created() {

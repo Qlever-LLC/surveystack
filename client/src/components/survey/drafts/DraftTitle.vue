@@ -1,11 +1,11 @@
 <template>
   <div class="px-4 d-flex" id="draft-breadcrumbs">
-    <v-chip dark small class="mr-0 mr-1" v-if="breadcrumbs.length > 0">
+    <a-chip small class="mr-0 mr-1" v-if="breadcrumbs.length > 0">
       <span v-for="(crumb, ci) in breadcrumbs" :key="`bread_${ci}`">
         {{ crumb }}
         <span class="mr-1" v-if="ci < breadcrumbs.length - 1"> &gt; </span>
       </span>
-    </v-chip>
+    </a-chip>
   </div>
 </template>
 
@@ -15,4 +15,4 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

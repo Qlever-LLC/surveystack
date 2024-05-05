@@ -1,20 +1,26 @@
 <template>
-  <v-container>
-    <v-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
-      successMessage
-    }}</v-alert>
+  <a-container>
+    <a-alert
+      v-if="successMessage"
+      class="mt-4"
+      mode="fade"
+      variant="text"
+      type="success"
+      @click="successMessage = null"
+      >{{ successMessage }}</a-alert
+    >
 
-    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error" @click="errorMessage = null">{{
+    <a-alert v-if="errorMessage" class="mt-4" mode="fade" variant="text" type="error" @click="errorMessage = null">{{
       errorMessage
-    }}</v-alert>
+    }}</a-alert>
 
-    <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
-      <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
-    </v-tabs>
+    <a-tabs v-model="tab" bg-color="transparent" color="basil" grow>
+      <a-tab v-for="item in items" :key="item.name">{{ item.name }}</a-tab>
+    </a-tabs>
 
-    <v-tabs-items v-model="tab">
-      <v-tab-item v-for="item in items" :key="item.name">
-        <v-component
+    <a-window v-model="tab">
+      <a-window-item v-for="item in items" :key="item.name">
+        <component
           @map-group="mapGroup"
           @unmap-group="unmapGroup"
           @map-user="mapUser"
@@ -32,13 +38,13 @@
           @create-instance="createInstance"
           @create-plan="createPlan"
           @delete-plan="deletePlan"
-          @addSuperAdminNote="addSuperAdminNote"
-        ></v-component>
-      </v-tab-item>
-    </v-tabs-items>
+          @addSuperAdminNote="addSuperAdminNote">
+        </component>
+      </a-window-item>
+    </a-window>
 
-    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</v-alert>
-  </v-container>
+    <a-alert v-if="errorMessage" class="mt-4" mode="fade" variant="text" type="error">{{ errorMessage }}</a-alert>
+  </a-container>
 </template>
 
 <script>
@@ -46,7 +52,7 @@ import api from '@/services/api.service';
 import Aggregator from './Aggregator.vue';
 import Groups from './Groups.vue';
 import Users from './Users.vue';
-import FarmOSRegisterVue from './FarmOSRegister.vue';
+import FarmOSRegister from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
@@ -84,7 +90,7 @@ export default {
         {
           name: 'Create Instance',
           id: 'create-instance',
-          component: FarmOSRegisterVue,
+          component: FarmOSRegister,
           viewModel: {
             form: {
               groupId: null,
@@ -325,7 +331,6 @@ export default {
       delete formated.plan;
       delete formated.instanceName;
       delete formated.instanceNameValid;
-      formated.owner = formated.owner._id;
 
       try {
         const r = await api.post('/farmos/create-instance', formated);

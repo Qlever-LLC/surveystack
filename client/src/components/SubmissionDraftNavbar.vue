@@ -1,20 +1,20 @@
 <template>
   <nav class="app-navbar">
     <navbar-drawer v-model="drawerIsVisible" />
-    <v-app-bar app clipped-left color="appbar" absolute>
-      <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column flex-grow-1">
+    <a-app-bar color="appbar" absolute>
+      <a-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
+      <a-toolbar-title class="flex-column flex-grow-1">
         <draft-toolbar
           :groupPath="groupPath"
           :required="control && control.options && control.options.required"
           :anon="control && control.options && control.options.redacted"
           :showOverviewIcon="true"
-          :questionNumber="$store.getters['draft/questionNumber']"
-          @showOverviewClicked="showOverview = !showOverview"
-        />
-      </v-toolbar-title>
+          :questionNumber="questionNumber"
+          @showOverviewClicked="showOverview = !showOverview" />
+      </a-toolbar-title>
+
       <navbar-user-menu />
-    </v-app-bar>
+    </a-app-bar>
   </nav>
 </template>
 
@@ -43,6 +43,9 @@ export default {
     control() {
       return this.$store.getters['draft/control'];
     },
+    questionNumber() {
+      return this.$store.getters['draft/questionNumber'];
+    },
     groupPath() {
       return this.$store.getters['draft/groupPath'];
     },
@@ -57,7 +60,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .title {
   font-size: 1rem !important;
 }

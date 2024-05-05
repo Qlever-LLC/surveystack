@@ -1,24 +1,22 @@
 <template>
   <div>
-    <v-toolbar color="grey lighten-4" flat tile>
+    <a-toolbar color="grey-lighten-4" flat>
       <div class="flex-grow-1 d-flex flex-row justify-space-between maxw-60 mx-auto">
-        <v-toolbar-title id="draft-toolbar" v-if="questionNumber">
-          <div class="infos grey--text text--darken-2">
+        <a-toolbar-title id="draft-toolbar" v-if="questionNumber">
+          <div class="infos text-grey-darken-2">
             <div class="d-flex">
-              <span class="number-chip mr-2">{{ questionNumber }}</span>
+              <span class="number-chip mx-2" style="margin-top: 2px">{{ questionNumber }}</span>
             </div>
           </div>
-        </v-toolbar-title>
-
-        <v-spacer />
+        </a-toolbar-title>
 
         <slot name="toolbar-actions"></slot>
 
-        <v-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
-          <v-icon>mdi-format-list-numbered</v-icon>
-        </v-btn>
+        <a-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
+          <a-icon>mdi-format-list-numbered</a-icon>
+        </a-btn>
       </div>
-    </v-toolbar>
+    </a-toolbar>
   </div>
 </template>
 
@@ -28,7 +26,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .number-chip {
   display: inline-flex;
   border: 2px solid currentColor;

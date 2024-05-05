@@ -1,11 +1,11 @@
 <template>
   <div>
-    <v-input>
+    <a-input>
       <label for="select-items-file-input" class="cursor-pointer">
-        <v-btn class="pointer-events-none" color="primary">
-          <v-icon left>mdi-upload</v-icon>
+        <a-btn class="pointer-events-none" color="primary">
+          <a-icon left>mdi-upload</a-icon>
           Import CSV
-        </v-btn>
+        </a-btn>
       </label>
       <input
         type="file"
@@ -13,9 +13,8 @@
         ref="select-items-file-input"
         accept=".csv"
         class="d-none"
-        @change="handleFileChange"
-      />
-    </v-input>
+        @change="handleFileChange" />
+    </a-input>
   </div>
 </template>
 
@@ -72,7 +71,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pointer-events-none {
   pointer-events: none !important;
 }

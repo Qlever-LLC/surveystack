@@ -1,8 +1,5 @@
-import { mount, shallowMount } from '@vue/test-utils';
-import Vuetify from 'vuetify';
-import Number from './Number.vue';
-
-const vuetify = new Vuetify();
+import Number, { isValidNumber } from '@/components/survey/question_types/Number.vue';
+import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
 
 function getMountOpts(opts = {}) {
   const defaults = {
@@ -10,7 +7,7 @@ function getMountOpts(opts = {}) {
   };
   opts = { ...defaults, ...opts };
   return {
-    propsData: {
+    props: {
       control: {
         hint: '',
         id: '5',
@@ -23,28 +20,25 @@ function getMountOpts(opts = {}) {
           type: 'number',
         },
       },
-      value: opts.value,
+      modelValue: opts.value,
       index: 'data.dropdown_1',
     },
-    vuetify,
   };
 }
 
 describe('Number question', () => {
   describe('rendering', () => {
-    const rendersValue = (value) => {
-      const wrapper = shallowMount(Number, getMountOpts({ value }));
-      const input = wrapper.find('[data-test-id="input"]');
-      expect(input.vm.value).toBe(value);
+    const rendersValue = (value) => async () => {
+      const { findByDisplayValue } = renderWithVuetify(Number, getMountOpts({ value }));
+      await findByDisplayValue(value.toString());
     };
 
-    test('displays integer value', () => rendersValue(5));
-    test('displays float value', () => rendersValue(4.2));
-    test('displays negative value', () => rendersValue(-7));
+    test('displays integer value', rendersValue(5));
+    test('displays float value', rendersValue(4.2));
+    test('displays negative value', rendersValue(-7));
   });
 
   describe('input validating', () => {
-    const wrapper = shallowMount(Number, getMountOpts());
     const errorMsg = 'Please enter a number';
     [
       ['', true],
@@ -60,8 +54,8 @@ describe('Number question', () => {
       [-6, true],
       [6.42, true],
     ].forEach(([value, expected]) =>
-      test(`methods.isValidNumber(${JSON.stringify(value)}) = ${expected}`, async () => {
-        expect(wrapper.vm.isValidNumber(value)).toBe(expected);
+      test(`isValidNumber(${JSON.stringify(value)}) = ${expected}`, () => {
+        expect(isValidNumber(value)).toBe(expected);
       })
     );
   });
@@ -74,11 +68,9 @@ describe('Number question', () => {
       ['7e+2', 7e2],
     ].forEach(([value, result]) => {
       test(`emits change(${JSON.stringify(result)}) when the input value is ${JSON.stringify(value)}`, () => {
-        const wrapper = mount(Number, getMountOpts({ value: 0 }));
-        const input = wrapper.find('[data-test-id="input"]');
-        input.setValue(value);
-        const { changed } = wrapper.emitted();
-        expect(changed.pop()).toEqual([result]);
+        const changed = jest.fn();
+        Number.methods.onInput.call({ changed }, value);
+        expect(changed).toHaveBeenCalledWith(result);
       });
     });
   });

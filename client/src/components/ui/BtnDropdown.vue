@@ -1,12 +1,12 @@
 <template>
   <div class="text-center">
-    <v-btn v-bind="$attrs" @click="$emit('click', $event)" class="main-button"> {{ label }} </v-btn>
-    <v-menu v-if="showDropDown" v-bind="$attrs" :offset-y="true" class="pa-0 ma-0 right">
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="$attrs" v-on="on" class="dropdown-button"><v-icon>mdi-chevron-down</v-icon></v-btn>
+    <a-btn v-bind="$attrs" class="main-button"> {{ label }} </a-btn>
+    <a-menu v-if="showDropDown" v-model="menuIsOpen" location="bottom" class="pa-0 ma-0 right">
+      <template v-slot:activator="{ props }">
+        <a-btn v-bind="{ ...$attrs, ...props }" class="dropdown-button"><a-icon>mdi-chevron-down</a-icon></a-btn>
       </template>
       <slot></slot>
-    </v-menu>
+    </a-menu>
   </div>
 </template>
 
@@ -25,6 +25,11 @@ export default {
     },
   },
   emit: ['click'],
+  data() {
+    return {
+      menuIsOpen: false,
+    };
+  },
 };
 </script>
 

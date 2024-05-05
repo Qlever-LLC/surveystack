@@ -1,31 +1,31 @@
 <template>
-  <v-container v-if="entity && show" class="survey-detail">
+  <a-container v-if="entity && show" class="survey-detail bg-white" style="max-width: 100% !important">
     <div class="d-flex justify-end mb-4 survey-detail-nav">
-      <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
-        <v-icon>mdi-pencil</v-icon>
+      <a-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
+        <a-icon>mdi-pencil</a-icon>
         <span class="ml-2">Edit</span>
-      </v-btn>
-      <v-btn class="mx-2" :to="`/submissions?survey=${entity._id}`">
-        <v-icon>mdi-table</v-icon>
+      </a-btn>
+      <a-btn class="mx-2" :to="`/submissions?survey=${entity._id}`">
+        <a-icon>mdi-table</a-icon>
         <span class="ml-2">Results</span>
-      </v-btn>
+      </a-btn>
     </div>
 
-    <h1 class="heading--text">{{ entity.name }}</h1>
+    <h1 class="text-heading">{{ entity.name }}</h1>
     <div v-if="surveyInfo" class="survey-info">
       <div class="survey-description" v-if="surveyInfo.description">
         {{ surveyInfo.description }}
       </div>
-      <div class="text--secondary survey-info-submissions-count">
+      <div class="text-secondary survey-info-submissions-count">
         {{ surveyInfo.submissions }}
         {{ surveyInfo.submissions === 1 ? 'submission' : 'submissions' }}
       </div>
-      <div v-if="surveyInfo.latestSubmission" class="text--secondary survey-info-latest-submission">
+      <div v-if="surveyInfo.latestSubmission" class="text-secondary survey-info-latest-submission">
         Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
       </div>
     </div>
 
-    <div class="pt-8 pb-4 d-flex justify-center start-button-container">
+    <div class="pt-8 pb-4 d-flex justify-center start-button-container bg-white">
       <div>
         <btn-dropdown
           :label="'Start Survey'"
@@ -35,51 +35,44 @@
           x-large
           color="primary"
           top
-          left
-        >
-          <v-list class="pa-0 mx-auto" max-width="260">
-            <v-list-item @click="startDraft(entity)">
-              <v-list-item-content>
-                <v-list-item-title>Start survey</v-list-item-title>
-                <v-list-item-content class="multiline-subtitle">
-                  Start a survey as the user you are signed in with
-                </v-list-item-content>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item @click="showSelectMember = true">
-              <v-list-item-content>
-                <v-list-item-title>Start survey as a member</v-list-item-title>
-                <v-list-item-content class="multiline-subtitle">
-                  Select the member for whom you want to start the survey
-                </v-list-item-content>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+          left>
+          <a-list max-width="260">
+            <a-list-item @click="startDraft(entity)">
+              <a-list-item-title>Start survey</a-list-item-title>
+              <div class="multiline-subtitle">Start a survey as the user you are signed in with</div>
+            </a-list-item>
+            <a-list-item @click="showSelectMember = true">
+              <a-list-item-title>Start survey as a member</a-list-item-title>
+              <div class="multiline-subtitle">Select the member for whom you want to start the survey</div>
+            </a-list-item>
+          </a-list>
         </btn-dropdown>
 
         <div class="my-3 d-flex justify-center">
-          <v-btn color="primary" text large :loading="download.loading" @click="downloadPrintablePdf(entity._id)">
+          <a-btn
+            color="primary"
+            variant="text"
+            large
+            :loading="download.loading"
+            @click="downloadPrintablePdf(entity._id)">
             Print Blank Survey
-          </v-btn>
+          </a-btn>
         </div>
 
-        <div class="text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit.allowed">
+        <div class="text-secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit.allowed">
           {{ isAllowedToSubmit.message }}
         </div>
 
         <member-selector
           :show="showSelectMember"
           @hide="showSelectMember = false"
-          @selected="startDraftAs(entity, $event)"
-        />
+          @selected="startDraftAs(entity, $event)" />
       </div>
     </div>
-  </v-container>
-  <v-container fill-height v-else>
-    <v-layout column justify-center align-center>
-      <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
-    </v-layout>
-  </v-container>
+  </a-container>
+  <a-container cssHeight100 cssDisplayCenterOfPage v-else>
+    <a-progress-circular :size="50" />
+  </a-container>
 </template>
 
 <script>
@@ -225,14 +218,19 @@ export default {
     } else {
       this.$router.push({
         name: 'auth-login',
-        params: { redirect: this.$route.path, autoJoin: true },
+        query: { redirect: this.$route.path, autoJoin: true },
       });
     }
   },
 };
 </script>
 ,
-<style scoped>
+<style scoped lang="scss">
+.survey-detail {
+  width: 100%;
+  height: 100%;
+}
+
 .survey-description {
   margin: 16px 0px;
   white-space: pre-wrap;

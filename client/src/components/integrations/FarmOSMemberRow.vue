@@ -3,46 +3,44 @@
     <div class="user-row">
       <div class="user-icon"><span v-if="user.admin" class="mdi mdi-crown pr-1 mr-2"></span></div>
       <div class="user-name">{{ user.name }}</div>
-      <div class="user-email ml-2 font-weight-light text--lighten-2">{{ user.email }}</div>
+      <div class="user-email ml-2 font-weight-light text-lighten-2">{{ user.email }}</div>
     </div>
     <div class="instance-map mt-1 pb-1" v-for="instance in instanceMap" :key="`instance-${instance.name}`">
       <div class="instance-name ml-4">
-        <v-btn @click="$emit('open', { instanceName: instance.name, userId: user.id })" small icon>
-          <v-icon small>mdi-open-in-new</v-icon>
-        </v-btn>
+        <a-btn @click="$emit('open', { instanceName: instance.name, userId: user.id })" small icon>
+          <a-icon small>mdi-open-in-new</a-icon>
+        </a-btn>
         {{ instance.name }}
       </div>
       <div class="instance-groups">
         <div
           class="instance-group"
           v-for="(group, idx) in instance.groups"
-          :key="`user-${user.id}-instance-${instance.name}-group-${group.name}`"
-        >
+          :key="`user-${user.id}-instance-${instance.name}-group-${group.name}`">
           <div class="group-chip mx-1" v-if="idx < 3 || more.includes(`${user.id}-${instance.name}`)">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-chip small v-on="on"> {{ group.name }}</v-chip>
-              </template>
-              <span>{{ group.path }}</span>
-            </v-tooltip>
+            <a-chip small>
+              {{ group.name }}
+              <a-tooltip top activator="parent">{{ group.path }}</a-tooltip>
+            </a-chip>
           </div>
         </div>
         <div v-if="instance.groups.length >= 4 && !more.includes(`${user.id}-${instance.name}`)">
-          <v-btn text x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 3}` }} more</v-btn>
+          <a-btn variant="text" x-small @click="showMore(user, instance)">
+            + {{ `${instance.groups.length - 3}` }} more
+          </a-btn>
         </div>
-        <v-btn
+        <a-btn
           text
           small
           dense
-          @click="$emit('disconnect', { groupId: null, userId: user.id, instanceName: instance.name })"
-        >
+          @click="$emit('disconnect', { groupId: null, userId: user.id, instanceName: instance.name })">
           manage
-        </v-btn>
+        </a-btn>
       </div>
     </div>
 
     <div class="create-button mt-2">
-      <v-btn text color="green" x-small @click="$emit('connect', user.id)">+ connect farm</v-btn>
+      <a-btn variant="text" color="green" x-small @click="$emit('connect', user.id)">+ connect farm</a-btn>
     </div>
   </div>
 </template>
@@ -64,7 +62,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .local-container {
   display: flex;
   background-color: rgb(243, 242, 242);
