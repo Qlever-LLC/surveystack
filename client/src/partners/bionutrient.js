@@ -16,7 +16,7 @@ export default {
       info: '#26AAE2',
       success: '#8bc34a',
       appbar: '#ffffff',
-      background: '#649747',
+      background: '#82c25f',
       focus: '#524C40',
       heading: '#899856',
     },
