@@ -7,7 +7,8 @@
     :itemValue="itemValue"
     :loading="loading"
     :search="search"
-    :show-select="showSelect">
+    :show-select="showSelect"
+    :items-per-page="-1">
     <template v-if="labelSlot" v-slot:item.label="{ item }">
       <slot name="label" :item="item" />
     </template>
