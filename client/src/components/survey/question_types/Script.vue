@@ -128,7 +128,7 @@ export default {
         {
           type: 'REQUEST_RUN_SCRIPT',
           payload: {
-            value: this.modelValue,
+            value: this.modelValue ? toRaw(this.modelValue) : this.modelValue,
             context: this.meta.context ? toRaw(this.meta.context) : {},
             status: this.status || { type: null, message: null },
           },
@@ -141,7 +141,7 @@ export default {
         {
           type: 'REQUEST_RENDER_SCRIPT',
           payload: {
-            value: this.modelValue,
+            value: this.modelValue ? toRaw(this.modelValue) : this.modelValue,
             context: this.meta.context ? toRaw(this.meta.context) : {},
           },
         },
