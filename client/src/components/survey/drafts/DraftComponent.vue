@@ -102,14 +102,14 @@
         This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
         editor.
       </a-col>
-      <a-col class="shrink">
+      <a-col class="shrink" v-if="survey._id">
         <a-btn
           :to="{
             name: 'group-surveys-description',
             params: { surveyId: survey._id },
-          }"
-          >back</a-btn
-        >
+          }">
+          back
+        </a-btn>
       </a-col>
     </a-row>
   </a-alert>
