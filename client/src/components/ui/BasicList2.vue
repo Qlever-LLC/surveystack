@@ -11,7 +11,7 @@
         <slot name="title" />
       </a-col>
       <a-col align="end" class="flex-grow-0">
-        <a-btn v-if="buttonNew.title" color="accent" :to="buttonNew.link" variant="flat" rounded="lg">
+        <a-btn v-if="buttonNew?.title" color="accent" :to="buttonNew.link" variant="flat" rounded="lg">
           <a-icon class="mdi-24px"> mdi-plus-circle-outline </a-icon>
           <div v-if="!mobile" class="ml-2">{{ buttonNew.title }}</div>
         </a-btn>
