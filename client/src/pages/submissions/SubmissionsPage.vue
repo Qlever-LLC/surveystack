@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <basic-list :entities="state.submissions" :menu="state.menu">
+    <basic-list :entities="state.submissions" :menu="state.menu" :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
         My Submissions
@@ -44,7 +44,7 @@ const { setSurveyNames } = useSubmission();
 const PAGINATION_LIMIT = 10;
 
 const state = reactive({
-  isLoading: false,
+  loading: false,
   submissions: [],
   submissionsPagination: {
     total: 0,
@@ -95,8 +95,8 @@ async function initData() {
 }
 
 async function fetchRemoteSubmissions() {
-  state.isLoading = true;
   try {
+    state.loading = true;
     const queryParams = new URLSearchParams();
     queryParams.append('group', getActiveGroupId());
     queryParams.append('limit', PAGINATION_LIMIT);
@@ -125,8 +125,9 @@ async function fetchRemoteSubmissions() {
       skip: 0,
       limit: 1e5,
     };
+  } finally {
+    state.loading = false;
   }
-  state.isLoading = false;
 }
 </script>
 <style scoped lang="scss"></style>

@@ -3,6 +3,7 @@
     <basic-list
       listCard
       :entities="entities"
+      :loading="loading"
       groupStyle
       :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir } } }"
       :menu="[{ title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/groups/${e._id}`, color: 'green' }]">
@@ -31,19 +32,25 @@ export default {
     return {
       entities: [],
       showArchived: false,
+      loading: false,
     };
   },
   methods: {
     async fetchEntities() {
-      if (this.isWhitelabel) {
-        const { path } = this.whitelabelPartner;
-        const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}&prefix=${path}`);
-        this.entities = entities;
-        return;
-      }
+      try {
+        this.loading = true;
+        if (this.isWhitelabel) {
+          const { path } = this.whitelabelPartner;
+          const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}&prefix=${path}`);
+          this.entities = entities;
+          return;
+        }
 
-      const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}`);
-      this.entities = entities;
+        const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}`);
+        this.entities = entities;
+      } finally {
+        this.loading = false;
+      }
     },
   },
   computed: {

@@ -3,7 +3,8 @@
     <basic-list
       :entities="state.drafts"
       :menu="state.menu"
-      :buttonNew="{ title: 'Submit Completed TODO', action: () => handleSubmitCompleted() }">
+      :buttonNew="{ title: 'Submit Completed TODO', action: () => handleSubmitCompleted() }"
+      :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
         My Draft Submissions
@@ -65,6 +66,7 @@ const PAGINATION_LIMIT = 10;
 const { showResult, resultItems, result } = useResults();
 
 const state = reactive({
+  loading: false,
   drafts: [],
   paginationLength: computed(() => {
     return Math.ceil(state.drafts.length / PAGINATION_LIMIT);
@@ -110,11 +112,16 @@ const state = reactive({
 initData();
 
 async function initData() {
-  let rawDrafts = await store.dispatch('submissions/fetchLocalSubmissions');
-  rawDrafts = rawDrafts.filter((d) => d.meta.group?.id === getActiveGroupId());
-  rawDrafts = sortSubmissions(rawDrafts);
-  rawDrafts = await setSurveyNames(rawDrafts);
-  state.drafts = rawDrafts;
+  try {
+    state.loading = true;
+    let rawDrafts = await store.dispatch('submissions/fetchLocalSubmissions');
+    rawDrafts = rawDrafts.filter((d) => d.meta.group?.id === getActiveGroupId());
+    rawDrafts = sortSubmissions(rawDrafts);
+    rawDrafts = await setSurveyNames(rawDrafts);
+    state.drafts = rawDrafts;
+  } finally {
+    state.loading = false;
+  }
 }
 
 function sortSubmissions(submissions) {

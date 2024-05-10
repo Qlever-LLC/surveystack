@@ -38,36 +38,52 @@
       <div v-if="state.showFilter" class="mt-n4 mb-6">
         <slot name="filter" />
       </div>
-      <a-list v-if="listCard && filteredEntities.length > 0" dense twoLine class="pt-0">
-        <list-item-card
-          v-for="(entity, idx) in filteredEntities"
-          :key="entity._id"
-          @toogleStar="$emit('toogleStar', entity)"
-          :entity="entity"
-          :idx="String(idx)"
-          :enablePinned="enablePinned"
-          :groupStyle="groupStyle"
-          :questionSetsType="questionSetsType"
-          :menu="menu" />
-      </a-list>
-      <a-list v-else-if="filteredEntities.length > 0">
-        <list-item-row
-          v-for="(entity, idx) in filteredEntities"
-          :key="entity._id"
-          :entity="entity"
-          :idx="String(idx)"
-          :menu="menu">
-          <template v-slot:entityTitle="{ entity }">
-            <slot name="entityTitle" :entity="entity" />
-          </template>
-          <template v-slot:entitySubtitle="{ entity }">
-            <slot name="entitySubtitle" :entity="entity" />
-          </template>
-          <template v-slot:preMenu>
-            <slot name="preMenu" />
-          </template>
-        </list-item-row>
-      </a-list>
+      <template v-if="listCard && (filteredEntities.length > 0 || loading)">
+        <div v-if="loading">
+          <a-skeleton-loader v-for="index in [1, 2, 3]" :key="index" type="list-item" :height="57" class="mb-2" />
+        </div>
+        <a-list v-else dense twoLine class="pt-0">
+          <list-item-card
+            v-for="(entity, idx) in filteredEntities"
+            :key="entity._id"
+            @toogleStar="$emit('toogleStar', entity)"
+            :entity="entity"
+            :idx="String(idx)"
+            :enablePinned="enablePinned"
+            :groupStyle="groupStyle"
+            :questionSetsType="questionSetsType"
+            :menu="menu" />
+        </a-list>
+      </template>
+      <template v-else-if="filteredEntities.length > 0 || loading">
+        <div v-if="loading" class="py-2">
+          <a-skeleton-loader
+            v-for="index in [1, 2, 3]"
+            :key="index"
+            type="list-item"
+            class="light-border"
+            :height="52"
+            color="background" />
+        </div>
+        <a-list v-else>
+          <list-item-row
+            v-for="(entity, idx) in filteredEntities"
+            :key="entity._id"
+            :entity="entity"
+            :idx="String(idx)"
+            :menu="menu">
+            <template v-slot:entityTitle="{ entity }">
+              <slot name="entityTitle" :entity="entity" />
+            </template>
+            <template v-slot:entitySubtitle="{ entity }">
+              <slot name="entitySubtitle" :entity="entity" />
+            </template>
+            <template v-slot:preMenu>
+              <slot name="preMenu" />
+            </template>
+          </list-item-row>
+        </a-list>
+      </template>
       <div v-else class="text-grey">
         <slot name="noValue" />
       </div>
@@ -89,6 +105,7 @@ import ListItemCard from './ListItemCard.vue';
 import ListItemRow from './ListItemRow.vue';
 import { useDisplay } from 'vuetify';
 import AppNavigationControl from '@/components/AppNavigationControl.vue';
+import ASkeletonLoader from '@/components/ui/elements/ASkeletonLoader.vue';
 
 const { mobile } = useDisplay();
 
@@ -219,5 +236,10 @@ function defaultFilter() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.light-border {
+  border-bottom: 1px solid lightgray;
+  border-top: 1px solid lightgray;
 }
 </style>

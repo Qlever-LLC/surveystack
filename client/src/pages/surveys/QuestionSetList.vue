@@ -91,42 +91,50 @@ function updateSearch(val) {
 }
 
 async function initData() {
-  state.menu = [
-    {
-      title: 'Description',
-      icon: 'mdi-book-open',
-      action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
-      render: (s) => () => rightToView().allowed,
-      color: 'green',
-    },
-    {
-      title: 'Add to New Survey',
-      icon: 'mdi-file-plus',
-      action: (s) =>
-        createAction(s, rightToView, { path: `/groups/${getActiveGroupId()}/surveys/new`, query: { libId: s._id } }),
-      render: (s) => () => rightToView().allowed,
-    },
-    // {
-    //   title: 'View',
-    //   icon: 'mdi-file-document',
-    //   action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-    //   render: (s) => () => rightToView().allowed,
-    // },
-    {
-      title: 'Edit',
-      icon: 'mdi-pencil',
-      action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-      render: (s) => () => rightToEdit().allowed,
-    },
-    // {
-    //   title: 'Archive',
-    //   icon: 'mdi-archive',
-    //   action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/...`),
-    //   render: (s) => () => rightToEdit().allowed,
-    // },
-  ];
+  try {
+    state.loading = true;
+    state.menu = [
+      {
+        title: 'Description',
+        icon: 'mdi-book-open',
+        action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
+        render: (s) => () => rightToView().allowed,
+        color: 'green',
+      },
+      {
+        title: 'Add to New Survey',
+        icon: 'mdi-file-plus',
+        action: (s) =>
+          createAction(s, rightToView, {
+            path: `/groups/${getActiveGroupId()}/surveys/new`,
+            query: { libId: s._id },
+          }),
+        render: (s) => () => rightToView().allowed,
+      },
+      // {
+      //   title: 'View',
+      //   icon: 'mdi-file-document',
+      //   action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
+      //   render: (s) => () => rightToView().allowed,
+      // },
+      {
+        title: 'Edit',
+        icon: 'mdi-pencil',
+        action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
+        render: (s) => () => rightToEdit().allowed,
+      },
+      // {
+      //   title: 'Archive',
+      //   icon: 'mdi-archive',
+      //   action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/...`),
+      //   render: (s) => () => rightToEdit().allowed,
+      // },
+    ];
 
-  await Promise.all([fetchData()]);
+    await Promise.all([fetchData()]);
+  } finally {
+    state.loading = false;
+  }
 }
 
 async function fetchData(user = null) {

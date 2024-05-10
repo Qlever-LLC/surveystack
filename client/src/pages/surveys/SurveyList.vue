@@ -12,12 +12,12 @@
       @updateSearch="updateSearch"
       @toogleStar="toogleStar"
       listCard
-      :loading="state.loading"
       :entities="state.surveys.content"
       enablePinned
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : false"
       :menu="state.menu"
-      :page="state.page">
+      :page="state.page"
+      :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-cube-outline </a-icon>
         Surveys
@@ -133,8 +133,6 @@ function startDraftAs(selectedMember) {
   state.selectedSurvey = undefined;
 }
 async function downloadPrintablePdf(survey) {
-  state.loading = true;
-
   try {
     const { headers, data } = await api.get(`/surveys/${survey}/pdf`);
     const disposition = parseDisposition(headers['content-disposition']);
@@ -149,72 +147,75 @@ async function downloadPrintablePdf(survey) {
         'Sorry, something went wrong while downloading a PDF of paper version. Try again later.'
       )
     );
-  } finally {
-    state.loading = false;
   }
 }
 
 async function initData() {
-  state.menu = [
-    {
-      title: 'Start Survey',
-      icon: 'mdi-open-in-new',
-      action: (s) =>
-        createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
-      render: (s) => () => rightToSubmitSurvey(s).allowed,
-      color: 'green',
-    },
-    {
-      title: 'Start Survey as Member',
-      icon: 'mdi-open-in-new',
-      action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
-      render: (s) => () => rightToSubmitSurvey(s).allowed,
-    },
-    {
-      title: 'Call for Submissions',
-      icon: 'mdi-bullhorn',
-      action: (s) =>
-        createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
-      render: (s) => () => rightToEdit().allowed,
-    },
-    {
-      title: 'Description',
-      icon: 'mdi-book-open',
-      action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
-      render: (s) => () => rightToView(s).allowed,
-    },
-    {
-      title: 'Print Blank Survey',
-      icon: 'mdi-printer',
-      action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
-      render: (s) => () => rightToSubmitSurvey(s).allowed,
-    },
-    // {
-    //   title: 'View',
-    //   icon: 'mdi-file-document',
-    //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-    // },
-    {
-      title: 'Edit',
-      icon: 'mdi-pencil',
-      action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-      render: (s) => () => rightToEdit().allowed,
-    },
-    {
-      title: 'View Results',
-      icon: 'mdi-chart-bar',
-      action: (s) =>
-        createAction(s, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`),
-      render: (s) => () => rightToViewAnonymizedResults().allowed,
-    },
-    // {
-    //   title: 'Share',
-    //   icon: 'mdi-share',
-    //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-    // }
-  ];
+  try {
+    state.loading = true;
+    state.menu = [
+      {
+        title: 'Start Survey',
+        icon: 'mdi-open-in-new',
+        action: (s) =>
+          createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
+        render: (s) => () => rightToSubmitSurvey(s).allowed,
+        color: 'green',
+      },
+      {
+        title: 'Start Survey as Member',
+        icon: 'mdi-open-in-new',
+        action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
+        render: (s) => () => rightToSubmitSurvey(s).allowed,
+      },
+      {
+        title: 'Call for Submissions',
+        icon: 'mdi-bullhorn',
+        action: (s) =>
+          createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
+        render: (s) => () => rightToEdit().allowed,
+      },
+      {
+        title: 'Description',
+        icon: 'mdi-book-open',
+        action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
+        render: (s) => () => rightToView(s).allowed,
+      },
+      {
+        title: 'Print Blank Survey',
+        icon: 'mdi-printer',
+        action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
+        render: (s) => () => rightToSubmitSurvey(s).allowed,
+      },
+      // {
+      //   title: 'View',
+      //   icon: 'mdi-file-document',
+      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+      // },
+      {
+        title: 'Edit',
+        icon: 'mdi-pencil',
+        action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
+        render: (s) => () => rightToEdit().allowed,
+      },
+      {
+        title: 'View Results',
+        icon: 'mdi-chart-bar',
+        action: (s) =>
+          createAction(s, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`),
+        render: (s) => () => rightToViewAnonymizedResults().allowed,
+      },
+      // {
+      //   title: 'Share',
+      //   icon: 'mdi-share',
+      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+      // }
+    ];
 
-  await Promise.all([fetchData()]);
+    await Promise.all([fetchData()]);
+  } finally {
+    state.loading = false;
+  }
 }
 async function fetchData(user = null) {
   const now = new Date();

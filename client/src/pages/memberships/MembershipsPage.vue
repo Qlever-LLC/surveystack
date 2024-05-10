@@ -6,7 +6,8 @@
       :buttonNew="{
         title: 'Invite New Members',
         link: { name: 'group-members-new', params: { id: getActiveGroupId() } },
-      }">
+      }"
+      :loading="state.isLoading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
         Members

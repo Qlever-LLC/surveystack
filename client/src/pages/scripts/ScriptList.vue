@@ -15,7 +15,8 @@
         title: 'Create new Script',
         link: { name: 'group-scripts-new', params: { id: getActiveGroupId() } },
       }"
-      :menu="state.menu">
+      :menu="state.menu"
+      :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml </a-icon>
         Scripts
@@ -39,6 +40,7 @@ const { rightToEdit, rightToView } = getPermission();
 const { message, createAction } = menuAction();
 
 const state = reactive({
+  loading: false,
   entities: [],
   menu: [],
 });
@@ -46,23 +48,28 @@ const state = reactive({
 initData();
 
 async function initData() {
-  state.menu.push({
-    title: 'View Script',
-    icon: 'mdi-open-in-new',
-    action: (e) => createAction(e, rightToView, `/groups/${getActiveGroupId()}/scripts/${e._id}`),
-    render: (e) => () => rightToView(e).allowed,
-    color: 'green',
-  });
-  if (isGroupAdmin()) {
+  try {
+    state.loading = true;
     state.menu.push({
-      title: 'Edit Script',
-      icon: 'mdi-pencil',
-      action: (e) => createAction(e, rightToEdit, `/groups/${getActiveGroupId()}/scripts/${e._id}/edit`),
-      render: (e) => () => rightToEdit(e).allowed,
+      title: 'View Script',
+      icon: 'mdi-open-in-new',
+      action: (e) => createAction(e, rightToView, `/groups/${getActiveGroupId()}/scripts/${e._id}`),
+      render: (e) => () => rightToView(e).allowed,
+      color: 'green',
     });
-  }
+    if (isGroupAdmin()) {
+      state.menu.push({
+        title: 'Edit Script',
+        icon: 'mdi-pencil',
+        action: (e) => createAction(e, rightToEdit, `/groups/${getActiveGroupId()}/scripts/${e._id}/edit`),
+        render: (e) => () => rightToEdit(e).allowed,
+      });
+    }
 
-  const { data } = await api.get(`/scripts?groupId=${getActiveGroupId()}`);
-  state.entities = data;
+    const { data } = await api.get(`/scripts?groupId=${getActiveGroupId()}`);
+    state.entities = data;
+  } finally {
+    state.loading = false;
+  }
 }
 </script>
