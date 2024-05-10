@@ -26,7 +26,10 @@
             <a-tooltip bottom activator="parent">Number of submission using this</a-tooltip>
           </span>
         </a-list-item-title>
-        <a-list-item-subtitle v-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
+        <a-list-item-subtitle v-if="$slots.entitySubtitle && !state.entity.createdAgo">
+          <slot name="entitySubtitle" :entity="state.entity" />
+        </a-list-item-subtitle>
+        <a-list-item-subtitle v-else-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
       </span>
       <a-menu location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
