@@ -1,8 +1,11 @@
 <template>
   <a-card :loading="loading" color="background">
     <a-card-title v-if="showTitle" class="text-heading d-flex pa-4">
-      <a-col align="start" class="flex-grow-0">
+      <a-col v-if="showNavigationControl" align="start" class="flex-grow-0">
         <AppNavigationControl />
+      </a-col>
+      <a-col v-else align="start" class="flex-grow-0">
+        {{ title }}
       </a-col>
       <a-col class="flex-grow-1 pl-0" :class="mobile ? 'text-center' : 'text-center'">
         <slot name="title" />
@@ -48,7 +51,11 @@
           :enablePinned="enablePinned"
           :groupStyle="groupStyle"
           :questionSetsType="questionSetsType"
-          :menu="menu" />
+          :menu="menu">
+          <template v-slot:entitySubtitle="{ entity }">
+            <slot name="entitySubtitle" :entity="entity" />
+          </template>
+        </list-item-card>
       </a-list>
       <a-list v-else-if="filteredEntities.length > 0">
         <list-item-row
@@ -142,6 +149,14 @@ const props = defineProps({
   },
   filter: {
     type: Function,
+  },
+  showNavigationControl: {
+    type: Boolean,
+    default: true,
+  },
+  title: {
+    type: String,
+    default: 'List',
   },
 });
 

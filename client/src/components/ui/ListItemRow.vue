@@ -1,6 +1,10 @@
 <template>
   <a-hover v-slot="{ isHovering, props }">
-    <a-list-item v-bind="props" :class="{ innerShadow: isHovering }" class="light-border">
+    <a-list-item
+      v-bind="props"
+      :class="{ innerShadow: isHovering }"
+      class="light-border"
+      @click="menu[0].render === undefined || menu[0].render(entity) ? runAction(menu[0].action(entity)) : undefined">
       <span>
         <a-list-item-title class="d-flex align-center">
           <slot name="entityTitle" :entity="entity" />

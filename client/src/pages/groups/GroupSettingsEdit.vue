@@ -85,17 +85,46 @@
           </div>
         </form>
       </a-card-text>
-      <app-basic-list
-        class="ma-4"
+      <basic-list
         v-if="editMode"
+        listRow
+        :showNavigationControl="false"
+        :entities="subgroups"
+        title="Subgroups"
+        :menu="[
+          {
+            title: 'Go to Group',
+            icon: 'mdi-open-in-new',
+            action: (e) => `/groups/${e._id}`,
+            color: 'green',
+          },
+        ]"
+        :buttonNew="{ title: 'new...', link: { name: 'groups-new', query: { dir: entity.path } } }">
+        <template v-slot:entityTitle="{ entity }">
+          {{ entity.name }}
+        </template>
+        <template v-slot:entitySubtitle="{ entity }">
+          {{ entity.path }}
+        </template>
+      </basic-list>
+      <basic-list
+        v-if="editMode"
+        listCard
+        :showNavigationControl="false"
         :entities="integrations"
         title="Integrations"
-        :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
-        <template v-slot:entity="{ entity }">
-          <a-list-item-title>{{ entity.name }}</a-list-item-title>
-          <a-list-item-subtitle>{{ entity.description }} </a-list-item-subtitle>
+        :menu="[
+          {
+            title: 'Go to',
+            icon: 'mdi-open-in-new',
+            action: (integration) => `/group-manage/${integration.slug}/${entity._id}`,
+            color: 'green',
+          },
+        ]">
+        <template v-slot:entitySubtitle="{ entity }">
+          {{ entity.description }}
         </template>
-      </app-basic-list>
+      </basic-list>
       <app-pinned-surveys
         class="ma-4"
         v-if="editMode"
@@ -113,7 +142,7 @@
 import api from '@/services/api.service';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
-import appBasicList from '@/components/ui/BasicList.vue';
+import BasicList from '@/components/ui/BasicList2.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
@@ -138,7 +167,7 @@ export default {
     AppNavigationControl,
     appPinnedSurveys,
     appDocLinks,
-    appBasicList,
+    BasicList,
     appDialog,
   },
   data() {
@@ -159,6 +188,7 @@ export default {
           pinned: [],
         },
       },
+      subgroups: [],
       searchResults: [],
       learnMoreDialog: false,
       integrations,
@@ -199,6 +229,15 @@ export default {
       );
       this.searchResults = searchResults;
     },
+    async getSubgroups() {
+      try {
+        const { data } = await api.get(`/groups/all?showArchived=${this.entity.meta.archived}&dir=${this.entity.path}`);
+        this.subgroups = data;
+      } catch (e) {
+        this.status.code = e.response.status;
+        this.status.message = e.response.data.message;
+      }
+    },
   },
   watch: {
     'entity.name': {
@@ -213,6 +252,11 @@ export default {
       handler(newVal) {
         const handle = handleize(newVal);
         this.entity.slug = handle;
+      },
+    },
+    'entity.meta.archived': {
+      handler() {
+        this.getSubgroups();
       },
     },
   },
@@ -251,6 +295,7 @@ export default {
         const { id } = this.$route.params;
         const { data } = await api.get(`/groups/${id}?populate=true`);
         this.entity = { ...this.entity, ...data };
+        await this.getSubgroups();
       } catch (e) {
         console.log('something went wrong:', e);
       } finally {
