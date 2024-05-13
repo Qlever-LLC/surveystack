@@ -17,7 +17,7 @@
               <a-select
                 variant="outlined"
                 v-model="value.meta.submissions"
-                label="Allow Submissions for..."
+                label="Allow Responses for..."
                 :items="availableSubmissions"
                 item-title="text"
                 item-value="value" />

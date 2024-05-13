@@ -53,8 +53,8 @@
     <result-dialog
       v-model="showResult"
       :items="resultItems"
-      title="Result of Submission"
-      additionalMessage="<span class='text-caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      title="Result of Response"
+      additionalMessage="<span class='text-caption'>Note: responses from Builder are automatically archived. Please browse archived responses to view this result.</span>"
       :survey="survey"
       :submission="submission"
       @close="showResult = false" />

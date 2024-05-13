@@ -7,7 +7,7 @@
       :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
-        My Draft Submissions
+        My Draft Responses
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.drafts.length }}
         </a-chip>

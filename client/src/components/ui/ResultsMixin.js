@@ -26,7 +26,7 @@ export default {
         } else {
           this.resultItems.push({
             title: 'Offline',
-            body: 'Cannot submit without internet connection. Go to MY SUBMISSIONS and then DRAFTS to submit completed surveys when you have an internet connection',
+            body: 'Cannot submit without internet connection. Go to MY DRAFT RESPONSES to submit completed surveys when you have an internet connection',
             error: true,
           });
         }

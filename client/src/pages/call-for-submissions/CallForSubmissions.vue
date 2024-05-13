@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <h1>Call for Submissions</h1>
+    <h1>Call for Responses</h1>
     <a-card class="my-2">
       <a-card-text>
         <a-text-field v-model="subject" label="Subject" variant="filled" />
@@ -62,7 +62,7 @@
     <result-dialog
       v-model="showSubmitResult"
       :items="submitResults"
-      title="Call for Submissions"
+      title="Call for Responses"
       @close="showSubmitResult = false" />
   </a-container>
 </template>
@@ -192,10 +192,10 @@ export default {
       this.group = id;
       await this.loadMembers();
     }
-    if(surveyId){
-      const {data} = await api.get(`/surveys/${surveyId}`)
-      this.selectedSurvey = data
-      this.subject = `Request to submit survey '${this.selectedSurvey.name}'`
+    if (surveyId) {
+      const { data } = await api.get(`/surveys/${surveyId}`);
+      this.selectedSurvey = data;
+      this.subject = `Request to submit survey '${this.selectedSurvey.name}'`;
     }
   },
 };

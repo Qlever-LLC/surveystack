@@ -20,7 +20,7 @@
       @cancel="reassignment.showModal = false"
       @confirm="reassign(selected)"
       labelConfirm="Reassign">
-      <template v-slot:title>Reassign Submission</template>
+      <template v-slot:title>Reassign Response</template>
       <a-select
         :items="reassignment.groups"
         item-title="text"
@@ -64,7 +64,7 @@
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
             :to="`/groups/${$route.params.id}/surveys/${survey}/submissions/new`">
             <a-icon left>mdi-plus</a-icon>
-            New submission
+            New response
           </a-btn>
         </div>
       </div>

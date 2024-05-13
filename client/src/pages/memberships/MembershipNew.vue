@@ -80,8 +80,8 @@
                 <a-list-item-title>Add Member</a-list-item-title>
                 <div class="multiline-subtitle">
                   The member joins immediately. An email is still sent informing them they are joined. This is useful
-                  when using "Call for Submissions" to send this member survey requests without waiting for them to
-                  check their email.
+                  when using "Call for Responses" to send this member survey requests without waiting for them to check
+                  their email.
                 </div>
               </a-list-item>
             </a-list>
