@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-4 mt-4 text-white text-body-2">Manage {{ getActiveGroup()?.name }}</div>
+  <div class="ml-4 mt-4 text-white text-body-2">Manage {{ state.activeGroup?.name }}</div>
   <a-list dense class="px-4">
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/question-sets`, query: { t: Date.now() } }"
@@ -37,6 +37,17 @@
 </template>
 <script setup>
 import { useGroup } from '@/components/groups/group';
+import { reactive } from 'vue';
 
 const { getActiveGroupId, getActiveGroup } = useGroup();
+
+const state = reactive({
+  activeGroup: null,
+});
+
+initData();
+
+async function initData() {
+  state.activeGroup = await getActiveGroup();
+}
 </script>

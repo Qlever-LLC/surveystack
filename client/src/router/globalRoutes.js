@@ -41,6 +41,11 @@ export default [
       header: AppHeader,
       main: LandingPage,
     },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
   },
   {
     path: '/invitations',
@@ -52,7 +57,21 @@ export default [
   },
   {
     path: '/groups/all',
-    name: 'groups-list',
+    name: 'all-groups-list',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGlobal,
+      main: GroupList,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/groups/my',
+    name: 'my-groups-list',
     components: {
       header: AppHeader,
       navigation: AppNavigationGlobal,

@@ -46,8 +46,12 @@ export default {
           return;
         }
 
-        const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}`);
-        this.entities = entities;
+        if (this.onlyMyGroups) {
+          this.entities = this.$store.getters['memberships/groups'];
+        } else {
+          const { data: entities } = await api.get(`/groups/all?showArchived=${this.showArchived}`);
+          this.entities = entities;
+        }
       } finally {
         this.loading = false;
       }
@@ -64,8 +68,10 @@ export default {
       if (this.isWhitelabel) {
         return this.whitelabelPartner.path;
       }
-
       return '/';
+    },
+    onlyMyGroups() {
+      return this.$route.matched.some(({ name }) => name === 'my-groups-list');
     },
   },
   watch: {

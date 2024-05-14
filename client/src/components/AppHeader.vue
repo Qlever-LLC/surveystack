@@ -2,8 +2,8 @@
   <a-app-bar flat color="rgba(0, 0, 0, 0)" class="header-gradient">
     <a-app-bar-title v-if="showLogo">
       <a-img
-        v-if="isWhitelabel"
-        :src="whitelabelPartner.hero || whitelabelPartner.logo"
+        v-if="state.isWhitelabel"
+        :src="state.whitelabelPartner.hero || state.whitelabelPartner.logo"
         class="my-3"
         width="200"
         height="60"
@@ -23,7 +23,7 @@
     <a-app-bar-title v-else>
       <!-- todo replace by group chooser button -->
       <div class="text-h5 text-white font-bold" style="cursor: pointer" @click="router.push('/')">
-        {{ getActiveGroup()?.name }}
+        {{ state.activeGroup?.name }}
       </div>
     </a-app-bar-title>
 
@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 import { useStore } from 'vuex';
 
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
@@ -60,12 +60,21 @@ const props = defineProps({
   },
 });
 
-const isWhitelabel = computed(() => {
-  return store.getters['whitelabel/isWhitelabel'];
+const state = reactive({
+  activeGroup: null,
+  isWhitelabel: computed(() => {
+    return store.getters['whitelabel/isWhitelabel'];
+  }),
+  whitelabelPartner: computed(() => {
+    return store.getters['whitelabel/partner'];
+  }),
 });
-const whitelabelPartner = computed(() => {
-  return store.getters['whitelabel/partner'];
-});
+
+initData();
+
+async function initData() {
+  state.activeGroup = await getActiveGroup();
+}
 </script>
 <style scoped lang="scss">
 .fixed-bar {

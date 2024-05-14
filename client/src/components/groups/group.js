@@ -1,5 +1,6 @@
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
+import api from '@/services/api.service';
 
 export function useGroup() {
   const store = useStore();
@@ -32,11 +33,18 @@ export function useGroup() {
   function getActiveGroupId() {
     return route.params.id;
   }
-  function getActiveGroup() {
-    //TODO get all groups, otherwise group name would not resolve for non-mine groups
-    const groups = getMyGroups();
+  async function getActiveGroup() {
     const activeGroupId = getActiveGroupId();
-    return groups.find((group) => group._id === activeGroupId);
+    if (!activeGroupId) {
+      return null;
+    }
+    const groups = getMyGroups();
+    let groupFound = groups.find((group) => group._id === activeGroupId);
+    if (!groupFound) {
+      const { data: group } = await api.get(`/groups/${activeGroupId}`);
+      groupFound = group;
+    }
+    return groupFound;
   }
 
   function isGroupAdmin() {
