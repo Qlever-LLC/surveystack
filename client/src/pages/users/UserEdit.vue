@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="bg-background rounded">
     <h1>{{ editMode ? 'Edit user' : 'Create user' }}</h1>
     <div v-if="hasMembership && groupEntity" class="subtitle-1">
       ... with role <span class="font-weight-bold">{{ $route.query.role }}</span> @
