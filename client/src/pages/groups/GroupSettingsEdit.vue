@@ -117,7 +117,7 @@
           {
             title: 'Go to',
             icon: 'mdi-open-in-new',
-            action: (integration) => `/group-manage/${integration.slug}/${entity._id}`,
+            action: (integration) => `/groups/${entity._id}/${integration.slug}`,
             color: 'green',
           },
         ]">

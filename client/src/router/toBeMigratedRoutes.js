@@ -8,10 +8,7 @@ import store from '@/store';
 import ResourceList from '@/pages/resources/ResourceList.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
-import FarmOS from '@/pages/groups/FarmOS.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
-
-const Hylo = () => import('@/pages/groups/Hylo.vue');
 
 const commonComponents = {
   header: AppHeader,
@@ -78,19 +75,6 @@ export default [
     name: 'unauthorized',
     components: getComponents(Unauthorized),
     props: (route) => ({ ...route.query }),
-  },
-  // users
-  {
-    path: '/group-manage/farmos/:id',
-    name: 'farmos-group-manage',
-    props: true,
-    components: getComponents(FarmOS),
-  },
-  {
-    path: '/group-manage/hylo/:id',
-    name: 'hylo-group-manage',
-    props: true,
-    components: getComponents(Hylo),
   },
   // integrations
   {
