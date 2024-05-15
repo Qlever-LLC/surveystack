@@ -29,14 +29,12 @@
       </a-list>
       <GroupNavigation />
       <SuperAdminNavigation v-if="store.getters['auth/isSuperAdmin']" />
-      <GroupDocsNavigation />
     </div>
   </a-navigation-drawer>
 </template>
 
 <script setup>
 import GroupNavigation from '@/components/groups/GroupNavigation.vue';
-import GroupDocsNavigation from '@/components/groups/GroupDocsNavigation.vue';
 import SuperAdminNavigation from '@/components/superAdmin/SuperAdminNavigation.vue';
 import { useStore } from 'vuex';
 

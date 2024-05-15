@@ -449,12 +449,12 @@
                 class="align-center align-self-start" />
             </div>
 
-            <div>Filled Submission</div>
+            <div>Filled Response</div>
             <div class="mt-2">
               <a-checkbox
                 label="Show all resource list options"
                 v-model="controlInProgress.options.printLayout.showAllOptions"
-                helper-text="Show the complete list of possible options when printing a completed survey submission, with the selected answer highlighted"
+                helper-text="Show the complete list of possible options when printing a completed survey response, with the selected answer highlighted"
                 color="grey-darken-1"
                 class="align-center align-self-start" />
             </div>

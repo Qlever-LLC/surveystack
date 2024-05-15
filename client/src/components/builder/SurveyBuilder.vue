@@ -204,7 +204,7 @@
               </a-btn>
 
               <a-btn @click="viewSubmission = true" class="ma-2" variant="outlined">
-                <span class="hidden-sm-and-down">submission</span>
+                <span class="hidden-sm-and-down">response</span>
                 <a-icon right>mdi-code-tags</a-icon>
               </a-btn>
             </template>

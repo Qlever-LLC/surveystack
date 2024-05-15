@@ -32,7 +32,7 @@ const route = useRoute();
 const now = new Date();
 
 const state = reactive({
-  group: getActiveGroup(),
+  group: null,
   editMode: !route.matched.some(({ name }) => name === 'group-scripts-new'),
   entity: {
     _id: '',
@@ -55,6 +55,7 @@ const state = reactive({
 initData();
 
 async function initData() {
+  state.group = await getActiveGroup();
   state.entity._id = new ObjectId();
 
   if (state.editMode) {

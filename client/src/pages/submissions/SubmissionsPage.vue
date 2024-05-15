@@ -3,7 +3,7 @@
     <basic-list :entities="state.submissions" :menu="state.menu" :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
-        My Submissions
+        My Responses
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.submissions.length }}
         </a-chip>
@@ -70,7 +70,7 @@ const state = reactive({
       action: (e) => `/todo`,
     },
     {
-      title: 'View Submissions (TODO)',
+      title: 'View Response (TODO)',
       icon: 'mdi-open-in-new',
       action: (e) => `/todo`,
     },

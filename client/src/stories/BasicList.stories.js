@@ -139,7 +139,7 @@ export const BasicListRow_Submissions = {
       <basic-list v-bind="args">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-file-document</a-icon>
-        My Submissions
+        My Responses
         <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ args.entities.length }}
         </a-avatar>
       </template>
@@ -179,7 +179,7 @@ export const BasicListRow_Drafts = {
       <basic-list v-bind="args">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-file-document</a-icon>
-        My Submissions
+        My Responses
         <a-avatar class="ml-4" color="grey" rounded="lg" size="30"> {{ args.entities.length }}
         </a-avatar>
       </template>

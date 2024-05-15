@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-4 mt-4 text-white text-body-2">Drafts and Submissions</div>
+  <div class="ml-4 mt-4 text-white text-body-2">Responses</div>
   <a-list dense class="px-4">
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/my-drafts`, query: { t: Date.now() } }"
@@ -7,7 +7,7 @@
       prepend-icon="mdi-file-document-edit-outline"
       class="text-white bg-transparent mb-2"
       rounded="lg">
-      <a-list-item-title class="text-white">My Draft Submissions</a-list-item-title>
+      <a-list-item-title class="text-white">My Draft Responses</a-list-item-title>
     </a-list-item>
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/my-submissions`, query: { t: Date.now() } }"
@@ -15,7 +15,7 @@
       prepend-icon="mdi-file-document-multiple-outline"
       class="text-white bg-transparent mb-2"
       rounded="lg">
-      <a-list-item-title class="text-white">My Submissions</a-list-item-title>
+      <a-list-item-title class="text-white">My Responses</a-list-item-title>
     </a-list-item>
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/submissions`, query: { t: Date.now() } }"

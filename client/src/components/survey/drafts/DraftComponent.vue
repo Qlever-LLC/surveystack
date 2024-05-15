@@ -280,7 +280,7 @@ export default {
 .draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after {
   background-color: gray;
   position: absolute;
-  content: "Builder submissions not visible in 'Results'.  Check 'archived' to view.";
+  content: "Builder responses not visible in 'Results'.  Check 'archived' to view.";
   white-space: pre-wrap;
   padding: 8px;
   border-radius: 5px;

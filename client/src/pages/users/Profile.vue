@@ -1,5 +1,5 @@
 <template>
-  <a-container class="maxw-40">
+  <a-container class="maxw-40 bg-background rounded">
     <template v-if="isLoggedIn">
       <app-feedback
         title="Shapeshift:"

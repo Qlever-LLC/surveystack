@@ -2,11 +2,9 @@ import AppHeader from '@/components/AppHeader.vue';
 import SubmissionList from '@/pages/submissions/List.vue';
 import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
-import Profile from '@/pages/users/Profile.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 import { decode as b64Decode } from 'js-base64';
 import store from '@/store';
-import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
 import User from '@/pages/users/User.vue';
 import ResourceList from '@/pages/resources/ResourceList.vue';
@@ -48,11 +46,6 @@ export default [
     props: (route) => ({ ...route.query }),
   },
   {
-    path: '/auth/profile',
-    name: 'auth-profile',
-    components: getComponents(Profile),
-  },
-  {
     path: '/auth/forgot-password',
     name: 'auth-forgot-password',
     components: getComponents(ForgotPassword),
@@ -87,11 +80,6 @@ export default [
     name: 'unauthorized',
     components: getComponents(Unauthorized),
     props: (route) => ({ ...route.query }),
-  },
-  {
-    path: '/farmos/profile',
-    name: 'farmos-profile',
-    components: getComponents(FarmOSProfile),
   },
   // users
   {

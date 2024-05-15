@@ -16,12 +16,12 @@
           <a-expansion-panel-text class="pa-0 ma-0">
             <a-list class="pa-0 ma-0">
               <a-list-item
-                v-for="(doc, index) in docs"
+                v-for="(doc, index) in state.docs"
                 :key="doc.link + index"
                 :href="doc.link"
                 target="_blank"
                 prepend-icon="mdi-notebook"
-                class="text-white">
+                class="pa-0 text-white">
                 <a-list-item-title class="text-white">{{ doc.label }}</a-list-item-title>
               </a-list-item>
 
@@ -55,18 +55,25 @@
 </template>
 <script setup>
 import { useGroup } from '@/components/groups/group';
-import { computed, ref } from 'vue';
-import { useStore } from 'vuex';
+import { computed, reactive, ref } from 'vue';
 
 const { getActiveGroup } = useGroup();
-const store = useStore();
 const lcl = JSON.parse(process.env.VUE_APP_LCL);
 
 const expanded = ref(false);
 
-const docs = computed(() => {
-  return getActiveGroup()?.docs || [];
+const state = reactive({
+  docs: [],
 });
+
+initData();
+
+async function initData() {
+  const activeGroup = await getActiveGroup();
+  if (activeGroup) {
+    state.docs = activeGroup.docs;
+  }
+}
 </script>
 
 <style scoped lang="scss">

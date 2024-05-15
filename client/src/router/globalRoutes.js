@@ -8,6 +8,8 @@ import AppInfo from '@/pages/app/AppInfo.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
 import GroupEdit from '@/pages/groups/GroupSettingsEdit.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
+import Profile from '@/pages/users/Profile.vue';
+import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 
 const guardLanding = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -39,6 +41,11 @@ export default [
       header: AppHeader,
       main: LandingPage,
     },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
   },
   {
     path: '/invitations',
@@ -50,7 +57,21 @@ export default [
   },
   {
     path: '/groups/all',
-    name: 'groups-list',
+    name: 'all-groups-list',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGlobal,
+      main: GroupList,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/groups/my',
+    name: 'my-groups-list',
     components: {
       header: AppHeader,
       navigation: AppNavigationGlobal,
@@ -69,6 +90,32 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGlobal,
       main: GroupEdit,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/auth/profile',
+    name: 'auth-profile',
+    components: {
+      header: AppHeader,
+      main: Profile,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/farmos/profile',
+    name: 'farmos-profile',
+    components: {
+      header: AppHeader,
+      main: FarmOSProfile,
     },
     props: {
       header: {

@@ -1,5 +1,5 @@
 <template>
-  <a-container class="maxw-4">
+  <a-container class="maxw-4 bg-background rounded">
     <template v-if="isLoggedIn">
       <a-alert
         v-if="successMessage"
@@ -18,8 +18,7 @@
         class="mt-4 cursor-pointer"
         mode="fade"
         variant="text"
-        type="error"
-      >
+        type="error">
         {{ errorMessage }}
       </a-alert>
 
@@ -37,8 +36,7 @@
         v-model="showAddDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Add an Additional User"
-      >
+        title="Add an Additional User">
         <div class="my-8">
           <p>Which user do you want to add to your instance?</p>
           <div class="d-block mb-4">
@@ -66,8 +64,7 @@
         v-model="showConfirmAddDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Add an Additional User"
-      >
+        title="Add an Additional User">
         <div class="my-8" style="color: black">
           <p class="mb-4">Are you sure you want to add this user {{ newAddedUserEmail }} to your instance?<br /></p>
           <a-btn block @click="confirmaddUser" color="primary" target="_blank"> Confirm</a-btn>
@@ -83,8 +80,7 @@
         v-model="showMoveDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Change Ownership of FarmOS Instance"
-      >
+        title="Change Ownership of FarmOS Instance">
         <div class="my-8">
           <p>To whom do you wish to transfer the ownership of this farm?</p>
           <div class="d-flex mb-4">
@@ -111,8 +107,7 @@
         v-model="showConfirmMoveDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Change Ownership of FarmOS Instance"
-      >
+        title="Change Ownership of FarmOS Instance">
         <div class="my-8" style="color: black">
           <p>
             Are you sure you want to move ownership to another Survey Stack user?<br />
@@ -139,8 +134,7 @@
         v-model="showConfirmRemoveDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Remove FarmOS Instance"
-      >
+        title="Remove FarmOS Instance">
         <div class="my-8" style="color: black">
           <p>
             Are you sure? This will disconnect your Survey Stack account from your farmOS account. You will no longer be
@@ -164,8 +158,7 @@
         v-model="showConfirmDeleteDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Remove FarmOS Instance"
-      >
+        title="Remove FarmOS Instance">
         <div class="my-8" style="color: black">
           <p>
             Are you sure? This will disconnect your Survey Stack account from your farmOS account. You will no longer be
@@ -199,8 +192,7 @@
         v-model="showConfirmRemoveInstFromGrpDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Remove Instance From Group"
-      >
+        title="Remove Instance From Group">
         <div class="my-8" style="color: black">
           <p>
             Are you sure? Removing yourself from this group means group admins can no longer access your farmOS account
@@ -225,8 +217,7 @@
         v-model="showConfirmRemoveInstFromOthUsrDialog"
         @cancel="closeAndReset"
         @confirm="closeAndReset"
-        title="Remove Instance From Group"
-      >
+        title="Remove Instance From Group">
         <div class="my-8" style="color: black">
           <p>
             Are you sure? Removing this users access means they can no longer see your farmOS instance or access your
@@ -262,8 +253,7 @@
                       style="min-width: 0px"
                       color="blue"
                       :href="getInstanceLink(instance.instanceName)"
-                      target="_blank"
-                    >
+                      target="_blank">
                       access
                       <a-tooltip top activator="parent">Access FarmOS instance</a-tooltip>
                     </a-btn>
@@ -274,8 +264,7 @@
                       class="px-1 mx-1"
                       style="min-width: 0px"
                       color="black"
-                      @click="addUserToInstance(instance.instanceName)"
-                    >
+                      @click="addUserToInstance(instance.instanceName)">
                       add
                       <a-tooltip top activator="parent">Add a user to your instance</a-tooltip>
                     </a-btn>
@@ -286,8 +275,7 @@
                       class="px-1 mx-1"
                       style="min-width: 0px"
                       color="black"
-                      @click="moveInstance(instance.instanceName)"
-                    >
+                      @click="moveInstance(instance.instanceName)">
                       re-assign
                       <a-tooltip top activator="parent">Re-assign the instance's ownership</a-tooltip>
                     </a-btn>
@@ -298,8 +286,7 @@
                       class="px-1 mx-1"
                       style="min-width: 0px"
                       color="red"
-                      @click="deleteInstance(instance.instanceName)"
-                    >
+                      @click="deleteInstance(instance.instanceName)">
                       delete
                       <a-tooltip top activator="parent">Delete this instance</a-tooltip>
                     </a-btn>
@@ -312,8 +299,7 @@
                       style="min-width: 0px"
                       color="blue"
                       :href="getInstanceLink(instance.instanceName)"
-                      target="_blank"
-                    >
+                      target="_blank">
                       access
                       <a-tooltip top activator="parent">Access FarmOS instance</a-tooltip>
                     </a-btn>
@@ -324,8 +310,7 @@
                       class="px-1 mx-1"
                       style="min-width: 0px"
                       color="red"
-                      @click="removeInstance(instance.instanceName)"
-                    >
+                      @click="removeInstance(instance.instanceName)">
                       remove
                       <a-tooltip top activator="parent">Remove this instance</a-tooltip>
                     </a-btn>
@@ -341,8 +326,7 @@
                     color="green"
                     v-for="(group, uidx) in instance.groups"
                     :key="`instance-${idx}-group-${uidx}`"
-                    @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
-                  >
+                    @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)">
                     {{ group.groupName }}
                   </a-chip>
                 </div>
