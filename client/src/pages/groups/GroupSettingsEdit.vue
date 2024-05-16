@@ -109,7 +109,7 @@
       </basic-list>
       <basic-list
         v-if="editMode"
-        listCard
+        listType="card"
         :showNavigationControl="false"
         :entities="integrations"
         title="Integrations"

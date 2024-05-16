@@ -10,7 +10,7 @@
     </a-alert>
     <basic-list
       @updateSearch="updateSearch"
-      listCard
+      listType="card"
       questionSetsType
       :loading="state.loading"
       :entities="state.surveys.content"

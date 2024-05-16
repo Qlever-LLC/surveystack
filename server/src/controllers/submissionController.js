@@ -16,6 +16,7 @@ import { queryParam } from '../helpers';
 import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
 import { getServerSelfOrigin } from '../services/auth.service';
 const col = 'submissions';
+const USERS_COLLECTION = 'users';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
 
@@ -260,7 +261,7 @@ export const buildPipeline = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRoleForRequest(res, groupId);
 
     if (hasAdminRights) {
-      addUserDetailsStage(pipeline);
+      addUserDetailsStage(pipeline, req.query.userIdCorrespondingToSearch);
     }
   }
 
@@ -368,7 +369,7 @@ const addCreatorDetailStage = (pipeline, user) => {
   );
 };
 
-const addUserDetailsStage = (pipeline) => {
+const addUserDetailsStage = (pipeline, userIdCorrespondingToSearch) => {
   pipeline.push({
     $lookup: {
       from: 'users',
@@ -413,11 +414,35 @@ const addUserDetailsStage = (pipeline) => {
   pipeline.push({
     $unwind: { path: '$meta.resubmitterUserDetail', preserveNullAndEmptyArrays: true },
   });
+
+  if (userIdCorrespondingToSearch) {
+    const userIds = userIdCorrespondingToSearch.map((id) => ObjectId(id));
+    pipeline.push({
+      $match: {
+        'meta.creator': { $in: userIds },
+      },
+    });
+  }
 };
 
 const getSubmissionsPage = async (req, res) => {
   let skip = 0;
   let limit = DEFAULT_LIMIT;
+
+  if (req.query.search) {
+    const pipelineSearchName = [
+      {
+        $match: {
+          name: {
+            $regex: req.query.search,
+            $options: 'i',
+          },
+        },
+      },
+    ];
+    const users = await db.collection(USERS_COLLECTION).aggregate(pipelineSearchName).toArray();
+    req.query.userIdCorrespondingToSearch = users.map((user) => new ObjectId(user._id));
+  }
 
   const pipeline = await buildPipeline(req, res);
 

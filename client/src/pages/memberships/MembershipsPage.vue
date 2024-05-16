@@ -1,6 +1,7 @@
 <template>
   <a-container>
     <basic-list
+      listType="row"
       :entities="state.members"
       :menu="state.menu"
       :buttonNew="{

@@ -9,7 +9,7 @@
       {{ message.errorMessage }}
     </a-alert>
     <basic-list
-      listCard
+      listType="card"
       :entities="state.entities"
       :buttonNew="{
         title: 'Create new Script',

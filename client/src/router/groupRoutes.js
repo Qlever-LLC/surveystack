@@ -6,7 +6,7 @@ import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 import GroupSettingsEdit from '@/pages/groups/GroupSettingsEdit.vue';
 import Builder from '@/pages/builder/Builder.vue';
-import List from '@/pages/submissions/List.vue';
+import ResultList from '@/pages/submissions/ResultList.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import Script from '@/pages/scripts/Script.vue';
 import DraftList from '@/pages/submissions/DraftsPage.vue';
@@ -233,7 +233,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: List,
+      main: ResultList,
     },
   },
   {

@@ -1,6 +1,6 @@
 <template>
   <a-container>
-    <basic-list :entities="state.submissions" :menu="state.menu" :loading="state.loading">
+    <basic-list listType="row" :entities="state.submissions" :menu="state.menu" :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
         My Responses

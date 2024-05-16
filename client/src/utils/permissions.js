@@ -35,10 +35,17 @@ export function getPermission() {
       : { allowed: false, message: "Sorry you can't see this result" };
   }
 
+  function rightToManageResponses() {
+    return isGroupAdmin()
+      ? { allowed: true, message: 'success' }
+      : { allowed: false, message: "Sorry you can't manage this response" };
+  }
+
   return {
     rightToSubmitSurvey,
     rightToEdit,
     rightToViewAnonymizedResults,
     rightToView,
+    rightToManageResponses,
   };
 }
