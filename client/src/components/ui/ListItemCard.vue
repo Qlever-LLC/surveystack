@@ -7,7 +7,7 @@
       dense
       class="py-2 mb-2 bg-white"
       rounded="lg"
-      @click="menu[0].render === undefined || menu[0].render(entity) ? runAction(menu[0].action(entity)) : undefined">
+      @click="runDefaultAction()">
       <span>
         <a-list-item-title class="d-flex align-center">
           <span v-if="enablePinned" @click.stop="toogleStar(entity)">
@@ -130,6 +130,20 @@ function getTextColor(itemMenu) {
 
 function toogleStar(entity) {
   emit('toogleStar', entity);
+}
+
+function runDefaultAction() {
+  //find first renderable default menu item, defined by color='green'
+  let defaultMenuItem = null;
+  for (const item of props.menu) {
+    if (item.color === 'green' && (item.render === undefined || item.render(props.entity)())) {
+      defaultMenuItem = item;
+      break;
+    }
+  }
+  if (defaultMenuItem) {
+    runAction(defaultMenuItem.action(props.entity));
+  }
 }
 
 function runAction(action) {

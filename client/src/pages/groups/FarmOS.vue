@@ -1,5 +1,5 @@
 <template>
-  <a-container v-if="farmosEnabled" class="max-800">
+  <a-container v-if="farmosEnabled" class="max-800 bg-background rounded">
     <a-alert
       v-if="successMessage"
       class="mt-4"

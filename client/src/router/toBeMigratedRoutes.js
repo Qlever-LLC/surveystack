@@ -5,15 +5,10 @@ import Register from '@/pages/auth/Register.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 import { decode as b64Decode } from 'js-base64';
 import store from '@/store';
-import UserEdit from '@/pages/users/UserEdit.vue';
-import User from '@/pages/users/User.vue';
 import ResourceList from '@/pages/resources/ResourceList.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
-import FarmOS from '@/pages/groups/FarmOS.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
-
-const Hylo = () => import('@/pages/groups/Hylo.vue');
 
 const commonComponents = {
   header: AppHeader,
@@ -80,34 +75,6 @@ export default [
     name: 'unauthorized',
     components: getComponents(Unauthorized),
     props: (route) => ({ ...route.query }),
-  },
-  // users
-  {
-    path: '/group-manage/farmos/:id',
-    name: 'farmos-group-manage',
-    props: true,
-    components: getComponents(FarmOS),
-  },
-  {
-    path: '/group-manage/hylo/:id',
-    name: 'hylo-group-manage',
-    props: true,
-    components: getComponents(Hylo),
-  },
-  {
-    path: '/users/new',
-    name: 'users-new',
-    components: getComponents(UserEdit),
-  },
-  {
-    path: '/users/:id/edit',
-    name: 'users-edit',
-    components: getComponents(UserEdit),
-  },
-  {
-    path: '/users/:id',
-    name: 'users-detail',
-    components: getComponents(User),
   },
   // integrations
   {

@@ -17,6 +17,9 @@ import MembershipsPage from '@/pages/memberships/MembershipsPage.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import store from '@/store';
+import FarmOS from '@/pages/groups/FarmOS.vue';
+
+const Hylo = () => import('@/pages/groups/Hylo.vue');
 
 export const authGuard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -178,6 +181,26 @@ export default [
       main: GroupSettingsEdit,
     },
     beforeEnter: groupAdminGuard,
+  },
+  {
+    path: '/groups/:id/farmos',
+    name: 'farmos-group-manage',
+    props: true,
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: FarmOS,
+    },
+  },
+  {
+    path: '/groups/:id/hylo',
+    name: 'hylo-group-manage',
+    props: true,
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGroup,
+      main: Hylo,
+    },
   },
   //edit group resource
   {
