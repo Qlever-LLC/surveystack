@@ -102,6 +102,7 @@ export default [
     name: 'auth-profile',
     components: {
       header: AppHeader,
+      navigation: AppNavigationGlobal,
       main: Profile,
     },
     props: {
@@ -115,6 +116,7 @@ export default [
     name: 'farmos-profile',
     components: {
       header: AppHeader,
+      navigation: AppNavigationGlobal,
       main: FarmOSProfile,
     },
     props: {
