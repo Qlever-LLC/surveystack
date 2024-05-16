@@ -480,6 +480,7 @@ async function initData() {
           resubmit(s);
         }),
       render: (s) => () => rightToManageResponses().allowed && !s.meta.archived,
+      color: 'green',
     },
     {
       title: 'Restore',
