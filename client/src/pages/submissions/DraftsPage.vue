@@ -34,7 +34,7 @@
     :dateSubmitted="state.activeSubmission.meta.dateSubmitted"
     v-model="state.confirmSubmissionIsVisible"
     @close="handleConfirmSubmissionDialogClose"
-    @submit="uploadSubmission(state.activeSubmission)" />
+    @submit="submit(state.activeSubmission)" />
   <submitting-dialog v-model="state.isSubmitting" />
   <result-dialog
     v-model="showResult"
@@ -53,13 +53,11 @@ import { useSubmission } from '@/pages/submissions/submission';
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
-import { uploadFileResources } from '@/utils/resources';
-import api from '@/services/api.service';
 import { useResults } from '@/components/ui/results';
 
 const store = useStore();
 const { getActiveGroupId } = useGroup();
-const { setSurveyNames, getSurvey } = useSubmission();
+const { getDrafts, isDraftReadyToSubmit, getDraftsReadyToSubmit, uploadSubmission } = useSubmission();
 
 const PAGINATION_LIMIT = 10;
 
@@ -71,15 +69,12 @@ const state = reactive({
   paginationLength: computed(() => {
     return Math.ceil(state.drafts.length / PAGINATION_LIMIT);
   }),
-  draftsReadyToSubmit: computed(() => {
-    return store.getters['submissions/readyToSubmit'];
-  }),
   menu: [
     {
       title: 'Submit',
       icon: 'mdi-open-in-new',
       action: (e) => () => handleSubmitClick(e._id),
-      render: (e) => () => isReadyToSubmit(e._id),
+      render: (e) => () => isDraftReadyToSubmit(e._id),
       color: 'green',
       buttonFixed: true,
     },
@@ -87,7 +82,7 @@ const state = reactive({
       title: 'Continue',
       icon: 'mdi-open-in-new',
       action: (e) => `/groups/${getActiveGroupId()}/surveys/${e.meta.survey.id}/submissions/${e._id}/edit`,
-      render: (e) => () => !isReadyToSubmit(e._id),
+      render: (e) => () => !isDraftReadyToSubmit(e._id),
       color: 'green',
       buttonFixed: true,
     },
@@ -114,24 +109,10 @@ initData();
 async function initData() {
   try {
     state.loading = true;
-    let rawDrafts = await store.dispatch('submissions/fetchLocalSubmissions');
-    rawDrafts = rawDrafts.filter((d) => d.meta.group?.id === getActiveGroupId());
-    rawDrafts = sortSubmissions(rawDrafts);
-    rawDrafts = await setSurveyNames(rawDrafts);
-    state.drafts = rawDrafts;
+    state.drafts = await getDrafts(getActiveGroupId());
   } finally {
     state.loading = false;
   }
-}
-
-function sortSubmissions(submissions) {
-  return [...submissions].sort(
-    (a, b) => new Date(b.meta.dateModified).valueOf() - new Date(a.meta.dateModified).valueOf()
-  );
-}
-
-function isReadyToSubmit(id) {
-  return state.draftsReadyToSubmit.indexOf(id) > -1;
 }
 
 function handleSubmitClick(id) {
@@ -140,7 +121,7 @@ function handleSubmitClick(id) {
 }
 
 function handleSubmitCompleted() {
-  state.uploadQueue = [...state.draftsReadyToSubmit];
+  state.uploadQueue = [...getDraftsReadyToSubmit()];
   uploadQueueNext();
 }
 
@@ -174,15 +155,10 @@ function uploadQueueNext() {
   }
 }
 
-async function uploadSubmission(submission) {
+async function submit(submission) {
   state.isSubmitting = true;
   try {
-    const survey = await getSurvey(submission);
-    await uploadFileResources(store, survey, submission, true);
-    const response = submission.meta.dateSubmitted
-      ? await api.put(`/submissions/${submission._id}`, submission)
-      : await api.post('/submissions', submission);
-    await store.dispatch('submissions/remove', submission._id);
+    const response = uploadSubmission(submission);
     result({ response });
   } catch (error) {
     console.log('Draft submit error:', error);

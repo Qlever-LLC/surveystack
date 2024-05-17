@@ -53,13 +53,15 @@ import { get } from 'lodash';
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 
-import isValid from 'date-fns/isValid';
-import parseISO from 'date-fns/parseISO';
-import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
+import parseISO from 'date-fns/parseISO';
+import isValid from 'date-fns/isValid';
+import formatDistance from 'date-fns/formatDistance';
+
+import { useSurvey } from '@/components/survey/survey';
 
 const store = useStore();
 const router = useRouter();
@@ -67,6 +69,7 @@ const { getActiveGroupId } = useGroup();
 const { rightToSubmitSurvey, rightToEdit, rightToViewAnonymizedResults, rightToView } = getPermission();
 const { message, createAction } = menuAction();
 const PAGINATION_LIMIT = 10;
+const { getSurveys } = useSurvey();
 
 const state = reactive({
   page: 1,
@@ -91,12 +94,6 @@ const activeTabPaginationLength = computed(() => {
 });
 const groups = computed(() => {
   return store.getters['memberships/groups'];
-});
-const isWhitelabel = computed(() => {
-  return store.getters['whitelabel/isWhitelabel'];
-});
-const whitelabelPartner = computed(() => {
-  return store.getters['whitelabel/partner'];
 });
 
 initData();
@@ -212,42 +209,10 @@ async function initData() {
       // }
     ];
 
-    await Promise.all([fetchData()]);
-  } finally {
-    state.loading = false;
-  }
-}
-async function fetchData(user = null) {
-  const now = new Date();
-  const queryParams = new URLSearchParams();
-  if (user) {
-    queryParams.append('creator', user);
-  }
-  if (state.search) {
-    queryParams.append('q', state.search);
-  }
-  if (isWhitelabel.value) {
-    queryParams.append('prefix', whitelabelPartner.value.path);
-  }
-
-  queryParams.append('groupId', getActiveGroupId());
-  queryParams.append('isLibrary', 'false');
-  queryParams.append('skip', (state.page - 1) * PAGINATION_LIMIT);
-  queryParams.append('limit', PAGINATION_LIMIT);
-  queryParams.append('prioPinned', true);
-
-  try {
-    const { data } = await api.get(`/surveys/list-page?${queryParams}`);
-
-    if (data.pinned) {
-      data.pinned.forEach((s) => {
-        s.pinnedSurveys = true;
-        data.content.unshift(s);
-      });
-    }
-    delete data.pinned;
-
-    state.surveys = data;
+    //laod the surveys
+    state.surveys = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT);
+    //add createdAgo information
+    const now = new Date();
     state.surveys.content.forEach((s) => {
       if (s.meta) {
         const parsedDate = parseISO(s.meta.dateCreated);
@@ -256,18 +221,8 @@ async function fetchData(user = null) {
         }
       }
     });
-    return data;
-  } catch (e) {
-    // TODO: use cached data?
-    console.log('Error fetching surveys:', e);
+  } finally {
+    state.loading = false;
   }
-  return {
-    content: [],
-    pagination: {
-      parsedLimit: 10,
-      parsedSkip: 0,
-      total: 0,
-    },
-  };
 }
 </script>
