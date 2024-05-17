@@ -41,16 +41,17 @@
 </template>
 
 <script setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
 
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useGroup } from '@/components/groups/group';
 
 const store = useStore();
 const router = useRouter();
+const route = useRoute();
 const { getActiveGroup } = useGroup();
 
 const props = defineProps({
@@ -75,6 +76,14 @@ initData();
 async function initData() {
   state.activeGroup = await getActiveGroup();
 }
+
+watch(
+  route,
+  () => {
+    initData();
+  },
+  { deep: true }
+);
 </script>
 <style scoped lang="scss">
 .fixed-bar {
