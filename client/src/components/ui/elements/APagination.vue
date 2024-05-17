@@ -3,8 +3,7 @@
     @update:modelValue="$emit('update:modelValue', $event)"
     :color="color"
     :length="length"
-    :modelValue="modelValue"
-    :total-visible="7" />
+    :modelValue="modelValue" />
 </template>
 
 <script>

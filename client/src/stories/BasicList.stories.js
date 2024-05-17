@@ -27,7 +27,7 @@ export const BasicListCard_Survey = {
   }),
   args: {
     //👇 The args you need here will depend on your component
-    listCard: true,
+    listType: 'card',
     entities: entityType.surveys,
     enablePinned: true,
     buttonNew: { title: 'Create new Survey', link: '/url' },
@@ -60,7 +60,7 @@ export const BasicListCard_Scripts = {
       </basic-list>`,
   }),
   args: {
-    listCard: true,
+    listType: 'card',
     entities: entityType.scripts,
     buttonNew: { title: 'Create new Script', link: '/url' },
     menu: [
@@ -86,7 +86,7 @@ export const BasicListCard_QuestionsLibrary = {
       </basic-list>`,
   }),
   args: {
-    listCard: true,
+    listType: 'card',
     entities: entityType.questionsLibrary,
     buttonNew: { title: 'Create new Question Set', link: '/url' },
     menu: [
@@ -116,7 +116,7 @@ export const BasicListCard_Groups = {
       </basic-list>`,
   }),
   args: {
-    listCard: true,
+    listType: 'card',
     entities: entityType.groups,
     groupStyle: true,
     buttonNew: { title: 'Create a Group', link: '/url' },
@@ -152,6 +152,7 @@ export const BasicListRow_Submissions = {
       </basic-list>`,
   }),
   args: {
+    listType: 'row',
     entities: entityType.submissions,
     submissions: true,
     menu: [
@@ -196,6 +197,7 @@ export const BasicListRow_Drafts = {
       </basic-list>`,
   }),
   args: {
+    listType: 'row',
     entities: entityType.drafts,
     drafts: true,
     menu: [
@@ -231,6 +233,7 @@ export const BasicListRow_Results = {
         </basic-list>`,
   }),
   args: {
+    listType: 'row',
     entities: entityType.results,
     showTitle: false,
     menu: [
@@ -272,6 +275,7 @@ export const BasicListRow_Members = {
       </basic-list>`,
   }),
   args: {
+    listType: 'row',
     entities: entityType.members,
     buttonNew: { title: 'Invite New Members', link: '/url' },
     members: true,

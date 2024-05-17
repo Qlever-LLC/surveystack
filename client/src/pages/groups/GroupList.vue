@@ -1,7 +1,7 @@
 <template>
   <a-container>
     <basic-list
-      listCard
+      listType="card"
       :entities="entities"
       :loading="loading"
       groupStyle

@@ -197,7 +197,9 @@ export default {
       }
       try {
         await api.delete(`/surveys/${this.survey._id}`);
-        this.$router.push(this.$route.path + '/surveys');
+        this.$router.push({
+          name: 'group-surveys',
+        });
       } catch (error) {
         console.log(error);
       }

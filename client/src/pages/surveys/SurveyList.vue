@@ -11,7 +11,7 @@
     <basic-list
       @updateSearch="updateSearch"
       @toogleStar="toogleStar"
-      listCard
+      listType="card"
       :entities="state.surveys.content"
       enablePinned
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"

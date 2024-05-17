@@ -1,6 +1,7 @@
 <template>
   <a-container>
     <basic-list
+      listType="row"
       :entities="state.drafts"
       :menu="state.menu"
       :buttonNew="{ title: 'Submit Completed TODO', action: () => handleSubmitCompleted() }"

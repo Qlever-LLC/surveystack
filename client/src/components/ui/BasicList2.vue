@@ -1,21 +1,25 @@
 <template>
   <a-card :loading="loading" color="background">
-    <a-card-title v-if="showTitle" class="text-heading d-flex pa-4">
-      <a-col v-if="showNavigationControl" align="start" class="flex-grow-0">
-        <AppNavigationControl />
-      </a-col>
-      <a-col v-else align="start" class="flex-grow-0">
-        {{ title }}
-      </a-col>
-      <a-col class="flex-grow-1 pl-0" :class="mobile ? 'text-center' : 'text-center'">
-        <slot name="title" />
-      </a-col>
-      <a-col align="end" class="flex-grow-0">
-        <a-btn v-if="buttonNew?.title" color="accent" :to="buttonNew.link" variant="flat" rounded="lg">
-          <a-icon class="mdi-24px"> mdi-plus-circle-outline </a-icon>
-          <div v-if="!mobile" class="ml-2">{{ buttonNew.title }}</div>
-        </a-btn>
-      </a-col>
+    <a-card-title v-if="showTitle" class="text-heading pa-4">
+      <a-row class="d-flex">
+        <a-col v-if="showNavigationControl" class="flex-grow-0">
+          <AppNavigationControl />
+        </a-col>
+        <a-col v-else class="flex-grow-0">
+          {{ title }}
+        </a-col>
+        <a-col class="flex-grow-1 pl-0" :class="mobile ? 'text-center' : 'text-center'">
+          <slot name="title" />
+        </a-col>
+        <a-col class="flex-grow-0">
+          <slot name="titleBtn" />
+          <a-btn v-if="buttonNew?.title" color="accent" :to="buttonNew.link" variant="flat" rounded="lg">
+            <a-icon class="mdi-24px"> mdi-plus-circle-outline </a-icon>
+            <div v-if="!mobile" class="ml-2">{{ buttonNew.title }}</div>
+          </a-btn>
+        </a-col>
+      </a-row>
+      <slot name="customTypeList" />
     </a-card-title>
     <a-card-text>
       <span v-if="showSearch" class="d-flex mb-6">
@@ -24,7 +28,7 @@
           bgColor="transparent"
           dense
           hideDetails
-          label="Search"
+          :label="labelSearch"
           prependInnerIcon="mdi-magnify"
           rounded="lg"
           variant="solo-filled"
@@ -41,7 +45,7 @@
       <div v-if="state.showFilter" class="mt-n4 mb-6">
         <slot name="filter" />
       </div>
-      <template v-if="listCard && (filteredEntities.length > 0 || loading)">
+      <template v-if="listType === 'card' && (filteredEntities.length > 0 || loading)">
         <div v-if="loading">
           <a-skeleton-loader v-for="index in [1, 2, 3]" :key="index" type="list-item" :height="57" class="mb-2" />
         </div>
@@ -55,14 +59,14 @@
             :enablePinned="enablePinned"
             :groupStyle="groupStyle"
             :questionSetsType="questionSetsType"
-          :menu="menu">
-          <template v-slot:entitySubtitle="{ entity }">
-            <slot name="entitySubtitle" :entity="entity" />
-          </template>
-        </list-item-card>
+            :menu="menu">
+            <template v-slot:entitySubtitle="{ entity }">
+              <slot name="entitySubtitle" :entity="entity" />
+            </template>
+          </list-item-card>
         </a-list>
       </template>
-      <template v-else-if="filteredEntities.length > 0 || loading">
+      <template v-else-if="(listType === 'row' && filteredEntities.length > 0) || loading">
         <div v-if="loading" class="py-2">
           <a-skeleton-loader
             v-for="index in [1, 2, 3]"
@@ -90,6 +94,9 @@
             </template>
           </list-item-row>
         </a-list>
+      </template>
+      <template v-else-if="listType === 'custom' || loading">
+        <slot name="customList" />
       </template>
       <div v-else class="text-grey">
         <slot name="noValue" />
@@ -125,10 +132,13 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  listCard: {
-    type: Boolean,
+  listType: {
+    type: String,
+    validator: function (value) {
+      return ['row', 'card', 'custom'].includes(value);
+    },
     required: false,
-    default: false,
+    default: 'row',
   },
   enablePinned: {
     type: Boolean,
@@ -163,6 +173,10 @@ const props = defineProps({
   showSearch: {
     type: Boolean,
     default: true,
+  },
+  labelSearch: {
+    type: String,
+    default: 'Search',
   },
   filter: {
     type: Function,
