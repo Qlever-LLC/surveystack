@@ -3,10 +3,23 @@ const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../../db');
 
 const createSubmissionMeta =
-  ({ isDraft = false, creator = new ObjectId(), dateModified = new Date() } = {}) =>
+  (
+    {
+      isDraft = false,
+      isDeletedDraft = false,
+      creator = new ObjectId(),
+      dateModified = new Date(),
+      specVersion = 4,
+      archived = false,
+      archivedReason = undefined,
+      status = [],
+    } = {},
+    { omitIsDraft = false, omitIsDeletedDraft = false } = {}
+  ) =>
   (survey) => {
     return {
-      isDraft,
+      ...(omitIsDraft ? {} : { isDraft }),
+      ...(omitIsDeletedDraft ? {} : { isDeletedDraft }),
       dateCreated: new Date(),
       dateModified,
       dateSubmitted: new Date(),
@@ -16,26 +29,36 @@ const createSubmissionMeta =
         version: 2,
       },
       revision: 1,
+      archived,
+      ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
-      status: [],
+      status,
       group: survey.meta.group,
-      specVersion: 4,
+      specVersion,
       creator,
       permanentResults: [],
     };
   };
 
 const createRequestSubmissionMeta =
-  ({
-    isDraft = false,
-    creator = new ObjectId().toString(),
-    dateModified = new Date().toISOString(),
-    dateSubmitted = null,
-    status = [],
-  } = {}) =>
+  (
+    {
+      isDraft = false,
+      isDeletedDraft = false,
+      creator = new ObjectId().toString(),
+      dateModified = new Date().toISOString(),
+      dateSubmitted = null,
+      specVersion = 4,
+      archived = false,
+      archivedReason = undefined,
+      status = [],
+    } = {},
+    { omitIsDraft = false, omitIsDeletedDraft = false } = {}
+  ) =>
   (survey) => {
     return {
-      isDraft,
+      ...(omitIsDraft ? {} : { isDraft }),
+      ...(omitIsDeletedDraft ? {} : { isDeletedDraft }),
       dateCreated: new Date().toISOString(),
       dateModified,
       dateSubmitted,
@@ -45,13 +68,15 @@ const createRequestSubmissionMeta =
         version: 2,
       },
       revision: 1,
+      archived,
+      ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
       status,
       group: {
         id: survey.meta.group.id.toString(),
         path: survey.meta.group.path,
       },
-      specVersion: 4,
+      specVersion,
       creator,
       permanentResults: [],
     };

@@ -4,8 +4,9 @@
       v-if="!loading && !hasError"
       :survey="survey"
       :submission="submission"
-      :persist="true"
-      @submit="submit" />
+      :persist="!isResubmission()"
+      @submit="submit"
+    />
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <a-progress-circular :size="50" />
     </div>
@@ -14,6 +15,9 @@
     </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
+      <p class="font-weight-bold" v-if="isResubmission()">
+        Drafts are not saved when resubmitting a submission. Any changes will be lost if you leave.
+      </p>
       Are you sure you want to exit this draft?
     </confirm-leave-dialog>
 
@@ -101,6 +105,12 @@ export default {
     };
   },
   methods: {
+    isResubmission() {
+      return this.submission && this.submission.meta && this.submission.meta.dateSubmitted;
+    },
+    isProxySubmission() {
+      return this.submission && this.submission.meta && this.submission.meta.submitAsUser;
+    },
     abortEditSubmitted() {
       this.$store.dispatch('submissions/remove', this.submission._id);
       // TODO: should we remove the router guard in this situation? otherwise it pops up a modal asking if the user
@@ -226,11 +236,11 @@ export default {
         await autoSelectActiveGroup(this.$store, group);
       }
 
-      const startDraftConfig = { survey: this.survey };
+      const createSubmissionConfig = { survey: this.survey, version: this.survey.latestVersion };
       if (submitAsUserId) {
         try {
           const { data: submitAsUser } = await api.get(`/users/${submitAsUserId}`);
-          startDraftConfig.submitAsUser = submitAsUser;
+          createSubmissionConfig.submitAsUser = submitAsUser;
         } catch (error) {
           this.hasError = true;
           this.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
@@ -238,11 +248,10 @@ export default {
           return;
         }
       }
-      const submissionId = await this.$store.dispatch('submissions/startDraft', startDraftConfig);
-      await this.$router.replace({ name: 'edit-submission', params: { surveyId, submissionId } });
-    }
 
-    if (this.$route.name === 'edit-submission') {
+      this.submission = createSubmissionFromSurvey(createSubmissionConfig);
+      this.$router.replace({ name: 'edit-submission', params: { surveyId, submissionId: this.submission._id } });
+    } else if (this.$route.name === 'edit-submission') {
       const { submissionId } = this.$route.params;
       await this.$store.dispatch('submissions/fetchLocalSubmissions');
       const localSubmission = this.$store.getters['submissions/getSubmission'](submissionId);
@@ -267,8 +276,7 @@ export default {
       }
     }
 
-    const isResubmission = this.submission && this.submission.meta && this.submission.meta.dateSubmitted;
-    if (isResubmission) {
+    if (this.isResubmission()) {
       const allowedToResubmit = checkAllowedToResubmit(
         this.submission,
         this.$store.getters['memberships/memberships'],
@@ -312,7 +320,7 @@ export default {
 
     // Set proxy header if resubmit by proxy or admin.
     // Otherwise, remove it
-    if (this.submission.meta.submitAsUser) {
+    if (this.isProxySubmission()) {
       api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
     } else {
       api.removeHeader('x-delegate-to');
@@ -322,6 +330,12 @@ export default {
     this.loading = false;
   },
   beforeRouteLeave(to, from, next) {
+    if (from.name === 'new-submission' && to.name === 'edit-submission') {
+      // This is a programmatic navigation that doesn't leave this component (the two routes share this component)
+      // We don't need the confirm leave dialog in this case.
+      return next(true);
+    }
+
     if (this.submission && this.survey && !this.isSubmitted && !this.hasError) {
       this.$refs.confirmLeaveDialog.open(next);
       return;

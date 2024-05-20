@@ -800,6 +800,7 @@ export default {
         survey: this.surveyUnderWork,
         version,
         instance: this.instance,
+        isDraft: false,
       });
     },
   },

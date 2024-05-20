@@ -1,8 +1,6 @@
 import * as db from '@/store/db';
 import api from '@/services/api.service';
 
-import { createSubmissionFromSurvey } from '@/utils/submissions';
-
 export const types = {
   mutations: {
     SET_SUBMISSIONS: 'SET_SUBMISSIONS',
@@ -17,7 +15,6 @@ export const types = {
     remove: 'remove',
     fetchLocalSubmission: 'fetchLocalSubmission',
     fetchLocalSubmissions: 'fetchLocalSubmissions',
-    startDraft: 'startDraft',
     get: 'get',
     update: 'update',
     fetchRemoteSubmission: 'fetchRemoteSubmission',
@@ -92,26 +89,6 @@ const actions = {
     const submissions =
       state.submissions.length > 0 ? state.submissions : await dispatch(types.actions.fetchLocalSubmissions);
     return submissions.find((submission) => submission._id === id);
-  },
-  // Create a draft, store it in database and Vuex store, then navigate to draft
-  // TODO: figure out where and when to persist to database and store.
-  // Also, should this even be a Vuex action or should it reside somewhere else?
-  async [types.actions.startDraft]({ dispatch }, { survey, submitAsUser = undefined }) {
-    const surveyEntity = await dispatch('surveys/fetchSurvey', { id: survey._id }, { root: true });
-    const submission = createSubmissionFromSurvey({
-      survey: surveyEntity,
-      version: surveyEntity.latestVersion,
-      submitAsUser: submitAsUser,
-    });
-
-    try {
-      await db.persistSubmission(submission);
-    } catch (err) {
-      console.warn('failed to save submission to IDB');
-    }
-
-    dispatch(types.actions.add, submission);
-    return submission._id;
   },
   async [types.actions.update]({ commit }, submission) {
     await db.persistSubmission(submission);

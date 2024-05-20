@@ -44,9 +44,7 @@ const connectDatabase = async () => {
   await db.collection('farmos-instance-notes').createIndex({ instanceName: 1 }, { unique: true });
 
   await db.collection(COLL_GROUPS_HYLO_MAPPINGS).createIndex({ groupId: 1 }, { unique: true });
-  // await db.collection(COLL_GROUPS_HYLO_MAPPINGS).dropIndex({ hyloGroupId: 1 });
 
-  // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
   const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';
   const farmOsWebhookRequestsCollectionExists = await db
     .listCollections({ name: farmOsWebhookRequestsCollectionName })
@@ -76,6 +74,47 @@ const connectDatabase = async () => {
   await migrateSurveyControlPrintLayout_VXtoV6();
   await migrateSurveyOntologyOptions_VXtoV7();
   await migrateSurveyControlPrintLayout_VXtoV9();
+  await migrateSubmissions_VXtoV4();
+};
+
+/*
+  Set all existing submissions to not be drafts (isDraft = false),
+  because prior to this migration all submissions
+  in the database are *submitted* submissions. Soon
+  after this migration, we will be persisting drafts
+  in the database within the submissions collection.
+
+  Set isDeletedDraft to false because only a submission with isDraft = true
+  can have isDeletedDraft = true, and no submissions are drafts at this point.
+
+  Set status to an empty array. Prior to this migration, the only status that
+  can exist in the status array has type 'READY_TO_SUBMIT'. That status is added
+  by the client when submitting a draft/submission. Prior to this migration,
+  that status is never used in any server logic, nor is it needed by the client once
+  the submission is persisted to the server, so we can remove it.
+
+  Soon after this migration, the server will have logic that behaves differently 
+  depending on if a submission coming in on a request has status READY_TO_SUBMIT.
+  In these cases, the server will process the submission according to the
+  READY_TO_SUBMIT status, and then remove the status before persisting the submission
+  to the database. That doesn't really matter for this migration, but is a bit of
+  additional context.
+*/
+const migrateSubmissions_VXtoV4 = async () => {
+  const updateResult = await db.collection('submissions').updateMany(
+    { 'meta.specVersion': { $lte: 3 } },
+    {
+      $set: {
+        'meta.specVersion': 4,
+        'meta.isDraft': false,
+        'meta.isDeletedDraft': false,
+        'meta.status': [],
+      },
+    }
+  );
+  if (updateResult.modifiedCount) {
+    console.log('migrateSubmissions_VXtoV4: Updated', updateResult.modifiedCount, 'submissions');
+  }
 };
 
 const migrateScripts_V1toV2 = async () => {

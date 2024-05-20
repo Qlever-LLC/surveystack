@@ -69,6 +69,26 @@ async function removeFromIndexedDB(storeName, id) {
   return (await db).delete(storeName, id);
 }
 
+const migrateSubmissions = async () => {
+  const drafts = await getAllSubmissions();
+
+  const isResubmissionDraft = (draft) => draft.meta.dateSubmitted && !draft.meta.isDraft;
+  const resubmissionDrafts = drafts.filter(isResubmissionDraft);
+  const remainingDrafts = drafts.filter((draft) => !isResubmissionDraft(draft));
+
+  const upgradeSubmissionFromVXtoV4 = (submission) => {
+    submission.meta.isDraft = true;
+    submission.meta.isDeletedDraft = false;
+    submission.meta.specVersion = 4;
+    return submission;
+  };
+
+  const removals = resubmissionDrafts.map((draft) => removeFromIndexedDB(stores.SUBMISSIONS, draft._id));
+  const updates = remainingDrafts.map(upgradeSubmissionFromVXtoV4).map(persistSubmission);
+
+  return Promise.all([...removals, ...updates]);
+};
+
 export {
   stores,
   clearAllSubmissions,
@@ -79,4 +99,5 @@ export {
   getAllSubmissions,
   getAllResources,
   removeFromIndexedDB,
+  migrateSubmissions,
 };

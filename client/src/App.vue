@@ -18,6 +18,7 @@ import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
+import { migrateSubmissions } from './store/db';
 
 export default {
   name: 'App',
@@ -41,7 +42,8 @@ export default {
       }
     };
 
-    onMounted(() => {
+    onMounted(async () => {
+      await migrateSubmissions();
       domainHandler.install(store);
 
       fetchPinnedSurveys();
