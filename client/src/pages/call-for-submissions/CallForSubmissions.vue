@@ -31,7 +31,7 @@
     </a-card>
     <a-card>
       <a-card-title>Select members</a-card-title>
-      <a-card-subtitle>{{ selectedMembers.length }} selected</a-card-subtitle>
+      <a-card-subtitle>{{ selectedMembers.length }} of {{ activeMembers.length }} selected</a-card-subtitle>
       <a-card-text>
         <a-data-table
           v-model="selectedMembers"
@@ -155,7 +155,7 @@ export default {
     async submit() {
       this.isSubmitting = true;
       try {
-        const members = this.selectedMembers.map((member) => member._id);
+        const members = this.selectedMembers;
         const survey = this.selectedSurvey._id;
         await api.post('/call-for-submissions/send', {
           survey,

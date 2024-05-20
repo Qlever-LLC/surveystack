@@ -45,7 +45,7 @@
                       <a-btn
                         v-if="readyToSubmitHas(item._id)"
                         icon
-                        @click="() => handleSubmitClick(item._id)"
+                        @click.stop="() => handleSubmitClick(item._id)"
                         color="primary">
                         <a-icon> mdi-cloud-upload-outline</a-icon>
                         <a-tooltip bottom activator="parent">Upload Submission</a-tooltip>
