@@ -65,6 +65,10 @@ function getAllResources() {
   return getResults(stores.RESOURCES);
 }
 
+async function getSubmission(id) {
+  return (await db).get(stores.SUBMISSIONS, id);
+}
+
 async function removeFromIndexedDB(storeName, id) {
   return (await db).delete(storeName, id);
 }
@@ -98,6 +102,7 @@ export {
   persistResource,
   getAllSubmissions,
   getAllResources,
+  getSubmission,
   removeFromIndexedDB,
   migrateSubmissions,
 };

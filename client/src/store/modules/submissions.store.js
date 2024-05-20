@@ -5,33 +5,27 @@ export const types = {
   mutations: {
     SET_SUBMISSIONS: 'SET_SUBMISSIONS',
     ADD_SUBMISSION: 'ADD_SUBMISSION',
-    GET_SUBMISSION: 'GET_SUBMISSION',
     UPDATE_SUBMISSION: 'UPDATE_SUBMISSION',
     REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
-    SET_READY_TO_SUBMIT: 'SET_READY_TO_SUBMIT',
+    RESET: 'RESET',
   },
   actions: {
+    reset: 'reset',
     add: 'add',
     remove: 'remove',
-    fetchLocalSubmission: 'fetchLocalSubmission',
     fetchLocalSubmissions: 'fetchLocalSubmissions',
-    get: 'get',
     update: 'update',
     fetchRemoteSubmission: 'fetchRemoteSubmission',
   },
 };
 
-const createInitialState = () => ({
+export const createInitialState = () => ({
   submissions: [],
-  readyToSubmit: [],
 });
 
 const initialState = createInitialState();
 
 const getters = {
-  drafts: (state) => state.submissions.filter((s) => s),
-  outbox: (state) => state.submissions.filter((s) => s),
-  // TODO should this search previously uploaded submissions
   getSubmission: (state) => (id) => state.submissions.find((submission) => submission._id === id),
   readyToSubmit: (state) =>
     state.submissions
@@ -40,7 +34,7 @@ const getters = {
 };
 
 const mutations = {
-  RESET(state) {
+  [types.mutations.RESET](state) {
     Object.assign(state, createInitialState());
   },
   [types.mutations.SET_SUBMISSIONS](state, submissions) {
@@ -66,7 +60,7 @@ const mutations = {
 };
 
 const actions = {
-  reset({ commit }) {
+  [types.actions.reset]({ commit }) {
     commit('RESET');
   },
   async [types.actions.fetchLocalSubmissions]({ commit }) {
@@ -84,11 +78,6 @@ const actions = {
       console.warn('unable to remove submission from IDB');
     }
     commit(types.mutations.REMOVE_SUBMISSION, id);
-  },
-  async [types.actions.fetchLocalSubmission]({ state, dispatch }, id) {
-    const submissions =
-      state.submissions.length > 0 ? state.submissions : await dispatch(types.actions.fetchLocalSubmissions);
-    return submissions.find((submission) => submission._id === id);
   },
   async [types.actions.update]({ commit }, submission) {
     await db.persistSubmission(submission);
