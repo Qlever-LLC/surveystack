@@ -82,6 +82,7 @@ import BaseQuestionComponent from './BaseQuestionComponent';
 import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
+import { toRaw } from 'vue';
 
 export default {
   mixins: [BaseQuestionComponent],
@@ -127,8 +128,8 @@ export default {
         {
           type: 'REQUEST_RUN_SCRIPT',
           payload: {
-            value: this.modelValue,
-            context: this.meta.context || {},
+            value: this.modelValue ? toRaw(this.modelValue) : this.modelValue,
+            context: this.meta.context ? toRaw(this.meta.context) : {},
             status: this.status || { type: null, message: null },
           },
         },
@@ -140,8 +141,8 @@ export default {
         {
           type: 'REQUEST_RENDER_SCRIPT',
           payload: {
-            value: this.modelValue,
-            context: this.meta.context || {},
+            value: this.modelValue ? toRaw(this.modelValue) : this.modelValue,
+            context: this.meta.context ? toRaw(this.meta.context) : {},
           },
         },
         '*'
