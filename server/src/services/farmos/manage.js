@@ -677,6 +677,11 @@ export const deletePlan = async (planId) => {
   const filter = { _id: planIdToDelete };
   await db.collection('farmos-plans').deleteMany(filter);
 
+  /*
+  planId can exist in the FARMOS_GROUP_SETTINGS collection
+  so I filter all other planId that are not equal to this planId
+  then I update by replacing the old planId array with the new filtered array
+  */
   const pipeline = [
     {
       $match: {
