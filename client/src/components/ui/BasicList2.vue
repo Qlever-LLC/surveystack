@@ -34,6 +34,7 @@
           variant="solo-filled"
           clearable />
         <a-btn
+          v-if="$slots.filter"
           class="ml-6"
           :color="state.showFilter ? 'primary' : 'accent-lighten-8-no bg-transparent'"
           @click="state.showFilter = !state.showFilter"
