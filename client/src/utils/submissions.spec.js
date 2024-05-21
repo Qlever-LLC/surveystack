@@ -61,11 +61,14 @@ api.get.mockImplementation(() => {
 });
 
 describe('createSubmissionFromSurvey', () => {
-  it('returns a submission from the given survey version', () => {
+  it('creates a submission from the given survey version', () => {
     const survey = createSurvey({ group: { id: 'group-id', path: '/group-path' } });
     const submission = createSubmissionFromSurvey({ survey, version: survey.latestVersion });
     expect(submission.meta.survey.id).toEqual(survey._id);
     expect(submission.meta.group.id).toEqual(survey.meta.group.id);
+    expect(submission.meta.isDraft).toBe(true);
+    expect(submission.meta.isDeletedDraft).toBe(false);
+    expect(submission.meta.specVersion).toBe(4);
   });
 });
 

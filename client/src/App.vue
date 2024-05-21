@@ -22,6 +22,7 @@ import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
+import { migrateSubmissions } from './store/db';
 import { useDisplay } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
 import { useNavigation } from '@/components/navigation';
@@ -61,6 +62,7 @@ const state = reactive({
 });
 
 onMounted(async () => {
+  await migrateSubmissions();
   domainHandler.install(store);
 
   fetchPinnedSurveys();

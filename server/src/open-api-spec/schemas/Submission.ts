@@ -37,6 +37,7 @@ const Submission: OpenAPIV3.SchemaObject = {
           type: 'array',
           items: {},
         },
+        // TODO: add `archived` and `archivedReason` properties
         status: {
           type: 'array',
           items: {
