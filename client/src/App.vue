@@ -8,7 +8,7 @@
 
     <a-main v-if="state.showMain" :style="state.showNav ? '--v-layout-left: 300px' : ''">
       <app-global-feedback />
-      <router-view name="main" :key="$route.fullPath" />
+      <router-view name="main" />
     </a-main>
     <install-banner />
   </a-app>
@@ -26,6 +26,7 @@ import { useDisplay } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
 import { useNavigation } from '@/components/navigation';
 import { autoJoinWhiteLabelGroup } from '@/utils/memberships';
+import { migrateSubmissions } from './store/db';
 
 const store = useStore();
 const router = useRouter();
@@ -62,6 +63,7 @@ const state = reactive({
 
 onMounted(async () => {
   domainHandler.install(store);
+  await migrateSubmissions();
 
   fetchPinnedSurveys();
   fetchFarmOsAssets();

@@ -699,6 +699,23 @@ const getSubmission = async (req, res) => {
 const prepareCreateSubmissionEntity = async (submission, res) => {
   const entity = await sanitize(submission);
 
+  const isReadyToSubmit = submission.meta.status.some(
+    (status) => status.type === 'READY_TO_SUBMIT'
+  );
+  if (submission.meta.isDraft && !isReadyToSubmit) {
+    throw boom.badData('Draft must be ready to submit.');
+  }
+
+  /*
+    Clear all existing statuses. At the time of this comment, none of the possible statuses
+    make sense to be on submitted submissions, and this function is responsible for preparing
+    submitted submission (not draft submissions). This could change in the future, at which point
+    we should update this logic to only clear some statuses. The current statuses are:
+    'READY_TO_SUBMIT', 'READY_TO_DELETE', 'UNAUTHORIZED_TO_SUBMIT' and 'FAILED_TO_SUBMIT'
+  */
+  entity.meta.status = [];
+  entity.meta.isDraft = false;
+
   const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
   if (!survey) {
     throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
@@ -764,23 +781,17 @@ const createSubmission = async (req, res) => {
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
+
+  if (req.body.meta.isDraft === true) {
+    throw boom.badData('Draft submissions cannot but updated with this endpoint.');
+  }
+
   let newSubmission = await sanitize(req.body);
   const oldSubmission = res.locals.existing;
 
   // update with upped revision and resubmitter
   newSubmission.meta.revision = oldSubmission.meta.revision + 1;
   newSubmission.meta.resubmitter = new ObjectId(res.locals.auth.user._id);
-
-  const updateOperation = {
-    data: newSubmission.data,
-    'meta.group': newSubmission.meta.group,
-    'meta.revision': newSubmission.meta.revision,
-    'meta.resubmitter': newSubmission.meta.resubmitter,
-    'meta.dateModified': newSubmission.meta.dateModified,
-    'meta.dateSubmitted': newSubmission.meta.dateSubmitted,
-    'meta.specVersion': newSubmission.meta.specVersion,
-    'meta.status': newSubmission.meta.status,
-  };
 
   // re-insert old submission version with a new _id
   oldSubmission._id = new ObjectId();
@@ -806,6 +817,17 @@ const updateSubmission = async (req, res) => {
   } catch (errorObject) {
     return res.status(503).send(errorObject);
   }
+
+  const updateOperation = {
+    data: newSubmission.data,
+    'meta.group': newSubmission.meta.group,
+    'meta.revision': newSubmission.meta.revision,
+    'meta.resubmitter': newSubmission.meta.resubmitter,
+    'meta.dateModified': newSubmission.meta.dateModified,
+    'meta.dateSubmitted': newSubmission.meta.dateSubmitted,
+    'meta.specVersion': newSubmission.meta.specVersion,
+    'meta.status': [], // there are no statuses relevant to submitted (non draft) submissions, so we clear statuses if there happen to be any
+  };
 
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },

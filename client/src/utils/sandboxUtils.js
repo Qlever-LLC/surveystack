@@ -302,7 +302,6 @@ async function parseArrayBuffer(file) {
 }
 
 export const unstable = {
-
   /*
    * Find a nested item inside a JSON object.
    * Pass the object and the string referencing the location.
@@ -549,14 +548,14 @@ export const unstable = {
   },
 
   /**
-  * unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
-  * @data {object} data - the flattened object you pass.
-  * 
-  * Caveats:
-  * 1. Assumes no property keys in the original data contain periods (`.`).
-  * 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
-  * 3. Does not recreate circular structures from the "[Circular]" marker.
-  */
+   * unflattenAll reverses the operation of flattenAll to reconstruct nested objects and arrays.
+   * @data {object} data - the flattened object you pass.
+   *
+   * Caveats:
+   * 1. Assumes no property keys in the original data contain periods (`.`).
+   * 2. Assumes that string keys containing only digits (e.g., "123") should be treated as array indices.
+   * 3. Does not recreate circular structures from the "[Circular]" marker.
+   */
   unflattenAll(data) {
     var result = {};
 
@@ -585,7 +584,7 @@ export const unstable = {
       }
     }
 
-    return result[""] || result;
+    return result[''] || result;
   },
 
   /**
@@ -764,7 +763,7 @@ export const unstable = {
           }
         }
         if (url) break; // found answer, stop looking
-      };
+      }
     }
     if (!url) {
       prettyLog(`no URL found.`, `warning`);
@@ -850,12 +849,12 @@ export const unstable = {
   },
 
   /**
- * getDates
- *
- * @date {date_first} starting date for the events (if only 1 event, then this is the date of that 1 event)
- * @date {date_last} ending date for the events.
- * @number {frequency} frequency (in days) of events between the start and end date
- */
+   * getDates
+   *
+   * @date {date_first} starting date for the events (if only 1 event, then this is the date of that 1 event)
+   * @date {date_last} ending date for the events.
+   * @number {frequency} frequency (in days) of events between the start and end date
+   */
   getDates(date_single, date_first, date_last, frequency) {
     let dates = [];
     // use first/last/frequency if it exists
@@ -867,8 +866,8 @@ export const unstable = {
         // establish the first two dates, based on the frequency
         dates = [date_first, date_first + Number(frequency) * 86400]; // get started with initial date
         // keep creating new dates until the next one we create is bigger than the last date in the period
-        while ((dates[dates.length - 1] + Number(frequency) * 86400) < date_last) {
-          dates.push(dates[dates.length - 1] + Number(frequency) * 86400)
+        while (dates[dates.length - 1] + Number(frequency) * 86400 < date_last) {
+          dates.push(dates[dates.length - 1] + Number(frequency) * 86400);
         }
         prettyLog(dates);
       } else {
@@ -883,8 +882,8 @@ export const unstable = {
     } else {
       prettyLog('no dates found', 'warning');
     }
-    return dates
-  }
+    return dates;
+  },
 };
 
 // this separate export allows the Scripts to see utils and unstable functions
@@ -898,5 +897,5 @@ export const utils = {
   getResourceAsText,
   getResourceAsArrayBuffer,
   getResource,
-  unstable
+  unstable,
 };
