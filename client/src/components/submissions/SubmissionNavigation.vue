@@ -59,7 +59,7 @@ import { useSubmission } from '@/pages/submissions/submission';
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import { useResults } from '@/components/ui/results';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import * as Sentry from '@sentry/vue';
 
@@ -67,6 +67,7 @@ const { getActiveGroupId } = useGroup();
 const { getDrafts, isDraftReadyToSubmit, uploadSubmission } = useSubmission();
 const { showResult, resultItems, result } = useResults();
 const router = useRouter();
+const route = useRoute();
 const store = useStore();
 
 const state = reactive({
@@ -79,6 +80,10 @@ const state = reactive({
 });
 
 initData();
+
+watch(route, () => {
+  initData();
+});
 
 async function initData() {
   state.drafts = await getDrafts(getActiveGroupId(), 2);

@@ -1,7 +1,7 @@
 <template>
-  <a-hover v-slot="{ isHovering, props }">
+  <a-hover v-slot="{ isHovering }">
     <a-list-item
-      v-bind="props"
+      v-bind="$attrs"
       :style="state.groupStyle"
       :elevation="isHovering ? 2 : 0"
       dense
@@ -15,11 +15,11 @@
             <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>
           </span>
           <span v-if="groupStyle">
-            <a-avatar class="mr-3" color="accent-lighten-2" rounded="lg" size="35">
+            <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
               {{ state.avatarName }}
             </a-avatar>
           </span>
-          {{ state.entity.name }}
+          <span class="entityName_deepCSS">{{ state.entity.name }}</span>
           <span v-if="questionSetsType">
             <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
             {{ state.entity.meta.libraryUsageCountSubmissions ? state.entity.meta.libraryUsageCountSubmissions : 0 }}
@@ -31,7 +31,7 @@
         </a-list-item-subtitle>
         <a-list-item-subtitle v-else-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
       </span>
-      <a-menu location="start" v-model="state.menuIsOpen[idx]">
+      <a-menu v-if="!groupSelectorStyle" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
           <a-icon v-bind="props" @click.prevent>mdi-dots-horizontal</a-icon>
         </template>
@@ -85,6 +85,11 @@ const props = defineProps({
   menu: {
     type: Array,
     required: false,
+  },
+  groupSelectorStyle: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
 
