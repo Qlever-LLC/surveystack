@@ -18,6 +18,7 @@
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
       :questionNumber="questionNumber"
+      :show-navigation-control="!builder"
       :surveyName="survey.name"
       @showOverviewClicked="showOverview = !showOverview">
       <!-- forward all the slots -->
