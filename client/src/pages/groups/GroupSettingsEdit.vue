@@ -211,7 +211,8 @@ export default {
         if (this.editMode) {
           await api.put(`/groups/${this.entity._id}`, this.entity);
         } else {
-          await api.post('/groups', this.entity);
+          const { data: newGroup } = await api.post('/groups', this.entity);
+          this.entity = newGroup;
         }
 
         this.$router.push(`/groups/${this.entity._id}/settings`);

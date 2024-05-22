@@ -33,7 +33,7 @@
       prepend-icon="mdi-file-document-multiple"
       class="text-white bg-transparent mb-2"
       rounded="lg">
-      <a-list-item-title class="text-white">Group Submissions</a-list-item-title>
+      <a-list-item-title class="text-white">Group Responses</a-list-item-title>
     </a-list-item>
   </a-list>
   <confirm-submission-dialog

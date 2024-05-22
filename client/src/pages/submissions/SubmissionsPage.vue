@@ -3,7 +3,8 @@
     <basic-list listType="row" :entities="state.submissions" :menu="state.menu" :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
-        My Responses
+        <template v-if="route.name === 'group-my-submissions'"> My Responses </template>
+        <template v-else> Group Responses </template>
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.submissions.length }}
         </a-chip>
@@ -34,9 +35,10 @@ import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
 import api from '@/services/api.service';
 import { useSubmission } from '@/pages/submissions/submission';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const store = useStore();
+const router = useRouter();
 const route = useRoute();
 const { getActiveGroupId } = useGroup();
 const { setSurveyNames } = useSubmission();
@@ -59,11 +61,12 @@ const state = reactive({
   }),
   menu: [
     {
-      title: 'Resubmit (TODO)',
+      title: 'Edit',
       icon: 'mdi-open-in-new',
-      action: (e) => `/todo`,
+      action: (e) => () => resubmit(e),
       color: 'green',
     },
+    /*
     {
       title: 'Reassign (TODO)',
       icon: 'mdi-open-in-new',
@@ -84,7 +87,7 @@ const state = reactive({
       icon: 'mdi-trash-can-outline',
       action: (e) => `/todo`,
       color: 'red',
-    },
+    },*/
   ],
 });
 
@@ -128,6 +131,13 @@ async function fetchRemoteSubmissions() {
   } finally {
     state.loading = false;
   }
+}
+
+function resubmit(submission) {
+  router.push({
+    name: 'group-survey-submissions-edit',
+    params: { id: getActiveGroupId(), surveyId: submission.meta.survey.id, submissionId: submission._id },
+  });
 }
 </script>
 <style scoped lang="scss"></style>

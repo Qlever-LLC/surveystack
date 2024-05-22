@@ -1,5 +1,4 @@
 import AppHeader from '@/components/AppHeader.vue';
-import SubmissionList from '@/pages/submissions/List.vue';
 import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
@@ -22,12 +21,6 @@ function getComponents(component, mainComponents = commonComponents) {
 }
 
 export default [
-  {
-    path: '/submissions',
-    name: 'submissions',
-    components: getComponents(SubmissionList),
-  },
-
   {
     path: '/auth/login',
     name: 'auth-login',
