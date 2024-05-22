@@ -3,7 +3,8 @@
     <basic-list listType="row" :entities="state.submissions" :menu="state.menu" :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
-        My Responses
+        <template v-if="route.name === 'group-my-submissions'"> My Responses </template>
+        <template v-else> Group Responses </template>
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.submissions.length }}
         </a-chip>
