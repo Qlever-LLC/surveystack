@@ -18,8 +18,8 @@
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
       :questionNumber="questionNumber"
-      :show-navigation-control="!builder"
-      :surveyName="survey.name"
+      :showNavigationControl="!builder"
+      :surveyName="!builder ? survey.name : undefined"
       @showOverviewClicked="showOverview = !showOverview">
       <!-- forward all the slots -->
       <template v-for="(_, name) in $slots" v-slot:[name]="{ props }">
