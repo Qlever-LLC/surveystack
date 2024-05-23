@@ -55,8 +55,10 @@
 </template>
 <script setup>
 import { useGroup } from '@/components/groups/group';
-import { computed, reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const { getActiveGroup } = useGroup();
 const lcl = JSON.parse(process.env.VUE_APP_LCL);
 
@@ -67,6 +69,10 @@ const state = reactive({
 });
 
 initData();
+
+watch(route, () => {
+  initData();
+});
 
 async function initData() {
   const activeGroup = await getActiveGroup();

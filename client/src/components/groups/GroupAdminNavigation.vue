@@ -37,8 +37,10 @@
 </template>
 <script setup>
 import { useGroup } from '@/components/groups/group';
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const { getActiveGroupId, getActiveGroup } = useGroup();
 
 const state = reactive({
@@ -46,6 +48,10 @@ const state = reactive({
 });
 
 initData();
+
+watch(route, () => {
+  initData();
+});
 
 async function initData() {
   state.activeGroup = await getActiveGroup();

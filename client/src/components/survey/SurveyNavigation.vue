@@ -25,8 +25,8 @@
 <script setup>
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
-import { useRouter } from 'vue-router';
-import { reactive } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { reactive, watch } from 'vue';
 import { getPermission } from '@/utils/permissions';
 import { menuAction } from '@/utils/threeDotsMenu';
 
@@ -35,12 +35,17 @@ const { getSurveys } = useSurvey();
 const { rightToSubmitSurvey } = getPermission();
 const { createAction } = menuAction();
 const router = useRouter();
+const route = useRoute();
 
 const state = reactive({
   surveys: [],
 });
 
 initData();
+
+watch(route, () => {
+  initData();
+});
 
 async function initData() {
   const surveyData = await getSurveys(getActiveGroupId(), '', 1, 2);

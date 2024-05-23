@@ -1,5 +1,5 @@
 <template>
-  <a-app-bar flat color="rgba(0, 0, 0, 0)" class="header-gradient">
+  <a-app-bar flat color="rgba(0, 0, 0, 0)" class="header-gradient" :class="{ topPadding: state.activeGroup }">
     <a-app-bar-title v-if="showLogo">
       <a-img
         v-if="state.isWhitelabel"
@@ -21,10 +21,50 @@
     </a-app-bar-title>
 
     <a-app-bar-title v-else>
-      <!-- todo replace by group chooser button -->
-      <div class="text-h5 text-white font-bold" style="cursor: pointer" @click="router.push('/')">
-        {{ state.activeGroup?.name }}
-      </div>
+      <a-expansion-panels class="panels" variant="accordion" v-model="state.expanded">
+        <a-expansion-panel class="no-background">
+          <a-expansion-panel-title
+            class="pa-2 pr-7 text-white"
+            css-transparent-overlay
+            style="min-height: 0px !important">
+            <a-list-subheader style="width: inherit" class="pr-0">
+              <div class="text-h5 text-white font-bold nowrap" style="cursor: pointer">
+                {{ state.activeGroup?.name }}
+              </div>
+            </a-list-subheader>
+          </a-expansion-panel-title>
+          <a-expansion-panel-text class="pa-0 ma-0">
+            <a-list class="pt-0" style="overflow-y: auto">
+              <list-item-card
+                v-for="(entity, idx) in state.myGroups"
+                :key="entity._id"
+                :entity="entity"
+                :idx="String(idx)"
+                :groupStyle="true"
+                :menu="[{ action: (entity) => `/groups/${entity._id}`, color: 'green' }]"
+                groupSelectorStyle
+                :class="{
+                  lessContrast: state.activeGroup?._id !== entity?._id,
+                  moreContrast: state.activeGroup?._id === entity?._id,
+                  entityAvatar_deepCSS: state.activeGroup?._id === entity?._id,
+                }">
+              </list-item-card>
+            </a-list>
+            <a-btn
+              @click="
+                {
+                  state.expanded = false;
+                  router.push({ name: 'all-groups-list' });
+                }
+              "
+              variant="flat"
+              block
+              class="text-white backgroundDarkgreen">
+              All groups</a-btn
+            >
+          </a-expansion-panel-text>
+        </a-expansion-panel>
+      </a-expansion-panels>
     </a-app-bar-title>
 
     <a-spacer />
@@ -46,13 +86,15 @@ import { useStore } from 'vuex';
 
 import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 import OfflineIndicator from '@/components/ui/OfflineIndicator.vue';
+import ListItemCard from '@/components/ui/ListItemCard.vue';
+
 import { useRoute, useRouter } from 'vue-router';
 import { useGroup } from '@/components/groups/group';
 
 const store = useStore();
 const router = useRouter();
 const route = useRoute();
-const { getActiveGroup } = useGroup();
+const { getActiveGroup, getMyGroups } = useGroup();
 
 const props = defineProps({
   showLogo: {
@@ -63,6 +105,8 @@ const props = defineProps({
 
 const state = reactive({
   activeGroup: null,
+  expanded: false,
+  myGroups: undefined,
   isWhitelabel: computed(() => {
     return store.getters['whitelabel/isWhitelabel'];
   }),
@@ -75,11 +119,13 @@ initData();
 
 async function initData() {
   state.activeGroup = await getActiveGroup();
+  state.myGroups = getMyGroups();
 }
 
 watch(
   route,
   () => {
+    state.expanded = false;
     initData();
   },
   { deep: true }
@@ -97,10 +143,72 @@ watch(
   min-width: 0px;
   padding: 0px 8px;
 }
-</style>
 
-<style scoped lang="scss">
 .header-gradient {
   background: linear-gradient(#225034, rgba(0, 0, 0, 0)) !important;
+}
+
+.no-background {
+  background: #225034 !important;
+}
+
+.backgroundDarkgreen {
+  background-color: darkgreen;
+}
+
+.panels {
+  position: fixed;
+  width: 25%;
+  min-width: fit-content;
+  min-height: 0px !important;
+  top: 8px;
+  left: 8px;
+  border: 1px solid #ffffff70;
+  border-radius: 5px;
+}
+
+:deep(.v-list) {
+  // activate scrollbar
+  max-height: calc(100vh - 128px);
+}
+
+:deep(.v-list),
+:deep(.v-list-item) {
+  background-color: transparent !important;
+}
+
+:deep(.v-expansion-panel-text__wrapper) {
+  padding: 8px !important;
+}
+
+.nowrap,
+:deep(.entityName_deepCSS) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:deep(.lessContrast) {
+  opacity: 0.75;
+}
+:deep(.entityName_deepCSS) {
+  color: white;
+}
+
+:deep(.moreContrast) .entityName_deepCSS {
+  font-weight: bold;
+}
+:deep(.moreContrast) .entityAvatar_deepCSS {
+  border: 2px solid white;
+}
+
+@media (max-width: 960px) {
+  .topPadding {
+    padding-top: 64px;
+  }
+  .panels {
+    min-width: -webkit-fill-available;
+    right: 8px;
+  }
 }
 </style>
