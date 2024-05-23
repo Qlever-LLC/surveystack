@@ -33,7 +33,7 @@
       </span>
       <a-menu v-if="!groupSelectorStyle" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
-          <a-icon v-bind="props" @click.prevent>mdi-dots-horizontal</a-icon>
+          <a-btn v-bind="props" icon @click.prevent><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
         <a-list dense class="py-0">
           <a-list-item
