@@ -166,7 +166,7 @@ async function initData() {
         render: (s) => () => rightToSubmitSurvey(s).allowed,
       },
       {
-        title: 'Call for Submissions',
+        title: 'Call for Responses',
         icon: 'mdi-bullhorn',
         action: (s) =>
           createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
