@@ -8,7 +8,7 @@
 
     <a-main v-if="state.showMain" :style="state.showNav ? '--v-layout-left: 300px' : ''">
       <app-global-feedback />
-      <router-view name="main" />
+      <router-view name="main" :key="$route.fullPath" />
     </a-main>
     <install-banner />
   </a-app>

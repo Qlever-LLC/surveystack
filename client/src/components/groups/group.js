@@ -58,5 +58,7 @@ export function useGroup() {
     getActiveGroupId,
     getActiveGroup,
     isGroupAdmin,
+    isWhitelabel,
+    getWhitelabelPartner,
   };
 }
