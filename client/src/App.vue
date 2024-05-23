@@ -8,7 +8,7 @@
 
     <a-main v-if="state.showMain" :style="state.showNav ? '--v-layout-left: 300px' : ''">
       <app-global-feedback />
-      <router-view name="main" :key="$route.fullPath" />
+      <router-view name="main" />
     </a-main>
     <install-banner />
   </a-app>
@@ -62,8 +62,8 @@ const state = reactive({
 });
 
 onMounted(async () => {
-  await migrateSubmissions();
   domainHandler.install(store);
+  await migrateSubmissions();
 
   fetchPinnedSurveys();
   fetchFarmOsAssets();
