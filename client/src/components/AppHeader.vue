@@ -1,5 +1,5 @@
 <template>
-  <a-app-bar flat color="rgba(0, 0, 0, 0)" class="header-gradient" :class="{ topPadding: state.activeGroup }">
+  <a-app-bar flat color="rgba(0, 0, 0, 0)" class="header-gradient">
     <a-app-bar-title v-if="showLogo">
       <a-img
         v-if="state.isWhitelabel"
@@ -22,19 +22,24 @@
 
     <a-app-bar-title v-else>
       <a-expansion-panels class="panels" variant="accordion" v-model="state.expanded">
-        <a-expansion-panel class="no-background">
+        <a-expansion-panel :elevation="0" class="no-background">
           <a-expansion-panel-title
             class="pa-2 pr-7 text-white"
             css-transparent-overlay
             style="min-height: 0px !important">
             <a-list-subheader style="width: inherit" class="pr-0">
-              <div class="text-h5 text-white font-bold nowrap" style="cursor: pointer">
-                {{ state.activeGroup?.name }}
-              </div>
+              <span style="display: flex !important; align-items: center !important">
+                <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
+                  {{ state.avatarName }}
+                </a-avatar>
+                <span class="panelTitle" style="cursor: pointer">
+                  {{ state.activeGroup?.name }}
+                </span>
+              </span>
             </a-list-subheader>
           </a-expansion-panel-title>
           <a-expansion-panel-text class="pa-0 ma-0">
-            <a-list class="pt-0" style="overflow-y: auto">
+            <a-list class="pt-0">
               <list-item-card
                 v-for="(entity, idx) in state.myGroups"
                 :key="entity._id"
@@ -59,7 +64,8 @@
               "
               variant="flat"
               block
-              class="text-white backgroundDarkgreen">
+              color="accent-darken-1"
+              class="text-white">
               All groups</a-btn
             >
           </a-expansion-panel-text>
@@ -105,6 +111,7 @@ const props = defineProps({
 
 const state = reactive({
   activeGroup: null,
+  avatarName: '',
   expanded: false,
   myGroups: undefined,
   isWhitelabel: computed(() => {
@@ -120,6 +127,27 @@ initData();
 async function initData() {
   state.activeGroup = await getActiveGroup();
   state.myGroups = getMyGroups();
+
+  const membership = store.getters['memberships/memberships'];
+
+  state.myGroups.map((g) => {
+    const found = membership.find((m) => m.group._id === g._id);
+    g.role = found ? (found.role === 'user' ? 'Member' : 'Admin') : undefined;
+  });
+
+  if (state.activeGroup) {
+    const name = state.activeGroup.name;
+    const names = name.split(' ');
+    if (names.length === 1) {
+      state.avatarName = name.slice(0, 2).toUpperCase();
+    } else if (names.length >= 2) {
+      const premiereLettrePremierMot = names[0].charAt(0).toUpperCase();
+      const premiereLettreDeuxiemeMot = names[1].charAt(0).toUpperCase();
+      state.avatarName = premiereLettrePremierMot + premiereLettreDeuxiemeMot;
+    } else {
+      state.avatarName = '';
+    }
+  }
 }
 
 watch(
@@ -152,24 +180,19 @@ watch(
   background: #225034 !important;
 }
 
-.backgroundDarkgreen {
-  background-color: darkgreen;
-}
-
 .panels {
   position: fixed;
   width: 25%;
-  min-width: fit-content;
   min-height: 0px !important;
   top: 8px;
   left: 8px;
-  border: 1px solid #ffffff70;
+  border: 2px solid darkgreen;
   border-radius: 5px;
 }
 
 :deep(.v-list) {
   // activate scrollbar
-  max-height: calc(100vh - 128px);
+  max-height: calc(80vh - 128px);
 }
 
 :deep(.v-list),
@@ -177,22 +200,38 @@ watch(
   background-color: transparent !important;
 }
 
+:deep(.v-list-item) {
+  padding: 0 !important;
+}
+
 :deep(.v-expansion-panel-text__wrapper) {
   padding: 8px !important;
 }
 
-.nowrap,
+.panelTitle {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.panelTitle,
 :deep(.entityName_deepCSS) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.panelTitle,
+:deep(.entityName_deepCSS) {
+  color: white;
+  line-height: normal;
+}
+
+:deep(.subEntityName_deepCSS) {
+  font-size: 0.875rem;
 }
 
 :deep(.lessContrast) {
   opacity: 0.75;
-}
-:deep(.entityName_deepCSS) {
-  color: white;
 }
 
 :deep(.moreContrast) .entityName_deepCSS {
@@ -202,13 +241,18 @@ watch(
   border: 2px solid white;
 }
 
-@media (max-width: 960px) {
-  .topPadding {
-    padding-top: 64px;
-  }
+@media (max-width: 600px) {
   .panels {
-    min-width: -webkit-fill-available;
+    width: 50%;
     right: 8px;
+  }
+
+  :deep(.entityName_deepCSS) {
+    font-size: 0.875rem;
+  }
+
+  :deep(.subEntityName_deepCSS) {
+    font-size: 0.75rem;
   }
 }
 </style>

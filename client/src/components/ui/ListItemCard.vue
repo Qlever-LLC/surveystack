@@ -19,7 +19,11 @@
               {{ state.avatarName }}
             </a-avatar>
           </span>
-          <span class="entityName_deepCSS">{{ state.entity.name }}</span>
+          <span class="entityName_deepCSS">
+            <span class=""> {{ state.entity.name }}</span>
+            <br />
+            <span class="subEntityName_deepCSS">{{ state.entity?.role }}</span>
+          </span>
           <span v-if="questionSetsType">
             <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
             {{ state.entity.meta.libraryUsageCountSubmissions ? state.entity.meta.libraryUsageCountSubmissions : 0 }}
