@@ -34,7 +34,7 @@ export const BasicListCard_Survey = {
     menu: [
       { title: 'Start Survey', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },
       { title: 'Start Survey as Member', icon: 'mdi-open-in-new', action: () => `/url` },
-      { title: 'Call for Submissions', icon: 'mdi-bullhorn', action: () => `/url` },
+      { title: 'Call for Responses', icon: 'mdi-bullhorn', action: () => `/url` },
       { title: 'Edit', icon: 'mdi-pencil', action: () => `/url` },
       { title: 'View Survey', icon: 'mdi-file-document', action: () => `/url` },
       { title: 'View Results', icon: 'mdi-chart-bar', action: () => `/url` },

@@ -4,7 +4,7 @@
       <a-card-title> Confirm Membership </a-card-title>
       <a-card-text>
         This will immediately activate the membership of the user "{{ membership.meta.invitationEmail }}". They will
-        receive an email with login instructions. You'll be able to send "Call for Submission" links to this user.
+        receive an email with login instructions. You'll be able to send "Call for Responses" links to this user.
       </a-card-text>
       <a-card-actions>
         <a-spacer />
