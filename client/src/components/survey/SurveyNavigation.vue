@@ -12,7 +12,7 @@
       <a-list-item-title>{{ survey.name }}</a-list-item-title>
     </a-list-item>
     <a-list-item
-      :to="{ path: `/groups/${getActiveGroupId()}/surveys`, query: { t: Date.now() } }"
+      :to="{ path: `/groups/${getActiveGroupId()}/surveys` }"
       dense
       prepend-icon="mdi-list-box-outline"
       class="text-white bg-transparent mb-2"

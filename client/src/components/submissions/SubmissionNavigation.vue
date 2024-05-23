@@ -12,7 +12,7 @@
       <a-list-item-title>{{ draft.meta.survey.name }}</a-list-item-title>
     </a-list-item>
     <a-list-item
-      :to="{ path: `/groups/${getActiveGroupId()}/my-drafts`, query: { t: Date.now() } }"
+      :to="{ path: `/groups/${getActiveGroupId()}/my-drafts` }"
       dense
       prepend-icon="mdi-file-document-edit-outline"
       class="text-white bg-transparent mb-2"
@@ -20,7 +20,7 @@
       <a-list-item-title class="text-white">My Draft Responses</a-list-item-title>
     </a-list-item>
     <a-list-item
-      :to="{ path: `/groups/${getActiveGroupId()}/my-submissions`, query: { t: Date.now() } }"
+      :to="{ path: `/groups/${getActiveGroupId()}/my-submissions` }"
       dense
       prepend-icon="mdi-file-document-multiple-outline"
       class="text-white bg-transparent mb-2"
@@ -28,7 +28,7 @@
       <a-list-item-title class="text-white">My Responses</a-list-item-title>
     </a-list-item>
     <a-list-item
-      :to="{ path: `/groups/${getActiveGroupId()}/submissions`, query: { t: Date.now() } }"
+      :to="{ path: `/groups/${getActiveGroupId()}/submissions` }"
       dense
       prepend-icon="mdi-file-document-multiple"
       class="text-white bg-transparent mb-2"
