@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="basicListContainer">
     <a-alert
       v-if="message.errorMessage"
       style="cursor: pointer"
@@ -55,7 +55,6 @@ async function initData() {
       icon: 'mdi-open-in-new',
       action: (e) => createAction(e, rightToView, `/groups/${getActiveGroupId()}/scripts/${e._id}`),
       render: (e) => () => rightToView(e).allowed,
-      color: 'green',
     });
     if (isGroupAdmin()) {
       state.menu.push({

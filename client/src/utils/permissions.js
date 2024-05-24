@@ -20,6 +20,12 @@ export function getPermission() {
       ? { allowed: true, message: 'success' }
       : { allowed: false, message: "Sorry you can't edit this survey" };
   }
+  function rightToCallForSubmissions(survey) {
+    console.log(survey);
+    return rightToEdit().allowed && survey.latestVersion > 1
+      ? { allowed: true, message: 'success' }
+      : { allowed: false, message: "Sorry you can't call for submissions on a draft" };
+  }
 
   function rightToView() {
     const publicAccess = true;
@@ -44,6 +50,7 @@ export function getPermission() {
   return {
     rightToSubmitSurvey,
     rightToEdit,
+    rightToCallForSubmissions,
     rightToViewAnonymizedResults,
     rightToView,
     rightToManageResponses,

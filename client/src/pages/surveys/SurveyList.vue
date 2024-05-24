@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="basicListContainer">
     <a-alert
       v-if="message.errorMessage"
       style="cursor: pointer"
@@ -23,6 +23,18 @@
         Surveys
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.surveys.pagination.total }}
+        </a-chip>
+      </template>
+      <template v-slot:preMenu="{ entity }">
+        <a-chip
+          v-if="entity.latestVersion === 1"
+          x-small
+          class="mr-2 py-0 px-1"
+          color="blue"
+          variant="outlined"
+          disabled
+          style="opacity: 1">
+          draft
         </a-chip>
       </template>
       <template v-slot:noValue> No Surveys available </template>
@@ -66,7 +78,8 @@ import { useSurvey } from '@/components/survey/survey';
 const store = useStore();
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
-const { rightToSubmitSurvey, rightToEdit, rightToViewAnonymizedResults, rightToView } = getPermission();
+const { rightToSubmitSurvey, rightToEdit, rightToCallForSubmissions, rightToViewAnonymizedResults, rightToView } =
+  getPermission();
 const { message, createAction } = menuAction();
 const PAGINATION_LIMIT = 10;
 const { getSurveys } = useSurvey();
@@ -157,7 +170,6 @@ async function initData() {
         action: (s) =>
           createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
         render: (s) => () => rightToSubmitSurvey(s).allowed,
-        color: 'green',
       },
       {
         title: 'Start Survey as Member',
@@ -169,8 +181,12 @@ async function initData() {
         title: 'Call for Responses',
         icon: 'mdi-bullhorn',
         action: (s) =>
-          createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
-        render: (s) => () => rightToEdit().allowed,
+          createAction(
+            s,
+            rightToCallForSubmissions,
+            `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`
+          ),
+        render: (s) => () => rightToCallForSubmissions(s).allowed,
       },
       {
         title: 'Description',

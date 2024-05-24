@@ -1,5 +1,5 @@
 <template>
-  <a-card :loading="loading" color="background">
+  <a-card :loading="loading" color="background" class="cardStyle">
     <a-card-title v-if="showTitle" class="text-heading pa-4">
       <a-row class="d-flex">
         <a-col v-if="showNavigationControl" class="flex-grow-0">
@@ -63,6 +63,9 @@
             :menu="menu">
             <template v-slot:entitySubtitle="{ entity }">
               <slot name="entitySubtitle" :entity="entity" />
+            </template>
+            <template v-slot:preMenu="{ entity }">
+              <slot name="preMenu" :entity="entity" />
             </template>
           </list-item-card>
         </a-list>
@@ -251,6 +254,10 @@ function defaultFilter() {
 </script>
 
 <style scoped>
+.cardStyle {
+  height: 100%;
+}
+
 .v-card--variant-elevated {
   box-shadow: none !important;
 }

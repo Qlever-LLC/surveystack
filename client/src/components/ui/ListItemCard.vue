@@ -7,7 +7,7 @@
       dense
       class="py-2 mb-2 bg-white"
       rounded="lg"
-      @click="runDefaultAction()">
+      @[getDefaultAction()&&`click`]="runDefaultAction()">
       <span>
         <a-list-item-title class="d-flex align-center">
           <span v-if="enablePinned" @click.stop="toogleStar(entity)">
@@ -35,6 +35,8 @@
         </a-list-item-subtitle>
         <a-list-item-subtitle v-else-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
       </span>
+      <a-spacer />
+      <slot name="preMenu" :entity="state.entity" />
       <a-menu v-if="!groupSelectorStyle" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
           <a-btn v-bind="props" icon @click.prevent><a-icon>mdi-dots-horizontal</a-icon></a-btn>
@@ -141,7 +143,7 @@ function toogleStar(entity) {
   emit('toogleStar', entity);
 }
 
-function runDefaultAction() {
+function getDefaultAction() {
   //find first renderable default menu item, defined by color='green'
   let defaultMenuItem = null;
   for (const item of props.menu) {
@@ -150,6 +152,11 @@ function runDefaultAction() {
       break;
     }
   }
+  return defaultMenuItem;
+}
+
+function runDefaultAction() {
+  let defaultMenuItem = getDefaultAction();
   if (defaultMenuItem) {
     runAction(defaultMenuItem.action(props.entity));
   }
