@@ -64,7 +64,6 @@ const state = reactive({
       title: 'Edit',
       icon: 'mdi-open-in-new',
       action: (e) => () => resubmit(e),
-      color: 'green',
     },
     /*
     {
