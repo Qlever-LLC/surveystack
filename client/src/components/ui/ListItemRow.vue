@@ -1,6 +1,10 @@
 <template>
   <a-hover v-slot="{ isHovering, props }">
-    <a-list-item v-bind="props" :class="{ innerShadow: isHovering }" class="light-border" @click="runDefaultAction()">
+    <a-list-item
+      v-bind="props"
+      :class="{ innerShadow: isHovering }"
+      class="light-border"
+      @[getDefaultAction()&&`click`]="runDefaultAction()">
       <span>
         <a-list-item-title class="d-flex align-center">
           <slot name="entityTitle" :entity="entity" />
@@ -97,7 +101,7 @@ function getTextColor(itemMenu) {
   return { color: itemMenu.color };
 }
 
-function runDefaultAction() {
+function getDefaultAction() {
   //find first renderable default menu item, defined by color='green'
   let defaultMenuItem = null;
   for (const item of props.menu) {
@@ -106,6 +110,11 @@ function runDefaultAction() {
       break;
     }
   }
+  return defaultMenuItem;
+}
+
+function runDefaultAction() {
+  let defaultMenuItem = getDefaultAction();
   if (defaultMenuItem) {
     runAction(defaultMenuItem.action(props.entity));
   }
