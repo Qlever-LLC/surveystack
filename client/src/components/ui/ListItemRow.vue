@@ -41,7 +41,7 @@
       </a-btn>
       <a-menu v-if="menu" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
-          <a-icon v-bind="props">mdi-dots-horizontal</a-icon>
+          <a-btn v-bind="props" icon @click.prevent><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
         <a-list dense class="py-0">
           <a-list-item

@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="basicListContainer">
     <a-alert
       v-if="message.errorMessage"
       style="cursor: pointer"

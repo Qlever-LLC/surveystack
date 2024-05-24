@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="basicListContainer">
     <app-dialog
       v-model="learnMoreDialog"
       title="Premium Features"

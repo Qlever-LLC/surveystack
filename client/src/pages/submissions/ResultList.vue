@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <a-container class="basicListContainer">
     <app-submission-archive-dialog
       v-model="state.showArchiveModal"
       maxWidth="50rem"
@@ -126,32 +126,31 @@
       <template v-slot:iconLeftToConfirm><a-icon left>mdi-download</a-icon></template>
     </app-dialog>
 
-    <a-container>
-      <a-alert
-        v-if="message.errorMessage"
-        style="cursor: pointer"
-        type="error"
-        closable
-        @click:close="message.errorMessage = null">
-        {{ message.errorMessage }}
-      </a-alert>
-      <basic-list
-        :listType="state.tab === 'List' ? 'row' : 'custom'"
-        :entities="state.submissions.content"
-        labelSearch="Search by user name"
-        :filter="() => state.submissions.content"
-        :menu="state.menu"
-        :loading="state.loading"
-        @updateSearch="updateSearch">
-        <template v-slot:title>
-          <a-icon class="mr-2"> mdi-chart-bar</a-icon>
-          Results - {{ state.surveyEntity?.name }}
-          <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
-            {{ state.submissions.pagination.total }}
-          </a-chip>
-        </template>
-        <template v-slot:titleBtn>
-          <!-- <a-btn
+    <a-alert
+      v-if="message.errorMessage"
+      style="cursor: pointer"
+      type="error"
+      closable
+      @click:close="message.errorMessage = null">
+      {{ message.errorMessage }}
+    </a-alert>
+    <basic-list
+      :listType="state.tab === 'List' ? 'row' : 'custom'"
+      :entities="state.submissions.content"
+      labelSearch="Search by user name"
+      :filter="() => state.submissions.content"
+      :menu="state.menu"
+      :loading="state.loading"
+      @updateSearch="updateSearch">
+      <template v-slot:title>
+        <a-icon class="mr-2"> mdi-chart-bar</a-icon>
+        Results - {{ state.surveyEntity?.name }}
+        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
+          {{ state.submissions.pagination.total }}
+        </a-chip>
+      </template>
+      <template v-slot:titleBtn>
+        <!-- <a-btn
             v-if="state.survey"
             variant="outlined"
             color="secondary"
@@ -171,100 +170,99 @@
             <a-icon left>mdi-plus</a-icon>
             New response
           </a-btn> -->
-          <a-btn outlined color="secondary" @click="state.showDownloadModal = true">
-            <a-icon left>mdi-export</a-icon>
-            Export Results
-          </a-btn>
-        </template>
-        <template v-slot:customTypeList>
-          <a-row>
-            <a-col class="d-flex justify-center">
-              <a-btn
-                @click="updateView(view)"
-                v-for="view in state.views"
-                :key="view"
-                class="mx-2"
-                :class="{ 'inactive-btn': state.tab !== view }"
-                :color="state.tab === view ? 'primary' : 'green-darken-3'">
-                {{ view }}
-              </a-btn>
-            </a-col>
-          </a-row>
-        </template>
-        <template v-slot:entityTitle="{ entity }">
-          <span>{{ entity.meta.creatorDetail ? entity.meta.creatorDetail.name : 'anonymized' }}</span>
-        </template>
-        <template v-slot:entitySubtitle="{ entity }">
-          Submitted {{ new Date(entity.meta.dateSubmitted).toLocaleString() }}
-        </template>
-        <template v-slot:filter>
-          <a-switch v-model="state.filter.showArchived" label="View archived only" class="mt-2 ml-5" hideDetails />
-          <div class="border rounded pa-2">
-            <app-submissions-filter-basic
-              v-if="!state.showAdvancedFilters && queryList"
-              :queryList="queryList"
-              @show-advanced="(ev) => (state.showAdvancedFilters = ev)"
-              :basicFilters="state.basicFilters"
-              @apply-basic-filters="applyBasicFilters"
-              @reset="reset" />
-            <app-submissions-filter-advanced
-              class="mt-2"
-              v-if="state.showAdvancedFilters"
-              v-model="state.filter"
-              @show-advanced="(ev) => (state.showAdvancedFilters = ev)"
-              @apply-advanced-filters="fetchData"
-              @reset="reset" />
-          </div>
-        </template>
-        <template v-slot:customList>
-          <app-submissions-table-client-csv
-            :submissions="state.submissions"
-            v-if="state.tab === 'Table' && state.submissions"
-            v-model:selected="state.selected"
-            :sortBy="state.sortBy"
-            @onDataTablePropsChanged="onDataTablePropsChanged"
-            @excludeMetaChange="state.filter.showCsvMeta = $event"
-            :excludeMeta="!state.filter.showCsvMeta"
-            :loading="state.loading"
-            style="margin: 3px 2px"
-            :actionsAreDisabled="state.surveyEntity && state.surveyEntity.meta.isLibrary"
-            @showDeleteModal="state.showDeleteModal = true"
-            @archiveSubmissions="archiveSubmissions(state.selected, '', false)"
-            @showArchiveModal="state.showArchiveModal = true"
-            @reassignment="state.reassignment.showModal = true"
-            @resubmit="resubmit(state.selected[0])" />
-          <app-submissions-tree v-if="state.tab === 'Tree' && state.submissions" :submissions="state.submissions" />
-          <app-submissions-code v-if="state.tab === 'Raw' && state.submissions" :submissions="state.submissions" />
-        </template>
-        <template v-slot:pagination>
-          <a-row class="my-2 mx-4">
-            <a-col sm="2">
-              <a-select
-                style="max-width: 5rem; min-width: 5rem; display: inline-block"
-                label="Page Size"
-                dense
-                :items="state.pageSizes"
-                item-title="text"
-                item-value="value"
-                hide-details
-                v-model="state.pageSize"
-                @update:modelValue="changedPaginationSize" />
-            </a-col>
-            <a-col cols="10">
-              <a-pagination
-                style="min-width: 231px"
-                class="ml-0"
-                v-model="state.page"
-                :length="paginationTotalPages"
-                @update:modelValue="changedPaginationPage"
-                color="grey-darken-1" />
-            </a-col>
-          </a-row>
-        </template>
-        <template v-slot:noValue> No Results available </template>
-      </basic-list>
-    </a-container>
-  </div>
+        <a-btn outlined color="secondary" @click="state.showDownloadModal = true">
+          <a-icon left>mdi-export</a-icon>
+          Export Results
+        </a-btn>
+      </template>
+      <template v-slot:customTypeList>
+        <a-row>
+          <a-col class="d-flex justify-center">
+            <a-btn
+              @click="updateView(view)"
+              v-for="view in state.views"
+              :key="view"
+              class="mx-2"
+              :class="{ 'inactive-btn': state.tab !== view }"
+              :color="state.tab === view ? 'primary' : 'green-darken-3'">
+              {{ view }}
+            </a-btn>
+          </a-col>
+        </a-row>
+      </template>
+      <template v-slot:entityTitle="{ entity }">
+        <span>{{ entity.meta.creatorDetail ? entity.meta.creatorDetail.name : 'anonymized' }}</span>
+      </template>
+      <template v-slot:entitySubtitle="{ entity }">
+        Submitted {{ new Date(entity.meta.dateSubmitted).toLocaleString() }}
+      </template>
+      <template v-slot:filter>
+        <a-switch v-model="state.filter.showArchived" label="View archived only" class="mt-2 ml-5" hideDetails />
+        <div class="border rounded pa-2">
+          <app-submissions-filter-basic
+            v-if="!state.showAdvancedFilters && queryList"
+            :queryList="queryList"
+            @show-advanced="(ev) => (state.showAdvancedFilters = ev)"
+            :basicFilters="state.basicFilters"
+            @apply-basic-filters="applyBasicFilters"
+            @reset="reset" />
+          <app-submissions-filter-advanced
+            class="mt-2"
+            v-if="state.showAdvancedFilters"
+            v-model="state.filter"
+            @show-advanced="(ev) => (state.showAdvancedFilters = ev)"
+            @apply-advanced-filters="fetchData"
+            @reset="reset" />
+        </div>
+      </template>
+      <template v-slot:customList>
+        <app-submissions-table-client-csv
+          :submissions="state.submissions"
+          v-if="state.tab === 'Table' && state.submissions"
+          v-model:selected="state.selected"
+          :sortBy="state.sortBy"
+          @onDataTablePropsChanged="onDataTablePropsChanged"
+          @excludeMetaChange="state.filter.showCsvMeta = $event"
+          :excludeMeta="!state.filter.showCsvMeta"
+          :loading="state.loading"
+          style="margin: 3px 2px"
+          :actionsAreDisabled="state.surveyEntity && state.surveyEntity.meta.isLibrary"
+          @showDeleteModal="state.showDeleteModal = true"
+          @archiveSubmissions="archiveSubmissions(state.selected, '', false)"
+          @showArchiveModal="state.showArchiveModal = true"
+          @reassignment="state.reassignment.showModal = true"
+          @resubmit="resubmit(state.selected[0])" />
+        <app-submissions-tree v-if="state.tab === 'Tree' && state.submissions" :submissions="state.submissions" />
+        <app-submissions-code v-if="state.tab === 'Raw' && state.submissions" :submissions="state.submissions" />
+      </template>
+      <template v-slot:pagination>
+        <a-row class="my-2 mx-4">
+          <a-col sm="2">
+            <a-select
+              style="max-width: 5rem; min-width: 5rem; display: inline-block"
+              label="Page Size"
+              dense
+              :items="state.pageSizes"
+              item-title="text"
+              item-value="value"
+              hide-details
+              v-model="state.pageSize"
+              @update:modelValue="changedPaginationSize" />
+          </a-col>
+          <a-col cols="10">
+            <a-pagination
+              style="min-width: 231px"
+              class="ml-0"
+              v-model="state.page"
+              :length="paginationTotalPages"
+              @update:modelValue="changedPaginationPage"
+              color="grey-darken-1" />
+          </a-col>
+        </a-row>
+      </template>
+      <template v-slot:noValue> No Results available </template>
+    </basic-list>
+  </a-container>
 </template>
 
 <script setup>

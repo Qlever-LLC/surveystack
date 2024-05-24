@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="basicListContainer">
     <basic-list
       listType="card"
       :entities="state.entities"
@@ -50,10 +50,11 @@ async function fetchEntities() {
     }
 
     if (onlyMyGroups()) {
-      state.entities = store.getters['memberships/groups'];
+      const myGroups = store.getters['memberships/groups'];
+      state.entities = myGroups.sort((a, b) => a.path.localeCompare(b.path));
     } else {
       const { data: entities } = await api.get(`/groups/all?showArchived=${state.showArchived}`);
-      state.entities = entities;
+      state.entities = entities.sort((a, b) => a.path.localeCompare(b.path));
     }
   } finally {
     state.loading = false;

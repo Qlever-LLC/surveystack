@@ -4,8 +4,7 @@
     :permanent="permanent"
     :sticky="sticky"
     :floating="floating"
-    :width="width"
-    class="topMarginMobile">
+    :width="width">
     <slot />
     <template v-slot:append>
       <slot name="append" />
@@ -25,13 +24,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-@media (max-width: 960px) {
-  .topMarginMobile {
-    top: 128px !important;
-    height: calc(100% - 128px) !important;
-    padding-top: 0px !important;
-  }
-}
-</style>

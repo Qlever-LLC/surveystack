@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="basicListContainer">
     <basic-list
       listType="row"
       :entities="state.members"
