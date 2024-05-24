@@ -35,6 +35,8 @@
         </a-list-item-subtitle>
         <a-list-item-subtitle v-else-if="!groupStyle">created {{ state.entity.createdAgo }} ago</a-list-item-subtitle>
       </span>
+      <a-spacer />
+      <slot name="preMenu" :entity="state.entity" />
       <a-menu v-if="!groupSelectorStyle" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
           <a-btn v-bind="props" icon @click.prevent><a-icon>mdi-dots-horizontal</a-icon></a-btn>

@@ -25,6 +25,18 @@
           {{ state.surveys.pagination.total }}
         </a-chip>
       </template>
+      <template v-slot:preMenu="{ entity }">
+        <a-chip
+          v-if="entity.latestVersion === 1"
+          x-small
+          class="mr-2 py-0 px-1"
+          color="blue"
+          variant="outlined"
+          disabled
+          style="opacity: 1">
+          draft
+        </a-chip>
+      </template>
       <template v-slot:noValue> No Surveys available </template>
       <template v-slot:pagination>
         <a-pagination
@@ -66,7 +78,8 @@ import { useSurvey } from '@/components/survey/survey';
 const store = useStore();
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
-const { rightToSubmitSurvey, rightToEdit, rightToViewAnonymizedResults, rightToView } = getPermission();
+const { rightToSubmitSurvey, rightToEdit, rightToCallForSubmissions, rightToViewAnonymizedResults, rightToView } =
+  getPermission();
 const { message, createAction } = menuAction();
 const PAGINATION_LIMIT = 10;
 const { getSurveys } = useSurvey();
@@ -168,8 +181,12 @@ async function initData() {
         title: 'Call for Responses',
         icon: 'mdi-bullhorn',
         action: (s) =>
-          createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`),
-        render: (s) => () => rightToEdit().allowed,
+          createAction(
+            s,
+            rightToCallForSubmissions,
+            `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`
+          ),
+        render: (s) => () => rightToCallForSubmissions(s).allowed,
       },
       {
         title: 'Description',
