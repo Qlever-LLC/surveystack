@@ -168,3 +168,15 @@ body {
 ::placeholder {
   color: rgba(0, 0, 0, 0.6) !important;
 }
+
+.basicListContainer{
+  max-width: none !important;
+  height: 100%;
+  padding: 0px !important;
+}
+
+@media (max-width: 1280px) {
+  .basicListContainer > .v-card {
+    border-radius: 0 !important;
+  }
+}

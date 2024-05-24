@@ -1,5 +1,5 @@
 <template>
-  <a-card :loading="loading" color="background">
+  <a-card :loading="loading" color="background" class="cardStyle">
     <a-card-title v-if="showTitle" class="text-heading pa-4">
       <a-row class="d-flex">
         <a-col v-if="showNavigationControl" class="flex-grow-0">
@@ -251,6 +251,10 @@ function defaultFilter() {
 </script>
 
 <style scoped>
+.cardStyle {
+  height: 100%;
+}
+
 .v-card--variant-elevated {
   box-shadow: none !important;
 }

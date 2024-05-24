@@ -184,7 +184,7 @@ watch(
   position: fixed;
   width: 25%;
   min-height: 0px !important;
-  top: 8px;
+  top: 0px;
   left: 8px;
   border: 2px solid darkgreen;
   border-radius: 5px;
