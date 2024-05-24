@@ -157,7 +157,6 @@ async function initData() {
         action: (s) =>
           createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
         render: (s) => () => rightToSubmitSurvey(s).allowed,
-        color: 'green',
       },
       {
         title: 'Start Survey as Member',

@@ -99,7 +99,6 @@ async function initData() {
         icon: 'mdi-book-open',
         action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
         render: (s) => () => rightToView().allowed,
-        color: 'green',
       },
       {
         title: 'Add to New Survey',

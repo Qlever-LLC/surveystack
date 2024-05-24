@@ -55,7 +55,6 @@ async function initData() {
       icon: 'mdi-open-in-new',
       action: (e) => createAction(e, rightToView, `/groups/${getActiveGroupId()}/scripts/${e._id}`),
       render: (e) => () => rightToView(e).allowed,
-      color: 'green',
     });
     if (isGroupAdmin()) {
       state.menu.push({
