@@ -1,10 +1,8 @@
 <template>
   <a-card class="mt-4">
     <a-card-title>
-      Console Log<a-spacer />
-      <a-icon @click="$emit('clear')">mdi-delete</a-icon>
+      Console Log <a-icon @click="$emit('clear')" color="grey-darken-1" size="sm" class="mt-n1">mdi-delete</a-icon>
     </a-card-title>
-
     <a-textarea class="console-container" readonly :modelValue="log" />
   </a-card>
 </template>
