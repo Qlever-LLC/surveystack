@@ -184,7 +184,7 @@
           @click:clear="setToNull" />
       </template>
       <a-date-picker
-        :modelValue="value ? new Date(value) : null"
+        :modelValue="dateForPicker"
         ref="datepickerRef"
         @update:modelValue="onDateInput($event, index, header)"
         no-title />
@@ -268,6 +268,14 @@ export default {
         this.item[this.header.value].value = newValue;
       },
     },
+    dateForPicker() {
+      if (this.value) {
+        // remove the Z which indicates the timezone
+        return new Date(this.value.slice(0, -1));
+      } else {
+        return null;
+      }
+    },
     localValue() {
       if (this.value === null) {
         return '';
@@ -284,7 +292,7 @@ export default {
       if (!isValid(date)) {
         return '';
       }
-      return format(date, 'yyyy-MM-dd');
+      return format(this.dateForPicker, 'yyyy-MM-dd');
     },
   },
   methods: {
