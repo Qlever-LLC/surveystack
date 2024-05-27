@@ -6,7 +6,6 @@
       :key="group._id"
       @click="selectGroup(group)"
       dense
-      prepend-icon="mdi-account-group"
       class="bg-white mb-2"
       rounded="lg">
       <a-list-item-title>{{ group.name }}</a-list-item-title>

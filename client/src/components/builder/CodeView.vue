@@ -4,7 +4,9 @@
     :options="MONACO_EDITOR_OPTIONS"
     language="javascript"
     @change="emit('update:modelValue', $event)"
-    @mount="handleMount" />
+    @mount="handleMount"
+    >Loading code editor...</vue-monaco-editor
+  >
 </template>
 
 <script setup>

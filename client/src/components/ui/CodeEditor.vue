@@ -20,7 +20,7 @@
           <a-card>
             <a-card-title class="headline">Object Created</a-card-title>
             <div style="width: 100%; height: 60vh">
-              <code-view :modelValue="result" :read-only="readonly" />
+              <code-view :modelValue="JSON.stringify(result, null, 2)" :read-only="readonly" />
             </div>
 
             <a-card-actions>

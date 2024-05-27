@@ -11,11 +11,13 @@ import Invitation from '@/pages/invitations/Invitation.vue';
 import Profile from '@/pages/users/Profile.vue';
 import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 
-const guardLanding = async (to, from, next) => {
-  if (!store.getters['auth/isLoggedIn']) {
-    next({ name: 'landing', params: { redirect: to } });
+const redirectLanding = async (to, from, next) => {
+  //redirect logged in users to my-groups-list
+  if (store.getters['auth/isLoggedIn']) {
+    next({ name: 'my-groups-list', params: { redirect: to } });
   } else {
-    next();
+    //redirect not logged-in users to all-groups-list
+    next({ name: 'all-groups-list', params: { redirect: to, showLogin: true } });
   }
 };
 
@@ -23,16 +25,7 @@ export default [
   {
     path: '/',
     name: 'home',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
-    },
-    beforeEnter: guardLanding,
+    beforeEnter: redirectLanding,
   },
   {
     path: '/landing',

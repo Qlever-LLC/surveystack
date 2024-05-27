@@ -6,10 +6,14 @@
       :key="draft._id"
       @click="selectDraft(draft)"
       dense
-      prepend-icon="mdi-file-document-edit-outline"
       class="bg-white mb-2"
       rounded="lg">
-      <a-list-item-title>{{ draft.meta.survey.name }}</a-list-item-title>
+      <a-list-item-title>
+        {{ draft.meta.survey.name }}
+      </a-list-item-title>
+      <a-list-item-subtitle v-if="draft.meta.dateCreated">
+        Created {{ formatDistance(parseISO(draft.meta.dateCreated), new Date()) }} ago
+      </a-list-item-subtitle>
     </a-list-item>
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/my-drafts` }"
@@ -61,7 +65,9 @@ import { useResults } from '@/components/ui/results';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import * as Sentry from '@sentry/vue';
+import parseISO from 'date-fns/parseISO';
+import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
+import formatDistance from 'date-fns/formatDistance';
 
 const { getActiveGroupId } = useGroup();
 const { getDrafts, isDraftReadyToSubmit, uploadSubmission } = useSubmission();
