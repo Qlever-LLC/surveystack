@@ -6,7 +6,6 @@
       :key="draft._id"
       @click="selectDraft(draft)"
       dense
-      prepend-icon="mdi-file-document-edit-outline"
       class="bg-white mb-2"
       rounded="lg">
       <a-list-item-title>

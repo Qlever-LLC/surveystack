@@ -6,7 +6,6 @@
       :key="survey._id"
       @click="selectSurvey(survey)"
       dense
-      prepend-icon="mdi-list-box-outline"
       class="bg-white mb-2"
       rounded="lg">
       <a-list-item-title>{{ survey.name }}</a-list-item-title>
