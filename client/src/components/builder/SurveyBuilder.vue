@@ -169,7 +169,7 @@
             title="Shared Code"
             v-if="survey"
             class="code-editor"
-            readonly="true"
+            :readonly="true"
             :code="sharedCode"></code-editor>
         </div>
       </pane>
