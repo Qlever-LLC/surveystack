@@ -33,7 +33,7 @@
         </a-col>
         <a-col class="flex-grow-1 pl-0" :class="'text-center'">
           <a-icon class="mr-2" :icon="editMode ? 'mdi-cog-outline' : 'mdi-account-group'" />
-          {{ editMode ? 'Edit group' : 'Create group' }}
+          {{ editMode ? 'Settings' : 'Create group' }}
           <a-chip v-if="isPremium" class="ml-2" color="success" rounded="lg" variant="flat" disabled>
             <a-icon small left> mdi-octagram </a-icon>Premium
           </a-chip>

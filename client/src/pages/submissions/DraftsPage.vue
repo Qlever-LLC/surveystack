@@ -7,7 +7,7 @@
       :buttonNew="{ title: 'Submit Completed TODO', action: () => handleSubmitCompleted() }"
       :loading="state.loading">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-xml</a-icon>
+        <a-icon class="mr-2">mdi-file-document-edit-outline</a-icon>
         My Draft Responses
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.drafts.length }}
