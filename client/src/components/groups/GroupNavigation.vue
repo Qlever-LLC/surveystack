@@ -1,15 +1,14 @@
 <template>
   <div class="ml-4 mt-4 text-white text-body-2">My Groups</div>
   <a-list dense class="px-4">
-    <a-list-item
-      v-for="group in getMyGroups(2)"
-      :key="group._id"
-      @click="selectGroup(group)"
-      dense
-      class="bg-white mb-2"
-      rounded="lg">
-      <a-list-item-title>{{ group.name }}</a-list-item-title>
-    </a-list-item>
+    <list-item-card
+      v-for="(entity, idx) in getMyGroups(2)"
+      :key="entity._id"
+      :entity="entity"
+      :idx="String(idx)"
+      :menu="state.menu">
+      <template v-slot:entitySubtitle></template>
+    </list-item-card>
     <a-list-item
       :to="{ path: '/groups/my', query: { t: Date.now() } }"
       dense
@@ -21,13 +20,29 @@
   </a-list>
 </template>
 <script setup>
+import { reactive } from 'vue';
 import { useGroup } from '@/components/groups/group';
-import { useRouter } from 'vue-router';
+
+import ListItemCard from '@/components/ui/ListItemCard.vue';
 
 const { getMyGroups } = useGroup();
-const router = useRouter();
 
-function selectGroup(group) {
-  router.push(`/groups/${group._id}`);
+const state = reactive({
+  menu: [],
+});
+
+initData();
+
+function initData() {
+  state.menu = [
+    { title: 'Go to Group', icon: 'mdi-open-in-new', action: (entity) => `/groups/${entity._id}`, color: 'green' },
+  ];
 }
 </script>
+
+<style scoped lang="scss">
+:deep(.v-list-item__content) {
+  display: flex;
+  align-items: center;
+}
+</style>

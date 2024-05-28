@@ -9,7 +9,10 @@
       rounded="lg"
       @[getDefaultAction()&&`click`]="runDefaultAction()">
       <span>
-        <a-list-item-title class="d-flex align-center">
+        <a-list-item-title v-if="$slots.entityTitle">
+          <slot name="entityTitle" :entity="state.entity" />
+        </a-list-item-title>
+        <a-list-item-title v-else class="d-flex align-center">
           <span v-if="enablePinned" @click.stop="toogleStar(entity)">
             <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
             <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>

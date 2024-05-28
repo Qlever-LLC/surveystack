@@ -1,20 +1,19 @@
 <template>
   <div class="ml-4 mt-4 text-white text-body-2">Responses</div>
   <a-list dense class="px-4">
-    <a-list-item
-      v-for="draft in state.drafts"
-      :key="draft._id"
-      @click="selectDraft(draft)"
-      dense
-      class="bg-white mb-2"
-      rounded="lg">
-      <a-list-item-title>
-        {{ draft.meta.survey.name }}
-      </a-list-item-title>
-      <a-list-item-subtitle v-if="draft.meta.dateCreated">
-        Created {{ formatDistance(parseISO(draft.meta.dateCreated), new Date()) }} ago
-      </a-list-item-subtitle>
-    </a-list-item>
+    <list-item-card
+      v-for="(entity, idx) in state.drafts"
+      :key="entity._id"
+      :entity="entity"
+      :idx="String(idx)"
+      class="whiteCard"
+      :menu="state.menu">
+      <template v-slot:entityTitle>{{ entity.meta.survey.name }}</template>
+      <template v-slot:entitySubtitle v-if="entity.meta.dateCreated">
+        Created {{ formatDistance(parseISO(entity.meta.dateCreated), new Date()) }} ago
+      </template>
+      <template v-slot:entitySubtitle v-else></template>
+    </list-item-card>
     <a-list-item
       :to="{ path: `/groups/${getActiveGroupId()}/my-drafts`, query: { t: Date.now() } }"
       dense
@@ -63,10 +62,12 @@ import { useSubmission } from '@/pages/submissions/submission';
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import { useResults } from '@/components/ui/results';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
+import ListItemCard from '@/components/ui/ListItemCard.vue';
+
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import parseISO from 'date-fns/parseISO';
-import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
+
 import formatDistance from 'date-fns/formatDistance';
 
 const { getActiveGroupId } = useGroup();
@@ -78,6 +79,7 @@ const store = useStore();
 
 const state = reactive({
   drafts: [],
+  menu: [],
   confirmSubmissionIsVisible: false,
   activeSubmissionId: null,
   activeSubmission: computed(() => {
@@ -93,6 +95,32 @@ watch(route, () => {
 
 async function initData() {
   state.drafts = await getDrafts(getActiveGroupId(), 2);
+  state.menu = [
+    {
+      title: 'Submit',
+      icon: 'mdi-open-in-new',
+      action: (e) => () => handleSubmitClick(e._id),
+      render: (e) => () => isDraftReadyToSubmit(e._id),
+      color: 'green',
+      buttonFixed: true,
+    },
+    {
+      title: 'Continue',
+      icon: 'mdi-open-in-new',
+      action: (e) => `/groups/${getActiveGroupId()}/surveys/${e.meta.survey.id}/submissions/${e._id}/edit`,
+      render: (e) => () => !isDraftReadyToSubmit(e._id),
+      color: 'green',
+      buttonFixed: true,
+    },
+    {
+      title: 'Delete',
+      icon: 'mdi-trash-can-outline',
+      action: (e) => `/todo`,
+      color: 'red',
+      disabled: true,
+      buttonHover: true,
+    },
+  ];
 }
 
 //update the drafts if the drafts in store have been changed
@@ -104,13 +132,9 @@ store.watch(
   { immediate: true }
 );
 
-function selectDraft(draft) {
-  if (isDraftReadyToSubmit(draft._id)) {
-    state.activeSubmissionId = draft._id;
-    state.confirmSubmissionIsVisible = true;
-  } else {
-    router.push(`/groups/${getActiveGroupId()}/surveys/${draft.meta.survey.id}/submissions/${draft._id}/edit`);
-  }
+function handleSubmitClick(id) {
+  state.activeSubmissionId = id;
+  state.confirmSubmissionIsVisible = true;
 }
 
 async function submit(submission) {
@@ -127,3 +151,10 @@ async function submit(submission) {
   }
 }
 </script>
+
+<style scoped lang="scss">
+:deep(.whiteCard .v-list-item__content) {
+  display: flex;
+  align-items: center;
+}
+</style>
