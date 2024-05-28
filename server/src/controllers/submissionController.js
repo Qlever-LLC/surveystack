@@ -430,8 +430,9 @@ const addUserDetailsStage = (pipeline, userIdCorrespondingToSearch) => {
 };
 
 const getSubmissionsPage = async (req, res) => {
-  let skip = 0;
-  let limit = DEFAULT_LIMIT;
+  const pipeline = await buildPipeline(req, res);
+  const skip = getSkip(req);
+  const limit = getLimit(req);
 
   if (req.query.search) {
     const pipelineSearchName = [
@@ -446,32 +447,6 @@ const getSubmissionsPage = async (req, res) => {
     ];
     const users = await db.collection(USERS_COLLECTION).aggregate(pipelineSearchName).toArray();
     req.query.userIdCorrespondingToSearch = users.map((user) => new ObjectId(user._id));
-  }
-
-  const pipeline = await buildPipeline(req, res);
-
-  // skip
-  if (req.query.skip) {
-    try {
-      const querySkip = Number.parseInt(req.query.skip);
-      if (querySkip > 0) {
-        skip = querySkip;
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
-    }
-  }
-
-  // limit
-  if (req.query.limit) {
-    try {
-      const queryLimit = Number.parseInt(req.query.limit);
-      if (queryLimit > 0) {
-        limit = queryLimit;
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
-    }
   }
 
   // pagination stage
@@ -511,36 +486,9 @@ const getSubmissionsPage = async (req, res) => {
 };
 
 const getSubmissions = async (req, res) => {
-  let skip = 0;
-  let limit = DEFAULT_LIMIT;
-
   const pipeline = await buildPipeline(req, res);
-
-  // skip
-  if (req.query.skip) {
-    try {
-      const querySkip = Number.parseInt(req.query.skip);
-      if (querySkip > 0) {
-        skip = querySkip;
-        pipeline.push({ $skip: skip });
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
-    }
-  }
-
-  // limit
-  if (req.query.limit) {
-    try {
-      const queryLimit = Number.parseInt(req.query.limit);
-      if (queryLimit > 0) {
-        limit = queryLimit;
-        pipeline.push({ $limit: limit });
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
-    }
-  }
+  addSkipToPipeline(pipeline, req);
+  addLimitToPipeline(pipeline, req);
 
   const databaseOperationStartTime = new Date();
   const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
@@ -552,40 +500,48 @@ const getSubmissions = async (req, res) => {
   return res.send(entities);
 };
 
-const addSkipToPipeline = (pipeline, reqSkip) => {
-  let skip = 0;
-  if (reqSkip) {
+const getSkip = (req) => {
+  if (req.query.skip) {
     try {
-      const querySkip = Number.parseInt(reqSkip);
-      if (querySkip > 0) {
-        skip = querySkip;
-        pipeline.push({ $skip: skip });
-      }
+      const skip = Number.parseInt(req.query.skip);
+      return skip > 0 ? skip : 0;
     } catch (error) {
-      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${req.query.skip}`);
     }
+  }
+  return 0;
+};
+
+const getLimit = (req) => {
+  if (req.query.limit) {
+    try {
+      const limit = Number.parseInt(req.query.limit);
+      return limit > 0 ? limit : DEFAULT_LIMIT;
+    } catch (error) {
+      throw boom.badRequest(`Bad query parameter limit: ${req.query.limit}`);
+    }
+  }
+  return DEFAULT_LIMIT;
+};
+
+const addSkipToPipeline = (pipeline, req) => {
+  const skip = getSkip(req);
+  if (req.query.skip && skip > 0) {
+    pipeline.push({ $skip: skip });
   }
 };
 
-const addLimitToPipeline = (pipeline, reqLimit) => {
-  let limit = DEFAULT_LIMIT;
-  if (reqLimit) {
-    try {
-      const queryLimit = Number.parseInt(reqLimit);
-      if (queryLimit > 0) {
-        limit = queryLimit;
-        pipeline.push({ $limit: limit });
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
-    }
+const addLimitToPipeline = (pipeline, req) => {
+  const limit = getLimit(req);
+  if (req.query.limit && limit > 0) {
+    pipeline.push({ $limit: limit });
   }
 };
 
 const getSubmissionsCsv = async (req, res) => {
   const pipeline = await buildPipeline(req, res);
-  addSkipToPipeline(pipeline, req.query.skip);
-  addLimitToPipeline(pipeline, req.query.limit);
+  addSkipToPipeline(pipeline, req);
+  addLimitToPipeline(pipeline, req);
 
   const formatOptions = {
     expandAllMatrices: queryParam(req.query.expandAllMatrices),
