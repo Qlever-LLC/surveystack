@@ -112,6 +112,24 @@
         </a-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
+        <a-alert
+          v-if="successMessage"
+          style="cursor: pointer"
+          type="success"
+          variant="outlined"
+          closable
+          @click:close="successMessage = null">
+          {{ successMessage }}
+        </a-alert>
+        <a-alert
+          v-if="errorMessage"
+          style="cursor: pointer"
+          type="error"
+          variant="outlined"
+          closable
+          @click:close="errorMessage = null">
+          {{ errorMessage }}
+        </a-alert>
         <code-editor
           :saveable="true"
           :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
@@ -355,6 +373,10 @@ export default {
       updateLibraryDialogIsVisible: false,
       updateLibraryRootGroup: null,
       updateToLibrary: null,
+      //successMessage and errorMessage for script update
+      timeoutID: undefined,
+      successMessage: null,
+      errorMessage: null,
     };
   },
   methods: {
@@ -364,13 +386,23 @@ export default {
         return;
       }
 
+      //TODO when this file will be migrated to script setup, use getActiveGroupId()
+      if (this.$route.params.id !== this.scriptCode.meta.group.id) {
+        this.error(
+          "This script is managed by another group, so you can't save it.  If you want to make changes, contact the group who manages this script. Otherwise, you can copy the script contents and create your own script in your group which you can control directly."
+        );
+        return;
+      }
+
       try {
         if (this.scriptCode._id !== null) {
           await api.put(`/scripts/${this.scriptCode._id}`, this.scriptCode);
         } else {
           await api.post('/scripts', this.scriptCode);
         }
+        this.success('successfully saved');
       } catch (err) {
+        this.error(err);
         console.log(err);
       }
     },
@@ -673,6 +705,30 @@ export default {
       }
 
       this.scriptCode = data;
+    },
+    success(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
+      window.scrollTo(0, 0);
+      setTimeout(() => {
+        this.successMessage = null;
+        this.timeoutID = null;
+      }, 15000);
+      this.successMessage = msg;
+      this.errorMessage = null;
+    },
+    error(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
+      this.errorMessage = msg;
+      this.successMessage = null;
+      window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.errorMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
     updateSurvey(controls) {
       this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls = controls;

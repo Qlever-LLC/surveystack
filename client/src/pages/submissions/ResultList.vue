@@ -495,6 +495,7 @@ async function initData() {
       icon: 'mdi-open-in-new',
       action: (s) =>
         createAction(s, rightToManageResponses, () => {
+          state.selected = [s];
           state.reassignment.showModal = true;
         }),
       render: (s) => () => rightToManageResponses().allowed,
@@ -515,6 +516,7 @@ async function initData() {
       icon: 'mdi-trash-can-outline',
       action: (s) =>
         createAction(s, rightToManageResponses, () => {
+          state.selected = [s];
           state.showDeleteModal = true;
         }),
       render: (s) => () => rightToManageResponses().allowed && s.meta.archived,
