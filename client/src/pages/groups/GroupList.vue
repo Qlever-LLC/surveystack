@@ -8,7 +8,9 @@
       :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir } } }"
       :menu="[{ title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/groups/${e._id}`, color: 'green' }]">
       <template v-slot:title>
-        <template v-if="props.scope === 'user'"><a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups</template>
+        <template v-if="props.scope === 'user'"
+          ><a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups</template
+        >
         <template v-else> <a-icon class="mr-2">mdi-compass-outline</a-icon>Find a group</template>
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ state.entities.length }} </a-chip>
       </template>
@@ -25,14 +27,18 @@ import api from '@/services/api.service';
 import BasicList from '@/components/ui/BasicList2.vue';
 import { reactive, watch } from 'vue';
 import { useGroup } from '@/components/groups/group';
-import { useRoute } from 'vue-router';
 import store from '@/store';
 
 const props = defineProps({
-  scope: String,
+  scope: {
+    type: String,
+    required: true,
+    validator(value) {
+      return ['all', 'user'].includes(value);
+    },
+  },
 });
 
-const route = useRoute();
 const { isWhitelabel, getWhitelabelPartner } = useGroup();
 
 const state = reactive({
@@ -42,6 +48,8 @@ const state = reactive({
 });
 
 fetchEntities();
+
+watch([() => state.showArchived, () => props.scope], fetchEntities);
 
 async function fetchEntities() {
   try {
@@ -71,9 +79,4 @@ function rootDir() {
   }
   return '/';
 }
-
-watch(
-  [() => state.showArchived, () => props.scope],
-  fetchEntities,
-);
 </script>
