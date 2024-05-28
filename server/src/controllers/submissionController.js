@@ -212,6 +212,10 @@ export const buildPipeline = async (req, res) => {
     });
   }
 
+  pipeline.push({
+    $match: { 'meta.isDraft': false },
+  });
+
   // archived
   const archivedMatch = { 'meta.archived': { $ne: true } };
   if (queryParam(req.query.showArchived)) {

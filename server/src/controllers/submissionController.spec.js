@@ -894,6 +894,90 @@ describe('submissionController', () => {
     });
   });
 
+  describe('getSubmissions', () => {
+    const app = createApp();
+    const token = '1234';
+    let authHeaderValue;
+    let group;
+    let user;
+    beforeEach(async () => {
+      group = await createGroup();
+      ({ user } = await group.createUserMember({
+        userOverrides: { token },
+      }));
+      authHeaderValue = `${user.email} ${token}`;
+    });
+
+    it('does not return drafts', async () => {
+      const { createSubmission } = await createSurvey(['string']);
+      const [{ submission }, { submission: draft }] = await Promise.all([
+        createSubmission({
+          _id: new ObjectId(),
+          meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
+        }),
+        createSubmission({
+          _id: new ObjectId(),
+          meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+        }),
+      ]);
+
+      const response = await request(app)
+        .get('/api/submissions')
+        .set('Authorization', authHeaderValue)
+        .send()
+        .expect(200);
+
+      expect(response.body).toContainEqual(
+        expect.objectContaining({ _id: submission._id.toString() })
+      );
+      expect(response.body).not.toContainEqual(
+        expect.objectContaining({ _id: draft._id.toString() })
+      );
+    });
+  });
+
+  describe('getSubmissionsPage', () => {
+    const app = createApp();
+    const token = '1234';
+    let authHeaderValue;
+    let group;
+    let user;
+    beforeEach(async () => {
+      group = await createGroup();
+      ({ user } = await group.createUserMember({
+        userOverrides: { token },
+      }));
+      authHeaderValue = `${user.email} ${token}`;
+    });
+
+    it('does not return drafts', async () => {
+      const { createSubmission } = await createSurvey(['string']);
+      const [{ submission }, { submission: draft }] = await Promise.all([
+        createSubmission({
+          _id: new ObjectId(),
+          meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
+        }),
+        createSubmission({
+          _id: new ObjectId(),
+          meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+        }),
+      ]);
+
+      const response = await request(app)
+        .get('/api/submissions/page')
+        .set('Authorization', authHeaderValue)
+        .send()
+        .expect(200);
+
+      expect(response.body.content).toContainEqual(
+        expect.objectContaining({ _id: submission._id.toString() })
+      );
+      expect(response.body.content).not.toContainEqual(
+        expect.objectContaining({ _id: draft._id.toString() })
+      );
+    });
+  });
+
   describe('createSubmission', () => {
     const app = createApp();
     const token = '1234';
@@ -1147,27 +1231,67 @@ describe('submissionController', () => {
   });
 
   describe('getSubmissionsCsv', () => {
-    it('returns expected CSV for geojson question type', async () => {
-      const { survey, createSubmission } = await createSurvey(['geoJSON']);
-      const { submission } = await createSubmission();
-      const mockReq = createReq({ query: { showCsvMeta: 'true', survey: survey._id } });
-      const mockRes = await createRes();
-      await getSubmissionsCsv(mockReq, mockRes);
-      const expected =
-        '_id,meta.isDraft,meta.isDeletedDraft,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.name,meta.survey.version,meta.revision,meta.archived,meta.permissions,meta.status,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
-        `${submission._id},` +
-        `false,` +
-        `false,` +
-        `${new Date(submission.meta.dateCreated).toISOString()},` +
-        `${new Date(submission.meta.dateModified).toISOString()},` +
-        `${new Date(submission.meta.dateSubmitted).toISOString()},` +
-        `${submission.meta.survey.id},Mock Survey Name,` +
-        `2,1,false,,,` +
-        `${submission.meta.group.id},` +
-        `${submission.meta.group.path},4,` +
-        `${submission.meta.creator},` +
-        `,"{""type"":""Feature"",""geometry"":{""type"":""Polygon"",""coordinates"":[[[-79.39869321685993,43.65614580273717],[-79.39799841596073,43.6460912513611],[-79.37263818314015,43.645085703645464],[-79.3698589795434,43.657653840263464],[-79.39869321685993,43.65614580273717]]]},""properties"":null,""id"":""measureFeature0""}",FeatureCollection`;
-      expect(mockRes.send).toHaveBeenCalledWith(expected);
+    describe('controller tests', () => {
+      it('returns expected CSV for geojson question type', async () => {
+        const { survey, createSubmission } = await createSurvey(['geoJSON']);
+        const { submission } = await createSubmission();
+        const mockReq = createReq({ query: { showCsvMeta: 'true', survey: survey._id } });
+        const mockRes = await createRes();
+        await getSubmissionsCsv(mockReq, mockRes);
+        const expected =
+          '_id,meta.isDraft,meta.isDeletedDraft,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.name,meta.survey.version,meta.revision,meta.archived,meta.permissions,meta.status,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
+          `${submission._id},` +
+          `false,` +
+          `false,` +
+          `${new Date(submission.meta.dateCreated).toISOString()},` +
+          `${new Date(submission.meta.dateModified).toISOString()},` +
+          `${new Date(submission.meta.dateSubmitted).toISOString()},` +
+          `${submission.meta.survey.id},Mock Survey Name,` +
+          `2,1,false,,,` +
+          `${submission.meta.group.id},` +
+          `${submission.meta.group.path},4,` +
+          `${submission.meta.creator},` +
+          `,"{""type"":""Feature"",""geometry"":{""type"":""Polygon"",""coordinates"":[[[-79.39869321685993,43.65614580273717],[-79.39799841596073,43.6460912513611],[-79.37263818314015,43.645085703645464],[-79.3698589795434,43.657653840263464],[-79.39869321685993,43.65614580273717]]]},""properties"":null,""id"":""measureFeature0""}",FeatureCollection`;
+        expect(mockRes.send).toHaveBeenCalledWith(expected);
+      });
+    });
+
+    describe('endpoint tests', () => {
+      const app = createApp();
+      const token = '1234';
+      let authHeaderValue;
+      let group;
+      let user;
+      beforeEach(async () => {
+        group = await createGroup();
+        ({ user } = await group.createUserMember({
+          userOverrides: { token },
+        }));
+        authHeaderValue = `${user.email} ${token}`;
+      });
+
+      it('does not return drafts', async () => {
+        const { createSubmission, survey } = await createSurvey(['string']);
+        const [{ submission }, { submission: draft }] = await Promise.all([
+          createSubmission({
+            _id: new ObjectId(),
+            meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
+          }),
+          createSubmission({
+            _id: new ObjectId(),
+            meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+          }),
+        ]);
+
+        const response = await request(app)
+          .get(`/api/submissions/csv?showCsvMeta=true&survey=${survey._id}`)
+          .set('Authorization', authHeaderValue)
+          .send()
+          .expect(200);
+
+        expect(response.text).toContain(submission._id.toString());
+        expect(response.text).not.toContain(draft._id.toString());
+      });
     });
   });
 
@@ -1332,6 +1456,10 @@ describe('submissionController', () => {
 
 describe('buildPipeline', () => {
   // TODO add tests for the rest of the operations ( $match, $redact, $project)
+  it('does not include submissions with isDraft=true by default', async () => {
+    const pipeline = await buildPipeline(createReq({ query: {} }), await createRes());
+    expect(pipeline).toContainEqual({ $match: { 'meta.isDraft': false } });
+  });
 
   it('adds default $sort operation to pipeline', async () => {
     const pipeline = await buildPipeline(createReq({ query: {} }), await createRes());
