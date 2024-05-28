@@ -60,6 +60,9 @@ export default [
       header: {
         showLogo: true,
       },
+      main: {
+        scope: 'all',
+      },
     },
   },
   {
@@ -73,6 +76,9 @@ export default [
     props: {
       header: {
         showLogo: true,
+      },
+      main: {
+        scope: 'user',
       },
     },
   },

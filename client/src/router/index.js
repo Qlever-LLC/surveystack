@@ -4,6 +4,7 @@ import groupRoutes from './groupRoutes.js';
 import superAdminRoutes from './superAdminRoutes.js';
 import legacyRoutes from './legacyRoutes.js';
 import oldRoutes from './toBeMigratedRoutes.js';
+import { useNavigation } from '@/components/navigation';
 
 const routes = [...globalRoutes, ...groupRoutes, ...superAdminRoutes, ...legacyRoutes, ...oldRoutes];
 
@@ -16,6 +17,13 @@ const router = createRouter({
       top: 0,
     };
   },
+});
+
+const { forceDesktopFullscreen, forceMobileFullscreen } = useNavigation();
+// close the navigation anytime a route changes, even if the change is redundant (from and to the same path)
+router.afterEach(() => {
+  forceDesktopFullscreen.value = false;
+  forceMobileFullscreen.value = true;
 });
 
 export default router;

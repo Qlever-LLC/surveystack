@@ -10,7 +10,7 @@
     <div class="content-width">
       <a-list dense class="px-4">
         <a-list-item
-          :to="{ path: '/groups/all', query: { t: Date.now() } }"
+          :to="{ path: '/groups/all' }"
           dense
           prepend-icon="mdi-compass-outline"
           class="text-white bg-primary mb-2"
@@ -19,7 +19,7 @@
           <a-list-item-title>Find a group</a-list-item-title>
         </a-list-item>
         <a-list-item
-          :to="{ path: '/groups/new', query: { t: Date.now() } }"
+          :to="{ path: '/groups/new' }"
           dense
           prepend-icon="mdi-account-group"
           class="text-white bg-transparent mb-2"

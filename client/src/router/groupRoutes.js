@@ -81,6 +81,11 @@ export default [
       navigation: AppNavigationGroup,
       main: SubmissionsPage,
     },
+    props: {
+      main: {
+        scope: 'user',
+      },
+    },
   },
   {
     path: '/groups/:id/submissions',
@@ -89,6 +94,11 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: SubmissionsPage,
+    },
+    props: {
+      main: {
+        scope: 'group',
+      },
     },
   },
   {

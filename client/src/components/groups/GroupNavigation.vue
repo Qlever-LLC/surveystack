@@ -10,7 +10,7 @@
       <template v-slot:entitySubtitle></template>
     </list-item-card>
     <a-list-item
-      :to="{ path: '/groups/my', query: { t: Date.now() } }"
+      :to="{ path: '/groups/my' }"
       dense
       prepend-icon="mdi-account-group"
       class="text-white bg-transparent mb-2"

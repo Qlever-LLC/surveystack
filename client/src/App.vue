@@ -8,7 +8,7 @@
 
     <a-main v-if="state.showMain" :style="state.showNav ? '--v-layout-left: 300px' : ''">
       <app-global-feedback />
-      <router-view name="main" :key="$route.fullPath" />
+      <router-view name="main" />
     </a-main>
     <install-banner />
   </a-app>
@@ -76,15 +76,6 @@ onMounted(async () => {
   //moved from domainHandler.install
   await autoJoinWhiteLabelGroup(store);
 });
-
-watch(
-  () => route,
-  () => {
-    forceDesktopFullscreen.value = false;
-    forceMobileFullscreen.value = true;
-  },
-  { deep: true }
-);
 
 const fetchPinnedSurveys = async () => {
   await store.dispatch('resources/initFromIndexedDB');
