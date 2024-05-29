@@ -6,6 +6,7 @@
       :key="entity._id"
       :entity="entity"
       :idx="String(idx)"
+      :smallCard="true"
       :menu="state.menu">
       <template v-slot:entitySubtitle></template>
     </list-item-card>
