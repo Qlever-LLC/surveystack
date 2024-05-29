@@ -31,6 +31,7 @@ const MONACO_EDITOR_OPTIONS = {
   formatOnType: true,
   formatOnPaste: true,
   readOnly: props.readOnly,
+  minimap: { enabled: false },
 };
 
 const editorRef = shallowRef();
