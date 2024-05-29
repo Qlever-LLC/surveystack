@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded" style="height: 100%; max-height: 100%">
+  <div class="rounded basicListContainer" style="height: 100%; max-height: 100%">
     <app-draft-component
       v-if="!loading && !hasError"
       :survey="survey"
