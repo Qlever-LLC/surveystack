@@ -1078,6 +1078,29 @@ describe('submissionController', () => {
     });
   });
 
+  describe('getSubmission', () => {
+    const app = createApp();
+    const token = '1234';
+    let group;
+    let user;
+    beforeEach(async () => {
+      group = await createGroup();
+      ({ user } = await group.createUserMember({
+        userOverrides: { token },
+      }));
+    });
+
+    it('returns 404 when the submission is a draft', async () => {
+      const { createSubmission } = await createSurvey(['string']);
+      const { submission } = await createSubmission({
+        _id: new ObjectId(),
+        meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+      });
+
+      await request(app).get(`/api/submissions/${submission._id.toString()}`).send().expect(404);
+    });
+  });
+
   describe('getSubmissionsPage', () => {
     const app = createApp();
     const token = '1234';

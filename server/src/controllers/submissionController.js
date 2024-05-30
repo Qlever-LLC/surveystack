@@ -641,8 +641,12 @@ const getSubmission = async (req, res) => {
     pipeline.push(relevanceStage);
   }
 
-  // Fetch by id
-  pipeline.push({ $match: { _id: new ObjectId(id) } });
+  pipeline.push({
+    $match: {
+      _id: new ObjectId(id),
+      'meta.isDraft': false,
+    },
+  });
 
   // Redact
   const redactStage = createRedactStage(user, roles);
