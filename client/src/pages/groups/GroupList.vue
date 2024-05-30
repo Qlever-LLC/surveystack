@@ -63,7 +63,8 @@ async function fetchEntities() {
 
     if (props.scope === 'user') {
       const myGroups = store.getters['memberships/groups'];
-      state.entities = myGroups.sort((a, b) => a.path.localeCompare(b.path));
+      const filteredMyGroups = myGroups.filter((g) => (state.showArchived ? g.meta.archived : !g.meta.archived));
+      state.entities = filteredMyGroups.sort((a, b) => a.path.localeCompare(b.path));
     } else {
       const { data: entities } = await api.get(`/groups/all?showArchived=${state.showArchived}`);
       state.entities = entities.sort((a, b) => a.path.localeCompare(b.path));
