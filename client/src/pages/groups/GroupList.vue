@@ -5,7 +5,7 @@
       :entities="state.entities"
       :loading="state.loading"
       groupStyle
-      :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir } } }"
+      :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir() } } }"
       :menu="[{ title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/groups/${e._id}`, color: 'green' }]">
       <template v-slot:title>
         <template v-if="props.scope === 'user'"
