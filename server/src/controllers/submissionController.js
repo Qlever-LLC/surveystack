@@ -196,7 +196,7 @@ const createRelevanceStage = () => {
   };
 };
 
-export const buildPipeline = async (req, res) => {
+const buildPipeline = async (req, res) => {
   const pipeline = [];
 
   let match = {};
@@ -1195,7 +1195,7 @@ const sendPdfLink = async (req, res) => {
   return res.send({ success: true });
 };
 
-export { sanitize };
+export { buildPipeline, sanitize, getSkip, getLimit, DEFAULT_LIMIT };
 
 export default {
   getSubmissions,

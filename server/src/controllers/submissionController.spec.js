@@ -1,5 +1,5 @@
 import request from 'supertest';
-import submissionController, { buildPipeline } from './submissionController';
+import submissionController, { buildPipeline, DEFAULT_LIMIT } from './submissionController';
 import {
   createReq,
   createRes,
@@ -890,6 +890,148 @@ describe('submissionController', () => {
             expect(submission.meta.dateModified).toEqual(databaseSubmission.meta.dateModified);
           });
         });
+      });
+    });
+  });
+
+  describe('getDraftsPage', () => {
+    const app = createApp();
+    const token = '1234';
+    let authHeaderValue;
+    let group;
+    let user;
+    beforeEach(async () => {
+      group = await createGroup();
+      ({ user } = await group.createUserMember({
+        userOverrides: { token },
+      }));
+      authHeaderValue = `${user.email} ${token}`;
+    });
+
+    it('returns 401 when the request is not authenticated', async () => {
+      await request(app).get('/api/submissions/drafts/page').send().expect(401);
+    });
+
+    describe('when authenticated', () => {
+      it('returns 200 with empty array and pagination metadata when user has no drafts', async () => {
+        const response = await request(app)
+          .get('/api/submissions/drafts/page')
+          .set('Authorization', authHeaderValue)
+          .send()
+          .expect(200);
+
+        expect(response.body.content).toHaveLength(0);
+        expect(response.body.pagination).toEqual({
+          total: 0,
+          skip: 0,
+          limit: DEFAULT_LIMIT,
+        });
+      });
+
+      it('returns drafts belonging to the requesting user but does not return other things (see details in test body).', async () => {
+        const { createSubmission } = await createSurvey(['string']);
+        // Should return...
+        // draft belonging to the requesting user
+        const draftBelongingToRequestingUserId = new ObjectId();
+        await createSubmission({
+          _id: draftBelongingToRequestingUserId,
+          meta: createSubmissionMeta({ isDraft: true, isDeletedDraft: false, creator: user._id }),
+        });
+
+        // Should not return...
+        // deleted draft belonging to the requesting user
+        const deletedDraftBelongingToRequestingUserId = new ObjectId();
+        await createSubmission({
+          _id: deletedDraftBelongingToRequestingUserId,
+          meta: createSubmissionMeta({
+            isDraft: true,
+            isDeletedDraft: true,
+            creator: user._id,
+          }),
+        });
+        // submitted submissions belonging to the requesting user
+        const submittedSubmissionBelongToTheRequestingUserId = new ObjectId();
+        await createSubmission({
+          _id: submittedSubmissionBelongToTheRequestingUserId,
+          meta: createSubmissionMeta({
+            isDraft: false,
+            isDeletedDraft: false,
+            creator: user._id,
+          }),
+        });
+        // drafts NOT belonging to requesting user
+        const draftNotBelongingToRequestingUserId = new ObjectId();
+        await createSubmission({
+          _id: draftNotBelongingToRequestingUserId,
+          meta: createSubmissionMeta({
+            isDraft: true,
+            isDeletedDraft: false,
+            creator: new ObjectId(),
+          }),
+        });
+
+        const response = await request(app)
+          .get('/api/submissions/drafts/page')
+          .set('Authorization', authHeaderValue)
+          .send()
+          .expect(200);
+
+        expect(response.body.content).toContainEqual(
+          expect.objectContaining({ _id: draftBelongingToRequestingUserId.toString() })
+        );
+        expect(response.body.content).not.toContainEqual(
+          expect.objectContaining({
+            _id: submittedSubmissionBelongToTheRequestingUserId.toString(),
+          })
+        );
+        expect(response.body.content).not.toContainEqual(
+          expect.objectContaining({ _id: deletedDraftBelongingToRequestingUserId.toString() })
+        );
+        expect(response.body.content).not.toContainEqual(
+          expect.objectContaining({ _id: draftNotBelongingToRequestingUserId.toString() })
+        );
+      });
+
+      it('paginates correctly (limits according to query param, show different results between pages, and sorts by most recetly modified first)', async () => {
+        const { createSubmission } = await createSurvey(['string']);
+        const { submission: draftCreatedFirst } = await createSubmission({
+          _id: new ObjectId(),
+          meta: createSubmissionMeta({
+            isDraft: true,
+            isDeletedDraft: false,
+            creator: user._id,
+            dateModified: new Date('2021-01-02').toISOString(),
+          }),
+        });
+        const { submission: draftCreatedSecond } = await createSubmission({
+          _id: new ObjectId(),
+          meta: createSubmissionMeta({
+            isDraft: true,
+            isDeletedDraft: false,
+            creator: user._id,
+            dateModified: new Date('2021-01-03').toISOString(),
+          }),
+        });
+
+        const pageOneResponse = await request(app)
+          .get('/api/submissions/drafts/page?limit=1&skip=0')
+          .set('Authorization', authHeaderValue)
+          .send()
+          .expect(200);
+        const pageTwoResponse = await request(app)
+          .get('/api/submissions/drafts/page?limit=1&skip=1')
+          .set('Authorization', authHeaderValue)
+          .send()
+          .expect(200);
+
+        expect(pageOneResponse.body.content).toContainEqual(
+          expect.objectContaining({ _id: draftCreatedSecond._id.toString() })
+        );
+        expect(pageOneResponse.body.content).toHaveLength(1);
+        expect(pageTwoResponse.body.content).toContainEqual(
+          expect.objectContaining({ _id: draftCreatedFirst._id.toString() })
+        );
+        expect(pageTwoResponse.body.content).toHaveLength(1);
       });
     });
   });

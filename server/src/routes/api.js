@@ -4,7 +4,7 @@ import authController from '../controllers/authController';
 import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
-import { syncDraft } from '../controllers/submissionController.part.ts';
+import { syncDraft, getDraftsPage } from '../controllers/submissionController.part.ts';
 import userController from '../controllers/userController';
 import * as scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
@@ -160,6 +160,7 @@ router.post(
   [checkFeatureToggledOn('feature_sync_drafts'), assertAuthenticated],
   catchErrors(syncDraft)
 );
+router.get('/submissions/drafts/page', [assertAuthenticated], catchErrors(getDraftsPage));
 
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
