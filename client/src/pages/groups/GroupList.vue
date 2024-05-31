@@ -5,7 +5,7 @@
       :entities="state.entities"
       :loading="state.loading"
       groupStyle
-      :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir } } }"
+      :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir() } } }"
       :menu="[{ title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/groups/${e._id}`, color: 'green' }]">
       <template v-slot:title>
         <template v-if="props.scope === 'user'"
@@ -63,7 +63,8 @@ async function fetchEntities() {
 
     if (props.scope === 'user') {
       const myGroups = store.getters['memberships/groups'];
-      state.entities = myGroups.sort((a, b) => a.path.localeCompare(b.path));
+      const filteredMyGroups = myGroups.filter((g) => (state.showArchived ? g.meta.archived : !g.meta.archived));
+      state.entities = filteredMyGroups.sort((a, b) => a.path.localeCompare(b.path));
     } else {
       const { data: entities } = await api.get(`/groups/all?showArchived=${state.showArchived}`);
       state.entities = entities.sort((a, b) => a.path.localeCompare(b.path));

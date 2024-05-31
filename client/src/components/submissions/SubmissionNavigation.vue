@@ -7,6 +7,7 @@
       :entity="entity"
       :idx="String(idx)"
       class="whiteCard"
+      :smallCard="true"
       :menu="state.menu">
       <template v-slot:entityTitle>{{ entity.meta.survey.name }}</template>
       <template v-slot:entitySubtitle v-if="entity.meta.dateCreated">

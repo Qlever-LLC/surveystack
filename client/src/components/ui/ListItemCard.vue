@@ -5,7 +5,8 @@
       :style="state.groupStyle"
       :elevation="isHovering ? 2 : 0"
       dense
-      class="py-2 mb-2 bg-white"
+      class="mb-2 bg-white"
+      :class="{ 'py-2': !smallCard }"
       rounded="lg"
       @[getDefaultAction()&&`click`]="runDefaultAction()">
       <span>
@@ -25,7 +26,7 @@
           <span class="entityName_deepCSS">
             <span class=""> {{ state.entity.name }}</span>
             <br />
-            <span class="subEntityName_deepCSS">{{ state.entity?.role }}</span>
+            <span v-if="!smallCard" class="subEntityName_deepCSS">{{ state.entity?.role }}</span>
           </span>
           <span v-if="questionSetsType">
             <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
@@ -42,7 +43,7 @@
       <slot name="preMenu" :entity="state.entity" />
       <a-menu v-if="!groupSelectorStyle" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
-          <a-btn v-bind="props" icon @click.prevent><a-icon>mdi-dots-horizontal</a-icon></a-btn>
+          <a-btn v-bind="props" icon @click.prevent :small="smallCard"><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
         <a-list dense class="py-0">
           <a-list-item
@@ -96,6 +97,11 @@ const props = defineProps({
     required: false,
   },
   groupSelectorStyle: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  smallCard: {
     type: Boolean,
     required: false,
     default: false,
