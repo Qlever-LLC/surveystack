@@ -15,12 +15,15 @@
     @update:sortBy="$emit('update:sortBy', $event)">
     <template v-slot:top><slot name="top" /></template>
     <template v-if="headerSlot" v-slot:header></template>
-    <template v-if="headerSlot" v-slot:[`header.data-table-select`]>
-      <slot name="header.data-table-select" />
+    <template v-slot:headers="{ columns, isSorted, getSortIcon, toggleSort }">
+      <slot
+        name="headers"
+        :columns="columns"
+        :isSorted="isSorted"
+        :getSortIcon="getSortIcon"
+        :toggleSort="toggleSort" />
     </template>
-    <template v-for="header in headers" :key="header.value" v-slot:[`header.${header.value}`]>
-      <slot :name="`header.${header.value}`" />
-    </template>
+
     <template v-slot:item="{ item, index }">
       <slot name="item" :item="item" :index="index" />
     </template>

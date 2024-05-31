@@ -164,11 +164,11 @@ const dateFormat = (type, value) => {
   switch (type) {
     // case 'date-month-year':
     //   return format(value, 'yyyy-MM');
-    // case 'date-year':
+    // case 'date-year': not defined here
     //   return format(value, 'yyyy');
     case 'date-week-month-year':
       return format(new Date(startOfWeek(value[0])), 'yyyy-MM-dd');
-    default: //case 'date':
+    default: //case 'date' or no type selected for old survey
       return format(value, 'yyyy-MM-dd');
   }
 };
