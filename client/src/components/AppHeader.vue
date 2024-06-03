@@ -126,7 +126,7 @@ initData();
 
 async function initData() {
   state.activeGroup = await getActiveGroup();
-  state.myGroups = getMyGroups();
+  state.myGroups = getMyGroups().sort((a, b) => a.path.localeCompare(b.path));
 
   const membership = store.getters['memberships/memberships'];
 
