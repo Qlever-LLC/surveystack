@@ -182,7 +182,7 @@ watch(
 
 .panels {
   position: fixed;
-  width: 25%;
+  width: 285px;
   min-height: 0px !important;
   top: 0px;
   left: 8px;
