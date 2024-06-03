@@ -4,7 +4,7 @@ import SurveyList from '@/pages/surveys/SurveyList.vue';
 import QuestionSetList from '@/pages/surveys/QuestionSetList.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
-import GroupSettingsEdit from '@/pages/groups/GroupSettingsEdit.vue';
+import GroupSettings from '@/pages/groups/GroupSettings.vue';
 import Builder from '@/pages/builder/Builder.vue';
 import ResultList from '@/pages/submissions/ResultList.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
@@ -188,7 +188,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: GroupSettingsEdit,
+      main: GroupSettings,
     },
     beforeEnter: groupAdminGuard,
   },

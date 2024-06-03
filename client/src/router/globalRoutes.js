@@ -6,10 +6,10 @@ import store from '@/store';
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import AppInfo from '@/pages/app/AppInfo.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
-import GroupEdit from '@/pages/groups/GroupSettingsEdit.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
 import Profile from '@/pages/users/Profile.vue';
 import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
+import GroupNew from '@/pages/groups/GroupNew.vue';
 
 const redirectLanding = async (to, from, next) => {
   //redirect logged in users to my-groups-list
@@ -88,7 +88,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGlobal,
-      main: GroupEdit,
+      main: GroupNew,
     },
     props: {
       header: {
