@@ -15,7 +15,7 @@
       :entity="entity"
       :idx="String(idx)"
       class="whiteCard"
-      :smallCard="true"
+      smallCard
       :menu="state.menu">
       <template v-slot:entitySubtitle></template>
     </list-item-card>

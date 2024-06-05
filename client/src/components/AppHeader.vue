@@ -215,8 +215,7 @@ watch(
   font-size: 1rem;
 }
 
-.panelTitle,
-:deep(.entityName_deepCSS) {
+.panelTitle {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;

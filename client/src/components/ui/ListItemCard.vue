@@ -6,34 +6,36 @@
       :elevation="isHovering ? 2 : 0"
       dense
       class="mb-2 bg-white"
-      :class="{ 'py-2': !smallCard }"
+      :class="{ 'py-2': !smallCard, 'py-0': smallCard }"
       rounded="lg"
       @[getDefaultAction()&&`click`]="runDefaultAction()">
-      <span>
-        <a-list-item-title v-if="$slots.entityTitle">
-          <slot name="entityTitle" :entity="state.entity" />
-        </a-list-item-title>
-        <a-list-item-title v-else class="d-flex align-center">
-          <span v-if="enablePinned" @click.stop="toogleStar(entity)">
-            <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
-            <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>
-          </span>
-          <span v-if="groupStyle">
-            <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
-              {{ state.avatarName }}
-            </a-avatar>
-          </span>
-          <span class="entityName_deepCSS">
-            <span class=""> {{ state.entity.name }}</span>
-            <br />
-            <span v-if="!smallCard" class="subEntityName_deepCSS">{{ state.entity?.role }}</span>
-          </span>
-          <span v-if="questionSetsType">
-            <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
-            {{ state.entity.meta.libraryUsageCountSubmissions ? state.entity.meta.libraryUsageCountSubmissions : 0 }}
-            <a-tooltip bottom activator="parent">Number of submission using this</a-tooltip>
-          </span>
-        </a-list-item-title>
+      <span style="display: grid">
+        <span style="display: contents">
+          <a-list-item-title v-if="$slots.entityTitle">
+            <slot name="entityTitle" :entity="state.entity" />
+          </a-list-item-title>
+          <a-list-item-title v-else class="d-flex align-center">
+            <span v-if="enablePinned" @click.stop="toogleStar(entity)">
+              <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
+              <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>
+            </span>
+            <span v-if="groupStyle">
+              <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
+                {{ state.avatarName }}
+              </a-avatar>
+            </span>
+            <span class="entityName_deepCSS">
+              <span> {{ state.entity.name }}</span>
+              <br />
+              <span v-if="!smallCard" class="subEntityName_deepCSS">{{ state.entity?.role }}</span>
+            </span>
+            <span v-if="questionSetsType">
+              <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
+              {{ state.entity.meta.libraryUsageCountSubmissions ? state.entity.meta.libraryUsageCountSubmissions : 0 }}
+              <a-tooltip bottom activator="parent">Number of submission using this</a-tooltip>
+            </span>
+          </a-list-item-title>
+        </span>
         <a-list-item-subtitle v-if="$slots.entitySubtitle && !state.entity.createdAgo">
           <slot name="entitySubtitle" :entity="state.entity" />
         </a-list-item-subtitle>
@@ -189,5 +191,10 @@ function runAction(action) {
 
 .elevation-6 {
   box-shadow: 0px 11px 10px -8px var(--v-shadow-key-umbra-opacity, rgba(0, 0, 0, 1)) !important;
+}
+
+.entityName_deepCSS {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 </style>
