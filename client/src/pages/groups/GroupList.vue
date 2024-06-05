@@ -6,7 +6,14 @@
       :loading="state.loading"
       groupStyle
       :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir() } } }"
-      :menu="[{ title: 'Go to Group', icon: 'mdi-open-in-new', action: (e) => `/groups/${e._id}`, color: 'green' }]">
+      :menu="[
+        {
+          title: 'Go to Group',
+          icon: 'mdi-open-in-new',
+          action: (entity) => (mobile ? `/groups/${entity._id}` : `/groups/${entity._id}/submissions`),
+          color: 'green',
+        },
+      ]">
       <template v-slot:title>
         <template v-if="props.scope === 'user'"
           ><a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups</template
@@ -28,6 +35,9 @@ import BasicList from '@/components/ui/BasicList2.vue';
 import { reactive, watch } from 'vue';
 import { useGroup } from '@/components/groups/group';
 import store from '@/store';
+import { useDisplay } from 'vuetify';
+
+const { mobile } = useDisplay();
 
 const props = defineProps({
   scope: {

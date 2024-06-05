@@ -25,8 +25,10 @@ import { reactive } from 'vue';
 import { useGroup } from '@/components/groups/group';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
+import { useDisplay } from 'vuetify';
 
 const { getMyGroups } = useGroup();
+const { mobile } = useDisplay();
 
 const state = reactive({
   menu: [],
@@ -36,7 +38,12 @@ initData();
 
 function initData() {
   state.menu = [
-    { title: 'Go to Group', icon: 'mdi-open-in-new', action: (entity) => `/groups/${entity._id}`, color: 'green' },
+    {
+      title: 'Go to Group',
+      icon: 'mdi-open-in-new',
+      action: (entity) => (mobile.value ? `/groups/${entity._id}` : `/groups/${entity._id}/submissions`),
+      color: 'green',
+    },
   ];
 }
 </script>
