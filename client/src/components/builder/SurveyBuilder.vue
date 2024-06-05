@@ -131,14 +131,16 @@
           {{ errorMessage }}
         </a-alert>
         <code-editor
-          :saveable="true"
+          :saveable="scriptIsSavable"
           :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
           @change="updateScriptCode"
-          @save="saveScript">
-        </code-editor>
+          @save="saveScript"
+          :isClosable="true"
+          :title="`Script: ${scriptCode.name}`"
+        />
       </pane>
 
       <pane class="pane pane-main-code" v-if="hasCode && !hideCode">
@@ -168,8 +170,8 @@
                 :result="evaluated"
                 @change="updateSelectedCode"
                 :examples="true"
-                @examples="showExamples = true">
-              </code-editor>
+                @examples="showExamples = true"
+              />
             </div>
           </pane>
           <pane size="20">
@@ -187,7 +189,8 @@
             v-if="survey"
             class="code-editor"
             :readonly="true"
-            :code="sharedCode"></code-editor>
+            :code="sharedCode"
+          />
         </div>
       </pane>
 
@@ -386,8 +389,7 @@ export default {
         return;
       }
 
-      //TODO when this file will be migrated to script setup, use getActiveGroupId()
-      if (this.$route.params.id !== this.scriptCode.meta.group.id) {
+      if (!this.scriptIsSavable) {
         this.error(
           "This script is managed by another group, so you can't save it.  If you want to make changes, contact the group who manages this script. Otherwise, you can copy the script contents and create your own script in your group which you can control directly."
         );
@@ -857,6 +859,15 @@ export default {
     },
   },
   computed: {
+    scriptIsSavable() {
+      const scriptIsInSameGroupAsSurvey = this.$route.params.id !== this.scriptCode.meta.group.id;
+      // check that user is admin of script's group or one of it's ancestors
+      const scriptPath = this.scriptCode.meta.group.path;
+      const roles = this.$store.getters['memberships/memberships'].map(m => `${m.role}@${m.path}`);
+      const targetRole = `admin@${scriptPath}`;
+      const userHasPermissionToSaveScript = roles.some(role => targetRole.startsWith(role));
+      return userHasPermissionToSaveScript && scriptIsInSameGroupAsSurvey;
+    },
     surveyIsValid() {
       // return this.invalidValidations.length > 0 ? invalidValidations : true;
       return !(this.surveyValidationErrors.length > 0) && this.validateSurveyName() === true;
