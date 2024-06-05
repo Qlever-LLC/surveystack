@@ -242,7 +242,8 @@ export function prettyLog(label, status = '', show = true) {
       info: 'background-color: #d9de45; padding: 0.2rem 1.5rem;',
     };
     const style = styles[status] || '';
-    console.log('%c' + label, style);
+    console.log('%c' + label, style); // pretty version prints to inspect -> console
+    if (typeof log === 'function') log(label); // `log` prints to the console log box in edit UI.  Check that it exists first to be safe.
   }
 }
 
