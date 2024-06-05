@@ -1,77 +1,94 @@
 <template>
-  <a-container>
-    <h1>Call for Responses</h1>
+  <a-dialog
+    :modelValue="props.modelValue"
+    @update:modelValue="closeDialog"
+    @click:outside="closeDialog"
+    :max-width="mobile ? '100%' : '75%'"
+    scrollable>
     <a-card class="my-2">
+      <a-card-title class="my-4 d-flex align-start justify-space-between" style="white-space: pre-wrap"
+        ><h1>Call for Responses</h1>
+        <a-btn @click="closeDialog" variant="flat">x</a-btn>
+      </a-card-title>
       <a-card-text>
-        <a-text-field v-model="subject" label="Subject" variant="filled" />
-        <a-textarea rows="10" v-model="body" label="Message" hide-details />
+        <a-text-field v-model="state.subject" label="Subject" variant="filled" />
+        <a-textarea rows="10" v-model="state.body" label="Message" hide-details />
         <div v-if="showMissingMagicLinkWarning" class="mt-2 text-error">
           Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
         </div>
         <div class="d-flex justify-end align-center mt-3">
           <span v-if="!submittable" class="mr-2">Select at least one member below</span>
-          <a-btn variant="text" @click="cancel">Cancel</a-btn>
-          <a-btn color="primary" :disabled="!submittable" @click="showConfirmDialog = true">Send...</a-btn>
+          <a-btn variant="text" @click="closeDialog">Cancel</a-btn>
+          <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send...</a-btn>
         </div>
       </a-card-text>
     </a-card>
     <a-card>
       <a-card-title>Select members</a-card-title>
-      <a-card-subtitle>{{ selectedMembers.length }} of {{ activeMembers.length }} selected</a-card-subtitle>
+      <a-card-subtitle>{{ state.selectedMembers.length }} of {{ activeMembers.length }} selected</a-card-subtitle>
       <a-card-text>
         <a-data-table
-          v-model="selectedMembers"
+          v-model="state.selectedMembers"
           :items="activeMembers"
-          :headers="headers"
+          :headers="state.headers"
           showSelect
           itemValue="_id"
-          :loading="isLoadingMembers"
+          :loading="state.isLoadingMembers"
           hideDefaultFooter
           actionsSlot>
           <template v-slot:actions="{ item }">
-            <a-btn v-if="item.meta.status === 'pending'" @click="memberToConfirm = item">Confirm</a-btn>
+            <a-btn v-if="item.meta.status === 'pending'" @click="state.memberToConfirm = item">Confirm</a-btn>
           </template>
         </a-data-table>
       </a-card-text>
     </a-card>
 
     <confirm-membership-dialog
-      v-if="memberToConfirm"
-      :membership="memberToConfirm"
+      v-if="state.memberToConfirm"
+      :membership="state.memberToConfirm"
       @confirmed="
-        memberToConfirm = null;
+        state.memberToConfirm = null;
         loadMembers;
       " />
 
-    <a-dialog v-model="showConfirmDialog" max-width="500">
+    <a-dialog v-model="state.showConfirmDialog" max-width="500">
       <a-card>
         <a-card-title class="headline">Confirmation</a-card-title>
         <a-card-text>
           <p class="body-1">
-            You are about to send an E-mail to {{ selectedMembers.length }}
-            {{ selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
+            You are about to send an E-mail to {{ state.selectedMembers.length }}
+            {{ state.selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
           </p>
-          <a-checkbox label="Also send a copy to myself" v-model="copy" />
+          <a-checkbox label="Also send a copy to myself" v-model="state.copy" />
         </a-card-text>
         <a-card-actions class="d-flex justify-end">
-          <a-btn @click="showConfirmDialog = false" variant="text">Cancel</a-btn>
-          <a-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</a-btn>
+          <a-btn @click="state.showConfirmDialog = false" variant="text">Cancel</a-btn>
+          <a-btn color="primary" :loading="state.isSubmitting" @click="submit">SEND NOW</a-btn>
         </a-card-actions>
       </a-card>
     </a-dialog>
     <result-dialog
-      v-model="showSubmitResult"
-      :items="submitResults"
+      v-model="state.showSubmitResult"
+      :items="state.submitResults"
       title="Call for Responses"
-      @close="showSubmitResult = false" />
-  </a-container>
+      @close="state.showSubmitResult = false" />
+  </a-dialog>
 </template>
 
-<script>
+<script setup>
+import { computed, reactive, watch } from 'vue';
+import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
+import { useDisplay } from 'vuetify';
+
 import confirmMembershipDialog from '@/components/shared/ConfirmMembershipDialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
+
+const { mobile } = useDisplay();
+const store = useStore();
+const route = useRoute();
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -83,120 +100,117 @@ Please use the following link to automatically login and start the survey:
 All the best
 `;
 
-export default {
-  components: {
-    resultDialog,
-    confirmMembershipDialog,
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    required: true,
   },
-  data() {
-    return {
-      members: [],
-      group: null,
-      selectedMembers: [],
-      selectedSurvey: null,
-      subject: defaultSubject,
-      body: defaultBody,
-      copy: false,
-      headers: [
-        { title: 'id', value: '_id', sortable: true },
-        { title: 'name', value: 'name', sortable: true },
-        { title: 'email', value: 'email', sortable: true },
-        { title: 'actions', value: 'actions', sortable: true },
-      ],
-      showConfirmDialog: false,
-      memberToConfirm: null,
-      isLoadingMembers: false,
-      isSubmitting: false,
-      showSubmitResult: false,
-      submitResults: [],
-    };
+  selectedSurvey: {
+    type: undefined,
+    required: true,
   },
-  methods: {
-    async loadMembers() {
-      this.isLoadingMembers = true;
-      try {
-        const { data: members } = await api.get(`/memberships?group=${this.group}&populate=true`);
-        this.members = members;
-      } catch (e) {
-        console.error(e);
-        this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
-      } finally {
-        this.isLoadingMembers = false;
-      }
-    },
-    cancel() {
-      this.$router.back();
-    },
-    async submit() {
-      this.isSubmitting = true;
-      try {
-        const members = this.selectedMembers;
-        const survey = this.selectedSurvey._id;
-        await api.post('/call-for-submissions/send', {
-          survey,
-          members,
-          subject: this.subject,
-          body: this.body,
-          group: this.group,
-          copy: this.copy,
-        });
-        this.submitResults = [
-          {
-            title: 'Success:',
-            body: 'Emails are sent out!',
-          },
-        ];
-        this.showSubmitResult = true;
-      } catch (e) {
-        console.error(e);
-        this.submitResults = [
-          {
-            title: 'Error:',
-            body: get(e, 'response.data.message', String(e)),
-            error: true,
-          },
-        ];
-        this.showSubmitResult = true;
-      } finally {
-        this.isSubmitting = false;
-        this.showConfirmDialog = false;
-      }
-    },
-  },
-  watch: {
-    selectedSurvey(newVal) {
-      if (!newVal) {
-        this.subject = defaultSubject;
-      }
-    },
-  },
-  computed: {
-    activeMembers() {
-      return this.members.map((m) => ({
-        ...m,
-        name: (m.user && m.user.name) || (m.meta && m.meta.invitationName),
-        email: (m.user && m.user.email) || (m.meta && m.meta.invitationEmail),
-        isSelectable: m.meta.status === 'active',
-      }));
-    },
-    submittable() {
-      return this.selectedSurvey !== null && this.selectedMembers.length !== 0;
-    },
-    showMissingMagicLinkWarning() {
-      return this.body.search('%CFS_MAGIC_LINK%') === -1;
-    },
-  },
-  async created() {
-    const { id, surveyId } = this.$route.params;
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const state = reactive({
+  members: [],
+  group: null,
+  selectedMembers: [],
+  subject: defaultSubject,
+  body: defaultBody,
+  copy: false,
+  headers: [
+    { title: 'id', value: '_id', sortable: true },
+    { title: 'name', value: 'name', sortable: true },
+    { title: 'email', value: 'email', sortable: true },
+    { title: 'actions', value: 'actions', sortable: true },
+  ],
+  showConfirmDialog: false,
+  memberToConfirm: null,
+  isLoadingMembers: false,
+  isSubmitting: false,
+  showSubmitResult: false,
+  submitResults: [],
+});
+
+const activeMembers = computed(() => {
+  return state.members.map((m) => ({
+    ...m,
+    name: (m.user && m.user.name) || (m.meta && m.meta.invitationName),
+    email: (m.user && m.user.email) || (m.meta && m.meta.invitationEmail),
+    isSelectable: m.meta.status === 'active',
+  }));
+});
+const submittable = computed(() => {
+  return props.selectedSurvey !== null && state.selectedMembers.length !== 0;
+});
+const showMissingMagicLinkWarning = computed(() => {
+  return state.body.search('%CFS_MAGIC_LINK%') === -1;
+});
+
+async function loadMembers() {
+  state.isLoadingMembers = true;
+  try {
+    const { data: members } = await api.get(`/memberships?group=${state.group}&populate=true`);
+    state.members = members;
+  } catch (e) {
+    console.error(e);
+    store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
+  } finally {
+    state.isLoadingMembers = false;
+  }
+}
+async function submit() {
+  state.isSubmitting = true;
+  try {
+    const members = state.selectedMembers;
+    const survey = props.selectedSurvey._id;
+    await api.post('/call-for-submissions/send', {
+      survey,
+      members,
+      subject: state.subject,
+      body: state.body,
+      group: state.group,
+      copy: state.copy,
+    });
+    state.submitResults = [
+      {
+        title: 'Success:',
+        body: 'Emails are sent out!',
+      },
+    ];
+    state.showSubmitResult = true;
+  } catch (e) {
+    console.error(e);
+    state.submitResults = [
+      {
+        title: 'Error:',
+        body: get(e, 'response.data.message', String(e)),
+        error: true,
+      },
+    ];
+    state.showSubmitResult = true;
+  } finally {
+    state.isSubmitting = false;
+    state.showConfirmDialog = false;
+  }
+}
+
+function closeDialog() {
+  state.selectedMembers = [];
+  emit('update:modelValue', false);
+}
+
+watch(
+  () => props.selectedSurvey,
+  async () => {
+    const { id } = route.params;
     if (id) {
-      this.group = id;
-      await this.loadMembers();
+      state.group = id;
+      await loadMembers();
     }
-    if (surveyId) {
-      const { data } = await api.get(`/surveys/${surveyId}`);
-      this.selectedSurvey = data;
-      this.subject = `Request to submit survey '${this.selectedSurvey.name}'`;
-    }
-  },
-};
+    state.subject = `Request to submit survey '${props.selectedSurvey.name}'`;
+  }
+);
 </script>

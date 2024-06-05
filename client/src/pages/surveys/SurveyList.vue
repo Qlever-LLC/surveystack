@@ -1,4 +1,8 @@
 <template>
+  <call-for-submissions
+    v-model="stateComposable.renderCallForResponses"
+    :selectedSurvey="stateComposable.selectedSurvey">
+  </call-for-submissions>
   <a-container class="basicListContainer">
     <a-alert
       v-if="message.errorMessage"
@@ -65,6 +69,7 @@ import api from '@/services/api.service';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
+import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import formatDistance from 'date-fns/formatDistance';

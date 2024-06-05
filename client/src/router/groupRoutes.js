@@ -12,7 +12,6 @@ import Script from '@/pages/scripts/Script.vue';
 import DraftList from '@/pages/submissions/DraftsPage.vue';
 import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
 import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
-import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import MembershipsPage from '@/pages/memberships/MembershipsPage.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
@@ -250,16 +249,6 @@ export default [
     },
   },
 
-  {
-    // Request submissions
-    path: '/groups/:id/surveys/:surveyId/call-for-submissions',
-    name: 'group-call-for-submissions',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: CallForSubmissions,
-    },
-  },
   {
     path: '/groups/:id/surveys/:surveyId/submissions',
     name: 'group-survey-submissions',

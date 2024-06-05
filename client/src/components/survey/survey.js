@@ -21,6 +21,7 @@ export function useSurvey() {
   const stateComposable = reactive({
     showSelectMember: false,
     selectedSurvey: undefined,
+    renderCallForResponses: false,
     menu: [
       {
         title: 'Start Survey',
@@ -39,11 +40,10 @@ export function useSurvey() {
         title: 'Call for Responses',
         icon: 'mdi-bullhorn',
         action: (s) =>
-          createAction(
-            s,
-            rightToCallForSubmissions,
-            `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`
-          ),
+          createAction(s, rightToCallForSubmissions, () => {
+            stateComposable.renderCallForResponses = true;
+            stateComposable.selectedSurvey = s;
+          }),
         render: (s) => () => rightToCallForSubmissions(s).allowed,
       },
       {
