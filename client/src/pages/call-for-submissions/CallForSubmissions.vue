@@ -6,13 +6,13 @@
     :max-width="mobile ? '100%' : '75%'"
     scrollable>
     <a-card class="my-2">
-      <a-card-title class="my-4 d-flex align-start justify-space-between" style="white-space: pre-wrap"
-        ><h1>Call for Responses</h1>
-        <a-btn @click="closeDialog" variant="flat">x</a-btn>
+      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: pre-wrap">
+        <span class="d-flex align-start"><a-icon class="mr-2">mdi-bullhorn</a-icon>Call for Responses</span>
+        <a-btn @click="closeDialog" variant="flat"><a-icon>mdi-close</a-icon></a-btn>
       </a-card-title>
-      <a-card-text>
+      <a-card-text class="pb-0" style="overflow: revert !important">
         <a-text-field v-model="state.subject" label="Subject" variant="filled" />
-        <a-textarea rows="10" v-model="state.body" label="Message" hide-details />
+        <a-textarea rows="7" v-model="state.body" label="Message" hide-details />
         <div v-if="showMissingMagicLinkWarning" class="mt-2 text-error">
           Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
         </div>
@@ -22,11 +22,9 @@
           <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send...</a-btn>
         </div>
       </a-card-text>
-    </a-card>
-    <a-card>
-      <a-card-title>Select members</a-card-title>
+      <a-card-title class="pt-0">Select members</a-card-title>
       <a-card-subtitle>{{ state.selectedMembers.length }} of {{ activeMembers.length }} selected</a-card-subtitle>
-      <a-card-text>
+      <a-card-text class="pt-0" style="min-height: 150px">
         <a-data-table
           v-model="state.selectedMembers"
           :items="activeMembers"
