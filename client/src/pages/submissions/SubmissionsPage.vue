@@ -24,7 +24,7 @@
           @update:modelValue="fetchRemoteSubmissions"
           color="grey-darken-1" />
       </template>
-      <template v-slot:noValue> No Drafts available</template>
+      <template v-slot:noValue> No Responses available</template>
     </basic-list>
   </a-container>
 </template>
