@@ -4,7 +4,7 @@
       listType="row"
       :entities="state.drafts"
       :menu="state.menu"
-      :buttonNew="{ title: 'Submit Completed TODO', action: () => handleSubmitCompleted() }"
+      :buttonNew="undefined /*{ title: 'Submit Completed TODO', action: () => handleSubmitCompleted() }*/"
       :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2">mdi-file-document-edit-outline</a-icon>
@@ -91,6 +91,7 @@ const state = reactive({
       title: 'Delete',
       icon: 'mdi-trash-can-outline',
       action: (e) => `/todo`,
+      render: (e) => () => false,
       color: 'red',
       disabled: true,
       buttonHover: true,
