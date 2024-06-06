@@ -9,9 +9,11 @@
       class="whiteCard"
       :smallCard="true"
       :menu="state.menu">
-      <template v-slot:entityTitle>{{ entity.meta.survey.name }}</template>
+      <template v-slot:entityTitle>
+        {{ entity.meta.survey.name }}
+      </template>
       <template v-slot:entitySubtitle v-if="entity.meta.dateCreated">
-        Created {{ formatDistance(parseISO(entity.meta.dateCreated), new Date()) }} ago
+        Created {{ new Date(entity.meta.dateCreated).toLocaleString() }}
       </template>
       <template v-slot:entitySubtitle v-else></template>
     </list-item-card>
@@ -65,11 +67,8 @@ import { useResults } from '@/components/ui/results';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import parseISO from 'date-fns/parseISO';
-
-import formatDistance from 'date-fns/formatDistance';
 
 const { getActiveGroupId } = useGroup();
 const { getDrafts, isDraftReadyToSubmit, uploadSubmission } = useSubmission();
