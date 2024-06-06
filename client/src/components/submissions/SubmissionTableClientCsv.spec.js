@@ -2,10 +2,14 @@ import SubmissionTableClientCsv, {
   getPropertiesFromMatrix,
   transformGeoJsonHeaders,
   transformMatrixHeaders,
+  getCellValue,
 } from './SubmissionTableClientCsv.vue';
 import { fireEvent } from '@testing-library/vue';
 import { within } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
+
+import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
 
 const mockSubmissions = () => {
   return {
@@ -399,7 +403,6 @@ describe('SubmissionTableClientCsv', () => {
     });
   });
 
-
   describe('SubmissionTableClientCsv UI Tests', () => {
     it('should check that the modal text content is the same with the clicked table cell', async () => {
       const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
@@ -456,11 +459,11 @@ describe('SubmissionTableClientCsv', () => {
           ],
         },
       });
-  
+
       const reassignButton = getByRole('button', { name: /reassign/i });
       expect(reassignButton).toBeDisabled();
     });
-  
+
     it('should disable resubmit Button if actionsAreDisabled prop is set to true', async () => {
       const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
         props: {
@@ -474,11 +477,11 @@ describe('SubmissionTableClientCsv', () => {
           ],
         },
       });
-  
+
       const resubmitButton = getByRole('button', { name: /resubmit/i });
       expect(resubmitButton).toBeDisabled();
     });
-  
+
     it('should disable archive Button if actionsAreDisabled prop is set to true', async () => {
       const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
         props: {
@@ -492,7 +495,7 @@ describe('SubmissionTableClientCsv', () => {
           ],
         },
       });
-  
+
       const archiveButton = getByRole('button', { name: /archive/i });
       expect(archiveButton).toBeDisabled();
     });
@@ -522,9 +525,9 @@ describe('SubmissionTableClientCsv', () => {
     });
     const firstRow = getAllByRole('row')[0];
     const checkbox = within(firstRow).getByRole('checkbox');
-    
+
     await fireEvent.click(checkbox);
-    
+
     expect(emitted()['update:selected']).toBeTruthy();
   });
 
@@ -580,5 +583,23 @@ describe('SubmissionTableClientCsv', () => {
     const reassignButton = getByRole('button', { name: /reassign/i });
     await fireEvent.click(reassignButton);
     expect(emitted().reassignment).toBeTruthy();
+  });
+});
+
+describe('Test on date', () => {
+  it.only('getCellValue', () => {
+    const item = {
+      _id: '66604d163091e164aaca19e6',
+      'meta.creatorDetail.name': 'Super Admin',
+      'meta.dateSubmitted': '2024-06-05T11:34:01.446Z',
+      'meta.archived': 'false',
+      'data.date_1.value': '2024-06-06T00:00:00.000Z',
+      'data.matrix_1.value===>sample.value': ['2024-06-06T00:00:00.000Z'],
+    };
+    const fulldate = getCellValue(item['meta.dateSubmitted'], 2);
+    const justDay = getCellValue(item['data.date_1.value'], 4);
+
+    expect(fulldate).toEqual(format(parseISO('2024-06-05T11:34:01.446Z'), 'MMM d, yyyy h:mm a'));
+    expect(justDay).toEqual('Jun 6, 2024');
   });
 });
