@@ -132,7 +132,7 @@
         </a-alert>
         <code-editor
           :saveable="scriptIsSavable"
-          :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          :readonly="!scriptIsSavable"
           @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
@@ -860,12 +860,20 @@ export default {
   },
   computed: {
     scriptIsSavable() {
-      const scriptIsInSameGroupAsSurvey = this.$route.params.id !== this.scriptCode.meta.group.id;
+      if (this.control.type !== 'script') {
+        return false;
+      }
+      const scriptIsInQSL = Boolean(this.control.libraryId);
+      const scriptInQSLIsModifiable = this.control.options.allowModify;
+      const scriptIsInSameGroupAsSurvey = this.$route.params.id === this.scriptCode.meta.group.id;
       // check that user is admin of script's group or one of it's ancestors
       const scriptPath = this.scriptCode.meta.group.path;
-      const roles = this.$store.getters['memberships/memberships'].map(m => `${m.role}@${m.path}`);
+      const roles = this.$store.getters['memberships/memberships'].map(m => `${m.role}@${m.group.path}`);
       const targetRole = `admin@${scriptPath}`;
       const userHasPermissionToSaveScript = roles.some(role => targetRole.startsWith(role));
+      if (scriptIsInQSL) {
+        return scriptInQSLIsModifiable && userHasPermissionToSaveScript && scriptIsInSameGroupAsSurvey;
+      }
       return userHasPermissionToSaveScript && scriptIsInSameGroupAsSurvey;
     },
     surveyIsValid() {
