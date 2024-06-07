@@ -1,7 +1,7 @@
 <template>
   <vue-monaco-editor
     :value="modelValue"
-    :options="MONACO_EDITOR_OPTIONS"
+    :options="editorOptions"
     language="javascript"
     @change="emit('update:modelValue', $event)"
     @mount="handleMount"
@@ -11,7 +11,7 @@
 
 <script setup>
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor';
-import { shallowRef } from 'vue';
+import { shallowRef, computed } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -26,13 +26,16 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-const MONACO_EDITOR_OPTIONS = {
-  automaticLayout: true,
-  formatOnType: true,
-  formatOnPaste: true,
-  readOnly: props.readOnly,
-  minimap: { enabled: false },
-};
+const editorOptions = computed(() => {
+  return {
+    automaticLayout: true,
+    formatOnType: true,
+    formatOnPaste: true,
+    readOnly: props.readOnly,
+    minimap: { enabled: false },
+  };
+});
+
 
 const editorRef = shallowRef();
 const handleMount = (editor) => (editorRef.value = editor);
