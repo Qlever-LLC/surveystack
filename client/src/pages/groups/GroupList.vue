@@ -15,9 +15,9 @@
         },
       ]">
       <template v-slot:title>
-        <template v-if="props.scope === 'user'"
-          ><a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups</template
-        >
+        <template v-if="props.scope === 'user'">
+          <a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups
+        </template>
         <template v-else> <a-icon class="mr-2">mdi-compass-outline</a-icon>Find a group</template>
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ state.entities.length }} </a-chip>
       </template>
@@ -27,6 +27,9 @@
       <template v-slot:noValue> No Groups available </template>
     </basic-list>
   </a-container>
+  <a-dialog v-model="state.showAuthSelector" :width="mobile ? '100%' : '50%'">
+    <auth-selector @skip="skipAuth" />
+  </a-dialog>
 </template>
 
 <script setup>
@@ -36,8 +39,12 @@ import { reactive, watch } from 'vue';
 import { useGroup } from '@/components/groups/group';
 import store from '@/store';
 import { useDisplay } from 'vuetify';
+import { useRoute, useRouter } from 'vue-router';
+import AuthSelector from '@/components/ui/AuthSelector.vue';
 
 const { mobile } = useDisplay();
+const router = useRouter();
+const route = useRoute();
 
 const props = defineProps({
   scope: {
@@ -55,13 +62,22 @@ const state = reactive({
   entities: [],
   showArchived: false,
   loading: false,
+  showAuthSelector: false,
 });
 
-fetchEntities();
+initData();
 
-watch([() => state.showArchived, () => props.scope], fetchEntities);
+watch([() => state.showArchived, () => props.scope], initData);
 
-async function fetchEntities() {
+watch(
+  () => route.query.login,
+  () => (route.query.login ? (state.showAuthSelector = true) : (state.showAuthSelector = false))
+);
+
+async function initData() {
+  if (route.query.login) {
+    state.showAuthSelector = true;
+  }
   try {
     state.loading = true;
     if (isWhitelabel()) {
@@ -89,5 +105,10 @@ function rootDir() {
     return getWhitelabelPartner().path;
   }
   return '/';
+}
+
+function skipAuth() {
+  state.showAuthSelector = false;
+  router.push({ query: null });
 }
 </script>
