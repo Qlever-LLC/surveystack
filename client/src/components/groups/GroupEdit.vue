@@ -172,6 +172,9 @@ async function onSubmit() {
     } else {
       const { data: newGroup } = await api.post('/groups', state.entity);
       state.entity = newGroup;
+      //reload user memberships
+      const user = store.getters['auth/user'];
+      await store.dispatch('memberships/getUserMemberships', user._id);
       await router.push(`/groups/${state.entity._id}/settings`);
     }
   } catch (err) {
