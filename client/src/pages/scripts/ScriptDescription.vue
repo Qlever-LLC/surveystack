@@ -11,15 +11,9 @@
           <a-icon class="mr-2">mdi-open-in-new</a-icon>
           {{ state.entity.name }}
         </span>
-        <span :class="{ mobileDisplay: smAndDown, desktopDisplay: !smAndDown }">
-          <router-link
-            :to="{ name: 'group-scripts-edit', params: { id: $route.params.id, scriptId: state.entity._id } }">
-            <a-btn class="marginRight" color="primary"> <a-icon left>mdi-pencil</a-icon> Edit </a-btn>
-          </router-link>
-          <a-btn @click="closeDialog" variant="flat">
-            <a-icon>mdi-close</a-icon>
-          </a-btn>
-        </span>
+        <a-btn color="background" @click="closeDialog" variant="flat">
+          <a-icon>mdi-close</a-icon>
+        </a-btn>
       </a-card-title>
       <a-card-subtitle>
         <div class="text-secondary">{{ state.entity._id }}</div>
@@ -39,7 +33,7 @@ import codeEditor from '@/components/ui/CodeEditor.vue';
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = defineAsyncComponent(() => import('@/components/ui/CodeEditor.vue'));
 
-const { mobile, smAndDown } = useDisplay();
+const { mobile } = useDisplay();
 
 const props = defineProps({
   modelValue: {
@@ -79,17 +73,5 @@ watch(
 .code-editor {
   height: 75vh;
   min-height: 300px;
-}
-
-.mobileDisplay {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: flex-end;
-}
-.mobileDisplay .marginRight {
-  margin-top: 16px;
-}
-.desktopDisplay .marginRight {
-  margin-right: 16px;
 }
 </style>
