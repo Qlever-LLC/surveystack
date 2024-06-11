@@ -6,7 +6,7 @@
     :max-width="mobile ? '100%' : '75%'"
     scrollable>
     <a-card class="my-2">
-      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: pre-wrap">
+      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: normal">
         <span class="d-flex align-start"><a-icon class="mr-2">mdi-bullhorn</a-icon>Call for Responses</span>
         <a-btn @click="closeDialog" variant="flat"><a-icon>mdi-close</a-icon></a-btn>
       </a-card-title>
@@ -155,6 +155,7 @@ async function loadMembers() {
   } catch (e) {
     console.error(e);
     store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
+    closeDialog();
   } finally {
     state.isLoadingMembers = false;
   }
@@ -201,14 +202,17 @@ function closeDialog() {
 }
 
 watch(
-  () => props.selectedSurvey,
-  async () => {
-    const { id } = route.params;
-    if (id) {
-      state.group = id;
-      await loadMembers();
+  () => props.modelValue,
+  async (newVal) => {
+    // if the dialog will be displayed
+    if (newVal) {
+      const { id } = route.params;
+      if (id) {
+        state.group = id;
+        await loadMembers();
+      }
+      state.subject = `Request to submit survey '${props.selectedSurvey.name}'`;
     }
-    state.subject = `Request to submit survey '${props.selectedSurvey.name}'`;
   }
 );
 </script>

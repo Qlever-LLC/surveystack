@@ -1,4 +1,5 @@
 <template>
+  <survey-description v-model="state.showDescription" :selectedSurvey="state.selectedSurvey"> </survey-description>
   <a-container class="basicListContainer">
     <a-alert
       v-if="message.errorMessage"
@@ -55,6 +56,7 @@ import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 
 import BasicList from '@/components/ui/BasicList2.vue';
+import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
 const { rightToView, rightToEdit } = getPermission();
@@ -75,6 +77,8 @@ const state = reactive({
   menu: [],
   showSelectMember: false,
   loading: false,
+  showCallForResponses: false,
+  showDescription: false,
 });
 
 const activeTabPaginationLength = computed(() => {
@@ -97,7 +101,11 @@ async function initData() {
       {
         title: 'Description',
         icon: 'mdi-book-open',
-        action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
+        action: (s) =>
+          createAction(s, rightToView, () => {
+            state.showDescription = true;
+            state.selectedSurvey = s;
+          }),
         render: (s) => () => rightToView().allowed,
       },
       {

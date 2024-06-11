@@ -1,8 +1,8 @@
 <template>
-  <call-for-submissions
-    v-model="stateComposable.renderCallForResponses"
-    :selectedSurvey="stateComposable.selectedSurvey">
+  <call-for-submissions v-model="stateComposable.showCallForResponses" :selectedSurvey="stateComposable.selectedSurvey">
   </call-for-submissions>
+  <survey-description v-model="stateComposable.showDescription" :selectedSurvey="stateComposable.selectedSurvey">
+  </survey-description>
   <a-alert
     v-if="message.errorMessage"
     style="cursor: pointer"
@@ -48,6 +48,7 @@ import { reactive, watch } from 'vue';
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
+import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
 const { stateComposable, getSurveys, message } = useSurvey();

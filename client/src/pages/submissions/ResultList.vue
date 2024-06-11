@@ -155,7 +155,7 @@
             variant="outlined"
             color="secondary"
             :to="{
-              name: 'group-surveys-description',
+              name: '...',
               params: { surveyId: state.survey },
             }">
             <a-icon left>mdi-note-text-outline</a-icon>

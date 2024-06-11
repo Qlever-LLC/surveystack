@@ -9,7 +9,7 @@
         class="code-editor mt-4"
         :code="state.entity && state.entity.content"
         @change="updateCode" />
-      <div class="d-flex mt-5 justify-end">
+      <div class="d-flex justify-end">
         <a-btn variant="text" @click="cancel">Cancel</a-btn>
         <a-btn color="primary" @click="submit">Save</a-btn>
       </div>

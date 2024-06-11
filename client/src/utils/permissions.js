@@ -21,7 +21,6 @@ export function getPermission() {
       : { allowed: false, message: "Sorry you can't edit this survey" };
   }
   function rightToCallForSubmissions(survey) {
-    console.log(survey);
     return rightToEdit().allowed && survey.latestVersion > 1
       ? { allowed: true, message: 'success' }
       : { allowed: false, message: "Sorry you can't call for submissions on a draft" };

@@ -1,4 +1,5 @@
 <template>
+  <membership-new v-model="state.showNewMembership"></membership-new>
   <a-container class="basicListContainer">
     <basic-list
       listType="row"
@@ -6,7 +7,9 @@
       :menu="state.menu"
       :buttonNew="{
         title: 'Invite New Members',
-        link: { name: 'group-members-new', params: { id: getActiveGroupId() } },
+        action: () => {
+          state.showNewMembership = true;
+        },
       }"
       :loading="state.isLoading">
       <template v-slot:title>
@@ -62,6 +65,7 @@ import { useGroup } from '@/components/groups/group';
 import { useStore } from 'vuex';
 import ConfirmMembershipDialog from '@/components/shared/ConfirmMembershipDialog.vue';
 import hyloInviteMemberDialog from '@/components/integrations/HyloInviteMemberDialog.vue';
+import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 
 const store = useStore();
 const { getActiveGroupId, isGroupAdmin } = useGroup();
@@ -123,6 +127,7 @@ const state = reactive({
   memberToConfirm: null,
   hyloGroup: null,
   memberToInviteToHylo: null,
+  showNewMembership: false,
 });
 
 initData();

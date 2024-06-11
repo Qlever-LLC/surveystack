@@ -106,8 +106,7 @@
       <a-col class="shrink" v-if="survey._id">
         <a-btn
           :to="{
-            name: 'group-surveys-description',
-            params: { surveyId: survey._id },
+            name: 'group-surveys',
           }">
           back
         </a-btn>

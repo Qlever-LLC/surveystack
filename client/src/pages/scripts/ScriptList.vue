@@ -1,4 +1,5 @@
 <template>
+  <script-description v-model="state.showScript" :selectedScript="state.selectedScript"></script-description>
   <a-container class="basicListContainer">
     <a-alert
       v-if="message.errorMessage"
@@ -35,6 +36,8 @@ import { getPermission } from '@/utils/permissions';
 import { menuAction } from '@/utils/threeDotsMenu';
 import { reactive } from 'vue';
 
+import ScriptDescription from '@/pages/scripts/ScriptDescription.vue';
+
 const { getActiveGroupId, isGroupAdmin } = useGroup();
 const { rightToEdit, rightToView } = getPermission();
 const { message, createAction } = menuAction();
@@ -43,6 +46,8 @@ const state = reactive({
   loading: false,
   entities: [],
   menu: [],
+  showScript: false,
+  selectedScript: undefined,
 });
 
 initData();
@@ -53,7 +58,12 @@ async function initData() {
     state.menu.push({
       title: 'View Script',
       icon: 'mdi-open-in-new',
-      action: (e) => createAction(e, rightToView, `/groups/${getActiveGroupId()}/scripts/${e._id}`),
+      action: (e) =>
+        createAction(e, rightToView, () => {
+          state.showScript = true;
+          state.selectedScript = e;
+          console.log(state.showScript, e);
+        }),
       render: (e) => () => rightToView(e).allowed,
     });
     if (isGroupAdmin()) {
