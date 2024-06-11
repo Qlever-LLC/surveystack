@@ -587,7 +587,13 @@ describe('SubmissionTableClientCsv', () => {
 });
 
 describe('Test on date', () => {
-  it.only('getCellValue', () => {
+  /*
+  timezone rule:
+  Dates contained in PREFERRED_HEADERS must match the user's timezone in the format 'MMM d, yyyy h:mm a'.
+  As for dates from user responses, since we're only interested in the day and not the hourly part of the date,
+  they must not depend on the timezone and will be displayed as 'MMM d, yyyy'.
+  */
+  it('test getCellValue function based on timezone rule', () => {
     const item = {
       _id: '66604d163091e164aaca19e6',
       'meta.creatorDetail.name': 'Super Admin',
