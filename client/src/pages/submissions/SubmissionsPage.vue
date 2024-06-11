@@ -107,6 +107,10 @@ watch(() => props.scope, fetchRemoteSubmissions);
 
 async function fetchRemoteSubmissions() {
   try {
+    if (!state.activeUser && props.scope === 'user') {
+      //do not load anything, scope is user but not active user found (probably not logged in)
+      return;
+    }
     state.loading = true;
     const queryParams = new URLSearchParams();
     queryParams.append('group', getActiveGroupId());
