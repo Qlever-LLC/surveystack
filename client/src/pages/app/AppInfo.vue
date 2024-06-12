@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="bg-background rounded mt-10">
     <h1>Welcome to SurveyStack</h1>
     <p>
       Current commit: <strong>{{ lcl.shortHash }}</strong>

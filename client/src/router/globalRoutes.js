@@ -203,6 +203,11 @@ export default [
       header: AppHeader,
       main: AppInfo,
     },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
   },
   {
     path: '/kit/*',
@@ -210,6 +215,11 @@ export default [
     components: {
       header: AppHeader,
       main: Kit,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
     },
   },
   // tabula rasa
