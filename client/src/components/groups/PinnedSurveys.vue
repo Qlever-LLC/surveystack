@@ -24,8 +24,6 @@
         <a-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
-              <span class="text-caption text-grey-darken-1">{{ el._id }}</span>
-              <br />
               <span class="title">{{ el.name }}</span>
               <br />
               <span class="font-weight-light text-grey-darken-2" v-if="el.meta">
