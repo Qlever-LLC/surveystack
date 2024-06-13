@@ -54,7 +54,7 @@ export default {
 
         this.farms = assets
           .map((f) => ({
-            label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+            label: f.name,
             value: {
               archived: f.archived,
               farmName: f.instanceName,
@@ -77,7 +77,7 @@ export default {
       for (const node of nodes) {
         if (node.type === 'farmOsUuid' && node.options.farmOsType === 'field') {
           localAreas.push({
-            label: `<span class="green-chip mr-4">New Field</span> ${node.value.name}`,
+            label: `New Field: ${node.value.name}`,
             value: {
               farmName: '',
               url: '',
@@ -95,7 +95,7 @@ export default {
             const values = node.value.filter((row) => row[colName].value && row[colName].value.name);
             localAreas.push(
               ...values.map((row) => ({
-                label: `<span class="green-chip mr-4">New Field</span> ${row[colName].value.name}`,
+                label: `New Field: ${row[colName].value.name}`,
                 value: {
                   farmName: '',
                   url: '',
@@ -134,7 +134,7 @@ export default {
               : [];
 
             return {
-              label: `<span class="blue-chip mr-4">${asset.instanceName}</span> ${asset.name} `,
+              label: `${asset.name} (${asset.instanceName})`,
               value: {
                 farmName: asset.instanceName,
                 url: asset.instanceName,
@@ -199,6 +199,116 @@ export default {
 
       this.assets = [...localPlantings, ...this.assets];
       this.loading = false;
+    },
+    transform(assets) {
+      const withoutArea = [];
+      const localAssets = [];
+      const areas = {};
+
+      assets.forEach((asset) => {
+        if (asset.value.location.length === 0) {
+          const tmp = Object.assign({}, asset);
+          tmp.value.hash = this.hashItem(asset);
+          if (asset.value.url === '') {
+            localAssets.push(tmp);
+          } else {
+            withoutArea.push(tmp);
+          }
+
+          return;
+        }
+
+        asset.value.location.forEach((location) => {
+          areas[`${asset.value.farmName}.${location.id}`] = {
+            farmName: asset.value.farmName,
+            location,
+          };
+        });
+      });
+
+      const res = Object.keys(areas).flatMap((key) => {
+        const area = areas[key];
+
+        const matchedAssets = assets.filter((asset) => {
+          if (asset.value.farmName !== area.farmName) {
+            return false;
+          }
+
+          return asset.value.location.some((loc) => loc.id === area.location.id);
+        });
+
+        console.log('loc', area);
+        const field = {
+          value: {
+            farmName: area.farmName,
+            location: area.location,
+            isField: true,
+            name: '',
+          },
+          label: area.location.name,
+        };
+
+        field.value.hash = this.hashItem(field);
+
+        const assetItems = matchedAssets.map((asset) => {
+          const r = {
+            value: asset.value,
+            label: `${asset.value.name} `,
+          };
+
+          r.value.hash = this.hashItem(r);
+          return r;
+        });
+
+        return [field, ...assetItems];
+      });
+
+      const withoutAreaSection = {
+        value: {
+          farmName: null,
+          location: null,
+          isField: true,
+          isNotClickable: true,
+          name: '',
+        },
+        label: 'Plantings without Area',
+      };
+
+      const localAssetSection = {
+        value: {
+          farmName: null,
+          location: null,
+          isField: true,
+          isNotClickable: true,
+          name: '',
+        },
+        label: 'New Plantings',
+      };
+
+      if (withoutArea.length > 0) {
+        res.push(withoutAreaSection, ...withoutArea);
+      }
+
+      if (localAssets.length > 0) {
+        res.unshift(localAssetSection, ...localAssets);
+      }
+
+      return res;
+    },
+    hashItem(listItem) {
+      if (listItem === null || listItem.value === null) {
+        return '';
+      }
+
+      const { value } = listItem;
+      if (value.isField) {
+        if (!value.farmName) {
+          return 'NOT_ASSIGNED';
+        }
+        return `FIELD:${value.farmName}.${value.location.id}`;
+      }
+
+      return `ASSET:${value.farmName}.${value.id}`;
     },
   },
   computed: {

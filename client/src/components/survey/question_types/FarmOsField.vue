@@ -29,13 +29,14 @@
         <span v-bind="props" v-html="item.raw.label" />
       </template>
       <template v-slot:chip="{ props, item }">
-        <a-chip v-bind="props" closable style="height: 35px">
-          <span v-html="item.raw.label" />
+        <a-chip v-bind="props" closable style="margin-top: -3px">
+          <span>{{ item.raw.label }}</span>
         </a-chip>
       </template>
       <template v-slot:item="{ props, item }">
         <a-list-item v-bind="props" :title="undefined">
           <a-list-item-title v-html="item.raw.label" />
+          <a-list-item-subtitle v-html="item.raw.value.url" />
         </a-list-item>
       </template>
     </a-select>
@@ -47,8 +48,10 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
+import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
 
 export default {
+  components: { AListItemSubtitle },
   mixins: [baseQuestionComponent, farmosBase],
 
   async created() {
@@ -58,32 +61,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-:deep(.blue-chip, .orange-chip, .green-chip) {
-  display: inline-flex;
-  border: 1px rgb(var(--v-theme-focus)) solid;
-  color: rgb(var(--v-theme-focus));
-  border-radius: 0.6rem;
-  font-weight: bold;
-  font-size: 80%;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-  padding-right: 0.2rem;
-  vertical-align: middle;
-  margin-top: 0.4rem;
-  margin-bottom: 0.4rem;
-  margin-right: 0.2rem !important;
-}
-
-:deep(.green-chip) {
-  color: #46b355;
-  border: 1px #46b355 solid;
-}
-
-:deep(.orange-chip) {
-  color: #f38d49;
-  border: 1px #f38d49 solid;
-}
-
 :deep(.v-list-item.v-list-item--active) {
   color: rgb(var(--v-theme-focus)) !important;
 }

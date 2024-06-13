@@ -40,7 +40,12 @@
               <a-radio :value="true" color="focus" />
             </a-radio-group>
           </a-list-item-action>
-          <a-list-item-title v-html="item.label" />
+          <a-list-item-title :class="item.value.isField && idx > 0 ? 'mt-4' : ''">
+            {{ item.label }}
+            <a-list-item-subtitle v-if="item.value.isField">
+              {{ item.value.farmName }}
+            </a-list-item-subtitle>
+          </a-list-item-title>
         </template>
       </a-list-item>
     </a-list>
@@ -51,127 +56,17 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-
-const hashItem = (listItem) => {
-  if (listItem === null || listItem.value === null) {
-    return '';
-  }
-
-  const { value } = listItem;
-  if (value.isField) {
-    if (!value.farmName) {
-      return 'NOT_ASSIGNED';
-    }
-    return `FIELD:${value.farmName}.${value.location.id}`;
-  }
-
-  return `ASSET:${value.farmName}.${value.id}`;
-};
-
-const transform = (assets) => {
-  const withoutArea = [];
-  const localAssets = [];
-  const areas = {};
-
-  assets.forEach((asset) => {
-    if (asset.value.location.length === 0) {
-      const tmp = Object.assign({}, asset);
-      tmp.value.hash = hashItem(asset);
-      if (asset.value.url === '') {
-        localAssets.push(tmp);
-      } else {
-        withoutArea.push(tmp);
-      }
-
-      return;
-    }
-
-    asset.value.location.forEach((location) => {
-      areas[`${asset.value.farmName}.${location.id}`] = {
-        farmName: asset.value.farmName,
-        location,
-      };
-    });
-  });
-
-  const res = Object.keys(areas).flatMap((key) => {
-    const area = areas[key];
-
-    const matchedAssets = assets.filter((asset) => {
-      if (asset.value.farmName !== area.farmName) {
-        return false;
-      }
-
-      return asset.value.location.some((loc) => loc.id === area.location.id);
-    });
-
-    console.log('loc', area);
-    const field = {
-      value: {
-        farmName: area.farmName,
-        location: area.location,
-        isField: true,
-        name: '',
-      },
-      label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
-    };
-
-    field.value.hash = hashItem(field);
-
-    const assetItems = matchedAssets.map((asset) => {
-      const r = {
-        value: asset.value,
-        label: `${asset.value.name} `,
-      };
-
-      r.value.hash = hashItem(r);
-      return r;
-    });
-
-    return [field, ...assetItems];
-  });
-
-  const withoutAreaSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
-  };
-
-  const localAssetSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
-  };
-
-  if (withoutArea.length > 0) {
-    res.push(withoutAreaSection, ...withoutArea);
-  }
-
-  if (localAssets.length > 0) {
-    res.unshift(localAssetSection, ...localAssets);
-  }
-
-  return res;
-};
+import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
 
 export default {
+  components: { AListItemSubtitle },
   mixins: [baseQuestionComponent, farmosBase],
   data: () => ({
     transformed: [],
   }),
   async created() {
     await this.fetchAssets();
-    this.transformed = transform(this.assets);
+    this.transformed = this.transform(this.assets);
   },
   computed: {
     listSelection() {
@@ -179,16 +74,15 @@ export default {
         return [];
       }
       if (this.modelValue !== null && !this.control.options.hasMultipleSelections) {
-        return [hashItem({ value: this.modelValue[0] })];
+        return [this.hashItem({ value: this.modelValue[0] })];
       }
       if (this.control.options.hasMultipleSelections && Array.isArray(this.modelValue)) {
-        return this.modelValue.map((v) => hashItem({ value: v }));
+        return this.modelValue.map((v) => this.hashItem({ value: v }));
       }
       return null;
     },
   },
   methods: {
-    hashItem,
     localChange(hashesArg) {
       let hashes;
       if (!Array.isArray(hashesArg)) {
@@ -249,30 +143,6 @@ export default {
 <style scoped lang="scss">
 .chip-no-wrap {
   white-space: nowrap;
-}
-
-:deep(.blue-chip, .orange-chip, .green-chip) {
-  display: inline-flex;
-  border: 1px rgb(var(--v-theme-focus)) solid;
-  background-color: white;
-  color: rgb(var(--v-theme-focus));
-  border-radius: 0.4rem;
-  font-weight: bold;
-  font-size: 80%;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
-  vertical-align: middle;
-}
-
-:deep(.green-chip) {
-  color: #46b355;
-  border: 1px #46b355 solid;
-}
-
-:deep(.orange-chip) {
-  color: #f38d49;
-  border: 1px #f38d49 solid;
 }
 
 .v-list-item--disabled {
