@@ -83,25 +83,27 @@
         </a-toolbar>
       </template>
 
-      <template v-slot:[`header.data-table-select`]>
-        <a-checkbox
-          :modelValue="selected.length === selectableItems.length"
-          :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
-          @click="toggleSelectAllItems"
-          color="#777"
-          class="custom-checkbox"
-          hide-details
-          role="checkbox" />
-      </template>
-
-      <template v-for="header in headers" :key="header.value" v-slot:[`header.${header.value}`]>
-        <span
-          @click.stop="openModal($event, [header.title, -1, header.value])"
-          :class="{ activeHeader: isModalOpen([header.title, -1, header.value]) }">
-          <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
-            {{ header.title }}
-          </div>
-        </span>
+      <template v-slot:headers="{ columns, isSorted, getSortIcon, toggleSort }">
+        <tr>
+          <template v-for="(column, index) in columns" :key="column.key">
+            <td v-if="index === 0">
+              <a-checkbox
+                :modelValue="selected.length === selectableItems.length"
+                :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
+                @click="toggleSelectAllItems"
+                color="#777"
+                class="custom-checkbox"
+                hide-details
+                role="checkbox" />
+            </td>
+            <td v-else>
+              <span class="mr-2 cursor-pointer" @click="() => toggleSort(column)">{{ column.title }}</span>
+              <template v-if="isSorted(column)">
+                <a-icon :icon="getSortIcon(column)"></a-icon>
+              </template>
+            </td>
+          </template>
+        </tr>
       </template>
 
       <template v-slot:item="{ item, index }">
@@ -246,7 +248,7 @@ export function transformMatrixHeaders(headers, submissions) {
   return result;
 }
 
-const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted'];
+const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted', 'meta.archived'];
 
 export default {
   components: {

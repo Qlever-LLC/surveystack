@@ -1,9 +1,18 @@
 <template>
-  <a-container>
-    <a-card class="pa-4 mb-4" color="background">
-      <span class="text-secondary overline">{{ state.entity._id }}</span>
-      <h2>Invite people to '{{ state.groupDetail.name }}'</h2>
-      <a-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
+  <a-dialog
+    v-if="state.entity"
+    :modelValue="props.modelValue"
+    @update:modelValue="closeDialog"
+    @click:outside="closeDialog"
+    :max-width="mobile ? '100%' : '75%'">
+    <a-card color="background">
+      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: pre-wrap">
+        <span class="d-flex align-start"
+          ><a-icon class="mr-2"> mdi-plus-circle-outline</a-icon>Invite people to '{{ state.groupDetail.name }}'</span
+        >
+        <a-btn color="background" @click="closeDialog" variant="flat"><a-icon>mdi-close</a-icon></a-btn>
+      </a-card-title>
+      <a-card-text ref="form" @keydown.enter.prevent="submit">
         <a-select
           class="mt-3"
           :items="availableRoles"
@@ -56,7 +65,6 @@
         </a-radio-group>
 
         <div class="d-flex mt-2 justify-end">
-          <a-btn variant="text" @click="cancel">Cancel</a-btn>
           <btn-dropdown
             :label="state.invitationMethod.includes(INVITATION_METHODS.INVITE) ? 'Invite Member' : 'Add Member'"
             :show-drop-down="true"
@@ -87,9 +95,9 @@
             </a-list>
           </btn-dropdown>
         </div>
-      </a-form>
+      </a-card-text>
     </a-card>
-  </a-container>
+  </a-dialog>
 </template>
 
 <script setup>
@@ -102,10 +110,13 @@ import BtnDropdown from '@/components/ui/BtnDropdown';
 import { ref, reactive, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
+import { useDisplay } from 'vuetify';
 
 const store = useStore();
 const router = useRouter();
 const route = useRoute();
+
+const { mobile } = useDisplay();
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -124,6 +135,15 @@ const availableRoles = [
     text: 'Admin',
   },
 ];
+
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['update:modelValue']);
 
 const state = reactive({
   entity: {
@@ -154,9 +174,10 @@ const state = reactive({
 
 const form = ref(null);
 
-function cancel() {
-  router.back();
+function closeDialog() {
+  emit('update:modelValue', false);
 }
+
 async function submit() {
   if (!(await form.value.validate())) {
     return;

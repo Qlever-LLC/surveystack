@@ -2,9 +2,10 @@
   <a-container class="basicListContainer">
     <basic-list listType="row" :entities="state.submissions" :menu="state.menu" :loading="state.loading">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-xml</a-icon>
-        <template v-if="route.name === 'group-my-submissions'"> My Responses </template>
-        <template v-else> Group Responses </template>
+        <template v-if="route.name === 'group-my-submissions'"
+          ><a-icon class="mr-2">mdi-file-document-multiple-outline</a-icon> My Responses
+        </template>
+        <template v-else><a-icon class="mr-2">mdi-file-document-multiple</a-icon> Group Responses </template>
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.submissions.length }}
         </a-chip>
@@ -23,14 +24,14 @@
           @update:modelValue="fetchRemoteSubmissions"
           color="grey-darken-1" />
       </template>
-      <template v-slot:noValue> No Drafts available</template>
+      <template v-slot:noValue> No Responses available</template>
     </basic-list>
   </a-container>
 </template>
 
 <script setup>
 import BasicList from '@/components/ui/BasicList2.vue';
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
 import api from '@/services/api.service';
@@ -44,6 +45,16 @@ const { getActiveGroupId } = useGroup();
 const { setSurveyNames } = useSubmission();
 
 const PAGINATION_LIMIT = 10;
+
+const props = defineProps({
+  scope: {
+    type: String,
+    required: true,
+    validator(value) {
+      return ['group', 'user'].includes(value);
+    },
+  },
+});
 
 const state = reactive({
   loading: false,
@@ -90,21 +101,23 @@ const state = reactive({
   ],
 });
 
-initData();
+fetchRemoteSubmissions();
 
-async function initData() {
-  await fetchRemoteSubmissions();
-}
+watch(() => props.scope, fetchRemoteSubmissions);
 
 async function fetchRemoteSubmissions() {
   try {
+    if (!state.activeUser && props.scope === 'user') {
+      //do not load anything, scope is user but not active user found (probably not logged in)
+      return;
+    }
     state.loading = true;
     const queryParams = new URLSearchParams();
     queryParams.append('group', getActiveGroupId());
     queryParams.append('limit', PAGINATION_LIMIT);
     queryParams.append('skip', (state.paginationPage - 1) * PAGINATION_LIMIT);
     queryParams.append('sort', '{"meta.dateCreated":-1}');
-    if (route.name === 'group-my-submissions' || route.name === 'group-my-drafts') {
+    if (props.scope === 'user') {
       //only filter by the creator if route is my-submissions. if route is submissions, do not filter by activeUser at all
       queryParams.append('creator', state.activeUser);
     }

@@ -71,6 +71,12 @@
       </template>
     </div>
 
+    <div class="align-self-end">
+      <a-btn v-if="skippable" @click.stop="$emit('skip')" color="primary" class="no-uppercase" variant="text">
+        or skip
+      </a-btn>
+    </div>
+
     <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }}</a-alert>
   </a-card>
   <a-alert
@@ -119,6 +125,10 @@ export default {
     useLink: {
       type: Boolean,
       default: true,
+    },
+    skippable: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -266,7 +276,7 @@ a {
   margin-top: -1px;
 }
 .card-width {
-  max-width: min(600px, 92vw);
+  max-width: min(700px, 92vw);
 }
 @media (min-width: 600px) {
   .line {
@@ -278,5 +288,8 @@ a {
     height: 40%;
     margin-left: -1px;
   }
+}
+.no-uppercase {
+  text-transform: unset !important;
 }
 </style>

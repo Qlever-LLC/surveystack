@@ -179,9 +179,6 @@ export default {
         return { id: null, path: null };
       }
     },
-    navigateToLogin() {
-      this.$router.push('/auth/login');
-    },
     snack(message) {
       this.snackbarMessage = message;
       this.showSnackbar = true;

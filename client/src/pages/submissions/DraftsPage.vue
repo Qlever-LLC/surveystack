@@ -7,7 +7,7 @@
       :menu="state.menu"
       :loading="isPending">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-xml</a-icon>
+        <a-icon class="mr-2">mdi-file-document-edit-outline</a-icon>
         My Draft Responses
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ groupDrafts.length }}
@@ -100,6 +100,7 @@ const state = reactive({
       title: 'Delete',
       icon: 'mdi-trash-can-outline',
       action: (e) => `/todo`,
+      render: (e) => () => false,
       color: 'red',
       disabled: true,
       buttonHover: true,

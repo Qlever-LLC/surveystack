@@ -1,4 +1,8 @@
 <template>
+  <call-for-submissions v-model="stateComposable.showCallForResponses" :selectedSurvey="stateComposable.selectedSurvey">
+  </call-for-submissions>
+  <survey-description v-model="stateComposable.showDescription" :selectedSurvey="stateComposable.selectedSurvey">
+  </survey-description>
   <a-container class="basicListContainer">
     <a-alert
       v-if="message.errorMessage"
@@ -19,8 +23,8 @@
       :page="state.page"
       :loading="state.loading">
       <template v-slot:title>
-        <a-icon class="mr-2"> mdi-cube-outline </a-icon>
-        Surveys
+        <a-icon class="mr-2">mdi-list-box-outline</a-icon>
+        All Surveys
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.surveys.pagination.total }}
         </a-chip>
@@ -46,9 +50,9 @@
           @update:modelValue="() => initData()" />
       </template>
       <member-selector
-        :show="state.showSelectMember"
+        :show="stateComposable.showSelectMember"
         :fixed-group-id="getActiveGroupId()"
-        @hide="state.showSelectMember = false"
+        @hide="stateComposable.showSelectMember = false"
         @selected="(selectedMemb) => startDraftAs(selectedMemb)" />
     </basic-list>
   </a-container>
@@ -60,15 +64,13 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
-import { menuAction } from '@/utils/threeDotsMenu';
-import { get } from 'lodash';
-import { parse as parseDisposition } from 'content-disposition';
-import downloadExternal from '@/utils/downloadExternal';
 
 import api from '@/services/api.service';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
+import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
+import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import formatDistance from 'date-fns/formatDistance';
@@ -78,11 +80,9 @@ import { useSurvey } from '@/components/survey/survey';
 const store = useStore();
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
-const { rightToSubmitSurvey, rightToEdit, rightToCallForSubmissions, rightToViewAnonymizedResults, rightToView } =
-  getPermission();
-const { message, createAction } = menuAction();
+const { rightToEdit } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { getSurveys } = useSurvey();
+const { stateComposable, getSurveys, message } = useSurvey();
 
 const state = reactive({
   page: 1,
@@ -96,8 +96,6 @@ const state = reactive({
     },
   },
   menu: [],
-  showSelectMember: false,
-  selectedSurvey: undefined,
   loading: false,
 });
 
@@ -128,102 +126,22 @@ async function toogleStar(entity) {
   await api.put(`/groups/${group._id}`, group);
   await initData();
 }
-function setSelectMember(survey) {
-  state.showSelectMember = true;
-  state.selectedSurvey = survey;
-}
+
 function startDraftAs(selectedMember) {
-  this.showSelectMember = false;
-  if (selectedMember.user && state.selectedSurvey) {
-    const surveyId = state.selectedSurvey._id;
+  stateComposable.showSelectMember = false;
+  if (selectedMember.user && stateComposable.selectedSurvey) {
+    const surveyId = stateComposable.selectedSurvey._id;
     router.push(
       `/groups/${getActiveGroupId()}/surveys/${surveyId}/submissions/new?submitAsUserId=${selectedMember.user._id}`
     );
   }
-  state.selectedSurvey = undefined;
-}
-async function downloadPrintablePdf(survey) {
-  try {
-    const { headers, data } = await api.get(`/surveys/${survey}/pdf`);
-    const disposition = parseDisposition(headers['content-disposition']);
-    downloadExternal(data, disposition.parameters.filename);
-  } catch (e) {
-    console.error('Failed to download printable PDF', e);
-    store.dispatch(
-      'feedback/add',
-      get(
-        e,
-        'response.data.message',
-        'Sorry, something went wrong while downloading a PDF of paper version. Try again later.'
-      )
-    );
-  }
+  stateComposable.selectedSurvey = undefined;
 }
 
 async function initData() {
   try {
     state.loading = true;
-    state.menu = [
-      {
-        title: 'Start Survey',
-        icon: 'mdi-open-in-new',
-        action: (s) =>
-          createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
-        render: (s) => () => rightToSubmitSurvey(s).allowed,
-      },
-      {
-        title: 'Start Survey as Member',
-        icon: 'mdi-open-in-new',
-        action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
-        render: (s) => () => rightToSubmitSurvey(s).allowed,
-      },
-      {
-        title: 'Call for Responses',
-        icon: 'mdi-bullhorn',
-        action: (s) =>
-          createAction(
-            s,
-            rightToCallForSubmissions,
-            `/groups/${getActiveGroupId()}/surveys/${s._id}/call-for-submissions`
-          ),
-        render: (s) => () => rightToCallForSubmissions(s).allowed,
-      },
-      {
-        title: 'Description',
-        icon: 'mdi-book-open',
-        action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/description`),
-        render: (s) => () => rightToView(s).allowed,
-      },
-      {
-        title: 'Print Blank Survey',
-        icon: 'mdi-printer',
-        action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
-        render: (s) => () => rightToSubmitSurvey(s).allowed,
-      },
-      // {
-      //   title: 'View',
-      //   icon: 'mdi-file-document',
-      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-      // },
-      {
-        title: 'Edit',
-        icon: 'mdi-pencil',
-        action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-        render: (s) => () => rightToEdit().allowed,
-      },
-      {
-        title: 'View Results',
-        icon: 'mdi-chart-bar',
-        action: (s) =>
-          createAction(s, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`),
-        render: (s) => () => rightToViewAnonymizedResults().allowed,
-      },
-      // {
-      //   title: 'Share',
-      //   icon: 'mdi-share',
-      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-      // }
-    ];
+    state.menu = stateComposable.menu;
 
     //laod the surveys
     state.surveys = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT);

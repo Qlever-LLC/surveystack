@@ -126,7 +126,7 @@ initData();
 
 async function initData() {
   state.activeGroup = await getActiveGroup();
-  state.myGroups = getMyGroups();
+  state.myGroups = getMyGroups().sort((a, b) => a.path.localeCompare(b.path));
 
   const membership = store.getters['memberships/memberships'];
 
@@ -182,7 +182,7 @@ watch(
 
 .panels {
   position: fixed;
-  width: 25%;
+  width: 285px;
   min-height: 0px !important;
   top: 0px;
   left: 8px;
@@ -215,8 +215,7 @@ watch(
   font-size: 1rem;
 }
 
-.panelTitle,
-:deep(.entityName_deepCSS) {
+.panelTitle {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;

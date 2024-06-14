@@ -1,15 +1,19 @@
 import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
-import LandingPage from '@/pages/LandingPage.vue';
 import Kit from '@/pages/Kit.vue';
 import store from '@/store';
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import AppInfo from '@/pages/app/AppInfo.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
-import GroupEdit from '@/pages/groups/GroupSettingsEdit.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
 import Profile from '@/pages/users/Profile.vue';
 import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
+import GroupNew from '@/pages/groups/GroupNew.vue';
+import Login from '@/pages/auth/Login.vue';
+import Register from '@/pages/auth/Register.vue';
+import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
+import { decode as b64Decode } from 'js-base64';
+import Unauthorized from '@/pages/Unauthorized.vue';
 
 const redirectLanding = async (to, from, next) => {
   //redirect logged in users to my-groups-list
@@ -17,7 +21,7 @@ const redirectLanding = async (to, from, next) => {
     next({ name: 'my-groups-list', params: { redirect: to } });
   } else {
     //redirect not logged-in users to all-groups-list
-    next({ name: 'all-groups-list', params: { redirect: to, showLogin: true } });
+    next({ name: 'all-groups-list', params: { redirect: to }, query: { login: true } });
   }
 };
 
@@ -26,19 +30,6 @@ export default [
     path: '/',
     name: 'home',
     beforeEnter: redirectLanding,
-  },
-  {
-    path: '/landing',
-    name: 'landing',
-    components: {
-      header: AppHeader,
-      main: LandingPage,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
-    },
   },
   {
     path: '/invitations',
@@ -88,7 +79,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGlobal,
-      main: GroupEdit,
+      main: GroupNew,
     },
     props: {
       header: {
@@ -105,6 +96,86 @@ export default [
       main: Profile,
     },
     props: {
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/auth/login',
+    name: 'auth-login',
+    components: {
+      header: AppHeader,
+      main: Login,
+    },
+    props: {
+      main: (route) => ({ ...route.query }),
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/auth/register',
+    name: 'auth-register',
+    components: {
+      header: AppHeader,
+      main: Register,
+    },
+    props: {
+      main: (route) => ({ ...route.query }),
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/auth/forgot-password',
+    name: 'auth-forgot-password',
+    components: {
+      header: AppHeader,
+      main: ForgotPassword,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
+  },
+  {
+    path: '/auth/accept-magic-link',
+    name: 'accept-magic-link',
+    redirect: async (to) => {
+      let { user, landingPath = '/', invalidateMagicLink } = to.query;
+      try {
+        user = JSON.parse(b64Decode(user));
+      } catch (e) {
+        store.dispatch('feedback/add', 'Failed to validate the login data');
+        return '/auth/login?magicLinkExpired';
+      }
+      await store.dispatch('auth/loginWithUserObject', user);
+
+      try {
+        if (invalidateMagicLink) {
+          await fetch(invalidateMagicLink);
+        }
+      } catch (e) {
+        console.error('Failed to invalidate magic link');
+      }
+
+      landingPath = decodeURIComponent(landingPath);
+      window.location.replace(`${location.origin}${landingPath}`);
+    },
+  },
+  {
+    path: '/unauthorized',
+    name: 'unauthorized',
+    components: {
+      header: AppHeader,
+      main: Unauthorized,
+    },
+    props: {
+      main: (route) => ({ ...route.query }),
       header: {
         showLogo: true,
       },
@@ -132,6 +203,11 @@ export default [
       header: AppHeader,
       main: AppInfo,
     },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
   },
   {
     path: '/kit/*',
@@ -139,6 +215,11 @@ export default [
     components: {
       header: AppHeader,
       main: Kit,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
     },
   },
   // tabula rasa

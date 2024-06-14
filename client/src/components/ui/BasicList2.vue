@@ -13,7 +13,13 @@
         </a-col>
         <a-col class="flex-grow-0">
           <slot name="titleBtn" />
-          <a-btn v-if="buttonNew?.title" color="accent" :to="buttonNew.link" variant="flat" rounded="lg">
+          <a-btn
+            v-if="buttonNew?.title"
+            color="accent"
+            :to="buttonNew?.link || undefined"
+            @click="buttonNew?.action() || undefined"
+            variant="flat"
+            rounded="lg">
             <a-icon class="mdi-24px"> mdi-plus-circle-outline </a-icon>
             <div v-if="!mobile" class="ml-2">{{ buttonNew.title }}</div>
           </a-btn>

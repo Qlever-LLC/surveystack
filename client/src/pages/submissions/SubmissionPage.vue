@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded" style="height: 100%; max-height: 100%">
+  <div class="rounded basicListContainer" style="height: 100%; max-height: 100%">
     <app-draft-component
       v-if="!state.loading && !state.hasError"
       :survey="state.survey"
@@ -289,12 +289,16 @@ export default defineComponent({
       } else if (route.name === 'group-survey-submissions-edit') {
         const { submissionId } = route.params;
 
-        if (syncDraftsIsPending.value !== true) { syncDrafts(); }
+        if (syncDraftsIsPending.value !== true) {
+          syncDrafts(); 
+        }
         const allDraftsReady = new Promise((resolve, reject) => {
           watch(
             allDraftsIsPending,
             (newValue, oldValue) => {
-              if (newValue === false) { resolve(); }
+              if (newValue === false) {
+                resolve(); 
+              }
             },
             { immediate: true }
           );

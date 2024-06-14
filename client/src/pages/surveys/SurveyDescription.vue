@@ -1,123 +1,140 @@
 <template>
-  <a-container v-if="state.loading" class="d-flex align-center justify-center" cssHeight100>
-    <a-progress-circular :size="50" />
-  </a-container>
-  <a-container v-else>
-    <a-card color="background" class="pa-4">
-      <a-row cssMinHeight96px>
-        <a-col cssMinWidth0px>
-          <div class="title text-truncate">
-            {{ state.selectedSurvey.name }}
-          </div>
-          <div>
-            <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
-            {{
-              state.selectedSurvey.meta.libraryUsageCountSubmissions
-                ? state.selectedSurvey.meta.libraryUsageCountSubmissions
-                : 0
-            }}
-            <a-tooltip bottom activator="parent">Number of submission using this</a-tooltip>
-          </div>
-          <div>
-            <small class="text-grey">{{ state.selectedSurvey._id }}</small>
-          </div>
-          <a-chip small variant="outlined" color="grey" class="font-weight-medium mt-1">
-            Version {{ state.selectedSurvey.latestVersion }}
-          </a-chip>
-        </a-col>
-        <a-col v-if="state.selectedSurvey.meta.isLibrary">
-          <a-btn
-            v-if="rightToView().allowed"
-            color="white"
-            key="library"
-            :to="{ name: 'group-surveys-new', query: { libId: state.selectedSurvey._id } }"
-            class="d-inline-block shadow bg-green span-button align-content-center"
-            outlined
-            small>
-            add to new survey
-          </a-btn>
-        </a-col>
-        <a-col v-else>
-          <a-btn
-            v-if="rightToSubmitSurvey(state.selectedSurvey).allowed"
-            color="white"
-            key="survey"
-            :to="{
-              name: 'group-survey-submissions-new',
-            }"
-            class="d-inline-block shadow bg-green span-button align-content-center"
-            outlined
-            small>
-            start survey
-          </a-btn>
-        </a-col>
-      </a-row>
-
-      <a-row>
-        <a-col v-if="state.selectedSurvey.meta.isLibrary">
-          <h4>Description</h4>
-          <small v-html="state.selectedSurvey.meta.libraryDescription" class="preview"></small>
-          <br />
-          <h4>Applications</h4>
-          <small v-html="state.selectedSurvey.meta.libraryApplications" class="preview"></small>
-          <br />
-          <h4>Maintainers</h4>
-          <small v-html="state.selectedSurvey.meta.libraryMaintainers" class="preview"></small>
-          <br />
-          <h4>Updates</h4>
-          <small v-html="state.selectedSurvey.meta.libraryHistory" class="preview"></small>
-        </a-col>
-        <a-col v-else>
-          <h4>Description</h4>
-          <small v-html="state.selectedSurvey?.description" class="preview"></small>
-        </a-col>
-        <a-col>
-          <h4>Questions</h4>
-          <graphical-view
-            v-if="state.selectedSurvey"
-            readOnly
-            :scale="0.75"
-            class="graphical-view"
-            :modelValue="state.selectedSurvey.revisions[state.selectedSurvey.revisions.length - 1].controls" />
-        </a-col>
-      </a-row>
+  <a-dialog
+    v-if="state.loading && props.modelValue"
+    :modelValue="props.modelValue"
+    @update:modelValue="closeDialog"
+    @click:outside="closeDialog"
+    style="height: 75vh; width: 75vw">
+    <span class="d-flex justify-center">
+      <a-progress-circular :size="50" />
+    </span>
+  </a-dialog>
+  <a-dialog
+    v-else-if="state.survey"
+    :modelValue="props.modelValue"
+    @update:modelValue="closeDialog"
+    @click:outside="closeDialog"
+    :max-width="mobile ? '100%' : '75%'"
+    scrollable>
+    <a-card class="my-2">
+      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: pre-wrap">
+        <span class="d-flex align-start"><a-icon class="mr-2">mdi-book-open</a-icon>{{ state.survey.name }}</span>
+        <a-btn @click="closeDialog" variant="flat"><a-icon>mdi-close</a-icon></a-btn>
+      </a-card-title>
+      <a-card-subtitle v-if="state.survey.meta.isLibrary" style="width: fit-content">
+        <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
+        {{ getCountSubmissions }}
+        <a-tooltip right activator="parent">Number of submission using this</a-tooltip>
+      </a-card-subtitle>
+      <a-card-subtitle style="white-space: normal">
+        <small class="text-grey">{{ state.survey._id }}</small>
+        <a-chip small variant="outlined" color="grey" class="font-weight-medium ml-2">
+          Version {{ state.survey.latestVersion }}
+        </a-chip>
+      </a-card-subtitle>
+      <a-card-text style="overflow: auto !important; padding-bottom: 1rem; min-height: 150px">
+        <a-row>
+          <a-col v-if="state.survey.meta.isLibrary">
+            <h4>Description</h4>
+            <small v-html="state.survey.meta.libraryDescription" class="preview"></small>
+            <br />
+            <h4>Applications</h4>
+            <small v-html="state.survey.meta.libraryApplications" class="preview"></small>
+            <br />
+            <h4>Maintainers</h4>
+            <small v-html="state.survey.meta.libraryMaintainers" class="preview"></small>
+            <br />
+            <h4>Updates</h4>
+            <small v-html="state.survey.meta.libraryHistory" class="preview"></small>
+          </a-col>
+          <a-col v-else>
+            <h4>Description</h4>
+            <small v-html="state.survey?.description" class="preview"></small>
+          </a-col>
+          <a-col>
+            <h4>Questions</h4>
+            <graphical-view
+              v-if="state.survey"
+              readOnly
+              :scale="0.75"
+              class="graphical-view"
+              :modelValue="state.survey.revisions[state.survey.revisions.length - 1].controls" />
+          </a-col>
+        </a-row>
+      </a-card-text>
     </a-card>
-  </a-container>
+  </a-dialog>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
-import { useRoute } from 'vue-router';
-import { getPermission } from '@/utils/permissions';
+import { reactive, computed, watch } from 'vue';
+import { useDisplay } from 'vuetify';
+import { useStore } from 'vuex';
 
 import api from '@/services/api.service';
+import { get } from 'lodash';
 
 import graphicalView from '@/components/builder/GraphicalView.vue';
 
-const { rightToSubmitSurvey, rightToView } = getPermission();
+const store = useStore();
+const { mobile } = useDisplay();
 
-const route = useRoute();
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    required: true,
+  },
+  selectedSurvey: {
+    type: undefined,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['update:modelValue']);
 
 const state = reactive({
-  selectedSurvey: undefined,
+  survey: undefined,
   loading: false,
 });
 
-fetchData();
+const getCountSubmissions = computed(() => {
+  return props.selectedSurvey.meta.libraryUsageCountSubmissions
+    ? props.selectedSurvey.meta.libraryUsageCountSubmissions
+    : 0;
+});
 
 async function fetchData() {
-  const { surveyId } = route.params;
+  if (props.selectedSurvey) {
+    const surveyId = props.selectedSurvey._id;
 
-  try {
-    state.loading = true;
-    const { data } = await api.get(`/surveys/${surveyId}`);
-    state.loading = false;
-    state.selectedSurvey = data;
-  } catch (e) {
-    console.log('Error fetching surveys:', e);
+    try {
+      const { data } = await api.get(`/surveys/${surveyId}`);
+      state.survey = data;
+    } catch (e) {
+      console.log('Error fetching surveys:', e);
+      store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
+      closeDialog();
+    } finally {
+      state.loading = false;
+    }
   }
   return;
 }
+
+function closeDialog() {
+  emit('update:modelValue', false);
+}
+
+watch(
+  () => props.modelValue,
+  async (newVal) => {
+    // if the dialog will be displayed
+    if (newVal) {
+      state.loading = true;
+      await fetchData();
+    }
+  }
+);
 </script>
 
 <style lang="scss">

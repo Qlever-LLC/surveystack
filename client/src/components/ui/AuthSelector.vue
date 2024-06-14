@@ -1,7 +1,7 @@
 <template>
   <app-register v-if="activeComponent === 'register'" @updateActive="updateComp" :useLink="false" />
   <app-forgot-password v-else-if="activeComponent === 'forgot-password'" @updateActive="updateComp" :useLink="false" />
-  <app-login v-else @updateActive="updateComp" :useLink="false" />
+  <app-login v-else @updateActive="updateComp" :useLink="false" skippable @skip="$emit('skip')" />
 </template>
 
 <script>

@@ -108,8 +108,7 @@
       <a-col class="shrink" v-if="survey._id">
         <a-btn
           :to="{
-            name: 'group-surveys-description',
-            params: { surveyId: survey._id },
+            name: 'group-surveys',
           }">
           back
         </a-btn>
@@ -353,7 +352,14 @@ export default {
   z-index: 3;
   height: 68px;
   width: 100%;
-  position: fixed;
-  bottom: 0px;
+  position: sticky;
+  bottom: 16px;
+}
+
+@media (max-width: 1280px) {
+  .draft-footer {
+    width: calc(100% - 12px);
+    bottom: 12px;
+  }
 }
 </style>

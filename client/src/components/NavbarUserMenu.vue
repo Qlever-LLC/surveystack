@@ -24,7 +24,7 @@
     </a-list>
   </a-menu>
 
-  <a-btn v-else :to="{ name: 'auth-login' }" variant="text" large color="white">
+  <a-btn v-else :to="{ name: 'home' }" variant="text" large color="white">
     <a-icon>mdi-login-variant</a-icon>
     <span class="ml-2">Login</span>
   </a-btn>
@@ -57,7 +57,7 @@ export default {
     },
     async logout() {
       this.$store.dispatch('auth/logout');
-      this.$router.push('/landing');
+      this.$router.push('/');
     },
   },
 };

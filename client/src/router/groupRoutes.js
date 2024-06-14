@@ -2,20 +2,16 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppNavigationGroup from '@/components/AppNavigationGroup.vue';
 import SurveyList from '@/pages/surveys/SurveyList.vue';
 import QuestionSetList from '@/pages/surveys/QuestionSetList.vue';
-import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 import ScriptList from '@/pages/scripts/ScriptList.vue';
-import GroupSettingsEdit from '@/pages/groups/GroupSettingsEdit.vue';
+import GroupSettings from '@/pages/groups/GroupSettings.vue';
 import Builder from '@/pages/builder/Builder.vue';
 import ResultList from '@/pages/submissions/ResultList.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
-import Script from '@/pages/scripts/Script.vue';
 import DraftList from '@/pages/submissions/DraftsPage.vue';
 import SubmissionPage from '@/pages/submissions/SubmissionPage.vue';
 import SubmissionsPage from '@/pages/submissions/SubmissionsPage.vue';
-import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import MembershipsPage from '@/pages/memberships/MembershipsPage.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
-import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import store from '@/store';
 import FarmOS from '@/pages/groups/FarmOS.vue';
 
@@ -81,6 +77,11 @@ export default [
       navigation: AppNavigationGroup,
       main: SubmissionsPage,
     },
+    props: {
+      main: {
+        scope: 'user',
+      },
+    },
   },
   {
     path: '/groups/:id/submissions',
@@ -89,6 +90,11 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: SubmissionsPage,
+    },
+    props: {
+      main: {
+        scope: 'group',
+      },
     },
   },
   {
@@ -133,32 +139,12 @@ export default [
     beforeEnter: groupAdminGuard,
   },
   {
-    path: '/groups/:id/scripts/:scriptId',
-    name: 'group-scripts-detail',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: Script,
-    },
-    //TODO beforeEnter: groupAdminGuard, <- restricts to admin, but should non-admin users be able to see the script?
-  },
-  {
     path: '/groups/:id/members',
     name: 'group-members',
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: MembershipsPage,
-    },
-    beforeEnter: groupAdminGuard,
-  },
-  {
-    path: '/groups/:id/members/new',
-    name: 'group-members-new',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: MembershipNew,
     },
     beforeEnter: groupAdminGuard,
   },
@@ -178,7 +164,7 @@ export default [
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
-      main: GroupSettingsEdit,
+      main: GroupSettings,
     },
     beforeEnter: groupAdminGuard,
   },
@@ -228,27 +214,6 @@ export default [
       isNew: false,
     },
     beforeEnter: groupAdminGuard,
-  },
-
-  {
-    path: '/groups/:id/surveys/:surveyId/description',
-    name: 'group-surveys-description',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: SurveyDescription,
-    },
-  },
-
-  {
-    // Request submissions
-    path: '/groups/:id/surveys/:surveyId/call-for-submissions',
-    name: 'group-call-for-submissions',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
-      main: CallForSubmissions,
-    },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions',

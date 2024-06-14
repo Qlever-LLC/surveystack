@@ -23,6 +23,11 @@ export default [
       navigation: AppNavigationGlobal,
       main: UserList,
     },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
     beforeEnter: superGuard,
   },
   {
@@ -32,6 +37,11 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGlobal,
       main: UserEdit,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
     },
     beforeEnter: superGuard,
   },
@@ -43,6 +53,11 @@ export default [
       navigation: AppNavigationGlobal,
       main: UserEdit,
     },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
     beforeEnter: superGuard,
   },
   {
@@ -53,6 +68,11 @@ export default [
       navigation: AppNavigationGlobal,
       main: User,
     },
+    props: {
+      header: {
+        showLogo: true,
+      },
+    },
     beforeEnter: superGuard,
   },
   {
@@ -62,6 +82,11 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGlobal,
       main: FarmosManage,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
     },
     beforeEnter: superGuard,
   },

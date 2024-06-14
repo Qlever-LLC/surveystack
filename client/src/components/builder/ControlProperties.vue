@@ -565,10 +565,10 @@ export default {
           text: 'Full Date (Month, Day, and Year)',
           value: 'date',
         },
-        {
-          text: 'Month and Year Only',
-          value: 'date-month-year',
-        },
+        // {
+        //   text: 'Month and Year Only',
+        //   value: 'date-month-year',
+        // },
         {
           text: 'Year Only',
           value: 'date-year',
