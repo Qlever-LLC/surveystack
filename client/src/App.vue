@@ -62,12 +62,12 @@ const state = reactive({
   }),
 });
 
-const syncDraftsMutation = useSyncDrafts();
+const { mutate: syncDrafts } = useSyncDrafts();
 
 onMounted(async () => {
   domainHandler.install(store);
   await migrateSubmissions();
-  syncDraftsMutation.mutate();
+  syncDrafts();
 
   fetchPinnedSurveys();
   fetchFarmOsAssets();

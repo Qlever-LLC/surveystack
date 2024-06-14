@@ -66,7 +66,11 @@ const PAGINATION_LIMIT = 10;
 
 const { showResult, resultItems, result } = useResults();
 
-useSyncDrafts().mutate();
+const { isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts();
+if (!syncDraftsIsPending.value !== true) {
+ syncDrafts(); 
+}
+
 const { data: allDrafts, isPending, isError } = useAllDrafts();
 const groupDrafts = computed(
   () => allDrafts.value.filter(draft => draft.meta.group?.id === getActiveGroupId())
