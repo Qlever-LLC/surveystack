@@ -140,12 +140,23 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
 });
 
 export const hasSubmissionRights = async (submission, res) => {
-  const survey = await db
-    .collection('surveys')
-    .findOne({ _id: new ObjectId(submission.meta.survey.id) });
+  const [
+    existingSubmission,
+    survey,
+  ] = await Promise.all([
+    db.collection('submissions').findOne({ _id: new ObjectId(submission._id) }),
+    db.collection('surveys').findOne({ _id: new ObjectId(submission.meta.survey.id) }),
+  ]);
+  
   if (!survey) {
     // survey not found, boom!
     throw boom.notFound(`No survey found: ${submission.meta.survey.id}`);
+  }
+
+  if (existingSubmission?.meta?.isDraft) {
+    if (!existingSubmission.meta.creator.equals(res.locals.auth.user._id)) {
+      throw boom.unauthorized('You are not the creator of this submission.');
+    }
   }
 
   const { submissions } = survey.meta;

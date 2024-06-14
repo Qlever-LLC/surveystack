@@ -157,7 +157,7 @@ router.post(
 );
 router.post(
   '/submissions/sync-draft',
-  [checkFeatureToggledOn('feature_sync_drafts'), assertAuthenticated],
+  [assertAuthenticated],
   catchErrors(syncDraft)
 );
 router.get('/submissions/drafts/page', [assertAuthenticated], catchErrors(getDraftsPage));

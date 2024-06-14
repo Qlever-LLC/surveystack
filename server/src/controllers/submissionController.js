@@ -680,7 +680,18 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   entity.meta.status = [];
   entity.meta.isDraft = false;
 
-  const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
+  const [
+    existingSubmission,
+    survey,
+  ] = await Promise.all([
+    db.collection('submissions').findOne({ _id: new ObjectId(submission._id) }),
+    db.collection('surveys').findOne({ _id: entity.meta.survey.id }),
+  ]);
+
+  if (existingSubmission && !existingSubmission.meta.isDraft) {
+    throw boom.conflict('Submission already exists.');
+  }
+
   if (!survey) {
     throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
   }
@@ -721,15 +732,22 @@ const createSubmission = async (req, res) => {
     try {
       return await withTransaction(session, async () => {
         const submissionsToInsert = submissionEntities.map(({ entity }) => entity);
+        const upsertOperations = submissionsToInsert.map(submission => ({
+          updateOne: {
+            filter: { _id: submission._id },
+            update: { $set: submission },
+            upsert: true,
+          },
+        }));
 
-        const insertResult = await db.collection(col).insertMany(submissionsToInsert);
+        const bulkWriteResult = await db.collection(col).bulkWrite(upsertOperations);
 
-        if (submissionsToInsert.length !== Object.keys(insertResult.insertedIds).length) {
+        if (!bulkWriteResult.result.ok) {
           await session.abortTransaction();
           return;
         }
 
-        return insertResult;
+        return bulkWriteResult;
       });
     } catch (error) {
       throw boom.boomify(error);
@@ -748,6 +766,9 @@ const updateSubmission = async (req, res) => {
 
   if (req.body.meta.isDraft === true) {
     throw boom.badData('Draft submissions cannot but updated with this endpoint.');
+  }
+  if (res.locals.existing.meta.isDraft === true) {
+    throw boom.conflict('Draft submissions cannot but updated with this endpoint.');
   }
 
   let newSubmission = await sanitize(req.body);
@@ -807,6 +828,10 @@ const updateSubmission = async (req, res) => {
 const bulkReassignSubmissions = async (req, res) => {
   const { group, creator, ids } = req.body;
   let submissions = res.locals.existing;
+
+  if (submissions.some(submission => submission.meta.isDraft === true)) {
+    throw boom.conflict('You cannot reassign a draft.');
+  }
 
   const surveyIds = [
     ...new Set(submissions.map((submission) => submission.meta.survey.id.toString())),
@@ -920,6 +945,9 @@ const reassignSubmission = async (req, res) => {
   const { body } = req;
 
   let existing = res.locals.existing;
+  if (existing.meta.isDraft) {
+    throw boom.conflict('You cannot reassign a draft.');
+  }
   const updatedRevision = existing.meta.revision + 1;
 
   const survey = await db.collection('surveys').findOne({ _id: existing.meta.survey.id });
@@ -996,6 +1024,13 @@ const archiveSubmissions = async (req, res) => {
     ids = [id];
   }
 
+  const submissionIsDraft = Array.isArray(res.locals.existing) ?
+    res.locals.existing.some(submission => submission.meta.isDraft === true) :
+    res.locals.existing.meta.isDraft === true;
+  if (submissionIsDraft) {
+    throw boom.conflict('You cannot archive a draft.');
+  }
+
   const { reason } = req.query;
   let archived = true;
 
@@ -1023,6 +1058,13 @@ const deleteSubmissions = async (req, res) => {
     ids = [id];
   }
 
+  const submissionIsDraft = Array.isArray(res.locals.existing) ?
+    res.locals.existing.some(submission => submission.meta.isDraft === true) :
+    res.locals.existing.meta.isDraft === true;
+  if (submissionIsDraft) {
+    throw boom.conflict('You cannot delete a draft with this endpoint. Use /sync-draft, instead.');
+  }
+
   const idSelector = { $in: ids.map(ObjectId) };
   const submissionQuery = { _id: idSelector };
   // TODO use transactions instead of this pre-check
@@ -1036,6 +1078,9 @@ const deleteSubmissions = async (req, res) => {
 };
 
 const getSubmissionPdf = async (req, res) => {
+  if (res.locals.existing.meta.isDraft === true) {
+    throw boom.conflict('You cannot get a pdf for a draft.');
+  }
   const [submission] = await db
     .collection(col)
     .aggregate([
@@ -1134,9 +1179,10 @@ const postSubmissionPdf = async (req, res) => {
 };
 
 const sendPdfLink = async (req, res) => {
-  const submission = await db.collection(col).findOne({ _id: new ObjectId(req.params.id) });
-  if (!submission) {
-    throw boom.notFound(`No entity found for id: ${req.params.id}`);
+  const submission = res.locals.existing;
+
+  if (submission.meta.isDraft === true) {
+    throw boom.conflict('You cannot send a pdf link for a draft.');
   }
 
   // Send to submitter
@@ -1149,52 +1195,6 @@ const sendPdfLink = async (req, res) => {
       'Thank you for taking the time to complete our survey. You can download a copy of your submission by clicking the button below.',
     btnText: 'Download',
   });
-
-  // /* TODO: - Do we need to send pdf link to creator now ?
-  //  * Note that there's no email subscription options there in the app
-  //  * Or just comment this out this block in this release?
-  //  */
-
-  // //  Fetch creator of the survey
-  // const [survey] = await db
-  //   .collection('surveys')
-  //   .aggregate([
-  //     {
-  //       $lookup: {
-  //         from: 'users',
-  //         let: { creatorId: '$meta.creator' },
-  //         pipeline: [
-  //           { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
-  //           { $project: { email: 1 } },
-  //         ],
-  //         as: 'creator',
-  //       },
-  //     },
-  //     {
-  //       $unwind: { path: '$creator', preserveNullAndEmptyArrays: true },
-  //     },
-  //     {
-  //       $match: {
-  //         _id: new ObjectId(submission.meta.survey.id),
-  //         'meta.creator': { $ne: new ObjectId(res.locals.auth.user._id) },
-  //       },
-  //     },
-  //     { $project: { creator: 1 } },
-  //   ])
-  //   .toArray();
-
-  // // Send to creator of the survey
-  // // No error thrown even the creator was not found
-  // if (survey && survey.creator) {
-  //   await mailService.sendLink({
-  //     from: 'noreply@surveystack.io',
-  //     to: survey.creator.email,
-  //     subject: `Survey report - ${submission.meta.survey.name}`,
-  //     link: new URL(`/api/submissions/${req.params.id}/pdf`, getServerSelfOrigin(req)).toString(),
-  //     actionDescriptionHtml: `${res.locals.auth.user.name} has submitted new submission. You can download a copy by clicking the button below.`,
-  //     btnText: 'Download',
-  //   });
-  // }
 
   return res.send({ success: true });
 };

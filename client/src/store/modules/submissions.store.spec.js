@@ -2,7 +2,6 @@ import createTestStore from '../../../tests/createTestStore';
 import { createMockSubmission } from '../../../tests/mockGenerators';
 import { createInitialState, types } from './submissions.store';
 import { getSubmission, persistSubmission, getAllSubmissions } from '../db';
-import api from '../../services/api.service';
 
 jest.mock('../../services/api.service');
 
@@ -85,18 +84,6 @@ describe('submissions store', () => {
         const idbSubmissions = await getAllSubmissions();
         expect(idbSubmissions).toHaveLength(1);
         expect(idbSubmissions).toContainEqual(mockSubmission2);
-      });
-    });
-
-    describe(types.actions.fetchRemoteSubmission, () => {
-      it('fetches the submission with the given id from the server and puts it in state', async () => {
-        const store = createTestStore();
-        const mockSubmission = createMockSubmission();
-        api.get.mockResolvedValueOnce({ data: mockSubmission });
-
-        await store.dispatch(`submissions/${types.actions.fetchRemoteSubmission}`, 'mock-id');
-
-        expect(store.state.submissions.submissions).toContainEqual(mockSubmission);
       });
     });
   });

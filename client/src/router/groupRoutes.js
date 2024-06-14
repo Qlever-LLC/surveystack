@@ -267,11 +267,6 @@ export default [
       navigation: AppNavigationGroup,
       main: SubmissionPage,
     },
-    props: {
-      main: {
-        start: true,
-      },
-    },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions/:submissionId/edit',

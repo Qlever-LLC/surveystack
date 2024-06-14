@@ -9,7 +9,9 @@
       :submitAsUser="submission.meta.submitAsUser"
       @submit="submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
-      :dateSubmitted="submission.meta.dateSubmitted" />
+      :dateSubmitted="submission.meta.dateSubmitted"
+      :isDraft="submission.meta.isDraft"
+    />
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar

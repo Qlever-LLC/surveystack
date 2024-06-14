@@ -2,22 +2,22 @@
   <a-container class="basicListContainer">
     <basic-list
       listType="row"
-      :entities="state.drafts"
+      :showSearch="false"
+      :entities="groupDrafts"
       :menu="state.menu"
-      :buttonNew="{ title: 'Submit Completed TODO', action: () => handleSubmitCompleted() }"
-      :loading="state.loading">
+      :loading="isPending">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml</a-icon>
         My Draft Responses
         <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
-          {{ state.drafts.length }}
+          {{ groupDrafts.length }}
         </a-chip>
       </template>
       <template v-slot:entityTitle="{ entity }">
         {{ entity.meta.survey.name }}
       </template>
       <template v-slot:entitySubtitle="{ entity }">
-        Created {{ new Date(entity.meta.dateCreated).toLocaleString() }}
+        Last modified {{ new Date(entity.meta.dateModified).toLocaleString() }}
       </template>
       <template v-slot:pagination>
         <a-pagination v-model="state.paginationPage" :length="state.paginationLength" color="grey-darken-1" />
@@ -33,6 +33,7 @@
     :id="state.activeSubmissionId"
     :submitAsUser="state.activeSubmission.meta.submitAsUser"
     :dateSubmitted="state.activeSubmission.meta.dateSubmitted"
+    :isDraft="state.activeSubmission.meta.isDraft"
     v-model="state.confirmSubmissionIsVisible"
     @close="handleConfirmSubmissionDialogClose"
     @submit="submit(state.activeSubmission)" />
@@ -47,7 +48,7 @@
 </template>
 <script setup>
 import BasicList from '@/components/ui/BasicList2.vue';
-import { computed, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
 import { useSubmission } from '@/pages/submissions/submission';
@@ -55,6 +56,7 @@ import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissio
 import ResultDialog from '@/components/ui/ResultDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import { useResults } from '@/components/ui/results';
+import { useAllDrafts, useSyncDrafts } from '../../queries';
 
 const store = useStore();
 const { getActiveGroupId } = useGroup();
@@ -64,11 +66,18 @@ const PAGINATION_LIMIT = 10;
 
 const { showResult, resultItems, result } = useResults();
 
+useSyncDrafts().mutate();
+const { data: allDrafts, isPending, isError } = useAllDrafts();
+const groupDrafts = computed(
+  () => allDrafts.value.filter(draft => draft.meta.group?.id === getActiveGroupId())
+);
+
 const state = reactive({
   loading: false,
   drafts: [],
   paginationLength: computed(() => {
-    return Math.ceil(state.drafts.length / PAGINATION_LIMIT);
+    const length = allDrafts.value?.length;
+    return length ? Math.ceil(length / PAGINATION_LIMIT) : 0;
   }),
   menu: [
     {

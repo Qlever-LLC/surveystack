@@ -27,6 +27,7 @@ import { useDisplay } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
 import { useNavigation } from '@/components/navigation';
 import { autoJoinWhiteLabelGroup } from '@/utils/memberships';
+import { useSyncDrafts } from './queries';
 
 const store = useStore();
 const router = useRouter();
@@ -61,9 +62,12 @@ const state = reactive({
   }),
 });
 
+const syncDraftsMutation = useSyncDrafts();
+
 onMounted(async () => {
   domainHandler.install(store);
   await migrateSubmissions();
+  syncDraftsMutation.mutate();
 
   fetchPinnedSurveys();
   fetchFarmOsAssets();

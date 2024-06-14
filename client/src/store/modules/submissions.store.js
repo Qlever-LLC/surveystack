@@ -15,7 +15,6 @@ export const types = {
     remove: 'remove',
     fetchLocalSubmissions: 'fetchLocalSubmissions',
     update: 'update',
-    fetchRemoteSubmission: 'fetchRemoteSubmission',
   },
 };
 
@@ -83,16 +82,6 @@ const actions = {
     await db.persistSubmission(submission);
     commit(types.mutations.UPDATE_SUBMISSION, submission);
     return submission;
-  },
-  async [types.actions.fetchRemoteSubmission]({ commit }, id) {
-    // pure param makes sure the submission is suitable for re-submissions
-    // with only the original or 'pure' submission being fetched, i.e. no "meta.creatorDetail" added, etc.
-    const { data } = await api.get(`/submissions/${id}?pure=1`);
-    // NOTE: this means that dispatching fetchRemoteSubmission will overwrite a local draft
-    // So if a user submits a Submission, then edits it (but without resubmitting it), then we
-    // execute fetchRemoteSubmission again, their local edits will be overwritten and lost
-    commit(types.mutations.ADD_SUBMISSION, data);
-    return data;
   },
 };
 

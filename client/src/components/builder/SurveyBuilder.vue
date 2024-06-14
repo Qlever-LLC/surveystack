@@ -260,7 +260,6 @@ import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 import appCodeView from '@/components/builder/CodeView.vue';
 import appExamplesView from '@/components/builder/ExamplesView.vue';
-import appMixin from '@/components/mixin/appComponent.mixin';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 import slugify from '@/utils/slugify';
 import { defaultApiCompose } from '@/utils/apiCompose';
@@ -315,7 +314,6 @@ function ${variable}(submission, survey, parent) {
 const tabMap = ['relevance', 'initialize', 'calculate', 'constraint', 'apiCompose'];
 
 export default {
-  mixins: [appMixin],
   components: {
     UpdateLibraryDialog,
     Splitpanes,
@@ -418,7 +416,7 @@ export default {
     saveDraft() {
       if (!this.isDraft) {
         this.createDraft();
-        this.initNavbarAndDirtyFlag(this.surveyUnderWork);
+        this.initDirtyFlag(this.surveyUnderWork);
       }
       this.$emit('onSaveDraft');
     },
@@ -528,7 +526,7 @@ export default {
       const { data } = await api.get(`/surveys/check-for-updates/${survey._id}`);
       this.availableLibraryUpdates = data;
     },
-    initNavbarAndDirtyFlag(survey) {
+    initDirtyFlag(survey) {
       if (!survey.revisions) {
         this.dirty = false;
       } else if (survey.revisions.length === 1 && !this.editMode) {
@@ -553,19 +551,6 @@ export default {
       }
 
       this.version = version;
-
-      const v = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].version;
-      const amountQuestions = getSurveyPositions(this.surveyUnderWork, v);
-      this.setNavbarContent({
-        title: this.surveyUnderWork.name || 'Untitled Survey',
-        subtitle: `
-          <span class="question-title-chip">Version ${version}</span>
-          <!--<span class="ml-2">${amountQuestions.length} Question${
-            amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''
-          }</span>-->
-          <!--<span class="question-title-chip">${this.groupPath}</span>-->
-        `,
-      });
     },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
@@ -1058,7 +1043,7 @@ export default {
     },
     survey: {
       handler(newVal) {
-        this.initNavbarAndDirtyFlag(newVal);
+        this.initDirtyFlag(newVal);
         if (!this.initialSurvey || !this.surveyUnderWork) {
           this.surveyUnchanged = true;
         }
@@ -1084,7 +1069,7 @@ export default {
     },
   },
   created() {
-    this.initNavbarAndDirtyFlag(this.surveyUnderWork);
+    this.initDirtyFlag(this.surveyUnderWork);
     this.createInstance();
     this.checkForLibraryUpdates(this.surveyUnderWork);
 

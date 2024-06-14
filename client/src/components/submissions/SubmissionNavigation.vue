@@ -47,6 +47,7 @@
     :id="state.activeSubmissionId"
     :submitAsUser="state.activeSubmission.meta.submitAsUser"
     :dateSubmitted="state.activeSubmission.meta.dateSubmitted"
+    :isDraft="state.activeSubmission.meta.isDraft"
     v-model="state.confirmSubmissionIsVisible"
     @submit="submit(state.activeSubmission)" />
   <result-dialog

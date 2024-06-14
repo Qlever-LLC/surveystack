@@ -1,5 +1,4 @@
 import { useStore } from 'vuex';
-import { computed } from 'vue';
 import { uploadFileResources } from '@/utils/resources';
 import api from '@/services/api.service';
 
@@ -57,7 +56,8 @@ export function useSubmission() {
   async function uploadSubmission(submission) {
     const survey = await getSurvey(submission);
     await uploadFileResources(store, survey, submission, true);
-    const response = submission.meta.dateSubmitted
+    const isResubmission = submission.meta.dateSubmitted && !submission.meta.isDraft;
+    const response = isResubmission
       ? await api.put(`/submissions/${submission._id}`, submission)
       : await api.post('/submissions', submission);
     await store.dispatch('submissions/remove', submission._id);
