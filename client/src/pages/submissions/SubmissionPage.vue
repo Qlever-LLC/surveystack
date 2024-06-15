@@ -68,6 +68,7 @@
 import { watch, defineComponent, reactive, toRaw, ref } from 'vue';
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
+import { useQueryClient } from '@tanstack/vue-query';
 import api from '@/services/api.service';
 import resultMixin from '@/components/ui/ResultsMixin';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
@@ -103,6 +104,7 @@ export default defineComponent({
     const route = useRoute();
     const store = useStore();
     const confirmLeaveDialogRef = ref();
+    const queryClient = useQueryClient();
     
     const state = reactive({
       submission: null,
@@ -116,6 +118,16 @@ export default defineComponent({
       apiComposeErrors: [],
       showApiComposeErrors: false,
     });
+
+    let syncDraftsIsPending;
+    let syncDrafts;
+    let allDraftsIsPending;
+    let allDraftsData;
+    let allDraftsIsError;
+    if (route.name === 'group-survey-submissions-edit') {
+      ({ isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts());
+      ({ isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts());
+    }
 
     onBeforeRouteLeave((to, from, next) => {
       if (from.name === 'group-survey-submissions-new' && to.name === 'group-survey-submissions-edit') {
@@ -186,6 +198,7 @@ export default defineComponent({
         result({ response });
         state.isSubmitted = true;
         await db.deleteSubmission(state.submission._id);
+        queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
         message = {
           type: 'SUBMISSION_SUBMIT_SUCCESS',
           payload: { submissionId: state.submission._id },
@@ -204,17 +217,6 @@ export default defineComponent({
         window.parent.postMessage(message, '*');
       }
     };
-
-    let syncDraftsIsPending;
-    let syncDrafts;
-    let allDraftsIsPending;
-    let allDraftsData;
-    let allDraftsIsError;
-    if (route.name === 'group-survey-submissions-edit') {
-      ({ isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts());
-      ({ isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts());
-    }
-
     async function init() {
       const { surveyId } = route.params;
 
@@ -377,6 +379,7 @@ export default defineComponent({
       await surveyResourcesLoaded;
       state.loading = false;
     };
+
     init();
 
     return {
