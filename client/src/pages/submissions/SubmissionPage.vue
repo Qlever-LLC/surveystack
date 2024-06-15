@@ -141,12 +141,7 @@ export default defineComponent({
       return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
     };
     function abortEditSubmitted() {
-      store.dispatch('submissions/remove', state.submission._id);
-      // TODO: should we remove the router guard in this situation? otherwise it pops up a modal asking if the user
-      // is sure they want to leave. User can click 'cancel' when prompted whether they want to "Confirm editing submitted",
-      // which deleted the submission from the store, then when prompted whether they want to leave the current draft
-      // they can also click cancel, which may cause an error
-      router.push(`/groups/${route.params.id}/my-drafts`);
+      router.push(`/groups/${route.params.id}/my-submission`);
     };
     function addReadyToSubmit(status) {
       return [
@@ -190,7 +185,7 @@ export default defineComponent({
           : await api.post('/submissions', payload);
         result({ response });
         state.isSubmitted = true;
-        await store.dispatch('submissions/remove', state.submission._id);
+        await db.deleteSubmission(state.submission._id);
         message = {
           type: 'SUBMISSION_SUBMIT_SUCCESS',
           payload: { submissionId: state.submission._id },

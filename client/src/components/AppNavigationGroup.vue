@@ -8,7 +8,7 @@
     :class="fullWidth ? 'w-100 align-center' : ''"
     class="pt-4 mr-4">
     <div class="content-width">
-      <SubmissionNavigation />
+      <SubmissionNavigation :id="id" />
       <SurveyNavigation />
       <GroupAdminNavigation v-if="rightToEdit().allowed" />
       <GroupDocsNavigation />
@@ -31,6 +31,10 @@ const props = defineProps({
     type: Boolean,
     required: false,
   },
+  id: {
+    type: String,
+    required: true,
+  }
 });
 </script>
 

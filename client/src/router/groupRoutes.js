@@ -49,6 +49,7 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
     },
+    props: { navigation: true },
   },
   //lists of group resources
   {
@@ -59,6 +60,7 @@ export default [
       navigation: AppNavigationGroup,
       main: SurveyList,
     },
+    props: { navigation: true },
   },
   {
     path: '/groups/:id/my-drafts',
@@ -68,6 +70,7 @@ export default [
       navigation: AppNavigationGroup,
       main: DraftList,
     },
+    props: { navigation: true, main: true },
   },
   {
     path: '/groups/:id/my-submissions',
@@ -81,6 +84,7 @@ export default [
       main: {
         scope: 'user',
       },
+      navigation: true,
     },
   },
   {
@@ -95,6 +99,7 @@ export default [
       main: {
         scope: 'group',
       },
+      navigation: true,
     },
   },
   {
@@ -105,6 +110,7 @@ export default [
       navigation: AppNavigationGroup,
       main: QuestionSetList,
     },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard, //TODO should non-admin users be able to view the script list?
   },
   //Scripts
@@ -116,6 +122,7 @@ export default [
       navigation: AppNavigationGroup,
       main: ScriptList,
     },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard, //TODO should non-admin users be able to view the script list?
   },
   {
@@ -126,6 +133,7 @@ export default [
       navigation: AppNavigationGroup,
       main: ScriptEdit,
     },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -136,6 +144,7 @@ export default [
       navigation: AppNavigationGroup,
       main: ScriptEdit,
     },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -146,6 +155,7 @@ export default [
       navigation: AppNavigationGroup,
       main: MembershipsPage,
     },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -156,6 +166,7 @@ export default [
       navigation: AppNavigationGroup,
       main: MembershipEdit,
     },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -166,26 +177,35 @@ export default [
       navigation: AppNavigationGroup,
       main: GroupSettings,
     },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard,
   },
   {
     path: '/groups/:id/farmos',
     name: 'farmos-group-manage',
-    props: true,
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: FarmOS,
     },
+    props: {
+      header: true,
+      navigation: true,
+      main: true,
+    },
   },
   {
     path: '/groups/:id/hylo',
     name: 'hylo-group-manage',
-    props: true,
     components: {
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: Hylo,
+    },
+    props: {
+      header: true,
+      navigation: true,
+      main: true,
     },
   },
   //edit group resource
@@ -197,9 +217,7 @@ export default [
       navigation: AppNavigationGroup,
       main: Builder,
     },
-    props: {
-      isNew: false,
-    },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -210,9 +228,7 @@ export default [
       navigation: AppNavigationGroup,
       main: Builder,
     },
-    props: {
-      isNew: false,
-    },
+    props: { navigation: true },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -223,6 +239,7 @@ export default [
       navigation: AppNavigationGroup,
       main: ResultList,
     },
+    props: { navigation: true },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions/new',
@@ -232,6 +249,7 @@ export default [
       navigation: AppNavigationGroup,
       main: SubmissionPage,
     },
+    props: { navigation: true },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions/:submissionId/edit',
@@ -241,5 +259,6 @@ export default [
       navigation: AppNavigationGroup,
       main: SubmissionPage,
     },
+    props: { navigation: true },
   },
 ];
