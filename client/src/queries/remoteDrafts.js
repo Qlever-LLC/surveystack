@@ -77,8 +77,8 @@ const useSyncDrafts = () => {
     onSettled: () => {
       hasSyncDraftsCompleted.value = true;
       console.log('syncDraftsMutation onSettled...');
-      db.getLocalDrafts();
-      queryClient.invalidateQueries({ queryKey: ['remoteDrafts'] })
+      queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+      queryClient.invalidateQueries({ queryKey: ['remoteDrafts'] });
     },
   })
 }

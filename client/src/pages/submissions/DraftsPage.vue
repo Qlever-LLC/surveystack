@@ -17,7 +17,7 @@
         {{ entity.meta.survey.name }}
       </template>
       <template v-slot:entitySubtitle="{ entity }">
-        Last modified {{ new Date(entity.meta.dateModified).toLocaleString() }}
+        Last modified {{ formatDistance(parseISO(entity.meta.dateModified), new Date()) }} ago
       </template>
       <template v-slot:pagination>
         <a-pagination v-model="paginationPage" :length="paginationLength" color="grey-darken-1" />
@@ -30,6 +30,8 @@
 import BasicList from '@/components/ui/BasicList2.vue';
 import { computed, reactive, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import formatDistance from 'date-fns/formatDistance';
+import parseISO from 'date-fns/parseISO';
 import { useGroup } from '@/components/groups/group';
 import { useAllDrafts, useSyncDrafts } from '../../queries';
 
@@ -42,7 +44,7 @@ const PAGINATION_LIMIT = 10;
 const { data: allDrafts, isPending, isError } = useAllDrafts();
 const { isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts();
 
-if (!syncDraftsIsPending.value !== true) {
+if (syncDraftsIsPending.value !== true) {
  syncDrafts(); 
 }
 

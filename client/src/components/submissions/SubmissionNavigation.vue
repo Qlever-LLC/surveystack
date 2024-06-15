@@ -13,7 +13,7 @@
         {{ entity.meta.survey.name }}
       </template>
       <template v-slot:entitySubtitle v-if="entity.meta.dateCreated">
-        Last modified {{ new Date(entity.meta.dateModified).toLocaleString() }}
+        {{ formatDistance(parseISO(entity.meta.dateModified), new Date()) }} ago
       </template>
       <template v-slot:entitySubtitle v-else></template>
     </list-item-card>
@@ -47,6 +47,8 @@
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import parseISO from 'date-fns/parseISO';
+import formatDistance from 'date-fns/formatDistance';
 import { useAllDrafts, useSyncDrafts } from '../../queries';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
@@ -62,7 +64,7 @@ const store = useStore();
 const { data: allDrafts } = useAllDrafts();
 const { isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts();
 
-if (!syncDraftsIsPending.value !== true) {
+if (syncDraftsIsPending.value !== true) {
  syncDrafts(); 
 }
 
