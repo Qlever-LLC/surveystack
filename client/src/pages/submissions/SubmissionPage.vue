@@ -66,7 +66,7 @@
 
 <script>
 import { watch, defineComponent, reactive, toRaw, ref } from 'vue';
-import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { useQueryClient } from '@tanstack/vue-query';
 import api from '@/services/api.service';
@@ -93,20 +93,30 @@ export default defineComponent({
     SubmittingDialog,
     appSubmissionArchiveDialog,
   },
-  setup() {
+  props: {
+    routeAction: {
+      required: true,
+      type: String, // 'new' or 'edit'
+    },
+    submissionId: {
+      required: false,
+      type: String,
+    }
+  },
+  setup(props) {
     const {
       showResult,
       resultItems,
       result,
+      reset: resetResults,
     } = useResults();
-
     const router = useRouter();
     const route = useRoute();
     const store = useStore();
     const confirmLeaveDialogRef = ref();
     const queryClient = useQueryClient();
-    
-    const state = reactive({
+
+    const initialState = {
       submission: null,
       survey: null,
       loading: true,
@@ -117,18 +127,40 @@ export default defineComponent({
       showResubmissionDialog: false,
       apiComposeErrors: [],
       showApiComposeErrors: false,
+    };
+    const state = reactive({ ...initialState });
+
+    const resetComponentState = () => {
+      Object.assign(state, initialState);
+      resetResults();
+    };
+
+    watch(
+      [() => props.submissionId, () => props.routeAction],
+      ([newSubmissionId, newRouteAction], [oldSubmissionId, oldRouteAction]) => {
+        const isNavigatingFromEditToNew = oldRouteAction === 'edit' && newRouteAction === 'new';
+        const isNavigatingToNewSubmissionId = oldRouteAction === 'edit' &&
+          newRouteAction === 'edit' &&
+          oldSubmissionId !== newSubmissionId;
+        const submissionChanged = isNavigatingFromEditToNew || isNavigatingToNewSubmissionId;
+        if (submissionChanged) {
+          resetComponentState();
+          init();
+        }
+      },
+    );
+
+    const { isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts();
+    const { isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts();
+    
+    onBeforeRouteUpdate((to, from, next) => {
+      if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
+        confirmLeaveDialogRef.value.open(next);
+        return;
+      }
+      api.removeHeader('x-delegate-to');
+      next(true);
     });
-
-    let syncDraftsIsPending;
-    let syncDrafts;
-    let allDraftsIsPending;
-    let allDraftsData;
-    let allDraftsIsError;
-    if (route.name === 'group-survey-submissions-edit') {
-      ({ isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts());
-      ({ isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts());
-    }
-
     onBeforeRouteLeave((to, from, next) => {
       if (from.name === 'group-survey-submissions-new' && to.name === 'group-survey-submissions-edit') {
         // This is a programmatic navigation that doesn't leave this component (the two routes share this component)
@@ -140,9 +172,7 @@ export default defineComponent({
         confirmLeaveDialogRef.value.open(next);
         return;
       }
-
       api.removeHeader('x-delegate-to');
-
       next(true);
     });
 
@@ -218,6 +248,7 @@ export default defineComponent({
       }
     };
     async function init() {
+      state.loading = true;
       const { surveyId } = route.params;
 
       try {

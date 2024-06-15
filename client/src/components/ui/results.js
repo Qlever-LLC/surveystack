@@ -73,9 +73,15 @@ export function useResults() {
     }
   }
 
+  function reset() {
+    showResult.value = false;
+    resultItems.value = [];
+  }
+
   return {
     showResult,
     resultItems,
     result,
+    reset,
   };
 }

@@ -249,7 +249,10 @@ export default [
       navigation: AppNavigationGroup,
       main: SubmissionPage,
     },
-    props: { navigation: true },
+    props: {
+      navigation: true,
+      main: { routeAction: 'new' },
+    },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions/:submissionId/edit',
@@ -259,6 +262,12 @@ export default [
       navigation: AppNavigationGroup,
       main: SubmissionPage,
     },
-    props: { navigation: true },
+    props: {
+      navigation: true,
+      main: route => ({
+        routeAction: 'edit',
+        submissionId: route.params.submissionId
+      }),
+    },
   },
 ];
