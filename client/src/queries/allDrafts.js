@@ -1,5 +1,5 @@
 import { computed } from 'vue';
-import { useRemoteDrafts } from './remoteDrafts';
+import { useRemoteDrafts, useSyncDrafts } from './remoteDrafts';
 import { useLocalDrafts } from './localDrafts';
 
 function sortDateModifiedDescending(a, b) {
@@ -7,6 +7,7 @@ function sortDateModifiedDescending(a, b) {
 }
 
 const useAllDrafts = () => {
+  useSyncDrafts().mutate();
   const { isPending: remoteIsPending, isError: remoteIsError, data: remoteDrafts } = useRemoteDrafts();
   const { isPending: localIsPending, isError: localIsError, data: localDrafts } = useLocalDrafts();
   return {

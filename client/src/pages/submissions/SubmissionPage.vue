@@ -82,7 +82,7 @@ import { createSubmissionFromSurvey, checkAllowedToSubmit, checkAllowedToResubmi
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
-import { useSyncDrafts, useAllDrafts } from '../../queries';
+import { useAllDrafts } from '../../queries';
 import { useResults } from '../../components/ui/results';
 
 export default defineComponent({
@@ -150,7 +150,6 @@ export default defineComponent({
       },
     );
 
-    const { isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts();
     const { isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts();
     
     onBeforeRouteUpdate((to, from, next) => {
@@ -317,9 +316,6 @@ export default defineComponent({
       } else if (route.name === 'group-survey-submissions-edit') {
         const { submissionId } = route.params;
 
-        if (syncDraftsIsPending.value !== true) {
-          syncDrafts(); 
-        }
         const allDraftsReady = new Promise((resolve, reject) => {
           watch(
             allDraftsIsPending,

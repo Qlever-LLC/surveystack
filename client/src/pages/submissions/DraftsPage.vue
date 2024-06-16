@@ -33,7 +33,7 @@ import { useStore } from 'vuex';
 import formatDistance from 'date-fns/formatDistance';
 import parseISO from 'date-fns/parseISO';
 import { useGroup } from '@/components/groups/group';
-import { useAllDrafts, useSyncDrafts } from '../../queries';
+import { useAllDrafts } from '../../queries';
 
 const props = defineProps({
   // group id from route param
@@ -42,11 +42,6 @@ const props = defineProps({
 
 const PAGINATION_LIMIT = 10;
 const { data: allDrafts, isPending, isError } = useAllDrafts();
-const { isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts();
-
-if (syncDraftsIsPending.value !== true) {
- syncDrafts(); 
-}
 
 const groupDrafts = computed(
   () => allDrafts.value.filter(draft => draft.meta.group?.id === props.id)

@@ -1,19 +1,21 @@
-import { useQueryClient, useQuery, useMutation } from '@tanstack/vue-query';
+import { useQueryClient, useQuery, useMutation, useIsMutating } from '@tanstack/vue-query';
 import { ref } from 'vue';
-import { useStore } from 'vuex';
 import api from '../services/api.service';
 import * as db from '../store/db';
+import store from '../store';
 
 const hasSyncDraftsCompleted = ref(false);
+
+const fetchRemoteDrafts = async () => {
+  const { data: { content } } = await api.get('/submissions/drafts/page');
+  return content;
+};
 
 const useRemoteDrafts = () => {
   const { isPending, isError, data } = useQuery({
     queryKey: ['remoteDrafts'],
     initialData: [],
-    queryFn: async () => {
-      const { data: { content } } = await api.get('/submissions/drafts/page');
-      return content;
-    },
+    queryFn: fetchRemoteDrafts,
     networkMode: 'offlineFirst',
     enabled: hasSyncDraftsCompleted,
   });
@@ -39,20 +41,21 @@ const createSyncDraftPromise = draft => new Promise(async (resolve, reject) => {
 });
 
 const useSyncDrafts = () => {
-  const store = useStore();
   const queryClient = useQueryClient();
-  return useMutation({
+  const isMutating = useIsMutating({ mutationKey: ['syncDrafts'] });
+  const mutation = useMutation({
+    mutationKey: ['syncDrafts'],
     mutationFn: async () => {
       if (!store.getters['auth/isLoggedIn']) {
         // users without an account cannot persist their drafts to the server.
-        return;
+        return { draftsSynced: false };
       }
       console.log('syncDraftsMutation mutationFn...');
       const user = store.getters['auth/user'];
       const localDrafts = (await db.getAllSubmissions()).filter(draft => draft.meta.creator === user._id);
       console.log({ localDraftsBefore: localDrafts })
       if (localDrafts.length === 0) {
-        return;
+        return { draftsSynced: false };
       }
       const syncDraftRequests = await Promise.allSettled(
         localDrafts.map(createSyncDraftPromise)
@@ -73,15 +76,28 @@ const useSyncDrafts = () => {
       )
       const localDraftsAfter = (await db.getAllSubmissions()).filter(draft => draft.meta.creator === user._id);
       console.log({ localDraftsAfter });
+      return { draftsSynced: true };
     },
-    onSettled: () => {
-      hasSyncDraftsCompleted.value = true;
+    onSettled: ({ draftsSynced } = {}) => {
       console.log('syncDraftsMutation onSettled...');
-      queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
-      queryClient.invalidateQueries({ queryKey: ['remoteDrafts'] });
+      hasSyncDraftsCompleted.value = true;
+      if (draftsSynced) {
+        queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+        queryClient.invalidateQueries({ queryKey: ['remoteDrafts'] });
+      }
     },
-  })
-}
+  });
+
+  return {
+    ...mutation,
+    mutate: () => {
+      const isSyncDraftsPending = isMutating.value > 0;
+      if (!isSyncDraftsPending) {
+        mutation.mutate();
+      }
+    }
+  };
+};
 
 export {
   useRemoteDrafts,

@@ -49,7 +49,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
-import { useAllDrafts, useSyncDrafts } from '../../queries';
+import { useAllDrafts } from '../../queries';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 
@@ -62,11 +62,6 @@ const router = useRouter();
 const route = useRoute();
 const store = useStore();
 const { data: allDrafts } = useAllDrafts();
-const { isPending: syncDraftsIsPending, mutate: syncDrafts } = useSyncDrafts();
-
-if (syncDraftsIsPending.value !== true) {
- syncDrafts(); 
-}
 
 const groupDrafts = computed(
   () => allDrafts.value.filter(draft => draft.meta.group?.id === props.id).slice(0, 2)
