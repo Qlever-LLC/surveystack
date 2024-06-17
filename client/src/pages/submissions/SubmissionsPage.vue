@@ -116,7 +116,7 @@ async function fetchRemoteSubmissions() {
     queryParams.append('group', getActiveGroupId());
     queryParams.append('limit', PAGINATION_LIMIT);
     queryParams.append('skip', (state.paginationPage - 1) * PAGINATION_LIMIT);
-    queryParams.append('sort', '{"meta.dateCreated":-1}');
+    queryParams.append('sort', '{"meta.dateSubmitted":-1}');
     if (props.scope === 'user') {
       //only filter by the creator if route is my-submissions. if route is submissions, do not filter by activeUser at all
       queryParams.append('creator', state.activeUser);

@@ -22,7 +22,7 @@
       <template v-slot:pagination>
         <a-pagination v-model="paginationPage" :length="paginationLength" color="grey-darken-1" />
       </template>
-      <template v-slot:noValue> No Drafts available</template>
+      <template v-slot:noValue>No Drafts available</template>
     </basic-list>
   </a-container>
   <confirm-dialog
