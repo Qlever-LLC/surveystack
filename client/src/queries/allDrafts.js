@@ -22,13 +22,17 @@ const useAllDrafts = () => {
       const uniqueDrafts = uniqueDraftIds.map(id => {
         const local = localDrafts.value.find(draft => draft._id === id);
         const remote = remoteDrafts.value.find(draft => draft._id === id);
+        const isReadyToDelete = local?.meta.status.some(status => status.type === 'READY_TO_DELETE');
+        if (isReadyToDelete) {
+          return false; // will be filtered out with `filter(Boolean)` following this map fn
+        }
         if (local && remote) {
           // choose the more recently modified copy
           return local.meta.dateModified.localeCompare(remote.meta.dateModified) === 1 ? local : remote;
         } else {
           return local ?? remote;
         }
-      });
+      }).filter(Boolean);
       return uniqueDrafts.sort(sortDateModifiedDescending);
     }),
   };

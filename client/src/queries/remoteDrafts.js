@@ -1,5 +1,5 @@
 import { useQueryClient, useQuery, useMutation, useIsMutating } from '@tanstack/vue-query';
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
 import api from '../services/api.service';
 import * as db from '../store/db';
 import store from '../store';
@@ -99,7 +99,29 @@ const useSyncDrafts = () => {
   };
 };
 
+const useDeleteDraft = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    networkMode: 'always',
+    mutationFn: async (draft) => {
+      const readyToDeleteDraft = toRaw(draft);
+      readyToDeleteDraft.meta.status = [
+        ...readyToDeleteDraft.meta.status,
+        { type: 'READY_TO_DELETE', value: { at: new Date().toISOString() } }
+      ];
+      await db.persistSubmission(readyToDeleteDraft);
+      await syncDraft(readyToDeleteDraft);
+      await db.deleteSubmission(draft._id);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+      queryClient.invalidateQueries({ queryKey: ['remoteDrafts'] });
+    },
+  });
+};
+
 export {
   useRemoteDrafts,
   useSyncDrafts,
+  useDeleteDraft,
 };

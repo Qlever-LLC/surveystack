@@ -17,7 +17,7 @@
         {{ entity.meta.survey.name }}
       </template>
       <template v-slot:entitySubtitle="{ entity }">
-        Last modified {{ formatDistance(parseISO(entity.meta.dateModified), new Date()) }} ago
+        {{ createSubtitle(entity) }}
       </template>
       <template v-slot:pagination>
         <a-pagination v-model="paginationPage" :length="paginationLength" color="grey-darken-1" />
@@ -25,6 +25,16 @@
       <template v-slot:noValue> No Drafts available</template>
     </basic-list>
   </a-container>
+  <confirm-dialog
+    v-model="showDeleteDialog"
+    title="Delete Draft"
+    message="Are you sure you want to delete this draft?"
+    button="Delete"
+    button-color="error"
+    :loading="deleteDraftIsPending"
+    @confirm="handleConfirmDelete"
+    @cleanup="resetDeleteDraft"
+  />
 </template>
 <script setup>
 import BasicList from '@/components/ui/BasicList2.vue';
@@ -33,19 +43,27 @@ import { useStore } from 'vuex';
 import formatDistance from 'date-fns/formatDistance';
 import parseISO from 'date-fns/parseISO';
 import { useGroup } from '@/components/groups/group';
-import { useAllDrafts } from '../../queries';
+import { useAllDrafts, useDeleteDraft } from '../../queries';
+import ConfirmDialog from '../../components/shared/ConfirmDialog.vue';
 
 const props = defineProps({
   // group id from route param
   id: String,
-})
+});
 
 const PAGINATION_LIMIT = 10;
 const { data: allDrafts, isPending, isError } = useAllDrafts();
+const {
+  isPending: deleteDraftIsPending,
+  mutate: deleteDraft,
+  reset: resetDeleteDraft,
+} = useDeleteDraft();
 
 const groupDrafts = computed(
   () => allDrafts.value.filter(draft => draft.meta.group?.id === props.id)
 );
+const showDeleteDialog = ref(false);
+const activeDeleteDraft = ref(null);
 const paginationPage = ref(1);
 const paginationLength = computed(() => {
   const length = groupDrafts.value?.length;
@@ -63,11 +81,28 @@ const menu = computed(() => [
   {
     title: 'Delete',
     icon: 'mdi-trash-can-outline',
-    action: (e) => `/todo`,
+    action: (e) => () => showDeleteDialogFor(e),
     render: (e) => () => true,
     color: 'red',
-    buttonHover: true,
   },
 ]);
+
+const createSubtitle = draft => {
+  const isReadyToSubmit = draft.meta.status.some(status => status.type === 'READY_TO_SUBMIT');
+  return isReadyToSubmit ?
+    'Marked for submission (pending internet connection)' :
+    `Last modified ${formatDistance(parseISO(draft.meta.dateModified), new Date())} ago`;
+};
+
+const handleConfirmDelete = () => {
+  resetDeleteDraft();
+  deleteDraft(activeDeleteDraft.value);
+  showDeleteDialog.value = false;
+  activeDeleteDraft.value = null;
+};
+
+const showDeleteDialogFor = draft => {
+  activeDeleteDraft.value = draft;
+  showDeleteDialog.value = true;
+};
 </script>
-<style scoped lang="scss"></style>

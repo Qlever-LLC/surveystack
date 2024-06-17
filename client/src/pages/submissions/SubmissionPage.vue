@@ -228,6 +228,7 @@ export default defineComponent({
         state.isSubmitted = true;
         await db.deleteSubmission(state.submission._id);
         queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+        queryClient.invalidateQueries({ queryKey: ['remoteDrafts'] });
         message = {
           type: 'SUBMISSION_SUBMIT_SUCCESS',
           payload: { submissionId: state.submission._id },

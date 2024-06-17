@@ -13,7 +13,7 @@
         {{ entity.meta.survey.name }}
       </template>
       <template v-slot:entitySubtitle v-if="entity.meta.dateCreated">
-        {{ formatDistance(parseISO(entity.meta.dateModified), new Date()) }} ago
+        {{ createSubtitle(entity) }} ago
       </template>
       <template v-slot:entitySubtitle v-else></template>
     </list-item-card>
@@ -42,16 +42,27 @@
       <a-list-item-title class="text-white">Group Responses</a-list-item-title>
     </a-list-item>
   </a-list>
+  <confirm-dialog
+    v-model="showDeleteDialog"
+    title="Delete Draft"
+    :error="null"
+    message="Are you sure you want to delete this draft?"
+    button="Delete"
+    button-color="error"
+    :loading="deleteDraftIsPending"
+    @confirm="handleConfirmDelete"
+    @cleanup="resetDeleteDraft"
+  />
 </template>
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
-import { useAllDrafts } from '../../queries';
-
+import { useAllDrafts, useDeleteDraft } from '../../queries';
 import ListItemCard from '@/components/ui/ListItemCard.vue';
+import ConfirmDialog from '../shared/ConfirmDialog.vue';
 
 const props = defineProps({
   // group id from route param
@@ -62,10 +73,17 @@ const router = useRouter();
 const route = useRoute();
 const store = useStore();
 const { data: allDrafts } = useAllDrafts();
+const {
+  isPending: deleteDraftIsPending,
+  mutate: deleteDraft,
+  reset: resetDeleteDraft,
+} = useDeleteDraft();
 
 const groupDrafts = computed(
   () => allDrafts.value.filter(draft => draft.meta.group?.id === props.id).slice(0, 2)
 );
+const showDeleteDialog = ref(false);
+const activeDeleteDraft = ref(null);
 const menu = computed(() => [
   {
     title: 'Continue',
@@ -78,12 +96,31 @@ const menu = computed(() => [
   {
     title: 'Delete',
     icon: 'mdi-trash-can-outline',
-    action: (e) => `/todo`,
+    action: (e) => () => showDeleteDialogFor(e),
     color: 'red',
     disabled: false,
     buttonHover: true,
   },
 ]);
+
+const createSubtitle = draft => {
+  const isReadyToSubmit = draft.meta.status.some(status => status.type === 'READY_TO_SUBMIT');
+  return isReadyToSubmit ?
+    'Marked for submission' :
+    `Last modified ${formatDistance(parseISO(draft.meta.dateModified), new Date())} ago`;
+};
+
+const handleConfirmDelete = () => {
+  resetDeleteDraft();
+  deleteDraft(activeDeleteDraft.value);
+  showDeleteDialog.value = false;
+  activeDeleteDraft.value = null;
+};
+
+const showDeleteDialogFor = draft => {
+  activeDeleteDraft.value = draft;
+  showDeleteDialog.value = true;
+}
 </script>
 
 <style scoped lang="scss">
