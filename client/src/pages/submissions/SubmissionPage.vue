@@ -182,7 +182,7 @@ export default defineComponent({
       return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
     };
     function abortEditSubmitted() {
-      router.push(`/groups/${route.params.id}/my-submission`);
+      router.push(`/groups/${route.params.id}/my-submissions`);
     };
     function addReadyToSubmit(status) {
       return [
@@ -236,6 +236,7 @@ export default defineComponent({
       } catch (error) {
         console.log('Draft submit error:', error);
         await db.persistSubmission(state.submission);
+        queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
         result({ error });
         message = {
           type: 'SUBMISSION_SUBMIT_ERROR',

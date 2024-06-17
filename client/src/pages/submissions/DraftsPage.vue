@@ -3,7 +3,7 @@
     <basic-list
       listType="row"
       :showSearch="false"
-      :entities="groupDrafts"
+      :entities="currentPageDrafts"
       :menu="menu"
       :loading="isPending">
       <template v-slot:title>
@@ -61,6 +61,12 @@ const {
 
 const groupDrafts = computed(
   () => allDrafts.value.filter(draft => draft.meta.group?.id === props.id)
+);
+const currentPageDrafts = computed(() =>
+  groupDrafts.value.slice(
+    (paginationPage.value - 1) * PAGINATION_LIMIT, 
+    paginationPage.value * PAGINATION_LIMIT,
+  )
 );
 const showDeleteDialog = ref(false);
 const activeDeleteDraft = ref(null);
