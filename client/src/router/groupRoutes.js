@@ -198,7 +198,10 @@ export default [
       main: Builder,
     },
     props: {
-      isNew: false,
+      main: (route) => ({
+        id: route.params.id,
+        editMode: false,
+      }),
     },
     beforeEnter: groupAdminGuard,
   },
@@ -211,7 +214,11 @@ export default [
       main: Builder,
     },
     props: {
-      isNew: false,
+      main: (route) => ({
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+        editMode: true,
+      }),
     },
     beforeEnter: groupAdminGuard,
   },

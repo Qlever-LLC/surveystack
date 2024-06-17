@@ -9,9 +9,11 @@ import { useGroup } from '@/components/groups/group';
 import { get } from 'lodash';
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
+import { useRouter } from 'vue-router';
 
 export function useSurvey() {
   const store = useStore();
+  const router = useRouter();
   const { rightToSubmitSurvey, rightToEdit, rightToCallForSubmissions, rightToViewAnonymizedResults, rightToView } =
     getPermission();
   const { message, createAction } = menuAction();
@@ -71,7 +73,7 @@ export function useSurvey() {
       {
         title: 'Edit',
         icon: 'mdi-pencil',
-        action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
+        action: (s) => createAction(s, rightToEdit, () => editSurvey(s)),
         render: (s) => () => rightToEdit().allowed,
       },
       {
@@ -151,6 +153,13 @@ export function useSurvey() {
         )
       );
     }
+  }
+
+  function editSurvey(s) {
+    router.push({
+      name: 'group-surveys-edit',
+      params: { id: getActiveGroupId(), surveyId: s._id },
+    });
   }
 
   return {
