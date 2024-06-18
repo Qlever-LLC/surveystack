@@ -5,8 +5,8 @@
       :class="{ innerShadow: isHovering }"
       class="light-border"
       @[getDefaultAction()&&`click`]="runDefaultAction()">
-      <span>
-        <a-list-item-title class="d-flex align-center">
+      <span class="wapper">
+        <a-list-item-title>
           <slot name="entityTitle" :entity="entity" />
         </a-list-item-title>
         <a-list-item-subtitle>
@@ -144,5 +144,15 @@ function runAction(action) {
 .light-border {
   border-bottom: 1px solid lightgray;
   border-top: 1px solid lightgray;
+}
+
+.wapper {
+  overflow: hidden !important;
+}
+
+.wapper * {
+  display: block !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 </style>
