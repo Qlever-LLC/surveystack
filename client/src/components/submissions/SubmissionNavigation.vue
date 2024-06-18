@@ -112,14 +112,14 @@ async function initData() {
       color: 'green',
       buttonFixed: true,
     },
-    {
+    /*TODO not yet implemented {
       title: 'Delete',
       icon: 'mdi-trash-can-outline',
       action: (e) => `/todo`,
       color: 'red',
       disabled: true,
       buttonHover: true,
-    },
+    },*/
   ];
 }
 
