@@ -1,5 +1,5 @@
 <template>
-  <membership-new v-model="state.showNewMembership"></membership-new>
+  <membership-new v-model="state.showNewMembership" @reload="initData()" />
   <a-container class="basicListContainer">
     <basic-list
       listType="row"

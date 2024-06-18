@@ -109,13 +109,12 @@ import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 import BtnDropdown from '@/components/ui/BtnDropdown';
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
 
 const store = useStore();
-const router = useRouter();
 const route = useRoute();
 
 const { mobile } = useDisplay();
@@ -145,30 +144,28 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'reload']);
 
 const state = reactive({
   entity: {
     _id: '',
     user: null,
     group: null,
-    role: 'user',
+    role: null,
     meta: {
       status: 'pending',
-      dateCreated: new Date().toISOString(),
+      dateCreated: undefined,
       dateSent: null,
       dateActivated: null,
       notes: '',
-      invitationEmail: null,
-      invitationName: null,
-      invitationCode: uuid(),
+      invitationEmail: undefined,
+      invitationName: undefined,
+      invitationCode: undefined,
     },
   },
   groupDetail: { name: '', path: '' },
-  sendEmail: 'SEND_NOW',
-  invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
-    ? [localStorage[LS_MEMBER_INVITATION_METHOD]]
-    : [INVITATION_METHODS.INVITE],
+  sendEmail: undefined,
+  invitationMethod: undefined,
   isSubmitting: false,
   emailRules: [(v) => !!v || 'E-mail is required', (v) => EmailValidator.validate(v) || 'E-mail must be valid'],
   submittable: true,
@@ -193,6 +190,7 @@ async function submit() {
     state.isSubmitting = true;
     await api.post(url, data);
     closeDialog();
+    emit('reload');
   } catch (err) {
     await store.dispatch('feedback/add', err.response.data.message);
   } finally {
@@ -204,22 +202,34 @@ watch(state.invitationMethod, (newValue) => {
   localStorage[LS_MEMBER_INVITATION_METHOD] = newValue[0];
 });
 
-onMounted(async () => {
-  state.entity._id = new ObjectId();
+watch(
+  () => props.modelValue,
+  async (val) => {
+    state.entity.role = 'user';
+    (state.entity.meta.dateCreated = new Date().toISOString()), (state.entity.meta.invitationEmail = null);
+    state.entity.meta.invitationName = null;
+    state.entity.meta.invitationCode = uuid();
+    state.sendEmail = 'SEND_NOW';
+    state.invitationMethod = Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
+      ? [localStorage[LS_MEMBER_INVITATION_METHOD]]
+      : [INVITATION_METHODS.INVITE];
 
-  const { id } = route.params;
-  if (!id) {
-    return;
-  }
+    state.entity._id = new ObjectId();
 
-  try {
-    const { data: groupDetailData } = await api.get(`/groups/${id}`);
-    state.groupDetail = groupDetailData;
-    state.entity.group = id;
-  } catch (e) {
-    console.log('something went wrong:', e);
+    const { id } = route.params;
+    if (!id) {
+      return;
+    }
+
+    try {
+      const { data: groupDetailData } = await api.get(`/groups/${id}`);
+      state.groupDetail = groupDetailData;
+      state.entity.group = id;
+    } catch (e) {
+      console.log('something went wrong:', e);
+    }
   }
-});
+);
 </script>
 
 <style scoped lang="scss">
