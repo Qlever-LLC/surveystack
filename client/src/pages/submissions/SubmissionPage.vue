@@ -70,7 +70,6 @@ import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter, useRoute } from 'vu
 import { useStore } from 'vuex';
 import { useQueryClient } from '@tanstack/vue-query';
 import api from '@/services/api.service';
-import resultMixin from '@/components/ui/ResultsMixin';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
