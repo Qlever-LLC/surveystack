@@ -89,6 +89,47 @@ export default {
     SubmittingDialog,
     appSubmissionArchiveDialog,
   },
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+    surveyId: {
+      type: String,
+      required: true,
+    },
+    submissionId: {
+      type: String,
+      required: false,
+    },
+    submitAsUserId: {
+      type: String,
+      required: false,
+    },
+  },
+  watch: {
+    surveyId: {
+      async handler(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          await this.init();
+        }
+      },
+    },
+    submissionId: {
+      async handler(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          await this.init();
+        }
+      },
+    },
+    submitAsUserId: {
+      async handler(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          await this.init();
+        }
+      },
+    },
+  },
   data() {
     return {
       submission: null,
@@ -104,6 +145,148 @@ export default {
     };
   },
   methods: {
+    async init() {
+      this.loading = true;
+
+      try {
+        this.survey = (await api.get(`/surveys/${this.surveyId}?version=latest`)).data;
+      } catch (error) {
+        this.hasError = true;
+        this.errorMessage = 'Survey not found.';
+        this.loading = false;
+        return;
+      }
+      const isLoginRequired = this.survey.meta.submissions === 'user' || this.survey.meta.submissions === 'group';
+      if (isLoginRequired && !this.$store.getters['auth/isLoggedIn']) {
+        this.$router.push({
+          name: 'auth-login',
+          query: { redirect: this.$route.path, autoJoin: true },
+        });
+        return;
+      }
+
+      const surveyResourcesLoaded = this.survey.resources
+        ? this.$store.dispatch('resources/fetchResources', this.survey.resources)
+        : Promise.resolve();
+
+      const user = this.$store.getters['auth/user'];
+      try {
+        await this.$store.dispatch('memberships/getUserMemberships', user._id);
+      } catch (error) {
+        this.hasError = true;
+        this.errorMessage = 'Error fetching user memberships. Please refresh to try again.';
+        this.loading = false;
+        return;
+      }
+
+      const allowedToSubmit = checkAllowedToSubmit(
+        this.survey,
+        this.$store.getters['auth/isLoggedIn'],
+        this.$store.getters['memberships/groups']
+      );
+      if (!allowedToSubmit.allowed) {
+        this.hasError = true;
+        this.errorMessage = allowedToSubmit.message;
+        this.loading = false;
+        return;
+      }
+
+      // If the user is on the group-survey-submissions-new route, initialize a new submission and then redirect to the group-survey-submissions-edit route for that submission
+      if (this.$route.name === 'group-survey-submissions-new') {
+        const createSubmissionConfig = { survey: this.survey, version: this.survey.latestVersion };
+        if (this.submitAsUserId) {
+          try {
+            const { data: submitAsUser } = await api.get(`/users/${this.submitAsUserId}`);
+            createSubmissionConfig.submitAsUser = submitAsUser;
+          } catch (error) {
+            this.hasError = true;
+            this.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
+            this.loading = false;
+            return;
+          }
+        }
+        this.submission = createSubmissionFromSurvey(createSubmissionConfig);
+        await this.$router.replace({
+          name: 'group-survey-submissions-edit',
+          params: { submissionId: this.submission._id },
+        });
+      } else if (this.$route.name === 'group-survey-submissions-edit') {
+        await this.$store.dispatch('submissions/fetchLocalSubmissions');
+        const localSubmission = this.$store.getters['submissions/getSubmission'](this.submissionId);
+        if (localSubmission) {
+          this.submission = localSubmission;
+        } else {
+          let remoteSubmission;
+          try {
+            remoteSubmission = await this.$store.dispatch('submissions/fetchRemoteSubmission', this.submissionId);
+          } catch (error) {
+            // Swallow this error for now. This case is handled below where we set a 'Submission not found.' error message if there is no submission.
+          }
+          if (remoteSubmission) {
+            this.submission = remoteSubmission;
+          }
+        }
+        if (!this.submission) {
+          this.hasError = true;
+          this.errorMessage = 'Submission not found.';
+          this.loading = false;
+          return;
+        }
+      }
+
+      if (this.isResubmission()) {
+        const allowedToResubmit = checkAllowedToResubmit(
+          this.submission,
+          this.$store.getters['memberships/memberships'],
+          user._id
+        );
+        if (!allowedToResubmit) {
+          this.hasError = true;
+          this.errorMessage = 'You are not allowed to edit this submission.';
+          this.loading = false;
+          return;
+        }
+
+        const editSubmissionReason = this.$route.query.reason;
+        if (editSubmissionReason && ARCHIVE_REASONS.includes(editSubmissionReason)) {
+          this.submission.meta.archivedReason = editSubmissionReason;
+        } else {
+          this.showResubmissionDialog = true;
+        }
+      }
+
+      if (this.survey.latestVersion !== this.submission.meta.survey.version) {
+        try {
+          this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
+            id: this.submission.meta.survey.id,
+            version: this.submission.meta.survey.version,
+          });
+        } catch (error) {
+          this.hasError = true;
+          this.errorMessage = 'Survey not found.';
+          this.loading = false;
+          return;
+        }
+      }
+
+      const cleanSubmission = createSubmissionFromSurvey({
+        survey: this.survey,
+        version: this.submission.meta.survey.version,
+      });
+      // initialize data in case anything is missing from data
+      defaultsDeep(this.submission.data, cleanSubmission.data);
+
+      // Set proxy header if resubmit by proxy or admin.
+      // Otherwise, remove it
+      if (this.isProxySubmission()) {
+        api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
+      } else {
+        api.removeHeader('x-delegate-to');
+      }
+
+      await surveyResourcesLoaded;
+      this.loading = false;
+    },
     isResubmission() {
       return this.submission && this.submission.meta && this.submission.meta.dateSubmitted;
     },
@@ -116,7 +299,7 @@ export default {
       // is sure they want to leave. User can click 'cancel' when prompted whether they want to "Confirm editing submitted",
       // which deleted the submission from the store, then when prompted whether they want to leave the current draft
       // they can also click cancel, which may cause an error
-      this.$router.push(`/groups/${this.$route.params.id}/my-drafts`);
+      this.$router.push(`/groups/${this.id}/my-drafts`);
     },
     addReadyToSubmit(status) {
       return [
@@ -181,149 +364,7 @@ export default {
     },
   },
   async created() {
-    this.loading = true;
-    const { surveyId } = this.$route.params;
-
-    try {
-      this.survey = (await api.get(`/surveys/${surveyId}?version=latest`)).data;
-    } catch (error) {
-      this.hasError = true;
-      this.errorMessage = 'Survey not found.';
-      this.loading = false;
-      return;
-    }
-    const isLoginRequired = this.survey.meta.submissions === 'user' || this.survey.meta.submissions === 'group';
-    if (isLoginRequired && !this.$store.getters['auth/isLoggedIn']) {
-      this.$router.push({
-        name: 'auth-login',
-        query: { redirect: this.$route.path, autoJoin: true },
-      });
-      return;
-    }
-
-    const surveyResourcesLoaded = this.survey.resources
-      ? this.$store.dispatch('resources/fetchResources', this.survey.resources)
-      : Promise.resolve();
-
-    const user = this.$store.getters['auth/user'];
-    try {
-      await this.$store.dispatch('memberships/getUserMemberships', user._id);
-    } catch (error) {
-      this.hasError = true;
-      this.errorMessage = 'Error fetching user memberships. Please refresh to try again.';
-      this.loading = false;
-      return;
-    }
-
-    const allowedToSubmit = checkAllowedToSubmit(
-      this.survey,
-      this.$store.getters['auth/isLoggedIn'],
-      this.$store.getters['memberships/groups']
-    );
-    if (!allowedToSubmit.allowed) {
-      this.hasError = true;
-      this.errorMessage = allowedToSubmit.message;
-      this.loading = false;
-      return;
-    }
-
-    // If the user is on the group-survey-submissions-new route, initialize a new submission and then redirect to the group-survey-submissions-edit route for that submission
-    if (this.$route.name === 'group-survey-submissions-new') {
-      const { submitAsUserId } = this.$route.query;
-      const createSubmissionConfig = { survey: this.survey, version: this.survey.latestVersion };
-      if (submitAsUserId) {
-        try {
-          const { data: submitAsUser } = await api.get(`/users/${submitAsUserId}`);
-          createSubmissionConfig.submitAsUser = submitAsUser;
-        } catch (error) {
-          this.hasError = true;
-          this.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
-          this.loading = false;
-          return;
-        }
-      }
-      this.submission = createSubmissionFromSurvey(createSubmissionConfig);
-      await this.$router.replace({
-        name: 'group-survey-submissions-edit',
-        params: { submissionId: this.submission._id },
-      });
-    } else if (this.$route.name === 'group-survey-submissions-edit') {
-      const { submissionId } = this.$route.params;
-      await this.$store.dispatch('submissions/fetchLocalSubmissions');
-      const localSubmission = this.$store.getters['submissions/getSubmission'](submissionId);
-      if (localSubmission) {
-        this.submission = localSubmission;
-      } else {
-        let remoteSubmission;
-        try {
-          remoteSubmission = await this.$store.dispatch('submissions/fetchRemoteSubmission', submissionId);
-        } catch (error) {
-          // Swallow this error for now. This case is handled below where we set a 'Submission not found.' error message if there is no submission.
-        }
-        if (remoteSubmission) {
-          this.submission = remoteSubmission;
-        }
-      }
-      if (!this.submission) {
-        this.hasError = true;
-        this.errorMessage = 'Submission not found.';
-        this.loading = false;
-        return;
-      }
-    }
-
-    if (this.isResubmission()) {
-      const allowedToResubmit = checkAllowedToResubmit(
-        this.submission,
-        this.$store.getters['memberships/memberships'],
-        user._id
-      );
-      if (!allowedToResubmit) {
-        this.hasError = true;
-        this.errorMessage = 'You are not allowed to edit this submission.';
-        this.loading = false;
-        return;
-      }
-
-      const editSubmissionReason = this.$route.query.reason;
-      if (editSubmissionReason && ARCHIVE_REASONS.includes(editSubmissionReason)) {
-        this.submission.meta.archivedReason = editSubmissionReason;
-      } else {
-        this.showResubmissionDialog = true;
-      }
-    }
-
-    if (this.survey.latestVersion !== this.submission.meta.survey.version) {
-      try {
-        this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
-          id: this.submission.meta.survey.id,
-          version: this.submission.meta.survey.version,
-        });
-      } catch (error) {
-        this.hasError = true;
-        this.errorMessage = 'Survey not found.';
-        this.loading = false;
-        return;
-      }
-    }
-
-    const cleanSubmission = createSubmissionFromSurvey({
-      survey: this.survey,
-      version: this.submission.meta.survey.version,
-    });
-    // initialize data in case anything is missing from data
-    defaultsDeep(this.submission.data, cleanSubmission.data);
-
-    // Set proxy header if resubmit by proxy or admin.
-    // Otherwise, remove it
-    if (this.isProxySubmission()) {
-      api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
-    } else {
-      api.removeHeader('x-delegate-to');
-    }
-
-    await surveyResourcesLoaded;
-    this.loading = false;
+    await this.init();
   },
   beforeRouteLeave(to, from, next) {
     if (from.name === 'group-survey-submissions-new' && to.name === 'group-survey-submissions-edit') {

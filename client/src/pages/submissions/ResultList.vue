@@ -292,11 +292,9 @@ import { menuAction } from '@/utils/threeDotsMenu';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 
-const route = useRoute();
 const store = useStore();
 const router = useRouter();
 
-const { getActiveGroupId } = useGroup();
 const { rightToManageResponses } = getPermission();
 const { message, createAction } = menuAction();
 
@@ -327,6 +325,17 @@ const apiDownloadExpandAllMatricesOptions = [
   { text: 'Add a row for each matrix answers', value: 'true' },
   { text: 'Keep matrix answers in a single cell', value: 'false' },
 ];
+
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
+  surveyId: {
+    type: String,
+    required: true,
+  },
+});
 
 const state = reactive({
   isOpen: undefined,
@@ -379,6 +388,8 @@ const state = reactive({
 });
 
 initData();
+
+watch([() => props.id, () => props.surveyId], initData);
 
 const validQuery = computed(() => {
   try {
@@ -462,8 +473,7 @@ function copyUrlToClipboard() {
 async function initData() {
   state.loading = true;
 
-  const { surveyId } = route.params;
-  state.survey = surveyId;
+  state.survey = props.surveyId;
   const { data: surveyEntity } = await api.get(`/surveys/${state.survey}?version=latest`);
   state.surveyEntity = surveyEntity;
 
@@ -629,7 +639,7 @@ function onSubmissionsSelected(submissions) {
 function resubmit(submission) {
   router.push({
     name: 'group-survey-submissions-edit',
-    params: { id: getActiveGroupId(), surveyId: state.survey, submissionId: submission._id },
+    params: { id: props.id, surveyId: state.survey, submissionId: submission._id },
   });
 }
 async function reassign(submissions) {
