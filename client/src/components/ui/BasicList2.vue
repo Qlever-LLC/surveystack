@@ -155,10 +155,6 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  page: {
-    type: Number,
-    required: false,
-  },
   groupStyle: {
     type: Boolean,
     required: false,

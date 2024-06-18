@@ -20,7 +20,6 @@
       enablePinned
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
       :menu="state.menu"
-      :page="state.page"
       :loading="state.loading">
       <template v-slot:title>
         <a-icon class="mr-2">mdi-list-box-outline</a-icon>
