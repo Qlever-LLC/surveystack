@@ -11,7 +11,7 @@
     </div>
     <div v-else-if="state.hasError" class="text-center mt-8">
       {{ state.errorMessage }}
-      <router-link :to="`/groups/${route.params.id}/surveys`">Back to survey list</router-link>
+      <router-link :to="`/groups/${id}/surveys`">Back to survey list</router-link>
     </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialogRef" title="Confirm Exit Draft" v-if="state.submission && state.survey">
@@ -46,7 +46,7 @@
       :to="
         state.survey && {
           name: 'group-my-submissions',
-          params: { id: route.params.id },
+          params: { id },
           query: { minimal_ui: route.query.minimal_ui },
         }
       "
@@ -108,7 +108,11 @@ export default defineComponent({
     submitAsUserId: {
       required: false,
       type: String,
-    }
+    },
+    id: { // group id from route
+      required: true,
+      type: String,
+    },
   },
   setup(props) {
     const {
@@ -195,7 +199,7 @@ export default defineComponent({
       return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
     };
     function abortEditSubmitted() {
-      router.push(`/groups/${route.params.id}/my-submissions`);
+      router.push(`/groups/${props.id}/my-submissions`);
     };
     function addReadyToSubmit(status) {
       return [
@@ -327,8 +331,6 @@ export default defineComponent({
           params: { submissionId: state.submission._id },
         });
       } else if (route.name === 'group-survey-submissions-edit') {
-        const { submissionId } = route.params;
-
         const allDraftsReady = new Promise((resolve, reject) => {
           watch(
             allDraftsIsPending,
@@ -340,7 +342,7 @@ export default defineComponent({
             { immediate: true }
           );
         });
-        const remoteSubmissionReady = api.get(`/submissions/${submissionId}?pure=1`);
+        const remoteSubmissionReady = api.get(`/submissions/${props.submissionId}?pure=1`);
         const [
           allDraftsReadySettled,
           remoteSubmissionReadySettled,
@@ -353,7 +355,7 @@ export default defineComponent({
           state.submission = remoteSubmissionReadySettled.value.data;
         } else {
           console.log('no remote submission, finding draft...')
-          state.submission = toRaw(allDraftsData.value.find(draft => draft._id === submissionId));
+          state.submission = toRaw(allDraftsData.value.find(draft => draft._id === props.submissionId));
         }
 
         if (!state.submission) {
