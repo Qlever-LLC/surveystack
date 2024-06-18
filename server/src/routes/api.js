@@ -155,11 +155,7 @@ router.post(
   [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
   catchErrors(submissionController.deleteSubmissions)
 );
-router.post(
-  '/submissions/sync-draft',
-  [assertAuthenticated],
-  catchErrors(syncDraft)
-);
+router.post('/submissions/sync-draft', [assertAuthenticated], catchErrors(syncDraft));
 router.get('/submissions/drafts/page', [assertAuthenticated], catchErrors(getDraftsPage));
 
 /** Surveys */

@@ -223,7 +223,8 @@ const paths: OpenAPIV3.PathsObject = {
       },
       responses: {
         200: {
-          description: 'Successfully synced draft to the server.',
+          description:
+            'Successfully synced draft to the server. The client can safely delete its copy and fetch the latest state from the server in another request.',
         },
         401: {
           $ref: '#/components/responses/401',

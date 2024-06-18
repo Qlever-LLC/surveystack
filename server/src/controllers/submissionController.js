@@ -680,10 +680,7 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   entity.meta.status = [];
   entity.meta.isDraft = false;
 
-  const [
-    existingSubmission,
-    survey,
-  ] = await Promise.all([
+  const [existingSubmission, survey] = await Promise.all([
     db.collection('submissions').findOne({ _id: new ObjectId(submission._id) }),
     db.collection('surveys').findOne({ _id: entity.meta.survey.id }),
   ]);
@@ -732,7 +729,7 @@ const createSubmission = async (req, res) => {
     try {
       return await withTransaction(session, async () => {
         const submissionsToInsert = submissionEntities.map(({ entity }) => entity);
-        const upsertOperations = submissionsToInsert.map(submission => ({
+        const upsertOperations = submissionsToInsert.map((submission) => ({
           updateOne: {
             filter: { _id: submission._id },
             update: { $set: submission },
@@ -829,7 +826,7 @@ const bulkReassignSubmissions = async (req, res) => {
   const { group, creator, ids } = req.body;
   let submissions = res.locals.existing;
 
-  if (submissions.some(submission => submission.meta.isDraft === true)) {
+  if (submissions.some((submission) => submission.meta.isDraft === true)) {
     throw boom.conflict('You cannot reassign a draft.');
   }
 
@@ -1024,9 +1021,9 @@ const archiveSubmissions = async (req, res) => {
     ids = [id];
   }
 
-  const submissionIsDraft = Array.isArray(res.locals.existing) ?
-    res.locals.existing.some(submission => submission.meta.isDraft === true) :
-    res.locals.existing.meta.isDraft === true;
+  const submissionIsDraft = Array.isArray(res.locals.existing)
+    ? res.locals.existing.some((submission) => submission.meta.isDraft === true)
+    : res.locals.existing.meta.isDraft === true;
   if (submissionIsDraft) {
     throw boom.conflict('You cannot archive a draft.');
   }
@@ -1058,9 +1055,9 @@ const deleteSubmissions = async (req, res) => {
     ids = [id];
   }
 
-  const submissionIsDraft = Array.isArray(res.locals.existing) ?
-    res.locals.existing.some(submission => submission.meta.isDraft === true) :
-    res.locals.existing.meta.isDraft === true;
+  const submissionIsDraft = Array.isArray(res.locals.existing)
+    ? res.locals.existing.some((submission) => submission.meta.isDraft === true)
+    : res.locals.existing.meta.isDraft === true;
   if (submissionIsDraft) {
     throw boom.conflict('You cannot delete a draft with this endpoint. Use /sync-draft, instead.');
   }

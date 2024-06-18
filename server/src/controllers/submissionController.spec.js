@@ -30,8 +30,7 @@ beforeEach(() => {
   withTransaction.mockImplementation(actualWithTransaction);
 });
 
-const { getSubmissionsCsv, getSubmissionPdf, postSubmissionPdf, sendPdfLink } =
-  submissionController;
+const { getSubmissionsCsv, postSubmissionPdf } = submissionController;
 
 describe('submissionController', () => {
   const handleApiComposeHappyPathImplementation = (submissionEntities) => ({
@@ -1219,7 +1218,7 @@ describe('submissionController', () => {
     describe('when an existing submission with the same id exists in the database', () => {
       it('when the existing submission is already submitted (isDraft=false), the request is rejected', async () => {
         const { createSubmission, createRequestSubmission } = await createSurvey(['string']);
-        const { submission: existingSubmission }  = await createSubmission({
+        const { submission: existingSubmission } = await createSubmission({
           _id: new ObjectId(),
           meta: createSubmissionMeta({
             isDraft: false,
@@ -1249,15 +1248,17 @@ describe('submissionController', () => {
           .send(requestSubmission)
           .expect(409);
 
-        const submission = await db.collection('submissions').findOne({ _id: existingSubmission._id });
+        const submission = await db
+          .collection('submissions')
+          .findOne({ _id: existingSubmission._id });
         expect(submission).not.toBeNull();
         expect(submission.meta.dateModified).toEqual(existingSubmission.meta.dateModified);
       });
-      
+
       describe('when the existing submission is a draft and the submission in the request is READY_TO_SUBMIT', () => {
         it('it updates the submission to be "submitted"', async () => {
           const { createSubmission, createRequestSubmission } = await createSurvey(['string']);
-          const { submission: existingSubmission }  = await createSubmission({
+          const { submission: existingSubmission } = await createSubmission({
             _id: new ObjectId(),
             meta: createSubmissionMeta({
               isDraft: true,
@@ -1287,18 +1288,22 @@ describe('submissionController', () => {
             .send(requestSubmission)
             .expect(200);
 
-          const submission = await db.collection('submissions').findOne({ _id: existingSubmission._id });
+          const submission = await db
+            .collection('submissions')
+            .findOne({ _id: existingSubmission._id });
           expect(submission).not.toBeNull();
           expect(submission.meta.status).not.toContainEqual(
             expect.objectContaining({ type: 'READY_TO_SUBMIT' })
           );
           expect(submission.meta.isDraft).toBe(false);
-          expect(submission.meta.dateModified.toISOString()).toEqual(requestSubmission.meta.dateModified);
+          expect(submission.meta.dateModified.toISOString()).toEqual(
+            requestSubmission.meta.dateModified
+          );
         });
 
         it('returns 401 if the requesting user is not the owner of the existing draft', async () => {
           const { createSubmission, createRequestSubmission } = await createSurvey(['string']);
-          const { submission: existingSubmission }  = await createSubmission({
+          const { submission: existingSubmission } = await createSubmission({
             _id: new ObjectId(),
             meta: createSubmissionMeta({
               isDraft: true,
@@ -1328,12 +1333,13 @@ describe('submissionController', () => {
             .send(requestSubmission)
             .expect(401);
 
-          const submission = await db.collection('submissions').findOne({ _id: existingSubmission._id });
+          const submission = await db
+            .collection('submissions')
+            .findOne({ _id: existingSubmission._id });
           expect(submission).not.toBeNull();
           expect(submission.meta.dateModified).toEqual(existingSubmission.meta.dateModified);
         });
       });
-
     });
 
     describe('when the request submission is a draft (isDraft=true)', () => {
@@ -1622,7 +1628,7 @@ describe('submissionController', () => {
     let group;
     let user;
     let createSubmission;
-    
+
     beforeEach(async () => {
       group = await createGroup();
       ({ user } = await group.createUserMember({
@@ -1635,7 +1641,7 @@ describe('submissionController', () => {
     it('should return 409 if the submission is a draft', async () => {
       const { submission } = await createSubmission({
         _id: new ObjectId(),
-        meta: createSubmissionMeta({ creator: user._id, isDraft: true })
+        meta: createSubmissionMeta({ creator: user._id, isDraft: true }),
       });
 
       await request(app)
@@ -1648,7 +1654,7 @@ describe('submissionController', () => {
     it('should return PDF base64 when `base64=1` if success', async () => {
       const { submission } = await createSubmission({
         _id: new ObjectId(),
-        meta: createSubmissionMeta({ creator: user._id })
+        meta: createSubmissionMeta({ creator: user._id }),
       });
 
       const response = await request(app)
@@ -1658,14 +1664,19 @@ describe('submissionController', () => {
         .expect(200);
 
       expect(response.type).toEqual('application/pdf');
-      expect(response._body.toString('utf-8', 0, 'data:application/pdf;base64'.length)).toEqual('data:application/pdf;base64');
-      expect(response.headers).toHaveProperty('content-disposition', expect.stringContaining('attachment; filename="Mock Survey Name'));
+      expect(response._body.toString('utf-8', 0, 'data:application/pdf;base64'.length)).toEqual(
+        'data:application/pdf;base64'
+      );
+      expect(response.headers).toHaveProperty(
+        'content-disposition',
+        expect.stringContaining('attachment; filename="Mock Survey Name')
+      );
     });
 
     it('should return PDF buffer when `base64=0` if success', async () => {
       const { submission } = await createSubmission({
         _id: new ObjectId(),
-        meta: createSubmissionMeta({ creator: user._id })
+        meta: createSubmissionMeta({ creator: user._id }),
       });
 
       const response = await request(app)
@@ -1675,8 +1686,13 @@ describe('submissionController', () => {
         .expect(200);
 
       expect(response.type).toEqual('application/pdf');
-      expect(response._body.toString('utf-8', 0, 'data:application/pdf;base64'.length)).not.toEqual('data:application/pdf;base64');
-      expect(response.headers).toHaveProperty('content-disposition', expect.stringContaining('attachment; filename="Mock Survey Name'));
+      expect(response._body.toString('utf-8', 0, 'data:application/pdf;base64'.length)).not.toEqual(
+        'data:application/pdf;base64'
+      );
+      expect(response.headers).toHaveProperty(
+        'content-disposition',
+        expect.stringContaining('attachment; filename="Mock Survey Name')
+      );
     });
 
     it('returns 404 when a submission with the specified id does not exist', async () => {
@@ -1733,7 +1749,7 @@ describe('submissionController', () => {
     let group;
     let user;
     let createSubmission;
-    
+
     beforeEach(async () => {
       group = await createGroup();
       ({ user } = await group.createUserMember({
@@ -1745,7 +1761,7 @@ describe('submissionController', () => {
 
     it('returns 409 when the submission is a draft', async () => {
       const { submission } = await createSubmission({
-        meta: createSubmissionMeta({ isDraft: true })
+        meta: createSubmissionMeta({ isDraft: true }),
       });
 
       await request(app)
@@ -1803,7 +1819,7 @@ describe('submissionController', () => {
     describe('/submissions/:id/archive', () => {
       it('returns 409 if the existing submission is a draft', async () => {
         const { createSubmission } = await createSurvey(['string']);
-        const { submission: existingSubmission }  = await createSubmission({
+        const { submission: existingSubmission } = await createSubmission({
           _id: new ObjectId(),
           meta: createSubmissionMeta({
             isDraft: true,
@@ -1811,14 +1827,16 @@ describe('submissionController', () => {
             creator: user._id,
           }),
         });
-  
+
         await request(app)
           .post(`/api/submissions/${existingSubmission._id}/archive`)
           .set('Authorization', authHeaderValue)
           .send()
           .expect(409);
 
-        const submission = await db.collection('submissions').findOne({ _id: existingSubmission._id });
+        const submission = await db
+          .collection('submissions')
+          .findOne({ _id: existingSubmission._id });
         expect(submission).not.toBeNull();
         expect(submission.meta.archived).toBe(false);
       });
@@ -1827,7 +1845,7 @@ describe('submissionController', () => {
     describe('/submissions/:id/bulk-archive', () => {
       it('returns 409 if any of the existing submissions are drafts', async () => {
         const { createSubmission } = await createSurvey(['string']);
-        const { submission: existingDraft }  = await createSubmission({
+        const { submission: existingDraft } = await createSubmission({
           _id: new ObjectId(),
           meta: createSubmissionMeta({
             isDraft: true,
@@ -1835,7 +1853,7 @@ describe('submissionController', () => {
             creator: user._id,
           }),
         });
-        const { submission: existingSubmission }  = await createSubmission({
+        const { submission: existingSubmission } = await createSubmission({
           _id: new ObjectId(),
           meta: createSubmissionMeta({
             isDraft: false,
@@ -1843,14 +1861,16 @@ describe('submissionController', () => {
             creator: user._id,
           }),
         });
-  
+
         await request(app)
           .post(`/api/submissions/bulk-archive`)
           .set('Authorization', authHeaderValue)
           .send({ ids: [existingDraft._id, existingSubmission._id] })
           .expect(409);
 
-        const submission = await db.collection('submissions').findOne({ _id: existingSubmission._id });
+        const submission = await db
+          .collection('submissions')
+          .findOne({ _id: existingSubmission._id });
         const draft = await db.collection('submissions').findOne({ _id: existingDraft._id });
         expect(submission).not.toBeNull();
         expect(draft).not.toBeNull();
@@ -1858,7 +1878,6 @@ describe('submissionController', () => {
         expect(draft.meta.archived).toBe(false);
       });
     });
-
   });
 
   describe('reassignSubmission', () => {
@@ -1878,7 +1897,7 @@ describe('submissionController', () => {
 
     it('returns 409 if the existing submission is a draft', async () => {
       const { createSubmission } = await createSurvey(['string']);
-      const { submission: existingSubmission }  = await createSubmission({
+      const { submission: existingSubmission } = await createSubmission({
         _id: new ObjectId(),
         meta: createSubmissionMeta({
           isDraft: true,
@@ -1893,8 +1912,12 @@ describe('submissionController', () => {
         .send({ group: new ObjectId().toString() })
         .expect(409);
 
-      const submission = await db.collection('submissions').findOne({ _id: existingSubmission._id });
-      const archivedSubmission = await db.collection('submissions').findOne({ 'meta.original': existingSubmission._id });
+      const submission = await db
+        .collection('submissions')
+        .findOne({ _id: existingSubmission._id });
+      const archivedSubmission = await db
+        .collection('submissions')
+        .findOne({ 'meta.original': existingSubmission._id });
       expect(archivedSubmission).toBeNull();
       expect(submission).not.toBeNull();
       expect(submission.meta.archived).toBe(false);
@@ -1918,7 +1941,7 @@ describe('submissionController', () => {
 
     it('returns 409 if any of the existing submissions are drafts', async () => {
       const { createSubmission } = await createSurvey(['string']);
-      const { submission: existingDraft }  = await createSubmission({
+      const { submission: existingDraft } = await createSubmission({
         _id: new ObjectId(),
         meta: createSubmissionMeta({
           isDraft: true,
@@ -1926,7 +1949,7 @@ describe('submissionController', () => {
           creator: user._id,
         }),
       });
-      const { submission: existingSubmission }  = await createSubmission({
+      const { submission: existingSubmission } = await createSubmission({
         _id: new ObjectId(),
         meta: createSubmissionMeta({
           isDraft: false,
@@ -1938,13 +1961,22 @@ describe('submissionController', () => {
       await request(app)
         .post(`/api/submissions/bulk-reassign`)
         .set('Authorization', authHeaderValue)
-        .send({ ids: [existingDraft._id, existingSubmission._id], creator: new ObjectId().toString() })
+        .send({
+          ids: [existingDraft._id, existingSubmission._id],
+          creator: new ObjectId().toString(),
+        })
         .expect(409);
 
-      const submission = await db.collection('submissions').findOne({ _id: existingSubmission._id });
+      const submission = await db
+        .collection('submissions')
+        .findOne({ _id: existingSubmission._id });
       const draft = await db.collection('submissions').findOne({ _id: existingSubmission._id });
-      const archivedSubmission = await db.collection('submissions').findOne({ 'meta.original': existingSubmission._id });
-      const archivedDraft = await db.collection('submissions').findOne({ 'meta.original': existingSubmission._id });
+      const archivedSubmission = await db
+        .collection('submissions')
+        .findOne({ 'meta.original': existingSubmission._id });
+      const archivedDraft = await db
+        .collection('submissions')
+        .findOne({ 'meta.original': existingSubmission._id });
       expect(archivedSubmission).toBeNull();
       expect(archivedDraft).toBeNull();
       expect(submission).not.toBeNull();
@@ -1976,8 +2008,8 @@ describe('submissionController', () => {
         const { submission } = await createSubmission({
           meta: createSubmissionMeta({
             creator: user._id,
-            isDraft: true
-          })
+            isDraft: true,
+          }),
         });
 
         await request(app)
@@ -1986,24 +2018,26 @@ describe('submissionController', () => {
           .send()
           .expect(409);
 
-        const existingSubmission = await db.collection('submissions').findOne({ _id: submission._id });
+        const existingSubmission = await db
+          .collection('submissions')
+          .findOne({ _id: submission._id });
         expect(existingSubmission).not.toBeNull();
       });
     });
-    
+
     describe('DELETE /api/submissions/bulk-delete', () => {
       it('returns 409 when any of the submissions are drafts', async () => {
         const { submission: draft } = await createSubmission({
           meta: createSubmissionMeta({
             creator: user._id,
-            isDraft: true
-          })
+            isDraft: true,
+          }),
         });
         const { submission } = await createSubmission({
           meta: createSubmissionMeta({
             creator: user._id,
-            isDraft: false
-          })
+            isDraft: false,
+          }),
         });
 
         await request(app)
@@ -2012,7 +2046,9 @@ describe('submissionController', () => {
           .send({ ids: [submission._id, draft._id] })
           .expect(409);
 
-        const existingSubmission = await db.collection('submissions').findOne({ _id: submission._id });
+        const existingSubmission = await db
+          .collection('submissions')
+          .findOne({ _id: submission._id });
         const existingDraft = await db.collection('submissions').findOne({ _id: draft._id });
         expect(existingSubmission).not.toBeNull();
         expect(existingDraft).not.toBeNull();

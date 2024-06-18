@@ -140,14 +140,11 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
 });
 
 export const hasSubmissionRights = async (submission, res) => {
-  const [
-    existingSubmission,
-    survey,
-  ] = await Promise.all([
+  const [existingSubmission, survey] = await Promise.all([
     db.collection('submissions').findOne({ _id: new ObjectId(submission._id) }),
     db.collection('surveys').findOne({ _id: new ObjectId(submission.meta.survey.id) }),
   ]);
-  
+
   if (!survey) {
     // survey not found, boom!
     throw boom.notFound(`No survey found: ${submission.meta.survey.id}`);
