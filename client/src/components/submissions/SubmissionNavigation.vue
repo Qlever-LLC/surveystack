@@ -104,10 +104,13 @@ const menu = computed(() => [
   },
 ]);
 
+const isReadyToSubmit = draft => draft.meta.status.some(status => status.type === 'READY_TO_SUBMIT');
+const isUnauthorizedToSubmit = draft => draft.meta.status.some(status => status.type === 'UNAUTHORIZED_TO_SUBMIT');
 const createSubtitle = draft => {
-  const isReadyToSubmit = draft.meta.status.some(status => status.type === 'READY_TO_SUBMIT');
-  return isReadyToSubmit ?
+  return isReadyToSubmit(draft) ?
     'Marked for submission' :
+    isUnauthorizedToSubmit(draft) ?
+    'Unauthorized to submit' :
     `Last modified ${formatDistance(parseISO(draft.meta.dateModified), new Date())} ago`;
 };
 

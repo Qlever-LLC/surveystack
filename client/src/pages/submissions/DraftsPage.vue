@@ -17,7 +17,12 @@
         {{ entity.meta.survey.name }}
       </template>
       <template v-slot:entitySubtitle="{ entity }">
-        {{ createSubtitle(entity) }}
+        <span v-if="isUnauthorizedToSubmit(entity)" @click.stop.capture="openUnauthorizedDialog">
+          {{ createSubtitle(entity) }}
+        </span>
+        <template v-else>
+          {{ createSubtitle(entity) }}
+        </template>
       </template>
       <template v-slot:pagination>
         <a-pagination v-model="paginationPage" :length="paginationLength" color="grey-darken-1" />
@@ -34,6 +39,18 @@
     :loading="deleteDraftIsPending"
     @confirm="handleConfirmDelete"
     @cleanup="resetDeleteDraft"
+  />
+  <confirm-dialog
+    v-model="showUnauthorizedDialog"
+    title="Unauthorized to Submit"
+    :message="[
+      'You attempted to submit this draft but were not authorized. This could be due to the survey\'s permissions changing or you losing access to a group, for example.',
+      'If this has been resolved, you can retry submitting by continuing the draft.',
+      'If you are unable to regain access to submit this draft, you can delete it to remove it from your drafts.',
+    ]"
+    button="Okay"
+    :showCancelButton="false"
+    @confirm="handleConfirmUnauthorized"
   />
 </template>
 <script setup>
@@ -68,6 +85,7 @@ const currentPageDrafts = computed(() =>
     paginationPage.value * PAGINATION_LIMIT,
   )
 );
+const showUnauthorizedDialog = ref(false);
 const showDeleteDialog = ref(false);
 const activeDeleteDraft = ref(null);
 const paginationPage = ref(1);
@@ -87,16 +105,19 @@ const menu = computed(() => [
   {
     title: 'Delete',
     icon: 'mdi-trash-can-outline',
-    action: (e) => () => showDeleteDialogFor(e),
+    action: (e) => () => openDeleteDialogFor(e),
     render: (e) => () => true,
     color: 'red',
   },
 ]);
 
+const isReadyToSubmit = draft => draft.meta.status.some(status => status.type === 'READY_TO_SUBMIT');
+const isUnauthorizedToSubmit = draft => draft.meta.status.some(status => status.type === 'UNAUTHORIZED_TO_SUBMIT');
 const createSubtitle = draft => {
-  const isReadyToSubmit = draft.meta.status.some(status => status.type === 'READY_TO_SUBMIT');
-  return isReadyToSubmit ?
+  return isReadyToSubmit(draft) ?
     'Marked for submission (pending internet connection)' :
+    isUnauthorizedToSubmit(draft) ?
+    'Unauthorized to submit (click to learn more)' :
     `Last modified ${formatDistance(parseISO(draft.meta.dateModified), new Date())} ago`;
 };
 
@@ -107,8 +128,16 @@ const handleConfirmDelete = () => {
   activeDeleteDraft.value = null;
 };
 
-const showDeleteDialogFor = draft => {
+const openDeleteDialogFor = draft => {
   activeDeleteDraft.value = draft;
   showDeleteDialog.value = true;
+};
+
+const handleConfirmUnauthorized = () => {
+  showUnauthorizedDialog.value = false;
+};
+
+const openUnauthorizedDialog = () => {
+  showUnauthorizedDialog.value = true;
 };
 </script>
