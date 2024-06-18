@@ -232,7 +232,6 @@
           @showArchiveModal="state.showArchiveModal = true"
           @reassignment="state.reassignment.showModal = true"
           @resubmit="resubmit(state.selected[0])" />
-        <app-submissions-tree v-if="state.tab === 'Tree' && state.submissions" :submissions="state.submissions" />
         <app-submissions-code v-if="state.tab === 'Raw' && state.submissions" :submissions="state.submissions" />
       </template>
       <template v-slot:pagination>
@@ -280,7 +279,6 @@ import api from '@/services/api.service';
 import appSubmissionsFilterBasic from '@/components/submissions/SubmissionFilterBasic.vue';
 import appSubmissionsFilterAdvanced from '@/components/submissions/SubmissionFilterAdvanced.vue';
 import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTableClientCsv.vue';
-import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
@@ -340,7 +338,7 @@ const state = reactive({
   apiDownloadExpandAllMatricesOptions,
   showAdvancedFilters: false,
   tab: 'List',
-  views: ['List', 'Table', 'Tree', 'Raw'],
+  views: ['List', 'Table', 'Raw'],
   survey: null,
   surveyEntity: null,
   formats: [
