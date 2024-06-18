@@ -7,6 +7,9 @@ import store from '../store';
 const hasSyncDraftsCompleted = ref(false);
 
 const fetchRemoteDrafts = async () => {
+  if (!store.getters['auth/isLoggedIn']) {
+    return [];
+  }
   const { data: { content } } = await api.get('/submissions/drafts/page');
   return content;
 };
@@ -104,13 +107,17 @@ const useDeleteDraft = () => {
   return useMutation({
     networkMode: 'always',
     mutationFn: async (draft) => {
-      const readyToDeleteDraft = toRaw(draft);
-      readyToDeleteDraft.meta.status = [
-        ...readyToDeleteDraft.meta.status,
+      if (!store.getters['auth/isLoggedIn']) {
+        // users without an account cannot persist their drafts to the server, so we know their draft must be in idb.
+        db.deleteSubmission(draft._id);
+        return;
+      }
+      draft.meta.status = [
+        ...draft.meta.status,
         { type: 'READY_TO_DELETE', value: { at: new Date().toISOString() } }
       ];
-      await db.persistSubmission(readyToDeleteDraft);
-      await syncDraft(readyToDeleteDraft);
+      await db.persistSubmission(draft);
+      await syncDraft(draft);
       await db.deleteSubmission(draft._id);
     },
     onSettled: () => {

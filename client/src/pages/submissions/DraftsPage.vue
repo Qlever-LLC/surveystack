@@ -55,7 +55,7 @@
 </template>
 <script setup>
 import BasicList from '@/components/ui/BasicList2.vue';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch, toRaw } from 'vue';
 import { useStore } from 'vuex';
 import formatDistance from 'date-fns/formatDistance';
 import parseISO from 'date-fns/parseISO';
@@ -123,7 +123,7 @@ const createSubtitle = draft => {
 
 const handleConfirmDelete = () => {
   resetDeleteDraft();
-  deleteDraft(activeDeleteDraft.value);
+  deleteDraft(toRaw(activeDeleteDraft.value));
   showDeleteDialog.value = false;
   activeDeleteDraft.value = null;
 };

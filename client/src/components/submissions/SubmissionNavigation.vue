@@ -55,7 +55,7 @@
   />
 </template>
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import parseISO from 'date-fns/parseISO';
@@ -116,7 +116,7 @@ const createSubtitle = draft => {
 
 const handleConfirmDelete = () => {
   resetDeleteDraft();
-  deleteDraft(activeDeleteDraft.value);
+  deleteDraft(toRaw(activeDeleteDraft.value));
   showDeleteDialog.value = false;
   activeDeleteDraft.value = null;
 };
