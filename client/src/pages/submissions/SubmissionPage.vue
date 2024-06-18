@@ -82,7 +82,7 @@ import { createSubmissionFromSurvey, checkAllowedToSubmit, checkAllowedToResubmi
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
-import { useAllDrafts } from '../../queries';
+import { useAllDrafts, useSyncDrafts } from '../../queries';
 import { useResults } from '../../components/ui/results';
 
 export default defineComponent({
@@ -137,6 +137,8 @@ export default defineComponent({
       showApiComposeErrors: false,
     };
     const state = reactive({ ...initialState });
+    const { isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts();
+    const { mutate: syncDrafts } = useSyncDrafts();
 
     const resetComponentState = () => {
       Object.assign(state, initialState);
@@ -158,11 +160,15 @@ export default defineComponent({
       },
     );
 
-    const { isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts();
-    
+    const handleLeave = (next) => (isLeaving) => {
+      if (isLeaving) {
+        syncDrafts();
+      }
+      next(isLeaving);
+    }
     onBeforeRouteUpdate((to, from, next) => {
       if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
-        confirmLeaveDialogRef.value.open(next);
+        confirmLeaveDialogRef.value.open(handleLeave(next));
         return;
       }
       api.removeHeader('x-delegate-to');
@@ -176,7 +182,7 @@ export default defineComponent({
       }
 
       if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
-        confirmLeaveDialogRef.value.open(next);
+        confirmLeaveDialogRef.value.open(handleLeave(next));
         return;
       }
       api.removeHeader('x-delegate-to');
