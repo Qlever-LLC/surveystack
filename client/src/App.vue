@@ -28,6 +28,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useNavigation } from '@/components/navigation';
 import { autoJoinWhiteLabelGroup } from '@/utils/memberships';
 import { useSyncDrafts } from './queries';
+import { focusManager } from '@tanstack/vue-query';
 
 const store = useStore();
 const router = useRouter();
@@ -63,6 +64,10 @@ const state = reactive({
 });
 
 const { mutate: syncDrafts } = useSyncDrafts();
+
+focusManager.subscribe((isVisible) => {
+  syncDrafts();
+});
 
 onMounted(async () => {
   domainHandler.install(store);
