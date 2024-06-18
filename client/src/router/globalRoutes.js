@@ -196,20 +196,6 @@ export default [
     },
   },
   {
-    path: '/app/info',
-    alias: '/about',
-    name: 'app-info',
-    components: {
-      header: AppHeader,
-      main: AppInfo,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
-    },
-  },
-  {
     path: '/kit/*',
     name: 'kit',
     components: {

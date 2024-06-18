@@ -67,7 +67,7 @@ import ConfirmDialog from '../shared/ConfirmDialog.vue';
 const props = defineProps({
   // group id from route param
   id: String,
-})
+});
 
 const router = useRouter();
 const route = useRoute();
@@ -82,6 +82,7 @@ const {
 const groupDrafts = computed(
   () => allDrafts.value.filter(draft => draft.meta.group?.id === props.id).slice(0, 2)
 );
+
 const showDeleteDialog = ref(false);
 const activeDeleteDraft = ref(null);
 const menu = computed(() => [

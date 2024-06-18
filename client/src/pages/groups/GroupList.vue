@@ -13,7 +13,8 @@
           action: (entity) => (mobile ? `/groups/${entity._id}` : `/groups/${entity._id}/submissions`),
           color: 'green',
         },
-      ]">
+      ]"
+      @updateSearch="updateSearch">
       <template v-slot:title>
         <template v-if="props.scope === 'user'">
           <a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups
@@ -66,14 +67,18 @@ const { isWhitelabel, getWhitelabelPartner } = useGroup();
 
 const state = reactive({
   entities: [],
+  filterText: '',
+  filteredEntities: computed(() => {
+    return state.entities.filter((entity) => entity.name.toLowerCase().indexOf(state.filterText.toLowerCase()) > -1);
+  }),
   pagedEntities: computed(() => {
     const startIndex = (state.paginationPage - 1) * PAGINATION_LIMIT;
     const endIndex = startIndex + PAGINATION_LIMIT;
-    return state.entities.slice(startIndex, endIndex);
+    return state.filteredEntities.slice(startIndex, endIndex);
   }),
   paginationPage: 1,
   paginationLength: computed(() => {
-    return Math.ceil(state.entities.length / PAGINATION_LIMIT);
+    return Math.ceil(state.filteredEntities.length / PAGINATION_LIMIT);
   }),
   showArchived: false,
   loading: false,
@@ -122,5 +127,10 @@ function rootDir() {
 function skipAuth() {
   state.showAuthSelector = false;
   router.push({ query: null });
+}
+
+function updateSearch(filterText) {
+  state.filterText = filterText;
+  state.paginationPage = 1;
 }
 </script>

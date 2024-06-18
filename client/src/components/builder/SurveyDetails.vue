@@ -1,7 +1,8 @@
 <template>
   <a-card>
-    <a-card-title class="d-block pb-0">
+    <a-card-title class="d-block py-0">
       <div class="d-flex">
+        <AppNavigationControl class="align-self-center mr-2 ml-n4 mt-n4" />
         <survey-name-editor v-model="value.name" />
         <a-spacer />
         <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
@@ -230,6 +231,7 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AppNavigationControl from '@/components/AppNavigationControl.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -290,6 +292,7 @@ export default {
     },
   },
   components: {
+    AppNavigationControl,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,

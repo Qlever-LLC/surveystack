@@ -1,5 +1,4 @@
 import AppHeader from '@/components/AppHeader.vue';
-import ResourceList from '@/pages/resources/ResourceList.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
 
@@ -35,11 +34,5 @@ export default [
     path: '/membership-integrations/:id/edit',
     name: 'membership-integrations-edit',
     components: getComponents(MembershipIntegrationEdit),
-  },
-  // Resources
-  {
-    path: '/resources',
-    name: 'resources-list',
-    components: getComponents(ResourceList),
   },
 ];

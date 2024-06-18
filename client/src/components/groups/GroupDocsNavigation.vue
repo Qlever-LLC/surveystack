@@ -1,4 +1,5 @@
 <template>
+  <app-info v-model="state.showAppInfo" />
   <a-list dense class="mt">
     <a-list-item class="pa-0">
       <a-expansion-panels
@@ -32,20 +33,19 @@
                 class="pa-0 text-white">
                 <a-list-item-title class="text-white">SurveyStack Help</a-list-item-title>
               </a-list-item>
-              <v-list-item
+              <a-list-item
                 href="https://www.surveystack.io"
                 target="_blank"
                 prepend-icon="mdi-information-outline"
                 class="pa-0 text-white">
                 <a-list-item-title class="text-white">About</a-list-item-title>
-              </v-list-item>
-              <v-list-item
-                to="/app/info"
-                target="_blank"
+              </a-list-item>
+              <a-list-item
+                @click="state.showAppInfo = true"
                 prepend-icon="mdi-information-outline"
                 class="pa-0 text-white">
                 <a-list-item-title class="text-white">Version {{ lcl.shortHash }}</a-list-item-title>
-              </v-list-item>
+              </a-list-item>
             </a-list>
           </a-expansion-panel-text>
         </a-expansion-panel>
@@ -58,6 +58,8 @@ import { useGroup } from '@/components/groups/group';
 import { reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+import AppInfo from '@/pages/app/AppInfo.vue';
+
 const route = useRoute();
 const { getActiveGroup } = useGroup();
 const lcl = JSON.parse(process.env.VUE_APP_LCL);
@@ -66,6 +68,7 @@ const expanded = ref(false);
 
 const state = reactive({
   docs: [],
+  showAppInfo: false,
 });
 
 initData();

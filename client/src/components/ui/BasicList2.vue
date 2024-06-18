@@ -8,7 +8,7 @@
         <a-col v-else class="flex-grow-0">
           {{ title }}
         </a-col>
-        <a-col class="flex-grow-1 pl-0" :class="mobile ? 'text-center' : 'text-center'">
+        <a-col class="flex-grow-1 pl-0 text-center" style="white-space: normal; min-width: 50%">
           <slot name="title" />
         </a-col>
         <a-col class="flex-grow-0">
@@ -154,10 +154,6 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
-  },
-  page: {
-    type: Number,
-    required: false,
   },
   groupStyle: {
     type: Boolean,

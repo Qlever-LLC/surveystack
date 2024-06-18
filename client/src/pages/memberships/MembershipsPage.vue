@@ -1,5 +1,5 @@
 <template>
-  <membership-new v-model="state.showNewMembership"></membership-new>
+  <membership-new v-model="state.showNewMembership" @reload="initData()" />
   <a-container class="basicListContainer">
     <basic-list
       listType="row"
@@ -25,7 +25,7 @@
           {{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}
         </template>
         <template v-else>
-          <a-icon v-if="entity.role === 'admin'" class="mr-2">mdi-crown-outline</a-icon>
+          <a-icon v-if="entity.role === 'admin'" class="pb-1">mdi-crown-outline</a-icon>
           {{ entity.user.name }}
         </template>
       </template>

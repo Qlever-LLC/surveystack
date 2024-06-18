@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="bg-background rounded mt-5">
     <span class="text-secondary overline">{{ entity._id }}</span>
     <h1>Edit Membership</h1>
 

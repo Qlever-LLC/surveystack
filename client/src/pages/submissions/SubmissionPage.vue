@@ -101,6 +101,14 @@ export default defineComponent({
     submissionId: {
       required: false,
       type: String,
+    },
+    surveyId: {
+      required: true,
+      type: String,
+    },
+    submitAsUserId: {
+      required: false,
+      type: String,
     }
   },
   setup(props) {
@@ -250,10 +258,9 @@ export default defineComponent({
     };
     async function init() {
       state.loading = true;
-      const { surveyId } = route.params;
 
       try {
-        state.survey = (await api.get(`/surveys/${surveyId}?version=latest`)).data;
+        state.survey = (await api.get(`/surveys/${props.surveyId}?version=latest`)).data;
       } catch (error) {
         state.hasError = true;
         state.errorMessage = 'Survey not found.';
@@ -297,11 +304,10 @@ export default defineComponent({
 
       // If the user is on the group-survey-submissions-new route, initialize a new submission and then redirect to the group-survey-submissions-edit route for that submission
       if (route.name === 'group-survey-submissions-new') {
-        const { submitAsUserId } = route.query;
         const createSubmissionConfig = { survey: state.survey, version: state.survey.latestVersion };
-        if (submitAsUserId) {
+        if (props.submitAsUserId) {
           try {
-            const { data: submitAsUser } = await api.get(`/users/${submitAsUserId}`);
+            const { data: submitAsUser } = await api.get(`/users/${props.submitAsUserId}`);
             createSubmissionConfig.submitAsUser = submitAsUser;
           } catch (error) {
             state.hasError = true;

@@ -217,7 +217,13 @@ export default [
       navigation: AppNavigationGroup,
       main: Builder,
     },
-    props: { navigation: true },
+    props: {
+      main: (route) => ({
+        id: route.params.id,
+        editMode: false,
+      }),
+      navigation: true,
+    },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -228,7 +234,14 @@ export default [
       navigation: AppNavigationGroup,
       main: Builder,
     },
-    props: { navigation: true },
+    props: {
+      main: (route) => ({
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+        editMode: true,
+      }),
+      navigation: true,
+    },
     beforeEnter: groupAdminGuard,
   },
   {
@@ -239,7 +252,13 @@ export default [
       navigation: AppNavigationGroup,
       main: ResultList,
     },
-    props: { navigation: true },
+    props: {
+      main: (route) => ({
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+      }),
+      navigation: true,
+    },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions/new',
@@ -250,8 +269,13 @@ export default [
       main: SubmissionPage,
     },
     props: {
+      main: (route) => ({
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+        submitAsUserId: route.query.submitAsUserId,
+        routeAction: 'new',
+      }),
       navigation: true,
-      main: { routeAction: 'new' },
     },
   },
   {
@@ -266,7 +290,9 @@ export default [
       navigation: true,
       main: route => ({
         routeAction: 'edit',
-        submissionId: route.params.submissionId
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+        submissionId: route.params.submissionId,
       }),
     },
   },
