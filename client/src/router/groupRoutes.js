@@ -230,6 +230,12 @@ export default [
       navigation: AppNavigationGroup,
       main: ResultList,
     },
+    props: {
+      main: (route) => ({
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+      }),
+    },
   },
   {
     path: '/groups/:id/surveys/:surveyId/submissions/new',
@@ -240,9 +246,11 @@ export default [
       main: SubmissionPage,
     },
     props: {
-      main: {
-        start: true,
-      },
+      main: (route) => ({
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+        submitAsUserId: route.query.submitAsUserId,
+      }),
     },
   },
   {
@@ -252,6 +260,13 @@ export default [
       header: AppHeader,
       navigation: AppNavigationGroup,
       main: SubmissionPage,
+    },
+    props: {
+      main: (route) => ({
+        id: route.params.id,
+        surveyId: route.params.surveyId,
+        submissionId: route.params.submissionId,
+      }),
     },
   },
 ];
