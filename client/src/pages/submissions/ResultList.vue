@@ -248,7 +248,7 @@
               v-model="state.pageSize"
               @update:modelValue="changedPaginationSize" />
           </a-col>
-          <a-col cols="10">
+          <a-col>
             <a-pagination
               style="min-width: 231px"
               class="ml-0"
