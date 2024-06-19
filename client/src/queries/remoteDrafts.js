@@ -1,5 +1,5 @@
 import { useQueryClient, useQuery, useMutation, useIsMutating } from '@tanstack/vue-query';
-import { ref, toRaw } from 'vue';
+import { ref } from 'vue';
 import api from '../services/api.service';
 import * as db from '../store/db';
 import store from '../store';
@@ -14,6 +14,14 @@ const fetchRemoteDrafts = async () => {
   return content;
 };
 
+const prefetchRemoteDrafts = (queryClient) => {
+  return queryClient.prefetchQuery({
+    queryKey: ['remoteDrafts'],
+    queryFn: fetchRemoteDrafts,
+    networkMode: 'offlineFirst',
+  });
+}
+
 const useRemoteDrafts = () => {
   const { isPending, isError, data } = useQuery({
     queryKey: ['remoteDrafts'],
@@ -21,6 +29,8 @@ const useRemoteDrafts = () => {
     queryFn: fetchRemoteDrafts,
     networkMode: 'offlineFirst',
     enabled: hasSyncDraftsCompleted,
+    staleTime: 1000 * 60,
+    initialDataUpdatedAt: 0,
   });
 
   return { isPending, isError, data };
@@ -98,6 +108,13 @@ const useSyncDrafts = () => {
       if (!isSyncDraftsPending) {
         mutation.mutate();
       }
+    },
+    mutateAsync: () => {
+      const isSyncDraftsPending = isMutating.value > 0;
+      if (!isSyncDraftsPending) {
+        return mutation.mutateAsync();
+      }
+      return Promise.resolve();
     }
   };
 };
@@ -131,4 +148,5 @@ export {
   useRemoteDrafts,
   useSyncDrafts,
   useDeleteDraft,
+  prefetchRemoteDrafts,
 };
