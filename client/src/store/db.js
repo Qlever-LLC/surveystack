@@ -81,8 +81,9 @@ const migrateSubmissions = async () => {
   const drafts = await getAllSubmissions();
 
   const isResubmissionDraft = (draft) => draft.meta.dateSubmitted && !draft.meta.isDraft;
-  const resubmissionDrafts = drafts.filter(isResubmissionDraft);
-  const remainingDrafts = drafts.filter((draft) => !isResubmissionDraft(draft));
+  const isProxyDraft = (draft) => draft.meta.submitAsUser;
+  const draftsToDelete = drafts.filter(draft => isResubmissionDraft(draft) || isProxyDraft(draft));
+  const remainingDrafts = drafts.filter((draft) => !(isResubmissionDraft(draft) || isProxyDraft(draft)));
 
   const upgradeSubmissionFromVXtoV4 = (submission) => {
     submission.meta.isDraft = true;
@@ -91,7 +92,7 @@ const migrateSubmissions = async () => {
     return submission;
   };
 
-  const removals = resubmissionDrafts.map((draft) => removeFromIndexedDB(stores.SUBMISSIONS, draft._id));
+  const removals = draftsToDelete.map((draft) => removeFromIndexedDB(stores.SUBMISSIONS, draft._id));
   const updates = remainingDrafts.map(upgradeSubmissionFromVXtoV4).map(persistSubmission);
 
   return Promise.all([...removals, ...updates]);

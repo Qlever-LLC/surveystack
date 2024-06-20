@@ -112,8 +112,10 @@
         <slot name="noValue" />
       </div>
     </a-card-text>
-    <span v-if="$slots.pagination">
-      <slot name="pagination" />
+    <span v-if="$slots.pagination" class="slotPagination">
+      <div class="divPagination">
+        <slot name="pagination" />
+      </div>
     </span>
     <slot />
   </a-card>
@@ -280,5 +282,32 @@ function defaultFilter() {
 .light-border {
   border-bottom: 1px solid lightgray;
   border-top: 1px solid lightgray;
+}
+
+@media (330px <= width <= 400px) {
+  .divPagination {
+    display: contents;
+  }
+}
+@media (264px <= width <= 329px) {
+  .slotPagination {
+    display: flex;
+    justify-content: center;
+  }
+}
+@media (max-width: 400px) {
+  :deep(.divPagination) li {
+    margin: 0;
+  }
+}
+@media (274px <= width <= 329px) {
+  .divPagination {
+    width: 70vw !important;
+  }
+}
+@media (264px <= width <= 273px) {
+  .divPagination {
+    width: 75vw !important;
+  }
 }
 </style>

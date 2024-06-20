@@ -189,8 +189,8 @@ async function submit() {
   try {
     state.isSubmitting = true;
     await api.post(url, data);
-    closeDialog();
     emit('reload');
+    closeDialog();
   } catch (err) {
     await store.dispatch('feedback/add', err.response.data.message);
   } finally {
