@@ -198,9 +198,12 @@ async function submit() {
   }
 }
 
-watch(state.invitationMethod, (newValue) => {
-  localStorage[LS_MEMBER_INVITATION_METHOD] = newValue[0];
-});
+watch(
+  () => state.invitationMethod,
+  (newValue) => {
+    localStorage[LS_MEMBER_INVITATION_METHOD] = newValue[0];
+  }
+);
 
 watch(
   () => props.modelValue,
