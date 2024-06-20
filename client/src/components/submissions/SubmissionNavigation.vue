@@ -13,7 +13,7 @@
         {{ entity.meta.survey.name }}
       </template>
       <template v-slot:entitySubtitle v-if="entity.meta.dateCreated">
-        {{ createSubtitle(entity) }} ago
+        {{ createSubtitle(entity) }}
       </template>
       <template v-slot:entitySubtitle v-else></template>
     </list-item-card>

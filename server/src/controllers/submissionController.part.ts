@@ -93,8 +93,12 @@ const syncDraft = async (req: Request, res: Response) => {
     return res.status(200).send();
   }
 
-  if (submission.meta.status.some((status) => status.type === 'READY_TO_DELETE')) {
+  const readyToDeleteStatus = submission.meta.status.find(
+    (status) => status.type === 'READY_TO_DELETE'
+  );
+  if (readyToDeleteStatus) {
     if (existingSubmission) {
+      submission.meta.dateModified = new Date(readyToDeleteStatus.value.at);
       submission.meta.status = submission.meta.status.filter(
         (status) => status.type !== 'READY_TO_DELETE'
       );

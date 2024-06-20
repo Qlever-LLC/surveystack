@@ -29,7 +29,7 @@ const useRemoteDrafts = () => {
     queryFn: fetchRemoteDrafts,
     networkMode: 'offlineFirst',
     enabled: hasSyncDraftsCompleted,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 5,
     initialDataUpdatedAt: 0,
   });
 
