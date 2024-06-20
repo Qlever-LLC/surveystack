@@ -354,10 +354,8 @@ export default defineComponent({
           remoteSubmissionReady,
         ]);
         if (remoteSubmissionReadySettled.status === 'fulfilled') {
-          console.log('found remote submission...');
           state.submission = remoteSubmissionReadySettled.value.data;
         } else {
-          console.log('no remote submission, finding draft...')
           state.submission = toRaw(allDraftsData.value.find(draft => draft._id === props.submissionId));
         }
 
@@ -370,7 +368,6 @@ export default defineComponent({
       }
 
       if (isResubmission()) {
-        console.log('isResubmission')
         const allowedToResubmit = checkAllowedToResubmit(
           state.submission,
           store.getters['memberships/memberships'],
@@ -415,7 +412,6 @@ export default defineComponent({
       // Set proxy header if resubmit by proxy or admin.
       // Otherwise, remove it
       if (isProxySubmission()) {
-        console.log('is proxy submission...');
         api.setHeader('x-delegate-to', state.submission.meta.submitAsUser._id);
       } else {
         api.removeHeader('x-delegate-to');

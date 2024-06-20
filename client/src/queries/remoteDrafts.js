@@ -63,10 +63,8 @@ const useSyncDrafts = () => {
         // users without an account cannot persist their drafts to the server.
         return { draftsSynced: false };
       }
-      console.log('syncDraftsMutation mutationFn...');
       const user = store.getters['auth/user'];
       const localDrafts = (await db.getAllSubmissions()).filter(draft => draft.meta.creator === user._id);
-      console.log({ localDraftsBefore: localDrafts })
       if (localDrafts.length === 0) {
         return { draftsSynced: false };
       }
@@ -76,23 +74,12 @@ const useSyncDrafts = () => {
       const successfulSyncs = syncDraftRequests
         .filter(result => result.status === 'fulfilled')
         .map(result => result.value);
-      const failedSyncs = syncDraftRequests
-        .filter(result => result.status === 'rejected')
-        .map(result => result.reason);
-      console.log({
-        successfulSyncs,
-        failedSyncs,
-      });
-      console.log('Removing successfully synced drafts from idb...');
       await Promise.allSettled(
         successfulSyncs.map(({ id }) => db.deleteSubmission(id))
       )
-      const localDraftsAfter = (await db.getAllSubmissions()).filter(draft => draft.meta.creator === user._id);
-      console.log({ localDraftsAfter });
       return { draftsSynced: true };
     },
     onSettled: ({ draftsSynced } = {}) => {
-      console.log('syncDraftsMutation onSettled...');
       hasSyncDraftsCompleted.value = true;
       if (draftsSynced) {
         queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
