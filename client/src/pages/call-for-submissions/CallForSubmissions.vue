@@ -1,27 +1,56 @@
 <template>
-  <a-dialog
+  <a-dialog v-model="state.showConfirmDialog" max-width="500">
+    <a-card>
+      <a-card-title class="headline">Confirmation</a-card-title>
+      <a-card-text>
+        <p class="body-1">
+          You are about to send an E-mail to {{ state.selectedMembers.length }}
+          {{ state.selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
+        </p>
+        <a-checkbox label="Also send a copy to myself" v-model="state.copy" />
+      </a-card-text>
+      <a-card-actions class="d-flex justify-end">
+        <a-btn @click="state.showConfirmDialog = false" variant="text">Cancel</a-btn>
+        <a-btn color="primary" :loading="state.isSubmitting" @click="submit">SEND NOW</a-btn>
+      </a-card-actions>
+    </a-card>
+  </a-dialog>
+  <result-dialog
+    v-model="state.showSubmitResult"
+    :items="state.submitResults"
+    title="Call for Responses"
+    @close="state.showSubmitResult = false" />
+
+  <confirm-membership-dialog
+    v-if="state.memberToConfirm"
+    :membership="state.memberToConfirm"
+    @confirmed="
+      state.memberToConfirm = null;
+      loadMembers;
+    "
+    @cancel="state.memberToConfirm = null" />
+  <app-dialog
     :modelValue="props.modelValue"
     @update:modelValue="closeDialog"
-    @click:outside="closeDialog"
-    :max-width="mobile ? '100%' : '75%'"
-    scrollable>
-    <a-card class="my-2">
-      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: normal">
-        <span class="d-flex align-start"><a-icon class="mr-2">mdi-bullhorn</a-icon>Call for Responses</span>
-        <a-btn @click="closeDialog" variant="flat"><a-icon>mdi-close</a-icon></a-btn>
-      </a-card-title>
-      <a-card-text class="pb-0" style="overflow: revert !important">
-        <a-text-field v-model="state.subject" label="Subject" variant="filled" />
-        <a-textarea rows="7" v-model="state.body" label="Message" hide-details />
-        <div v-if="showMissingMagicLinkWarning" class="mt-2 text-error">
-          Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
-        </div>
-        <div class="d-flex justify-end align-center mt-3">
-          <span v-if="!submittable" class="mr-2">Select at least one member below</span>
-          <a-btn variant="text" @click="closeDialog">Cancel</a-btn>
-          <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send...</a-btn>
-        </div>
-      </a-card-text>
+    @close="closeDialog"
+    scrollable
+    textRevertOverflow>
+    <template v-slot:title>
+      <span class="d-flex align-start"><a-icon class="mr-2">mdi-bullhorn</a-icon>Call for Responses</span>
+    </template>
+    <template v-slot:text>
+      <a-text-field v-model="state.subject" label="Subject" variant="filled" />
+      <a-textarea rows="7" v-model="state.body" label="Message" hide-details />
+      <div v-if="showMissingMagicLinkWarning" class="mt-2 text-error">
+        Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.
+      </div>
+      <div class="d-flex justify-end align-center mt-3">
+        <span v-if="!submittable" class="mr-2">Select at least one member below</span>
+        <a-btn variant="text" @click="closeDialog">Cancel</a-btn>
+        <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send...</a-btn>
+      </div>
+    </template>
+    <template v-slot:more>
       <a-card-title class="pt-0">Select members</a-card-title>
       <a-card-subtitle>{{ state.selectedMembers.length }} of {{ activeMembers.length }} selected</a-card-subtitle>
       <a-card-text class="pt-0" style="min-height: 150px">
@@ -39,52 +68,22 @@
           </template>
         </a-data-table>
       </a-card-text>
-    </a-card>
-
-    <confirm-membership-dialog
-      v-if="state.memberToConfirm"
-      :membership="state.memberToConfirm"
-      @confirmed="
-        state.memberToConfirm = null;
-        loadMembers;
-      " />
-
-    <a-dialog v-model="state.showConfirmDialog" max-width="500">
-      <a-card>
-        <a-card-title class="headline">Confirmation</a-card-title>
-        <a-card-text>
-          <p class="body-1">
-            You are about to send an E-mail to {{ state.selectedMembers.length }}
-            {{ state.selectedMembers.length === 1 ? 'member' : 'members' }}.<br />Are you sure you want to proceed?
-          </p>
-          <a-checkbox label="Also send a copy to myself" v-model="state.copy" />
-        </a-card-text>
-        <a-card-actions class="d-flex justify-end">
-          <a-btn @click="state.showConfirmDialog = false" variant="text">Cancel</a-btn>
-          <a-btn color="primary" :loading="state.isSubmitting" @click="submit">SEND NOW</a-btn>
-        </a-card-actions>
-      </a-card>
-    </a-dialog>
-    <result-dialog
-      v-model="state.showSubmitResult"
-      :items="state.submitResults"
-      title="Call for Responses"
-      @close="state.showSubmitResult = false" />
-  </a-dialog>
+    </template>
+  </app-dialog>
 </template>
 
 <script setup>
 import { computed, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { useDisplay } from 'vuetify';
 
 import confirmMembershipDialog from '@/components/shared/ConfirmMembershipDialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
 
-const { mobile } = useDisplay();
+import appDialog from '@/components/ui/Dialog2.vue';
+
 const store = useStore();
 const route = useRoute();
 

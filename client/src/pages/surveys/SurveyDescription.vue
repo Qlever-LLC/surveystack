@@ -1,38 +1,45 @@
 <template>
-  <a-dialog
+  <app-dialog
     v-if="state.loading && props.modelValue"
     :modelValue="props.modelValue"
     @update:modelValue="closeDialog"
-    @click:outside="closeDialog"
-    style="height: 75vh; width: 75vw">
-    <span class="d-flex justify-center">
-      <a-progress-circular :size="50" />
-    </span>
-  </a-dialog>
-  <a-dialog
+    @close="closeDialog"
+    height="75vh"
+    width="75vw">
+    <template v-slot:text>
+      <span class="d-flex justify-center align-center" style="width: 100%; height: 100%">
+        <a-progress-circular :size="50" />
+      </span>
+    </template>
+  </app-dialog>
+  <app-dialog
     v-else-if="state.survey"
     :modelValue="props.modelValue"
     @update:modelValue="closeDialog"
-    @click:outside="closeDialog"
-    :max-width="mobile ? '100%' : '75%'"
+    @close="closeDialog"
     scrollable>
-    <a-card class="my-2">
-      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: pre-wrap">
-        <span class="d-flex align-start"><a-icon class="mr-2">mdi-book-open</a-icon>{{ state.survey.name }}</span>
-        <a-btn @click="closeDialog" variant="flat"><a-icon>mdi-close</a-icon></a-btn>
-      </a-card-title>
-      <a-card-subtitle v-if="state.survey.meta.isLibrary" style="width: fit-content">
-        <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
-        {{ getCountSubmissions }}
-        <a-tooltip right activator="parent">Number of submission using this</a-tooltip>
-      </a-card-subtitle>
-      <a-card-subtitle style="white-space: normal">
-        <small class="text-grey">{{ state.survey._id }}</small>
-        <a-chip small variant="outlined" color="grey" class="font-weight-medium ml-2">
-          Version {{ state.survey.latestVersion }}
-        </a-chip>
-      </a-card-subtitle>
-      <a-card-text style="overflow: auto !important; padding-bottom: 1rem; min-height: 150px">
+    <template v-slot:title>
+      <span class="d-flex align-start"><a-icon class="mr-2">mdi-book-open</a-icon>{{ state.survey.name }}</span>
+    </template>
+
+    <template v-slot:subtitle>
+      <span class="d-flex flex-column">
+        <span v-if="state.survey.meta.isLibrary" style="width: fit-content">
+          <a-icon class="mr-1">mdi-note-multiple-outline</a-icon>
+          {{ getCountSubmissions }}
+          <a-tooltip right activator="parent">Number of submission using this</a-tooltip>
+        </span>
+        <span style="white-space: normal">
+          <small class="text-grey">{{ state.survey._id }}</small>
+          <a-chip small variant="outlined" color="grey" class="font-weight-medium ml-2">
+            Version {{ state.survey.latestVersion }}
+          </a-chip>
+        </span>
+      </span>
+    </template>
+
+    <template v-slot:text>
+      <span style="overflow: auto !important; padding-bottom: 1rem; min-height: 150px">
         <a-row>
           <a-col v-if="state.survey.meta.isLibrary">
             <h4>Description</h4>
@@ -61,23 +68,22 @@
               :modelValue="state.survey.revisions[state.survey.revisions.length - 1].controls" />
           </a-col>
         </a-row>
-      </a-card-text>
-    </a-card>
-  </a-dialog>
+      </span>
+    </template>
+  </app-dialog>
 </template>
 
 <script setup>
 import { reactive, computed, watch } from 'vue';
-import { useDisplay } from 'vuetify';
 import { useStore } from 'vuex';
 
 import api from '@/services/api.service';
 import { get } from 'lodash';
 
+import appDialog from '@/components/ui/Dialog2.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 
 const store = useStore();
-const { mobile } = useDisplay();
 
 const props = defineProps({
   modelValue: {
