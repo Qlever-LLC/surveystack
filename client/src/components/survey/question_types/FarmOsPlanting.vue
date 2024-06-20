@@ -1,34 +1,39 @@
 <template>
-  <div class="farm-os-planting">
-    <div class="d-flex justify-space-between flex-wrap">
-      <app-control-label
-        :value="control.label"
-        :redacted="redacted"
-        :required="required"
-        :initializable="control.options.initialize && control.options.initialize.enabled"
-        :is-modified="meta && !!meta.dateModified"
-        @initialize="initialize" />
-      <a-btn rounded small variant="text" color="primary" class="align-self-center mb-3" @click="clearSelection">
-        clear selection
-      </a-btn>
-    </div>
-    <app-control-hint :value="control.hint" />
-
-    <a-progress-circular v-if="loading" color="secondary" class="my-8" />
-
-    <a-list
-      v-if="!loading"
-      :disabled="loading"
-      style="overflow: auto"
-      :selected="listSelection"
-      :selectStrategy="!!control.options.hasMultipleSelections ? 'classic' : 'single-leaf'"
-      @update:selected="localChange">
-      <a-list-item
-        v-for="(item, idx) in transformed"
-        :value="hashItem(item)"
-        :key="`item_${idx}`"
-        dense
-        :disabled="(!control.options.hasMultipleSelections && item.value.isField) || item.value?.isNotClickable">
+  <app-control-label
+    :value="control.label"
+    :redacted="redacted"
+    :required="required"
+    :initializable="control.options.initialize && control.options.initialize.enabled"
+    :is-modified="meta && !!meta.dateModified"
+    @initialize="initialize" />
+  <a-select
+    :disabled="loading"
+    :modelValue="getValue"
+    @update:modelValue="localChange"
+    :items="transformed"
+    item-title="label"
+    item-value="value"
+    variant="outlined"
+    :label="control.hint"
+    :multiple="control.options.hasMultipleSelections"
+    @keyup.enter.prevent="submit"
+    :loading="loading"
+    color="focus"
+    clearable
+    :selectionSlot="!control.options.hasMultipleSelections"
+    :chipSlot="control.options.hasMultipleSelections"
+    itemSlot
+    cssFlexWrap>
+    <template v-slot:selection="{ props, item }">
+      <span v-bind="props" v-html="item.raw.label" />
+    </template>
+    <template v-slot:chip="{ props, item }">
+      <a-chip v-bind="props" closable style="margin-top: -3px">
+        <span>{{ item.raw.label }}</span>
+      </a-chip>
+    </template>
+    <template v-slot:item="{ props, item, index }">
+      <a-list-item v-bind="props" :title="undefined" :key="`item_${index}`">
         <template v-slot:prepend="{ isSelected }">
           <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
             <a-checkbox
@@ -40,17 +45,17 @@
               <a-radio :value="true" color="focus" />
             </a-radio-group>
           </a-list-item-action>
-          <a-list-item-title :class="item.value.isField && idx > 0 ? 'mt-4' : ''">
-            {{ item.label }}
+          <a-list-item-title>
+            {{ item.raw.label }}
             <a-list-item-subtitle v-if="item.value.isField">
               {{ item.value.farmName }}
             </a-list-item-subtitle>
           </a-list-item-title>
         </template>
       </a-list-item>
-    </a-list>
-    <app-control-more-info :value="control.moreInfo" />
-  </div>
+    </template>
+  </a-select>
+  <app-control-more-info :value="control.moreInfo" />
 </template>
 
 <script>
@@ -132,9 +137,6 @@ export default {
       } else {
         this.onChange(assets);
       }
-    },
-    clearSelection() {
-      this.onChange(null);
     },
   },
 };

@@ -1,48 +1,46 @@
 <template>
-  <div class="farm-os-field">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-      :initializable="control.options.initialize && control.options.initialize.enabled"
-      :is-modified="meta && !!meta.dateModified"
-      @initialize="initialize" />
-    <a-select
-      :disabled="loading"
-      :modelValue="getValue"
-      @update:modelValue="onChange"
-      :items="farms || []"
-      item-title="label"
-      item-value="value"
-      variant="outlined"
-      :label="control.hint"
-      :multiple="control.options.hasMultipleSelections"
-      @keyup.enter.prevent="submit"
-      :loading="loading"
-      color="focus"
-      clearable
-      :selectionSlot="!control.options.hasMultipleSelections"
-      :chipSlot="control.options.hasMultipleSelections"
-      itemSlot
-      cssFlexWrap>
-      <template v-slot:selection="{ props, item }">
-        <span v-bind="props" v-html="item.raw.label" />
-      </template>
-      <template v-slot:chip="{ props, item }">
-        <a-chip v-bind="props" closable style="margin-top: -3px">
-          <span>{{ item.raw.label }}</span>
-        </a-chip>
-      </template>
-      <template v-slot:item="{ props, item }">
-        <a-list-item v-bind="props" :title="undefined">
-          <a-list-item-title v-html="item.raw.label" />
-          <a-list-item-subtitle v-html="item.raw.value.url" />
-        </a-list-item>
-      </template>
-    </a-select>
+  <app-control-label
+    :value="control.label"
+    :redacted="redacted"
+    :required="required"
+    :initializable="control.options.initialize && control.options.initialize.enabled"
+    :is-modified="meta && !!meta.dateModified"
+    @initialize="initialize" />
+  <a-select
+    :disabled="loading"
+    :modelValue="getValue"
+    @update:modelValue="onChange"
+    :items="farms || []"
+    item-title="label"
+    item-value="value"
+    variant="outlined"
+    :label="control.hint"
+    :multiple="control.options.hasMultipleSelections"
+    @keyup.enter.prevent="submit"
+    :loading="loading"
+    color="focus"
+    clearable
+    :selectionSlot="!control.options.hasMultipleSelections"
+    :chipSlot="control.options.hasMultipleSelections"
+    itemSlot
+    cssFlexWrap>
+    <template v-slot:selection="{ props, item }">
+      <span v-bind="props" v-html="item.raw.label" />
+    </template>
+    <template v-slot:chip="{ props, item }">
+      <a-chip v-bind="props" closable style="margin-top: -3px">
+        <span>{{ item.raw.label }}</span>
+      </a-chip>
+    </template>
+    <template v-slot:item="{ props, item }">
+      <a-list-item v-bind="props" :title="undefined">
+        <a-list-item-title v-html="item.raw.label" />
+        <a-list-item-subtitle v-html="item.raw.value.url" />
+      </a-list-item>
+    </template>
+  </a-select>
 
-    <app-control-more-info :value="control.moreInfo" />
-  </div>
+  <app-control-more-info :value="control.moreInfo" />
 </template>
 
 <script>
