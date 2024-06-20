@@ -182,20 +182,6 @@ export default [
     },
   },
   {
-    path: '/farmos/profile',
-    name: 'farmos-profile',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-      main: FarmOSProfile,
-    },
-    props: {
-      header: {
-        showLogo: true,
-      },
-    },
-  },
-  {
     path: '/kit/*',
     name: 'kit',
     components: {
