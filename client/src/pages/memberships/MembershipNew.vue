@@ -1,105 +1,97 @@
 <template>
-  <a-dialog
-    v-if="state.entity"
-    :modelValue="props.modelValue"
-    @update:modelValue="closeDialog"
-    @click:outside="closeDialog"
-    :max-width="mobile ? '100%' : '75%'">
-    <a-card color="background">
-      <a-card-title class="mt-4 d-flex align-start justify-space-between" style="white-space: pre-wrap">
-        <span class="d-flex align-start"
-          ><a-icon class="mr-2"> mdi-plus-circle-outline</a-icon>Invite people to '{{ state.groupDetail.name }}'</span
-        >
-        <a-btn color="background" @click="closeDialog" variant="flat"><a-icon>mdi-close</a-icon></a-btn>
-      </a-card-title>
-      <a-card-text>
-        <a-form ref="form" @keydown.enter.prevent="submit">
-          <a-select
-            class="mt-3"
-            :items="availableRoles"
-            item-title="text"
-            item-value="value"
-            v-model="state.entity.role"
-            label="Role"
-            variant="outlined" />
+  <app-dialog v-if="state.entity" :modelValue="props.modelValue" @update:modelValue="closeDialog" @close="closeDialog">
+    <template v-slot:title>
+      <span class="d-flex align-start">
+        <a-icon class="mr-2"> mdi-plus-circle-outline</a-icon>Invite people to '{{ state.groupDetail.name }}'
+      </span>
+    </template>
+    <template v-slot:text>
+      <a-form ref="form" @keydown.enter.prevent="submit">
+        <a-select
+          class="mt-3"
+          :items="availableRoles"
+          item-title="text"
+          item-value="value"
+          v-model="state.entity.role"
+          label="Role"
+          variant="outlined" />
 
-          <a-text-field
-            class="mt-3"
-            v-model="state.entity.meta.invitationEmail"
-            label="Email"
-            variant="outlined"
-            :rules="state.emailRules"
-            validate-on-blur
-            hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work." />
+        <a-text-field
+          class="mt-3"
+          v-model="state.entity.meta.invitationEmail"
+          label="Email"
+          variant="outlined"
+          :rules="state.emailRules"
+          validate-on-blur
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work." />
 
-          <a-text-field
-            class="mt-3"
-            v-model="state.entity.meta.invitationName"
-            variant="outlined"
-            hint="Default name for newly registered users"
-            labelSlot>
+        <a-text-field
+          class="mt-3"
+          v-model="state.entity.meta.invitationName"
+          variant="outlined"
+          hint="Default name for newly registered users"
+          labelSlot>
+          <template v-slot:label>
+            <div>Name <small>(optional)</small></div>
+          </template>
+        </a-text-field>
+
+        <a-radio-group
+          v-model="state.sendEmail"
+          name="sendEmail"
+          :disabled="state.invitationMethod.includes(INVITATION_METHODS.ADD)">
+          <a-radio label="Send an invitation email" value="SEND_NOW" labelSlot>
             <template v-slot:label>
-              <div>Name <small>(optional)</small></div>
+              <div>
+                <div class="font-weight-medium">Send an invitation email</div>
+                <div class="font-weight-regular text-caption">An email invitation will be sent right now</div>
+              </div>
             </template>
-          </a-text-field>
+          </a-radio>
+          <a-radio label="Do not send an invitation email at this moment" value="SEND_LATER" labelSlot>
+            <template v-slot:label>
+              <div>
+                <div class="font-weight-medium">Do not send an invitation email now</div>
+                <div class="font-weight-regular text-caption">You can send an email invitation later on</div>
+              </div>
+            </template>
+          </a-radio>
+        </a-radio-group>
 
-          <a-radio-group
-            v-model="state.sendEmail"
-            name="sendEmail"
-            :disabled="state.invitationMethod.includes(INVITATION_METHODS.ADD)">
-            <a-radio label="Send an invitation email" value="SEND_NOW" labelSlot>
-              <template v-slot:label>
-                <div>
-                  <div class="font-weight-medium">Send an invitation email</div>
-                  <div class="font-weight-regular text-caption">An email invitation will be sent right now</div>
+        <div class="d-flex mt-2 justify-end">
+          <btn-dropdown
+            :label="state.invitationMethod.includes(INVITATION_METHODS.INVITE) ? 'Invite Member' : 'Add Member'"
+            :show-drop-down="true"
+            :disabled="!state.submittable"
+            :loading="state.isSubmitting"
+            @click="submit"
+            color="primary"
+            elevation="0"
+            top
+            left>
+            <a-list class="pa-0 mx-auto" max-width="280" v-model:selected="state.invitationMethod">
+              <a-list-item two-line :value="INVITATION_METHODS.INVITE">
+                <a-list-item-title>Invite Member</a-list-item-title>
+                <div class="multiline-subtitle">
+                  Send them an email to agree to join your group. They only join once they click the "Join" link in the
+                  email.
                 </div>
-              </template>
-            </a-radio>
-            <a-radio label="Do not send an invitation email at this moment" value="SEND_LATER" labelSlot>
-              <template v-slot:label>
-                <div>
-                  <div class="font-weight-medium">Do not send an invitation email now</div>
-                  <div class="font-weight-regular text-caption">You can send an email invitation later on</div>
+              </a-list-item>
+
+              <a-list-item three-line :value="INVITATION_METHODS.ADD">
+                <a-list-item-title>Add Member</a-list-item-title>
+                <div class="multiline-subtitle">
+                  The member joins immediately. An email is still sent informing them they are joined. This is useful
+                  when using "Call for Responses" to send this member survey requests without waiting for them to check
+                  their email.
                 </div>
-              </template>
-            </a-radio>
-          </a-radio-group>
-
-          <div class="d-flex mt-2 justify-end">
-            <btn-dropdown
-              :label="state.invitationMethod.includes(INVITATION_METHODS.INVITE) ? 'Invite Member' : 'Add Member'"
-              :show-drop-down="true"
-              :disabled="!state.submittable"
-              :loading="state.isSubmitting"
-              @click="submit"
-              color="primary"
-              elevation="0"
-              top
-              left>
-              <a-list class="pa-0 mx-auto" max-width="280" v-model:selected="state.invitationMethod">
-                <a-list-item two-line :value="INVITATION_METHODS.INVITE">
-                  <a-list-item-title>Invite Member</a-list-item-title>
-                  <div class="multiline-subtitle">
-                    Send them an email to agree to join your group. They only join once they click the "Join" link in
-                    the email.
-                  </div>
-                </a-list-item>
-
-                <a-list-item three-line :value="INVITATION_METHODS.ADD">
-                  <a-list-item-title>Add Member</a-list-item-title>
-                  <div class="multiline-subtitle">
-                    The member joins immediately. An email is still sent informing them they are joined. This is useful
-                    when using "Call for Responses" to send this member survey requests without waiting for them to
-                    check their email.
-                  </div>
-                </a-list-item>
-              </a-list>
-            </btn-dropdown>
-          </div>
-        </a-form>
-      </a-card-text>
-    </a-card>
-  </a-dialog>
+              </a-list-item>
+            </a-list>
+          </btn-dropdown>
+        </div>
+      </a-form>
+    </template>
+  </app-dialog>
 </template>
 
 <script setup>
@@ -112,12 +104,11 @@ import BtnDropdown from '@/components/ui/BtnDropdown';
 import { ref, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { useDisplay } from 'vuetify';
+
+import appDialog from '@/components/ui/Dialog2.vue';
 
 const store = useStore();
 const route = useRoute();
-
-const { mobile } = useDisplay();
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -198,9 +189,12 @@ async function submit() {
   }
 }
 
-watch(state.invitationMethod, (newValue) => {
-  localStorage[LS_MEMBER_INVITATION_METHOD] = newValue[0];
-});
+watch(
+  () => state.invitationMethod,
+  (newValue) => {
+    localStorage[LS_MEMBER_INVITATION_METHOD] = newValue[0];
+  }
+);
 
 watch(
   () => props.modelValue,

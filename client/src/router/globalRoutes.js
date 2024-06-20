@@ -3,11 +3,9 @@ import AppNavigationGlobal from '@/components/AppNavigationGlobal.vue';
 import Kit from '@/pages/Kit.vue';
 import store from '@/store';
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
-import AppInfo from '@/pages/app/AppInfo.vue';
 import GroupList from '@/pages/groups/GroupList.vue';
 import Invitation from '@/pages/invitations/Invitation.vue';
 import Profile from '@/pages/users/Profile.vue';
-import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
 import GroupNew from '@/pages/groups/GroupNew.vue';
 import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
@@ -176,20 +174,6 @@ export default [
     },
     props: {
       main: (route) => ({ ...route.query }),
-      header: {
-        showLogo: true,
-      },
-    },
-  },
-  {
-    path: '/farmos/profile',
-    name: 'farmos-profile',
-    components: {
-      header: AppHeader,
-      navigation: AppNavigationGlobal,
-      main: FarmOSProfile,
-    },
-    props: {
       header: {
         showLogo: true,
       },
