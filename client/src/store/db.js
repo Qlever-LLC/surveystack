@@ -73,6 +73,10 @@ async function removeFromIndexedDB(storeName, id) {
   return (await db).delete(storeName, id);
 }
 
+function deleteSubmission(id) {
+  return removeFromIndexedDB(stores.SUBMISSIONS, id);
+}
+
 const migrateSubmissions = async () => {
   const drafts = await getAllSubmissions();
 
@@ -105,5 +109,6 @@ export {
   getAllResources,
   getSubmission,
   removeFromIndexedDB,
+  deleteSubmission,
   migrateSubmissions,
 };

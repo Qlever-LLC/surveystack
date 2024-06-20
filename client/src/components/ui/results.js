@@ -23,7 +23,7 @@ export function useResults() {
       } else {
         resultItems.value.push({
           title: 'Offline',
-          body: 'Cannot submit without internet connection. Go to MY DRAFT RESPONSES to submit completed surveys when you have an internet connection',
+          body: 'Cannot submit without internet connection. This submission will be submitted automatically next time you open the app while online.',
           error: true,
         });
       }
@@ -73,9 +73,15 @@ export function useResults() {
     }
   }
 
+  function reset() {
+    showResult.value = false;
+    resultItems.value = [];
+  }
+
   return {
     showResult,
     resultItems,
     result,
+    reset,
   };
 }

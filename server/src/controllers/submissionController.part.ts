@@ -2,7 +2,7 @@ import boom from '@hapi/boom';
 import { Request, Response } from 'express';
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 import { db } from '../db';
-import { sanitize } from './submissionController.js';
+import { sanitize, getSkip, getLimit } from './submissionController.js';
 import handleApiCompose from './utils/handleApiCompose';
 import { type ObjectId } from 'mongodb';
 import { hasSubmissionRights } from '../handlers/assertions.js';
@@ -93,8 +93,12 @@ const syncDraft = async (req: Request, res: Response) => {
     return res.status(200).send();
   }
 
-  if (submission.meta.status.some((status) => status.type === 'READY_TO_DELETE')) {
+  const readyToDeleteStatus = submission.meta.status.find(
+    (status) => status.type === 'READY_TO_DELETE'
+  );
+  if (readyToDeleteStatus) {
     if (existingSubmission) {
+      submission.meta.dateModified = new Date(readyToDeleteStatus.value.at);
       submission.meta.status = submission.meta.status.filter(
         (status) => status.type !== 'READY_TO_DELETE'
       );
@@ -167,6 +171,45 @@ const syncDraft = async (req: Request, res: Response) => {
   }
 };
 
+const getDraftsPage = async (req: Request, res: Response) => {
+  const skip = getSkip(req);
+  const limit = getLimit(req);
+
+  const paginationStages = [
+    {
+      $facet: {
+        content: [{ $skip: skip }, { $limit: limit }],
+        pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
+      },
+    },
+    { $unwind: '$pagination' },
+  ];
+  const pipeline = [
+    {
+      $match: {
+        'meta.isDraft': true,
+        'meta.isDeletedDraft': false,
+        'meta.creator': res.locals.auth.user._id,
+      },
+    },
+    { $sort: { 'meta.dateModified': -1 } },
+    ...paginationStages,
+  ];
+
+  const [results] = await db.collection('submissions').aggregate(pipeline).toArray();
+
+  return res.status(200).json(
+    results ?? {
+      content: [],
+      pagination: {
+        limit,
+        skip: 0,
+        total: 0,
+      },
+    }
+  );
+};
+
 const paths: OpenAPIV3.PathsObject = {
   '/api/submissions/sync-draft': {
     post: {
@@ -184,7 +227,57 @@ const paths: OpenAPIV3.PathsObject = {
       },
       responses: {
         200: {
-          description: 'Successfully synced draft to the server.',
+          description:
+            'Successfully synced draft to the server. The client can safely delete its copy and fetch the latest state from the server in another request.',
+        },
+        401: {
+          $ref: '#/components/responses/401',
+        },
+      },
+    },
+  },
+  '/api/submissions/drafts/page': {
+    get: {
+      summary: 'Get drafts for the requesting user, paginated.',
+      parameters: [
+        {
+          name: 'skip',
+          in: 'query',
+          required: false,
+          schema: {
+            type: 'string',
+          },
+        },
+        {
+          name: 'limit',
+          in: 'query',
+          required: false,
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Drafts for the requesting user, with pagination metadata.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['content', 'pagination'],
+                properties: {
+                  content: {
+                    type: 'array',
+                    items: { $ref: '#/components/schemas/DraftSubmission' },
+                  },
+                  pagination: {
+                    $ref: '#/components/schemas/PaginationMetadata',
+                  },
+                },
+              },
+            },
+          },
         },
         401: {
           $ref: '#/components/responses/401',
@@ -194,4 +287,4 @@ const paths: OpenAPIV3.PathsObject = {
   },
 };
 
-export { syncDraft, paths };
+export { syncDraft, getDraftsPage, paths };

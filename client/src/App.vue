@@ -17,16 +17,18 @@
 <script setup>
 import { computed, onMounted, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
+import { useRoute, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
+import { focusManager, useQueryClient } from '@tanstack/vue-query';
 
 import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
 import { migrateSubmissions } from './store/db';
-import { useDisplay } from 'vuetify';
-import { useRoute, useRouter } from 'vue-router';
 import { useNavigation } from '@/components/navigation';
 import { autoJoinWhiteLabelGroup } from '@/utils/memberships';
+import { useSyncDrafts, prefetchRemoteDrafts } from './queries';
 
 const store = useStore();
 const router = useRouter();
@@ -61,9 +63,20 @@ const state = reactive({
   }),
 });
 
+const { mutate: syncDrafts, mutateAsync: syncDraftsAsync } = useSyncDrafts();
+const queryClient = useQueryClient();
+
+focusManager.subscribe((isVisible) => {
+  syncDrafts();
+});
+
 onMounted(async () => {
   domainHandler.install(store);
   await migrateSubmissions();
+  syncDraftsAsync()
+    .then(() => {
+ prefetchRemoteDrafts(queryClient); 
+});
 
   fetchPinnedSurveys();
   fetchFarmOsAssets();

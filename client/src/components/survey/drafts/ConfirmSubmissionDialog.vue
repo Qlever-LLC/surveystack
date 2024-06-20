@@ -19,7 +19,7 @@
         <div v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
         </div>
-        <div v-if="dateSubmitted">
+        <div v-if="isResubmission()">
           This submission was previously submitted on
           {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
         </div>
@@ -73,6 +73,10 @@ export default {
     dateSubmitted: {
       type: String,
     },
+    isDraft: {
+      type: Boolean,
+      required: true,
+    },
   },
   emits: ['update:modelValue', 'submit', 'close', 'set-group'],
   components: {
@@ -90,6 +94,9 @@ export default {
   },
   computed: {},
   methods: {
+    isResubmission() {
+      return this.isDraft === false && this.dateSubmitted;
+    },
     handleConfirm() {
       this.$emit('update:modelValue', false);
       this.$emit('submit');
