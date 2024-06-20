@@ -4,8 +4,9 @@
       v-if="!loading && !hasError"
       :survey="survey"
       :submission="submission"
-      :persist="!isResubmission()"
-      @submit="submit" />
+      :persist="!isResubmission() && !isProxySubmission()"
+      @submit="submit"
+    />
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <a-progress-circular :size="50" />
     </div>
@@ -17,6 +18,9 @@
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
       <p class="font-weight-bold" v-if="isResubmission()">
         Drafts are not saved when resubmitting a submission. Any changes will be lost if you leave.
+      </p>
+      <p class="font-weight-bold" v-if="isProxySubmission()">
+        Drafts are not saved when submitting as another user. Any changes will be lost if you leave.
       </p>
       Are you sure you want to exit this draft?
     </confirm-leave-dialog>
