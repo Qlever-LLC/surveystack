@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    touchless
     :modelValue="modelValue"
     :permanent="permanent"
     :sticky="sticky"
