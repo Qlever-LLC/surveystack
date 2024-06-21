@@ -12,7 +12,7 @@
       </a-btn>
     </template>
     <a-list flat>
-      <a-list-item link to="/auth/profile" prepend-icon="mdi-account-circle">
+      <a-list-item link to="/auth/profile" prepend-icon="mdi-account-circle" @click="closeMenu()">
         <a-list-item-title> Profile </a-list-item-title>
       </a-list-item>
       <a-list-item v-if="state.isOwner" link @click="displayFarmOSProfile" prepend-icon="mdi-leaf-circle-outline">
@@ -53,7 +53,12 @@ const isLoggedIn = computed(() => {
   return store.getters['auth/isLoggedIn'];
 });
 
+function closeMenu() {
+  state.menuIsOpen = false;
+}
+
 function displayFarmOSProfile() {
+  closeMenu();
   state.showFarmosProfile = true;
 }
 
@@ -67,6 +72,7 @@ async function checkIsOwner() {
   }
 }
 async function logout() {
+  closeMenu();
   store.dispatch('auth/logout');
   router.push('/');
 }
