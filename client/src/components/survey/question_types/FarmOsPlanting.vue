@@ -33,7 +33,11 @@
       </a-chip>
     </template>
     <template v-slot:item="{ props, item, index }">
-      <a-list-item v-bind="props" :title="undefined" :key="`item_${index}`">
+      <a-list-item
+        v-bind="props"
+        :title="undefined"
+        :key="`item_${index}`"
+        :disabled="!control.options.hasMultipleSelections && item.value.isField">
         <template v-slot:prepend="{ isSelected }">
           <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
             <a-checkbox
@@ -110,18 +114,18 @@ export default {
         return foundTransformed.value;
       });
 
+      // selected fields
       const fields = selectedItems.filter((item) => !!item.isField);
-
       // selected assets
       const assets = selectedItems.filter((item) => !item.isField);
-
+      // if fields are selected, select all assets of these fields
       const assetsToSelect = fields.flatMap((field) =>
         this.transformed
           .filter((item) => !item.value.isField)
           .filter((item) => item.value.farmName === field.farmName)
           .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
       );
-
+      // add single assets selected
       assetsToSelect.forEach((assetToSelect) => {
         if (
           assets.some((asset) => asset.farmName === assetToSelect.value.farmName && asset.id === assetToSelect.value.id)
