@@ -1,15 +1,10 @@
 <template>
   <a-container class="basicListContainer">
-    <basic-list
-      listType="row"
-      :showSearch="false"
-      :entities="currentPageDrafts"
-      :menu="menu"
-      :loading="isPending">
+    <basic-list listType="row" :showSearch="false" :entities="currentPageDrafts" :menu="menu" :loading="isPending">
       <template v-slot:title>
         <a-icon class="mr-2">mdi-file-document-edit-outline</a-icon>
         My Draft Responses
-        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
+        <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
           {{ groupDrafts.length }}
         </a-chip>
       </template>
@@ -38,8 +33,7 @@
     button-color="error"
     :loading="deleteDraftIsPending"
     @confirm="handleConfirmDelete"
-    @cleanup="resetDeleteDraft"
-  />
+    @cleanup="resetDeleteDraft" />
   <confirm-dialog
     v-model="showUnauthorizedDialog"
     title="Unauthorized to Submit"
@@ -50,8 +44,7 @@
     ]"
     button="Okay"
     :showCancelButton="false"
-    @confirm="handleConfirmUnauthorized"
-  />
+    @confirm="handleConfirmUnauthorized" />
 </template>
 <script setup>
 import BasicList from '@/components/ui/BasicList2.vue';
@@ -68,20 +61,11 @@ const props = defineProps({
 
 const PAGINATION_LIMIT = 10;
 const { data: allDrafts, isPending, isError } = useAllDrafts();
-const {
-  isPending: deleteDraftIsPending,
-  mutate: deleteDraft,
-  reset: resetDeleteDraft,
-} = useDeleteDraft();
+const { isPending: deleteDraftIsPending, mutate: deleteDraft, reset: resetDeleteDraft } = useDeleteDraft();
 
-const groupDrafts = computed(
-  () => allDrafts.value.filter(draft => draft.meta.group?.id === props.id)
-);
+const groupDrafts = computed(() => allDrafts.value.filter((draft) => draft.meta.group?.id === props.id));
 const currentPageDrafts = computed(() =>
-  groupDrafts.value.slice(
-    (paginationPage.value - 1) * PAGINATION_LIMIT, 
-    paginationPage.value * PAGINATION_LIMIT,
-  )
+  groupDrafts.value.slice((paginationPage.value - 1) * PAGINATION_LIMIT, paginationPage.value * PAGINATION_LIMIT)
 );
 const showUnauthorizedDialog = ref(false);
 const showDeleteDialog = ref(false);
@@ -109,14 +93,14 @@ const menu = computed(() => [
   },
 ]);
 
-const isReadyToSubmit = draft => draft.meta.status.some(status => status.type === 'READY_TO_SUBMIT');
-const isUnauthorizedToSubmit = draft => draft.meta.status.some(status => status.type === 'UNAUTHORIZED_TO_SUBMIT');
-const createSubtitle = draft => {
-  return isReadyToSubmit(draft) ?
-    'Marked for submission (pending internet connection)' :
-    isUnauthorizedToSubmit(draft) ?
-    'Unauthorized to submit (click to learn more)' :
-    `Last modified ${formatDistance(parseISO(draft.meta.dateModified), new Date())} ago`;
+const isReadyToSubmit = (draft) => draft.meta.status.some((status) => status.type === 'READY_TO_SUBMIT');
+const isUnauthorizedToSubmit = (draft) => draft.meta.status.some((status) => status.type === 'UNAUTHORIZED_TO_SUBMIT');
+const createSubtitle = (draft) => {
+  return isReadyToSubmit(draft)
+    ? 'Marked for submission (pending internet connection)'
+    : isUnauthorizedToSubmit(draft)
+      ? 'Unauthorized to submit (click to learn more)'
+      : `Last modified ${formatDistance(parseISO(draft.meta.dateModified), new Date())} ago`;
 };
 
 const handleConfirmDelete = () => {
@@ -126,7 +110,7 @@ const handleConfirmDelete = () => {
   activeDeleteDraft.value = null;
 };
 
-const openDeleteDialogFor = draft => {
+const openDeleteDialogFor = (draft) => {
   activeDeleteDraft.value = draft;
   showDeleteDialog.value = true;
 };

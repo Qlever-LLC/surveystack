@@ -20,7 +20,9 @@
           <a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups
         </template>
         <template v-else> <a-icon class="mr-2">mdi-compass-outline</a-icon>Find a group</template>
-        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ state.entities.length }} </a-chip>
+        <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
+          {{ state.entities.length }}
+        </a-chip>
       </template>
       <template v-slot:filter>
         <a-checkbox v-model="state.showArchived" label="View archived" dense hide-details color="primary" />

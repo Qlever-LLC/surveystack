@@ -21,7 +21,9 @@
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-xml </a-icon>
         Scripts
-        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled> {{ state.entities.length }} </a-chip>
+        <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
+          {{ state.entities.length }}
+        </a-chip>
       </template>
       <template v-slot:noValue> No Scripts available </template>
     </basic-list>

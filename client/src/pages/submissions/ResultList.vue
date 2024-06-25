@@ -145,7 +145,7 @@
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-chart-bar</a-icon>
         Results - {{ state.surveyEntity?.name }}
-        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
+        <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.submissions.pagination.total }}
         </a-chip>
       </template>

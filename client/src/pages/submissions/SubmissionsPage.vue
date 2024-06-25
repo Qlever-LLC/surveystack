@@ -6,7 +6,7 @@
           ><a-icon class="mr-2">mdi-file-document-multiple-outline</a-icon> My Responses
         </template>
         <template v-else><a-icon class="mr-2">mdi-file-document-multiple</a-icon> Group Responses </template>
-        <a-chip class="ml-4" color="accent" rounded="lg" variant="flat" disabled>
+        <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.submissions.length }}
         </a-chip>
       </template>
