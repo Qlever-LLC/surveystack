@@ -126,6 +126,11 @@ export function useSurvey() {
         });
       }
       delete data.pinned;
+
+      if (searchString) {
+        const filterContent = data.content.sort((a, b) => a.name.localeCompare(b.name));
+        data.content = filterContent;
+      }
       return data;
     } catch (e) {
       // TODO: use cached data?
