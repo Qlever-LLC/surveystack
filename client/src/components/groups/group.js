@@ -6,9 +6,6 @@ export function useGroup() {
   const store = useStore();
   const route = useRoute();
 
-  const user = store.getters['auth/user'];
-  store.dispatch('memberships/getUserMemberships', user._id);
-
   function getMyGroups(limit = undefined) {
     let groups;
     if (isWhitelabel()) {
