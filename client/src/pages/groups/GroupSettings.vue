@@ -54,12 +54,6 @@
           {{ entity.description }}
         </template>
       </basic-list>
-      <app-pinned-surveys
-        class="ma-4"
-        :entities="entity.surveys.pinned"
-        :searchResults="searchResults"
-        @search="searchSurveys">
-      </app-pinned-surveys>
 
       <app-doc-links class="ma-4" :group="entity"></app-doc-links>
     </a-card>
@@ -68,7 +62,6 @@
 
 <script>
 import api from '@/services/api.service';
-import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import BasicList from '@/components/ui/BasicList2.vue';
 import { handleize } from '@/utils/groups';
@@ -95,7 +88,6 @@ export default {
     ACardText,
     AppNavigationControl,
     GroupEdit,
-    appPinnedSurveys,
     appDocLinks,
     BasicList,
   },
