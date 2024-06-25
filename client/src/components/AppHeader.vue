@@ -167,7 +167,7 @@ watch(
   z-index: 2;
 }
 
-.help-btn.v-btn:not(.v-btn--round).v-size--default {
+.help-btn {
   min-width: 0px;
   padding: 0px 8px;
 }
@@ -244,8 +244,7 @@ watch(
 
 @media (max-width: 600px) {
   .panels {
-    width: 50%;
-    right: 8px;
+    width: calc(100vw - 120px);
   }
 
   :deep(.entityName_deepCSS) {

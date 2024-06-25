@@ -7,7 +7,7 @@
     v-model="state.menuIsOpen"
     location="bottom">
     <template v-slot:activator="{ props }">
-      <a-btn variant="text" v-bind="props" @click="checkIsOwner()">
+      <a-btn variant="text" v-bind="props" @click="checkIsOwner()" class="pa-0" style="min-width: 40px">
         <a-icon large color="white">mdi-account</a-icon>
       </a-btn>
     </template>
