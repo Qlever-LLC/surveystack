@@ -271,7 +271,7 @@ export default {
           isNotClickable: true,
           name: '',
         },
-        label: 'Plantings without Area',
+        label: 'Plantings without field',
       };
 
       const localAssetSection = {
