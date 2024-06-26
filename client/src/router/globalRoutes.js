@@ -12,22 +12,15 @@ import Register from '@/pages/auth/Register.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 import { decode as b64Decode } from 'js-base64';
 import Unauthorized from '@/pages/Unauthorized.vue';
-
-const redirectLanding = async (to, from, next) => {
-  //redirect logged in users to my-groups-list
-  if (store.getters['auth/isLoggedIn']) {
-    next({ name: 'my-groups-list', params: { redirect: to } });
-  } else {
-    //redirect not logged-in users to all-groups-list
-    next({ name: 'all-groups-list', params: { redirect: to }, query: { login: true } });
-  }
-};
+import LandingRedirect from '@/pages/app/LandingRedirect.vue';
 
 export default [
   {
     path: '/',
     name: 'home',
-    beforeEnter: redirectLanding,
+    components: {
+      main: LandingRedirect,
+    },
   },
   {
     path: '/invitations',
@@ -35,6 +28,19 @@ export default [
     components: {
       header: AppHeader,
       main: Invitation,
+    },
+  },
+  {
+    path: '/groups',
+    name: 'groups',
+    components: {
+      header: AppHeader,
+      navigation: AppNavigationGlobal,
+    },
+    props: {
+      header: {
+        showLogo: true,
+      },
     },
   },
   {
