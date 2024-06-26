@@ -16,8 +16,8 @@
           </a-list-item-title>
           <a-list-item-title v-else class="d-flex align-center">
             <span v-if="enablePinned" @click.stop="tooglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
-              <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
-              <a-icon v-if="!entity.pinnedSurveys && isHovering && !mobile" class="mr-2"> mdi-star-outline </a-icon>
+              <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
+              <a-icon v-if="!entity.pinnedSurveys && isHovering && !mobile" class="mr-2"> mdi-pin-outline </a-icon>
             </span>
             <span v-if="groupStyle">
               <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
