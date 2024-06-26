@@ -51,7 +51,7 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
-const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message } = useSurvey();
+const { stateComposable, getPinnedSurveys, tooglePinSurvey, togglePinEvent, message } = useSurvey();
 const router = useRouter();
 const route = useRoute();
 
@@ -75,8 +75,8 @@ watch(route, () => {
 });
 
 async function initData() {
-  const surveyData = await getSurveys(getActiveGroupId(), '', 1, 2);
-  state.surveys = surveyData?.content;
+  const surveyData = await getPinnedSurveys(getActiveGroupId());
+  state.surveys = surveyData;
   state.menu = stateComposable.menu;
 }
 

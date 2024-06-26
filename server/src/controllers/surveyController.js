@@ -775,6 +775,65 @@ const getPinned = async (req, res) => {
   });
 };
 
+const getPinnedFromGroup = async (req, res) => {
+  const query = {
+    ...req.query,
+    projections: [
+      ...(req.query.projections || []),
+      '_id',
+      'name',
+      'latestVersion',
+      'meta.dateModified',
+      'meta.dateCreated',
+      'meta.group',
+      'meta.creator',
+      'meta.submissions',
+      'meta.isLibrary',
+      'revisions',
+    ],
+  };
+
+  const pipelinePinned = buildPipelineGetSurveyPinnedFromGroupId(query.groupId);
+  const pipelinePinnedEntities = await db
+    .collection(GROUPS_COLLECTION)
+    .aggregate(pipelinePinned)
+    .toArray();
+
+  const pinnedEntities = pipelinePinnedEntities.map((obj) => obj._id);
+
+  const pipeline = [
+    {
+      $match: {
+        _id: { $in: pinnedEntities },
+      },
+    },
+    {
+      $addFields: {
+        lowercasedName: {
+          $toLower: '$name',
+        },
+      },
+    },
+    {
+      $sort: { sortOrder: 1, lowercasedName: 1 },
+    },
+  ];
+  const project = {};
+  query.projections.forEach((projection) => {
+    project[projection] = 1;
+  });
+  pipeline.push({
+    $project: { ...project },
+  });
+
+  const entities = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+
+  if (!entities) {
+    return res.send([]);
+  }
+  return res.send(entities);
+};
+
 const getSurveyAndCleanupInfo = async (id, res) => {
   const survey = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!survey) {
@@ -921,6 +980,7 @@ const deleteArchivedTestSubmissions = async (surveyId, surveyVersions) => {
 export default {
   getSurveys,
   getPinned,
+  getPinnedFromGroup,
   getSurveyListPage,
   getSurvey,
   getSurveyLibraryConsumers,
