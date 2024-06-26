@@ -1,5 +1,6 @@
 import { useStore } from 'vuex';
-import { reactive, computed } from 'vue';
+import { reactive, computed, ref } from 'vue';
+import { useDisplay } from 'vuetify';
 import api from '@/services/api.service';
 
 import { getPermission } from '@/utils/permissions';
@@ -14,6 +15,7 @@ import { useRouter } from 'vue-router';
 export function useSurvey() {
   const store = useStore();
   const router = useRouter();
+  const { mobile } = useDisplay();
   const { rightToSubmitSurvey, rightToEdit, rightToCallForSubmissions, rightToViewAnonymizedResults, rightToView } =
     getPermission();
   const { message, createAction } = menuAction();
@@ -88,6 +90,18 @@ export function useSurvey() {
       //   icon: 'mdi-share',
       //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
       // }
+      {
+        title: 'Pin Survey',
+        icon: 'mdi-pin',
+        action: (s) => createAction(s, rightToEdit, () => tooglePinOnMobile(s)),
+        render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && !s.pinnedSurveys,
+      },
+      {
+        title: 'Unpin Survey',
+        icon: 'mdi-pin-outline',
+        action: (s) => createAction(s, rightToEdit, () => tooglePinOnMobile(s)),
+        render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && s.pinnedSurveys,
+      },
     ],
   });
 
@@ -97,6 +111,30 @@ export function useSurvey() {
   const whitelabelPartner = computed(() => {
     return store.getters['whitelabel/partner'];
   });
+  const groups = computed(() => {
+    return store.getters['memberships/groups'];
+  });
+
+  function isADraft(survey) {
+    return survey.latestVersion === 1;
+  }
+
+  const togglePinEvent = ref(undefined);
+  function tooglePinOnMobile(s) {
+    togglePinEvent.value = s;
+  }
+
+  async function tooglePinSurvey(survey) {
+    const group = groups.value.find((g) => g._id === getActiveGroupId());
+    const index = group.surveys.pinned.indexOf(survey._id);
+    if (index > -1) {
+      group.surveys.pinned.splice(index, 1);
+    } else {
+      group.surveys.pinned.push(survey._id);
+    }
+
+    await api.put(`/groups/${group._id}`, group);
+  }
 
   async function getSurveys(groupId, searchString, page, limit, user = null) {
     const queryParams = new URLSearchParams();
@@ -171,6 +209,7 @@ export function useSurvey() {
     stateComposable,
     message,
     getSurveys,
-    downloadPrintablePdf,
+    tooglePinSurvey,
+    togglePinEvent,
   };
 }

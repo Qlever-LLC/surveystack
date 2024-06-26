@@ -51,7 +51,7 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
-const { stateComposable, getSurveys, message } = useSurvey();
+const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message } = useSurvey();
 const router = useRouter();
 const route = useRoute();
 
@@ -61,6 +61,14 @@ const state = reactive({
 });
 
 initData();
+
+watch(togglePinEvent, (entity) => {
+  tooglePin(entity);
+});
+async function tooglePin(entity) {
+  await tooglePinSurvey(entity);
+  await initData();
+}
 
 watch(route, () => {
   initData();
