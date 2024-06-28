@@ -19,10 +19,11 @@
           :type="control.options.subtype"
           variant="outlined"
           readonly
-          yearType="number"
           cssminWidth290px
           color="focus"
-          persistent-hint />
+          persistent-hint
+          :startMonth="getStartMonth()"
+          :startYear="getStartYear()" />
       </div>
     </a-row>
 
@@ -39,6 +40,12 @@ export default {
   methods: {
     getLabel() {
       return this.control.options.subtype === 'date-year' ? 'Year' : 'Date';
+    },
+    getStartMonth() {
+      return this.control?.startMonth ? String(this.control.startMonth) : undefined;
+    },
+    getStartYear() {
+      return this.control?.startYear ? Number(this.control.startYear.substring(0, 4)) : undefined;
     },
   },
 };

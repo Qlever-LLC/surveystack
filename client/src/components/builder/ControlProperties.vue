@@ -183,6 +183,25 @@
         @blur="handleDefaultValueTrim"
         :type="controlInProgress.options.subtype"
         class="mt-3" />
+      <div v-if="isDate && controlInProgress.options.subtype" class="d-flex justify-space-betweeen mt-3">
+        <date
+          label="Start Year"
+          v-model="controlInProgress.startYear"
+          @update:modelValue="$forceUpdate()"
+          type="date-year"
+          class="mt-0"
+          :class="{ 'mr-4': controlInProgress.options.subtype !== 'date-year' }" />
+        <a-select
+          v-if="controlInProgress.options.subtype !== 'date-year'"
+          label="Start Month"
+          v-model="controlInProgress.startMonth"
+          :items="monthsList"
+          item-title="title"
+          item-value="value"
+          clearable
+          hide-details
+          class="mt-0 ml-4" />
+      </div>
       <select-items
         v-if="isSelect && controlInProgress.options.source"
         v-model="controlInProgress.defaultValue"
@@ -605,6 +624,20 @@ export default {
           key: 'showGeoTrace',
           text: 'Show geotrace control',
         },
+      ],
+      monthsList: [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ],
     };
   },

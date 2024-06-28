@@ -198,7 +198,9 @@
         :modelValue="dateForPicker"
         ref="datepickerRef"
         @update:modelValue="onDateInput($event, index, header)"
-        no-title />
+        no-title
+        :startMonth="getStartMonth()"
+        :startYear="getStartYear()" />
     </a-menu>
   </div>
 
@@ -326,6 +328,12 @@ export default {
       }
 
       this.menus[`${index}_${header.value}`] = false;
+    },
+    getStartMonth() {
+      return this.header?.startMonth ? String(this.header.startMonth) : undefined;
+    },
+    getStartYear() {
+      return this.header?.startYear ? Number(this.header.startYear.substring(0, 4)) : undefined;
     },
     onFarmOsInput(value) {
       if (value) {
