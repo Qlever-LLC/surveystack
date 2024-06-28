@@ -88,7 +88,7 @@
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
       @addRow="add">
       <template v-slot:header-cell="{ header }">
-        <span class="flex-grow-1 text-truncate">
+        <span class="flex-grow-1 text-truncate-two-lines">
           {{ header.label }}
           <a-tooltip top activator="parent">{{ header.type }}: {{ header.label }}</a-tooltip>
         </span>
@@ -446,5 +446,13 @@ export default {
 :deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
+}
+
+.text-truncate-two-lines {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 </style>

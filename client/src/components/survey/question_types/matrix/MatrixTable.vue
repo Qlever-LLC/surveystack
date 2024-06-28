@@ -11,7 +11,10 @@
         }"
         :style="cellWidthStyles[colIdx]"
         :key="colIdx">
-        <div ref="headerCells" class="bg-white px-4 d-flex flex-nowrap mt-cell" :style="{ position: 'relative' }">
+        <div
+          ref="headerCells"
+          class="bg-white px-4 d-flex flex-nowrap mt-cell"
+          :style="{ position: 'relative', height: '100%' }">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
@@ -291,8 +294,7 @@ export default {
 }
 
 .mt-heading .mt-cell-wrap {
-  height: 48px;
-  line-height: 48px;
+  min-height: 32px;
 }
 
 .mt-heading .mt-cell-wrap.mt-fixed {
@@ -310,7 +312,6 @@ export default {
 }
 
 .mt-heading {
-  height: 48px;
   position: sticky;
   top: 0;
   /* should be above the all the input cells and actions */
