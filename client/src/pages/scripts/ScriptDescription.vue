@@ -1,18 +1,26 @@
 <template>
-  <app-dialog v-if="state.entity" :modelValue="props.modelValue" @update:modelValue="closeDialog" @close="closeDialog">
+  <app-dialog :modelValue="props.modelValue" @update:modelValue="closeDialog" @close="closeDialog">
     <template v-slot:title>
       <span class="d-flex align-start">
-        <a-icon class="mr-2">mdi-open-in-new</a-icon>
-        {{ state.entity.name }}
+        {{ state.entity?.name || 'Script' }}
       </span>
     </template>
 
     <template v-slot:subtitle>
-      <div class="text-secondary">{{ state.entity._id }}</div>
+      <div class="text-secondary">{{ state.entity?._id }}</div>
     </template>
 
     <template v-slot:text>
-      <code-editor title="" class="pt-4 code-editor" :readonly="true" :code="state.entity.content" />
+      <v-skeleton-loader type="card-avatar, actions" v-if="state.scriptIsLoading" />
+      <div v-else-if="state.entity">
+        <code-editor title="" class="pt-4 code-editor" :readonly="true" :code="state.entity.content" />
+      </div>
+      <div v-else class="ma-10">
+        <a-alert color="error">
+          <v-icon class="mr-3">mdi-alert</v-icon>
+          Error loading script, please check network connectivity and refresh.
+        </a-alert>
+      </div>
     </template>
   </app-dialog>
 </template>
@@ -33,7 +41,7 @@ const props = defineProps({
     required: true,
   },
   selectedScript: {
-    type: undefined,
+    type: null,
     required: true,
   },
 });
@@ -41,7 +49,9 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const state = reactive({
-  entity: undefined,
+  entity: null,
+  errorLoadingScript: false,
+  scriptIsLoading: false,
 });
 
 function closeDialog() {
@@ -53,9 +63,17 @@ watch(
   async (newVal) => {
     // if the dialog will be displayed
     if (newVal) {
-      const scriptId = props.selectedScript._id;
-      const { data } = await api.get(`/scripts/${scriptId}`);
-      state.entity = { ...state.entity, ...data };
+      try {
+        state.scriptIsLoading = true;
+        const scriptId = props.selectedScript._id;
+        const { data } = await api.get(`/scripts/${scriptId}`);
+        state.entity = { ...state.entity, ...data };
+      } catch (e) {
+        console.log(e);
+        state.errorLoadingScript = true;
+      } finally {
+        state.scriptIsLoading = false;
+      }
     }
   }
 );
