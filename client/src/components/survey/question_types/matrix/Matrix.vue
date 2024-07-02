@@ -88,8 +88,17 @@
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
       @addRow="add">
       <template v-slot:header-cell="{ header }">
-        <span class="flex-grow-1 text-truncate-two-lines">
+        <span
+          class="flex-grow-1 text-truncate-two-lines icon-on-hover"
+          style="cursor: pointer"
+          @click="sortRows(header)">
           {{ header.label }}
+          <a-icon
+            :class="sortedHeader === header?.value ? '' : 'sort-icon'"
+            :color="sortedHeader === header?.value ? 'primary' : ''"
+            :icon="sortAsc ? 'mdi-menu-up' : 'mdi-menu-down'"
+            large
+            @click.stop="sortRows(header)" />
           <a-tooltip top activator="parent">{{ header.type }}: {{ header.label }}</a-tooltip>
         </span>
         <app-redacted v-if="header.redacted" />
@@ -264,6 +273,8 @@ export default {
   data() {
     return {
       rows: this.modelValue,
+      sortedHeader: null,
+      sortAsc: null,
       rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
       farmosTransformedPlantings: [],
@@ -360,6 +371,52 @@ export default {
       this.rows = [...this.rows, clone];
       this.changed(this.rows);
     },
+    sortRows(header) {
+      if (this.sortedHeader && this.sortedHeader !== header.value) {
+        //selected header changed, reset sort direction
+        this.sortAsc = null;
+      }
+      if (!this.sortAsc) {
+        //if sortAsc is null or false, switch it to true
+        this.sortAsc = true;
+      } else {
+        //switch to desc order
+        this.sortAsc = false;
+      }
+
+      this.sortedHeader = header.value;
+
+      this.rows?.sort((a, b) => {
+        let result = 0;
+
+        let valueA = a[header.value].value;
+        let valueB = b[header.value].value;
+
+        //reduce arrays to the first element for sorting
+        if (Array.isArray(valueA)) {
+          valueA = valueA?.[0] || undefined;
+        }
+        if (Array.isArray(valueB)) {
+          valueB = valueB?.[0] || undefined;
+        }
+
+        if (typeof valueA === 'number' && typeof valueB === 'number') {
+          // Numerical comparison
+          result = valueA - valueB;
+        } else if (typeof valueA === 'object' && valueA.name && typeof valueB === 'object' && valueB.name) {
+          //this works in case of farmos fields and plantings. Don't check for the header type to decouple this function from question types
+          result = String(valueA.name).toLowerCase().localeCompare(String(valueB.name).toLowerCase());
+        } else {
+          // Case-insensitive lexicographical comparison (for strings and dates treated as strings)
+          result = String(valueA).toLowerCase().localeCompare(String(valueB).toLowerCase());
+        }
+        if (!this.sortAsc) {
+          result = -result;
+        }
+        return result;
+      });
+      this.changed(this.rows);
+    },
     initializeConfirm() {
       if (this.meta && !!this.meta.dateModified) {
         this.showConfirmInitializeDialog = true;
@@ -454,5 +511,13 @@ export default {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.sort-icon {
+  display: none;
+}
+
+.icon-on-hover:hover .sort-icon {
+  display: inline;
 }
 </style>
