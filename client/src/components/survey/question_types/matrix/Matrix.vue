@@ -389,12 +389,23 @@ export default {
       this.rows?.sort((a, b) => {
         let result = 0;
 
-        const valueA = a[header.value].value;
-        const valueB = b[header.value].value;
+        let valueA = a[header.value].value;
+        let valueB = b[header.value].value;
+
+        //reduce arrays to the first element for sorting
+        if (Array.isArray(valueA)) {
+          valueA = valueA?.[0] || undefined;
+        }
+        if (Array.isArray(valueB)) {
+          valueB = valueB?.[0] || undefined;
+        }
 
         if (typeof valueA === 'number' && typeof valueB === 'number') {
           // Numerical comparison
           result = valueA - valueB;
+        } else if (typeof valueA === 'object' && valueA.name && typeof valueB === 'object' && valueB.name) {
+          //this works in case of farmos fields and plantings. Don't check for the header type to decouple this function from question types
+          result = String(valueA.name).toLowerCase().localeCompare(String(valueB.name).toLowerCase());
         } else {
           // Case-insensitive lexicographical comparison (for strings and dates treated as strings)
           result = String(valueA).toLowerCase().localeCompare(String(valueB).toLowerCase());
