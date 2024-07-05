@@ -134,6 +134,9 @@ export function useSurvey() {
     }
 
     await api.put(`/groups/${group._id}`, group);
+
+    await store.dispatch('resources/initFromIndexedDB');
+    await store.dispatch('surveys/fetchPinned');
   }
 
   async function getSurveys(groupId, searchString, page, limit, user = null) {

@@ -14,13 +14,13 @@
   <div class="ml-4 mt-4 text-white text-body-2">Surveys</div>
   <a-list dense class="px-4">
     <list-item-card
-      v-for="(entity, idx) in state.surveys"
-      :key="entity._id"
+      v-for="(entity, idx) in surveys"
+      :key="entity"
       :entity="entity"
       :idx="String(idx)"
       class="whiteCard"
       smallCard
-      :menu="state.menu">
+      :menu="menu">
       <template v-slot:entitySubtitle></template>
     </list-item-card>
     <a-list-item
@@ -42,8 +42,9 @@
 <script setup>
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
-import { useRouter, useRoute } from 'vue-router';
-import { reactive, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
@@ -51,34 +52,13 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
-const { stateComposable, getPinnedSurveys, tooglePinSurvey, togglePinEvent, message } = useSurvey();
+const { stateComposable, message } = useSurvey();
 const router = useRouter();
-const route = useRoute();
+const store = useStore();
 
-const state = reactive({
-  surveys: [],
-  menu: [],
-});
+const menu = computed(() => stateComposable.menu);
 
-initData();
-
-watch(togglePinEvent, (entity) => {
-  tooglePin(entity);
-});
-async function tooglePin(entity) {
-  await tooglePinSurvey(entity);
-  await initData();
-}
-
-watch(route, () => {
-  initData();
-});
-
-async function initData() {
-  const surveyData = await getPinnedSurveys(getActiveGroupId());
-  state.surveys = surveyData;
-  state.menu = stateComposable.menu;
-}
+const surveys = computed(() => store.getters['surveys/pinned']);
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;

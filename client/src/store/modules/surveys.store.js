@@ -12,7 +12,7 @@ const initialState = createInitialState();
 
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
-  pinned: (state) => state.pinned,
+  pinned: (state) => state.pinned.sort((a, b) => a.name.localeCompare(b.name)),
   getPinned:
     (state) =>
     (prefix = '', excludePath = '') => {
@@ -57,6 +57,8 @@ const fetchPinned = async (commit, dispatch) => {
           fetched.push(s);
           item.name = s.name;
           item.meta = s.meta;
+          item.latestVersion = s.latestVersion;
+          item.revisions = s.revisions;
         } catch (error) {
           console.error('error:' + error);
           continue;
