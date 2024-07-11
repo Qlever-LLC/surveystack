@@ -49,7 +49,7 @@
           v-model="state.selectedGroup"
           :item-title="(g) => `${g.name} (${g.path})`"
           item-value="_id"
-          :items="groups"
+          :items="state.activeGroups"
           class="mt-4 mr-4" />
         <a-btn
           :disabled="!state.selectedGroup"
@@ -164,7 +164,7 @@
                   <a-chip
                     class="ma-1"
                     small
-                    color="green"
+                    :color="groupMapping.archived ? 'grey' : 'green'"
                     v-for="(groupMapping, gidx) in farm.groupMappings"
                     :key="`farm-${idx}-group-${gidx}`">
                     {{ groupMapping.group }}
@@ -282,6 +282,7 @@ const state = reactive({
         .map((group) => ({
           instanceName: group.instanceName,
           group: props.groups.find((g) => g._id === group.groupId).path,
+          archived: props.groups.find((g) => g._id === group.groupId).meta.archived,
         }));
 
       mappings.push({
@@ -326,6 +327,9 @@ const state = reactive({
       return [];
     }
     return state?.selectedInstanceInfo.tags.split(' ');
+  }),
+  activeGroups: computed(() => {
+    return props.groups.filter((g) => g.meta.archived === false);
   }),
   mappedGroups: computed(() => {
     if (!state?.selectedInstance) {

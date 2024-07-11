@@ -18,8 +18,7 @@
       v-model="selectedUser"
       :item-title="(item) => `${item.name} (${item.email})`"
       item-value="_id"
-      :items="users"
-    />
+      :items="users" />
 
     <a-divider class="my-4" />
 
@@ -45,8 +44,7 @@
                 v-model="selectedInstance"
                 item-value="instanceName"
                 item-title="instanceName"
-                :items="instances"
-              />
+                :items="instances" />
             </td>
             <td></td>
             <td>
@@ -66,8 +64,7 @@
                   class="ma-1"
                   color="blue"
                   v-for="(userMapping, uidx) in instance.userMappings"
-                  :key="`instance-${idx}-user-${uidx}`"
-                >
+                  :key="`instance-${idx}-user-${uidx}`">
                   {{ userMapping.user }}
                 </a-chip>
               </div>
@@ -76,10 +73,9 @@
                 <a-chip
                   class="ma-1"
                   small
-                  color="green"
+                  :color="groupMapping.archived ? 'grey' : 'green'"
                   v-for="(groupMapping, gidx) in instance.groupMappings"
-                  :key="`instance-${idx}-group-${gidx}`"
-                >
+                  :key="`instance-${idx}-group-${gidx}`">
                   {{ groupMapping.group }}
                 </a-chip>
               </div>
@@ -140,6 +136,7 @@ export default {
           .map((group) => ({
             instanceName: group.instanceName,
             group: this.groups.find((g) => g._id === group.groupId).path,
+            archived: this.groups.find((g) => g._id === group.groupId).meta.archived,
           }));
 
         mappings.push({

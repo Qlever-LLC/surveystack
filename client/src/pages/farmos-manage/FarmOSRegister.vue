@@ -307,6 +307,9 @@ export default {
       }
       return 'Select plan first';
     },
+    activeGroups() {
+      return this.localViewModel.groups.filter((g) => g.meta.archived === false);
+    },
   },
   watch: {
     viewModel: {
