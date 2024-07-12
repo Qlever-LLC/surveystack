@@ -9,7 +9,7 @@
         v-model="localViewModel.form.groupId"
         :item-title="(g) => `${g.name} (${g.path})`"
         item-value="_id"
-        :items="localViewModel.groups"
+        :items="activeGroups"
         :rules="[(v) => !!v || `select group`]" />
 
       <a-select
