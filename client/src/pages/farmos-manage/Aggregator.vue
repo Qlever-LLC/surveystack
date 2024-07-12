@@ -71,7 +71,7 @@
           </thead>
           <tbody>
             <tr v-for="(group, idx) in state.mappedGroups" :key="`grp-${idx}`">
-              <td>{{ group.name }}</td>
+              <td>{{ group.name }} <span v-if="group.meta.archived">(archived)</span></td>
               <td>
                 <a-btn color="red" @click="$emit('unmap-group', group._id, state.selectedInstance)">Unmap</a-btn>
               </td>

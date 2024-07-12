@@ -16,7 +16,7 @@
       primary
       label="Select Group"
       v-model="selectedGroup"
-      :item-title="(g) => `${g.name} (${g.path})`"
+      :item-title="(g) => `${g.name} (${g.path}) ${g.meta.archived ? '(archived)' : ''}`"
       item-value="_id"
       :items="groups" />
 
