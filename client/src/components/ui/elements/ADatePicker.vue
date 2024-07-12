@@ -2,7 +2,7 @@
   <v-date-picker
     v-if="props.viewMode === 'year'"
     :key="state.keyYearOnly"
-    :year="state.year"
+    :year="getYearAdapted"
     :view-mode="props.viewMode"
     :color="props.color"
     :hide-header="props.noTitle"
@@ -14,8 +14,8 @@
     v-else-if="props.viewMode === 'months'"
     :key="state.keyMonthYear"
     :view-mode="getMonthYearViewMode"
-    :year="state.year"
-    :month="state.month"
+    :year="getYearAdapted"
+    :month="getMonthAdapted"
     :color="props.color"
     :hide-header="props.noTitle"
     :modelValue="state.modelValue"
@@ -26,8 +26,8 @@
     @click="clickEvent" />
   <v-date-picker
     v-else
-    :year="state.year"
-    :month="state.month"
+    :year="getYearAdapted"
+    :month="getMonthAdapted"
     :color="props.color"
     :hide-header="props.noTitle"
     :show-adjacent-months="true"
@@ -38,6 +38,7 @@
 
 <script setup>
 import { reactive, computed, onMounted } from 'vue';
+import { getYear, getMonth } from 'date-fns';
 
 const monthsList = {
   January: 0,
@@ -99,16 +100,42 @@ const getMonthYearViewMode = computed(() => {
   return state.monthYearViewMode;
 });
 
+const getYearAdapted = computed(() => {
+  if (Array.isArray(state.modelValue)) {
+    if (state.modelValue.length > 0) {
+      return getYear(state.modelValue[0]);
+    }
+  } else if (state.modelValue) {
+    return getYear(state.modelValue);
+  }
+  if (state.year) {
+    return state.year;
+  }
+  return getYear(new Date());
+});
+const getMonthAdapted = computed(() => {
+  if (Array.isArray(state.modelValue)) {
+    if (state.modelValue.length > 0) {
+      return getMonth(state.modelValue[0]);
+    }
+  } else if (state.modelValue) {
+    return getMonth(state.modelValue);
+  }
+  if (state.month) {
+    return state.month;
+  }
+  return getMonth(new Date());
+});
+
 function convertMonthStrToInt() {
   return monthsList[props.startMonth];
 }
 
 function updateYear_ofMonthYear(year) {
-  state.year = year;
+  state.modelValue = new Date(year, getMonthAdapted.value, 1);
 }
 function updateMonth_ofMonthYear(nbMonth) {
-  state.month = nbMonth;
-  emitValue(new Date(state.year, state.month, 1));
+  emitValue(new Date(getYearAdapted.value, nbMonth, 1));
 }
 
 /*
@@ -116,17 +143,17 @@ Target: YearOnly and MonthYear types
 Aim: change default behavior 
 Result: when the user clicks on an already selected year or month chip, he is either redirected into the date-picker or out of it
 */
-function clickEvent() {
+function clickEvent(e) {
   if (props.viewMode === 'year') {
     if (!state.clickOnUnselectredChip_YearOnly) {
-      emitValue(state.year);
+      emitValue(getYearAdapted.value);
     }
   } else if (props.viewMode === 'months') {
     if (state.monthYearViewMode === 'year' && !state.clickOnUnselectredChip_MonthYear) {
       handleMonthYearViewMode('month');
     }
     if (state.monthYearViewMode === 'months' && !state.clickOnUnselectredChip_MonthYear) {
-      emitValue(new Date(state.year, state.month, 1));
+      emitValue(new Date(getYearAdapted.value, getMonthAdapted.value, 1));
     }
     state.clickOnUnselectredChip_MonthYear = false;
   }
