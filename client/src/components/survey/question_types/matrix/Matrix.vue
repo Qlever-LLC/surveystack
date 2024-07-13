@@ -149,118 +149,6 @@ import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
 import { createRow } from './matrixUtils';
 
-/* copied from FarmOsPlanting.vue */
-const hashItem = (listItem) => {
-  if (listItem === null || listItem.value === null) {
-    return '';
-  }
-
-  const { value } = listItem;
-  if (value.isField) {
-    if (!value.farmName) {
-      return 'NOT_ASSIGNED';
-    }
-    return `FIELD:${value.farmName}.${value.location.id}`;
-  }
-
-  return `ASSET:${value.farmName}.${value.id}`;
-};
-
-/* copied from FarmOsPlanting.vue */
-const transform = (assets) => {
-  const withoutArea = [];
-  const localAssets = [];
-  const areas = {};
-
-  assets.forEach((asset) => {
-    if (asset.value.location.length === 0) {
-      const tmp = Object.assign({}, asset);
-      tmp.value.hash = hashItem(asset);
-      if (asset.value.url === '') {
-        localAssets.push(tmp);
-      } else {
-        withoutArea.push(tmp);
-      }
-      return;
-    }
-
-    asset.value.location.forEach((location) => {
-      areas[`${asset.value.farmName}.${location.id}`] = {
-        farmName: asset.value.farmName,
-        location,
-      };
-    });
-  });
-
-  const res = Object.keys(areas).flatMap((key) => {
-    const area = areas[key];
-
-    const matchedAssets = assets.filter((asset) => {
-      if (asset.value.farmName !== area.farmName) {
-        return false;
-      }
-
-      return asset.value.location.some((loc) => loc.id === area.location.id);
-    });
-
-    const field = {
-      value: {
-        farmName: area.farmName,
-        location: area.location,
-        isField: true,
-        name: '',
-      },
-      label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
-    };
-
-    field.value.hash = hashItem(field);
-
-    const assetItems = matchedAssets.map((asset) => {
-      const r = {
-        value: asset.value,
-        label: `${asset.value.name} `,
-      };
-
-      r.value.hash = hashItem(r);
-      return r;
-    });
-
-    return [field, ...assetItems];
-  });
-
-  const withoutAreaSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
-  };
-
-  const localAssetSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
-  };
-
-  if (withoutArea.length > 0) {
-    res.push(withoutAreaSection, ...withoutArea);
-  }
-
-  if (localAssets.length > 0) {
-    res.unshift(localAssetSection, ...localAssets);
-  }
-
-  return res;
-};
-
 export default {
   mixins: [baseQuestionComponent, farmosBase],
   components: {
@@ -436,7 +324,7 @@ export default {
     // load farmos assets
     if (this.headers.some((header) => header.type === 'farmos_planting')) {
       await this.fetchAssets();
-      this.farmosTransformedPlantings = transform(this.assets);
+      this.farmosTransformedPlantings = this.transform(this.assets);
     }
 
     this.isFarmOsLoading = false;
