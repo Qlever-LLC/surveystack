@@ -216,7 +216,8 @@ watch(
 
 const entities = computed(() => {
   const now = new Date();
-  props.entities.forEach((e) => {
+  const entitiesWithCreatedAgo = JSON.parse(JSON.stringify(props.entities));
+  entitiesWithCreatedAgo.forEach((e) => {
     if (e.meta && !e.createdAgo) {
       const parsedDate = parseISO(e.meta.dateCreated);
       if (isValid(parsedDate)) {
@@ -224,7 +225,7 @@ const entities = computed(() => {
       }
     }
   });
-  return props.entities;
+  return entitiesWithCreatedAgo;
 });
 
 const filteredEntities = computed(() => {
