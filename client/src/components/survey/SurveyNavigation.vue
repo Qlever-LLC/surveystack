@@ -58,7 +58,7 @@ const store = useStore();
 
 const menu = computed(() => stateComposable.menu);
 
-const surveys = computed(() => store.getters['surveys/pinned']);
+const surveys = computed(() => store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId()));
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;

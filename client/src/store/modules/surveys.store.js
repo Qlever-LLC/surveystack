@@ -12,7 +12,7 @@ const initialState = createInitialState();
 
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
-  pinned: (state) => state.pinned.sort((a, b) => a.name.localeCompare(b.name)),
+  sortedPinned: (state) => state.pinned.slice().sort((a, b) => a.name.localeCompare(b.name)),
   getPinned:
     (state) =>
     (prefix = '', excludePath = '') => {
@@ -20,6 +20,15 @@ const getters = {
       const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
       return excluded;
     },
+  getPinnedSurveyForGroup: (_, getters) => (groupId) => {
+    const pinnedSurveys = getters.sortedPinned.filter((pinnedSurvey) => {
+      const survey = getters.getSurvey(pinnedSurvey.id);
+      return survey && survey.meta.group.id === groupId;
+    });
+
+    const surveysWith_id = pinnedSurveys.map((pinnedSurvey) => getters.getSurvey(pinnedSurvey.id));
+    return surveysWith_id;
+  },
 };
 
 const fetchPinned = async (commit, dispatch) => {

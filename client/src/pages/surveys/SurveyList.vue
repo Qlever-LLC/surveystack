@@ -60,6 +60,7 @@
 <script setup>
 import { reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
 
@@ -74,6 +75,7 @@ import formatDistance from 'date-fns/formatDistance';
 import { useSurvey } from '@/components/survey/survey';
 
 const router = useRouter();
+const store = useStore();
 const { getActiveGroupId } = useGroup();
 const { rightToEdit } = getPermission();
 const PAGINATION_LIMIT = 10;
@@ -127,10 +129,9 @@ function startDraftAs(selectedMember) {
 }
 
 async function initData() {
+  state.loading = true;
+  state.menu = stateComposable.menu;
   try {
-    state.loading = true;
-    state.menu = stateComposable.menu;
-
     //laod the surveys
     state.surveys = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT);
     //add createdAgo information
@@ -143,6 +144,18 @@ async function initData() {
         }
       }
     });
+  } catch (e) {
+    const surveysContent = store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId());
+    surveysContent.map((survey) => (survey.pinnedSurveys = true));
+
+    state.surveys = {
+      content: surveysContent,
+      pagination: {
+        total: 0,
+        skip: 0,
+        limit: 100000,
+      },
+    };
   } finally {
     state.loading = false;
   }
