@@ -120,7 +120,7 @@ const INVITATION_METHODS = {
 const availableRoles = [
   {
     value: 'user',
-    text: 'User',
+    text: 'Member',
   },
   {
     value: 'admin',
