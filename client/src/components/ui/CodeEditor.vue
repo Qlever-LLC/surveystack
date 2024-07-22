@@ -1,7 +1,7 @@
 <template>
   <div class="full">
     <a-card color="dark-blue-lighten-2" class="card-height">
-      <a-card-title
+      <a-card-title class="d-flex"
         >{{ title || '' }}
 
         <a-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
@@ -31,14 +31,18 @@
         </a-dialog>
 
         <a-spacer />
-        <a-icon v-if="saveable" class="mr-4" @click="$emit('save', code)">mdi-content-save</a-icon>
+        <a-btn variant="outlined" v-if="saveable" class="ml-auto mr-4" @click="$emit('save', code)">
+          <a-icon left>mdi-content-save</a-icon> Save
+        </a-btn>
         <a-btn class="mr-2" variant="outlined" v-if="examples" @click="$emit('examples')">
           <a-icon left>mdi-code-braces</a-icon>Examples
         </a-btn>
         <a-btn class="mr-2" variant="outlined" v-if="runnable" @click="$emit('run', code)">
           <a-icon left>mdi-play</a-icon> Run
         </a-btn>
-        <a-icon v-if="$attrs.onClose" @click="$emit('close')">mdi-close-circle-outline</a-icon>
+        <a-btn variant="outlined" v-if="isClosable" @click="$emit('close')">
+          <a-icon left>mdi-close</a-icon> Close
+        </a-btn>
       </a-card-title>
       <div class="error text-red pa-2" v-if="error">{{ error }}</div>
       <code-view
@@ -81,6 +85,9 @@ const props = defineProps({
     default: null,
   },
   examples: {
+    default: false,
+  },
+  isClosable: {
     default: false,
   },
 });
