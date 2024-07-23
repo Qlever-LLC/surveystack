@@ -26,7 +26,7 @@ export default {
         } else {
           this.resultItems.push({
             title: 'Offline',
-            body: 'Cannot submit without internet connection. This submission will be submitted automatically next time you open the app while online.',
+            body: 'Cannot submit without internet connection. This response will be submitted automatically the next time you open the app while online.',
             error: true,
           });
         }
@@ -68,8 +68,8 @@ export default {
 
       if (!hasErrors) {
         this.resultItems.push({
-          title: 'Success',
-          body: 'Successful submission',
+          title: 'Response Submission Successful',
+          body: '',
           response,
           logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
         });

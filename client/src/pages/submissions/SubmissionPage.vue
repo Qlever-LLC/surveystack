@@ -14,7 +14,10 @@
       <router-link :to="`/groups/${id}/surveys`">Back to survey list</router-link>
     </div>
 
-    <confirm-leave-dialog ref="confirmLeaveDialogRef" title="Confirm Exit Draft" v-if="state.submission && state.survey">
+    <confirm-leave-dialog
+      ref="confirmLeaveDialogRef"
+      title="Confirm Exit Draft"
+      v-if="state.submission && state.survey">
       <p class="font-weight-bold" v-if="isResubmission()">
         Drafts are not saved when resubmitting a submission. Any changes will be lost if you leave.
       </p>
@@ -44,7 +47,7 @@
     <result-dialog
       v-model="showResult"
       :items="resultItems"
-      title="Result of Submission"
+      title="Survey Result"
       persistent
       :to="
         state.survey && {
@@ -112,18 +115,14 @@ export default defineComponent({
       required: false,
       type: String,
     },
-    id: { // group id from route
+    id: {
+      // group id from route
       required: true,
       type: String,
     },
   },
   setup(props) {
-    const {
-      showResult,
-      resultItems,
-      result,
-      reset: resetResults,
-    } = useResults();
+    const { showResult, resultItems, result, reset: resetResults } = useResults();
     const router = useRouter();
     const route = useRoute();
     const store = useStore();
@@ -155,15 +154,14 @@ export default defineComponent({
       [() => props.submissionId, () => props.routeAction],
       ([newSubmissionId, newRouteAction], [oldSubmissionId, oldRouteAction]) => {
         const isNavigatingFromEditToNew = oldRouteAction === 'edit' && newRouteAction === 'new';
-        const isNavigatingToNewSubmissionId = oldRouteAction === 'edit' &&
-          newRouteAction === 'edit' &&
-          oldSubmissionId !== newSubmissionId;
+        const isNavigatingToNewSubmissionId =
+          oldRouteAction === 'edit' && newRouteAction === 'edit' && oldSubmissionId !== newSubmissionId;
         const submissionChanged = isNavigatingFromEditToNew || isNavigatingToNewSubmissionId;
         if (submissionChanged) {
           resetComponentState();
           init();
         }
-      },
+      }
     );
 
     const handleLeave = (next) => (isLeaving) => {
@@ -171,7 +169,7 @@ export default defineComponent({
         syncDrafts();
       }
       next(isLeaving);
-    }
+    };
     onBeforeRouteUpdate((to, from, next) => {
       if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
         confirmLeaveDialogRef.value.open(handleLeave(next));
@@ -197,13 +195,13 @@ export default defineComponent({
 
     function isResubmission() {
       return state.submission.meta.isDraft === false && state.submission?.meta?.dateSubmitted;
-    };
+    }
     function isProxySubmission() {
       return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
-    };
+    }
     function abortEditSubmitted() {
       router.push(`/groups/${props.id}/my-submissions`);
-    };
+    }
     function addReadyToSubmit(status) {
       return [
         ...status.filter(({ type }) => type !== 'READY_TO_SUBMIT'),
@@ -214,7 +212,7 @@ export default defineComponent({
           },
         },
       ];
-    };
+    }
     function onCloseResultDialog() {
       // send message to parent iframe that submission was completed
       const message = state.isSubmitted
@@ -227,7 +225,7 @@ export default defineComponent({
             payload: {},
           };
       window.parent.postMessage(message, '*');
-    };
+    }
     async function submit({ payload }) {
       state.apiComposeErrors = getApiComposeErrors(state.survey, payload);
       if (state.apiComposeErrors.length > 0) {
@@ -267,7 +265,7 @@ export default defineComponent({
         // Sent message to parent frame that Submission succeeded or failed
         window.parent.postMessage(message, '*');
       }
-    };
+    }
     async function init() {
       state.loading = true;
 
@@ -339,24 +337,21 @@ export default defineComponent({
             allDraftsIsPending,
             (newValue, oldValue) => {
               if (newValue === false) {
-                resolve(); 
+                resolve();
               }
             },
             { immediate: true }
           );
         });
         const remoteSubmissionReady = api.get(`/submissions/${props.submissionId}?pure=1`);
-        const [
-          allDraftsReadySettled,
-          remoteSubmissionReadySettled,
-        ] = await Promise.allSettled([
+        const [allDraftsReadySettled, remoteSubmissionReadySettled] = await Promise.allSettled([
           allDraftsReady,
           remoteSubmissionReady,
         ]);
         if (remoteSubmissionReadySettled.status === 'fulfilled') {
           state.submission = remoteSubmissionReadySettled.value.data;
         } else {
-          state.submission = toRaw(allDraftsData.value.find(draft => draft._id === props.submissionId));
+          state.submission = toRaw(allDraftsData.value.find((draft) => draft._id === props.submissionId));
         }
 
         if (!state.submission) {
@@ -419,7 +414,7 @@ export default defineComponent({
 
       await surveyResourcesLoaded;
       state.loading = false;
-    };
+    }
 
     init();
 
@@ -437,6 +432,6 @@ export default defineComponent({
       route,
       confirmLeaveDialogRef,
     };
-  }
+  },
 });
 </script>

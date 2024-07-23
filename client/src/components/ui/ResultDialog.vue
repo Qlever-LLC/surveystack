@@ -64,7 +64,7 @@
 
           <div v-if="survey && submission && isOnline()" class="mt-6 d-flex flex-column align-stretch">
             <a-btn color="primary" variant="flat" dense :loading="download.loading" @click="downloadSubmission">
-              Download Submission
+              Download Response
             </a-btn>
             <a-btn
               v-if="isLoggedIn"
@@ -74,7 +74,7 @@
               dense
               :loading="emailing.loading"
               @click="emailMe">
-              Email Submission
+              Email Response
             </a-btn>
           </div>
         </a-card-text>
