@@ -179,8 +179,11 @@ watch(
 }
 
 .panels {
+  position: fixed;
   width: 285px;
   min-height: 0px !important;
+  top: 0px;
+  left: 8px;
   border: 2px solid;
   border-color: rgb(var(--v-theme-accent-lighten-1));
   border-radius: 8px;
@@ -239,7 +242,7 @@ watch(
 
 @media (max-width: 600px) {
   .panels {
-    width: 100%;
+    width: calc(100vw - 120px);
   }
 
   :deep(.entityName_deepCSS) {
