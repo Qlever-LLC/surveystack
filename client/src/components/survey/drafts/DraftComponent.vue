@@ -10,8 +10,7 @@
       @submit="submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
-      :isDraft="submission.meta.isDraft"
-    />
+      :isDraft="submission.meta.isDraft" />
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
@@ -20,7 +19,7 @@
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
       :questionNumber="questionNumber"
-      :showNavigationControl="!builder"
+      :showNavigationControl="!builder && !$route.query.minimal_ui"
       :surveyName="!builder ? survey.name : undefined"
       @showOverviewClicked="showOverview = !showOverview">
       <!-- forward all the slots -->

@@ -1,5 +1,8 @@
 <template>
-  <div class="rounded basicListContainer" style="height: 100%; max-height: 100%">
+  <div
+    class="basicListContainer"
+    style="height: 100%; max-height: 100%"
+    :style="$route.query.minimal_ui ? 'padding:0px!important' : ''">
     <app-draft-component
       v-if="!state.loading && !state.hasError"
       :survey="state.survey"
@@ -330,6 +333,7 @@ export default defineComponent({
         await router.replace({
           name: 'group-survey-submissions-edit',
           params: { submissionId: state.submission._id },
+          query: route.query.minimal_ui ? { minimal_ui: route.query.minimal_ui } : undefined,
         });
       } else if (route.name === 'group-survey-submissions-edit') {
         const allDraftsReady = new Promise((resolve, reject) => {

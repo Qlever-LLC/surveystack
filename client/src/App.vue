@@ -1,8 +1,8 @@
 <template>
-  <a-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }" class="app-gradient">
-    <router-view v-if="state.showHeader" name="header" />
+  <a-app id="app" class="app-gradient">
+    <router-view v-if="state.showHeader" name="header" class="app-header" />
 
-    <router-view v-if="state.showNav" name="navigation" v-slot="{ Component }">
+    <router-view v-if="state.showNav" name="navigation" v-slot="{ Component }" class="app-navbar">
       <component :is="Component" :fullWidth="!state.showMain" />
     </router-view>
 
@@ -49,8 +49,8 @@ const state = reactive({
       }
     }
   }),
-  showHeader: computed(() => state?.routeHasHeader && !state?.fullscreen),
-  showNav: computed(() => state?.routeHasNavigation && !state?.fullscreen),
+  showHeader: computed(() => state?.routeHasHeader && !state?.fullscreen && !route.query.minimal_ui),
+  showNav: computed(() => state?.routeHasNavigation && !state?.fullscreen && !route.query.minimal_ui),
   showMain: computed(() => state?.routeHasMain && (!mobile.value || forceMobileFullscreen.value)),
   routeHasHeader: computed(() => {
     return !!route?.matched?.[0]?.components?.header;
@@ -73,10 +73,9 @@ focusManager.subscribe((isVisible) => {
 onMounted(async () => {
   domainHandler.install(store);
   await migrateSubmissions();
-  syncDraftsAsync()
-    .then(() => {
- prefetchRemoteDrafts(queryClient); 
-});
+  syncDraftsAsync().then(() => {
+    prefetchRemoteDrafts(queryClient);
+  });
 
   fetchPinnedSurveys();
   fetchFarmOsAssets();
