@@ -118,5 +118,11 @@ export default {
   async created() {
     this.value = true;
   },
+  watch: {
+    fixedGroupId: function (newVal) {
+      this.selectedGroupId = newVal;
+      this.fetchMembers(this.selectedGroupId);
+    },
+  },
 };
 </script>
