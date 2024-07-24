@@ -1,6 +1,6 @@
 <template>
   <a-app-bar flat color="rgba(0, 0, 0, 0)" class="header-gradient">
-    <div v-if="showLogo">
+    <a-app-bar-title v-if="showLogo">
       <a-img
         v-if="state.isWhitelabel"
         :src="state.whitelabelPartner.hero || state.whitelabelPartner.logo"
@@ -18,7 +18,7 @@
         height="40"
         @click="router.push('/')"
         style="cursor: pointer" />
-    </div>
+    </a-app-bar-title>
 
     <a-expansion-panels v-else class="panels" variant="accordion" v-model="state.expanded">
       <a-expansion-panel :elevation="0" class="bg-transparent">
