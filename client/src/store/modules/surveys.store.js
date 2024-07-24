@@ -3,6 +3,8 @@
 /* eslint-disable-next-line no-await-in-loop */
 import api from '@/services/api.service';
 
+import { isOnline } from '@/utils/surveyStack';
+
 const createInitialState = () => ({
   surveys: [],
   pinned: [],
@@ -12,6 +14,7 @@ const initialState = createInitialState();
 
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
+  getPinnedSurvey: (state) => (id) => state.pinned.find((pinned) => pinned._id === id),
   sortedPinned: (state) => state.pinned.slice().sort((a, b) => a.name.localeCompare(b.name)),
   getPinned:
     (state) =>
@@ -22,12 +25,11 @@ const getters = {
     },
   getPinnedSurveyForGroup: (_, getters) => (groupId) => {
     const pinnedSurveys = getters.sortedPinned.filter((pinnedSurvey) => {
-      const survey = getters.getSurvey(pinnedSurvey.id);
+      const survey = getters.getPinnedSurvey(pinnedSurvey._id);
       return survey && survey.meta.group.id === groupId;
     });
 
-    const surveysWith_id = pinnedSurveys.map((pinnedSurvey) => getters.getSurvey(pinnedSurvey.id));
-    return surveysWith_id;
+    return pinnedSurveys;
   },
 };
 
@@ -50,7 +52,7 @@ const fetchPinned = async (commit, dispatch) => {
 
     for (const sid of group.pinned) {
       const item = {
-        id: sid,
+        _id: sid,
         name: '',
         group: group.group_name,
         meta: {},
@@ -88,10 +90,17 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async fetchSurvey({ commit }, { id, version = 'latest' }) {
-    const response = await api.get(`/surveys/${id}?version=${version}`);
-    commit('ADD_SURVEY', response.data);
-    return response.data;
+  async fetchSurvey({ getters }, { id, version = 'latest' }) {
+    let survey = undefined;
+
+    if (!isOnline()) {
+      survey = getters.getPinnedSurvey(id);
+    } else {
+      const response = await api.get(`/surveys/${id}?version=${version}`);
+      survey = response.data;
+    }
+
+    return survey;
   },
   async fetchPinned({ commit, dispatch, rootState, rootGetters }) {
     const pinned = [];
@@ -123,6 +132,11 @@ const actions = {
 
     commit('SET_PINNED', pinned);
     return pinned;
+  },
+  async fetchSurveyFromBackendAndStore({ commit }, { id, version = 'latest' }) {
+    const response = await api.get(`/surveys/${id}?version=${version}`);
+    commit('ADD_SURVEY', response.data);
+    return response.data;
   },
   removeSurvey({ commit }, id) {
     commit('REMOVE_SURVEY', id);

@@ -243,7 +243,7 @@ export default {
         //change route
         await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {
-        switch (error.response.status) {
+        switch (error.response?.status) {
           case 401:
             this.status = 'Invalid email or password'; //error.response.data.message;
             break;

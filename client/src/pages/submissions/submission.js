@@ -8,7 +8,7 @@ export function useSubmission() {
     if (!survey) {
       //not found in the local store, fetch the survey from backend
       console.warn('fetching survey name of survey id ' + submission.meta.survey.id);
-      survey = await store.dispatch('surveys/fetchSurvey', { id: submission.meta.survey.id });
+      survey = await store.dispatch('surveys/fetchSurveyFromBackendAndStore', { id: submission.meta.survey.id });
     }
 
     return survey;
