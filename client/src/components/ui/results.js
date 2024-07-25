@@ -23,7 +23,7 @@ export function useResults() {
       } else {
         resultItems.value.push({
           title: 'Offline',
-          body: 'Cannot submit without internet connection. This submission will be submitted automatically next time you open the app while online.',
+          body: 'Cannot submit without internet connection. This response will be submitted automatically the next time you open the app while online.',
           error: true,
         });
       }
@@ -65,8 +65,8 @@ export function useResults() {
 
     if (!hasErrors) {
       resultItems.value.push({
-        title: 'Success',
-        body: 'Successful submission',
+        title: 'Response Submission Successful',
+        body: '',
         response,
         logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
       });

@@ -20,58 +20,56 @@
         style="cursor: pointer" />
     </a-app-bar-title>
 
-    <a-app-bar-title v-else>
-      <a-expansion-panels class="panels" variant="accordion" v-model="state.expanded">
-        <a-expansion-panel :elevation="0" class="bg-transparent">
-          <a-expansion-panel-title
-            class="pa-1 pl-2 pr-7 text-white"
-            css-transparent-overlay
-            style="min-height: 0px !important">
-            <a-list-subheader style="width: inherit" class="pr-0">
-              <span style="display: flex !important; align-items: center !important">
-                <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
-                  {{ state.avatarName }}
-                </a-avatar>
-                <span class="panelTitle" style="cursor: pointer">
-                  {{ state.activeGroup?.name }}
-                </span>
+    <a-expansion-panels v-else class="panels" variant="accordion" v-model="state.expanded">
+      <a-expansion-panel :elevation="0" class="bg-transparent">
+        <a-expansion-panel-title
+          class="pa-1 pl-2 pr-7 text-white"
+          css-transparent-overlay
+          style="min-height: 0px !important">
+          <a-list-subheader style="width: inherit" class="pr-0">
+            <span style="display: flex !important; align-items: center !important">
+              <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
+                {{ state.avatarName }}
+              </a-avatar>
+              <span class="panelTitle" style="cursor: pointer">
+                {{ state.activeGroup?.name }}
               </span>
-            </a-list-subheader>
-          </a-expansion-panel-title>
-          <a-expansion-panel-text class="pa-0 ma-0 background">
-            <a-list class="pt-0">
-              <list-item-card
-                v-for="(entity, idx) in state.myGroups"
-                :key="entity._id"
-                :entity="entity"
-                :idx="String(idx)"
-                :groupStyle="true"
-                :menu="[{ action: (entity) => `/groups/${entity._id}`, color: 'green' }]"
-                groupSelectorStyle
-                :class="{
-                  lessContrast: state.activeGroup?._id !== entity?._id,
-                  moreContrast: state.activeGroup?._id === entity?._id,
-                  entityAvatar_deepCSS: state.activeGroup?._id === entity?._id,
-                }">
-              </list-item-card>
-            </a-list>
-            <a-btn
-              @click="
-                {
-                  state.expanded = false;
-                  router.push({ name: 'all-groups-list' });
-                }
-              "
-              variant="flat"
-              block
-              color="accent-darken-1"
-              class="text-white">
-              All groups</a-btn
-            >
-          </a-expansion-panel-text>
-        </a-expansion-panel>
-      </a-expansion-panels>
-    </a-app-bar-title>
+            </span>
+          </a-list-subheader>
+        </a-expansion-panel-title>
+        <a-expansion-panel-text class="pa-0 ma-0 background">
+          <a-list class="pt-0">
+            <list-item-card
+              v-for="(entity, idx) in state.myGroups"
+              :key="entity._id"
+              :entity="entity"
+              :idx="String(idx)"
+              :groupStyle="true"
+              :menu="[{ action: (entity) => `/groups/${entity._id}`, color: 'green' }]"
+              groupSelectorStyle
+              :class="{
+                lessContrast: state.activeGroup?._id !== entity?._id,
+                moreContrast: state.activeGroup?._id === entity?._id,
+                entityAvatar_deepCSS: state.activeGroup?._id === entity?._id,
+              }">
+            </list-item-card>
+          </a-list>
+          <a-btn
+            @click="
+              {
+                state.expanded = false;
+                router.push({ name: 'all-groups-list' });
+              }
+            "
+            variant="flat"
+            block
+            color="accent-darken-1"
+            class="text-white">
+            All groups</a-btn
+          >
+        </a-expansion-panel-text>
+      </a-expansion-panel>
+    </a-expansion-panels>
 
     <a-spacer />
     <offline-indicator />

@@ -115,7 +115,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 const availableRoles = [
   {
     value: 'user',
-    text: 'User',
+    text: 'Member',
   },
   {
     value: 'admin',
