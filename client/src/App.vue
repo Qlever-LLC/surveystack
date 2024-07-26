@@ -1,12 +1,12 @@
 <template>
   <a-app id="app" class="app-gradient">
-    <router-view v-if="state.routeHasHeader && state.showHeader" name="header" class="app-header" />
+    <router-view v-if="state.showHeader" name="header" class="app-header" />
 
-    <router-view v-if="state.routeHasNavigation && state.showNav" name="navigation" v-slot="{ Component }" class="app-navbar">
+    <router-view v-if="state.showNav" name="navigation" v-slot="{ Component }" class="app-navbar">
       <component :is="Component" :fullWidth="!state.showMain" />
     </router-view>
 
-    <a-main v-if="state.routeHasMain" :style="state.showNav ? '--v-layout-left: 300px' : ''">
+    <a-main v-if="state.showMain" :style="state.showNav ? '--v-layout-left: 300px' : ''">
       <app-global-feedback />
       <router-view name="main" />
     </a-main>
@@ -49,9 +49,9 @@ const state = reactive({
       }
     }
   }),
-  showHeader: computed(() => !state?.fullscreen && !route.query.minimal_ui),
-  showNav: computed(() => !state?.fullscreen && !route.query.minimal_ui),
-  showMain: computed(() => !mobile.value || forceMobileFullscreen.value),
+  showHeader: computed(() => state?.routeHasHeader && !state?.fullscreen && !route.query.minimal_ui),
+  showNav: computed(() => state?.routeHasNavigation && !state?.fullscreen && !route.query.minimal_ui),
+  showMain: computed(() => state?.routeHasMain && (!mobile.value || forceMobileFullscreen.value)),
   routeHasHeader: computed(() => {
     return !!route?.matched?.[0]?.components?.header;
   }),
