@@ -179,20 +179,6 @@ export function useSurvey() {
     }
   }
 
-  async function getPinnedSurveys(groupId) {
-    const queryParams = new URLSearchParams();
-    queryParams.append('groupId', groupId);
-
-    try {
-      const { data } = await api.get(`/surveys/group-pinned?${queryParams}`);
-
-      return data;
-    } catch (e) {
-      // TODO: use cached data?
-      console.log('Error fetching surveys:', e);
-    }
-  }
-
   function setSelectMember(survey) {
     stateComposable.showSelectMember = true;
     stateComposable.selectedSurvey = survey;
@@ -226,7 +212,6 @@ export function useSurvey() {
     stateComposable,
     message,
     getSurveys,
-    getPinnedSurveys,
     tooglePinSurvey,
     togglePinEvent,
   };

@@ -168,7 +168,6 @@ router.get(
   catchErrors(surveyController.getSurveyLibraryConsumers)
 );
 router.get('/surveys/pinned', catchErrors(surveyController.getPinned));
-router.get('/surveys/group-pinned', catchErrors(surveyController.getPinnedFromGroup));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
 router.get('/surveys/:id/pdf', catchErrors(surveyController.getSurveyPdf));
 router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
