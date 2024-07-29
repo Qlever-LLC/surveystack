@@ -29,6 +29,8 @@ const getters = {
       return survey && survey.meta.group.id === groupId;
     });
 
+    console.log('pinnedSurveys', pinnedSurveys);
+
     return pinnedSurveys;
   },
 };
@@ -129,6 +131,8 @@ const actions = {
 
     const pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
     pinned.push(...pinnedItems);
+
+    console.log('fetchPinned', fetchPinned);
 
     commit('SET_PINNED', pinned);
     return pinned;
