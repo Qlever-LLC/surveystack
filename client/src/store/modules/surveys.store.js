@@ -29,8 +29,6 @@ const getters = {
       return survey && survey.meta.group.id === groupId;
     });
 
-    console.log('pinnedSurveys', pinnedSurveys);
-
     return pinnedSurveys;
   },
 };
@@ -51,8 +49,6 @@ const fetchPinned = async (commit, dispatch) => {
     if (!Array.isArray(group.pinned)) {
       continue;
     }
-
-    console.log('group', group);
 
     for (const sid of group.pinned) {
       const item = {
@@ -133,8 +129,6 @@ const actions = {
 
     const pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
     pinned.push(...pinnedItems);
-
-    console.log('fetchPinned', pinned);
 
     commit('SET_PINNED', pinned);
     return pinned;
