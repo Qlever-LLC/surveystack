@@ -104,8 +104,16 @@ const actions = {
       throw error;
     }
   },
-  async removeLocalResource({ commit, getters, dispatch }, resourceKey) {
-    let resource = getters['getResourceByKey'](resourceKey);
+
+  async removeLocalResource({ commit, getters, dispatch }, { id, key }) {
+    let resource = undefined;
+    if (id) {
+      resource = getters['getResource'](id);
+      console.log('resource founded', id, resource);
+    } else if (key) {
+      resource = getters['getResourceByKey'](key);
+      console.log('resource founded', key, resource);
+    }
     if (resource) {
       try {
         await db.removeFromIndexedDB(db.stores.RESOURCES, resource._id);
@@ -120,7 +128,7 @@ const actions = {
     let resource = getters['getResourceByKey'](resourceKey);
     if (resource) {
       try {
-        await dispatch('removeLocalResource', resourceKey);
+        await dispatch('removeLocalResource', { key: resourceKey });
         await deleteFileResource(resource._id);
       } catch (error) {
         dispatch('feedback/add', error, { root: true });
@@ -141,6 +149,7 @@ const actions = {
     try {
       // fetch resource
       ({ data: resource } = await api.get(`/resources/${resourceId}`));
+      console.log('get resources', resource);
     } catch (error) {
       dispatch('feedback/add', `Could not fetch resource ${resourceId}. This problem is reported automatically.`, {
         root: true,
@@ -154,6 +163,7 @@ const actions = {
     try {
       // get download url
       const url = getPublicDownloadUrl(resource.key);
+      console.log('url', url, resource.key);
       // download data
       const { data: binaryResult } = await axios.get(url, {
         responseType: 'arraybuffer',
@@ -171,6 +181,7 @@ const actions = {
   async fetchScriptResource({ commit, getters, dispatch }, resource) {
     try {
       let resourceStored = getters['getResource'](resource.id);
+      console.log('resourceStored', resourceStored);
       // TODO: navigator.onLine is not reliable
       if (isOnline()) {
         //always load latest script version if online
@@ -192,6 +203,7 @@ const actions = {
     }
   },
   async fetchResources({ commit, dispatch }, surveyResource) {
+    console.log('fetchResources', surveyResource);
     try {
       let promises = [];
       for (const r of surveyResource) {

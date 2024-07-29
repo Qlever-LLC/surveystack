@@ -343,6 +343,7 @@ const getSurveyListPage = async (req, res) => {
       'meta.submissions',
       'meta.isLibrary',
       'revisions',
+      'resources',
     ],
   };
 

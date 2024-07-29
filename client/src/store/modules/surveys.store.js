@@ -72,6 +72,7 @@ const fetchPinned = async (commit, dispatch) => {
           item.meta = s.meta;
           item.latestVersion = s.latestVersion;
           item.revisions = s.revisions;
+          item.resources = s.resources;
         } catch (error) {
           console.error('error:' + error);
           continue;
@@ -143,12 +144,25 @@ const actions = {
   removeSurvey({ commit }, id) {
     commit('REMOVE_SURVEY', id);
   },
-  addPinned({ commit }, pinned) {
+  async addPinned({ commit, dispatch }, pinned) {
     delete pinned?.createdAgo;
     commit('ADD_PINNED', pinned);
+    console.log('test', pinned, pinned.resources);
+    if (pinned.resources) {
+      console.log('addPinned');
+      await dispatch('resources/fetchResources', pinned.resources, { root: true });
+    }
   },
-  removePinned({ commit }, id) {
-    commit('REMOVE_PINNED', id);
+  async removePinned({ commit, dispatch }, pinned) {
+    commit('REMOVE_PINNED', pinned._id);
+    if (pinned.resources) {
+      console.log('removePinned');
+      const pinnedResource = pinned.resources;
+      for (const r of pinnedResource) {
+        console.log('r', r);
+        await dispatch('resources/removeLocalResource', { id: r.id }, { root: true });
+      }
+    }
   },
 };
 
