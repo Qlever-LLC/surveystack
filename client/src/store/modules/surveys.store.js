@@ -52,6 +52,8 @@ const fetchPinned = async (commit, dispatch) => {
       continue;
     }
 
+    console.log('group', group);
+
     for (const sid of group.pinned) {
       const item = {
         _id: sid,
@@ -132,7 +134,7 @@ const actions = {
     const pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
     pinned.push(...pinnedItems);
 
-    console.log('fetchPinned', fetchPinned);
+    console.log('fetchPinned', pinned);
 
     commit('SET_PINNED', pinned);
     return pinned;
