@@ -71,6 +71,8 @@ const fetchPinned = async (commit, dispatch) => {
           item.name = s.name;
           item.meta = s.meta;
           item.latestVersion = s.latestVersion;
+          item.revisions = s.revisions;
+          item.resources = s.resources;
         } catch (error) {
           console.error('error:' + error);
           continue;
