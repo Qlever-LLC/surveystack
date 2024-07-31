@@ -28,44 +28,41 @@
     </app-dialog>
 
     <a-dialog v-model="showEditItemDialog" v-bind="dialogProps" v-if="showEditItemDialog" max-width="800px">
-      <div style="background: #1867c0; padding: 4px 0px">
-        <a-card>
-          <a-card-title>
-            <a-btn @click="duplicateRow(editedIndex)" variant="text" color="primary">
-              <a-icon left>mdi-content-copy</a-icon>Duplicate
-            </a-btn>
-            <a-spacer />
-            <a-btn variant="text" @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
-          </a-card-title>
-          <a-card-text>
-            <a-form autocomplete="off" @submit.prevent="">
-              <div v-for="(header, idx) in headers" :key="header.value">
-                <div class="d-flex align-center">
-                  <h4>{{ header.label }}</h4>
-                  <app-redacted v-if="header.redacted" />
-                  <app-required v-if="header.required" />
-                </div>
-                <app-matrix-cell
-                  :header="header"
-                  :item="editedItem"
-                  :getDropdownItems="getDropdownItems"
-                  :farmos="farmos"
-                  :index="idx"
-                  @changed="onInput"
-                  class="my-2" />
+      <a-card>
+        <a-card-title class="d-flex justify-space-between">
+          <a-btn @click="duplicateRow(editedIndex)" variant="text" color="primary">
+            <a-icon left>mdi-content-copy</a-icon>Duplicate
+          </a-btn>
+          <a-btn variant="text" @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
+        </a-card-title>
+        <a-card-text style="padding: 0px 12px">
+          <a-form autocomplete="off" @submit.prevent="">
+            <div v-for="(header, idx) in headers" :key="header.value">
+              <div class="d-flex align-center">
+                <h4>{{ header.label }}</h4>
+                <app-redacted v-if="header.redacted" />
+                <app-required v-if="header.required" />
               </div>
-            </a-form>
-          </a-card-text>
-          <a-card-actions class="d-flex justify-space-between">
-            <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error" dense>
-              <a-icon left>mdi-trash-can-outline</a-icon>
-            </a-btn>
-            <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2" dense>
-              Close <a-icon right>mdi-close</a-icon>
-            </a-btn>
-          </a-card-actions>
-        </a-card>
-      </div>
+              <app-matrix-cell
+                :header="header"
+                :item="editedItem"
+                :getDropdownItems="getDropdownItems"
+                :farmos="farmos"
+                :index="idx"
+                @changed="onInput"
+                class="my-2" />
+            </div>
+          </a-form>
+        </a-card-text>
+        <a-card-actions class="d-flex justify-space-between">
+          <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error" dense>
+            <a-icon left>mdi-trash-can-outline</a-icon>
+          </a-btn>
+          <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2" dense>
+            Close <a-icon right>mdi-close</a-icon>
+          </a-btn>
+        </a-card-actions>
+      </a-card>
     </a-dialog>
     <app-control-label
       :value="control.label"

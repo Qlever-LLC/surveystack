@@ -114,9 +114,6 @@ export default {
     };
   },
   methods: {
-    clickOnChip(data) {
-      data.select;
-    },
     onChange(value) {
       if (this.modelValue !== value) {
         if (Array.isArray(value)) {
@@ -166,7 +163,7 @@ export default {
     },
     autocompleteMenuProps() {
       const defaultProps = {
-        closeOnClick: false,
+        closeOnContentClick: false,
         disableKeys: true,
         openOnClick: false,
         color: 'focus',
@@ -175,12 +172,10 @@ export default {
       if (this.$vuetify.display.smAndDown || this.forceMobile) {
         defaultProps.maxHeight = 130;
         defaultProps.top = true;
-        defaultProps.closeOnContentClick = true;
       } else {
         defaultProps.maxHeight = 304;
         defaultProps.bottom = true;
         defaultProps.offsetY = true;
-        defaultProps.closeOnContentClick = false;
       }
       return defaultProps;
     },
