@@ -148,6 +148,7 @@ const actions = {
     let pinnedItems = undefined;
 
     if (isOnline()) {
+      await db.clearAllPinnedSurveys();
       pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
     } else {
       pinnedItems = await db.getAllPinnedSurveys();
