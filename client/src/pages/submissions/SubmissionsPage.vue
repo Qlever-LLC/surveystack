@@ -37,12 +37,16 @@ import { useGroup } from '@/components/groups/group';
 import api from '@/services/api.service';
 import { useSubmission } from '@/pages/submissions/submission';
 import { useRoute, useRouter } from 'vue-router';
+import { getPermission } from '@/utils/permissions';
+import { menuAction } from '@/utils/threeDotsMenu';
 
 const store = useStore();
 const router = useRouter();
 const route = useRoute();
 const { getActiveGroupId } = useGroup();
 const { setSurveyNames } = useSubmission();
+const { rightToManageSubmission } = getPermission();
+const { createAction } = menuAction();
 
 const PAGINATION_LIMIT = 10;
 
@@ -74,7 +78,11 @@ const state = reactive({
     {
       title: 'Edit',
       icon: 'mdi-open-in-new',
-      action: (e) => () => resubmit(e),
+      action: (s) =>
+        createAction(s, rightToManageSubmission, () => {
+          resubmit(s);
+        }),
+      render: (s) => () => rightToManageSubmission(s).allowed && !s.meta.archived,
     },
     /*
     {
