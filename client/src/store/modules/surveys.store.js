@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable-next-line no-await-in-loop */
+import * as db from '@/store/db';
 import api from '@/services/api.service';
 
 import { isOnline } from '@/utils/surveyStack';
@@ -23,12 +24,22 @@ const getters = {
       return excluded;
     },
   getPinnedSurveyForGroup: (state, getters) => (groupId) => {
+    const seenIds = new Set();
     const pinnedSurveys = state.pinned
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((pinnedSurvey) => {
         const survey = getters.getPinnedSurvey(pinnedSurvey._id);
-        return survey && survey.meta.group.id === groupId;
+        if (
+          survey &&
+          survey.meta.group.id === groupId &&
+          survey.groupIdImPinnedIn === groupId &&
+          !seenIds.has(pinnedSurvey._id)
+        ) {
+          seenIds.add(pinnedSurvey._id);
+          return true;
+        }
+        return false;
       });
 
     return pinnedSurveys;
@@ -57,6 +68,7 @@ const fetchPinned = async (commit, dispatch) => {
         _id: sid,
         name: '',
         group: group.group_name,
+        groupIdImPinnedIn: group.group_id,
         meta: {},
       };
 
@@ -83,6 +95,9 @@ const fetchPinned = async (commit, dispatch) => {
       }
 
       pinned.push(item);
+      if (item.meta.group.id === item.groupIdImPinnedIn) {
+        await db.persistPinnedSurvey(item);
+      }
     }
   }
 
@@ -130,7 +145,13 @@ const actions = {
 
     const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
 
-    const pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+    let pinnedItems = undefined;
+
+    if (isOnline()) {
+      pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+    } else {
+      pinnedItems = await db.getAllPinnedSurveys();
+    }
     pinned.push(...pinnedItems);
 
     commit('SET_PINNED', pinned);
@@ -146,12 +167,14 @@ const actions = {
   },
   async addPinned({ commit, dispatch }, pinned) {
     delete pinned?.createdAgo;
+    await db.persistPinnedSurvey(pinned);
     commit('ADD_PINNED', pinned);
     if (pinned.resources) {
       await dispatch('resources/fetchResources', pinned.resources, { root: true });
     }
   },
   async removePinned({ commit, dispatch }, pinned) {
+    await db.deletePinnedSurvey(pinned._id);
     commit('REMOVE_PINNED', pinned._id);
     if (pinned.resources) {
       const pinnedResource = pinned.resources;
