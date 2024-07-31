@@ -28,7 +28,7 @@ const getters = {
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((pinnedSurvey) => {
         const survey = getters.getPinnedSurvey(pinnedSurvey._id);
-        return survey && survey.meta.group.id === groupId;
+        return survey && survey.meta.group.id === groupId && survey.groupIdImPinnedIn === groupId;
       });
 
     return pinnedSurveys;
@@ -57,6 +57,7 @@ const fetchPinned = async (commit, dispatch) => {
         _id: sid,
         name: '',
         group: group.group_name,
+        groupIdImPinnedIn: group.group_id,
         meta: {},
       };
 
