@@ -45,7 +45,7 @@
               :entity="entity"
               :idx="String(idx)"
               :groupStyle="true"
-              :menu="[{ action: (entity) => `/groups/${entity._id}`, color: 'green' }]"
+              :menu="state.groupChooserMenu"
               groupSelectorStyle
               :class="{
                 lessContrast: state.activeGroup?._id !== entity?._id,
@@ -94,10 +94,12 @@ import ListItemCard from '@/components/ui/ListItemCard.vue';
 
 import { useRoute, useRouter } from 'vue-router';
 import { useGroup } from '@/components/groups/group';
+import { useDisplay } from 'vuetify';
 
 const store = useStore();
 const router = useRouter();
 const route = useRoute();
+const { mobile } = useDisplay();
 const { getActiveGroup, getMyGroups } = useGroup();
 
 const props = defineProps({
@@ -118,6 +120,12 @@ const state = reactive({
   whitelabelPartner: computed(() => {
     return store.getters['whitelabel/partner'];
   }),
+  groupChooserMenu: [
+    {
+      action: (entity) => (mobile.value ? `/groups/${entity._id}` : `/groups/${entity._id}/submissions`),
+      color: 'green',
+    },
+  ],
 });
 
 initData();
