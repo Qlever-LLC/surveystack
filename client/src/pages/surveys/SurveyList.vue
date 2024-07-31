@@ -113,8 +113,10 @@ watch(togglePinEvent, (entity) => {
   tooglePin(entity);
 });
 async function tooglePin(entity) {
+  state.loading = true;
   await tooglePinSurvey(entity);
   await initData();
+  state.loading = false;
 }
 
 function startDraftAs(selectedMember) {
