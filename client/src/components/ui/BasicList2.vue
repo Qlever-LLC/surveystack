@@ -5,10 +5,10 @@
         <a-col v-if="showNavigationControl" class="flex-grow-0">
           <AppNavigationControl />
         </a-col>
-        <a-col v-else class="flex-grow-0">
+        <a-col v-if="title" class="flex-grow-1">
           {{ title }}
         </a-col>
-        <a-col class="flex-grow-1 pl-0 text-center" style="white-space: normal; min-width: 50%">
+        <a-col v-if="$slots.title" class="flex-grow-1 pl-0 text-center" style="white-space: normal; min-width: 50%">
           <slot name="title" />
         </a-col>
         <a-col class="flex-grow-0">
@@ -195,7 +195,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: 'List',
+    required: false,
   },
 });
 

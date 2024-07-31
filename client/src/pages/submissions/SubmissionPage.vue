@@ -53,11 +53,17 @@
       title="Survey Result"
       persistent
       :to="
-        state.survey && {
-          name: 'group-my-submissions',
-          params: { id },
-          query: { minimal_ui: route.query.minimal_ui },
-        }
+        route.query.minimal_ui
+          ? {
+              name: 'group-surveys',
+              params: { id },
+              query: { minimal_ui: route.query.minimal_ui },
+            }
+          : {
+              name: 'group-my-submissions',
+              params: { id },
+              query: { minimal_ui: route.query.minimal_ui },
+            }
       "
       :survey="state.survey"
       :submission="state.submission"
