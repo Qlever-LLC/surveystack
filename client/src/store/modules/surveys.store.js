@@ -95,7 +95,9 @@ const fetchPinned = async (commit, dispatch) => {
       }
 
       pinned.push(item);
-      await db.persistPinnedSurvey(item);
+      if (item.meta.group.id === item.groupIdImPinnedIn) {
+        await db.persistPinnedSurvey(item);
+      }
     }
   }
 
