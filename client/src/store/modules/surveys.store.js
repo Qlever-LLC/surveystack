@@ -15,7 +15,6 @@ const initialState = createInitialState();
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
   getPinnedSurvey: (state) => (id) => state.pinned.find((pinned) => pinned._id === id),
-  sortedPinned: (state) => state.pinned.slice().sort((a, b) => a.name.localeCompare(b.name)),
   getPinned:
     (state) =>
     (prefix = '', excludePath = '') => {
@@ -23,11 +22,14 @@ const getters = {
       const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
       return excluded;
     },
-  getPinnedSurveyForGroup: (_, getters) => (groupId) => {
-    const pinnedSurveys = getters.sortedPinned.filter((pinnedSurvey) => {
-      const survey = getters.getPinnedSurvey(pinnedSurvey._id);
-      return survey && survey.meta.group.id === groupId;
-    });
+  getPinnedSurveyForGroup: (state, getters) => (groupId) => {
+    const pinnedSurveys = state.pinned
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((pinnedSurvey) => {
+        const survey = getters.getPinnedSurvey(pinnedSurvey._id);
+        return survey && survey.meta.group.id === groupId;
+      });
 
     return pinnedSurveys;
   },
@@ -70,6 +72,7 @@ const fetchPinned = async (commit, dispatch) => {
           item.meta = s.meta;
           item.latestVersion = s.latestVersion;
           item.revisions = s.revisions;
+          item.resources = s.resources;
         } catch (error) {
           console.error('error:' + error);
           continue;
@@ -141,6 +144,22 @@ const actions = {
   removeSurvey({ commit }, id) {
     commit('REMOVE_SURVEY', id);
   },
+  async addPinned({ commit, dispatch }, pinned) {
+    delete pinned?.createdAgo;
+    commit('ADD_PINNED', pinned);
+    if (pinned.resources) {
+      await dispatch('resources/fetchResources', pinned.resources, { root: true });
+    }
+  },
+  async removePinned({ commit, dispatch }, pinned) {
+    commit('REMOVE_PINNED', pinned._id);
+    if (pinned.resources) {
+      const pinnedResource = pinned.resources;
+      for (const r of pinnedResource) {
+        await dispatch('resources/removeLocalResource', { id: r.id }, { root: true });
+      }
+    }
+  },
 };
 
 const mutations = {
@@ -157,8 +176,15 @@ const mutations = {
     const index = state.surveys.findIndex((survey) => survey._id === id);
     state.surveys.splice(index, 1);
   },
+  ADD_PINNED(state, pinned) {
+    state.pinned.push(pinned);
+  },
   SET_PINNED(state, pinned) {
     state.pinned = pinned;
+  },
+  REMOVE_PINNED(state, id) {
+    const index = state.pinned.findIndex((pinned) => pinned._id === id);
+    state.pinned.splice(index, 1);
   },
 };
 

@@ -129,14 +129,13 @@ export function useSurvey() {
     const index = group.surveys.pinned.indexOf(survey._id);
     if (index > -1) {
       group.surveys.pinned.splice(index, 1);
+      await store.dispatch('surveys/removePinned', survey);
     } else {
       group.surveys.pinned.push(survey._id);
+      await store.dispatch('surveys/addPinned', survey);
     }
 
     await api.put(`/groups/${group._id}`, group);
-
-    await store.dispatch('resources/initFromIndexedDB');
-    await store.dispatch('surveys/fetchPinned');
   }
 
   async function getSurveys(groupId, searchString, page, limit, user = null) {
@@ -179,20 +178,6 @@ export function useSurvey() {
     }
   }
 
-  async function getPinnedSurveys(groupId) {
-    const queryParams = new URLSearchParams();
-    queryParams.append('groupId', groupId);
-
-    try {
-      const { data } = await api.get(`/surveys/group-pinned?${queryParams}`);
-
-      return data;
-    } catch (e) {
-      // TODO: use cached data?
-      console.log('Error fetching surveys:', e);
-    }
-  }
-
   function setSelectMember(survey) {
     stateComposable.showSelectMember = true;
     stateComposable.selectedSurvey = survey;
@@ -226,7 +211,6 @@ export function useSurvey() {
     stateComposable,
     message,
     getSurveys,
-    getPinnedSurveys,
     tooglePinSurvey,
     togglePinEvent,
   };
