@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable-next-line no-await-in-loop */
+import * as db from '@/store/db';
 import api from '@/services/api.service';
 
 import { isOnline } from '@/utils/surveyStack';
@@ -94,6 +95,7 @@ const fetchPinned = async (commit, dispatch) => {
       }
 
       pinned.push(item);
+      await db.persistPinnedSurvey(item);
     }
   }
 
@@ -141,7 +143,13 @@ const actions = {
 
     const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
 
-    const pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+    let pinnedItems = undefined;
+
+    if (isOnline()) {
+      pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+    } else {
+      pinnedItems = await db.getAllPinnedSurveys();
+    }
     pinned.push(...pinnedItems);
 
     commit('SET_PINNED', pinned);
@@ -157,12 +165,14 @@ const actions = {
   },
   async addPinned({ commit, dispatch }, pinned) {
     delete pinned?.createdAgo;
+    await db.persistPinnedSurvey(pinned);
     commit('ADD_PINNED', pinned);
     if (pinned.resources) {
       await dispatch('resources/fetchResources', pinned.resources, { root: true });
     }
   },
   async removePinned({ commit, dispatch }, pinned) {
+    await db.deletePinnedSurvey(pinned._id);
     commit('REMOVE_PINNED', pinned._id);
     if (pinned.resources) {
       const pinnedResource = pinned.resources;

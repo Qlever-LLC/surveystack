@@ -39,7 +39,7 @@ export default {
       }
 
       try {
-        await db.clearAllSurveys();
+        await db.clearAllPinnedSurveys();
       } catch (error) {
         console.log(error);
       }

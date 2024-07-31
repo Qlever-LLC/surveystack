@@ -4,7 +4,7 @@ import { isProxy, toRaw } from 'vue';
 const DATABASE_NAME = 'Database';
 const stores = {
   SUBMISSIONS: 'submissions',
-  SURVEYS: 'surveys',
+  PINNEDSURVEYS: 'pinnedSurveys',
   RESOURCES: 'resources',
 };
 
@@ -12,7 +12,7 @@ const db = openDB(DATABASE_NAME, 8, {
   upgrade(db, oldVersion) {
     if (oldVersion < 4) {
       db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
-      db.createObjectStore(stores.SURVEYS, { keyPath: '_id' });
+      db.createObjectStore(stores.PINNEDSURVEYS, { keyPath: '_id' });
     }
     if (oldVersion < 8) {
       db.createObjectStore(stores.RESOURCES, { keyPath: '_id' });
@@ -38,18 +38,21 @@ async function clearObjectStore(storeName) {
 function clearAllSubmissions() {
   return clearObjectStore(stores.SUBMISSIONS);
 }
-function clearAllSurveys() {
-  return clearObjectStore(stores.SURVEYS);
+function clearAllPinnedSurveys() {
+  return clearObjectStore(stores.PINNEDSURVEYS);
 }
 function clearAllResources() {
   return clearObjectStore(stores.RESOURCES);
 }
 
 async function persist(storeName, obj) {
-  return (await db).put(storeName, isProxy(obj) ? toRaw(obj): obj);
+  return (await db).put(storeName, isProxy(obj) ? toRaw(obj) : obj);
 }
 function persistSubmission(submission) {
   return persist(stores.SUBMISSIONS, submission);
+}
+function persistPinnedSurvey(pinnedSurvey) {
+  return persist(stores.PINNEDSURVEYS, pinnedSurvey);
 }
 function persistResource(resource) {
   return persist(stores.RESOURCES, resource);
@@ -60,6 +63,9 @@ async function getResults(storeName) {
 }
 function getAllSubmissions() {
   return getResults(stores.SUBMISSIONS);
+}
+function getAllPinnedSurveys() {
+  return getResults(stores.PINNEDSURVEYS);
 }
 function getAllResources() {
   return getResults(stores.RESOURCES);
@@ -76,13 +82,16 @@ async function removeFromIndexedDB(storeName, id) {
 function deleteSubmission(id) {
   return removeFromIndexedDB(stores.SUBMISSIONS, id);
 }
+function deletePinnedSurvey(id) {
+  return removeFromIndexedDB(stores.PINNEDSURVEYS, id);
+}
 
 const migrateSubmissions = async () => {
   const drafts = await getAllSubmissions();
 
   const isResubmissionDraft = (draft) => draft.meta.dateSubmitted && !draft.meta.isDraft;
   const isProxyDraft = (draft) => draft.meta.submitAsUser;
-  const draftsToDelete = drafts.filter(draft => isResubmissionDraft(draft) || isProxyDraft(draft));
+  const draftsToDelete = drafts.filter((draft) => isResubmissionDraft(draft) || isProxyDraft(draft));
   const remainingDrafts = drafts.filter((draft) => !(isResubmissionDraft(draft) || isProxyDraft(draft)));
 
   const upgradeSubmissionFromVXtoV4 = (submission) => {
@@ -101,14 +110,17 @@ const migrateSubmissions = async () => {
 export {
   stores,
   clearAllSubmissions,
-  clearAllSurveys,
+  clearAllPinnedSurveys,
   clearAllResources,
   persistSubmission,
+  persistPinnedSurvey,
   persistResource,
   getAllSubmissions,
+  getAllPinnedSurveys,
   getAllResources,
   getSubmission,
   removeFromIndexedDB,
   deleteSubmission,
+  deletePinnedSurvey,
   migrateSubmissions,
 };
