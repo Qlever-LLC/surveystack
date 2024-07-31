@@ -23,12 +23,22 @@ const getters = {
       return excluded;
     },
   getPinnedSurveyForGroup: (state, getters) => (groupId) => {
+    const seenIds = new Set();
     const pinnedSurveys = state.pinned
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((pinnedSurvey) => {
         const survey = getters.getPinnedSurvey(pinnedSurvey._id);
-        return survey && survey.meta.group.id === groupId && survey.groupIdImPinnedIn === groupId;
+        if (
+          survey &&
+          survey.meta.group.id === groupId &&
+          survey.groupIdImPinnedIn === groupId &&
+          !seenIds.has(pinnedSurvey._id)
+        ) {
+          seenIds.add(pinnedSurvey._id);
+          return true;
+        }
+        return false;
       });
 
     return pinnedSurveys;
