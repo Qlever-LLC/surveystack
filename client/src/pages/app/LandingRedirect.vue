@@ -20,4 +20,5 @@ if (store.getters['auth/isLoggedIn']) {
 }
 </script>
 
+<template></template>
 <style scoped lang="scss"></style>
