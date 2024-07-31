@@ -43,7 +43,7 @@
       </span>
       <a-spacer />
       <slot name="preMenu" :entity="state.entity" />
-      <a-menu v-if="!groupSelectorStyle" location="start" v-model="state.menuIsOpen[idx]">
+      <a-menu v-if="!groupSelectorStyle && filteredMenu?.length > 0" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
           <a-btn v-bind="props" icon @click.prevent :small="smallCard"><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
@@ -143,7 +143,7 @@ onMounted(() => {
 });
 
 const filteredMenu = computed(() => {
-  return props.menu.filter((m) => m.render === undefined || m.render(props.entity)());
+  return props.menu?.filter((m) => m.render === undefined || m.render(props.entity)());
 });
 
 function getTextColor(itemMenu) {

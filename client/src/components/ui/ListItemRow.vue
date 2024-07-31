@@ -39,7 +39,7 @@
         @click="runAction(button.action(entity))">
         {{ button.title }}
       </a-btn>
-      <a-menu v-if="menu" location="start" v-model="state.menuIsOpen[idx]">
+      <a-menu v-if="filteredMenu?.length > 0" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
           <a-btn v-bind="props" icon @click.prevent><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
@@ -86,7 +86,7 @@ const state = reactive({
 });
 
 const filteredMenu = computed(() => {
-  return props.menu.filter((m) => m.render === undefined || m.render(props.entity)());
+  return props.menu?.filter((m) => m.render === undefined || m.render(props.entity)());
 });
 
 const actionButtonsFixed = computed(() => {
