@@ -52,19 +52,11 @@
       :items="resultItems"
       title="Survey Result"
       persistent
-      :to="
-        route.query.minimal_ui
-          ? {
-              name: 'group-surveys',
-              params: { id },
-              query: { minimal_ui: route.query.minimal_ui },
-            }
-          : {
-              name: 'group-my-submissions',
-              params: { id },
-              query: { minimal_ui: route.query.minimal_ui },
-            }
-      "
+      :to="{
+        name: 'group-surveys',
+        params: { id },
+        query: { minimal_ui: route.query.minimal_ui },
+      }"
       :survey="state.survey"
       :submission="state.submission"
       @close="onCloseResultDialog" />
@@ -80,8 +72,8 @@
 </template>
 
 <script>
-import { watch, defineComponent, reactive, toRaw, ref } from 'vue';
-import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter, useRoute } from 'vue-router';
+import { defineComponent, reactive, ref, toRaw, watch } from 'vue';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useQueryClient } from '@tanstack/vue-query';
 import api from '@/services/api.service';
@@ -92,7 +84,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import { createSubmissionFromSurvey, checkAllowedToSubmit, checkAllowedToResubmit } from '@/utils/submissions';
+import { checkAllowedToResubmit, checkAllowedToSubmit, createSubmissionFromSurvey } from '@/utils/submissions';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
@@ -205,12 +197,15 @@ export default defineComponent({
     function isResubmission() {
       return state.submission.meta.isDraft === false && state.submission?.meta?.dateSubmitted;
     }
+
     function isProxySubmission() {
       return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
     }
+
     function abortEditSubmitted() {
       router.push(`/groups/${props.id}/my-submissions`);
     }
+
     function addReadyToSubmit(status) {
       return [
         ...status.filter(({ type }) => type !== 'READY_TO_SUBMIT'),
@@ -222,6 +217,7 @@ export default defineComponent({
         },
       ];
     }
+
     function onCloseResultDialog() {
       // send message to parent iframe that submission was completed
       const message = state.isSubmitted
@@ -235,6 +231,7 @@ export default defineComponent({
           };
       window.parent.postMessage(message, '*');
     }
+
     async function submit({ payload }) {
       state.apiComposeErrors = getApiComposeErrors(state.survey, payload);
       if (state.apiComposeErrors.length > 0) {
@@ -275,6 +272,7 @@ export default defineComponent({
         window.parent.postMessage(message, '*');
       }
     }
+
     async function init() {
       state.loading = true;
 
@@ -323,7 +321,10 @@ export default defineComponent({
 
       // If the user is on the group-survey-submissions-new route, initialize a new submission and then redirect to the group-survey-submissions-edit route for that submission
       if (route.name === 'group-survey-submissions-new') {
-        const createSubmissionConfig = { survey: state.survey, version: state.survey.latestVersion };
+        const createSubmissionConfig = {
+          survey: state.survey,
+          version: state.survey.latestVersion,
+        };
         if (props.submitAsUserId) {
           try {
             const { data: submitAsUser } = await api.get(`/users/${props.submitAsUserId}`);
