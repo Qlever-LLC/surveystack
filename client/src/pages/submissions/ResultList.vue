@@ -295,7 +295,7 @@ import BasicList from '@/components/ui/BasicList2.vue';
 const store = useStore();
 const router = useRouter();
 
-const { rightToManageResponses } = getPermission();
+const { rightToManageSubmission } = getPermission();
 const { message, createAction } = menuAction();
 
 const defaultPageSize = 10;
@@ -482,52 +482,52 @@ async function initData() {
       title: 'Edit',
       icon: 'mdi-pencil',
       action: (s) =>
-        createAction(s, rightToManageResponses, () => {
+        createAction(s, rightToManageSubmission, () => {
           resubmit(s);
         }),
-      render: (s) => () => rightToManageResponses().allowed && !s.meta.archived,
+      render: (s) => () => rightToManageSubmission(s).allowed && !s.meta.archived,
       color: 'green',
     },
     {
       title: 'Restore',
       icon: 'mdi-backup-restore',
       action: (s) =>
-        createAction(s, rightToManageResponses, () => {
+        createAction(s, rightToManageSubmission, () => {
           state.selected = [s];
           archiveSubmissions(state.selected, '', false);
         }),
-      render: (s) => () => rightToManageResponses().allowed && s.meta.archived,
+      render: (s) => () => rightToManageSubmission(s).allowed && s.meta.archived,
     },
     {
       title: 'Reassign',
       icon: 'mdi-open-in-new',
       action: (s) =>
-        createAction(s, rightToManageResponses, () => {
+        createAction(s, rightToManageSubmission, () => {
           state.selected = [s];
           state.reassignment.showModal = true;
         }),
-      render: (s) => () => rightToManageResponses().allowed,
+      render: (s) => () => rightToManageSubmission(s).allowed,
     },
     {
       title: 'Archive',
       icon: 'mdi-archive',
       action: (s) =>
-        createAction(s, rightToManageResponses, () => {
+        createAction(s, rightToManageSubmission, () => {
           state.selected = [s];
           state.showArchiveModal = true;
         }),
-      render: (s) => () => rightToManageResponses().allowed && !s.meta.archived,
+      render: (s) => () => rightToManageSubmission(s).allowed && !s.meta.archived,
       color: 'red',
     },
     {
       title: 'Delete',
       icon: 'mdi-trash-can-outline',
       action: (s) =>
-        createAction(s, rightToManageResponses, () => {
+        createAction(s, rightToManageSubmission, () => {
           state.selected = [s];
           state.showDeleteModal = true;
         }),
-      render: (s) => () => rightToManageResponses().allowed && s.meta.archived,
+      render: (s) => () => rightToManageSubmission(s).allowed && s.meta.archived,
       color: 'red',
     },
   ];

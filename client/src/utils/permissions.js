@@ -40,8 +40,16 @@ export function getPermission() {
       : { allowed: false, message: "Sorry you can't see this result" };
   }
 
-  function rightToManageResponses() {
-    return isGroupAdmin()
+  function rightToManageSubmission(s) {
+    const user = store.getters['auth/user'];
+    const memberships = store.getters['memberships/memberships'];
+    const isAdminOfCurrentGroup = isGroupAdmin();
+    const isAdminOfSubmissionGroup = memberships.some(
+      (membership) => membership.group._id === s.meta.group.id && membership.role === 'admin'
+    );
+    const isCreatorOfSubmission = s.meta.creator === user?._id;
+
+    return isAdminOfCurrentGroup || isAdminOfSubmissionGroup || isCreatorOfSubmission
       ? { allowed: true, message: 'success' }
       : { allowed: false, message: "Sorry you can't manage this response" };
   }
@@ -52,6 +60,6 @@ export function getPermission() {
     rightToCallForSubmissions,
     rightToViewAnonymizedResults,
     rightToView,
-    rightToManageResponses,
+    rightToManageSubmission,
   };
 }

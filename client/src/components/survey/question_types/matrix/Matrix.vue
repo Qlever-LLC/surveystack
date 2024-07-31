@@ -28,44 +28,41 @@
     </app-dialog>
 
     <a-dialog v-model="showEditItemDialog" v-bind="dialogProps" v-if="showEditItemDialog" max-width="800px">
-      <div style="background: #1867c0; padding: 4px 0px">
-        <a-card>
-          <a-card-title>
-            <a-btn @click="duplicateRow(editedIndex)" variant="text" color="primary">
-              <a-icon left>mdi-content-copy</a-icon>Duplicate
-            </a-btn>
-            <a-spacer />
-            <a-btn variant="text" @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
-          </a-card-title>
-          <a-card-text>
-            <a-form autocomplete="off" @submit.prevent="">
-              <div v-for="(header, idx) in headers" :key="header.value">
-                <div class="d-flex align-center">
-                  <h4>{{ header.label }}</h4>
-                  <app-redacted v-if="header.redacted" />
-                  <app-required v-if="header.required" />
-                </div>
-                <app-matrix-cell
-                  :header="header"
-                  :item="editedItem"
-                  :getDropdownItems="getDropdownItems"
-                  :farmos="farmos"
-                  :index="idx"
-                  @changed="onInput"
-                  class="my-2" />
+      <a-card>
+        <a-card-title class="d-flex justify-space-between">
+          <a-btn @click="duplicateRow(editedIndex)" variant="text" color="primary">
+            <a-icon left>mdi-content-copy</a-icon>Duplicate
+          </a-btn>
+          <a-btn variant="text" @click="showEditItemDialog = false"> Close <a-icon right>mdi-close</a-icon> </a-btn>
+        </a-card-title>
+        <a-card-text style="padding: 0px 12px">
+          <a-form autocomplete="off" @submit.prevent="">
+            <div v-for="(header, idx) in headers" :key="header.value">
+              <div class="d-flex align-center">
+                <h4>{{ header.label }}</h4>
+                <app-redacted v-if="header.redacted" />
+                <app-required v-if="header.required" />
               </div>
-            </a-form>
-          </a-card-text>
-          <a-card-actions class="d-flex justify-space-between">
-            <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error" dense>
-              <a-icon left>mdi-trash-can-outline</a-icon>
-            </a-btn>
-            <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2" dense>
-              Close <a-icon right>mdi-close</a-icon>
-            </a-btn>
-          </a-card-actions>
-        </a-card>
-      </div>
+              <app-matrix-cell
+                :header="header"
+                :item="editedItem"
+                :getDropdownItems="getDropdownItems"
+                :farmos="farmos"
+                :index="idx"
+                @changed="onInput"
+                class="my-2" />
+            </div>
+          </a-form>
+        </a-card-text>
+        <a-card-actions class="d-flex justify-space-between">
+          <a-btn variant="text" @click="rowToBeDeleted = editedIndex" class="ma-2" color="error" dense>
+            <a-icon left>mdi-trash-can-outline</a-icon>
+          </a-btn>
+          <a-btn variant="text" @click="showEditItemDialog = false" class="ma-2" dense>
+            Close <a-icon right>mdi-close</a-icon>
+          </a-btn>
+        </a-card-actions>
+      </a-card>
     </a-dialog>
     <app-control-label
       :value="control.label"
@@ -88,8 +85,17 @@
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
       @addRow="add">
       <template v-slot:header-cell="{ header }">
-        <span class="flex-grow-1 text-truncate">
+        <span
+          class="flex-grow-1 text-truncate-two-lines icon-on-hover"
+          style="cursor: pointer"
+          @click="sortRows(header)">
           {{ header.label }}
+          <a-icon
+            :class="sortedHeader === header?.value ? '' : 'sort-icon'"
+            :color="sortedHeader === header?.value ? 'primary' : ''"
+            :icon="sortAsc ? 'mdi-menu-up' : 'mdi-menu-down'"
+            large
+            @click.stop="sortRows(header)" />
           <a-tooltip top activator="parent">{{ header.type }}: {{ header.label }}</a-tooltip>
         </span>
         <app-redacted v-if="header.redacted" />
@@ -140,118 +146,6 @@ import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
 import { createRow } from './matrixUtils';
 
-/* copied from FarmOsPlanting.vue */
-const hashItem = (listItem) => {
-  if (listItem === null || listItem.value === null) {
-    return '';
-  }
-
-  const { value } = listItem;
-  if (value.isField) {
-    if (!value.farmName) {
-      return 'NOT_ASSIGNED';
-    }
-    return `FIELD:${value.farmName}.${value.location.id}`;
-  }
-
-  return `ASSET:${value.farmName}.${value.id}`;
-};
-
-/* copied from FarmOsPlanting.vue */
-const transform = (assets) => {
-  const withoutArea = [];
-  const localAssets = [];
-  const areas = {};
-
-  assets.forEach((asset) => {
-    if (asset.value.location.length === 0) {
-      const tmp = Object.assign({}, asset);
-      tmp.value.hash = hashItem(asset);
-      if (asset.value.url === '') {
-        localAssets.push(tmp);
-      } else {
-        withoutArea.push(tmp);
-      }
-      return;
-    }
-
-    asset.value.location.forEach((location) => {
-      areas[`${asset.value.farmName}.${location.id}`] = {
-        farmName: asset.value.farmName,
-        location,
-      };
-    });
-  });
-
-  const res = Object.keys(areas).flatMap((key) => {
-    const area = areas[key];
-
-    const matchedAssets = assets.filter((asset) => {
-      if (asset.value.farmName !== area.farmName) {
-        return false;
-      }
-
-      return asset.value.location.some((loc) => loc.id === area.location.id);
-    });
-
-    const field = {
-      value: {
-        farmName: area.farmName,
-        location: area.location,
-        isField: true,
-        name: '',
-      },
-      label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
-    };
-
-    field.value.hash = hashItem(field);
-
-    const assetItems = matchedAssets.map((asset) => {
-      const r = {
-        value: asset.value,
-        label: `${asset.value.name} `,
-      };
-
-      r.value.hash = hashItem(r);
-      return r;
-    });
-
-    return [field, ...assetItems];
-  });
-
-  const withoutAreaSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
-  };
-
-  const localAssetSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
-  };
-
-  if (withoutArea.length > 0) {
-    res.push(withoutAreaSection, ...withoutArea);
-  }
-
-  if (localAssets.length > 0) {
-    res.unshift(localAssetSection, ...localAssets);
-  }
-
-  return res;
-};
-
 export default {
   mixins: [baseQuestionComponent, farmosBase],
   components: {
@@ -264,6 +158,8 @@ export default {
   data() {
     return {
       rows: this.modelValue,
+      sortedHeader: null,
+      sortAsc: null,
       rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
       farmosTransformedPlantings: [],
@@ -360,6 +256,52 @@ export default {
       this.rows = [...this.rows, clone];
       this.changed(this.rows);
     },
+    sortRows(header) {
+      if (this.sortedHeader && this.sortedHeader !== header.value) {
+        //selected header changed, reset sort direction
+        this.sortAsc = null;
+      }
+      if (!this.sortAsc) {
+        //if sortAsc is null or false, switch it to true
+        this.sortAsc = true;
+      } else {
+        //switch to desc order
+        this.sortAsc = false;
+      }
+
+      this.sortedHeader = header.value;
+
+      this.rows?.sort((a, b) => {
+        let result = 0;
+
+        let valueA = a[header.value].value;
+        let valueB = b[header.value].value;
+
+        //reduce arrays to the first element for sorting
+        if (Array.isArray(valueA)) {
+          valueA = valueA?.[0] || undefined;
+        }
+        if (Array.isArray(valueB)) {
+          valueB = valueB?.[0] || undefined;
+        }
+
+        if (typeof valueA === 'number' && typeof valueB === 'number') {
+          // Numerical comparison
+          result = valueA - valueB;
+        } else if (typeof valueA === 'object' && valueA.name && typeof valueB === 'object' && valueB.name) {
+          //this works in case of farmos fields and plantings. Don't check for the header type to decouple this function from question types
+          result = String(valueA.name).toLowerCase().localeCompare(String(valueB.name).toLowerCase());
+        } else {
+          // Case-insensitive lexicographical comparison (for strings and dates treated as strings)
+          result = String(valueA).toLowerCase().localeCompare(String(valueB).toLowerCase());
+        }
+        if (!this.sortAsc) {
+          result = -result;
+        }
+        return result;
+      });
+      this.changed(this.rows);
+    },
     initializeConfirm() {
       if (this.meta && !!this.meta.dateModified) {
         this.showConfirmInitializeDialog = true;
@@ -379,7 +321,7 @@ export default {
     // load farmos assets
     if (this.headers.some((header) => header.type === 'farmos_planting')) {
       await this.fetchAssets();
-      this.farmosTransformedPlantings = transform(this.assets);
+      this.farmosTransformedPlantings = this.transform(this.assets);
     }
 
     this.isFarmOsLoading = false;
@@ -446,5 +388,21 @@ export default {
 :deep(.orange-chip) {
   color: #f38d49;
   border: 1px #f38d49 solid;
+}
+
+.text-truncate-two-lines {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.sort-icon {
+  display: none;
+}
+
+.icon-on-hover:hover .sort-icon {
+  display: inline;
 }
 </style>

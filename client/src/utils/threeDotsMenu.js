@@ -34,13 +34,13 @@ export function menuAction() {
   }
 
   /**
-   * @param {id} survey
+   * @param {id, e.g. of a survey or submission} dataObject
    * @param {see permission.js} right
    * @param {either a String or () => function} action
    * @returns
    */
-  function createAction(survey, right, action) {
-    const { allowed, message } = right(survey);
+  function createAction(dataObject, right, action) {
+    const { allowed, message } = right(dataObject);
     if (allowed) {
       return action;
     } else {

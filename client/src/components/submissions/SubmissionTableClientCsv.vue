@@ -119,11 +119,11 @@
               role="checkbox" />
           </td>
           <td
-            v-for="header in headers"
+            v-for="(header, indx) in headers"
             :key="header.title"
-            @click.stop="openModal($event, [getCellValue(item, header.value), index, header.value], true)"
+            @click.stop="openModal($event, [getCellValue(item, indx, header.value), index, header.value], true)"
             :class="{
-              active: isModalOpen([getCellValue(item, header.value), index, header.value]),
+              active: isModalOpen([getCellValue(item, indx, header.value), index, header.value]),
               'expand-cell': isExpandMatrix,
             }">
             <table v-if="Array.isArray(item[header.value])" width="100%" cellSpacing="0" class="mt-6">
@@ -138,9 +138,9 @@
                   :class="{
                     active: isModalOpen([child, index, header.value, i]),
                   }"
-                  @click.stop="openModal($event, [getCellValue(child), index, header.value, i], true)">
+                  @click.stop="openModal($event, [getCellValue(child, indx), index, header.value, i], true)">
                   <div :class="{ truncate: shouldTruncate(child) }">
-                    {{ getCellValue(child) }}
+                    {{ getCellValue(child, indx) }}
                   </div>
                 </td>
               </tr>
@@ -151,7 +151,7 @@
               <a @click.stop="openResource(item[header.key])"> {{ getLabelFromKey(item[header.value]) }}</a>
             </div>
             <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
-              {{ getCellValue(item, header.value) }}
+              {{ getCellValue(item, indx, header.value) }}
             </div>
           </td>
         </tr>
@@ -246,6 +246,25 @@ export function transformMatrixHeaders(headers, submissions) {
   });
 
   return result;
+}
+
+export function getCellValue(item, index, header) {
+  const value = typeof item === 'string' ? item : typeof item[header] === 'string' ? item[header] : null;
+
+  // Parse date
+  let parsedDate = parseISO(value);
+  if (index < PREFERRED_HEADERS.length && isValid(parsedDate) && parsedDate.toISOString() === value) {
+    // In PREFERRED_HEADERS dateSubmitted is displayed depending on the user's time zone.
+    return format(parsedDate, 'MMM d, yyyy h:mm a');
+  } else if (isValid(parsedDate)) {
+    // In the results of the survey for the date types, we are only interested in days and not hours. We avoid timezone modifications: June 1, 2024 is June 1. 2024 anywhere
+    // extract YYYY-MM-DD from YYYY-MM-DDTHH:mm:ss.sssZ
+    const date = value.slice(0, 10);
+    parsedDate = parseISO(date);
+    return format(parsedDate, 'MMM d, yyyy');
+  }
+
+  return value || ' ';
 }
 
 const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted', 'meta.archived'];
@@ -374,17 +393,7 @@ export default {
   },
   methods: {
     getLabelFromKey,
-    getCellValue(item, header) {
-      const value = typeof item === 'string' ? item : typeof item[header] === 'string' ? item[header] : null;
-
-      // Parse date
-      let parsedDate = parseISO(value);
-      if (isValid(parsedDate) && parsedDate.toISOString() === value) {
-        return format(parsedDate, 'MMM d, yyyy h:mm a');
-      }
-
-      return value || ' ';
-    },
+    getCellValue,
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
     },
@@ -426,13 +435,11 @@ export default {
         const rawHeaders = this.parsed.meta.fields;
         const matrixHeaders = transformMatrixHeaders(rawHeaders, this.submissions.content);
         PREFERRED_HEADERS.forEach((header) => {
-          if (matrixHeaders.includes(header)) {
-            headers.push({
-              title: header,
-              value: header,
-              filter: this.createCustomFilter(header),
-            });
-          }
+          headers.push({
+            title: header,
+            value: header,
+            filter: this.createCustomFilter(header),
+          });
         });
         matrixHeaders.forEach((header) => {
           if (

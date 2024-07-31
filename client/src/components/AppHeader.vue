@@ -33,6 +33,9 @@
               </a-avatar>
               <span class="panelTitle" style="cursor: pointer">
                 {{ state.activeGroup?.name }}
+                <div class="subEntityName">
+                  {{ !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin() ? 'Admin' : 'Member' }}
+                </div>
               </span>
             </span>
           </a-list-subheader>
@@ -100,7 +103,7 @@ const store = useStore();
 const router = useRouter();
 const route = useRoute();
 const { mobile } = useDisplay();
-const { getActiveGroup, getMyGroups } = useGroup();
+const { getActiveGroup, getMyGroups, isGroupAdmin } = useGroup();
 
 const props = defineProps({
   showLogo: {
@@ -233,6 +236,11 @@ watch(
   line-height: normal;
 }
 
+.subEntityName {
+  font-size: 0.875rem;
+  font-weight: normal;
+}
+
 :deep(.subEntityName_deepCSS) {
   font-size: 0.875rem;
 }
@@ -255,6 +263,11 @@ watch(
 
   :deep(.entityName_deepCSS) {
     font-size: 0.875rem;
+  }
+
+  .subEntityName {
+    font-size: 0.75rem;
+    font-weight: normal;
   }
 
   :deep(.subEntityName_deepCSS) {
