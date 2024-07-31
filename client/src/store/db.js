@@ -8,14 +8,17 @@ const stores = {
   RESOURCES: 'resources',
 };
 
-const db = openDB(DATABASE_NAME, 8, {
+const db = openDB(DATABASE_NAME, 9, {
   upgrade(db, oldVersion) {
     if (oldVersion < 4) {
       db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
-      db.createObjectStore(stores.PINNEDSURVEYS, { keyPath: '_id' });
     }
     if (oldVersion < 8) {
       db.createObjectStore(stores.RESOURCES, { keyPath: '_id' });
+    }
+    if (oldVersion < 9) {
+      db.deleteObjectStore('surveys');
+      db.createObjectStore(stores.PINNEDSURVEYS, { keyPath: '_id' });
     }
   },
   blocked(currentVersion, blockedVersion) {
