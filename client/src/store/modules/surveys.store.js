@@ -68,6 +68,9 @@ const fetchPinned = async (commit, dispatch) => {
         _id: sid,
         name: '',
         group: group.group_name,
+        /*
+        groupIdImPinnedIn is a field that protects against residual inconsistencies in old data in the database when a survey is pinned in a group other than its own, and pinned surveys must be listed in the group to which they belong.
+        */
         groupIdImPinnedIn: group.group_id,
         meta: {},
       };
@@ -168,6 +171,8 @@ const actions = {
   },
   async addPinned({ commit, dispatch }, pinned) {
     delete pinned?.createdAgo;
+    pinned.pinnedSurveys = true;
+    pinned.groupIdImPinnedIn = pinned.meta.group.id;
     await db.persistPinnedSurvey(pinned);
     commit('ADD_PINNED', pinned);
     if (pinned.resources) {

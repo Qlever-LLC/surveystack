@@ -150,7 +150,6 @@ async function initData() {
     });
   } catch (e) {
     const surveysContent = store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId());
-    surveysContent.map((survey) => (survey.pinnedSurveys = true));
 
     state.surveys = {
       content: surveysContent,

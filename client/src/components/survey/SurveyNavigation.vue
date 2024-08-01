@@ -43,7 +43,7 @@
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useStore } from 'vuex';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
@@ -52,7 +52,7 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
-const { stateComposable, message } = useSurvey();
+const { stateComposable, message, tooglePinSurvey, togglePinEvent } = useSurvey();
 const router = useRouter();
 const store = useStore();
 
@@ -69,6 +69,13 @@ function startDraftAs(selectedMember) {
     );
   }
   stateComposable.selectedSurvey = undefined;
+}
+
+watch(togglePinEvent, (entity) => {
+  tooglePin(entity);
+});
+async function tooglePin(entity) {
+  await tooglePinSurvey(entity);
 }
 </script>
 
