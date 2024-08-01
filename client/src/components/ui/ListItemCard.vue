@@ -29,7 +29,7 @@
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
               <br />
-              <span v-if="!smallCard && groupStyle" class="subEntityName_deepCSS">{{
+              <span v-if="!smallCard && groupSelectorStyle" class="subEntityName_deepCSS">{{
                 !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin(state.entity._id) ? 'Admin' : 'Member'
               }}</span>
             </span>
