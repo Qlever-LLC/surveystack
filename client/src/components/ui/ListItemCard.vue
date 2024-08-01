@@ -29,7 +29,9 @@
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
               <br />
-              <span v-if="!smallCard" class="subEntityName_deepCSS">{{ state.entity?.role }}</span>
+              <span v-if="!smallCard && groupStyle" class="subEntityName_deepCSS">{{
+                !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin(state.entity._id) ? 'Admin' : 'Member'
+              }}</span>
             </span>
             <span v-if="questionSetsType">
               <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
@@ -71,12 +73,16 @@ import { cloneDeep } from 'lodash';
 import { reactive, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
+import { useStore } from 'vuex';
 
 import { useSurvey } from '@/components/survey/survey';
+import { useGroup } from '@/components/groups/group';
 
+const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
 const { isADraft } = useSurvey();
+const { isGroupAdmin } = useGroup();
 
 const props = defineProps({
   entity: {
