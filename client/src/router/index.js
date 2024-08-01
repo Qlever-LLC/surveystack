@@ -135,6 +135,11 @@ const routes = [
     components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
   },
   {
+    //TODO TEMPORARY, TO BE REMOVED AFTER GOING-LIVE OF OVERHAUL RELEASE
+    path: '/groups/:groupId/surveys/:id/submissions/new',
+    redirect: { name: 'surveys-detail', query: { minimal_ui: true } },
+  },
+  {
     path: '/surveys/:surveyId/submissions/:submissionId/edit',
     name: 'edit-submission',
     components: getComponents(SubmissionPage, { navbar: SubmissionDraftNavbar }),
