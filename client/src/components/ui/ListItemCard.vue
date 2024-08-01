@@ -17,7 +17,9 @@
           <a-list-item-title v-else class="d-flex align-center">
             <span v-if="enablePinned" @click.stop="tooglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
               <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
-              <a-icon v-if="!entity.pinnedSurveys && isHovering && !mobile" class="mr-2"> mdi-pin-outline </a-icon>
+              <a-icon v-if="!entity.pinnedSurveys && isHovering && !mobile && !isADraft(entity)" class="mr-2">
+                mdi-pin-outline
+              </a-icon>
             </span>
             <span v-if="groupStyle">
               <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
@@ -70,8 +72,11 @@ import { reactive, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 
+import { useSurvey } from '@/components/survey/survey';
+
 const router = useRouter();
 const { mobile } = useDisplay();
+const { isADraft } = useSurvey();
 
 const props = defineProps({
   entity: {

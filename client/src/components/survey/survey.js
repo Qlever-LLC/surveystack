@@ -33,13 +33,13 @@ export function useSurvey() {
         icon: 'mdi-open-in-new',
         action: (s) =>
           createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
-        render: (s) => () => rightToSubmitSurvey(s).allowed,
+        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
       },
       {
         title: 'Start Survey as Member',
         icon: 'mdi-open-in-new',
         action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
-        render: (s) => () => rightToSubmitSurvey(s).allowed,
+        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
       },
       {
         title: 'Call for Responses',
@@ -65,7 +65,7 @@ export function useSurvey() {
         title: 'Print Blank Survey',
         icon: 'mdi-printer',
         action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
-        render: (s) => () => rightToSubmitSurvey(s).allowed,
+        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
       },
       // {
       //   title: 'View',
@@ -213,5 +213,6 @@ export function useSurvey() {
     getSurveys,
     tooglePinSurvey,
     togglePinEvent,
+    isADraft,
   };
 }

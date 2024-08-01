@@ -32,7 +32,7 @@
       </template>
       <template v-slot:preMenu="{ entity }">
         <a-chip
-          v-if="entity.latestVersion === 1"
+          v-if="isADraft(entity)"
           x-small
           class="mr-2 py-0 px-1"
           color="blue"
@@ -81,7 +81,7 @@ const store = useStore();
 const { getActiveGroupId } = useGroup();
 const { rightToEdit } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message } = useSurvey();
+const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message, isADraft } = useSurvey();
 
 const state = reactive({
   page: 1,
