@@ -122,7 +122,7 @@ export default {
         //change route
         await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {
-        switch (error.response.status) {
+        switch (error.response?.status) {
           case 409:
             this.status = error.response.data.message;
             break;

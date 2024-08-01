@@ -85,26 +85,7 @@ const getSurveys = async (req, res) => {
   return res.send(entities);
 };
 
-const buildPipelineGetSurveyPinned = ({ q, groupId, creator, prefix }) => {
-  const match = {};
-
-  if (q) {
-    match.name = {
-      $regex: q,
-      $options: 'i',
-    };
-  }
-
-  if (creator) {
-    match['meta.creator'] = new ObjectId(creator);
-  }
-
-  if (prefix) {
-    match['meta.group.path'] = {
-      $regex: `^${prefix}`,
-    };
-  }
-
+const buildPipelineGetSurveyPinnedFromGroupId = (groupId) => {
   const pipeline = [
     { $match: { _id: ObjectId(groupId) } },
     { $unwind: '$surveys.pinned' },
@@ -125,10 +106,6 @@ const buildPipelineGetSurveyPinned = ({ q, groupId, creator, prefix }) => {
     },
     { $sort: { name: 1 } },
   ];
-
-  if (Object.keys(match).length > 0) {
-    pipeline.push({ $match: match });
-  }
 
   return pipeline;
 };
@@ -365,7 +342,6 @@ const getSurveyListPage = async (req, res) => {
       'meta.creator',
       'meta.submissions',
       'meta.isLibrary',
-      'revisions',
     ],
   };
 
@@ -381,7 +357,7 @@ const getSurveyListPage = async (req, res) => {
   };
 
   if (prioPinned) {
-    const pipelinePinned = buildPipelineGetSurveyPinned(query);
+    const pipelinePinned = buildPipelineGetSurveyPinnedFromGroupId(query.groupId);
     const pipelinePinnedEntities = await db
       .collection(GROUPS_COLLECTION)
       .aggregate(pipelinePinned)

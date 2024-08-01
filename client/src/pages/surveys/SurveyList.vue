@@ -14,7 +14,7 @@
     </a-alert>
     <basic-list
       @updateSearch="updateSearch"
-      @toogleStar="toogleStar"
+      @tooglePin="tooglePin"
       listType="card"
       :entities="state.surveys.content"
       enablePinned
@@ -32,7 +32,7 @@
       </template>
       <template v-slot:preMenu="{ entity }">
         <a-chip
-          v-if="entity.latestVersion === 1"
+          v-if="isADraft(entity)"
           x-small
           class="mr-2 py-0 px-1"
           color="blue"
@@ -60,13 +60,11 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue';
-import { useStore } from 'vuex';
+import { reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
-
-import api from '@/services/api.service';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
@@ -78,12 +76,12 @@ import formatDistance from 'date-fns/formatDistance';
 
 import { useSurvey } from '@/components/survey/survey';
 
-const store = useStore();
 const router = useRouter();
+const store = useStore();
 const { getActiveGroupId } = useGroup();
 const { rightToEdit } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getSurveys, message } = useSurvey();
+const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message, isADraft } = useSurvey();
 
 const state = reactive({
   page: 1,
@@ -104,9 +102,6 @@ const activeTabPaginationLength = computed(() => {
   const { total } = state.surveys.pagination;
   return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
 });
-const groups = computed(() => {
-  return store.getters['memberships/groups'];
-});
 
 initData();
 
@@ -115,17 +110,15 @@ function updateSearch(val) {
   state.page = 1;
   initData();
 }
-async function toogleStar(entity) {
-  const group = groups.value.find((g) => g._id === getActiveGroupId());
-  const index = group.surveys.pinned.indexOf(entity._id);
-  if (index > -1) {
-    group.surveys.pinned.splice(index, 1);
-  } else {
-    group.surveys.pinned.push(entity._id);
-  }
 
-  await api.put(`/groups/${group._id}`, group);
+watch(togglePinEvent, (entity) => {
+  tooglePin(entity);
+});
+async function tooglePin(entity) {
+  state.loading = true;
+  await tooglePinSurvey(entity);
   await initData();
+  state.loading = false;
 }
 
 function startDraftAs(selectedMember) {
@@ -140,10 +133,9 @@ function startDraftAs(selectedMember) {
 }
 
 async function initData() {
+  state.loading = true;
+  state.menu = stateComposable.menu;
   try {
-    state.loading = true;
-    state.menu = stateComposable.menu;
-
     //laod the surveys
     state.surveys = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT);
     //add createdAgo information
@@ -156,6 +148,17 @@ async function initData() {
         }
       }
     });
+  } catch (e) {
+    const surveysContent = store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId());
+
+    state.surveys = {
+      content: surveysContent,
+      pagination: {
+        total: 0,
+        skip: 0,
+        limit: 100000,
+      },
+    };
   } finally {
     state.loading = false;
   }

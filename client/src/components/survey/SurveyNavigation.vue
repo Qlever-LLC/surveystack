@@ -14,13 +14,13 @@
   <div class="ml-4 mt-4 text-white text-body-2">Surveys</div>
   <a-list dense class="px-4">
     <list-item-card
-      v-for="(entity, idx) in state.surveys"
-      :key="entity._id"
+      v-for="(entity, idx) in surveys"
+      :key="entity"
       :entity="entity"
       :idx="String(idx)"
       class="whiteCard"
       smallCard
-      :menu="state.menu">
+      :menu="menu">
       <template v-slot:entitySubtitle></template>
     </list-item-card>
     <a-list-item
@@ -42,8 +42,9 @@
 <script setup>
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
-import { useRouter, useRoute } from 'vue-router';
-import { reactive, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { computed, watch } from 'vue';
+import { useStore } from 'vuex';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
@@ -51,26 +52,13 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
-const { stateComposable, getSurveys, message } = useSurvey();
+const { stateComposable, message, tooglePinSurvey, togglePinEvent } = useSurvey();
 const router = useRouter();
-const route = useRoute();
+const store = useStore();
 
-const state = reactive({
-  surveys: [],
-  menu: [],
-});
+const menu = computed(() => stateComposable.menu);
 
-initData();
-
-watch(route, () => {
-  initData();
-});
-
-async function initData() {
-  const surveyData = await getSurveys(getActiveGroupId(), '', 1, 2);
-  state.surveys = surveyData?.content;
-  state.menu = stateComposable.menu;
-}
+const surveys = computed(() => store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId()));
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;
@@ -81,6 +69,13 @@ function startDraftAs(selectedMember) {
     );
   }
   stateComposable.selectedSurvey = undefined;
+}
+
+watch(togglePinEvent, (entity) => {
+  tooglePin(entity);
+});
+async function tooglePin(entity) {
+  await tooglePinSurvey(entity);
 }
 </script>
 

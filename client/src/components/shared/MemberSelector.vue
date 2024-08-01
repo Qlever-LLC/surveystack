@@ -103,20 +103,27 @@ export default {
   },
   methods: {
     async fetchMembers(groupId) {
-      const { data: members } = await api.get(`/memberships?group=${groupId}&populate=true`);
-      this.members = members;
+      try {
+        const { data: members } = await api.get(`/memberships?group=${groupId}&populate=true`);
+        this.members = members;
+      } catch (e) {
+        this.members = [];
+      }
     },
     setGroup(groupId) {
       this.selectedGroupId = groupId;
       this.fetchMembers(this.selectedGroupId);
     },
   },
-  mounted() {
-    this.value = true;
-    this.fetchMembers(this.selectedGroupId);
-  },
-  async created() {
-    this.value = true;
+  watch: {
+    show: function (show) {
+      if (show) {
+        this.fetchMembers(this.selectedGroupId);
+      }
+    },
+    fixedGroupId: function (newVal) {
+      this.selectedGroupId = newVal;
+    },
   },
 };
 </script>

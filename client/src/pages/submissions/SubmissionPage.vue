@@ -277,12 +277,14 @@ export default defineComponent({
       state.loading = true;
 
       try {
-        state.survey = (await api.get(`/surveys/${props.surveyId}?version=latest`)).data;
+        state.survey = await store.dispatch('surveys/fetchSurvey', { id: props.surveyId });
       } catch (error) {
-        state.hasError = true;
-        state.errorMessage = 'Survey not found.';
-        state.loading = false;
-        return;
+        if (!state.survey) {
+          state.hasError = true;
+          state.errorMessage = 'Survey not found.';
+          state.loading = false;
+          return;
+        }
       }
       const isLoginRequired = state.survey.meta.submissions === 'user' || state.survey.meta.submissions === 'group';
       if (isLoginRequired && !store.getters['auth/isLoggedIn']) {
