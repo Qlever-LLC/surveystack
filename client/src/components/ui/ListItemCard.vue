@@ -15,9 +15,11 @@
             <slot name="entityTitle" :entity="state.entity" />
           </a-list-item-title>
           <a-list-item-title v-else class="d-flex align-center">
-            <span v-if="enablePinned" @click.stop="tooglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
+            <span v-if="showPinned" @click.stop="tooglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
               <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
-              <a-icon v-if="!entity.pinnedSurveys && isHovering && !mobile && !isADraft(entity)" class="mr-2">
+              <a-icon
+                v-if="!entity.pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
+                class="mr-2">
                 mdi-pin-outline
               </a-icon>
             </span>
@@ -101,7 +103,12 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  enablePinned: {
+  showPinned: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  enableTogglePinned: {
     type: Boolean,
     required: false,
     default: false,
@@ -144,6 +151,7 @@ const state = reactive({
   menuIsOpen: [],
   groupStyle: {},
   avatarName: '',
+  ableTogglePinned: props.enableTogglePinned,
 });
 
 onMounted(() => {
@@ -177,7 +185,7 @@ function getTextColor(itemMenu) {
 }
 
 function tooglePin(entity) {
-  if (!mobile.value) {
+  if (state.ableTogglePinned && !mobile.value) {
     emit('tooglePin', entity);
   }
 }

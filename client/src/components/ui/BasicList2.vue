@@ -63,7 +63,8 @@
             @tooglePin="emit('tooglePin', entity)"
             :entity="entity"
             :idx="String(idx)"
-            :enablePinned="enablePinned"
+            :showPinned="showPinned"
+            :enableTogglePinned="enableTogglePinned"
             :groupStyle="groupStyle"
             :showGroupPath="showGroupPath"
             :questionSetsType="questionSetsType"
@@ -154,7 +155,12 @@ const props = defineProps({
     required: false,
     default: 'row',
   },
-  enablePinned: {
+  showPinned: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  enableTogglePinned: {
     type: Boolean,
     required: false,
     default: false,

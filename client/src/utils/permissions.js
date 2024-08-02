@@ -54,6 +54,12 @@ export function getPermission() {
       : { allowed: false, message: "Sorry you can't manage this response" };
   }
 
+  function rightToTogglePin() {
+    return store.getters['auth/isLoggedIn'] && rightToEdit().allowed
+      ? { allowed: true, message: 'success' }
+      : { allowed: false, message: "Sorry you can't pin and unpin this survey" };
+  }
+
   return {
     rightToSubmitSurvey,
     rightToEdit,
@@ -61,5 +67,6 @@ export function getPermission() {
     rightToViewAnonymizedResults,
     rightToView,
     rightToManageSubmission,
+    rightToTogglePin,
   };
 }

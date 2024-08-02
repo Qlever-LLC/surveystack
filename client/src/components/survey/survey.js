@@ -16,8 +16,14 @@ export function useSurvey() {
   const store = useStore();
   const router = useRouter();
   const { mobile } = useDisplay();
-  const { rightToSubmitSurvey, rightToEdit, rightToCallForSubmissions, rightToViewAnonymizedResults, rightToView } =
-    getPermission();
+  const {
+    rightToSubmitSurvey,
+    rightToEdit,
+    rightToCallForSubmissions,
+    rightToViewAnonymizedResults,
+    rightToView,
+    rightToTogglePin,
+  } = getPermission();
   const { message, createAction } = menuAction();
 
   const { getActiveGroupId } = useGroup();
@@ -93,13 +99,13 @@ export function useSurvey() {
       {
         title: 'Pin Survey',
         icon: 'mdi-pin',
-        action: (s) => createAction(s, rightToEdit, () => tooglePinOnMobile(s)),
+        action: (s) => createAction(s, rightToTogglePin, () => tooglePinOnMobile(s)),
         render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && !s.pinnedSurveys,
       },
       {
         title: 'Unpin Survey',
         icon: 'mdi-pin-outline',
-        action: (s) => createAction(s, rightToEdit, () => tooglePinOnMobile(s)),
+        action: (s) => createAction(s, rightToTogglePin, () => tooglePinOnMobile(s)),
         render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && s.pinnedSurveys,
       },
     ],

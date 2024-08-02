@@ -29,7 +29,8 @@ export const BasicListCard_Survey = {
     //👇 The args you need here will depend on your component
     listType: 'card',
     entities: entityType.surveys,
-    enablePinned: true,
+    showPinned: true,
+    enableTogglePinned: true,
     buttonNew: { title: 'Create new Survey', link: '/url' },
     menu: [
       { title: 'Start Survey', icon: 'mdi-open-in-new', action: () => `/url`, color: 'green' },

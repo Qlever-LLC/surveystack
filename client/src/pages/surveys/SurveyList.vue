@@ -17,7 +17,8 @@
       @tooglePin="tooglePin"
       listType="card"
       :entities="state.surveys.content"
-      enablePinned
+      showPinned
+      :enableTogglePinned="rightToTogglePin().allowed"
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
       :menu="state.menu"
       :loading="state.loading"
@@ -79,7 +80,7 @@ import { useSurvey } from '@/components/survey/survey';
 const router = useRouter();
 const store = useStore();
 const { getActiveGroupId } = useGroup();
-const { rightToEdit } = getPermission();
+const { rightToEdit, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
 const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message, isADraft } = useSurvey();
 
