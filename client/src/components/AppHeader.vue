@@ -34,7 +34,7 @@
               <span class="panelTitle" style="cursor: pointer">
                 {{ state.activeGroup?.name }}
                 <div class="subEntityName">
-                  {{ !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin() ? 'Admin' : 'Member' }}
+                  {{ state.selectedGroupRole }}
                 </div>
               </span>
             </span>
@@ -103,7 +103,7 @@ const store = useStore();
 const router = useRouter();
 const route = useRoute();
 const { mobile } = useDisplay();
-const { getActiveGroup, getMyGroups, isGroupAdmin } = useGroup();
+const { getActiveGroup, getMyGroups, isGroupAdmin, isGroupMember } = useGroup();
 
 const props = defineProps({
   showLogo: {
@@ -117,6 +117,17 @@ const state = reactive({
   avatarName: '',
   expanded: false,
   myGroups: undefined,
+  selectedGroupRole: computed(() => {
+    if (!state.activeGroup) {
+      return '';
+    } else if (isGroupAdmin()) {
+      return 'Admin';
+    } else if (isGroupMember()) {
+      return 'Member';
+    } else {
+      return 'Visitor';
+    }
+  }),
   isWhitelabel: computed(() => {
     return store.getters['whitelabel/isWhitelabel'];
   }),
