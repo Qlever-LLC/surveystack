@@ -34,6 +34,36 @@ describe('Script Endpoints', () => {
           done();
         });
     });
+    it('returns a 200 with the scripts of a group', (done) => {
+      request(app)
+        .get('/api/scripts?groupId=' + group._id)
+        .send()
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.body).toMatchObject([
+            {
+              _id: String(script._id),
+              meta: {
+                group: {
+                  id: String(group._id),
+                  path: String(group.path),
+                },
+              },
+            },
+          ]);
+          done();
+        });
+    });
+    it('returns a 200 with the an empty array for group which has no scripts', (done) => {
+      request(app)
+        .get('/api/scripts?groupId=' + new ObjectId())
+        .send()
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.body).toMatchObject([]);
+          done();
+        });
+    });
   });
 
   describe('DELETE /api/scripts/:id', () => {

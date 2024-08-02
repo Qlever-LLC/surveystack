@@ -1,7 +1,8 @@
 <template>
   <a-card>
-    <a-card-title class="d-block pb-0">
+    <a-card-title class="d-block py-0">
       <div class="d-flex">
+        <AppNavigationControl class="align-self-center mr-2 ml-n4 mt-n4" />
         <survey-name-editor v-model="value.name" />
         <a-spacer />
         <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
@@ -13,11 +14,11 @@
           <a-card>
             <a-card-title> Edit Survey Details</a-card-title>
             <a-card-text>
-              <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
+              <group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <a-select
                 variant="outlined"
                 v-model="value.meta.submissions"
-                label="Allow Submissions for..."
+                label="Allow Responses for..."
                 :items="availableSubmissions"
                 item-title="text"
                 item-value="value" />
@@ -220,7 +221,7 @@
 
 <script>
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import GroupSelector from '@/components/shared/GroupSelector.vue';
 import appResources from '@/components/builder/Resources.vue';
 import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
@@ -230,6 +231,7 @@ import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
 import { calcSurveySizeMB } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AppNavigationControl from '@/components/AppNavigationControl.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -290,12 +292,13 @@ export default {
     },
   },
   components: {
+    AppNavigationControl,
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,
     PrintSettingsDialog,
     SurveyNameEditor,
-    ActiveGroupSelector,
+    GroupSelector,
     appResources,
   },
   methods: {

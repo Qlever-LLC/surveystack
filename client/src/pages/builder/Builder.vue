@@ -1,12 +1,13 @@
 <template>
-  <div v-if="!showInvalidPlatformModal" style="height: 100%">
+  <div v-if="!showInvalidPlatformModal" style="height: 100%; padding: 16px">
     <survey-builder
+      class="rounded"
       v-if="!loading.fetch"
       :key="sessionId"
       :survey="survey"
       :isSaving="loading.save"
       :isUpdating="loading.publish"
-      :editMode="editMode"
+      :editMode="editModeLocal"
       :freshImport="freshImport"
       @submit="submitSubmission"
       @onSaveDraft="submitSurvey(true)"
@@ -52,8 +53,8 @@
     <result-dialog
       v-model="showResult"
       :items="resultItems"
-      title="Result of Submission"
-      additionalMessage="<span class='text-caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      title="Result of Response"
+      additionalMessage="<span class='text-caption'>Note: responses from Builder are automatically archived. Please browse archived responses to view this result.</span>"
       :survey="survey"
       :submission="submission"
       @close="showResult = false" />
@@ -121,10 +122,24 @@ export default {
     appDialog,
     resultDialog,
   },
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+    surveyId: {
+      type: String,
+      required: false,
+    },
+    editMode: {
+      type: Boolean,
+      required: true,
+    },
+  },
   mixins: [resultMixin],
   data() {
     return {
-      editMode: true,
+      editModeLocal: null,
       showConflictModal: false,
       sessionId: new ObjectId().toString(),
       loading: {
@@ -164,22 +179,36 @@ export default {
       return v.charAt(0).toUpperCase() + v.slice(1);
     },
   },
+  watch: {
+    surveyId: {
+      async handler(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          await this.init();
+        }
+      },
+    },
+  },
   methods: {
+    async init() {
+      this.editModeLocal = this.editMode;
+      if (this.editModeLocal) {
+        this.loading.fetch = true;
+        await this.fetchData();
+      } else {
+        this.survey._id = new ObjectId();
+      }
+    },
     getActiveGroupSimpleObject() {
       try {
-        const id = this.$store.getters['memberships/activeGroup'];
         const groups = this.$store.getters['memberships/groups'];
-        const { path } = groups.find(({ _id }) => _id === id);
+        const { path } = groups.find(({ _id }) => _id === this.id);
         return {
-          id,
+          id: this.id,
           path,
         };
       } catch (error) {
         return { id: null, path: null };
       }
-    },
-    navigateToLogin() {
-      this.$router.push('/auth/login');
     },
     snack(message) {
       this.snackbarMessage = message;
@@ -196,7 +225,9 @@ export default {
       }
       try {
         await api.delete(`/surveys/${this.survey._id}`);
-        this.$router.push('/surveys/browse');
+        this.$router.push({
+          name: 'group-surveys',
+        });
       } catch (error) {
         console.log(error);
       }
@@ -254,12 +285,12 @@ export default {
       console.log('submitting survey', tmp);
 
       try {
-        if (this.editMode) {
+        if (this.editModeLocal) {
           await api.put(`/surveys/${tmp._id}`, tmp);
         } else {
           await api.post('/surveys', tmp);
-          this.editMode = true;
-          this.$router.push(`/surveys/${tmp._id}/edit`);
+          this.editModeLocal = true;
+          this.$router.push(`/groups/${this.id}/surveys/${tmp._id}/edit`);
         }
 
         this.snack(isDraft ? 'Saved Draft' : 'Published Survey');
@@ -353,8 +384,7 @@ export default {
     },
     async fetchData() {
       try {
-        const { id } = this.$route.params;
-        this.survey._id = id;
+        this.survey._id = this.surveyId;
         const { data } = await api.get(`/surveys/${this.survey._id}?version=latestPublishedOrDraft`);
         this.survey = { ...this.survey, ...data };
         // Fetch all resources into local storage
@@ -372,14 +402,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(({ name }) => name === 'surveys-new');
-
-    this.survey._id = new ObjectId();
-
-    if (this.editMode) {
-      this.loading.fetch = true;
-      await this.fetchData();
-    }
+    await this.init();
   },
   beforeRouteLeave(to, from, next) {
     next(true);

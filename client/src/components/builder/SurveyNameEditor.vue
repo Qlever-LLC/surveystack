@@ -46,10 +46,9 @@ export default {
 </script>
 <style scoped lang="scss">
 .v-text-field :deep(input) {
-  font-size: 2.125rem;
-  padding-top: 0;
+  font-size: 1.5em;
+  padding-top: 4px;
   padding-bottom: 0;
-  line-height: 10px;
   min-height: 0;
 }
 .v-text-field {

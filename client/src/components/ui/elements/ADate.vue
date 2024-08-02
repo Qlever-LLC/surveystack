@@ -96,8 +96,8 @@ const dateFormatted = computed(() => {
 
 const datePickerType = computed(() => {
   switch (props.type) {
-    case 'date-month-year':
-      return 'months';
+    // case 'date-month-year':
+    //   return 'months';
     default:
       return 'date';
   }
@@ -162,8 +162,8 @@ const updateDatePicker = (date) => {
 
 const dateFormat = (type, value) => {
   switch (type) {
-    case 'date-month-year':
-      return format(value, 'yyyy-MM');
+    // case 'date-month-year':
+    //   return format(value, 'yyyy-MM');
     // case 'date-year': not defined here
     //   return format(value, 'yyyy');
     case 'date-week-month-year':

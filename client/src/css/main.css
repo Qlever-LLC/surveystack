@@ -147,24 +147,22 @@ body {
   right: 24px;
 }
 
-.minimal-ui .survey-detail-nav {
-  display: none !important;
-}
-
-.minimal-ui .app-navbar,
-.minimal-ui .survey-detail .survey-info-submissions-count,
-.minimal-ui .survey-detail .survey-info-latest-submission {
-  display: none;
-}
-
-.minimal-ui .v-main {
-  padding-top: 0;
-}
-
 .white-space-nowrap {
   white-space: nowrap;
 }
 
 ::placeholder {
   color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.basicListContainer {
+  max-width: none !important;
+  height: 100%;
+  padding: 16px !important;
+}
+
+@media (max-width: 1280px) {
+  .basicListContainer {
+    padding: 8px !important;
+  }
 }

@@ -115,7 +115,7 @@ export async function uploadFileResource(store, resourceKey, clearCacheAfterUplo
     //set resource to committed
     await api.put(`/resources/commit/${resource._id}`, { dummy: '' });
     if (clearCacheAfterUpload) {
-      await store.dispatch('resources/removeLocalResource', resource.key);
+      await store.dispatch('resources/removeLocalResource', { key: resource.key });
     } else {
       await store.dispatch('resources/updateResourceState', {
         resourceKey: resource.key,

@@ -1,42 +1,51 @@
 <template>
   <a-container>
-    <a-alert v-if="errorMsg" class="mt-4" mode="fade" variant="text" type="error">{{ errorMsg }}</a-alert>
-    <template v-if="initialized && membership">
-      <h1>Invitation</h1>
-      <p class="subtitle-2 text-secondary">{{ code }}</p>
-      <div v-if="membership.meta.status === 'pending'">
-        <a-alert class="mt-4" variant="outlined" v-if="membership" type="info"
-          >This code allows you to join <strong>{{ membership.group.name }}</strong
-          >!
-        </a-alert>
-
-        <div class="d-flex justify-end">
+    <a-card color="background">
+      <a-alert v-if="errorMsg" class="mt-4" mode="fade" variant="text" type="error">{{ errorMsg }} </a-alert>
+      <template v-if="initialized && membership">
+        <a-card-title class="text-heading d-flex pa-4"> Invitation</a-card-title>
+        <a-card-subtitle> Code {{ code }}</a-card-subtitle>
+        <a-card-text>
+          <div v-if="membership.meta.status === 'pending'">
+            <a-alert class="mt-4" variant="outlined" v-if="membership" type="info"
+              >This code allows you to join <strong>{{ membership.group.name }}</strong
+              >!
+            </a-alert>
+          </div>
+          <div v-else>
+            <a-alert class="mt-4" variant="outlined" v-if="membership" type="error"
+              >This code has already been activated and is no longer valid...
+            </a-alert>
+          </div>
+        </a-card-text>
+        <a-card-actions v-if="membership.meta.status === 'pending'" class="d-flex justify-end">
           <a-btn variant="text" @click="cancel">Cancel</a-btn>
-          <a-btn color="primary" @click="join">Join {{ membership.group.name }}</a-btn>
-        </div>
-      </div>
-      <div v-else>
-        <a-alert class="mt-4" variant="outlined" v-if="membership" type="error"
-          >This code has already been activated and is no longer valid...
-        </a-alert>
-      </div>
-    </template>
-    <template v-else-if="initialized && !membership">
-      <a-text-field v-model="code" label="Invitation" />
-      <div class="d-flex justify-end">
-        <a-btn class="primary" @click="fetchData">Try code</a-btn>
-      </div>
-    </template>
-    <a-progress-circular v-else :size="50" />
+          <a-btn color="primary" variant="flat" @click="join">Join {{ membership.group.name }}</a-btn>
+        </a-card-actions>
+      </template>
+      <template v-else-if="initialized && !membership">
+        <a-card-text>
+          <a-text-field v-model="code" label="Invitation" />
+          <a-card-actions>
+            <a-btn class="primary" @click="fetchData">Try code</a-btn>
+          </a-card-actions>
+        </a-card-text>
+      </template>
+      <a-progress-circular v-else :size="50" />
+    </a-card>
   </a-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
-import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
+import ACardTitle from '@/components/ui/elements/ACardTitle.vue';
+import ACardSubtitle from '@/components/ui/elements/ACardSubtitle.vue';
+import ACardText from '@/components/ui/elements/ACardText.vue';
+import ACardActions from '@/components/ui/elements/ACardActions.vue';
 
 export default {
+  components: { ACardActions, ACardText, ACardSubtitle, ACardTitle },
   data() {
     return {
       initialized: false,
@@ -76,13 +85,8 @@ export default {
         return;
       }
 
-      // Set joined group as active group
-      // autoSelectActiveGroup also fetches the user's groups, so we are using this instead of
-      // just dispatching 'memberships/setActiveGroup'
-      await autoSelectActiveGroup(this.$store, this.membership.group._id);
-
       this.$store.dispatch('surveys/fetchPinned');
-      this.$router.push('/');
+      this.$router.push(`/groups/${this.membership.group._id}`);
     },
   },
 

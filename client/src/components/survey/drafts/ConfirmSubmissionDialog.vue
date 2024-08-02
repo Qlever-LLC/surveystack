@@ -8,11 +8,7 @@
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
         <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
-          <active-group-selector
-            label="Group"
-            class="d-inline-block"
-            :modelValue="groupId"
-            @update:modelValue="setGroup" />
+          <group-selector label="Group" class="d-inline-block" :modelValue="groupId" @update:modelValue="setGroup" />
           <a-btn icon @click="handleCloseGroupEditor">
             <a-icon>mdi-close</a-icon>
           </a-btn>
@@ -23,7 +19,7 @@
         <div v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
         </div>
-        <div v-if="dateSubmitted">
+        <div v-if="isResubmission()">
           This submission was previously submitted on
           {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
         </div>
@@ -41,7 +37,7 @@
 </template>
 
 <script>
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import GroupSelector from '@/components/shared/GroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
 
 export default {
@@ -77,10 +73,14 @@ export default {
     dateSubmitted: {
       type: String,
     },
+    isDraft: {
+      type: Boolean,
+      required: true,
+    },
   },
   emits: ['update:modelValue', 'submit', 'close', 'set-group'],
   components: {
-    ActiveGroupSelector,
+    GroupSelector,
   },
   created() {
     if (this.groupId) {
@@ -94,6 +94,9 @@ export default {
   },
   computed: {},
   methods: {
+    isResubmission() {
+      return this.isDraft === false && this.dateSubmitted;
+    },
     handleConfirm() {
       this.$emit('update:modelValue', false);
       this.$emit('submit');

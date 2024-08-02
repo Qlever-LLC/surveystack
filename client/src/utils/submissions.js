@@ -280,8 +280,6 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
 
 export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
   const { submissions, isLibrary } = survey.meta;
-  const publishedVersion = survey.revisions.find((revision) => revision.version === survey.latestVersion);
-  const isPublishedVersionEmpty = publishedVersion.controls.length === 0;
 
   if (isLibrary) {
     return {
@@ -290,6 +288,10 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
     };
   }
 
+  // REMOVED this due to performance issues => have to load survey.revision => heavy for this edge case !
+  /*
+  const publishedVersion = survey.revisions.find((revision) => revision.version === survey.latestVersion);
+  const isPublishedVersionEmpty = publishedVersion.controls.length === 0;
   if (isPublishedVersionEmpty) {
     return {
       allowed: false,
@@ -297,6 +299,7 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
         'The latest published version of this survey is empty. Please publish a new version to start a submission.',
     };
   }
+    */
 
   switch (submissions) {
     case 'user':
@@ -326,6 +329,7 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
   return { allowed: false, message: 'You are not authorized to submit this survey.' };
 };
 
+//TODO replace this by permissions.js:rightToManageSubmission which requires to refactor the using components to script setup
 export const checkAllowedToResubmit = (submission, userMemberships, userId) => {
   const isAdminOfSubmissionGroup = userMemberships.some(
     (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'

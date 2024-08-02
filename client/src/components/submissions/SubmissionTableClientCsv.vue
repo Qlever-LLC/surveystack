@@ -27,11 +27,6 @@
                     label="Show metadata"
                     class="mt-2" />
                   <a-switch
-                    :modelValue="archived"
-                    @update:modelValue="$emit('showArchived', $event)"
-                    label="View archived only"
-                    class="mt-2 ml-5" />
-                  <a-switch
                     :modelValue="isExpandMatrix"
                     @update:modelValue="isExpandMatrix = $event"
                     label="Expand matrix questions"
@@ -483,8 +478,10 @@ export default {
         return;
       }
       const headers = transformGeoJsonHeaders(this.submissions.headers);
-      this.csv = csvService.createCsv(this.submissions.content, headers);
-      this.parsed = papa.parse(this.csv, { header: true });
+      if (this.submissions.content.length > 0) {
+        this.csv = csvService.createCsv(this.submissions.content, headers);
+        this.parsed = papa.parse(this.csv, { header: true });
+      }
       this.createHeaders();
     },
     async openResource(value) {

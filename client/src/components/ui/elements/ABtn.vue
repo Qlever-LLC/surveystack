@@ -1,5 +1,6 @@
 <template>
   <v-btn
+    :block="block"
     :type="type"
     :value="value"
     :disabled="disabled"
@@ -33,6 +34,10 @@
 <script>
 export default {
   props: {
+    block: {
+      type: Boolean,
+      default: false,
+    },
     type: {
       type: String,
       default: 'button',
@@ -102,7 +107,7 @@ export default {
       required: false,
     },
     rounded: {
-      type: Boolean,
+      type: [String, Number, Boolean],
       required: false,
     },
     variant: {

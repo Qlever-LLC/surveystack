@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-deprecated-slot-attribute -->
 <template>
-  <div class="draft-component-wrapper draft wrapper" :class="{ builder }" v-if="control" ref="wrapper">
+  <div class="draft-component-wrapper bg-background rounded" :class="{ builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-if="showConfirmSubmission"
@@ -9,7 +9,8 @@
       :submitAsUser="submission.meta.submitAsUser"
       @submit="submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
-      :dateSubmitted="submission.meta.dateSubmitted" />
+      :dateSubmitted="submission.meta.dateSubmitted"
+      :isDraft="submission.meta.isDraft" />
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
@@ -18,8 +19,9 @@
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
       :questionNumber="questionNumber"
-      @showOverviewClicked="showOverview = !showOverview"
-      v-if="builder">
+      :showNavigationControl="!builder && !$route.query.minimal_ui"
+      :surveyName="!builder ? survey.name : undefined"
+      @showOverviewClicked="showOverview = !showOverview">
       <!-- forward all the slots -->
       <template v-for="(_, name) in $slots" v-slot:[name]="{ props }">
         <slot :name="name" :props="props" />
@@ -60,12 +62,8 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-0 bg-grey-lighten-4"
+      class="draft-footer px-0 bg-background"
       :class="{ 'show-submit': showOverview }"
-      :style="{
-        left: moveFooter ? '256px' : '0px',
-        width: moveFooter ? 'calc(100% - 256px)' : '100%',
-      }"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered'] && $store.getters['draft/enableNext']"
       :enableSubmit="!$store.getters['draft/errors']"
@@ -106,8 +104,13 @@
         This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
         editor.
       </a-col>
-      <a-col class="shrink">
-        <a-btn :to="`/surveys/${survey._id}`">back</a-btn>
+      <a-col class="shrink" v-if="survey._id">
+        <a-btn
+          :to="{
+            name: 'group-surveys',
+          }">
+          back
+        </a-btn>
       </a-col>
     </a-row>
   </a-alert>
@@ -172,15 +175,6 @@ export default {
         this.$store.dispatch('draft/showConfirmSubmission', v);
       },
     },
-    moveFooter() {
-      if (this.builder) {
-        return false;
-      }
-      // we want a fixed footer, but this causes issues when the menu side bar is shown...
-      // Basically, we need to move the footer to the left and calculate its width if the menu is shown,
-      // However, if display breakpoint is 'md' or less, we do not move the footer
-      return this.$store.getters['appui/menu'] && !this.$vuetify.display.mdAndDown;
-    },
   },
   watch: {
     path() {
@@ -227,16 +221,14 @@ export default {
       this.showOverview = false;
     },
     submit() {
-      // if group is not yet set, select the user's selected group if set
+      // if group is not yet set, select the group defined by the url path
       if (!this.submission.meta.group.id) {
-        const activeGroupId = this.$store.getters['memberships/activeGroup'];
-        if (activeGroupId) {
-          const allGroups = this.$store.getters['memberships/groups'];
-          const activeGroup = allGroups.find(({ _id }) => _id === activeGroupId);
-          if (activeGroup) {
-            this.submission.meta.group.id = activeGroup._id;
-            this.submission.meta.group.path = activeGroup.path;
-          }
+        const currentGroupId = this.$route.params.id;
+        const allGroups = this.$store.getters['memberships/groups'];
+        const currentGroup = allGroups.find(({ _id }) => _id === currentGroupId);
+        if (currentGroup) {
+          this.submission.meta.group.id = currentGroup._id;
+          this.submission.meta.group.path = currentGroup.path;
         }
       }
 
@@ -289,7 +281,7 @@ export default {
 .draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after {
   background-color: gray;
   position: absolute;
-  content: "Builder submissions not visible in 'Results'.  Check 'archived' to view.";
+  content: "Builder responses not visible in 'Results'.  Check 'archived' to view.";
   white-space: pre-wrap;
   padding: 8px;
   border-radius: 5px;
@@ -332,7 +324,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0px !important;
+  padding: 4px !important;
 }
 
 .draft-overview {
@@ -359,8 +351,14 @@ export default {
   z-index: 3;
   height: 68px;
   width: 100%;
-  position: fixed;
-  bottom: 0px;
-  left: 0px;
+  position: sticky;
+  bottom: 16px;
+}
+
+@media (max-width: 1280px) {
+  .draft-footer {
+    width: calc(100% - 12px);
+    bottom: 12px;
+  }
 }
 </style>
