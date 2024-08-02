@@ -65,6 +65,7 @@
             :idx="String(idx)"
             :enablePinned="enablePinned"
             :groupStyle="groupStyle"
+            :showGroupPath="showGroupPath"
             :questionSetsType="questionSetsType"
             :menu="menu"
             usedInBasicList>
@@ -159,6 +160,11 @@ const props = defineProps({
     default: false,
   },
   groupStyle: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  showGroupPath: {
     type: Boolean,
     required: false,
     default: false,

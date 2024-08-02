@@ -29,6 +29,9 @@
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
               <br />
+              <span v-if="showGroupPath" style="color: gray">
+                {{ state.entity.path }}
+              </span>
               <span v-if="!smallCard && groupSelectorStyle" class="subEntityName_deepCSS">{{
                 !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin(state.entity._id) ? 'Admin' : 'Member'
               }}</span>
@@ -104,6 +107,11 @@ const props = defineProps({
     default: false,
   },
   groupStyle: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  showGroupPath: {
     type: Boolean,
     required: false,
     default: false,

@@ -129,7 +129,7 @@ const getGroups = async (req, res) => {
 
   let dirQuery;
   if (!dir) {
-    dirQuery = { $regex: `^/` };
+    dirQuery = `/`;
   } else {
     dirQuery = dir;
 
@@ -138,12 +138,12 @@ const getGroups = async (req, res) => {
     }
 
     if (queryParam(tree)) {
-      dirQuery = { $regex: `^${dir}` };
+      dirQuery = dir;
     }
   }
 
   const findQuery = {
-    dir: dirQuery,
+    dir: { $regex: `^${dirQuery}` },
     'meta.archived': archived,
   };
 

@@ -17,9 +17,12 @@
         <group-edit scope="edit" @changed="groupChanged" />
       </a-card-text>
       <basic-list
-        listRow
+        listType="card"
         :showNavigationControl="false"
         :entities="subgroups"
+        :loading="isLoadingGroup"
+        groupStyle
+        showGroupPath
         title="Subgroups"
         :menu="[
           {
@@ -30,12 +33,11 @@
           },
         ]"
         :buttonNew="{ title: 'new...', link: { name: 'groups-new', query: { dir: entity.path } } }">
-        <template v-slot:entityTitle="{ entity }">
-          {{ entity.name }}
+        <template v-slot:entityTitle="{ entity }"> {{ entity.name }} ! {{ entity.path }} </template>
+        <template v-slot:filter>
+          <a-checkbox v-model="this.showArchived" label="View archived" dense hide-details color="primary" />
         </template>
-        <template v-slot:entitySubtitle="{ entity }">
-          {{ entity.path }}
-        </template>
+        <template v-slot:noValue> No Groups available </template>
       </basic-list>
       <basic-list
         listType="card"
@@ -109,6 +111,7 @@ export default {
         },
       },
       subgroups: [],
+      showArchived: false,
       searchResults: [],
       integrations,
       isLoadingGroup: false,
@@ -123,7 +126,7 @@ export default {
     },
     async getSubgroups() {
       try {
-        const { data } = await api.get(`/groups/all?showArchived=${this.entity.meta.archived}&dir=${this.entity.path}`);
+        const { data } = await api.get(`/groups/all?showArchived=${this.showArchived}&dir=${this.entity.path}`);
         this.subgroups = data;
       } catch (e) {
         this.status.code = e.response.status;
@@ -172,6 +175,13 @@ export default {
     } finally {
       this.isLoadingGroup = false;
     }
+  },
+  watch: {
+    showArchived: async function () {
+      this.isLoadingGroup = true;
+      await this.getSubgroups();
+      this.isLoadingGroup = false;
+    },
   },
 };
 </script>
