@@ -2,7 +2,7 @@
   <div class="ml-4 mt-4 text-white text-body-2">My Groups</div>
   <a-list dense class="px-4">
     <list-item-card
-      v-for="(entity, idx) in getMyGroups(2)"
+      v-for="(entity, idx) in getMyGroups({ getOnlyNotArchived: true, limit: 2 })"
       :key="entity._id"
       :entity="entity"
       :idx="String(idx)"

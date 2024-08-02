@@ -135,7 +135,7 @@ initData();
 
 async function initData() {
   state.activeGroup = await getActiveGroup();
-  state.myGroups = getMyGroups().sort((a, b) => a.path.localeCompare(b.path));
+  state.myGroups = getMyGroups({ getOnlyNotArchived: true }).sort((a, b) => a.path.localeCompare(b.path));
 
   if (state.activeGroup) {
     const name = state.activeGroup.name;

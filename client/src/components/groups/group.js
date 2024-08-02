@@ -6,13 +6,18 @@ export function useGroup() {
   const store = useStore();
   const route = useRoute();
 
-  function getMyGroups(limit = undefined) {
+  function getMyGroups({ getOnlyNotArchived, limit = undefined }) {
     let groups;
     if (isWhitelabel()) {
       groups = store.getters['memberships/getPrefixedGroups'](getWhitelabelPartner().path);
     } else {
       groups = store.getters['memberships/groups'];
     }
+
+    if (getOnlyNotArchived) {
+      groups = groups.filter((g) => g.meta.archived === false);
+    }
+
     if (limit) {
       return groups.slice(0, limit);
     } else {
@@ -35,7 +40,7 @@ export function useGroup() {
     if (!activeGroupId) {
       return null;
     }
-    const groups = getMyGroups();
+    const groups = getMyGroups(false);
     let groupFound = groups.find((group) => group._id === activeGroupId);
     if (!groupFound) {
       const { data: group } = await api.get(`/groups/${activeGroupId}`);
