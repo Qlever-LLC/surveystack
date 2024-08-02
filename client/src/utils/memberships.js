@@ -29,17 +29,21 @@ export async function redirectAfterLogin(store, router, redirectUrl, preferredGr
   } else if (preferredGroupId) {
     const isMemberOfPreferredGroup = memberships.some((m) => m.group._id === preferredGroupId);
     if (isMemberOfPreferredGroup) {
-      router.push(`/groups/${preferredGroupId}`);
+      router.push(`/groups/${preferredGroupId}`).then(reloadPage);
     } else {
-      router.push('/');
+      router.push('/').then(reloadPage);
     }
   } else if (memberships && memberships.length === 1) {
     // only one group, redirect user to that group's page
-    router.push(`/groups/${memberships[0].group._id}`);
+    router.push(`/groups/${memberships[0].group._id}`).then(reloadPage);
   } else {
-    router.push('/');
+    router.push('/').then(reloadPage);
   }
 }
+
+const reloadPage = () => {
+  window.location.reload();
+};
 
 export const autoJoinWhiteLabelGroup = async (store) => {
   try {

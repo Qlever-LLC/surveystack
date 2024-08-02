@@ -60,13 +60,14 @@
           <list-item-card
             v-for="(entity, idx) in filteredEntities"
             :key="entity._id"
-            @toogleStar="$emit('toogleStar', entity)"
+            @tooglePin="emit('tooglePin', entity)"
             :entity="entity"
             :idx="String(idx)"
             :enablePinned="enablePinned"
             :groupStyle="groupStyle"
             :questionSetsType="questionSetsType"
-            :menu="menu">
+            :menu="menu"
+            usedInBasicList>
             <template v-slot:entitySubtitle="{ entity }">
               <slot name="entitySubtitle" :entity="entity" />
             </template>
@@ -199,7 +200,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['updateSearch', 'toogleStar']);
+const emit = defineEmits(['updateSearch', 'tooglePin']);
 
 const state = reactive({
   searchValue: '',
@@ -215,7 +216,8 @@ watch(
 
 const entities = computed(() => {
   const now = new Date();
-  props.entities.forEach((e) => {
+  const entitiesWithCreatedAgo = JSON.parse(JSON.stringify(props.entities));
+  entitiesWithCreatedAgo.forEach((e) => {
     if (e.meta && !e.createdAgo) {
       const parsedDate = parseISO(e.meta.dateCreated);
       if (isValid(parsedDate)) {
@@ -223,7 +225,7 @@ const entities = computed(() => {
       }
     }
   });
-  return props.entities;
+  return entitiesWithCreatedAgo;
 });
 
 const filteredEntities = computed(() => {

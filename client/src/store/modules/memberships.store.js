@@ -1,6 +1,8 @@
 import api from '@/services/api.service';
 import { MembershipService } from '@/services/storage.service';
 
+import { isOnline } from '@/utils/surveyStack';
+
 const createInitialState = () => ({
   status: MembershipService.getStatus(),
   memberships: MembershipService.getUserMemberships(),
@@ -27,11 +29,15 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  getUserMemberships({ commit, rootGetters }, userId) {
+  getUserMemberships({ commit, getters }, userId) {
     if (!userId) {
       return new Promise((resolve) => {
         resolve([]);
       });
+    }
+
+    if (!isOnline()) {
+      return getters.memberships;
     }
 
     return new Promise((resolve, reject) => {

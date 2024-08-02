@@ -148,13 +148,6 @@ async function initData() {
   state.activeGroup = await getActiveGroup();
   state.myGroups = getMyGroups().sort((a, b) => a.path.localeCompare(b.path));
 
-  const membership = store.getters['memberships/memberships'];
-
-  state.myGroups.map((g) => {
-    const found = membership.find((m) => m.group._id === g._id);
-    g.role = found ? (found.role === 'user' ? 'Member' : 'Admin') : undefined;
-  });
-
   if (state.activeGroup) {
     const name = state.activeGroup.name;
     const names = name.split(' ');

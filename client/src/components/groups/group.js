@@ -44,9 +44,9 @@ export function useGroup() {
     return groupFound;
   }
 
-  function isGroupAdmin() {
+  function isGroupAdmin(groupId) {
     const memberships = store.getters['memberships/memberships'];
-    const activeGroupId = getActiveGroupId();
+    const activeGroupId = groupId ? groupId : getActiveGroupId();
     return memberships.some((m) => m.group._id === activeGroupId && m.role === 'admin');
   }
 

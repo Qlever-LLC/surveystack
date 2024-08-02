@@ -1,7 +1,7 @@
 <template>
-  <a-hover v-slot="{ isHovering }">
+  <a-hover v-slot="{ isHovering, props }">
     <a-list-item
-      v-bind="$attrs"
+      v-bind="usedInBasicList ? props : $attrs"
       :style="state.groupStyle"
       :elevation="isHovering ? 2 : 0"
       dense
@@ -15,9 +15,11 @@
             <slot name="entityTitle" :entity="state.entity" />
           </a-list-item-title>
           <a-list-item-title v-else class="d-flex align-center">
-            <span v-if="enablePinned" @click.stop="toogleStar(entity)">
-              <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-star</a-icon>
-              <a-icon v-if="!entity.pinnedSurveys && isHovering" class="mr-2"> mdi-star-outline </a-icon>
+            <span v-if="enablePinned" @click.stop="tooglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
+              <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
+              <a-icon v-if="!entity.pinnedSurveys && isHovering && !mobile && !isADraft(entity)" class="mr-2">
+                mdi-pin-outline
+              </a-icon>
             </span>
             <span v-if="groupStyle">
               <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
@@ -27,7 +29,9 @@
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
               <br />
-              <span v-if="!smallCard" class="subEntityName_deepCSS">{{ state.entity?.role }}</span>
+              <span v-if="!smallCard && groupSelectorStyle" class="subEntityName_deepCSS">{{
+                !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin(state.entity._id) ? 'Admin' : 'Member'
+              }}</span>
             </span>
             <span v-if="questionSetsType">
               <a-icon class="ml-2 my-2">mdi-note-multiple-outline</a-icon>
@@ -68,8 +72,17 @@
 import { cloneDeep } from 'lodash';
 import { reactive, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
+import { useStore } from 'vuex';
 
+import { useSurvey } from '@/components/survey/survey';
+import { useGroup } from '@/components/groups/group';
+
+const store = useStore();
 const router = useRouter();
+const { mobile } = useDisplay();
+const { isADraft } = useSurvey();
+const { isGroupAdmin } = useGroup();
 
 const props = defineProps({
   entity: {
@@ -79,6 +92,11 @@ const props = defineProps({
   idx: {
     type: String,
     required: true,
+  },
+  usedInBasicList: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
   enablePinned: {
     type: Boolean,
@@ -110,7 +128,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['toogleStar']);
+const emit = defineEmits(['tooglePin']);
 
 const state = reactive({
   entity: cloneDeep(props.entity),
@@ -150,8 +168,10 @@ function getTextColor(itemMenu) {
   return { color: itemMenu.color };
 }
 
-function toogleStar(entity) {
-  emit('toogleStar', entity);
+function tooglePin(entity) {
+  if (!mobile.value) {
+    emit('tooglePin', entity);
+  }
 }
 
 function getDefaultAction() {
