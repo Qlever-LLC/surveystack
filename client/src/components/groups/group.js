@@ -55,11 +55,18 @@ export function useGroup() {
     return memberships.some((m) => m.group._id === activeGroupId && m.role === 'admin');
   }
 
+  function isGroupMember() {
+    const memberships = store.getters['memberships/memberships'];
+    const activeGroupId = getActiveGroupId();
+    return memberships.some((m) => m.group._id === activeGroupId && m.role === 'user');
+  }
+
   return {
     getMyGroups,
     getActiveGroupId,
     getActiveGroup,
     isGroupAdmin,
+    isGroupMember,
     isWhitelabel,
     getWhitelabelPartner,
   };
