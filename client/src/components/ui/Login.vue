@@ -71,6 +71,12 @@
       </template>
     </div>
 
+    <div class="align-self-end">
+      <a-btn v-if="skippable" @click.stop="$emit('skip')" color="primary" class="no-uppercase" variant="text">
+        or skip
+      </a-btn>
+    </div>
+
     <a-alert v-if="status" class="mt-4" mode="fade" variant="text" type="error">{{ status }}</a-alert>
   </a-card>
   <a-alert
@@ -95,6 +101,7 @@
 <script>
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import { autoJoinWhiteLabelGroup, redirectAfterLogin } from '@/utils/memberships';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -118,6 +125,10 @@ export default {
     useLink: {
       type: Boolean,
       default: true,
+    },
+    skippable: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -224,8 +235,15 @@ export default {
           url: '/auth/login',
           user: this.entity,
         });
+
+        //make sure whitelabel user is a member of its whitelabel group (this reflects legacy behaviour, though it's not clear why this had been added in the past)
+        const partnerGroupId = await autoJoinWhiteLabelGroup(this.$store);
+        //fetch pinned
+        this.$store.dispatch('surveys/fetchPinned');
+        //change route
+        await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {
-        switch (error.response.status) {
+        switch (error.response?.status) {
           case 401:
             this.status = 'Invalid email or password'; //error.response.data.message;
             break;
@@ -236,14 +254,6 @@ export default {
             this.status = 'An error occurred'; //'Unknown error :/';
         }
         return;
-      }
-
-      this.$store.dispatch('surveys/fetchPinned');
-
-      if (this.$route.query.redirect) {
-        this.$router.push(this.$route.query.redirect);
-      } else {
-        this.$router.push('/');
       }
     },
   },
@@ -266,7 +276,7 @@ a {
   margin-top: -1px;
 }
 .card-width {
-  max-width: min(600px, 92vw);
+  max-width: min(700px, 92vw);
 }
 @media (min-width: 600px) {
   .line {
@@ -278,5 +288,8 @@ a {
     height: 40%;
     margin-left: -1px;
   }
+}
+.no-uppercase {
+  text-transform: unset !important;
 }
 </style>

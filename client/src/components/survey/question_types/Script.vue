@@ -291,11 +291,11 @@ export default {
       const scriptResource = this.resources.find((r) => r.id === resourceId);
       let script;
       if (scriptResource) {
-        //load script from store
+        //load script from store (WORKS OFFLINE WHEN PINNED
         let resourceContainingScriptData = await this.$store.dispatch('resources/fetchScriptResource', scriptResource);
         script = resourceContainingScriptData.fileData;
       } else {
-        //fallback to directly using script id in case of legacy survey
+        //fallback to directly using script id in case of legacy survey (DOES ONLY WORK OFFLINE IF SURVEY WAS VISITED ONLINE BEFORE)
         let scriptId = this.control.options.source;
         const { data } = await api.get(`/scripts/${scriptId}`);
         script = data;

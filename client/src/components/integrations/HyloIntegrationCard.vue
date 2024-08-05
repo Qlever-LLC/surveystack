@@ -2,7 +2,7 @@
   <div>
     <a-card>
       <a-card-text v-if="isLoading">
-        <a-card-title> Hylo Integraton </a-card-title>
+        <a-card-title> Hylo Integration </a-card-title>
         <a-spacer />
         <a-skeleton-loader type="list-item-avatar, heading" />
       </a-card-text>

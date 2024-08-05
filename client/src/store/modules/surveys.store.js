@@ -1,7 +1,10 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable-next-line no-await-in-loop */
+import * as db from '@/store/db';
 import api from '@/services/api.service';
+
+import { isOnline } from '@/utils/surveyStack';
 
 const createInitialState = () => ({
   surveys: [],
@@ -12,7 +15,7 @@ const initialState = createInitialState();
 
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
-  pinned: (state) => state.pinned,
+  getPinnedSurvey: (state) => (id) => state.pinned.find((pinned) => pinned._id === id),
   getPinned:
     (state) =>
     (prefix = '', excludePath = '') => {
@@ -20,6 +23,27 @@ const getters = {
       const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
       return excluded;
     },
+  getPinnedSurveyForGroup: (state, getters) => (groupId) => {
+    const seenIds = new Set();
+    const pinnedSurveys = state.pinned
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((pinnedSurvey) => {
+        const survey = getters.getPinnedSurvey(pinnedSurvey._id);
+        if (
+          survey &&
+          survey.meta.group.id === groupId &&
+          survey.groupIdImPinnedIn === groupId &&
+          !seenIds.has(pinnedSurvey._id)
+        ) {
+          seenIds.add(pinnedSurvey._id);
+          return true;
+        }
+        return false;
+      });
+
+    return pinnedSurveys;
+  },
 };
 
 const fetchPinned = async (commit, dispatch) => {
@@ -41,9 +65,14 @@ const fetchPinned = async (commit, dispatch) => {
 
     for (const sid of group.pinned) {
       const item = {
-        id: sid,
+        _id: sid,
         name: '',
         group: group.group_name,
+        /*
+        groupIdImPinnedIn is a field that protects against residual inconsistencies in old data in the database when a survey is pinned in a group other than its own, and pinned surveys must be listed in the group to which they belong.
+        */
+        groupIdImPinnedIn: group.group_id,
+        pinnedSurveys: true,
         meta: {},
       };
 
@@ -57,6 +86,9 @@ const fetchPinned = async (commit, dispatch) => {
           fetched.push(s);
           item.name = s.name;
           item.meta = s.meta;
+          item.latestVersion = s.latestVersion;
+          item.revisions = s.revisions;
+          item.resources = s.resources;
         } catch (error) {
           console.error('error:' + error);
           continue;
@@ -67,6 +99,9 @@ const fetchPinned = async (commit, dispatch) => {
       }
 
       pinned.push(item);
+      if (item.meta.group.id === item.groupIdImPinnedIn) {
+        await db.persistPinnedSurvey(item);
+      }
     }
   }
 
@@ -77,10 +112,17 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async fetchSurvey({ commit }, { id, version = 'latest' }) {
-    const response = await api.get(`/surveys/${id}?version=${version}`);
-    commit('ADD_SURVEY', response.data);
-    return response.data;
+  async fetchSurvey({ getters }, { id, version = 'latest' }) {
+    let survey = undefined;
+
+    if (!isOnline()) {
+      survey = getters.getPinnedSurvey(id);
+    } else {
+      const response = await api.get(`/surveys/${id}?version=${version}`);
+      survey = response.data;
+    }
+
+    return survey;
   },
   async fetchPinned({ commit, dispatch, rootState, rootGetters }) {
     const pinned = [];
@@ -107,14 +149,46 @@ const actions = {
 
     const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
 
-    const pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+    let pinnedItems = undefined;
+
+    if (isOnline()) {
+      await db.clearAllPinnedSurveys();
+      pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+    } else {
+      pinnedItems = await db.getAllPinnedSurveys();
+    }
     pinned.push(...pinnedItems);
 
     commit('SET_PINNED', pinned);
     return pinned;
   },
+  async fetchSurveyFromBackendAndStore({ commit }, { id, version = 'latest' }) {
+    const response = await api.get(`/surveys/${id}?version=${version}`);
+    commit('ADD_SURVEY', response.data);
+    return response.data;
+  },
   removeSurvey({ commit }, id) {
     commit('REMOVE_SURVEY', id);
+  },
+  async addPinned({ commit, dispatch }, pinned) {
+    delete pinned?.createdAgo;
+    pinned.pinnedSurveys = true;
+    pinned.groupIdImPinnedIn = pinned.meta.group.id;
+    await db.persistPinnedSurvey(pinned);
+    commit('ADD_PINNED', pinned);
+    if (pinned.resources) {
+      await dispatch('resources/fetchResources', pinned.resources, { root: true });
+    }
+  },
+  async removePinned({ commit, dispatch }, pinned) {
+    await db.deletePinnedSurvey(pinned._id);
+    commit('REMOVE_PINNED', pinned._id);
+    if (pinned.resources) {
+      const pinnedResource = pinned.resources;
+      for (const r of pinnedResource) {
+        await dispatch('resources/removeLocalResource', { id: r.id }, { root: true });
+      }
+    }
   },
 };
 
@@ -132,8 +206,15 @@ const mutations = {
     const index = state.surveys.findIndex((survey) => survey._id === id);
     state.surveys.splice(index, 1);
   },
+  ADD_PINNED(state, pinned) {
+    state.pinned.push(pinned);
+  },
   SET_PINNED(state, pinned) {
     state.pinned = pinned;
+  },
+  REMOVE_PINNED(state, id) {
+    const index = state.pinned.findIndex((pinned) => pinned._id === id);
+    state.pinned.splice(index, 1);
   },
 };
 

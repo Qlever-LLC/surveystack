@@ -8,7 +8,8 @@
     :label="label"
     :size="xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
     :variant="variant"
-    :title="title">
+    :title="title"
+    :disabled="disabled">
     <slot />
   </v-chip>
 </template>
@@ -21,6 +22,7 @@ export default {
     //vuetify props
     closable: { type: Boolean, required: false },
     color: { type: String, required: false },
+    disabled: { type: Boolean, required: false },
     inputValue: { type: undefined, required: false },
     label: { type: Boolean, required: false },
     xSmall: { type: Boolean, required: false },

@@ -3,7 +3,7 @@
     <a-card>
       <a-card-title>Search members</a-card-title>
       <a-card-text>
-        <active-group-selector
+        <group-selector
           v-if="!fixedGroupId"
           :modelValue="selectedGroupId"
           :admin-groups-only="true"
@@ -40,12 +40,12 @@
 </template>
 
 <script>
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
+import GroupSelector from '@/components/shared/GroupSelector.vue';
 import api from '@/services/api.service';
 
 export default {
   components: {
-    ActiveGroupSelector,
+    GroupSelector,
   },
   props: {
     //if a fixedGroupId is passed, group chooser will be hidden
@@ -60,7 +60,7 @@ export default {
   },
   data() {
     return {
-      selectedGroupId: this.fixedGroupId || this.$store.getters['memberships/activeGroup'],
+      selectedGroupId: this.fixedGroupId,
       members: [],
       q: '',
     };
@@ -103,20 +103,27 @@ export default {
   },
   methods: {
     async fetchMembers(groupId) {
-      const { data: members } = await api.get(`/memberships?group=${groupId}&populate=true`);
-      this.members = members;
+      try {
+        const { data: members } = await api.get(`/memberships?group=${groupId}&populate=true`);
+        this.members = members;
+      } catch (e) {
+        this.members = [];
+      }
     },
     setGroup(groupId) {
       this.selectedGroupId = groupId;
       this.fetchMembers(this.selectedGroupId);
     },
   },
-  mounted() {
-    this.value = true;
-    this.fetchMembers(this.selectedGroupId);
-  },
-  async created() {
-    this.value = true;
+  watch: {
+    show: function (show) {
+      if (show) {
+        this.fetchMembers(this.selectedGroupId);
+      }
+    },
+    fixedGroupId: function (newVal) {
+      this.selectedGroupId = newVal;
+    },
   },
 };
 </script>

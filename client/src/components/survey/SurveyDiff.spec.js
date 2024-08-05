@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/vue';
 import SurveyDiff from './SurveyDiff.vue';
-import vuetify from '@/plugins/vuetify';
+import { vuetify } from '@/plugins/vuetify';
 import { createControlInstance } from '@/utils/surveyConfig';
 import { cloneDeep, pick, range, shuffle, uniqueId } from 'lodash';
 import { changeType, diffSurveyVersions } from '@/utils/surveyDiff';

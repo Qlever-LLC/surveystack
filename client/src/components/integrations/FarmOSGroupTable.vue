@@ -8,8 +8,7 @@
       :instance-map="member.farms"
       @open="(item) => $emit('open', item)"
       @connect="(item) => $emit('connect', item)"
-      @disconnect="(item) => $emit('disconnect', item)"
-    />
+      @disconnect="(item) => $emit('disconnect', item)" />
   </div>
 </template>
 
@@ -26,7 +25,7 @@ export default {
     remappedMembers() {
       return this.members.map((m) => {
         const farms = m.connectedFarms
-          .filter((f) => f.groups.length > 0)
+          .filter((f) => f.groups && f.groups.length > 0)
           .map((f) => ({
             name: f.instanceName,
             groups: f.groups.map((g) => ({

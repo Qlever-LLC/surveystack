@@ -10,6 +10,7 @@ import rolesService from '../services/roles.service';
 import pdfService from '../services/pdf.service';
 
 const SURVEYS_COLLECTION = 'surveys';
+const GROUPS_COLLECTION = 'groups';
 const SUBMISSIONS_COLLECTION = 'submissions';
 
 const DEFAULT_LIMIT = 20;
@@ -84,16 +85,36 @@ const getSurveys = async (req, res) => {
   return res.send(entities);
 };
 
-const buildPipelineForGetSurveyPage = ({
-  q,
-  groups,
-  projections,
-  creator,
-  skip,
-  limit,
-  prefix,
-  isLibrary,
-}) => {
+const buildPipelineGetSurveyPinnedFromGroupId = (groupId) => {
+  const pipeline = [
+    { $match: { _id: ObjectId(groupId) } },
+    { $unwind: '$surveys.pinned' },
+    {
+      $lookup: {
+        from: 'surveys',
+        localField: 'surveys.pinned',
+        foreignField: '_id',
+        as: 'pinnedSurveys',
+      },
+    },
+    {
+      $project: {
+        _id: {
+          $arrayElemAt: ['$pinnedSurveys._id', 0],
+        },
+      },
+    },
+    { $sort: { name: 1 } },
+  ];
+
+  return pipeline;
+};
+
+const buildPipelineForGetSurveyPage = (
+  { q, groupId, projections, creator, skip, limit, prefix, isLibrary },
+  pinnedEntities,
+  sortSurveysPrioPinnedForOneGroup = false
+) => {
   const match = {};
   const project = {};
   let parsedSkip = 0;
@@ -103,12 +124,6 @@ const buildPipelineForGetSurveyPage = ({
     match.name = {
       $regex: q,
       $options: 'i',
-    };
-  }
-
-  if (Array.isArray(groups) && groups.length > 0) {
-    match['meta.group.id'] = {
-      $in: groups.map((item) => new ObjectId(item)),
     };
   }
 
@@ -122,11 +137,51 @@ const buildPipelineForGetSurveyPage = ({
     };
   }
 
-  if (isLibrary) {
-    match['meta.isLibrary'] = isLibrary === 'true';
+  if (isLibrary === 'true') {
+    match['meta.isLibrary'] = true;
+  } else if (isLibrary === 'false') {
+    match.$or = [{ 'meta.isLibrary': { $exists: false } }, { 'meta.isLibrary': false }];
   }
 
-  const pipeline = [];
+  let pipeline = [];
+
+  if (sortSurveysPrioPinnedForOneGroup) {
+    pipeline = [
+      { $match: { 'meta.group.id': ObjectId(groupId) } },
+      {
+        $addFields: {
+          lowercasedName: {
+            $toLower: '$name',
+          },
+        },
+      },
+      {
+        $addFields: {
+          isInPinnedList: {
+            $in: ['$_id', pinnedEntities],
+          },
+        },
+      },
+      {
+        $addFields: {
+          sortOrder: {
+            $switch: {
+              branches: [
+                {
+                  case: { $eq: ['$isInPinnedList', true] },
+                  then: 0,
+                },
+              ],
+              default: 1,
+            },
+          },
+        },
+      },
+      {
+        $sort: { sortOrder: 1, lowercasedName: 1 },
+      },
+    ];
+  }
 
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });
@@ -136,18 +191,26 @@ const buildPipelineForGetSurveyPage = ({
     projections.forEach((projection) => {
       project[projection] = 1;
     });
-    pipeline.push({
-      $project: { ...project },
-    });
+    if (sortSurveysPrioPinnedForOneGroup) {
+      pipeline.push({
+        $project: { ...project, isInPinnedList: 1 },
+      });
+    } else {
+      pipeline.push({
+        $project: { ...project },
+      });
+    }
   }
 
-  // default sort by name (or date modified?)
-  // needs aggregation for case insensitive sorting
-  pipeline.push(
-    { $addFields: { lowercasedName: { $toLower: '$name' } } },
-    { $sort: { lowercasedName: 1 } },
-    { $project: { lowercasedName: 0 } }
-  );
+  if (!sortSurveysPrioPinnedForOneGroup) {
+    // default sort by name (or date modified?)
+    // needs aggregation for case insensitive sorting
+    pipeline.push(
+      { $addFields: { lowercasedName: { $toLower: '$name' } } },
+      { $sort: { lowercasedName: 1 } },
+      { $project: { lowercasedName: 0 } }
+    );
+  }
 
   if (isLibrary === 'true') {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
@@ -265,27 +328,6 @@ const buildPipelineForGetSurveyPage = ({
   return pipeline;
 };
 
-const getSurveyPage = async (req, res) => {
-  const pipeline = buildPipelineForGetSurveyPage(req.query);
-
-  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
-
-  // empty array when ther is no match
-  // however, we still want content and pagination properties
-  if (!entities) {
-    return res.send({
-      content: [],
-      pagination: {
-        total: 0,
-        skip: req.query.skip || 0,
-        limit: req.query.limit || DEFAULT_LIMIT,
-      },
-    });
-  }
-
-  return res.send(entities[0]);
-};
-
 const getSurveyListPage = async (req, res) => {
   const query = {
     ...req.query,
@@ -303,20 +345,60 @@ const getSurveyListPage = async (req, res) => {
     ],
   };
 
-  const pipeline = buildPipelineForGetSurveyPage(query);
-  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+  const { prioPinned } = req.query;
+  let entities;
+  const noEntities = {
+    content: [],
+    pagination: {
+      total: 0,
+      skip: req.query.skip || 0,
+      limit: req.query.limit || DEFAULT_LIMIT,
+    },
+  };
 
-  // empty array when there is no match
-  // however, we still want content and pagination properties
-  if (!entities) {
-    return res.send({
-      content: [],
-      pagination: {
-        total: 0,
-        skip: req.query.skip || 0,
-        limit: req.query.limit || DEFAULT_LIMIT,
-      },
-    });
+  if (prioPinned) {
+    const pipelinePinned = buildPipelineGetSurveyPinnedFromGroupId(query.groupId);
+    const pipelinePinnedEntities = await db
+      .collection(GROUPS_COLLECTION)
+      .aggregate(pipelinePinned)
+      .toArray();
+
+    const pinnedEntities = pipelinePinnedEntities.map((obj) => obj._id);
+
+    const sortSurveysPrioPinnedForOneGroup = true;
+    const pipeline = buildPipelineForGetSurveyPage(
+      query,
+      pinnedEntities,
+      sortSurveysPrioPinnedForOneGroup
+    );
+
+    [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+
+    if (!entities) {
+      return res.send(noEntities);
+    }
+
+    const pinned = [];
+
+    for (let i = entities.content.length - 1; i >= 0; i--) {
+      const entity = entities.content[i];
+      if (entity.isInPinnedList) {
+        delete entity.isInPinnedList;
+        pinned.push(entity);
+        entities.content.splice(entities.content.indexOf(entity), 1);
+      }
+    }
+
+    entities.pinned = pinned;
+  } else {
+    const pipeline = buildPipelineForGetSurveyPage(query);
+    [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+
+    // empty array when there is no match
+    // however, we still want content and pagination properties
+    if (!entities) {
+      return res.send(noEntities);
+    }
   }
 
   return res.send(entities);
@@ -837,7 +919,6 @@ const deleteArchivedTestSubmissions = async (surveyId, surveyVersions) => {
 
 export default {
   getSurveys,
-  getSurveyPage,
   getPinned,
   getSurveyListPage,
   getSurvey,

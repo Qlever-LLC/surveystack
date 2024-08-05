@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="bg-background rounded">
     <div class="d-flex justify-space-between align-center">
       <h1>Browse Users</h1>
 

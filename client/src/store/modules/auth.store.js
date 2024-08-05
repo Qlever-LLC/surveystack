@@ -1,5 +1,5 @@
 import api from '@/services/api.service';
-import { AuthService, GroupService, MembershipService } from '@/services/storage.service';
+import { AuthService, MembershipService } from '@/services/storage.service';
 
 const deleteCookie = (name) => {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
@@ -33,8 +33,6 @@ const clearLocalData = ({ dispatch }) => {
   // remove items from storage
   AuthService.clear();
   MembershipService.clear();
-  GroupService.clear();
-
   console.log('calling global reset...');
   dispatch('reset', null, { root: true });
 };
@@ -65,9 +63,6 @@ const actions = {
       AuthService.saveHeader(header);
 
       commit('auth_success', { user, header });
-
-      await dispatch('memberships/tryAutoJoinAndSelectGroup', {}, { root: true });
-
       return user;
     } catch (err) {
       commit('auth_error');

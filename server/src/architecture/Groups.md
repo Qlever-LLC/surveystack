@@ -6,7 +6,7 @@ Represents a group or an organization.
 
 API endpoint `/api/groups`
 
-- list<br/>GET /api/groups
+- list<br/>GET /api/groups/all
 - detail<br/>GET /api/groups/:id
 - create<br/> POST /api/groups
 - update<br/> PUT /api/groups/:id

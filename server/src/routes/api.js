@@ -4,7 +4,7 @@ import authController from '../controllers/authController';
 import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
-import { syncDraft } from '../controllers/submissionController.part.ts';
+import { syncDraft, getDraftsPage } from '../controllers/submissionController.part.ts';
 import userController from '../controllers/userController';
 import * as scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
@@ -62,7 +62,7 @@ router.get('/auth/enter-with-magic-link', catchErrors(authController.enterWithMa
 router.get('/auth/invalidate-magic-link', catchErrors(authController.invalidateMagicLink));
 
 /** Group */
-router.get('/groups', catchErrors(groupController.getGroups));
+router.get('/groups/all', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
@@ -155,11 +155,8 @@ router.post(
   [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
   catchErrors(submissionController.deleteSubmissions)
 );
-router.post(
-  '/submissions/sync-draft',
-  [checkFeatureToggledOn('feature_sync_drafts'), assertAuthenticated],
-  catchErrors(syncDraft)
-);
+router.post('/submissions/sync-draft', [assertAuthenticated], catchErrors(syncDraft));
+router.get('/submissions/drafts/page', [assertAuthenticated], catchErrors(getDraftsPage));
 
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
@@ -170,7 +167,6 @@ router.get(
   [assertAuthenticated],
   catchErrors(surveyController.getSurveyLibraryConsumers)
 );
-router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/pinned', catchErrors(surveyController.getPinned));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
 router.get('/surveys/:id/pdf', catchErrors(surveyController.getSurveyPdf));

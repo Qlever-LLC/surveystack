@@ -82,16 +82,4 @@ const MembershipService = {
   },
 };
 
-const GroupService = {
-  saveActiveGroup(group) {
-    localStorage.setItem(USER_ACTIVE_GROUP_KEY, JSON.stringify(group));
-  },
-  getActiveGroup() {
-    return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY)) || null;
-  },
-  clear() {
-    localStorage.removeItem(USER_ACTIVE_GROUP_KEY);
-  },
-};
-
-export { AuthService, MembershipService, GroupService };
+export { AuthService, MembershipService };
