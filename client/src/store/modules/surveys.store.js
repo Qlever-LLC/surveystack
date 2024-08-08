@@ -16,13 +16,7 @@ const initialState = createInitialState();
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
   getPinnedSurvey: (state) => (id) => state.pinned.find((pinned) => pinned._id === id),
-  getPinned:
-    (state) =>
-    (prefix = '', excludePath = '') => {
-      const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
-      const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
-      return excluded;
-    },
+  getPinned: (state) => state.pinned,
   getPinnedSurveyForGroup: (state, getters) => (groupId) => {
     const seenIds = new Set();
     const pinnedSurveys = state.pinned
@@ -32,7 +26,7 @@ const getters = {
         const survey = getters.getPinnedSurvey(pinnedSurvey._id);
         if (
           survey &&
-          survey.meta.group.id === groupId &&
+          survey.meta.group.id === groupId && //TODO maybe here is an issue while offline for certain groups`/ surveys?
           survey.groupIdImPinnedIn === groupId &&
           !seenIds.has(pinnedSurvey._id)
         ) {
