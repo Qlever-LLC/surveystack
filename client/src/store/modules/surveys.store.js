@@ -9,6 +9,7 @@ import { isOnline } from '@/utils/surveyStack';
 const createInitialState = () => ({
   surveys: [],
   pinned: [],
+  pinnedLoading: false,
 });
 
 const initialState = createInitialState();
@@ -17,6 +18,7 @@ const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
   getPinnedSurvey: (state) => (id) => state.pinned.find((pinned) => pinned._id === id),
   getPinned: (state) => state.pinned,
+  getPinnedLoading: (state) => state.pinnedLoading,
   getPinnedSurveyForGroup: (state, getters) => (groupId) => {
     const seenIds = new Set();
     const pinnedSurveys = state.pinned
@@ -141,10 +143,9 @@ const actions = {
       filteredMemberships = excluded;
     }
 
-    const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
-
     let pinnedItems = undefined;
 
+    commit('SET_PINNED_LOADING', true);
     if (isOnline()) {
       await db.clearAllPinnedSurveys();
       pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
@@ -153,6 +154,7 @@ const actions = {
     }
     pinned.push(...pinnedItems);
 
+    commit('SET_PINNED_LOADING', false);
     commit('SET_PINNED', pinned);
     return pinned;
   },
@@ -209,6 +211,9 @@ const mutations = {
   REMOVE_PINNED(state, id) {
     const index = state.pinned.findIndex((pinned) => pinned._id === id);
     state.pinned.splice(index, 1);
+  },
+  SET_PINNED_LOADING(state, loading) {
+    state.pinnedLoading = loading;
   },
 };
 
