@@ -128,27 +128,15 @@ const actions = {
     }
 
     const userId = rootState.auth.user._id;
+    //TODO check if this still is required as part of the data prefetch
     await dispatch('memberships/getUserMemberships', userId, { root: true });
-
-    const memberships = rootGetters['memberships/memberships'];
-    let filteredMemberships = memberships;
-
-    if (rootGetters['whitelabel/isWhitelabel']) {
-      // get any subgroup memberships of this whitelabel
-      // and later use those to find their pinned surveys
-      // (the whitelabel root group's pinned surveys are fetched separately inside whitelabel.store.js)
-      const { path } = rootGetters['whitelabel/partner'];
-      const prefixed = memberships.filter((m) => m.group.path.startsWith(path)); // find any memberships in this whitelabel
-      const excluded = prefixed.filter((m) => m.group.path !== path); // ... but exclude the whitelabel root group membership
-      filteredMemberships = excluded;
-    }
 
     let pinnedItems = undefined;
 
     commit('SET_PINNED_LOADING', true);
     if (isOnline()) {
       await db.clearAllPinnedSurveys();
-      pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+      pinnedItems = await fetchPinned(commit, dispatch);
     } else {
       pinnedItems = await db.getAllPinnedSurveys();
     }
