@@ -28,7 +28,7 @@ const getters = {
         const survey = getters.getPinnedSurvey(pinnedSurvey._id);
         if (
           survey &&
-          survey.meta.group.id === groupId && //TODO maybe here is an issue while offline for certain groups`/ surveys?
+          survey.meta.group.id === groupId &&
           survey.groupIdImPinnedIn === groupId &&
           !seenIds.has(pinnedSurvey._id)
         ) {
