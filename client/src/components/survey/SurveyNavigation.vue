@@ -45,7 +45,6 @@ import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
 import { useRouter } from 'vue-router';
 import { reactive, computed, watch, onMounted } from 'vue';
-import { useStore } from 'vuex';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
@@ -53,9 +52,8 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId, isGroupVisitor } = useGroup();
-const { stateComposable, message, tooglePinSurvey, togglePinEvent } = useSurvey();
+const { stateComposable, message, getSurveys, getSurveysFromStore, tooglePinSurvey, togglePinEvent } = useSurvey();
 const router = useRouter();
-const store = useStore();
 
 const state = reactive({
   surveys: [],
@@ -63,18 +61,6 @@ const state = reactive({
 
 const menu = computed(() => stateComposable.menu);
 const activeGroupId = computed(() => getActiveGroupId());
-
-async function fetchPinnedFromAPI() {
-  const queryParams = new URLSearchParams();
-  queryParams.append('justPinned', true);
-  const { data } = await api.get(`/groups/${getActiveGroupId()}?${queryParams}`);
-  const surveyPromises = data.surveys.pinned.map(async (id) => {
-    const { data } = await api.get(`/surveys/${id}`);
-    return data;
-  });
-  const fetchedSurveys = await Promise.all(surveyPromises);
-  state.surveys = fetchedSurveys;
-}
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;
@@ -89,21 +75,23 @@ function startDraftAs(selectedMember) {
 
 watch(activeGroupId, async () => {
   if (isGroupVisitor()) {
-    await fetchPinnedFromAPI();
+    const { content: surveys } = await getSurveys(getActiveGroupId());
+    state.surveys = surveys.filter((s) => s.pinnedSurveys);
   } else {
-    state.surveys = store.getters['surveys/getPinnedSurveyForGroup'](activeGroupId.value);
+    state.surveys = getSurveysFromStore();
   }
 });
 
 onMounted(async () => {
   if (isGroupVisitor()) {
-    await fetchPinnedFromAPI();
+    const { content: surveys } = await getSurveys(getActiveGroupId());
+    state.surveys = surveys.filter((s) => s.pinnedSurveys);
   } else {
     watch(
-      () => store.getters['surveys/getPinnedSurveyForGroup'](activeGroupId.value),
+      () => getSurveysFromStore(),
       (newVal) => {
         if (newVal) {
-          state.surveys = store.getters['surveys/getPinnedSurveyForGroup'](activeGroupId.value);
+          state.surveys = getSurveysFromStore();
         }
       },
       { immediate: true }

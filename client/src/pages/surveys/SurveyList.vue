@@ -63,7 +63,6 @@
 <script setup>
 import { reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
 
@@ -78,11 +77,11 @@ import formatDistance from 'date-fns/formatDistance';
 import { useSurvey } from '@/components/survey/survey';
 
 const router = useRouter();
-const store = useStore();
 const { getActiveGroupId } = useGroup();
 const { rightToEdit, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message, isADraft } = useSurvey();
+const { stateComposable, getSurveys, getSurveysFromStore, tooglePinSurvey, togglePinEvent, message, isADraft } =
+  useSurvey();
 
 const state = reactive({
   page: 1,
@@ -150,7 +149,7 @@ async function initData() {
       }
     });
   } catch (e) {
-    const surveysContent = store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId());
+    const surveysContent = getSurveysFromStore();
 
     state.surveys = {
       content: surveysContent,

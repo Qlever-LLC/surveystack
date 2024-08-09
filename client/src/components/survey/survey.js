@@ -184,6 +184,10 @@ export function useSurvey() {
     }
   }
 
+  function getSurveysFromStore() {
+    return store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId());
+  }
+
   function setSelectMember(survey) {
     stateComposable.showSelectMember = true;
     stateComposable.selectedSurvey = survey;
@@ -217,6 +221,7 @@ export function useSurvey() {
     stateComposable,
     message,
     getSurveys,
+    getSurveysFromStore,
     tooglePinSurvey,
     togglePinEvent,
     isADraft,
