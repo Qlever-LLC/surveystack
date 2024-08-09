@@ -9,7 +9,7 @@
         v-model="localViewModel.form.groupId"
         :item-title="(g) => `${g.name} (${g.path})`"
         item-value="_id"
-        :items="localViewModel.groups"
+        :items="activeGroups"
         :rules="[(v) => !!v || `select group`]" />
 
       <a-select
@@ -306,6 +306,9 @@ export default {
         return plan.planUrl;
       }
       return 'Select plan first';
+    },
+    activeGroups() {
+      return this.localViewModel.groups.filter((g) => g.meta.archived === false);
     },
   },
   watch: {

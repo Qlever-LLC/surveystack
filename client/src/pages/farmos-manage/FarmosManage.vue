@@ -133,7 +133,7 @@ export default {
       this.loading = true;
       const { data: notes } = await api.get('/farmos/notes/all');
       const { data: mappings } = await api.get('/farmos/all');
-      const { data: groups } = await api.get('/groups/all');
+      const { data: groups } = await api.get('/groups/all?populate=0&prefix=/&showAll=true');
       const { data: users } = await api.get('/users');
       const { data: plans } = await api.get('/farmos/plans');
 

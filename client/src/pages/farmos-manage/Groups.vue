@@ -16,7 +16,7 @@
       primary
       label="Select Group"
       v-model="selectedGroup"
-      :item-title="(g) => `${g.name} (${g.path})`"
+      :item-title="(g) => `${g.name} (${g.path}) ${g.meta.archived ? '(archived)' : ''}`"
       item-value="_id"
       :items="groups" />
 
@@ -89,7 +89,7 @@
                 <a-chip
                   class="ma-1"
                   small
-                  color="green"
+                  :color="groupMapping.archived ? 'grey' : 'green'"
                   v-for="(groupMapping, gidx) in instance.groupMappings"
                   :key="`instance-${idx}-group-${gidx}`">
                   {{ groupMapping.group }}
@@ -154,6 +154,7 @@ export default {
           .map((group) => ({
             instanceName: group.instanceName,
             group: this.groups.find((g) => g._id === group.groupId).path,
+            archived: this.groups.find((g) => g._id === group.groupId).meta.archived,
           }));
 
         mappings.push({
