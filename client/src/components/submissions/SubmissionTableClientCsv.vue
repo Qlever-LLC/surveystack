@@ -250,21 +250,28 @@ export function transformMatrixHeaders(headers, submissions) {
 
 export function getCellValue(item, index, header) {
   const value = typeof item === 'string' ? item : typeof item[header] === 'string' ? item[header] : null;
+  const isoDateRegex = /^(\d{4}-\d{2}-\d{2}([T\s](\d{2}:\d{2}:\d{2}(\.\d+)?(Z|([+-]\d{2}:\d{2})))?)?)?$/;
 
   // Parse date
-  let parsedDate = parseISO(value);
-  if (index < PREFERRED_HEADERS.length && isValid(parsedDate) && parsedDate.toISOString() === value) {
-    // In PREFERRED_HEADERS dateSubmitted is displayed depending on the user's time zone.
-    return format(parsedDate, 'MMM d, yyyy h:mm a');
-  } else if (isValid(parsedDate)) {
-    // In the results of the survey for the date types, we are only interested in days and not hours. We avoid timezone modifications: June 1, 2024 is June 1. 2024 anywhere
-    // extract YYYY-MM-DD from YYYY-MM-DDTHH:mm:ss.sssZ
-    const date = value.slice(0, 10);
-    parsedDate = parseISO(date);
-    return format(parsedDate, 'MMM d, yyyy');
+  if (value == null || value === '') {
+    return ' ';
+  } else if (!isoDateRegex.test(value)) {
+    return value;
+  } else {
+    let parsedDate = parseISO(value);
+    if (index < PREFERRED_HEADERS.length && isValid(parsedDate) && parsedDate.toISOString() === value) {
+      // In PREFERRED_HEADERS dateSubmitted is displayed depending on the user's time zone.
+      return format(parsedDate, 'MMM d, yyyy h:mm a');
+    } else if (isValid(parsedDate)) {
+      // In the results of the survey for the date types, we are only interested in days and not hours. We avoid timezone modifications: June 1, 2024 is June 1. 2024 anywhere
+      // extract YYYY-MM-DD from YYYY-MM-DDTHH:mm:ss.sssZ
+      const date = value.slice(0, 10);
+      parsedDate = parseISO(date);
+      return format(parsedDate, 'MMM d, yyyy');
+    } else {
+      return value;
+    }
   }
-
-  return value || ' ';
 }
 
 const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted', 'meta.archived'];
