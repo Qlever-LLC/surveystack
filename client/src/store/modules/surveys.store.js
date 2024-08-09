@@ -9,6 +9,7 @@ import { isOnline } from '@/utils/surveyStack';
 const createInitialState = () => ({
   surveys: [],
   pinned: [],
+  pinnedLoading: false,
 });
 
 const initialState = createInitialState();
@@ -16,13 +17,8 @@ const initialState = createInitialState();
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
   getPinnedSurvey: (state) => (id) => state.pinned.find((pinned) => pinned._id === id),
-  getPinned:
-    (state) =>
-    (prefix = '', excludePath = '') => {
-      const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
-      const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
-      return excluded;
-    },
+  getPinned: (state) => state.pinned,
+  getPinnedLoading: (state) => state.pinnedLoading,
   getPinnedSurveyForGroup: (state, getters) => (groupId) => {
     const seenIds = new Set();
     const pinnedSurveys = state.pinned
@@ -132,33 +128,21 @@ const actions = {
     }
 
     const userId = rootState.auth.user._id;
+    //TODO check if this still is required as part of the data prefetch
     await dispatch('memberships/getUserMemberships', userId, { root: true });
-
-    const memberships = rootGetters['memberships/memberships'];
-    let filteredMemberships = memberships;
-
-    if (rootGetters['whitelabel/isWhitelabel']) {
-      // get any subgroup memberships of this whitelabel
-      // and later use those to find their pinned surveys
-      // (the whitelabel root group's pinned surveys are fetched separately inside whitelabel.store.js)
-      const { path } = rootGetters['whitelabel/partner'];
-      const prefixed = memberships.filter((m) => m.group.path.startsWith(path)); // find any memberships in this whitelabel
-      const excluded = prefixed.filter((m) => m.group.path !== path); // ... but exclude the whitelabel root group membership
-      filteredMemberships = excluded;
-    }
-
-    const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
 
     let pinnedItems = undefined;
 
+    commit('SET_PINNED_LOADING', true);
     if (isOnline()) {
       await db.clearAllPinnedSurveys();
-      pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
+      pinnedItems = await fetchPinned(commit, dispatch);
     } else {
       pinnedItems = await db.getAllPinnedSurveys();
     }
     pinned.push(...pinnedItems);
 
+    commit('SET_PINNED_LOADING', false);
     commit('SET_PINNED', pinned);
     return pinned;
   },
@@ -215,6 +199,9 @@ const mutations = {
   REMOVE_PINNED(state, id) {
     const index = state.pinned.findIndex((pinned) => pinned._id === id);
     state.pinned.splice(index, 1);
+  },
+  SET_PINNED_LOADING(state, loading) {
+    state.pinnedLoading = loading;
   },
 };
 
