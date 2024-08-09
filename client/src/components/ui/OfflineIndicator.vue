@@ -3,7 +3,7 @@
     mdi-wifi-off
   </a-icon>
   <a-icon v-else-if="pinnedLoading" size="22" title="downloading surveys for offline use" color="warning" class="px-1"
-    >mdi-download-circle-outline</a-icon
+    >mdi-download</a-icon
   >
   <a-dialog v-model="showDialog" max-width="400">
     <a-card>
