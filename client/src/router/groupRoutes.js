@@ -29,10 +29,12 @@ export const groupAdminGuard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
     next({ name: 'auth-login', query: { redirect: to.path } });
   } else {
+    //TODO logic is duplicating group.js:isGroupAdmin, try to unite
+    const isSuperAdmin = store.getters['auth/isSuperAdmin'];
     const memberships = store.getters['memberships/memberships'];
     const groupId = to.params.id;
     const isGroupAdmin = memberships.some((m) => m.group._id === groupId && m.role === 'admin');
-    if (isGroupAdmin) {
+    if (isGroupAdmin || isSuperAdmin) {
       next(); //proceed
     } else {
       //redirect to the group page
@@ -288,7 +290,7 @@ export default [
     },
     props: {
       navigation: true,
-      main: route => ({
+      main: (route) => ({
         routeAction: 'edit',
         id: route.params.id,
         surveyId: route.params.surveyId,

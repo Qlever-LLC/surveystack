@@ -118,7 +118,7 @@ const createPinnedSurveysPopulationStages = () => {
 };
 
 const getGroups = async (req, res) => {
-  const { showArchived, prefix, dir, tree } = req.query;
+  const { showArchived, prefix, showAll, dir, tree } = req.query;
 
   let entities;
 
@@ -146,6 +146,10 @@ const getGroups = async (req, res) => {
     dir: { $regex: `^${dirQuery}` },
     'meta.archived': archived,
   };
+
+  if (showAll) {
+    delete findQuery['meta.archived'];
+  }
 
   if (prefix) {
     delete findQuery.dir;

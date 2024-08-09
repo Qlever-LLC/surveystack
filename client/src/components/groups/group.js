@@ -50,6 +50,10 @@ export function useGroup() {
   }
 
   function isGroupAdmin(groupId) {
+    const isSuperAdmin = store.getters['auth/isSuperAdmin'];
+    if (isSuperAdmin) {
+      return true;
+    }
     const memberships = store.getters['memberships/memberships'];
     const activeGroupId = groupId ? groupId : getActiveGroupId();
     return memberships.some((m) => m.group._id === activeGroupId && m.role === 'admin');
