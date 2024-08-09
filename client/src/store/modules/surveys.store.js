@@ -54,6 +54,8 @@ const fetchPinned = async (commit, dispatch) => {
     return pinned;
   }
 
+  const fetchSurveyPromises = [];
+
   for (const group of data.pinned) {
     if (!Array.isArray(group.pinned)) {
       continue;
@@ -64,42 +66,47 @@ const fetchPinned = async (commit, dispatch) => {
         _id: sid,
         name: '',
         group: group.group_name,
-        /*
-        groupIdImPinnedIn is a field that protects against residual inconsistencies in old data in the database when a survey is pinned in a group other than its own, and pinned surveys must be listed in the group to which they belong.
-        */
+        // groupIdImPinnedIn is a field that protects against residual inconsistencies in old data in the database when a survey is pinned in a group other than its own, and pinned surveys must be listed in the group to which they belong.
         groupIdImPinnedIn: group.group_id,
         pinnedSurveys: true,
         meta: {},
       };
 
-      const cached = fetched.find((f) => f._id == sid);
-      if (!cached) {
-        try {
-          let s = await actions.fetchSurvey({ commit }, { id: sid });
-          if (s.resources) {
-            await dispatch('resources/fetchResources', s.resources, { root: true });
+      const fetchPromise = (async () => {
+        const cached = fetched.find((f) => f._id == sid);
+        if (!cached) {
+          try {
+            let s = await actions.fetchSurvey({ commit }, { id: sid });
+            if (s.resources) {
+              await dispatch('resources/fetchResources', s.resources, { root: true });
+            }
+            fetched.push(s);
+            item.name = s.name;
+            item.meta = s.meta;
+            item.latestVersion = s.latestVersion;
+            item.revisions = s.revisions;
+            item.resources = s.resources;
+          } catch (error) {
+            console.error('error:' + error);
+            return null;
           }
-          fetched.push(s);
-          item.name = s.name;
-          item.meta = s.meta;
-          item.latestVersion = s.latestVersion;
-          item.revisions = s.revisions;
-          item.resources = s.resources;
-        } catch (error) {
-          console.error('error:' + error);
-          continue;
+        } else {
+          item.name = cached.name;
+          item.meta = cached.meta;
         }
-      } else {
-        item.name = cached.name;
-        item.meta = cached.meta;
-      }
 
-      pinned.push(item);
-      if (item.meta.group.id === item.groupIdImPinnedIn) {
-        await db.persistPinnedSurvey(item);
-      }
+        pinned.push(item);
+        if (item.meta.group.id === item.groupIdImPinnedIn) {
+          await db.persistPinnedSurvey(item);
+        }
+
+        return item;
+      })();
+      fetchSurveyPromises.push(fetchPromise);
     }
   }
+
+  await Promise.all(fetchSurveyPromises);
 
   return pinned;
 };
