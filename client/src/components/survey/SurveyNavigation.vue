@@ -14,10 +14,12 @@
   <div class="ml-4 mt-4 text-white text-body-2">Surveys</div>
   <a-list dense class="px-4">
     <list-item-card
-      v-for="(entity, idx) in surveys"
+      v-for="(entity, idx) in state.surveys"
       :key="entity"
+      @togglePin="togglePin"
       :entity="entity"
       :idx="String(idx)"
+      :enableTogglePinned="rightToTogglePin().allowed"
       class="whiteCard"
       smallCard
       :menu="menu">
@@ -42,23 +44,34 @@
 <script setup>
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
-import { useRouter } from 'vue-router';
-import { computed, watch } from 'vue';
-import { useStore } from 'vuex';
+import { useRouter, useRoute } from 'vue-router';
+import { reactive, computed, watch } from 'vue';
+import { getPermission } from '@/utils/permissions';
+import emitter from '@/utils/eventBus';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
+import { getPinnedSurveysForGroup } from '@/utils/surveyStack';
 
 const { getActiveGroupId } = useGroup();
-const { stateComposable, message, tooglePinSurvey, togglePinEvent } = useSurvey();
+const { stateComposable, message } = useSurvey();
+const { rightToTogglePin } = getPermission();
 const router = useRouter();
-const store = useStore();
+const route = useRoute();
+
+const state = reactive({
+  surveys: [],
+});
 
 const menu = computed(() => stateComposable.menu);
 
-const surveys = computed(() => store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId()));
+initData();
+
+async function initData() {
+  state.surveys = await getPinnedSurveysForGroup(getActiveGroupId());
+}
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;
@@ -71,12 +84,23 @@ function startDraftAs(selectedMember) {
   stateComposable.selectedSurvey = undefined;
 }
 
-watch(togglePinEvent, (entity) => {
-  tooglePin(entity);
-});
-async function tooglePin(entity) {
-  await tooglePinSurvey(entity);
+async function togglePin() {
+  await initData();
 }
+
+emitter.on('togglePin', () => {
+  initData();
+});
+emitter.on('togglePinFromIcon', () => {
+  initData();
+});
+
+watch(
+  () => route.params.id,
+  () => {
+    initData();
+  }
+);
 </script>
 
 <style scoped lang="scss">

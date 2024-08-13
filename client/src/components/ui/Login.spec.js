@@ -393,9 +393,6 @@ describe('Login component', () => {
             },
           ]);
         }
-        if (action === 'surveys/fetchPinned') {
-          return jest.fn();
-        }
       });
       const { getByLabelText, getByText } = renderLogin({
         props: { defaultUsePassword: true },

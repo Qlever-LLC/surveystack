@@ -15,10 +15,10 @@
             <slot name="entityTitle" :entity="state.entity" />
           </a-list-item-title>
           <a-list-item-title v-else class="d-flex align-center">
-            <span v-if="showPinned" @click.stop="tooglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
-              <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
+            <span v-if="showPinned" @click.stop="togglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
+              <a-icon v-if="state.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
               <a-icon
-                v-if="!entity.pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
+                v-if="!state.pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
                 class="mr-2">
                 mdi-pin-outline
               </a-icon>
@@ -52,13 +52,16 @@
       </span>
       <a-spacer />
       <slot name="preMenu" :entity="state.entity" />
-      <a-menu v-if="!groupSelectorStyle && filteredMenu?.length > 0" location="start" v-model="state.menuIsOpen[idx]">
+      <a-menu
+        v-if="!groupSelectorStyle && state.filteredMenu?.length > 0"
+        location="start"
+        v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
           <a-btn v-bind="props" icon @click.prevent :small="smallCard"><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
         <a-list dense class="py-0">
           <a-list-item
-            v-for="(itemMenu, idx) of filteredMenu"
+            v-for="(itemMenu, idx) of state.filteredMenu"
             :key="idx"
             class="d-flex align-center justify-end"
             :style="getTextColor(itemMenu)"
@@ -75,7 +78,7 @@
 
 <script setup>
 import { cloneDeep } from 'lodash';
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useStore } from 'vuex';
@@ -87,7 +90,9 @@ const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
 const { isADraft } = useSurvey();
-const { isGroupAdmin } = useGroup();
+const { isGroupAdmin, getActiveGroupId } = useGroup();
+
+import { isSurveyPinned } from '@/utils/surveyStack';
 
 const props = defineProps({
   entity: {
@@ -143,7 +148,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['tooglePin']);
+const emit = defineEmits(['togglePin']);
 
 const state = reactive({
   entity: cloneDeep(props.entity),
@@ -152,9 +157,11 @@ const state = reactive({
   groupStyle: {},
   avatarName: '',
   ableTogglePinned: props.enableTogglePinned,
+  filteredMenu: [],
+  pinnedSurveys: false,
 });
 
-onMounted(() => {
+onMounted(async () => {
   if (props.groupStyle) {
     const treeHierarchy = props.entity.dir.split('/').length - 2;
     const defaultIndentation = 20;
@@ -174,19 +181,43 @@ onMounted(() => {
       state.avatarName = '';
     }
   }
+  if (props.showPinned) {
+    await isPinned(getActiveGroupId(), state.entity._id);
+  }
 });
 
-const filteredMenu = computed(() => {
-  return props.menu?.filter((m) => m.render === undefined || m.render(props.entity)());
-});
+getFilteredMenu();
+
+async function getFilteredMenu() {
+  const filteredMenu = [];
+
+  for (const m of props.menu || []) {
+    let includeTypeFunction = true;
+    if (typeof m.render === 'function') {
+      const result = m.render(props.entity)();
+      includeTypeFunction = result instanceof Promise ? await result : result;
+    }
+
+    const shouldInclude = m.render === undefined || includeTypeFunction;
+
+    if (shouldInclude) {
+      filteredMenu.push(m);
+    }
+  }
+  state.filteredMenu = filteredMenu;
+}
+
+async function isPinned(groupId, surveyId) {
+  state.pinnedSurveys = await isSurveyPinned(groupId, surveyId);
+}
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };
 }
 
-function tooglePin(entity) {
-  if (state.ableTogglePinned && !mobile.value) {
-    emit('tooglePin', entity);
+function togglePin(entity) {
+  if (state.ableTogglePinned) {
+    emit('togglePin', entity);
   }
 }
 

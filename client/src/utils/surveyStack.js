@@ -1,5 +1,7 @@
 import TreeModel from 'tree-model';
 import { get } from 'lodash';
+import store from '@/store';
+import api from '@/services/api.service';
 
 export const getAllNodes = (root) => {
   const nodes = [];
@@ -181,10 +183,89 @@ export function isOnline() {
   return window.navigator.onLine;
 }
 
+export async function prefetchPinned() {
+  if (!store.getters['auth/isLoggedIn']) {
+    return;
+  }
+
+  const { _id: userId } = store.getters['auth/user'];
+  //TODO check if this still is required as part of the data prefetch
+  await store.dispatch('memberships/getUserMemberships', userId, { root: true });
+
+  const { data } = await api.get(`/surveys/pinned`);
+  const { status } = data;
+  console.log('pinned', data);
+
+  const surveys = [];
+
+  if (status !== 'success' || !Array.isArray(data.pinned)) {
+    return;
+  }
+
+  for (const group of data.pinned) {
+    if (!Array.isArray(group.pinned)) {
+      continue;
+    }
+
+    for (const sid of group.pinned) {
+      const alreadyFetched = surveys.find((f) => f._id == sid);
+      if (!alreadyFetched) {
+        try {
+          const s = await fetchSurveyWithResources(sid);
+          surveys.push(s);
+        } catch (error) {
+          console.error('error:' + error);
+          continue;
+        }
+      }
+    }
+  }
+}
+
+export async function fetchSurveyWithResources(sid) {
+  const s = await fetchSurvey({ id: sid });
+  if (s.resources) {
+    await store.dispatch('resources/fetchResources', s.resources, { root: true });
+  }
+  return s;
+}
+
+export async function fetchSurvey({ id, version = 'latest' }) {
+  const { data: survey } = await api.get(`/surveys/${id}?version=${version}`);
+
+  return survey;
+}
+
+export async function getPinnedSurveysForGroup(groupId) {
+  const { data } = await api.get(`/surveys/pinned`);
+  const group = data.pinned.find((obj) => obj.group_id === groupId);
+
+  const pinnedSurveys = [];
+  for (const sid of group.pinned) {
+    const s = await fetchSurvey({ id: sid });
+    pinnedSurveys.push(s);
+  }
+
+  pinnedSurveys.sort((a, b) => a.name.localeCompare(b.name));
+
+  return pinnedSurveys;
+}
+
+export async function isSurveyPinned(groupId, surveyId) {
+  const { data } = await api.get(`/surveys/pinned`);
+  const group = data.pinned.find((obj) => obj.group_id === groupId);
+  const isPinned = group.pinned.find((pid) => pid === surveyId);
+  return !!isPinned;
+}
+
 export default {
   getAllNodes,
   queueAction,
   getValueOrNull,
   createBasicQueryList,
   isOnline,
+  prefetchPinned,
+  fetchSurvey,
+  getPinnedSurveysForGroup,
+  isSurveyPinned,
 };

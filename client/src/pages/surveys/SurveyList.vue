@@ -14,7 +14,7 @@
     </a-alert>
     <basic-list
       @updateSearch="updateSearch"
-      @tooglePin="tooglePin"
+      @togglePin="togglePinWithIcon"
       listType="card"
       :entities="state.surveys.content"
       showPinned
@@ -63,9 +63,9 @@
 <script setup>
 import { reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
+import emitter from '@/utils/eventBus';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
@@ -76,13 +76,13 @@ import isValid from 'date-fns/isValid';
 import formatDistance from 'date-fns/formatDistance';
 
 import { useSurvey } from '@/components/survey/survey';
+import { getPinnedSurveysForGroup } from '@/utils/surveyStack';
 
 const router = useRouter();
-const store = useStore();
 const { getActiveGroupId } = useGroup();
 const { rightToEdit, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message, isADraft } = useSurvey();
+const { stateComposable, getSurveys, togglePinSurvey, message, isADraft } = useSurvey();
 
 const state = reactive({
   page: 1,
@@ -112,13 +112,14 @@ function updateSearch(val) {
   initData();
 }
 
-watch(togglePinEvent, (entity) => {
-  tooglePin(entity);
+emitter.on('togglePin', () => {
+  initData();
 });
-async function tooglePin(entity) {
+async function togglePinWithIcon(entity) {
   state.loading = true;
-  await tooglePinSurvey(entity);
+  await togglePinSurvey(entity);
   await initData();
+  emitter.emit('togglePinFromIcon', entity);
   state.loading = false;
 }
 
@@ -150,7 +151,7 @@ async function initData() {
       }
     });
   } catch (e) {
-    const surveysContent = store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId());
+    const surveysContent = await getPinnedSurveysForGroup(getActiveGroupId());
 
     state.surveys = {
       content: surveysContent,

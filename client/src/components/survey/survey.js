@@ -1,7 +1,7 @@
 import { useStore } from 'vuex';
 import { reactive, computed, ref } from 'vue';
-import { useDisplay } from 'vuetify';
 import api from '@/services/api.service';
+import emitter from '@/utils/eventBus';
 
 import { getPermission } from '@/utils/permissions';
 import { menuAction } from '@/utils/threeDotsMenu';
@@ -11,11 +11,11 @@ import { get } from 'lodash';
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import { useRouter } from 'vue-router';
+import { fetchSurveyWithResources, isSurveyPinned } from '@/utils/surveyStack';
 
 export function useSurvey() {
   const store = useStore();
   const router = useRouter();
-  const { mobile } = useDisplay();
   const {
     rightToSubmitSurvey,
     rightToEdit,
@@ -99,14 +99,16 @@ export function useSurvey() {
       {
         title: 'Pin Survey',
         icon: 'mdi-pin',
-        action: (s) => createAction(s, rightToTogglePin, () => tooglePinOnMobile(s)),
-        render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && !s.pinnedSurveys,
+        action: (s) => createAction(s, rightToTogglePin, () => togglePinInMenu(s)),
+        render: (s) => async () =>
+          !isADraft(s) && rightToEdit().allowed && !(await isSurveyPinned(getActiveGroupId(), s._id)),
       },
       {
         title: 'Unpin Survey',
         icon: 'mdi-pin-outline',
-        action: (s) => createAction(s, rightToTogglePin, () => tooglePinOnMobile(s)),
-        render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && s.pinnedSurveys,
+        action: (s) => createAction(s, rightToTogglePin, () => togglePinInMenu(s)),
+        render: (s) => async () =>
+          !isADraft(s) && rightToEdit().allowed && (await isSurveyPinned(getActiveGroupId(), s._id)),
       },
     ],
   });
@@ -125,20 +127,19 @@ export function useSurvey() {
     return survey.latestVersion === 1;
   }
 
-  const togglePinEvent = ref(undefined);
-  function tooglePinOnMobile(s) {
-    togglePinEvent.value = s;
+  async function togglePinInMenu(s) {
+    await togglePinSurvey(s);
+    emitter.emit('togglePin', s);
   }
 
-  async function tooglePinSurvey(survey) {
+  async function togglePinSurvey(survey) {
     const group = groups.value.find((g) => g._id === getActiveGroupId());
     const index = group.surveys.pinned.indexOf(survey._id);
     if (index > -1) {
       group.surveys.pinned.splice(index, 1);
-      await store.dispatch('surveys/removePinned', survey);
     } else {
       group.surveys.pinned.push(survey._id);
-      await store.dispatch('surveys/addPinned', survey);
+      await fetchSurveyWithResources(survey._id);
     }
 
     await api.put(`/groups/${group._id}`, group);
@@ -217,8 +218,7 @@ export function useSurvey() {
     stateComposable,
     message,
     getSurveys,
-    tooglePinSurvey,
-    togglePinEvent,
+    togglePinSurvey,
     isADraft,
   };
 }

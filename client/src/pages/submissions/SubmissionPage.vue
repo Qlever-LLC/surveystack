@@ -90,6 +90,7 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
 import { useAllDrafts, useSyncDrafts } from '../../queries';
 import { useResults } from '../../components/ui/results';
+import { fetchSurvey } from '@/utils/surveyStack.js';
 
 export default defineComponent({
   components: {
@@ -277,7 +278,7 @@ export default defineComponent({
       state.loading = true;
 
       try {
-        state.survey = await store.dispatch('surveys/fetchSurvey', { id: props.surveyId });
+        state.survey = await fetchSurvey({ id: props.surveyId });
       } catch (error) {
         if (!state.survey) {
           state.hasError = true;
@@ -398,7 +399,7 @@ export default defineComponent({
 
       if (state.survey.latestVersion !== state.submission.meta.survey.version) {
         try {
-          state.survey = await store.dispatch('surveys/fetchSurvey', {
+          state.survey = await fetchSurvey({
             id: state.submission.meta.survey.id,
             version: state.submission.meta.survey.version,
           });

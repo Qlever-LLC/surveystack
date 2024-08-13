@@ -45,6 +45,7 @@
 
 <script>
 import { redirectAfterLogin, autoJoinWhiteLabelGroup } from '@/utils/memberships';
+import { prefetchPinned } from '@/utils/surveyStack.js';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -118,7 +119,7 @@ export default {
         //TODO in case of autoJoinWhiteLabelGroup throwing an error, registration should maybe reverted
         const partnerGroupId = await autoJoinWhiteLabelGroup(this.$store);
         //fetch pinned
-        this.$store.dispatch('surveys/fetchPinned');
+        await prefetchPinned();
         //change route
         await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {

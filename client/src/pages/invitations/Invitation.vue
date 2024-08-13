@@ -44,6 +44,8 @@ import ACardSubtitle from '@/components/ui/elements/ACardSubtitle.vue';
 import ACardText from '@/components/ui/elements/ACardText.vue';
 import ACardActions from '@/components/ui/elements/ACardActions.vue';
 
+import { prefetchPinned } from '@/utils/surveyStack.js';
+
 export default {
   components: { ACardActions, ACardText, ACardSubtitle, ACardTitle },
   data() {
@@ -85,7 +87,7 @@ export default {
         return;
       }
 
-      this.$store.dispatch('surveys/fetchPinned');
+      await prefetchPinned();
       this.$router.push(`/groups/${this.membership.group._id}`);
     },
   },

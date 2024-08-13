@@ -29,6 +29,7 @@ import { migrateSubmissions } from './store/db';
 import { useNavigation } from '@/components/navigation';
 import { autoJoinWhiteLabelGroup } from '@/utils/memberships';
 import { useSyncDrafts, prefetchRemoteDrafts } from './queries';
+import { prefetchPinned } from '@/utils/surveyStack.js';
 
 const store = useStore();
 const router = useRouter();
@@ -91,7 +92,7 @@ onMounted(async () => {
 
 const fetchPinnedSurveys = async () => {
   await store.dispatch('resources/initFromIndexedDB');
-  await store.dispatch('surveys/fetchPinned');
+  await prefetchPinned();
 };
 
 const fetchFarmOsAssets = () => {

@@ -102,6 +102,7 @@
 import api from '@/services/api.service';
 import { get } from 'lodash';
 import { autoJoinWhiteLabelGroup, redirectAfterLogin } from '@/utils/memberships';
+import { prefetchPinned } from '@/utils/surveyStack.js';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -239,7 +240,7 @@ export default {
         //make sure whitelabel user is a member of its whitelabel group (this reflects legacy behaviour, though it's not clear why this had been added in the past)
         const partnerGroupId = await autoJoinWhiteLabelGroup(this.$store);
         //fetch pinned
-        this.$store.dispatch('surveys/fetchPinned');
+        await prefetchPinned();
         //change route
         await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {
