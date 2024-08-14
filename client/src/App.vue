@@ -92,7 +92,7 @@ onMounted(async () => {
 
 const fetchPinnedSurveys = async () => {
   await store.dispatch('resources/initFromIndexedDB');
-  await prefetchPinned();
+  await prefetchPinned(store);
 };
 
 const fetchFarmOsAssets = () => {

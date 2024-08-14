@@ -139,7 +139,7 @@ export function useSurvey() {
       group.surveys.pinned.splice(index, 1);
     } else {
       group.surveys.pinned.push(survey._id);
-      await fetchSurveyWithResources(survey._id);
+      await fetchSurveyWithResources(store, survey._id);
     }
 
     await api.put(`/groups/${group._id}`, group);

@@ -87,7 +87,7 @@ export default {
         return;
       }
 
-      await prefetchPinned();
+      await prefetchPinned(this.$store);
       this.$router.push(`/groups/${this.membership.group._id}`);
     },
   },

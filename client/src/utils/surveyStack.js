@@ -1,6 +1,5 @@
 import TreeModel from 'tree-model';
 import { get } from 'lodash';
-import store from '@/store';
 import api from '@/services/api.service';
 import emitter from '@/utils/eventBus';
 
@@ -184,7 +183,7 @@ export function isOnline() {
   return window.navigator.onLine;
 }
 
-export async function prefetchPinned() {
+export async function prefetchPinned(store) {
   if (!store.getters['auth/isLoggedIn']) {
     return;
   }
@@ -213,7 +212,7 @@ export async function prefetchPinned() {
       const alreadyFetched = surveys.find((f) => f._id == sid);
       if (!alreadyFetched) {
         try {
-          const s = await fetchSurveyWithResources(sid);
+          const s = await fetchSurveyWithResources(store, sid);
           surveys.push(s);
         } catch (error) {
           console.error('error:' + error);
@@ -225,7 +224,7 @@ export async function prefetchPinned() {
   emitter.emit('prefetchPinned', false);
 }
 
-export async function fetchSurveyWithResources(sid) {
+export async function fetchSurveyWithResources(store, sid) {
   const s = await fetchSurvey({ id: sid });
   if (s.resources) {
     await store.dispatch('resources/fetchResources', s.resources, { root: true });

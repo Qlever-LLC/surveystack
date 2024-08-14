@@ -240,7 +240,7 @@ export default {
         //make sure whitelabel user is a member of its whitelabel group (this reflects legacy behaviour, though it's not clear why this had been added in the past)
         const partnerGroupId = await autoJoinWhiteLabelGroup(this.$store);
         //fetch pinned
-        await prefetchPinned();
+        await prefetchPinned(this.$store);
         //change route
         await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {

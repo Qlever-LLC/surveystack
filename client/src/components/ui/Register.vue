@@ -119,7 +119,7 @@ export default {
         //TODO in case of autoJoinWhiteLabelGroup throwing an error, registration should maybe reverted
         const partnerGroupId = await autoJoinWhiteLabelGroup(this.$store);
         //fetch pinned
-        await prefetchPinned();
+        await prefetchPinned(this.$store);
         //change route
         await redirectAfterLogin(this.$store, this.$router, this.$route.query.redirect, partnerGroupId);
       } catch (error) {
