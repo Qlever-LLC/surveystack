@@ -192,7 +192,7 @@ export function useSurvey() {
     try {
       const { headers, data } = await api.get(`/surveys/${survey}/pdf`);
       const disposition = parseDisposition(headers['content-disposition']);
-      downloadExternal(data, disposition.parameters.filename);
+      await downloadExternal(store, data, disposition.parameters.filename);
     } catch (e) {
       console.error('Failed to download printable PDF', e);
       store.dispatch(

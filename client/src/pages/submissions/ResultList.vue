@@ -695,7 +695,7 @@ function onDataTablePropsChanged(props) {
   state.sortBy = props;
 }
 async function startDownload() {
-  await downloadExternal(apiDownloadUrl.value, `${state.surveyEntity.name}.${state.apiDownloadFormat}`);
+  await downloadExternal(store, apiDownloadUrl.value, `${state.surveyEntity.name}.${state.apiDownloadFormat}`);
 }
 
 function updateView(view) {

@@ -1,6 +1,8 @@
-async function downloadExternal(href, download) {
+async function downloadExternal(store, href, download) {
+  console.log('downloadExternal', href);
   try {
     const response = await fetch(href);
+    console.log('response', response);
 
     if (!response.ok) {
       throw new Error('Network response error');
@@ -18,6 +20,7 @@ async function downloadExternal(href, download) {
     window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error('An error occurred while trying to download the file.', error);
+    store.dispatch('feedback/add', 'An error occurred while trying to download the file.', { root: true });
   }
 }
 

@@ -167,7 +167,9 @@ export default {
           location: resourceLocations.REMOTE,
         },
       ]);
-      this.$refs['upload-resource'].value = null;
+      if (this.$refs['upload-resource']) {
+        this.$refs['upload-resource'].value = null;
+      }
       this.uploadingResource = false;
     },
     async openResource(resource) {

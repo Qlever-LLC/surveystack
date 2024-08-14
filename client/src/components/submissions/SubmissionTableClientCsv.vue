@@ -148,7 +148,7 @@
             <div
               v-else-if="item[header.value].includes('resources/')"
               :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }">
-              <a @click.stop="openResource(item[header.key])"> {{ getLabelFromKey(item[header.value]) }}</a>
+              <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
             </div>
             <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
               {{ getCellValue(item, indx, header.value) }}
