@@ -119,7 +119,7 @@ async function togglePinWithIcon(entity) {
   state.loading = true;
   await togglePinSurvey(entity);
   await initData();
-  emitter.emit('togglePinFromIcon', entity);
+  emitter.emit('togglePinFromIcon');
   state.loading = false;
 }
 

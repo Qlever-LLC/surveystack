@@ -46,9 +46,6 @@ async function clearObjectStore(storeName) {
 function clearAllSubmissions() {
   return clearObjectStore(stores.SUBMISSIONS);
 }
-function clearAllPinnedSurveys() {
-  return clearObjectStore(stores.PINNEDSURVEYS);
-}
 function clearAllResources() {
   return clearObjectStore(stores.RESOURCES);
 }
@@ -59,9 +56,6 @@ async function persist(storeName, obj) {
 function persistSubmission(submission) {
   return persist(stores.SUBMISSIONS, submission);
 }
-function persistPinnedSurvey(pinnedSurvey) {
-  return persist(stores.PINNEDSURVEYS, pinnedSurvey);
-}
 function persistResource(resource) {
   return persist(stores.RESOURCES, resource);
 }
@@ -71,9 +65,6 @@ async function getResults(storeName) {
 }
 function getAllSubmissions() {
   return getResults(stores.SUBMISSIONS);
-}
-function getAllPinnedSurveys() {
-  return getResults(stores.PINNEDSURVEYS);
 }
 function getAllResources() {
   return getResults(stores.RESOURCES);
@@ -89,9 +80,6 @@ async function removeFromIndexedDB(storeName, id) {
 
 function deleteSubmission(id) {
   return removeFromIndexedDB(stores.SUBMISSIONS, id);
-}
-function deletePinnedSurvey(id) {
-  return removeFromIndexedDB(stores.PINNEDSURVEYS, id);
 }
 
 const migrateSubmissions = async () => {
@@ -118,17 +106,13 @@ const migrateSubmissions = async () => {
 export {
   stores,
   clearAllSubmissions,
-  clearAllPinnedSurveys,
   clearAllResources,
   persistSubmission,
-  persistPinnedSurvey,
   persistResource,
   getAllSubmissions,
-  getAllPinnedSurveys,
   getAllResources,
   getSubmission,
   removeFromIndexedDB,
   deleteSubmission,
-  deletePinnedSurvey,
   migrateSubmissions,
 };

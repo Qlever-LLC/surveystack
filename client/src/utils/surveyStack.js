@@ -2,6 +2,7 @@ import TreeModel from 'tree-model';
 import { get } from 'lodash';
 import store from '@/store';
 import api from '@/services/api.service';
+import emitter from '@/utils/eventBus';
 
 export const getAllNodes = (root) => {
   const nodes = [];
@@ -187,6 +188,7 @@ export async function prefetchPinned() {
   if (!store.getters['auth/isLoggedIn']) {
     return;
   }
+  emitter.emit('prefetchPinned', true);
 
   const { _id: userId } = store.getters['auth/user'];
   //TODO check if this still is required as part of the data prefetch
@@ -220,6 +222,7 @@ export async function prefetchPinned() {
       }
     }
   }
+  emitter.emit('prefetchPinned', false);
 }
 
 export async function fetchSurveyWithResources(sid) {

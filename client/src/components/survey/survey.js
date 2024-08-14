@@ -129,7 +129,7 @@ export function useSurvey() {
 
   async function togglePinInMenu(s) {
     await togglePinSurvey(s);
-    emitter.emit('togglePin', s);
+    emitter.emit('togglePin');
   }
 
   async function togglePinSurvey(survey) {
@@ -168,7 +168,6 @@ export function useSurvey() {
 
       if (data.pinned) {
         data.pinned.forEach((s) => {
-          s.pinnedSurveys = true;
           data.content.unshift(s);
         });
       }
