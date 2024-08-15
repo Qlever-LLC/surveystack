@@ -183,6 +183,16 @@ export function isOnline() {
   return window.navigator.onLine;
 }
 
+async function getSurveyPinnedAPI() {
+  const response = await api.get('/surveys/pinned');
+  return response;
+}
+
+export async function fetchSurvey({ id, version = 'latest' }) {
+  const { data: survey } = await api.get(`/surveys/${id}?version=${version}`);
+  return survey;
+}
+
 export async function prefetchPinned(store) {
   if (!store.getters['auth/isLoggedIn']) {
     return;
@@ -193,7 +203,7 @@ export async function prefetchPinned(store) {
   //TODO check if this still is required as part of the data prefetch
   await store.dispatch('memberships/getUserMemberships', userId, { root: true });
 
-  const { data } = await api.get(`/surveys/pinned`);
+  const { data } = await getSurveyPinnedAPI();
   const { status } = data;
   console.log('pinned', data);
 
@@ -232,17 +242,14 @@ export async function fetchSurveyWithResources(store, sid) {
   return s;
 }
 
-export async function fetchSurvey({ id, version = 'latest' }) {
-  const { data: survey } = await api.get(`/surveys/${id}?version=${version}`);
-
-  return survey;
-}
-
 export async function getPinnedSurveysForGroup(groupId) {
-  const { data } = await api.get(`/surveys/pinned`);
+  const { data } = await getSurveyPinnedAPI();
+  const pinnedSurveys = [];
+  if (data.pinned.length === 0) {
+    return pinnedSurveys;
+  }
   const group = data.pinned.find((obj) => obj.group_id === groupId);
 
-  const pinnedSurveys = [];
   for (const sid of group.pinned) {
     const s = await fetchSurvey({ id: sid });
     pinnedSurveys.push(s);
@@ -254,7 +261,10 @@ export async function getPinnedSurveysForGroup(groupId) {
 }
 
 export async function isSurveyPinned(groupId, surveyId) {
-  const { data } = await api.get(`/surveys/pinned`);
+  const { data } = await getSurveyPinnedAPI();
+  if (data.pinned.length === 0) {
+    return false;
+  }
   const group = data.pinned.find((obj) => obj.group_id === groupId);
   const isPinned = group.pinned.find((pid) => pid === surveyId);
   return !!isPinned;
