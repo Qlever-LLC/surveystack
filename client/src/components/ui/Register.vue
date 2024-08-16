@@ -45,7 +45,6 @@
 
 <script>
 import { redirectAfterLogin, autoJoinWhiteLabelGroup } from '@/utils/memberships';
-import { prefetchPinned } from '@/utils/surveyStack.js';
 
 const DEFAULT_ENTITY = {
   email: '',
