@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import store from '@/store';
+
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
@@ -185,7 +187,7 @@ export default {
 
         if (res) {
           const disposition = parseDisposition(res.headers['content-disposition']);
-          downloadExternal(res.data, disposition.parameters.filename);
+          await downloadExternal(store, res.data, disposition.parameters.filename);
         }
       } catch (e) {
         console.error('Failed to download PDF of submission', e);
