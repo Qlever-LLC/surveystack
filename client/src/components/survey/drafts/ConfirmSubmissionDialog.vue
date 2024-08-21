@@ -4,7 +4,7 @@
       <a-card-title> Confirm Submission </a-card-title>
       <a-card-text v-if="!isLoggedIn"> Submit Survey </a-card-text>
       <a-card-text v-else>
-        Submit this draft <strong>{{ id }}</strong> to <br />
+        Submit this Response to <br />
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
         <div v-if="submitAsUser">
@@ -54,9 +54,6 @@ export default {
       type: String,
     },
     additionalMessage: {
-      type: String,
-    },
-    id: {
       type: String,
     },
     dateSubmitted: {
