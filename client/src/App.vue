@@ -89,16 +89,21 @@ watch([data], async ([data]) => {
   if (data?.length && !hasFetchedPinnedSurveys.value) {
     emitter.emit('prefetchPinned', true);
 
-    if (!initFromIndexedDBReady.value) {
-      await initFromIndexedDB();
+    try {
+      if (!initFromIndexedDBReady.value) {
+        await initFromIndexedDB();
+      }
+      const surveyIds = data.flatMap((group) => group.pinned);
+
+      const promises = surveyIds.map((id) => fetchSurveyWithResources(store, id));
+      await Promise.all(promises);
+
+      hasFetchedPinnedSurveys.value = true;
+    } catch (error) {
+      console.error('An error occurred while prefetching pinned surveys:', error);
+    } finally {
+      emitter.emit('prefetchPinned', false);
     }
-    const surveyIds = data.flatMap((group) => group.pinned);
-
-    const promises = surveyIds.map((id) => fetchSurveyWithResources(store, id));
-    await Promise.all(promises);
-
-    hasFetchedPinnedSurveys.value = true;
-    emitter.emit('prefetchPinned', false);
   }
 });
 

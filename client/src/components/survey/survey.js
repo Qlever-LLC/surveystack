@@ -31,11 +31,17 @@ export async function fetchSurvey({ id, version = 'latest' }) {
 }
 
 export async function fetchSurveyWithResources(store, sid) {
-  const s = await fetchSurvey({ id: sid });
-  if (s.resources) {
-    await store.dispatch('resources/fetchResources', s.resources, { root: true });
+  try {
+    const s = await fetchSurvey({ id: sid });
+    if (s.resources) {
+      await store.dispatch('resources/fetchResources', s.resources, { root: true });
+    }
+    return s;
+  } catch (error) {
+    console.error(`Error fetching survey resources with id ${sid}:`, error);
+    // Return something so that the promise is resolved and not rejected
+    return null;
   }
-  return s;
 }
 
 export function useSurvey() {
