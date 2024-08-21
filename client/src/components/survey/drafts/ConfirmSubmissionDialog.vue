@@ -2,20 +2,11 @@
   <a-dialog :modelValue="modelValue" @update:modelValue="$emit('update:modelValue', $event)" width="400">
     <a-card>
       <a-card-title> Confirm Submission </a-card-title>
-      <a-card-text v-if="!groupChangeAllowed"> Submit Survey </a-card-text>
+      <a-card-text v-if="!isLoggedIn"> Submit Survey </a-card-text>
       <a-card-text v-else>
-        Submit this draft <strong>{{ id }}</strong> to <br />
+        Submit this Response to <br />
         <strong v-if="groupName">{{ groupName }}</strong>
         <strong v-else>no group</strong>
-        <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
-          <group-selector label="Group" class="d-inline-block" :modelValue="groupId" @update:modelValue="setGroup" />
-          <a-btn icon @click="handleCloseGroupEditor">
-            <a-icon>mdi-close</a-icon>
-          </a-btn>
-        </div>
-        <a-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
-          <a-icon small>mdi-pencil</a-icon>
-        </a-btn>
         <div v-if="submitAsUser">
           As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
         </div>
@@ -37,15 +28,13 @@
 </template>
 
 <script>
-import GroupSelector from '@/components/shared/GroupSelector.vue';
 import { getGroupNameById } from '@/utils/groups';
 
 export default {
   data() {
     return {
-      groupEditorIsVisible: false,
       groupName: null,
-      groupChangeAllowed: false,
+      isLoggedIn: false,
     };
   },
   props: {
@@ -67,9 +56,6 @@ export default {
     additionalMessage: {
       type: String,
     },
-    id: {
-      type: String,
-    },
     dateSubmitted: {
       type: String,
     },
@@ -79,17 +65,14 @@ export default {
     },
   },
   emits: ['update:modelValue', 'submit', 'close', 'set-group'],
-  components: {
-    GroupSelector,
-  },
   created() {
     if (this.groupId) {
       getGroupNameById(this.groupId).then((response) => (this.groupName = response));
     }
     if (this.$store.getters['auth/isLoggedIn']) {
-      this.groupChangeAllowed = true;
+      this.isLoggedIn = true;
     } else {
-      this.groupChangeAllowed = false;
+      this.isLoggedIn = false;
     }
   },
   computed: {},
@@ -109,12 +92,6 @@ export default {
     async setGroup(v) {
       await getGroupNameById(v).then((response) => (this.groupName = response));
       this.$emit('set-group', v);
-    },
-    handleEditGroup() {
-      this.groupEditorIsVisible = true;
-    },
-    handleCloseGroupEditor() {
-      this.groupEditorIsVisible = false;
     },
   },
 };
