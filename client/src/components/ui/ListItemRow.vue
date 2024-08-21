@@ -63,6 +63,7 @@
 <script setup>
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import { resolveRenderFunctionResult } from '@/components/survey/survey';
 
 const router = useRouter();
 
@@ -86,7 +87,7 @@ const state = reactive({
 });
 
 const filteredMenu = computed(() => {
-  return props.menu?.filter((m) => m.render === undefined || m.render(props.entity)());
+  return props.menu?.filter((m) => resolveRenderFunctionResult(m.render, props.entity));
 });
 
 const actionButtonsFixed = computed(() => {

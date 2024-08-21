@@ -1,5 +1,5 @@
 import { useStore } from 'vuex';
-import { reactive, computed, ref } from 'vue';
+import { reactive, computed, isProxy } from 'vue';
 import api from '@/services/api.service';
 import emitter from '@/utils/eventBus';
 
@@ -11,7 +11,32 @@ import { get } from 'lodash';
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import { useRouter } from 'vue-router';
-import { fetchSurveyWithResources, isSurveyPinned } from '@/utils/surveyStack';
+import { useQueryClient } from '@tanstack/vue-query';
+import { usePinned, isSurveyPinned } from '@/queries';
+
+export const resolveRenderFunctionResult = (render, entity) => {
+  let includeTypeFunction = false;
+  if (typeof render === 'function') {
+    includeTypeFunction = render(entity)();
+  }
+
+  const shouldInclude = render === undefined || includeTypeFunction;
+
+  return isProxy(shouldInclude) ? shouldInclude.value : shouldInclude;
+};
+
+export async function fetchSurvey({ id, version = 'latest' }) {
+  const { data: survey } = await api.get(`/surveys/${id}?version=${version}`);
+  return survey;
+}
+
+export async function fetchSurveyWithResources(store, sid) {
+  const s = await fetchSurvey({ id: sid });
+  if (s.resources) {
+    await store.dispatch('resources/fetchResources', s.resources, { root: true });
+  }
+  return s;
+}
 
 export function useSurvey() {
   const store = useStore();
@@ -27,6 +52,9 @@ export function useSurvey() {
   const { message, createAction } = menuAction();
 
   const { getActiveGroupId } = useGroup();
+
+  const queryClient = useQueryClient();
+  const { data: pinnedData, isPending } = usePinned();
 
   const stateComposable = reactive({
     showSelectMember: false,
@@ -100,15 +128,23 @@ export function useSurvey() {
         title: 'Pin Survey',
         icon: 'mdi-pin',
         action: (s) => createAction(s, rightToTogglePin, () => togglePinInMenu(s)),
-        render: (s) => async () =>
-          !isADraft(s) && rightToEdit().allowed && !(await isSurveyPinned(getActiveGroupId(), s._id)),
+        render: (s) => () => {
+          return computed(() => {
+            const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
+            return !isADraft(s) && rightToEdit().allowed && !isPinned;
+          });
+        },
       },
       {
         title: 'Unpin Survey',
         icon: 'mdi-pin-outline',
         action: (s) => createAction(s, rightToTogglePin, () => togglePinInMenu(s)),
-        render: (s) => async () =>
-          !isADraft(s) && rightToEdit().allowed && (await isSurveyPinned(getActiveGroupId(), s._id)),
+        render: (s) => () => {
+          return computed(() => {
+            const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
+            return !isADraft(s) && rightToEdit().allowed && isPinned;
+          });
+        },
       },
     ],
   });
@@ -129,6 +165,8 @@ export function useSurvey() {
 
   async function togglePinInMenu(s) {
     await togglePinSurvey(s);
+    queryClient.invalidateQueries({ queryKey: ['pinnedSurveys'] });
+    queryClient.invalidateQueries({ queryKey: ['pinnedSurveysGroup', getActiveGroupId()] });
     emitter.emit('togglePin');
   }
 

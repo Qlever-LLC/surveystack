@@ -16,9 +16,9 @@
           </a-list-item-title>
           <a-list-item-title v-else class="d-flex align-center">
             <span v-if="showPinned" @click.stop="togglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
-              <a-icon v-if="state.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
+              <a-icon v-if="pinnedSurveys" class="mr-2">mdi-pin</a-icon>
               <a-icon
-                v-if="!state.pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
+                v-if="!pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
                 class="mr-2">
                 mdi-pin-outline
               </a-icon>
@@ -52,16 +52,13 @@
       </span>
       <a-spacer />
       <slot name="preMenu" :entity="state.entity" />
-      <a-menu
-        v-if="!groupSelectorStyle && state.filteredMenu?.length > 0"
-        location="start"
-        v-model="state.menuIsOpen[idx]">
+      <a-menu v-if="!groupSelectorStyle && filteredMenu?.length > 0" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
           <a-btn v-bind="props" icon @click.prevent :small="smallCard"><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
         <a-list dense class="py-0">
           <a-list-item
-            v-for="(itemMenu, idx) of state.filteredMenu"
+            v-for="(itemMenu, idx) of filteredMenu"
             :key="idx"
             class="d-flex align-center justify-end"
             :style="getTextColor(itemMenu)"
@@ -78,21 +75,20 @@
 
 <script setup>
 import { cloneDeep } from 'lodash';
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useStore } from 'vuex';
 
-import { useSurvey } from '@/components/survey/survey';
+import { useSurvey, resolveRenderFunctionResult } from '@/components/survey/survey';
 import { useGroup } from '@/components/groups/group';
+import { useIsSurveyPinned } from '@/queries';
 
 const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
 const { isADraft } = useSurvey();
 const { isGroupAdmin, getActiveGroupId } = useGroup();
-
-import { isSurveyPinned } from '@/utils/surveyStack';
 
 const props = defineProps({
   entity: {
@@ -157,9 +153,11 @@ const state = reactive({
   groupStyle: {},
   avatarName: '',
   ableTogglePinned: props.enableTogglePinned,
-  filteredMenu: [],
   pinnedSurveys: false,
 });
+
+const { data: isSurveyPinned } = useIsSurveyPinned(getActiveGroupId(), props.entity._id);
+const pinnedSurveys = computed(() => (props.showPinned ? isSurveyPinned.value : false));
 
 onMounted(async () => {
   if (props.groupStyle) {
@@ -181,35 +179,11 @@ onMounted(async () => {
       state.avatarName = '';
     }
   }
-  if (props.showPinned) {
-    await isPinned(getActiveGroupId(), state.entity._id);
-  }
 });
 
-getFilteredMenu();
-
-async function getFilteredMenu() {
-  const filteredMenu = [];
-
-  for (const m of props.menu || []) {
-    let includeTypeFunction = true;
-    if (typeof m.render === 'function') {
-      const result = m.render(props.entity)();
-      includeTypeFunction = result instanceof Promise ? await result : result;
-    }
-
-    const shouldInclude = m.render === undefined || includeTypeFunction;
-
-    if (shouldInclude) {
-      filteredMenu.push(m);
-    }
-  }
-  state.filteredMenu = filteredMenu;
-}
-
-async function isPinned(groupId, surveyId) {
-  state.pinnedSurveys = await isSurveyPinned(groupId, surveyId);
-}
+const filteredMenu = computed(() => {
+  return props.menu?.filter((m) => resolveRenderFunctionResult(m.render, props.entity));
+});
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };

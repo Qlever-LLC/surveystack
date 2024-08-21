@@ -90,7 +90,7 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
 import { useAllDrafts, useSyncDrafts } from '../../queries';
 import { useResults } from '../../components/ui/results';
-import { fetchSurvey } from '@/utils/surveyStack.js';
+import { fetchSurvey } from '@/components/survey/survey.js';
 
 export default defineComponent({
   components: {

@@ -66,7 +66,9 @@ async function countPinnedSurveysFromCache() {
   return matchingUrls;
 }
 
-emitter.on('prefetchPinned', (value) => (state.pinnedLoading = value));
+emitter.on('prefetchPinned', (value) => {
+  state.pinnedLoading = value;
+});
 
 watch(showDialog, async (newVal) => {
   if (newVal) {

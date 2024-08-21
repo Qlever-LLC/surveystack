@@ -1,4 +1,4 @@
-import { fetchSurvey } from '@/utils/surveyStack';
+import { fetchSurvey } from '@/components/survey/survey';
 
 export function useSubmission() {
   async function setSurveyNames(submissions) {
