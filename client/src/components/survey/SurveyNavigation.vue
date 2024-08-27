@@ -21,7 +21,7 @@
       :enableTogglePinned="rightToTogglePin().allowed"
       class="whiteCard"
       smallCard
-      :menu="menu">
+      :menu="surveyMenu">
       <template v-slot:entitySubtitle></template>
     </list-item-card>
     <a-list-item
@@ -44,7 +44,7 @@
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import { getPermission } from '@/utils/permissions';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
@@ -53,12 +53,14 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 import { useGetPinnedSurveysForGroup } from '@/queries';
 
+const onlineStatus = inject('onlineStatus');
+
 const { getActiveGroupId } = useGroup();
-const { stateComposable, message } = useSurvey();
+const { stateComposable, getMenu, message } = useSurvey();
 const { rightToTogglePin } = getPermission();
 const router = useRouter();
 
-const menu = computed(() => stateComposable.menu);
+const surveyMenu = computed(() => getMenu(onlineStatus.value));
 
 const { data: data } = useGetPinnedSurveysForGroup(getActiveGroupId());
 const surveys = computed(() => {

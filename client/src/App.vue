@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, watch, ref } from 'vue';
+import { computed, onMounted, reactive, watch, ref, provide, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
@@ -85,6 +85,12 @@ const initFromIndexedDB = async () => {
 const hasFetchedPinnedSurveys = ref(false);
 const { data } = usePinned();
 
+//online and offline status configuration
+const onlineStatus = ref(navigator.onLine);
+const updateOnlineStatus = () => {
+  onlineStatus.value = navigator.onLine;
+};
+
 watch([data], async ([data]) => {
   if (data?.length && !hasFetchedPinnedSurveys.value) {
     emitter.emit('prefetchPinned', true);
@@ -124,6 +130,14 @@ onMounted(async () => {
 
   //moved from domainHandler.install
   await autoJoinWhiteLabelGroup(store);
+
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('online', updateOnlineStatus);
+  window.removeEventListener('offline', updateOnlineStatus);
 });
 
 const fetchMemberships = async () => {
@@ -137,6 +151,8 @@ const fetchFarmOsAssets = () => {
     api.get('farmos/assets?bundle=plant');
   }
 };
+
+provide('onlineStatus', onlineStatus);
 </script>
 
 <style lang="scss">

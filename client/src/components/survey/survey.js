@@ -67,7 +67,20 @@ export function useSurvey() {
     selectedSurvey: undefined,
     showCallForResponses: false,
     showDescription: false,
-    menu: [
+  });
+
+  const isWhitelabel = computed(() => {
+    return store.getters['whitelabel/isWhitelabel'];
+  });
+  const whitelabelPartner = computed(() => {
+    return store.getters['whitelabel/partner'];
+  });
+  const groups = computed(() => {
+    return store.getters['memberships/groups'];
+  });
+
+  function getMenu(isOnline) {
+    return [
       {
         title: 'Start Survey',
         icon: 'mdi-open-in-new',
@@ -79,7 +92,7 @@ export function useSurvey() {
         title: 'Start Survey as Member',
         icon: 'mdi-open-in-new',
         action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
-        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
+        render: (s) => () => isOnline && !isADraft(s) && rightToSubmitSurvey(s).allowed,
       },
       {
         title: 'Call for Responses',
@@ -89,7 +102,7 @@ export function useSurvey() {
             stateComposable.showCallForResponses = true;
             stateComposable.selectedSurvey = s;
           }),
-        render: (s) => () => rightToCallForSubmissions(s).allowed,
+        render: (s) => () => isOnline && rightToCallForSubmissions(s).allowed,
       },
       {
         title: 'Description',
@@ -99,13 +112,13 @@ export function useSurvey() {
             stateComposable.showDescription = true;
             stateComposable.selectedSurvey = s;
           }),
-        render: (s) => () => rightToView(s).allowed,
+        render: (s) => () => isOnline && rightToView(s).allowed,
       },
       {
         title: 'Print Blank Survey',
         icon: 'mdi-printer',
         action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
-        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
+        render: (s) => () => isOnline && !isADraft(s) && rightToSubmitSurvey(s).allowed,
       },
       // {
       //   title: 'View',
@@ -116,14 +129,14 @@ export function useSurvey() {
         title: 'Edit',
         icon: 'mdi-pencil',
         action: (s) => createAction(s, rightToEdit, () => editSurvey(s)),
-        render: (s) => () => rightToEdit().allowed,
+        render: (s) => () => isOnline && rightToEdit().allowed,
       },
       {
         title: 'View Results',
         icon: 'mdi-chart-bar',
         action: (s) =>
           createAction(s, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`),
-        render: (s) => () => rightToViewAnonymizedResults().allowed,
+        render: (s) => () => isOnline && rightToViewAnonymizedResults().allowed,
       },
       // {
       //   title: 'Share',
@@ -137,7 +150,7 @@ export function useSurvey() {
         render: (s) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
-            return !isADraft(s) && rightToEdit().allowed && !isPinned;
+            return isOnline && !isADraft(s) && rightToEdit().allowed && !isPinned;
           });
         },
       },
@@ -148,22 +161,12 @@ export function useSurvey() {
         render: (s) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
-            return !isADraft(s) && rightToEdit().allowed && isPinned;
+            return isOnline && !isADraft(s) && rightToEdit().allowed && isPinned;
           });
         },
       },
-    ],
-  });
-
-  const isWhitelabel = computed(() => {
-    return store.getters['whitelabel/isWhitelabel'];
-  });
-  const whitelabelPartner = computed(() => {
-    return store.getters['whitelabel/partner'];
-  });
-  const groups = computed(() => {
-    return store.getters['memberships/groups'];
-  });
+    ];
+  }
 
   function isADraft(survey) {
     return survey.latestVersion === 1;
@@ -263,5 +266,6 @@ export function useSurvey() {
     getSurveys,
     togglePinSurvey,
     isADraft,
+    getMenu,
   };
 }

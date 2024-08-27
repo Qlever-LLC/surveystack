@@ -177,6 +177,7 @@ export const createBasicQueryList = (survey, version = 1) => {
   return items;
 };
 
+//TODO use const onlineStatus = inject('onlineStatus'); for component with script setup instead. usage: onlineStatus.value
 export function isOnline() {
   return window.navigator.onLine;
 }

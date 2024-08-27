@@ -20,7 +20,7 @@
       showPinned
       :enableTogglePinned="rightToTogglePin().allowed"
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
-      :menu="state.menu"
+      :menu="surveyMenu"
       :loading="state.loading"
       :show-navigation-control="!$route.query.minimal_ui"
       title="">
@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useGroup } from '@/components/groups/group';
@@ -79,11 +79,13 @@ import formatDistance from 'date-fns/formatDistance';
 import { useSurvey } from '@/components/survey/survey';
 import { useGetPinnedSurveysForGroup } from '@/queries';
 
+const onlineStatus = inject('onlineStatus');
+
 const router = useRouter();
 const { getActiveGroupId } = useGroup();
 const { rightToEdit, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getSurveys, togglePinSurvey, message, isADraft } = useSurvey();
+const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isADraft } = useSurvey();
 
 const queryClient = useQueryClient();
 
@@ -100,7 +102,6 @@ const state = reactive({
       limit: 100000,
     },
   },
-  menu: [],
   loading: false,
   networkOk: false,
 });
@@ -116,6 +117,8 @@ const surveys = computed(() => {
     },
   };
 });
+
+const surveyMenu = computed(() => getMenu(onlineStatus.value));
 
 const activeTabPaginationLength = computed(() => {
   const { total } = state.networkOk ? state.surveys.pagination : surveys.value.pagination;
@@ -166,7 +169,6 @@ async function fetchSurveysWithPagination() {
 
 async function initData() {
   state.loading = true;
-  state.menu = stateComposable.menu;
   try {
     state.surveys = await fetchSurveysWithPagination();
     state.networkOk = true;
