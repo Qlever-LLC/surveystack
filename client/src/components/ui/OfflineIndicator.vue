@@ -2,18 +2,24 @@
   <a-icon v-if="!isOnline" size="22" title="device is offline" color="warning" class="px-1" @click="showDialog = true">
     mdi-wifi-off
   </a-icon>
-  <a-icon v-else-if="pinnedLoading" size="22" title="downloading surveys for offline use" color="warning" class="px-1"
+  <a-icon
+    v-else-if="state.pinnedLoading"
+    size="22"
+    title="downloading surveys for offline use"
+    color="warning"
+    class="px-1"
     >mdi-download</a-icon
   >
   <a-dialog v-model="showDialog" max-width="400">
     <a-card>
       <a-card-title>Device offline</a-card-title>
       <a-card-text>
-        The following {{ pinnedSurveys.length }} pinned surveys have been downloaded and are available while offline:
+        The following {{ state.pinnedSurveys.length }} pinned surveys have been downloaded and are available while
+        offline:
       </a-card-text>
       <a-card-text>
         <ul class="ml-4">
-          <li v-for="s in pinnedSurveys" :key="s._id">{{ s.name }}</li>
+          <li v-for="s in state.pinnedSurveys" :key="s._id">{{ s.name }}</li>
         </ul>
       </a-card-text>
       <a-card-actions>
@@ -25,24 +31,50 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useStore } from 'vuex';
-import { cloneDeep } from 'lodash';
+import { reactive, ref, onMounted, onUnmounted, watch } from 'vue';
+import emitter from '@/utils/eventBus';
 
-const store = useStore();
 const isOnline = ref(window.navigator.onLine);
 const showDialog = ref(false);
-const pinnedLoading = computed(() => store.getters['surveys/getPinnedLoading']);
-const pinnedSurveys = computed(() => {
-  const s = store.getters['surveys/getPinned'];
-  let sCloned = cloneDeep(s);
-  sCloned.sort((a, b) => a.name.localeCompare(b.name));
-  return sCloned;
+
+const state = reactive({
+  pinnedLoading: false,
+  pinnedSurveys: [],
 });
 
 const handleOnlineStatus = () => {
   isOnline.value = window.navigator.onLine;
 };
+
+async function countPinnedSurveysFromCache() {
+  const surveyPattern = /^\/api\/surveys\/[a-fA-F0-9]{24}(?:\?version=latest)?$/;
+  const cacheNames = await caches.keys();
+  const matchingUrls = [];
+
+  for (const cacheName of cacheNames) {
+    const cache = await caches.open(cacheName);
+    const requests = await cache.keys();
+
+    for (const request of requests) {
+      const url = new URL(request.url);
+      if (surveyPattern.test(url.pathname + url.search)) {
+        matchingUrls.push({ _id: url.pathname.split('/').pop(), name: url.pathname });
+      }
+    }
+  }
+
+  return matchingUrls;
+}
+
+emitter.on('prefetchPinned', (value) => {
+  state.pinnedLoading = value;
+});
+
+watch(showDialog, async (newVal) => {
+  if (newVal) {
+    state.pinnedSurveys = await countPinnedSurveysFromCache();
+  }
+});
 
 onMounted(() => {
   window.addEventListener('online', handleOnlineStatus);

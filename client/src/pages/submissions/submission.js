@@ -1,23 +1,10 @@
-import { useStore } from 'vuex';
+import { fetchSurvey } from '@/components/survey/survey';
 
 export function useSubmission() {
-  const store = useStore();
-
-  async function getSurvey(submission) {
-    let survey = store.getters['surveys/getSurvey'](submission.meta.survey.id);
-    if (!survey) {
-      //not found in the local store, fetch the survey from backend
-      console.warn('fetching survey name of survey id ' + submission.meta.survey.id);
-      survey = await store.dispatch('surveys/fetchSurveyFromBackendAndStore', { id: submission.meta.survey.id });
-    }
-
-    return survey;
-  }
-
   async function setSurveyNames(submissions) {
     for (let submission of submissions) {
       if (!submission.meta.survey.name) {
-        const survey = await getSurvey(submission);
+        const survey = await fetchSurvey({ id: submission.meta.survey.id });
         if (survey) {
           submission.meta.survey.name = survey.name;
         }

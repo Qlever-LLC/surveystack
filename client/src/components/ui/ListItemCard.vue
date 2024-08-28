@@ -15,10 +15,10 @@
             <slot name="entityTitle" :entity="state.entity" />
           </a-list-item-title>
           <a-list-item-title v-else class="d-flex align-center">
-            <span v-if="showPinned" @click.stop="tooglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
-              <a-icon v-if="entity.pinnedSurveys" class="mr-2">mdi-pin</a-icon>
+            <span v-if="showPinned" @click.stop="togglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
+              <a-icon v-if="pinnedSurveys" class="mr-2">mdi-pin</a-icon>
               <a-icon
-                v-if="!entity.pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
+                v-if="!pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
                 class="mr-2">
                 mdi-pin-outline
               </a-icon>
@@ -75,19 +75,20 @@
 
 <script setup>
 import { cloneDeep } from 'lodash';
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useStore } from 'vuex';
 
-import { useSurvey } from '@/components/survey/survey';
+import { useSurvey, resolveRenderFunctionResult } from '@/components/survey/survey';
 import { useGroup } from '@/components/groups/group';
+import { useIsSurveyPinned } from '@/queries';
 
 const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
 const { isADraft } = useSurvey();
-const { isGroupAdmin } = useGroup();
+const { isGroupAdmin, getActiveGroupId } = useGroup();
 
 const props = defineProps({
   entity: {
@@ -143,7 +144,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['tooglePin']);
+const emit = defineEmits(['togglePin']);
 
 const state = reactive({
   entity: cloneDeep(props.entity),
@@ -152,9 +153,13 @@ const state = reactive({
   groupStyle: {},
   avatarName: '',
   ableTogglePinned: props.enableTogglePinned,
+  pinnedSurveys: false,
 });
 
-onMounted(() => {
+const { data: isSurveyPinned } = useIsSurveyPinned(getActiveGroupId(), props.entity._id);
+const pinnedSurveys = computed(() => (props.showPinned ? isSurveyPinned.value : false));
+
+onMounted(async () => {
   if (props.groupStyle) {
     const treeHierarchy = props.entity.dir.split('/').length - 2;
     const defaultIndentation = 20;
@@ -177,16 +182,16 @@ onMounted(() => {
 });
 
 const filteredMenu = computed(() => {
-  return props.menu?.filter((m) => m.render === undefined || m.render(props.entity)());
+  return props.menu?.filter((m) => resolveRenderFunctionResult(m.render, props.entity));
 });
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };
 }
 
-function tooglePin(entity) {
-  if (state.ableTogglePinned && !mobile.value) {
-    emit('tooglePin', entity);
+function togglePin(entity) {
+  if (state.ableTogglePinned) {
+    emit('togglePin', entity);
   }
 }
 

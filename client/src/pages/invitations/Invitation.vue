@@ -44,6 +44,8 @@ import ACardSubtitle from '@/components/ui/elements/ACardSubtitle.vue';
 import ACardText from '@/components/ui/elements/ACardText.vue';
 import ACardActions from '@/components/ui/elements/ACardActions.vue';
 
+import { reloadPage } from '@/utils/memberships';
+
 export default {
   components: { ACardActions, ACardText, ACardSubtitle, ACardTitle },
   data() {
@@ -85,8 +87,7 @@ export default {
         return;
       }
 
-      this.$store.dispatch('surveys/fetchPinned');
-      this.$router.push(`/groups/${this.membership.group._id}`);
+      this.$router.push(`/groups/${this.membership.group._id}`).then(reloadPage);
     },
   },
 

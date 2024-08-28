@@ -1,7 +1,7 @@
 import { useStore } from 'vuex';
-import { reactive, computed, ref } from 'vue';
-import { useDisplay } from 'vuetify';
+import { reactive, computed, isProxy } from 'vue';
 import api from '@/services/api.service';
+import emitter from '@/utils/eventBus';
 
 import { getPermission } from '@/utils/permissions';
 import { menuAction } from '@/utils/threeDotsMenu';
@@ -11,11 +11,42 @@ import { get } from 'lodash';
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import { useRouter } from 'vue-router';
+import { useQueryClient } from '@tanstack/vue-query';
+import { usePinned, isSurveyPinned } from '@/queries';
+
+export const resolveRenderFunctionResult = (render, entity) => {
+  let includeTypeFunction = false;
+  if (typeof render === 'function') {
+    includeTypeFunction = render(entity)();
+  }
+
+  const shouldInclude = render === undefined || includeTypeFunction;
+
+  return isProxy(shouldInclude) ? shouldInclude.value : shouldInclude;
+};
+
+export async function fetchSurvey({ id, version = 'latest' }) {
+  const { data: survey } = await api.get(`/surveys/${id}?version=${version}`);
+  return survey;
+}
+
+export async function fetchSurveyWithResources(store, sid) {
+  try {
+    const s = await fetchSurvey({ id: sid });
+    if (s.resources) {
+      await store.dispatch('resources/fetchResources', s.resources, { root: true });
+    }
+    return s;
+  } catch (error) {
+    console.error(`Error fetching survey resources with id ${sid}:`, error);
+    // Return something so that the promise is resolved and not rejected
+    return null;
+  }
+}
 
 export function useSurvey() {
   const store = useStore();
   const router = useRouter();
-  const { mobile } = useDisplay();
   const {
     rightToSubmitSurvey,
     rightToEdit,
@@ -28,87 +59,14 @@ export function useSurvey() {
 
   const { getActiveGroupId } = useGroup();
 
+  const queryClient = useQueryClient();
+  const { data: pinnedData, isPending } = usePinned();
+
   const stateComposable = reactive({
     showSelectMember: false,
     selectedSurvey: undefined,
     showCallForResponses: false,
     showDescription: false,
-    menu: [
-      {
-        title: 'Start Survey',
-        icon: 'mdi-open-in-new',
-        action: (s) =>
-          createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
-        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
-      },
-      {
-        title: 'Start Survey as Member',
-        icon: 'mdi-open-in-new',
-        action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
-        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
-      },
-      {
-        title: 'Call for Responses',
-        icon: 'mdi-bullhorn',
-        action: (s) =>
-          createAction(s, rightToCallForSubmissions, () => {
-            stateComposable.showCallForResponses = true;
-            stateComposable.selectedSurvey = s;
-          }),
-        render: (s) => () => rightToCallForSubmissions(s).allowed,
-      },
-      {
-        title: 'Description',
-        icon: 'mdi-book-open',
-        action: (s) =>
-          createAction(s, rightToView, () => {
-            stateComposable.showDescription = true;
-            stateComposable.selectedSurvey = s;
-          }),
-        render: (s) => () => rightToView(s).allowed,
-      },
-      {
-        title: 'Print Blank Survey',
-        icon: 'mdi-printer',
-        action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
-        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
-      },
-      // {
-      //   title: 'View',
-      //   icon: 'mdi-file-document',
-      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-      // },
-      {
-        title: 'Edit',
-        icon: 'mdi-pencil',
-        action: (s) => createAction(s, rightToEdit, () => editSurvey(s)),
-        render: (s) => () => rightToEdit().allowed,
-      },
-      {
-        title: 'View Results',
-        icon: 'mdi-chart-bar',
-        action: (s) =>
-          createAction(s, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`),
-        render: (s) => () => rightToViewAnonymizedResults().allowed,
-      },
-      // {
-      //   title: 'Share',
-      //   icon: 'mdi-share',
-      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
-      // }
-      {
-        title: 'Pin Survey',
-        icon: 'mdi-pin',
-        action: (s) => createAction(s, rightToTogglePin, () => tooglePinOnMobile(s)),
-        render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && !s.pinnedSurveys,
-      },
-      {
-        title: 'Unpin Survey',
-        icon: 'mdi-pin-outline',
-        action: (s) => createAction(s, rightToTogglePin, () => tooglePinOnMobile(s)),
-        render: (s) => () => mobile.value && !isADraft(s) && rightToEdit().allowed && s.pinnedSurveys,
-      },
-    ],
   });
 
   const isWhitelabel = computed(() => {
@@ -121,24 +79,114 @@ export function useSurvey() {
     return store.getters['memberships/groups'];
   });
 
+  function getMenu(isOnline) {
+    return [
+      {
+        title: 'Start Survey',
+        icon: 'mdi-open-in-new',
+        action: (s) =>
+          createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
+        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
+      },
+      {
+        title: 'Start Survey as Member',
+        icon: 'mdi-open-in-new',
+        action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
+        render: (s) => () => isOnline && !isADraft(s) && rightToSubmitSurvey(s).allowed,
+      },
+      {
+        title: 'Call for Responses',
+        icon: 'mdi-bullhorn',
+        action: (s) =>
+          createAction(s, rightToCallForSubmissions, () => {
+            stateComposable.showCallForResponses = true;
+            stateComposable.selectedSurvey = s;
+          }),
+        render: (s) => () => isOnline && rightToCallForSubmissions(s).allowed,
+      },
+      {
+        title: 'Description',
+        icon: 'mdi-book-open',
+        action: (s) =>
+          createAction(s, rightToView, () => {
+            stateComposable.showDescription = true;
+            stateComposable.selectedSurvey = s;
+          }),
+        render: (s) => () => isOnline && rightToView(s).allowed,
+      },
+      {
+        title: 'Print Blank Survey',
+        icon: 'mdi-printer',
+        action: (s) => createAction(s, rightToSubmitSurvey, () => downloadPrintablePdf(s._id)),
+        render: (s) => () => isOnline && !isADraft(s) && rightToSubmitSurvey(s).allowed,
+      },
+      // {
+      //   title: 'View',
+      //   icon: 'mdi-file-document',
+      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+      // },
+      {
+        title: 'Edit',
+        icon: 'mdi-pencil',
+        action: (s) => createAction(s, rightToEdit, () => editSurvey(s)),
+        render: (s) => () => isOnline && rightToEdit().allowed,
+      },
+      {
+        title: 'View Results',
+        icon: 'mdi-chart-bar',
+        action: (s) =>
+          createAction(s, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions`),
+        render: (s) => () => isOnline && rightToViewAnonymizedResults().allowed,
+      },
+      // {
+      //   title: 'Share',
+      //   icon: 'mdi-share',
+      //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
+      // }
+      {
+        title: 'Pin Survey',
+        icon: 'mdi-pin',
+        action: (s) => createAction(s, rightToTogglePin, () => togglePinInMenu(s)),
+        render: (s) => () => {
+          return computed(() => {
+            const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
+            return isOnline && !isADraft(s) && rightToEdit().allowed && !isPinned;
+          });
+        },
+      },
+      {
+        title: 'Unpin Survey',
+        icon: 'mdi-pin-outline',
+        action: (s) => createAction(s, rightToTogglePin, () => togglePinInMenu(s)),
+        render: (s) => () => {
+          return computed(() => {
+            const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
+            return isOnline && !isADraft(s) && rightToEdit().allowed && isPinned;
+          });
+        },
+      },
+    ];
+  }
+
   function isADraft(survey) {
     return survey.latestVersion === 1;
   }
 
-  const togglePinEvent = ref(undefined);
-  function tooglePinOnMobile(s) {
-    togglePinEvent.value = s;
+  async function togglePinInMenu(s) {
+    await togglePinSurvey(s);
+    queryClient.invalidateQueries({ queryKey: ['pinnedSurveys'] });
+    queryClient.invalidateQueries({ queryKey: ['pinnedSurveysGroup', getActiveGroupId()] });
+    emitter.emit('togglePin');
   }
 
-  async function tooglePinSurvey(survey) {
+  async function togglePinSurvey(survey) {
     const group = groups.value.find((g) => g._id === getActiveGroupId());
     const index = group.surveys.pinned.indexOf(survey._id);
     if (index > -1) {
       group.surveys.pinned.splice(index, 1);
-      await store.dispatch('surveys/removePinned', survey);
     } else {
       group.surveys.pinned.push(survey._id);
-      await store.dispatch('surveys/addPinned', survey);
+      await fetchSurveyWithResources(store, survey._id);
     }
 
     await api.put(`/groups/${group._id}`, group);
@@ -167,7 +215,6 @@ export function useSurvey() {
 
       if (data.pinned) {
         data.pinned.forEach((s) => {
-          s.pinnedSurveys = true;
           data.content.unshift(s);
         });
       }
@@ -217,8 +264,8 @@ export function useSurvey() {
     stateComposable,
     message,
     getSurveys,
-    tooglePinSurvey,
-    togglePinEvent,
+    togglePinSurvey,
     isADraft,
+    getMenu,
   };
 }

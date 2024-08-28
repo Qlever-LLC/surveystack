@@ -18,9 +18,10 @@
       :key="entity"
       :entity="entity"
       :idx="String(idx)"
+      :enableTogglePinned="rightToTogglePin().allowed"
       class="whiteCard"
       smallCard
-      :menu="menu">
+      :menu="surveyMenu">
       <template v-slot:entitySubtitle></template>
     </list-item-card>
     <a-list-item
@@ -43,22 +44,28 @@
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
 import { useRouter } from 'vue-router';
-import { computed, watch } from 'vue';
-import { useStore } from 'vuex';
+import { computed, inject } from 'vue';
+import { getPermission } from '@/utils/permissions';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
+import { useGetPinnedSurveysForGroup } from '@/queries';
+
+const onlineStatus = inject('onlineStatus');
 
 const { getActiveGroupId } = useGroup();
-const { stateComposable, message, tooglePinSurvey, togglePinEvent } = useSurvey();
+const { stateComposable, getMenu, message } = useSurvey();
+const { rightToTogglePin } = getPermission();
 const router = useRouter();
-const store = useStore();
 
-const menu = computed(() => stateComposable.menu);
+const surveyMenu = computed(() => getMenu(onlineStatus.value));
 
-const surveys = computed(() => store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId()));
+const { data: data } = useGetPinnedSurveysForGroup(getActiveGroupId());
+const surveys = computed(() => {
+  return data.value;
+});
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;
@@ -69,13 +76,6 @@ function startDraftAs(selectedMember) {
     );
   }
   stateComposable.selectedSurvey = undefined;
-}
-
-watch(togglePinEvent, (entity) => {
-  tooglePin(entity);
-});
-async function tooglePin(entity) {
-  await tooglePinSurvey(entity);
 }
 </script>
 

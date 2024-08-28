@@ -25,7 +25,7 @@ export async function redirectAfterLogin(store, router, redirectUrl, preferredGr
   const user = store.getters['auth/user'];
   const memberships = await store.dispatch('memberships/getUserMemberships', user._id);
   if (redirectUrl) {
-    router.push(redirectUrl);
+    router.push(redirectUrl).then(reloadPage);
   } else if (preferredGroupId) {
     const isMemberOfPreferredGroup = memberships.some((m) => m.group._id === preferredGroupId);
     if (isMemberOfPreferredGroup) {
@@ -41,7 +41,7 @@ export async function redirectAfterLogin(store, router, redirectUrl, preferredGr
   }
 }
 
-const reloadPage = () => {
+export const reloadPage = () => {
   window.location.reload();
 };
 

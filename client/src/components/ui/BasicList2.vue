@@ -60,7 +60,7 @@
           <list-item-card
             v-for="(entity, idx) in filteredEntities"
             :key="entity._id"
-            @tooglePin="emit('tooglePin', entity)"
+            @togglePin="emit('togglePin', entity)"
             :entity="entity"
             :idx="String(idx)"
             :showPinned="showPinned"
@@ -212,7 +212,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['updateSearch', 'tooglePin']);
+const emit = defineEmits(['updateSearch', 'togglePin']);
 
 const state = reactive({
   searchValue: '',

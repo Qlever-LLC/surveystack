@@ -5,7 +5,6 @@ import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
 import { get } from 'lodash';
 import api from '@/services/api.service';
-import { isRequiredUnanswered } from '@/utils/surveyStack';
 
 const getPath = (node) =>
   node
@@ -116,7 +115,7 @@ const getters = {
     (path, fallback = true) =>
       surveyStackUtils.getRelevance(state.submission, path, fallback),
   hasRequiredUnanswered: (state) => {
-    if (isRequiredUnanswered(state.node, state.submission)) {
+    if (surveyStackUtils.isRequiredUnanswered(state.node, state.submission)) {
       return true;
     }
 
@@ -124,7 +123,7 @@ const getters = {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
         const path = getPath(c);
-        if (isRequiredUnanswered(c, state.submission)) {
+        if (surveyStackUtils.isRequiredUnanswered(c, state.submission)) {
           requiredAndUnansweredPaths.push(path);
         }
       });
