@@ -100,6 +100,8 @@
 </template>
 
 <script>
+import store from '@/store';
+
 import ObjectId from 'bson-objectid';
 import appDialog from '@/components/ui/Dialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
@@ -380,7 +382,11 @@ export default {
     async exportSurvey() {
       const { data } = await api.get(`/surveys/${this.survey._id}?version=all`);
       const dataString = JSON.stringify(data, null, 4);
-      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`, `${this.survey.name}.json`);
+      await downloadExternal(
+        store,
+        `data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`,
+        `${this.survey.name}.json`
+      );
     },
     async fetchData() {
       try {

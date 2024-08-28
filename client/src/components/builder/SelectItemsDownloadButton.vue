@@ -6,6 +6,8 @@
 </template>
 
 <script>
+import store from '@/store';
+
 import { createResourceCsv } from '@/services/csv.service';
 import downloadExternal from '@/utils/downloadExternal';
 
@@ -26,7 +28,11 @@ export default {
     },
     async download() {
       const csv = createResourceCsv(this.items);
-      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`, `${this.resourceName}.csv`);
+      await downloadExternal(
+        store,
+        `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`,
+        `${this.resourceName}.csv`
+      );
     },
   },
 };
