@@ -54,7 +54,7 @@
       <slot name="preMenu" :entity="state.entity" />
       <a-menu v-if="!groupSelectorStyle && filteredMenu?.length > 0" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
-          <a-btn v-bind="props" icon @click.prevent :small="smallCard"><a-icon>mdi-dots-horizontal</a-icon></a-btn>
+          <a-btn v-bind="props" icon @click.stop :small="smallCard"><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
         <a-list dense class="py-0">
           <a-list-item
