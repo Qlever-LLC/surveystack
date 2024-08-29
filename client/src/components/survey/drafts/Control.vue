@@ -73,6 +73,8 @@
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 
+import emitter from '@/utils/eventBus';
+
 export default {
   name: 'app-control',
   components: {
@@ -103,6 +105,11 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      once: false,
+    };
+  },
   computed: {
     className() {
       return {
@@ -126,6 +133,10 @@ export default {
   },
   methods: {
     setProperty(value) {
+      if (!this.once) {
+        this.once = true;
+        emitter.emit('updateSubmissionNavigation');
+      }
       const path = `${this.path}.value`;
       // adjust modified date of the control
       const modified = new Date().toISOString();
