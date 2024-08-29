@@ -59,7 +59,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     }
 
     //do not initialize if dateModified is set (means user has set the value manually)
-    if (fname === 'initialize' && field.meta.dateModified) {
+    if (fname === 'initialize' && field?.meta.dateModified) {
       return {
         path,
         control,
@@ -125,6 +125,7 @@ export const calculateRelevance = async (nodes, submission, survey) => {
 };
 
 export const calculateInitialize = async (nodes, submission, survey) => {
+  //TODO SEE HERE
   const calculations = await calculateField({
     nodes,
     submission,

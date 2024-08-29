@@ -162,6 +162,7 @@ export default {
       //get the control's node
       const node = this.$store.getters['draft/nodeByControl'](controlId);
       //force initialize
+      //TODO SEE HERE
       this.$store.dispatch('draft/initializeForced', node);
     },
   },
