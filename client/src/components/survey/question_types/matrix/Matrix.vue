@@ -130,7 +130,6 @@
 
     <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
       <a-progress-circular size="24" />
-      <div class="ml-2 text-secondary">Loading farmOS data</div>
     </div>
   </div>
 </template>
@@ -145,6 +144,10 @@ import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
 import { createRow } from './matrixUtils';
+import { calculateInitialize } from '@/utils/codeEvaluator';
+import TreeModel from 'tree-model';
+import { uuidv4 } from '@/utils/surveys';
+import { getAllNodes } from '@/utils/surveyStack';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase],
@@ -203,8 +206,50 @@ export default {
     },
   },
   methods: {
-    add() {
+    async add() {
       const newRow = createRow(this.fields, this.headers);
+
+      //TODO initialize row
+      for (let [key, value] of Object.entries(newRow)) {
+        const columnCode = `
+        /**
+         * Initialize
+         *
+         * @param {submission} submission
+         * @param {survey} survey
+         * @param {parent} parent
+         */
+        function initialize(submission, survey, parent) {
+          console.log('hello world');
+          return 'hello world';
+        }
+        `;
+
+        const control = {
+          id: uuidv4(),
+          name: this.control.name + '.value.' + key + '.value', //TODO set this to the form matrix_name.value.column_name.value
+          label: key,
+          type: 'matrix_cell',
+          options: {
+            initialize: {
+              enabled: true,
+              code: columnCode,
+            },
+          },
+          value: null,
+        };
+        const controls = [control];
+        const tree = new TreeModel();
+        const root = tree.parse({ name: 'data', children: controls });
+        const nodes = getAllNodes(root);
+        const submission = this.$store.getters['draft/submission'];
+        const survey = this.$store.getters['draft/survey'];
+        const calculations = await calculateInitialize(nodes, submission, survey);
+        const { result, path, skip } = calculations[0];
+        //set the result to the cell
+        value.value = result;
+      }
+
       if (this.rows === null) {
         this.rows = [];
       }
@@ -306,6 +351,7 @@ export default {
       if (this.meta && !!this.meta.dateModified) {
         this.showConfirmInitializeDialog = true;
       } else {
+        //TODO SEE HERE
         this.initialize();
       }
     },

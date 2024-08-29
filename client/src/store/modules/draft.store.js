@@ -381,6 +381,7 @@ const actions = {
     });
   },
   async initialize({ state, dispatch }, node) {
+    //TODO SEE HERE
     let nodes = surveyStackUtils.getAllNodes(node);
     // Loop over nodes here to force calculations being based on results before instead of making them base on the initial state.
     // Example: Page as first control including two initalized controls: initializing the second control needs to take the result of the initialized first control into account
@@ -401,6 +402,7 @@ const actions = {
     }
   },
   async initializeForced({ commit, state, dispatch }, node) {
+    //TODO SEE HERE
     const path = getPath(node);
     //first set dateModified to null which is required in case of the value being re-initialized manually
     await dispatch('setProperty', {
