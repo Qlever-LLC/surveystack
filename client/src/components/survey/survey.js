@@ -13,6 +13,7 @@ import downloadExternal from '@/utils/downloadExternal';
 import { useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import { usePinned, isSurveyPinned } from '@/queries';
+import { isGroupMember } from '@/utils/submissions';
 
 export const resolveRenderFunctionResult = (render, entity) => {
   let includeTypeFunction = false;
@@ -92,7 +93,8 @@ export function useSurvey() {
         title: 'Start Survey as Member',
         icon: 'mdi-open-in-new',
         action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
-        render: (s) => () => isOnline && !isADraft(s) && rightToSubmitSurvey(s).allowed,
+        render: (s) => () =>
+          isOnline && isGroupMember(s, groups.value) && !isADraft(s) && rightToSubmitSurvey(s).allowed,
       },
       {
         title: 'Call for Responses',
