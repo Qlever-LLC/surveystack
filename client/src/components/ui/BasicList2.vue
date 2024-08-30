@@ -17,7 +17,7 @@
             v-if="buttonNew?.title"
             color="accent"
             :to="buttonNew?.link || undefined"
-            @click="buttonNew?.action() || undefined"
+            @click="buttonNew.action ? buttonNew.action() : undefined"
             variant="flat"
             rounded="lg">
             <a-icon class="mdi-24px"> mdi-plus-circle-outline </a-icon>
