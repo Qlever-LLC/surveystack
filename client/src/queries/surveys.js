@@ -57,7 +57,7 @@ export const isSurveyPinned = (groupId, surveyId) => (data) => {
     return false;
   }
   const group = data.find((obj) => obj.group_id === groupId);
-  return group.pinned.some((pid) => pid === surveyId);
+  return group?.pinned.some((pid) => pid === surveyId);
 };
 
 const useIsSurveyPinned = (groupId, surveyId) => {
