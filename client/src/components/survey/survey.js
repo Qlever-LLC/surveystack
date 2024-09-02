@@ -13,7 +13,6 @@ import downloadExternal from '@/utils/downloadExternal';
 import { useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import { usePinned, isSurveyPinned } from '@/queries';
-import { isGroupMember } from '@/utils/submissions';
 
 export const resolveRenderFunctionResult = (render, entity) => {
   let includeTypeFunction = false;
@@ -58,7 +57,7 @@ export function useSurvey() {
   } = getPermission();
   const { message, createAction } = menuAction();
 
-  const { getActiveGroupId } = useGroup();
+  const { getActiveGroupId, isGroupAdmin } = useGroup();
 
   const queryClient = useQueryClient();
   const { data: pinnedData, isPending } = usePinned();
@@ -94,7 +93,7 @@ export function useSurvey() {
         icon: 'mdi-open-in-new',
         action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
         render: (s) => () =>
-          isOnline && isGroupMember(s, groups.value) && !isADraft(s) && rightToSubmitSurvey(s).allowed,
+          isOnline && isGroupAdmin(getActiveGroupId()) && !isADraft(s) && rightToSubmitSurvey(s).allowed,
       },
       {
         title: 'Call for Responses',
