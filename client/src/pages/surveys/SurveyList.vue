@@ -18,7 +18,7 @@
       listType="card"
       :entities="state.networkOk ? state.surveys.content : surveys.content"
       showPinned
-      :enableTogglePinned="rightToTogglePin().allowed"
+      :enableTogglePinned="rightToTogglePin().allowed && !state.showArchived"
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
       :menu="surveyMenu"
       :loading="state.loading"
@@ -43,6 +43,9 @@
           draft
         </a-chip>
       </template>
+      <template v-slot:filter v-if="isGroupAdmin(getActiveGroupId())">
+        <a-checkbox v-model="state.showArchived" label="View archived" dense hide-details color="primary" />
+      </template>
       <template v-slot:noValue> No Surveys available </template>
       <template v-slot:pagination>
         <a-pagination
@@ -61,7 +64,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, inject } from 'vue';
+import { reactive, computed, inject, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useGroup } from '@/components/groups/group';
@@ -82,7 +85,7 @@ import { useGetPinnedSurveysForGroup } from '@/queries';
 const onlineStatus = inject('onlineStatus');
 
 const router = useRouter();
-const { getActiveGroupId } = useGroup();
+const { getActiveGroupId, isGroupAdmin } = useGroup();
 const { rightToEdit, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
 const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isADraft } = useSurvey();
@@ -104,6 +107,7 @@ const state = reactive({
   },
   loading: false,
   networkOk: false,
+  showArchived: false,
 });
 
 const surveys = computed(() => {
@@ -149,7 +153,7 @@ async function togglePinWithIcon(entity) {
 async function fetchSurveysWithPagination() {
   try {
     //laod the surveys
-    const result = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT);
+    const result = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT, state.showArchived);
     //add createdAgo information
     const now = new Date();
     result.content.forEach((s) => {
@@ -189,4 +193,6 @@ function startDraftAs(selectedMember) {
   }
   stateComposable.selectedSurvey = undefined;
 }
+
+watch(() => state.showArchived, initData);
 </script>

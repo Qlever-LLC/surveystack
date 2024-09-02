@@ -111,7 +111,7 @@ const buildPipelineGetSurveyPinnedFromGroupId = (groupId) => {
 };
 
 const buildPipelineForGetSurveyPage = (
-  { q, groupId, projections, creator, skip, limit, prefix, isLibrary },
+  { q, groupId, projections, creator, skip, limit, prefix, isLibrary, showArchived },
   pinnedEntities,
   sortSurveysPrioPinnedForOneGroup = false
 ) => {
@@ -141,6 +141,12 @@ const buildPipelineForGetSurveyPage = (
     match['meta.isLibrary'] = true;
   } else if (isLibrary === 'false') {
     match.$or = [{ 'meta.isLibrary': { $exists: false } }, { 'meta.isLibrary': false }];
+  }
+
+  if (showArchived === 'true') {
+    match['meta.archived'] = true;
+  } else {
+    match.$or = [{ 'meta.archived': { $exists: false } }, { 'meta.archived': false }];
   }
 
   let pipeline = [];
@@ -342,6 +348,7 @@ const getSurveyListPage = async (req, res) => {
       'meta.creator',
       'meta.submissions',
       'meta.isLibrary',
+      'meta.archived',
     ],
   };
 
@@ -658,6 +665,17 @@ const updateSurvey = async (req, res) => {
         returnDocument: 'after',
       }
     );
+
+    // delete from group.surveys.pinned in the groups collection, if pinned
+    if (entity.meta.archived) {
+      await db
+        .collection(GROUPS_COLLECTION)
+        .updateMany(
+          { 'surveys.pinned': new ObjectId(id) },
+          { $pull: { 'surveys.pinned': new ObjectId(id) } }
+        );
+    }
+
     return res.send(updated);
   } catch (err) {
     console.error(err);
@@ -665,6 +683,7 @@ const updateSurvey = async (req, res) => {
   }
 };
 
+// TODO deletes all traces (in group if pinned, draft)
 const deleteSurvey = async (req, res) => {
   const { id } = req.params;
 

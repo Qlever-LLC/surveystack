@@ -50,7 +50,7 @@
             @view-code-toggle="viewCode = !viewCode"
             @update="publish"
             @saveDraft="saveDraft"
-            @delete="$emit('onDelete')"
+            @archive="$emit('onArchive')"
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"

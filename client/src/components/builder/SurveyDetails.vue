@@ -123,9 +123,9 @@
             </a-list-item>
             <a-list-item v-if="!isNew">
               <a-list-item-title>
-                <a-btn variant="text" @click="$emit('delete')">
-                  <a-icon color="grey">mdi-delete</a-icon>
-                  <div class="ml-1">Delete</div>
+                <a-btn variant="text" @click="$emit('archive')">
+                  <a-icon color="grey">mdi-archive</a-icon>
+                  <div class="ml-1">Archive</div>
                 </a-btn>
               </a-list-item-title>
             </a-list-item>

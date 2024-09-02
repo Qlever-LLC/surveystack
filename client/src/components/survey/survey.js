@@ -86,14 +86,18 @@ export function useSurvey() {
         icon: 'mdi-open-in-new',
         action: (s) =>
           createAction(s, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`),
-        render: (s) => () => !isADraft(s) && rightToSubmitSurvey(s).allowed,
+        render: (s) => () => !isADraft(s) && !isArchived(s) && rightToSubmitSurvey(s).allowed,
       },
       {
         title: 'Start Survey as Member',
         icon: 'mdi-open-in-new',
         action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
         render: (s) => () =>
-          isOnline && isGroupAdmin(getActiveGroupId()) && !isADraft(s) && rightToSubmitSurvey(s).allowed,
+          isOnline &&
+          isGroupAdmin(getActiveGroupId()) &&
+          !isADraft(s) &&
+          !isArchived(s) &&
+          rightToSubmitSurvey(s).allowed,
       },
       {
         title: 'Call for Responses',
@@ -103,7 +107,7 @@ export function useSurvey() {
             stateComposable.showCallForResponses = true;
             stateComposable.selectedSurvey = s;
           }),
-        render: (s) => () => isOnline && rightToCallForSubmissions(s).allowed,
+        render: (s) => () => isOnline && !isArchived(s) && rightToCallForSubmissions(s).allowed,
       },
       {
         title: 'Description',
@@ -151,7 +155,7 @@ export function useSurvey() {
         render: (s) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
-            return isOnline && !isADraft(s) && rightToEdit().allowed && !isPinned;
+            return isOnline && !isADraft(s) && !isArchived(s) && rightToEdit().allowed && !isPinned;
           });
         },
       },
@@ -162,7 +166,7 @@ export function useSurvey() {
         render: (s) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
-            return isOnline && !isADraft(s) && rightToEdit().allowed && isPinned;
+            return isOnline && !isADraft(s) && !isArchived(s) && rightToEdit().allowed && isPinned;
           });
         },
       },
@@ -171,6 +175,10 @@ export function useSurvey() {
 
   function isADraft(survey) {
     return survey.latestVersion === 1;
+  }
+
+  function isArchived(survey) {
+    return survey.meta?.archived ? survey.meta.archived : false;
   }
 
   async function togglePinInMenu(s) {
@@ -193,7 +201,7 @@ export function useSurvey() {
     await api.put(`/groups/${group._id}`, group);
   }
 
-  async function getSurveys(groupId, searchString, page, limit, user = null) {
+  async function getSurveys(groupId, searchString, page, limit, showArchived, user = null) {
     const queryParams = new URLSearchParams();
     if (user) {
       queryParams.append('creator', user);
@@ -209,7 +217,8 @@ export function useSurvey() {
     queryParams.append('isLibrary', 'false');
     queryParams.append('skip', (page - 1) * limit);
     queryParams.append('limit', limit);
-    queryParams.append('prioPinned', true);
+    queryParams.append('prioPinned', showArchived ? false : true);
+    queryParams.append('showArchived', showArchived);
 
     try {
       const { data } = await api.get(`/surveys/list-page?${queryParams}`);
