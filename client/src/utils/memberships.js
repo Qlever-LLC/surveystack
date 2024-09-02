@@ -1,5 +1,6 @@
 import api from '@/services/api.service';
 import { get } from 'lodash';
+import { getDefaultLandingPage } from '@/components/navigation';
 
 export const uuid = () => {
   const rnd = new Uint8Array(32);
@@ -18,7 +19,7 @@ export const uuid = () => {
 };
 
 /* if a preferredGroupId is passed or user has only one group membership, redirects user to that group and returns true. Otherwise, returns false.*/
-export async function redirectAfterLogin(store, router, redirectUrl, preferredGroupId = null) {
+export async function redirectAfterLogin(store, router, mobile, redirectUrl, preferredGroupId = null) {
   if (!store.getters['auth/isLoggedIn']) {
     return;
   }
@@ -29,13 +30,15 @@ export async function redirectAfterLogin(store, router, redirectUrl, preferredGr
   } else if (preferredGroupId) {
     const isMemberOfPreferredGroup = memberships.some((m) => m.group._id === preferredGroupId);
     if (isMemberOfPreferredGroup) {
-      router.push(`/groups/${preferredGroupId}`).then(reloadPage);
+      const landingPage = getDefaultLandingPage(preferredGroupId, mobile);
+      router.push(landingPage).then(reloadPage);
     } else {
       router.push('/').then(reloadPage);
     }
   } else if (memberships && memberships.length === 1) {
     // only one group, redirect user to that group's page
-    router.push(`/groups/${memberships[0].group._id}`).then(reloadPage);
+    const landingPage = getDefaultLandingPage(memberships[0].group._id, mobile);
+    router.push(landingPage).then(reloadPage);
   } else {
     router.push('/').then(reloadPage);
   }

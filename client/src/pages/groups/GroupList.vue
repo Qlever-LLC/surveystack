@@ -84,7 +84,7 @@ const state = reactive({
     {
       title: 'Go to Group',
       icon: 'mdi-open-in-new',
-      action: (entity) => getDefaultLandingPage(entity, mobile),
+      action: (entity) => getDefaultLandingPage(entity._id, mobile),
       color: 'green',
     },
   ],

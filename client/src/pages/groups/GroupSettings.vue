@@ -112,7 +112,7 @@ const state = reactive({
     {
       title: 'Go to Group',
       icon: 'mdi-open-in-new',
-      action: (e) => getDefaultLandingPage(e, mobile),
+      action: (e) => getDefaultLandingPage(e._id, mobile),
       color: 'green',
     },
   ],
@@ -135,7 +135,7 @@ const isPremium = computed(() => {
   return false;
 });
 
-OnCreation();
+onCreation();
 
 async function searchSurveys(q) {
   const { data: searchResults } = await api.get(`/surveys?projections[]=name&projections[]=meta.dateModified&q=${q}`);
@@ -154,7 +154,7 @@ async function groupChanged() {
   await getSubgroups();
 }
 
-async function OnCreation() {
+async function onCreation() {
   const { dir } = route.query;
   if (dir) {
     state.entity.dir = dir;

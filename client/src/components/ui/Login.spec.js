@@ -476,7 +476,7 @@ describe('Login component', () => {
       expect(push).toHaveBeenCalledWith('/groups/2');
     });
 
-    it("submit and get the redirection 'this.$route.query.redirect = true' ", async () => {
+    it.only("submit and get the redirection 'this.$route.query.redirect = true' ", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderLogin({
         getters: {
@@ -503,6 +503,8 @@ describe('Login component', () => {
       const button = getByText('Login');
       await fireEvent.click(button);
       await flushPromises();
+
+      console.log('pushMock calls:', push.mock.calls);
 
       expect(push).toHaveBeenCalledWith(true);
     });

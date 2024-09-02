@@ -138,7 +138,7 @@ const state = reactive({
   }),
   groupChooserMenu: [
     {
-      action: (entity) => getDefaultLandingPage(entity, mobile),
+      action: (entity) => getDefaultLandingPage(entity._id, mobile),
       color: 'green',
     },
   ],

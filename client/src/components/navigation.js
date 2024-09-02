@@ -10,6 +10,6 @@ export function useNavigation() {
   };
 }
 
-export function getDefaultLandingPage(group, mobile) {
-  return mobile.value ? `/groups/${group._id}` : `/groups/${group._id}/submissions`;
+export function getDefaultLandingPage(groupId, mobile) {
+  return mobile.value ? `/groups/${groupId}` : `/groups/${groupId}/submissions`;
 }
