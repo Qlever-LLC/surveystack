@@ -760,7 +760,7 @@ const getPinned = async (req, res) => {
   // Pipeline
   // 1. find all memberships
   // 2. for all memberships find all groups
-  // 3. for all groups find all pinned surveys
+  // 3. for all non-archived groups find all pinned surveys
 
   const memberships = await db
     .collection('memberships')
@@ -769,9 +769,17 @@ const getPinned = async (req, res) => {
     .toArray();
 
   const groupIds = _.uniq(memberships.map((m) => m.group)).map((g) => new ObjectId(g));
+
+  const query = {
+    _id: { $in: groupIds },
+  };
+  if (req.query.getOnlyNonArchive === 'true') {
+    query['meta.archived'] = false;
+  }
+
   const groupsPinned = await db
     .collection('groups')
-    .find({ _id: { $in: groupIds } })
+    .find(query)
     .project({ name: 1, 'surveys.pinned': 1 })
     .toArray();
 

@@ -43,7 +43,7 @@
           draft
         </a-chip>
       </template>
-      <template v-slot:filter v-if="isGroupAdmin(getActiveGroupId())">
+      <template v-slot:filter v-if="isGroupAdmin(getActiveGroupId()) && onlineStatus.value">
         <a-checkbox v-model="state.showArchived" label="View archived" dense hide-details color="primary" />
       </template>
       <template v-slot:noValue> No Surveys available </template>

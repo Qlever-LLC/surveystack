@@ -3,7 +3,7 @@ import api from '../services/api.service';
 import store from '../store';
 import { fetchSurvey } from '@/components/survey/survey';
 
-async function fetchPinned() {
+async function fetchPinned(getOnlyNonArchive = false) {
   if (!store.getters['auth/isLoggedIn']) {
     return [];
   }
@@ -16,7 +16,7 @@ async function fetchPinned() {
   */
   const {
     data: { pinned },
-  } = await api.get('/surveys/pinned');
+  } = await api.get(`/surveys/pinned?getOnlyNonArchive=${getOnlyNonArchive}`);
 
   return pinned;
 }
@@ -39,11 +39,11 @@ async function fetchPinnedSurveys(groupId) {
   return pinnedSurveys;
 }
 
-const usePinned = () => {
+const usePinned = (getOnlyNonArchive = false) => {
   const { isPending, isError, data } = useQuery({
     queryKey: ['pinnedSurveys'],
     initialData: [],
-    queryFn: fetchPinned,
+    queryFn: () => fetchPinned(getOnlyNonArchive),
     networkMode: 'offlineFirst',
     staleTime: 1000 * 2,
     initialDataUpdatedAt: 0,

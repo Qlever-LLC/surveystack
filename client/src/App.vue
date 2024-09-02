@@ -83,7 +83,8 @@ const initFromIndexedDB = async () => {
 };
 
 const hasFetchedPinnedSurveys = ref(false);
-const { data } = usePinned();
+const getOnlyNonArchive = true;
+const { data } = usePinned(getOnlyNonArchive);
 
 //online and offline status configuration
 const onlineStatus = ref(navigator.onLine);
