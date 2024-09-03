@@ -177,16 +177,17 @@ const createTestUtilsWrapper = (testUtilsMethod) =>
 const mountWithVuetify = createTestUtilsWrapper(mount);
 const shallowMountWithVuetify = createTestUtilsWrapper(shallowMount);
 
-const renderWithVuetify = function (component, options, storeOverride, routerOverride) {
+const renderWithVuetify = function (component, options, storeOverride, routerOverride, tanstackVueQueryOverride) {
   const root = document.createElement('div');
   root.setAttribute('data-app', 'true');
   const router = routerOverride ?? createAppRouter();
   const store = storeOverride ?? createStore(createStoreObject());
+  const tanstackVueQuery = tanstackVueQueryOverride ?? undefined;
   const renderOptions = {
     ...options,
     container: document.body.appendChild(root),
     global: {
-      plugins: [vuetify, store, router],
+      plugins: [vuetify, store, router, tanstackVueQuery],
       components,
       stubs: {
         CodeEditor: { template: '<span id="CodeEditorStub" />' },
