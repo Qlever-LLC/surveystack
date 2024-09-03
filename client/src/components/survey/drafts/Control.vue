@@ -1,9 +1,9 @@
 <template>
   <div :class="className" style="width: 100%">
-    <div v-if="props.control.type === 'page' && !insidePage">
-      <div v-for="(child, i) in props.control.children" :key="i">
+    <div v-if="control.type === 'page' && !insidePage">
+      <div v-for="(child, i) in control.children" :key="i">
         <app-control
-          :path="`${props.path}.${child.name}`"
+          :path="`${path}.${child.name}`"
           :control="child"
           :autoFocus="i === 0"
           :forceMobile="forceMobile"
@@ -12,21 +12,19 @@
       </div>
     </div>
 
-    <div v-else-if="props.control.type === 'group' && insidePage">
+    <div v-else-if="control.type === 'group' && insidePage">
       <div
         class="group"
         :class="{
-          irrelevant: !$store.getters['draft/relevance'](props.path),
-          hidden: !$store.getters['draft/relevance'](props.path) && insidePage,
+          irrelevant: !store.getters['draft/relevance'](path),
+          hidden: !store.getters['draft/relevance'](path) && insidePage,
         }">
-        <app-control-label
-          :value="props.control.label"
-          :redacted="props.control.options && props.control.options.redacted" />
-        <app-control-hint :value="props.control.hint" />
+        <app-control-label :value="control.label" :redacted="control.options && control.options.redacted" />
+        <app-control-hint :value="control.hint" />
 
-        <div v-for="(child, i) in props.control.children" :key="i">
+        <div v-for="(child, i) in control.children" :key="i">
           <app-control
-            :path="`${props.path}.${child.name}`"
+            :path="`${path}.${child.name}`"
             :control="child"
             :autoFocus="autoFocus && i === 0"
             :forceMobile="forceMobile"
@@ -34,7 +32,7 @@
             :isInBuilder="isInBuilder" />
         </div>
 
-        <app-control-more-info :value="props.control.moreInfo" />
+        <app-control-more-info :value="control.moreInfo" />
       </div>
     </div>
 
@@ -42,15 +40,15 @@
       <div
         class="control"
         :class="{
-          irrelevant: !$store.getters['draft/relevance'](props.path),
-          hidden: !$store.getters['draft/relevance'](props.path) && insidePage,
+          irrelevant: !store.getters['draft/relevance'](path),
+          hidden: !store.getters['draft/relevance'](path) && insidePage,
         }">
         <component
-          :is="getComponentName(props.control)"
-          :control="props.control"
+          :is="getComponentName(control)"
+          :control="control"
           :modelValue="value"
-          :index="props.path"
-          :key="props.path"
+          :index="path"
+          :key="path"
           :resources="survey.resources"
           @update:modelValue="setProperty"
           :meta="meta"
@@ -59,15 +57,13 @@
           @setContext="setContext"
           @setRenderQueue="setRenderQueue"
           :autoFocus="autoFocus"
-          :relevant="$store.getters['draft/relevance'](props.path)"
-          @next="!$store.getters['draft/hasRequiredUnanswered'] && $store.dispatch('draft/next')"
-          :redacted="props.control.options && props.control.options.redacted"
-          :required="
-            $store.getters['draft/relevance'](props.path) && props.control.options && props.control.options.required
-          "
+          :relevant="store.getters['draft/relevance'](path)"
+          @next="!store.getters['draft/hasRequiredUnanswered'] && store.dispatch('draft/next')"
+          :redacted="control.options && control.options.redacted"
+          :required="store.getters['draft/relevance'](path) && control.options && control.options.required"
           :forceMobile="forceMobile"
           :isInBuilder="isInBuilder"
-          @initialize="initialize(props.control.id)" />
+          @initialize="initialize(control.id)" />
       </div>
     </div>
   </div>
