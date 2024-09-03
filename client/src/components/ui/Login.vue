@@ -139,6 +139,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  redirect: {
+    type: String,
+    required: false,
+  },
+  landingPath: {
+    type: String,
+    required: false,
+  },
+  callbackUrl: {
+    type: String,
+    required: false,
+  },
 });
 
 const state = reactive({
@@ -165,8 +177,8 @@ const registerLink = computed(() => {
       initialPassword: state.entity.password,
     },
   };
-  if (route.query?.redirect) {
-    link.query.redirect = route.query?.redirect;
+  if (props.redirect) {
+    link.query.redirect = props.redirect;
   }
 
   return link;
@@ -185,7 +197,7 @@ async function onCreation() {
     state.entity.email = props.initialEmail;
   }
 
-  if ('magicLinkExpired' in route.query) {
+  if ('magicLinkExpired' in props) {
     state.status = 'Your magic link is expired. Please request a new one.';
     // Select the magic link login variation of the dialog
     state.usePassword = false;
@@ -221,8 +233,8 @@ async function submit() {
 
   // email sign-in link
   if (!state.usePassword) {
-    const landingPath = route.query.redirect || route.query.landingPath;
-    const callbackUrl = route.query.callbackUrl;
+    const landingPath = props.redirect || props.landingPath;
+    const callbackUrl = props.callbackUrl;
 
     try {
       await store.dispatch('auth/sendMagicLink', { email: state.entity.email, landingPath, callbackUrl });
@@ -248,7 +260,7 @@ async function submit() {
     //make sure whitelabel user is a member of its whitelabel group (this reflects legacy behaviour, though it's not clear why this had been added in the past)
     const partnerGroupId = await autoJoinWhiteLabelGroup(store);
     //change route
-    await redirectAfterLogin(store, router, mobile, route.query.redirect, partnerGroupId);
+    await redirectAfterLogin(store, router, mobile, props.redirect, partnerGroupId);
   } catch (error) {
     switch (error.response?.status) {
       case 401:

@@ -70,6 +70,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  redirect: {
+    type: String,
+    required: false,
+  },
 });
 
 const state = reactive({
@@ -87,8 +91,8 @@ const passwordShowHideText = computed(() => {
 });
 const signInLink = computed(() => {
   const link = { name: 'auth-login', query: {} };
-  if (route.query?.redirect) {
-    link.query.redirect = route.query?.redirect;
+  if (props.redirect) {
+    link.query.redirect = props.redirect;
   }
   if (props.initialEmail) {
     link.query.initialEmail = props.initialEmail;
@@ -126,7 +130,7 @@ async function submit() {
     //TODO in case of autoJoinWhiteLabelGroup throwing an error, registration should maybe reverted
     const partnerGroupId = await autoJoinWhiteLabelGroup(store);
     //change route
-    await redirectAfterLogin(store, router, mobile, route.query.redirect, partnerGroupId);
+    await redirectAfterLogin(store, router, mobile, props.redirect, partnerGroupId);
   } catch (error) {
     switch (error.response?.status) {
       case 409:

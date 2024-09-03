@@ -3,7 +3,7 @@ import { mount, shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import { vuetify } from '../src/plugins/vuetify';
 import { createStoreObject } from '../src/store';
-import router from '../src/router';
+import { createAppRouter } from '../src/router';
 
 import AAlert from '../src/components/ui/elements/AAlert.vue';
 import AApp from '../src/components/ui/elements/AApp.vue';
@@ -177,9 +177,10 @@ const createTestUtilsWrapper = (testUtilsMethod) =>
 const mountWithVuetify = createTestUtilsWrapper(mount);
 const shallowMountWithVuetify = createTestUtilsWrapper(shallowMount);
 
-const renderWithVuetify = function (component, options, storeOverride) {
+const renderWithVuetify = function (component, options, storeOverride, routerOverride) {
   const root = document.createElement('div');
   root.setAttribute('data-app', 'true');
+  const router = routerOverride ?? createAppRouter();
   const store = storeOverride ?? createStore(createStoreObject());
   const renderOptions = {
     ...options,

@@ -7,16 +7,19 @@ import { useNavigation } from '@/components/navigation';
 
 const routes = [...globalRoutes, ...groupRoutes, ...superAdminRoutes, ...oldRoutes];
 
-const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes,
-  scrollBehavior(to, from, savedPosition) {
-    return {
-      left: 0,
-      top: 0,
-    };
-  },
-});
+const createAppRouter = () =>
+  createRouter({
+    history: createWebHistory(process.env.BASE_URL),
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+      return {
+        left: 0,
+        top: 0,
+      };
+    },
+  });
+
+const router = createAppRouter();
 
 const { forceDesktopFullscreen, forceMobileFullscreen } = useNavigation();
 // close the navigation anytime a route changes, even if the change is redundant (from and to the same path)
@@ -25,4 +28,5 @@ router.afterEach(() => {
   forceMobileFullscreen.value = true;
 });
 
+export { createAppRouter };
 export default router;
