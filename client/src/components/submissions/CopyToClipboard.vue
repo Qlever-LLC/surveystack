@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import copyTextToClipboard from '@/utils/copyToClipboard';
 export default {
   props: {
     value: {
@@ -14,13 +15,7 @@ export default {
   },
   methods: {
     copyText() {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(this.value).catch((err) => {
-          console.error('Async: Could not copy text: ', err);
-        });
-      } else {
-        console.warn("Can't copy to clipboard:", this.value);
-      }
+      copyTextToClipboard(this.value);
     },
   },
 };
