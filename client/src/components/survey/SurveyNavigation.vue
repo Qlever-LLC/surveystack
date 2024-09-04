@@ -41,10 +41,11 @@
 </template>
 
 <script setup>
+import api from '@/services/api.service';
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
 import { useRouter } from 'vue-router';
-import { computed, inject } from 'vue';
+import { reactive, computed, inject } from 'vue';
 import { getPermission } from '@/utils/permissions';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
@@ -55,17 +56,41 @@ import { useGetPinnedSurveysForGroup } from '@/queries';
 
 const onlineStatus = inject('onlineStatus');
 
-const { getActiveGroupId } = useGroup();
+const { getActiveGroupId, isGroupVisitor } = useGroup();
 const { stateComposable, getMenu, message } = useSurvey();
 const { rightToTogglePin } = getPermission();
 const router = useRouter();
+
+const state = reactive({
+  surveysForVisitor: [],
+});
 
 const surveyMenu = computed(() => getMenu(onlineStatus.value));
 
 const { data: data } = useGetPinnedSurveysForGroup(getActiveGroupId());
 const surveys = computed(() => {
-  return data.value;
+  return isGroupVisitor() ? state.surveysForVisitor : data.value;
 });
+
+init();
+async function init() {
+  if (isGroupVisitor()) {
+    await fetchPinnedForNonMember();
+  }
+}
+
+async function fetchPinnedForNonMember() {
+  const queryParams = new URLSearchParams();
+  queryParams.append('justPinned', true);
+  const { data } = await api.get(`/groups/${getActiveGroupId()}?${queryParams}`);
+  const surveyPromises = data.surveys.pinned.map(async (id) => {
+    const { data } = await api.get(`/surveys/${id}`);
+    return data;
+  });
+  const fetchedSurveys = await Promise.all(surveyPromises);
+
+  state.surveysForVisitor = fetchedSurveys.sort((a, b) => a.name.localeCompare(b.name));
+}
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;

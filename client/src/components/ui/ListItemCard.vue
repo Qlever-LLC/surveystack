@@ -88,7 +88,7 @@ const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
 const { isADraft } = useSurvey();
-const { isGroupAdmin, getActiveGroupId } = useGroup();
+const { isGroupAdmin, getActiveGroupId, isGroupVisitor } = useGroup();
 
 const props = defineProps({
   entity: {
@@ -157,7 +157,9 @@ const state = reactive({
 });
 
 const { data: isSurveyPinned } = useIsSurveyPinned(getActiveGroupId(), props.entity._id);
-const pinnedSurveys = computed(() => (props.showPinned ? isSurveyPinned.value : false));
+const pinnedSurveys = computed(() =>
+  props.showPinned ? (isGroupVisitor() ? props.entity.isInPinnedList : isSurveyPinned.value) : false
+);
 
 onMounted(async () => {
   if (props.groupStyle) {

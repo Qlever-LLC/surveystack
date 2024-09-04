@@ -65,6 +65,10 @@ export function useGroup() {
     return memberships.some((m) => m.group._id === activeGroupId && m.role === 'user');
   }
 
+  function isGroupVisitor(groupId) {
+    return !(isGroupAdmin(groupId) || isGroupMember());
+  }
+
   return {
     getMyGroups,
     getActiveGroupId,
@@ -73,5 +77,6 @@ export function useGroup() {
     isGroupMember,
     isWhitelabel,
     getWhitelabelPartner,
+    isGroupVisitor,
   };
 }
