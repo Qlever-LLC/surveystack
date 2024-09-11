@@ -200,7 +200,8 @@ watch(
   () => props.modelValue,
   async (val) => {
     state.entity.role = 'user';
-    (state.entity.meta.dateCreated = new Date().toISOString()), (state.entity.meta.invitationEmail = null);
+    state.entity.meta.dateCreated = new Date().toISOString();
+    state.entity.meta.invitationEmail = null;
     state.entity.meta.invitationName = null;
     state.entity.meta.invitationCode = uuid();
     state.sendEmail = 'SEND_NOW';
