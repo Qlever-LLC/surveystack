@@ -25,7 +25,7 @@
           class="mr-2 py-0 px-1"
           :color="button.color"
           variant="outlined"
-          @click="runAction(button.action(entity))">
+          @click.stop="runAction(button.action(entity))">
           {{ button.title }}
         </a-btn>
       </template>
@@ -36,12 +36,12 @@
         class="mr-2 py-0 px-1"
         :color="button.color"
         variant="outlined"
-        @click="runAction(button.action(entity))">
+        @click.stop="runAction(button.action(entity))">
         {{ button.title }}
       </a-btn>
       <a-menu v-if="filteredMenu?.length > 0" location="start" v-model="state.menuIsOpen[idx]">
         <template v-slot:activator="{ props }">
-          <a-btn v-bind="props" icon @click.prevent><a-icon>mdi-dots-horizontal</a-icon></a-btn>
+          <a-btn v-bind="props" icon @click.stop><a-icon>mdi-dots-horizontal</a-icon></a-btn>
         </template>
         <a-list dense class="py-0">
           <a-list-item
@@ -63,6 +63,7 @@
 <script setup>
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import { resolveRenderFunctionResult } from '@/components/survey/survey';
 
 const router = useRouter();
 
@@ -86,7 +87,7 @@ const state = reactive({
 });
 
 const filteredMenu = computed(() => {
-  return props.menu?.filter((m) => m.render === undefined || m.render(props.entity)());
+  return props.menu?.filter((m) => resolveRenderFunctionResult(m.render, props.entity));
 });
 
 const actionButtonsFixed = computed(() => {

@@ -29,15 +29,11 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  getUserMemberships({ commit, getters }, userId) {
+  getUserMemberships({ commit }, userId) {
     if (!userId) {
       return new Promise((resolve) => {
         resolve([]);
       });
-    }
-
-    if (!isOnline()) {
-      return getters.memberships;
     }
 
     return new Promise((resolve, reject) => {

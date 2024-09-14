@@ -6,14 +6,7 @@
       :loading="state.loading"
       groupStyle
       :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir() } } }"
-      :menu="[
-        {
-          title: 'Go to Group',
-          icon: 'mdi-open-in-new',
-          action: (entity) => (mobile ? `/groups/${entity._id}` : `/groups/${entity._id}/submissions`),
-          color: 'green',
-        },
-      ]"
+      :menu="state.groupMenu"
       @updateSearch="updateSearch">
       <template v-slot:title>
         <template v-if="props.scope === 'user'">
@@ -48,6 +41,7 @@ import { useDisplay } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import APagination from '@/components/ui/elements/APagination.vue';
+import { getDefaultLandingPage } from '@/components/navigation';
 
 const PAGINATION_LIMIT = 10;
 
@@ -85,6 +79,15 @@ const state = reactive({
   showArchived: false,
   loading: false,
   showAuthSelector: false,
+
+  groupMenu: [
+    {
+      title: 'Go to Group',
+      icon: 'mdi-open-in-new',
+      action: (entity) => getDefaultLandingPage(entity._id, mobile),
+      color: 'green',
+    },
+  ],
 });
 
 initData();

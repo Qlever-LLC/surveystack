@@ -99,6 +99,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { useGroup } from '@/components/groups/group';
 import { useDisplay } from 'vuetify';
 
+import { getDefaultLandingPage } from '@/components/navigation';
+
 const store = useStore();
 const router = useRouter();
 const route = useRoute();
@@ -136,7 +138,7 @@ const state = reactive({
   }),
   groupChooserMenu: [
     {
-      action: (entity) => (mobile.value ? `/groups/${entity._id}` : `/groups/${entity._id}/submissions`),
+      action: (entity) => getDefaultLandingPage(entity._id, mobile),
       color: 'green',
     },
   ],

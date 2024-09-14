@@ -22,10 +22,11 @@
 </template>
 <script setup>
 import { reactive } from 'vue';
-import { useGroup } from '@/components/groups/group';
-
-import ListItemCard from '@/components/ui/ListItemCard.vue';
 import { useDisplay } from 'vuetify';
+
+import { useGroup } from '@/components/groups/group';
+import ListItemCard from '@/components/ui/ListItemCard.vue';
+import { getDefaultLandingPage } from '@/components/navigation';
 
 const { getMyGroups } = useGroup();
 const { mobile } = useDisplay();
@@ -41,7 +42,7 @@ function initData() {
     {
       title: 'Go to Group',
       icon: 'mdi-open-in-new',
-      action: (entity) => (mobile.value ? `/groups/${entity._id}` : `/groups/${entity._id}/submissions`),
+      action: (entity) => getDefaultLandingPage(entity._id, mobile),
       color: 'green',
     },
   ];

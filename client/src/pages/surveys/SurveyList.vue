@@ -14,13 +14,13 @@
     </a-alert>
     <basic-list
       @updateSearch="updateSearch"
-      @tooglePin="tooglePin"
+      @togglePin="togglePinWithIcon"
       listType="card"
-      :entities="state.surveys.content"
+      :entities="state.networkOk ? state.surveys.content : surveys.content"
       showPinned
-      :enableTogglePinned="rightToTogglePin().allowed"
+      :enableTogglePinned="rightToTogglePin().allowed && !state.showArchived"
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
-      :menu="state.menu"
+      :menu="surveyMenu"
       :loading="state.loading"
       :show-navigation-control="!$route.query.minimal_ui"
       title="">
@@ -28,7 +28,7 @@
         <a-icon class="mr-2">mdi-list-box-outline</a-icon>
         All Surveys
         <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
-          {{ state.surveys.pagination.total }}
+          {{ state.networkOk ? state.surveys.pagination.total : surveys.pagination.total }}
         </a-chip>
       </template>
       <template v-slot:preMenu="{ entity }">
@@ -43,10 +43,13 @@
           draft
         </a-chip>
       </template>
+      <template v-slot:filter v-if="isGroupAdmin(getActiveGroupId()) && onlineStatus.value">
+        <a-checkbox v-model="state.showArchived" label="View archived" dense hide-details color="primary" />
+      </template>
       <template v-slot:noValue> No Surveys available </template>
       <template v-slot:pagination>
         <a-pagination
-          v-if="state.surveys.content.length > 0"
+          v-if="state.networkOk ? state.surveys.content.length > 0 : surveys.content.length > 0"
           v-model="state.page"
           :length="activeTabPaginationLength"
           @update:modelValue="() => initData()" />
@@ -61,11 +64,12 @@
 </template>
 
 <script setup>
-import { reactive, computed, watch } from 'vue';
+import { reactive, computed, inject, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
+import { useQueryClient } from '@tanstack/vue-query';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
+import emitter from '@/utils/eventBus';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
@@ -76,13 +80,19 @@ import isValid from 'date-fns/isValid';
 import formatDistance from 'date-fns/formatDistance';
 
 import { useSurvey } from '@/components/survey/survey';
+import { useGetPinnedSurveysForGroup } from '@/queries';
+
+const onlineStatus = inject('onlineStatus');
 
 const router = useRouter();
-const store = useStore();
-const { getActiveGroupId } = useGroup();
+const { getActiveGroupId, isGroupAdmin } = useGroup();
 const { rightToEdit, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getSurveys, tooglePinSurvey, togglePinEvent, message, isADraft } = useSurvey();
+const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isADraft } = useSurvey();
+
+const queryClient = useQueryClient();
+
+const { data: data } = useGetPinnedSurveysForGroup(getActiveGroupId());
 
 const state = reactive({
   page: 1,
@@ -95,12 +105,27 @@ const state = reactive({
       limit: 100000,
     },
   },
-  menu: [],
   loading: false,
+  networkOk: false,
+  showArchived: false,
 });
 
+const surveys = computed(() => {
+  const contentValue = data.value.length === 0 ? [] : data.value;
+  return {
+    content: contentValue,
+    pagination: {
+      total: 0,
+      skip: 0,
+      limit: 100000,
+    },
+  };
+});
+
+const surveyMenu = computed(() => getMenu(onlineStatus.value));
+
 const activeTabPaginationLength = computed(() => {
-  const { total } = state.surveys.pagination;
+  const { total } = state.networkOk ? state.surveys.pagination : surveys.value.pagination;
   return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
 });
 
@@ -112,14 +137,50 @@ function updateSearch(val) {
   initData();
 }
 
-watch(togglePinEvent, (entity) => {
-  tooglePin(entity);
+emitter.on('togglePin', () => {
+  initData();
 });
-async function tooglePin(entity) {
+
+async function togglePinWithIcon(entity) {
   state.loading = true;
-  await tooglePinSurvey(entity);
+  await togglePinSurvey(entity);
   await initData();
+  queryClient.invalidateQueries({ queryKey: ['pinnedSurveys'] });
+  queryClient.invalidateQueries({ queryKey: ['pinnedSurveysGroup', getActiveGroupId()] });
   state.loading = false;
+}
+
+async function fetchSurveysWithPagination() {
+  try {
+    //laod the surveys
+    const result = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT, state.showArchived);
+    //add createdAgo information
+    const now = new Date();
+    result.content.forEach((s) => {
+      if (s.meta) {
+        const parsedDate = parseISO(s.meta.dateCreated);
+        if (isValid(parsedDate)) {
+          s.createdAgo = formatDistance(parsedDate, now);
+        }
+      }
+    });
+    return result;
+  } catch (error) {
+    console.error('API fetch failed, falling back to cache', error);
+    throw error;
+  }
+}
+
+async function initData() {
+  state.loading = true;
+  try {
+    state.surveys = await fetchSurveysWithPagination();
+    state.networkOk = true;
+  } catch (error) {
+    state.networkOk = false;
+  } finally {
+    state.loading = false;
+  }
 }
 
 function startDraftAs(selectedMember) {
@@ -133,35 +194,5 @@ function startDraftAs(selectedMember) {
   stateComposable.selectedSurvey = undefined;
 }
 
-async function initData() {
-  state.loading = true;
-  state.menu = stateComposable.menu;
-  try {
-    //laod the surveys
-    state.surveys = await getSurveys(getActiveGroupId(), state.search, state.page, PAGINATION_LIMIT);
-    //add createdAgo information
-    const now = new Date();
-    state.surveys.content.forEach((s) => {
-      if (s.meta) {
-        const parsedDate = parseISO(s.meta.dateCreated);
-        if (isValid(parsedDate)) {
-          s.createdAgo = formatDistance(parsedDate, now);
-        }
-      }
-    });
-  } catch (e) {
-    const surveysContent = store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId());
-
-    state.surveys = {
-      content: surveysContent,
-      pagination: {
-        total: 0,
-        skip: 0,
-        limit: 100000,
-      },
-    };
-  } finally {
-    state.loading = false;
-  }
-}
+watch(() => state.showArchived, initData);
 </script>

@@ -39,12 +39,6 @@ export default {
       }
 
       try {
-        await db.clearAllPinnedSurveys();
-      } catch (error) {
-        console.log(error);
-      }
-
-      try {
         await db.clearAllResources();
       } catch (error) {
         console.log(error);

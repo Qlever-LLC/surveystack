@@ -10,7 +10,7 @@ import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import { createStore } from 'vuex';
 import { createStoreObject } from '../../store';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
-
+import { VueQueryPlugin } from '@tanstack/vue-query';
 
 // add a control and set its base parameters like a user would
 const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
@@ -38,14 +38,16 @@ const updateProperty = async (label, value, openAdvanced) => {
     await fireEvent.click(within(props).getByText(/advanced/i));
   }
   const input = within(props).getAllByLabelText(label)[0];
-  if (typeof value === 'boolean') { // input is assumed to be a checkbox
+  if (typeof value === 'boolean') {
+    // input is assumed to be a checkbox
     const inputNeedsToGoFromTrueToFalse = input.checked && value === false;
     const inputNeedsToGoFromFalseToTrue = !input.checked && value === true;
     if (inputNeedsToGoFromTrueToFalse || inputNeedsToGoFromFalseToTrue) {
       await fireEvent.click(input);
     }
-  } else { // input is assumed to be a text input
-    await fireEvent.update(input, value); 
+  } else {
+    // input is assumed to be a text input
+    await fireEvent.update(input, value);
   }
 };
 
@@ -128,10 +130,11 @@ describe('add control', () => {
               revisions: expect.arrayContaining([
                 expect.objectContaining({
                   controls: [expect.objectContaining({ name: dataName, label, type: info.type })],
-                })
-              ])
-            })
-          }));
+                }),
+              ]),
+            }),
+          })
+        );
       });
     });
   });
@@ -337,7 +340,7 @@ describe('add control', () => {
       it(name, async () => {
         const options = optionsWithControls(controls);
         const store = createStore(createStoreObject());
-        renderWithVuetify(SurveyBuilder, options, store);
+        renderWithVuetify(SurveyBuilder, options, store, undefined, VueQueryPlugin);
         const surveyDetails = screen.getByTestId('survey-details');
 
         // select the parent card

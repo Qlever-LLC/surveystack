@@ -9,7 +9,7 @@ const stores = {
   RESOURCES: 'resources',
 };
 
-const db = openDB(DATABASE_NAME, 9, {
+const db = openDB(DATABASE_NAME, 10, {
   upgrade(db, oldVersion) {
     if (oldVersion < 4) {
       db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
@@ -21,6 +21,9 @@ const db = openDB(DATABASE_NAME, 9, {
     if (oldVersion < 9) {
       db.deleteObjectStore(stores.SURVEYS);
       db.createObjectStore(stores.PINNEDSURVEYS, { keyPath: '_id' });
+    }
+    if (oldVersion < 10) {
+      db.deleteObjectStore(stores.PINNEDSURVEYS);
     }
   },
   blocked(currentVersion, blockedVersion) {
@@ -43,9 +46,6 @@ async function clearObjectStore(storeName) {
 function clearAllSubmissions() {
   return clearObjectStore(stores.SUBMISSIONS);
 }
-function clearAllPinnedSurveys() {
-  return clearObjectStore(stores.PINNEDSURVEYS);
-}
 function clearAllResources() {
   return clearObjectStore(stores.RESOURCES);
 }
@@ -56,9 +56,6 @@ async function persist(storeName, obj) {
 function persistSubmission(submission) {
   return persist(stores.SUBMISSIONS, submission);
 }
-function persistPinnedSurvey(pinnedSurvey) {
-  return persist(stores.PINNEDSURVEYS, pinnedSurvey);
-}
 function persistResource(resource) {
   return persist(stores.RESOURCES, resource);
 }
@@ -68,9 +65,6 @@ async function getResults(storeName) {
 }
 function getAllSubmissions() {
   return getResults(stores.SUBMISSIONS);
-}
-function getAllPinnedSurveys() {
-  return getResults(stores.PINNEDSURVEYS);
 }
 function getAllResources() {
   return getResults(stores.RESOURCES);
@@ -86,9 +80,6 @@ async function removeFromIndexedDB(storeName, id) {
 
 function deleteSubmission(id) {
   return removeFromIndexedDB(stores.SUBMISSIONS, id);
-}
-function deletePinnedSurvey(id) {
-  return removeFromIndexedDB(stores.PINNEDSURVEYS, id);
 }
 
 const migrateSubmissions = async () => {
@@ -115,17 +106,13 @@ const migrateSubmissions = async () => {
 export {
   stores,
   clearAllSubmissions,
-  clearAllPinnedSurveys,
   clearAllResources,
   persistSubmission,
-  persistPinnedSurvey,
   persistResource,
   getAllSubmissions,
-  getAllPinnedSurveys,
   getAllResources,
   getSubmission,
   removeFromIndexedDB,
   deleteSubmission,
-  deletePinnedSurvey,
   migrateSubmissions,
 };

@@ -18,9 +18,10 @@
       :key="entity"
       :entity="entity"
       :idx="String(idx)"
+      :enableTogglePinned="rightToTogglePin().allowed"
       class="whiteCard"
       smallCard
-      :menu="menu">
+      :menu="surveyMenu">
       <template v-slot:entitySubtitle></template>
     </list-item-card>
     <a-list-item
@@ -40,25 +41,56 @@
 </template>
 
 <script setup>
+import api from '@/services/api.service';
 import { useGroup } from '@/components/groups/group';
 import { useSurvey } from '@/components/survey/survey';
 import { useRouter } from 'vue-router';
-import { computed, watch } from 'vue';
-import { useStore } from 'vuex';
+import { reactive, computed, inject } from 'vue';
+import { getPermission } from '@/utils/permissions';
 
 import ListItemCard from '@/components/ui/ListItemCard.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
+import { useGetPinnedSurveysForGroup } from '@/queries';
 
-const { getActiveGroupId } = useGroup();
-const { stateComposable, message, tooglePinSurvey, togglePinEvent } = useSurvey();
+const onlineStatus = inject('onlineStatus');
+
+const { getActiveGroupId, isGroupVisitor } = useGroup();
+const { stateComposable, getMenu, message } = useSurvey();
+const { rightToTogglePin } = getPermission();
 const router = useRouter();
-const store = useStore();
 
-const menu = computed(() => stateComposable.menu);
+const state = reactive({
+  surveysForVisitor: [],
+});
 
-const surveys = computed(() => store.getters['surveys/getPinnedSurveyForGroup'](getActiveGroupId()));
+const surveyMenu = computed(() => getMenu(onlineStatus.value));
+
+const { data: data } = useGetPinnedSurveysForGroup(getActiveGroupId());
+const surveys = computed(() => {
+  return isGroupVisitor() ? state.surveysForVisitor : data.value;
+});
+
+init();
+async function init() {
+  if (isGroupVisitor()) {
+    await fetchPinnedForNonMember();
+  }
+}
+
+async function fetchPinnedForNonMember() {
+  const queryParams = new URLSearchParams();
+  queryParams.append('justPinned', true);
+  const { data } = await api.get(`/groups/${getActiveGroupId()}?${queryParams}`);
+  const surveyPromises = data.surveys.pinned.map(async (id) => {
+    const { data } = await api.get(`/surveys/${id}`);
+    return data;
+  });
+  const fetchedSurveys = await Promise.all(surveyPromises);
+
+  state.surveysForVisitor = fetchedSurveys.sort((a, b) => a.name.localeCompare(b.name));
+}
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;
@@ -69,13 +101,6 @@ function startDraftAs(selectedMember) {
     );
   }
   stateComposable.selectedSurvey = undefined;
-}
-
-watch(togglePinEvent, (entity) => {
-  tooglePin(entity);
-});
-async function tooglePin(entity) {
-  await tooglePinSurvey(entity);
 }
 </script>
 

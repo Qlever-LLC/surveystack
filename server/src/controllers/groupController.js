@@ -193,6 +193,14 @@ const getGroupById = async (req, res) => {
     pipeline.push(...createPinnedSurveysPopulationStages());
   }
 
+  if (queryParam(req.query.justPinned)) {
+    pipeline.push({
+      $project: {
+        surveys: 1,
+      },
+    });
+  }
+
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();
 
   if (!entity) {

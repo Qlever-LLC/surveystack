@@ -278,6 +278,8 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
   return uniqueItems;
 }
 
+export const isGroupMember = (survey, userGroups) => userGroups.some((group) => group._id === survey.meta.group.id);
+
 export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
   const { submissions, isLibrary } = survey.meta;
 
@@ -310,8 +312,7 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
       if (!isLoggedIn) {
         return { allowed: false, message: 'You must be logged in to submit this survey.' };
       }
-      const isGroupMember = userGroups.some((group) => group._id === survey.meta.group.id);
-      return isGroupMember
+      return isGroupMember(survey, userGroups)
         ? {
             allowed: true,
           }

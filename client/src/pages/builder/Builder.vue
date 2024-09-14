@@ -12,7 +12,7 @@
       @submit="submitSubmission"
       @onSaveDraft="submitSurvey(true)"
       @onPublish="submitSurvey(false)"
-      @onDelete="onDelete"
+      @onArchive="onArchive"
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
       @show-version-dialog="versionsDialogIsVisible = true" />
@@ -25,9 +25,9 @@
       <strong>{{ survey._id }}</strong> already exists. Do you want to generate a different id?
     </app-dialog>
 
-    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="onDelete" width="400">
+    <app-dialog v-model="showArchiveModal" @cancel="showArchiveModal = false" @confirm="onArchive" width="400">
       <template v-slot:title>Confirm your action</template>
-      Are you sure you want to delete survey
+      Are you sure you want to archive survey
       <strong>{{ survey.name }}</strong> ({{ survey._id }})?
     </app-dialog>
 
@@ -157,7 +157,7 @@ export default {
       submission: null,
       showSnackbar: false,
       snackbarMessage: '',
-      showDeleteModal: false,
+      showArchiveModal: false,
       showOverrideModal: false,
       importedSurvey: null,
       freshImport: false,
@@ -220,13 +220,14 @@ export default {
       this.survey._id = new ObjectId();
       this.showConflictModal = false;
     },
-    async onDelete() {
-      if (!this.showDeleteModal) {
-        this.showDeleteModal = true;
+    async onArchive() {
+      if (!this.showArchiveModal) {
+        this.showArchiveModal = true;
         return;
       }
       try {
-        await api.delete(`/surveys/${this.survey._id}`);
+        this.survey.meta.archived = true;
+        await api.put(`/surveys/${this.survey._id}`, this.survey);
         this.$router.push({
           name: 'group-surveys',
         });

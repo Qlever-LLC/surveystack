@@ -50,7 +50,7 @@
             @view-code-toggle="viewCode = !viewCode"
             @update="publish"
             @saveDraft="saveDraft"
-            @delete="$emit('onDelete')"
+            @archive="$emit('onArchive')"
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
@@ -139,8 +139,7 @@
           @change="updateScriptCode"
           @save="saveScript"
           :isClosable="true"
-          :title="`Script: ${scriptCode.name}`"
-        />
+          :title="`Script: ${scriptCode.name}`" />
       </pane>
 
       <pane class="pane pane-main-code" v-if="hasCode && !hideCode">
@@ -170,8 +169,7 @@
                 :result="evaluated"
                 @change="updateSelectedCode"
                 :examples="true"
-                @examples="showExamples = true"
-              />
+                @examples="showExamples = true" />
             </div>
           </pane>
           <pane size="20">
@@ -184,13 +182,7 @@
         class="pane pane-submission-code pane-shared-code"
         v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)">
         <div class="code-editor">
-          <code-editor
-            title="Shared Code"
-            v-if="survey"
-            class="code-editor"
-            :readonly="true"
-            :code="sharedCode"
-          />
+          <code-editor title="Shared Code" v-if="survey" class="code-editor" :readonly="true" :code="sharedCode" />
         </div>
       </pane>
 
@@ -413,6 +405,12 @@ export default {
       this.scriptCode.content = code;
     },
     publish() {
+      if (!this.isDraft) {
+        // handle the specific case of Version 1 to upgrade directly to Version 2
+        // Version 1 is defined at the creation stage, but is also used for rendering draft chips
+        this.createDraft();
+        this.initDirtyFlag(this.surveyUnderWork);
+      }
       this.$emit('onPublish');
     },
     saveDraft() {
@@ -853,9 +851,9 @@ export default {
       const scriptIsInSameGroupAsSurvey = this.$route.params.id === this.scriptCode.meta.group.id;
       // check that user is admin of script's group or one of it's ancestors
       const scriptPath = this.scriptCode.meta.group.path;
-      const roles = this.$store.getters['memberships/memberships'].map(m => `${m.role}@${m.group.path}`);
+      const roles = this.$store.getters['memberships/memberships'].map((m) => `${m.role}@${m.group.path}`);
       const targetRole = `admin@${scriptPath}`;
-      const userHasPermissionToSaveScript = roles.some(role => targetRole.startsWith(role));
+      const userHasPermissionToSaveScript = roles.some((role) => targetRole.startsWith(role));
       if (scriptIsInQSL) {
         return scriptInQSLIsModifiable && userHasPermissionToSaveScript && scriptIsInSameGroupAsSurvey;
       }
