@@ -1,11 +1,10 @@
-<!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 <template>
   <div>
     <app-control-label
       :value="control.label"
       :redacted="redacted"
       :required="required"
-      :initializable="control.options.initialize && control.options.initialize.enabled && value"
+      :initializable="control.options.initialize && control.options.initialize.enabled && modelValue"
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize" />
     <div style="display: flex">
