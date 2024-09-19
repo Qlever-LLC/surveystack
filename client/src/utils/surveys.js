@@ -381,8 +381,11 @@ export function compileSandbox(src, fname) {
   };
 }
 
+
+//TODO check worker.js -> maybe duplication
 export async function executeUnsafe({ code, fname, submission, survey, parent, log }) {
-  const sandbox = compileSandbox(code, fname);
+  console.log('execute unsafe called');
+  /*const sandbox = compileSandbox(code, fname);
 
   const res = await sandbox({
     arg1: submission,
@@ -392,7 +395,58 @@ export async function executeUnsafe({ code, fname, submission, survey, parent, l
     ...supplySandbox,
   });
 
-  return res;
+  console.log('result of sandbox', res);
+
+  return res;*/
+
+  return new Promise((resolve, reject) => {
+    // Create a sandboxed iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.sandbox = 'allow-scripts';
+
+    // Script to inject into the iframe, using srcdoc
+    const scriptContent = `
+      <script>
+        (async function() {
+          try {
+            console.log('Script inside the iframe executed');
+            // Injected user code
+            ${code}
+
+            // Call the user-provided function with parameters
+            const result = await ${fname}(${JSON.stringify(submission)}, ${JSON.stringify(survey)}, ${JSON.stringify(parent)});
+
+            // Send the result to the parent window
+            window.parent.postMessage({ result }, '*');
+          } catch (error) {
+            console.error('Error in iframe', error);
+            window.parent.postMessage({ error: error.message }, '*');
+          }
+        })();
+      </script>
+    `;
+
+    // Use srcdoc to inject the HTML + script into the iframe
+    iframe.srcdoc = `<html><body>${scriptContent}</body></html>`;
+    document.body.appendChild(iframe);
+
+    // Listen for the iframe's response via postMessage
+    window.addEventListener('message', function listener(event) {
+      if (event.source === iframe.contentWindow) {
+        // Remove listener after receiving message
+        window.removeEventListener('message', listener);
+        // Clean up the iframe after use
+        document.body.removeChild(iframe);
+
+        if (event.data.error) {
+          reject(new Error(event.data.error));
+        } else {
+          resolve(event.data.result);
+        }
+      }
+    });
+  });
 }
 
 /**
