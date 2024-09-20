@@ -102,7 +102,7 @@ export function useSurvey() {
       },
       {
         title: 'Copy Survey Link',
-        icon: 'mdi-link-variant',
+        icon: 'mdi-link',
         action: (s) =>
           createAction(s, rightToSubmitSurvey, () =>
             copyTextToClipboard(
