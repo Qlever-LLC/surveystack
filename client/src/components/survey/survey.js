@@ -101,6 +101,17 @@ export function useSurvey() {
           rightToSubmitSurvey(s).allowed,
       },
       {
+        title: 'Copy Start Link',
+        icon: 'mdi-content-copy',
+        action: (s) =>
+          createAction(s, rightToSubmitSurvey, () =>
+            copyTextToClipboard(
+              `${window.location.origin}/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`
+            )
+          ),
+        render: (s) => () => !isADraft(s) && !isArchived(s) && rightToSubmitSurvey(s).allowed,
+      },
+      {
         title: 'Call for Responses',
         icon: 'mdi-bullhorn',
         action: (s) =>
@@ -149,17 +160,6 @@ export function useSurvey() {
       //   icon: 'mdi-share',
       //   action: (s) => `/groups/${getActiveGroupId()}/surveys/${s._id}`,
       // }
-      {
-        title: 'Copy Start Link',
-        icon: 'mdi-content-copy',
-        action: (s) =>
-          createAction(s, rightToSubmitSurvey, () =>
-            copyTextToClipboard(
-              `${window.location.origin}/groups/${getActiveGroupId()}/surveys/${s._id}/submissions/new`
-            )
-          ),
-        render: (s) => () => !isADraft(s) && !isArchived(s) && rightToSubmitSurvey(s).allowed,
-      },
       {
         title: 'Pin Survey',
         icon: 'mdi-pin',
