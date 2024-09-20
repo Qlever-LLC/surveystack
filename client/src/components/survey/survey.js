@@ -101,8 +101,8 @@ export function useSurvey() {
           rightToSubmitSurvey(s).allowed,
       },
       {
-        title: 'Copy Start Link',
-        icon: 'mdi-content-copy',
+        title: 'Copy Survey Link',
+        icon: 'mdi-link-variant',
         action: (s) =>
           createAction(s, rightToSubmitSurvey, () =>
             copyTextToClipboard(
