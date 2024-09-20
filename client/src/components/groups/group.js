@@ -66,6 +66,7 @@ export function useGroup() {
   }
 
   function isGroupVisitor(groupId) {
+    // if groupId is undefined => will be set by the getActiveGroupId() in isGroupAdmin()
     return !(isGroupAdmin(groupId) || isGroupMember());
   }
 
