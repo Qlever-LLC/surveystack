@@ -11,5 +11,5 @@ export function useNavigation() {
 }
 
 export function getDefaultLandingPage(groupId, mobile) {
-  return mobile.value ? `/groups/${groupId}` : `/groups/${groupId}/submissions`;
+  return mobile.value ? `/groups/${groupId}` : `/groups/${groupId}/surveys`;
 }
