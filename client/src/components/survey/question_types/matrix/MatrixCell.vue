@@ -1,6 +1,17 @@
 <template>
+  <a-textarea
+    v-if="header.type === 'text' && header?.longText"
+    rows="3"
+    autoGrow
+    :modelValue="value"
+    @update:modelValue="onInput"
+    variant="outlined"
+    hide-details
+    autocomplete="off"
+    :disabled="disabled"
+    clearable />
   <a-text-field
-    v-if="header.type === 'text'"
+    v-else-if="header.type === 'text'"
     :modelValue="value"
     @update:modelValue="onInput"
     variant="outlined"

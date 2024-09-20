@@ -195,6 +195,16 @@
       <!-- Control options -->
       <a-spacer />
       <a-checkbox
+        v-if="isText"
+        label="Long Text"
+        v-model="controlInProgress.options.longText"
+        :disabled="
+          !!controlInProgress.libraryId && !controlInProgress.options.allowModify && !controlInProgress.isLibraryRoot
+        "
+        helper-text="Allow answers to flow to the next line for longer answers or paragraphs"
+        color="grey-darken-1"
+        class="align-center align-self-start" />
+      <a-checkbox
         v-if="isOntology"
         class="align-center align-self-start"
         color="grey-darken-1"

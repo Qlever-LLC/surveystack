@@ -8,6 +8,7 @@
     @update:modelValue="$emit('update:modelValue', $event)"
     :class="{ fontMonospace: cssFontMonospace, markdown: cssMarkdown }"
     :auto-grow="autoGrow"
+    :clearable="clearable"
     :disabled="disabled"
     :hide-details="hideDetails"
     :label="label"
@@ -29,6 +30,7 @@ const props = defineProps({
   cssMarkdown: { type: Boolean, required: false },
   // //vuetify props
   autoGrow: { type: Boolean, required: false },
+  clearable: { type: Boolean, required: false },
   disabled: { type: Boolean, required: false },
   hideDetails: { type: [Boolean, String], required: false },
   label: { type: String, required: false },

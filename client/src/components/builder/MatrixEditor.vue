@@ -151,6 +151,16 @@
 
                     <div class="mt-5"></div>
 
+                    <!-- LONG TEXT OPTION -->
+                    <a-checkbox
+                      v-if="item.type === 'text'"
+                      v-model="item.longText"
+                      label="Long Text"
+                      helper-text="Allow answers to flow to the next line for longer answers or paragraphs"
+                      hide-details
+                      color="grey-darken-1"
+                      class="align-center align-self-start" />
+
                     <!-- MULTIPLE -->
                     <a-checkbox
                       v-if="item.type === 'dropdown'"
