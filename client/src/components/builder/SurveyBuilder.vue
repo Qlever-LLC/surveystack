@@ -262,7 +262,7 @@ import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 import {
-  executeUnsafe,
+  executeCodeInIframe,
   getFlatName,
   getGroups,
   getPosition,
@@ -607,15 +607,12 @@ export default {
     async runCode() {
       const tab = tabMap[this.selectedTab];
       try {
-        const res = await executeUnsafe({
+        const res = await executeCodeInIframe({
           code: this.activeCode,
           fname: tab,
           submission: this.instance,
           survey: this.surveyUnderWork,
           parent: this.parent,
-          log: (arg) => {
-            this.log = `${this.log}${arg}\n`;
-          },
         });
         if (tab === 'apiCompose') {
           if (typeof res !== 'object') {

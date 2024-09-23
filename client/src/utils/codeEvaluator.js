@@ -3,7 +3,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 import { get } from 'lodash';
-import * as surveyUtils from './surveys';
+import { executeCodeInIframe } from '@/utils/surveys';
 import * as surveyStackUtils from './surveyStack';
 
 async function calculateField({ nodes, submission, survey, option, fname }) {
@@ -94,13 +94,12 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     try {
       const parentPath = surveyStackUtils.getParentPath(item.path);
       const parentData = get(submission, parentPath);
-      const result = await surveyUtils.executeUnsafe({
+      const result = await executeCodeInIframe({
         code: item.code,
         fname,
         submission,
         survey,
         parent: parentData,
-        log: (msg) => console.log(msg),
       });
 
       item.result = result;

@@ -360,44 +360,8 @@ export const uuidv4 = () => {
   return u;
 };
 
-// eslint-disable-next-line no-unused-vars
-function _has(target, key) {
-  return true;
-}
-
-function _get(target, key) {
-  if (key === Symbol.unscopables) return undefined;
-  return target[key];
-}
-
-export function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2, arg3); }`;
-  let AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-  const code = new AsyncFunction('sandbox', wrappedSource);
-
-  return async function (sandbox) {
-    const sandboxProxy = new Proxy(sandbox, { _has, _get });
-    return await code(sandboxProxy);
-  };
-}
-
-
-//TODO check worker.js -> maybe duplication worker.js is used for execute in surveys.js
-export async function executeUnsafe({ code, fname, submission, survey, parent, log }) {
-  console.log('execute unsafe called');
-  /*const sandbox = compileSandbox(code, fname);
-
-  const res = await sandbox({
-    arg1: submission,
-    arg2: survey,
-    arg3: parent,
-    log,
-    ...supplySandbox,
-  });
-
-  console.log('result of sandbox', res);
-
-  return res;*/
+export async function executeCodeInIframe({ code, fname, submission, survey, parent }) {
+  console.log('execute code in iframe');
 
   return new Promise((resolve, reject) => {
     // Create a sandboxed iframe
@@ -429,15 +393,15 @@ export async function executeUnsafe({ code, fname, submission, survey, parent, l
 
     // Use srcdoc to inject the HTML with Content Security Policy + script into the iframe
     /*
-      default-src 'self': Only allows resources from the same origin.
-      script-src 'self' 'unsafe-inline': Allows scripts from the same origin and inline scripts (not recommended for security).
-      connect-src 'self': Limits network requests (fetch, XHR, WebSockets) to the same origin.
-      img-src https://*: Allows images from secure (HTTPS) sources.
+      default-src 'none': Disallows all resource loading by default.
+      script-src 'self' 'unsafe-inline': Allows scripts from the same origin and inline scripts (less secure, use with caution).
+      connect-src https://app.surveystack.io/: Limits network requests (fetch, XHR, WebSockets) to the specified domain.
+      img-src 'none': Disallows loading of any images.
       child-src 'none': Prevents loading of nested iframes or embedded objects.
       object-src 'none': Disallows <object>, <embed>, or <applet> elements for enhanced security.
     */
     iframe.srcdoc = `<html>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src https://*; child-src 'none'; object-src 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; connect-src ${window.location.origin}/; img-src 'none'; child-src 'none'; object-src 'none';">
     <body>${scriptContent}</body>
     </html>`;
     document.body.appendChild(iframe);
