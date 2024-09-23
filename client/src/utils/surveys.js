@@ -382,7 +382,7 @@ export function compileSandbox(src, fname) {
 }
 
 
-//TODO check worker.js -> maybe duplication
+//TODO check worker.js -> maybe duplication worker.js is used for execute in surveys.js
 export async function executeUnsafe({ code, fname, submission, survey, parent, log }) {
   console.log('execute unsafe called');
   /*const sandbox = compileSandbox(code, fname);
@@ -427,8 +427,19 @@ export async function executeUnsafe({ code, fname, submission, survey, parent, l
       </script>
     `;
 
-    // Use srcdoc to inject the HTML + script into the iframe
-    iframe.srcdoc = `<html><body>${scriptContent}</body></html>`;
+    // Use srcdoc to inject the HTML with Content Security Policy + script into the iframe
+    /*
+      default-src 'self': Only allows resources from the same origin.
+      script-src 'self' 'unsafe-inline': Allows scripts from the same origin and inline scripts (not recommended for security).
+      connect-src 'self': Limits network requests (fetch, XHR, WebSockets) to the same origin.
+      img-src https://*: Allows images from secure (HTTPS) sources.
+      child-src 'none': Prevents loading of nested iframes or embedded objects.
+      object-src 'none': Disallows <object>, <embed>, or <applet> elements for enhanced security.
+    */
+    iframe.srcdoc = `<html>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src https://*; child-src 'none'; object-src 'none';">
+    <body>${scriptContent}</body>
+    </html>`;
     document.body.appendChild(iframe);
 
     // Listen for the iframe's response via postMessage
