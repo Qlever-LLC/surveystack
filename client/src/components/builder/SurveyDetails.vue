@@ -8,11 +8,11 @@
         <a-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ props }">
             <a-btn icon v-bind="props">
-              <a-icon>mdi-pencil</a-icon>
+              <a-icon>mdi-cog</a-icon>
             </a-btn>
           </template>
           <a-card>
-            <a-card-title> Edit Survey Details</a-card-title>
+            <a-card-title>Survey Settings</a-card-title>
             <a-card-text>
               <group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <a-select
@@ -22,6 +22,7 @@
                 :items="availableSubmissions"
                 item-title="text"
                 item-value="value" />
+              <a-checkbox label="Add a review page as the last page" v-model="value.meta.reviewPage" />
               <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" variant="outlined" />
             </a-card-text>
             <a-card-actions class="mr-3">
@@ -319,15 +320,6 @@ export default {
     },
     publishUpdateToLibrary() {
       this.$emit('publish');
-    },
-    updateSurveyName(name) {
-      this.$emit('set-survey-name', name);
-    },
-    updateSurveyGroup({ _id }) {
-      this.$emit('set-survey-group', _id);
-    },
-    updateSurveyDescription(description) {
-      this.$emit('set-survey-description', description);
     },
     addToLibrary(library) {
       //TODO do not mutate value prop
