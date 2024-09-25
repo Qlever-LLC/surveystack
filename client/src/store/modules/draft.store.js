@@ -68,6 +68,7 @@ const createInitialState = () => ({
   root: null, // root node starting from current survey controls
   node: null, // node with model pointing to current survey control
   firstNode: null,
+  lastNode: null,
   showOverview: false,
   showConfirmSubmission: false,
   enableNext: true,
@@ -87,6 +88,7 @@ const getters = {
   path: (state) => (state.node ? getPath(state.node).replace('[', '.').replace(']', '') : null),
   nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
   atStart: (state) => state.node === state.firstNode,
+  atEnd: (state) => state.lastNode,
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
   questionNumber: (state) => {
@@ -250,6 +252,9 @@ const actions = {
         continue;
       }
 
+      if (index + nextNode.children.length === traversal.length - 1) {
+        commit('LAST', true);
+      }
       commit('NEXT', nextNode);
       return;
     }
@@ -327,6 +332,9 @@ const actions = {
   },
   goto({ commit }, path) {
     commit('GOTO', path);
+  },
+  atEnd({ commit }, bool) {
+    commit('LAST', bool);
   },
   showOverview({ commit, dispatch }, show) {
     dispatch('calculateApiCompose');
@@ -501,6 +509,9 @@ const mutations = {
   },
   PREV(state, node) {
     state.node = node;
+  },
+  LAST(state, bool) {
+    state.lastNode = bool;
   },
   GOTO(state, path) {
     state.root.walk((node) => {

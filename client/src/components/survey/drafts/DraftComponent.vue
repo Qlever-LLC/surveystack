@@ -21,7 +21,7 @@
       :questionNumber="questionNumber"
       :showNavigationControl="!builder && !$route.query.minimal_ui"
       :surveyName="!builder ? survey.name : undefined"
-      @showOverviewClicked="showOverview = !showOverview">
+      @showOverviewClicked="overviewClicked">
       <!-- forward all the slots -->
       <template v-for="(_, name) in $slots" v-slot:[name]="{ props }">
         <slot :name="name" :props="props" />
@@ -67,7 +67,8 @@
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered'] && $store.getters['draft/enableNext']"
       :enableSubmit="!$store.getters['draft/errors']"
-      :showSubmit="showOverview"
+      :showSubmitWithoutReview="!survey.meta?.reviewPage && atEnd && !$store.getters['draft/hasRequiredUnanswered']"
+      :showReviewPage="showOverview"
       :showNav="true"
       @next="next"
       @prev="prev"
@@ -158,6 +159,14 @@ export default {
     questionNumber() {
       return this.$store.getters['draft/questionNumber'];
     },
+    atEnd: {
+      get() {
+        return this.$store.getters['draft/atEnd'];
+      },
+      set(v) {
+        queueAction(this.$store, 'draft/atEnd', v);
+      },
+    },
     showOverview: {
       get() {
         return this.$store.getters['draft/showOverview'];
@@ -198,6 +207,12 @@ export default {
     },
   },
   methods: {
+    overviewClicked() {
+      if (!this.showOverview) {
+        this.atEnd = false;
+      }
+      this.showOverview = !this.showOverview;
+    },
     scrollTop() {
       const previewDom = document.querySelector('#previewSurvey');
       if (previewDom) {
@@ -212,6 +227,7 @@ export default {
       this.scrollTop();
     },
     prev() {
+      this.atEnd = false;
       // this.$store.dispatch('draft/prev')
       queueAction(this.$store, 'draft/prev');
       this.scrollTop();
