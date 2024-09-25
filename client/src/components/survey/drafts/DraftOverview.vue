@@ -29,8 +29,9 @@
       </a-card-text>
     </a-card>
     <a-timeline v-if="controlDisplays" dense>
-      <template v-for="(display, idx) in controlDisplays" :key="idx">
+      <template v-for="(display, idx) in controlDisplays">
         <a-timeline-item
+          :key="idx"
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :icon="display.icon"
           :dotColor="display.color"
