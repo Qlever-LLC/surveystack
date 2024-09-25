@@ -202,7 +202,8 @@
     </a-menu>
   </div>
 
-  <a-text-field v-else value="unknown cell type" variant="outlined" hide-details disabled />
+  <!-- used for fakeRow -->
+  <a-text-field v-else value="" variant="outlined" hide-details disabled />
 </template>
 
 <script>
