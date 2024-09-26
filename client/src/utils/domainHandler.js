@@ -1,6 +1,6 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
-import vuetify from './../plugins/vuetify';
+import { vuetify } from './../plugins/vuetify';
 
 const partners = [];
 
@@ -70,7 +70,5 @@ export default {
     document.head.appendChild(iconElement);
     document.head.appendChild(appleTouch);
     document.head.appendChild(appBarThemeColor);
-
-    store.dispatch('memberships/tryAutoJoinAndSelectGroup');
   },
 };

@@ -1,34 +1,43 @@
 <template>
-  <div class="farm-os-planting">
-    <div class="d-flex justify-space-between flex-wrap">
-      <app-control-label
-        :value="control.label"
-        :redacted="redacted"
-        :required="required"
-        :initializable="control.options.initialize && control.options.initialize.enabled"
-        :is-modified="meta && !!meta.dateModified"
-        @initialize="initialize" />
-      <a-btn rounded small variant="text" color="primary" class="align-self-center mb-3" @click="clearSelection">
-        clear selection
-      </a-btn>
-    </div>
-    <app-control-hint :value="control.hint" />
-
-    <a-progress-circular v-if="loading" color="secondary" class="my-8" />
-
-    <a-list
-      v-if="!loading"
-      :disabled="loading"
-      style="overflow: auto"
-      :selected="listSelection"
-      :selectStrategy="!!control.options.hasMultipleSelections ? 'classic' : 'single-leaf'"
-      @update:selected="localChange">
+  <app-control-label
+    :value="control.label"
+    :redacted="redacted"
+    :required="required"
+    :initializable="control.options.initialize && control.options.initialize.enabled"
+    :is-modified="meta && !!meta.dateModified"
+    @initialize="initialize" />
+  <a-select
+    :disabled="loading"
+    :modelValue="getValue"
+    @update:modelValue="localChange"
+    :items="transformed"
+    item-title="label"
+    item-value="value"
+    variant="outlined"
+    :label="control.hint"
+    :multiple="control.options.hasMultipleSelections"
+    @keyup.enter.prevent="submit"
+    :loading="loading"
+    color="focus"
+    clearable
+    :selectionSlot="!control.options.hasMultipleSelections"
+    :chipSlot="control.options.hasMultipleSelections"
+    itemSlot
+    cssFlexWrap>
+    <template v-slot:selection="{ props, item }">
+      <span v-bind="props" v-html="item.raw.label" />
+    </template>
+    <template v-slot:chip="{ props, item }">
+      <a-chip v-bind="props" closable style="margin-top: -3px">
+        <span>{{ item.raw.label }}</span>
+      </a-chip>
+    </template>
+    <template v-slot:item="{ props, item, index }">
       <a-list-item
-        v-for="(item, idx) in transformed"
-        :value="hashItem(item)"
-        :key="`item_${idx}`"
-        dense
-        :disabled="(!control.options.hasMultipleSelections && item.value.isField) || item.value?.isNotClickable">
+        v-bind="props"
+        :title="undefined"
+        :key="`item_${index}`"
+        :disabled="!control.options.hasMultipleSelections && item.value.isField">
         <template v-slot:prepend="{ isSelected }">
           <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
             <a-checkbox
@@ -40,138 +49,33 @@
               <a-radio :value="true" color="focus" />
             </a-radio-group>
           </a-list-item-action>
-          <a-list-item-title v-html="item.label" />
+          <a-list-item-title>
+            {{ item.raw.label }}
+            <a-list-item-subtitle v-if="item.value.isField">
+              {{ item.value.farmName }}
+            </a-list-item-subtitle>
+          </a-list-item-title>
         </template>
       </a-list-item>
-    </a-list>
-    <app-control-more-info :value="control.moreInfo" />
-  </div>
+    </template>
+  </a-select>
+  <app-control-more-info :value="control.moreInfo" />
 </template>
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-
-const hashItem = (listItem) => {
-  if (listItem === null || listItem.value === null) {
-    return '';
-  }
-
-  const { value } = listItem;
-  if (value.isField) {
-    if (!value.farmName) {
-      return 'NOT_ASSIGNED';
-    }
-    return `FIELD:${value.farmName}.${value.location.id}`;
-  }
-
-  return `ASSET:${value.farmName}.${value.id}`;
-};
-
-const transform = (assets) => {
-  const withoutArea = [];
-  const localAssets = [];
-  const areas = {};
-
-  assets.forEach((asset) => {
-    if (asset.value.location.length === 0) {
-      const tmp = Object.assign({}, asset);
-      tmp.value.hash = hashItem(asset);
-      if (asset.value.url === '') {
-        localAssets.push(tmp);
-      } else {
-        withoutArea.push(tmp);
-      }
-
-      return;
-    }
-
-    asset.value.location.forEach((location) => {
-      areas[`${asset.value.farmName}.${location.id}`] = {
-        farmName: asset.value.farmName,
-        location,
-      };
-    });
-  });
-
-  const res = Object.keys(areas).flatMap((key) => {
-    const area = areas[key];
-
-    const matchedAssets = assets.filter((asset) => {
-      if (asset.value.farmName !== area.farmName) {
-        return false;
-      }
-
-      return asset.value.location.some((loc) => loc.id === area.location.id);
-    });
-
-    console.log('loc', area);
-    const field = {
-      value: {
-        farmName: area.farmName,
-        location: area.location,
-        isField: true,
-        name: '',
-      },
-      label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
-    };
-
-    field.value.hash = hashItem(field);
-
-    const assetItems = matchedAssets.map((asset) => {
-      const r = {
-        value: asset.value,
-        label: `${asset.value.name} `,
-      };
-
-      r.value.hash = hashItem(r);
-      return r;
-    });
-
-    return [field, ...assetItems];
-  });
-
-  const withoutAreaSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
-  };
-
-  const localAssetSection = {
-    value: {
-      farmName: null,
-      location: null,
-      isField: true,
-      isNotClickable: true,
-      name: '',
-    },
-    label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
-  };
-
-  if (withoutArea.length > 0) {
-    res.push(withoutAreaSection, ...withoutArea);
-  }
-
-  if (localAssets.length > 0) {
-    res.unshift(localAssetSection, ...localAssets);
-  }
-
-  return res;
-};
+import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
 
 export default {
+  components: { AListItemSubtitle },
   mixins: [baseQuestionComponent, farmosBase],
   data: () => ({
     transformed: [],
   }),
   async created() {
     await this.fetchAssets();
-    this.transformed = transform(this.assets);
+    this.transformed = this.transform(this.assets);
   },
   computed: {
     listSelection() {
@@ -179,16 +83,15 @@ export default {
         return [];
       }
       if (this.modelValue !== null && !this.control.options.hasMultipleSelections) {
-        return [hashItem({ value: this.modelValue[0] })];
+        return [this.hashItem({ value: this.modelValue[0] })];
       }
       if (this.control.options.hasMultipleSelections && Array.isArray(this.modelValue)) {
-        return this.modelValue.map((v) => hashItem({ value: v }));
+        return this.modelValue.map((v) => this.hashItem({ value: v }));
       }
       return null;
     },
   },
   methods: {
-    hashItem,
     localChange(hashesArg) {
       let hashes;
       if (!Array.isArray(hashesArg)) {
@@ -211,18 +114,18 @@ export default {
         return foundTransformed.value;
       });
 
+      // selected fields
       const fields = selectedItems.filter((item) => !!item.isField);
-
       // selected assets
       const assets = selectedItems.filter((item) => !item.isField);
-
+      // if fields are selected, select all assets of these fields
       const assetsToSelect = fields.flatMap((field) =>
         this.transformed
           .filter((item) => !item.value.isField)
           .filter((item) => item.value.farmName === field.farmName)
           .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
       );
-
+      // add single assets selected
       assetsToSelect.forEach((assetToSelect) => {
         if (
           assets.some((asset) => asset.farmName === assetToSelect.value.farmName && asset.id === assetToSelect.value.id)
@@ -239,9 +142,6 @@ export default {
         this.onChange(assets);
       }
     },
-    clearSelection() {
-      this.onChange(null);
-    },
   },
 };
 </script>
@@ -249,30 +149,6 @@ export default {
 <style scoped lang="scss">
 .chip-no-wrap {
   white-space: nowrap;
-}
-
-:deep(.blue-chip, .orange-chip, .green-chip) {
-  display: inline-flex;
-  border: 1px rgb(var(--v-theme-focus)) solid;
-  background-color: white;
-  color: rgb(var(--v-theme-focus));
-  border-radius: 0.4rem;
-  font-weight: bold;
-  font-size: 80%;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
-  vertical-align: middle;
-}
-
-:deep(.green-chip) {
-  color: #46b355;
-  border: 1px #46b355 solid;
-}
-
-:deep(.orange-chip) {
-  color: #f38d49;
-  border: 1px #f38d49 solid;
 }
 
 .v-list-item--disabled {

@@ -1,20 +1,26 @@
 <template>
-  <div style="height: 100%; max-height: 100%">
+  <div
+    class="basicListContainer"
+    style="height: 100%; max-height: 100%"
+    :style="route.query.minimal_ui ? 'padding:0px!important' : ''">
     <app-draft-component
-      v-if="!loading && !hasError"
-      :survey="survey"
-      :submission="submission"
+      v-if="!state.loading && !state.hasError"
+      :survey="state.survey"
+      :submission="state.submission"
       :persist="!isResubmission() && !isProxySubmission()"
-      @submit="submit"
-    />
-    <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
+      @submit="submit" />
+    <div v-else-if="state.loading && !state.hasError" class="d-flex align-center justify-center" style="height: 100%">
       <a-progress-circular :size="50" />
     </div>
-    <div v-else-if="hasError" class="text-center mt-8">
-      {{ errorMessage }} <router-link :to="`/surveys/${$route.params.surveyId}`">Back to survey.</router-link>
+    <div v-else-if="state.hasError" class="text-center mt-8">
+      {{ state.errorMessage }}
+      <router-link :to="`/groups/${id}/surveys`">Back to survey list</router-link>
     </div>
 
-    <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
+    <confirm-leave-dialog
+      ref="confirmLeaveDialogRef"
+      title="Confirm Exit Draft"
+      v-if="state.submission && state.survey">
       <p class="font-weight-bold" v-if="isResubmission()">
         Drafts are not saved when resubmitting a submission. Any changes will be lost if you leave.
       </p>
@@ -25,12 +31,12 @@
     </confirm-leave-dialog>
 
     <app-submission-archive-dialog
-      v-if="submission && survey"
-      v-model="showResubmissionDialog"
+      v-if="state.submission && state.survey"
+      v-model="state.showResubmissionDialog"
       maxWidth="50rem"
       labelConfirm="Edit anyway"
       @cancel="abortEditSubmitted"
-      @confirm="(reason) => (submission.meta.archivedReason = reason)"
+      @confirm="(reason) => (state.submission.meta.archivedReason = reason)"
       reason="RESUBMIT"
       persistent>
       <template v-slot:title>Confirm Submission Edit</template>
@@ -40,37 +46,37 @@
       </template>
     </app-submission-archive-dialog>
 
-    <submitting-dialog v-model="submitting" />
+    <submitting-dialog v-model="state.submitting" />
     <result-dialog
       v-model="showResult"
       :items="resultItems"
-      title="Result of Submission"
+      title="Survey Result"
       persistent
-      :to="
-        survey && {
-          name: 'surveys-detail',
-          params: { id: survey._id },
-          query: { minimal_ui: $route.query.minimal_ui },
-        }
-      "
-      :survey="survey"
-      :submission="submission"
+      :to="{
+        name: 'group-surveys',
+        params: { id },
+        query: { minimal_ui: route.query.minimal_ui },
+      }"
+      :survey="state.survey"
+      :submission="state.submission"
       @close="onCloseResultDialog" />
 
     <result-dialog
-      v-model="showApiComposeErrors"
-      :items="apiComposeErrors"
+      v-model="state.showApiComposeErrors"
+      :items="state.apiComposeErrors"
       title="ApiCompose Errors"
-      :survey="survey"
-      :submission="submission"
-      @close="showApiComposeErrors = false" />
+      :survey="state.survey"
+      :submission="state.submission"
+      @close="state.showApiComposeErrors = false" />
   </div>
 </template>
 
-<script>
+<script setup>
+import { reactive, ref, toRaw, watch } from 'vue';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { useQueryClient } from '@tanstack/vue-query';
 import api from '@/services/api.service';
-import appMixin from '@/components/mixin/appComponent.mixin';
-import resultMixin from '@/components/ui/ResultsMixin';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
@@ -78,275 +84,354 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import { createSubmissionFromSurvey, checkAllowedToSubmit, checkAllowedToResubmit } from '@/utils/submissions';
-import { autoSelectActiveGroup } from '@/utils/memberships';
+import { checkAllowedToResubmit, checkAllowedToSubmit, createSubmissionFromSurvey } from '@/utils/submissions';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
+import { useAllDrafts, useSyncDrafts } from '../../queries';
+import { useResults } from '../../components/ui/results';
+import { fetchSurvey } from '@/components/survey/survey.js';
+import { useGroup } from '@/components/groups/group';
+import { useNavigation } from '@/components/navigation';
 
-export default {
-  mixins: [appMixin, resultMixin],
-  components: {
-    appDraftComponent,
-    resultDialog,
-    ConfirmLeaveDialog,
-    SubmittingDialog,
-    appSubmissionArchiveDialog,
+const props = defineProps({
+  routeAction: {
+    required: true,
+    type: String, // 'new' or 'edit'
   },
-  data() {
-    return {
-      submission: null,
-      survey: null,
-      loading: false,
-      submitting: false,
-      isSubmitted: false,
-      hasError: false,
-      errorMessage: '',
-      showResubmissionDialog: false,
-      apiComposeErrors: [],
-      showApiComposeErrors: false,
-    };
+  submissionId: {
+    required: false,
+    type: String,
   },
-  methods: {
-    isResubmission() {
-      return this.submission && this.submission.meta && this.submission.meta.dateSubmitted;
-    },
-    isProxySubmission() {
-      return this.submission && this.submission.meta && this.submission.meta.submitAsUser;
-    },
-    abortEditSubmitted() {
-      this.$store.dispatch('submissions/remove', this.submission._id);
-      // TODO: should we remove the router guard in this situation? otherwise it pops up a modal asking if the user
-      // is sure they want to leave. User can click 'cancel' when prompted whether they want to "Confirm editing submitted",
-      // which deleted the submission from the store, then when prompted whether they want to leave the current draft
-      // they can also click cancel, which may cause an error
-      this.$router.push({ name: 'my-submissions' });
-    },
-    addReadyToSubmit(status) {
-      return [
-        ...status.filter(({ type }) => type !== 'READY_TO_SUBMIT'),
-        {
-          type: 'READY_TO_SUBMIT',
-          value: {
-            at: new Date().toISOString(),
-          },
-        },
-      ];
-    },
-    onCloseResultDialog() {
-      // send message to parent iframe that submission was completed
-      const message = this.isSubmitted
-        ? {
-            type: 'SUBMISSION_RESULT_SUCCESS_CLOSE',
-            payload: { submissionId: this.submission._id },
-          }
-        : {
-            type: 'SUBMISSION_RESULT_ERROR_CLOSE',
-            payload: {},
-          };
-      window.parent.postMessage(message, '*');
-    },
-    async submit({ payload }) {
-      this.apiComposeErrors = getApiComposeErrors(this.survey, payload);
-      if (this.apiComposeErrors.length > 0) {
-        this.showApiComposeErrors = true;
-        return;
-      }
-
-      this.submitting = true;
-      this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
-
-      let message;
-      try {
-        await uploadFileResources(this.$store, this.survey, payload, true);
-        const response = payload.meta.dateSubmitted
-          ? await api.put(`/submissions/${payload._id}`, payload)
-          : await api.post('/submissions', payload);
-        this.result({ response });
-        this.isSubmitted = true;
-        await this.$store.dispatch('submissions/remove', this.submission._id);
-        message = {
-          type: 'SUBMISSION_SUBMIT_SUCCESS',
-          payload: { submissionId: this.submission._id },
-        };
-      } catch (error) {
-        console.log('Draft submit error:', error);
-        await db.persistSubmission(this.submission);
-        this.result({ error });
-        message = {
-          type: 'SUBMISSION_SUBMIT_ERROR',
-          payload: {},
-        };
-      } finally {
-        this.submitting = false;
-        // Sent message to parent frame that Submission succeeded or failed
-        window.parent.postMessage(message, '*');
-      }
-    },
+  surveyId: {
+    required: true,
+    type: String,
   },
-  async created() {
-    this.loading = true;
-    const { surveyId } = this.$route.params;
-
-    try {
-      this.survey = (await api.get(`/surveys/${surveyId}?version=latest`)).data;
-    } catch (error) {
-      this.hasError = true;
-      this.errorMessage = 'Survey not found.';
-      this.loading = false;
-      return;
-    }
-    const isLoginRequired = this.survey.meta.submissions === 'user' || this.survey.meta.submissions === 'group';
-    if (isLoginRequired && !this.$store.getters['auth/isLoggedIn']) {
-      this.$router.push({
-        name: 'auth-login',
-        query: { redirect: this.$route.path, autoJoin: true },
-      });
-      return;
-    }
-
-    const surveyResourcesLoaded = this.survey.resources
-      ? this.$store.dispatch('resources/fetchResources', this.survey.resources)
-      : Promise.resolve();
-
-    const user = this.$store.getters['auth/user'];
-    try {
-      await this.$store.dispatch('memberships/getUserMemberships', user._id);
-    } catch (error) {
-      this.hasError = true;
-      this.errorMessage = 'Error fetching user memberships. Please refresh to try again.';
-      this.loading = false;
-      return;
-    }
-
-    const allowedToSubmit = checkAllowedToSubmit(
-      this.survey,
-      this.$store.getters['auth/isLoggedIn'],
-      this.$store.getters['memberships/groups']
-    );
-    if (!allowedToSubmit.allowed) {
-      this.hasError = true;
-      this.errorMessage = allowedToSubmit.message;
-      this.loading = false;
-      return;
-    }
-
-    // If the user is on the new-submission route, initialize a new submission and then redirect to the edit-submission route for that submission
-    if (this.$route.name === 'new-submission') {
-      const { group, submitAsUserId } = this.$route.query;
-      if (group) {
-        // see analysis in https://gitlab.com/our-sci/software/surveystack/-/merge_requests/230#note_1286909610
-        await autoSelectActiveGroup(this.$store, group);
-      }
-
-      const createSubmissionConfig = { survey: this.survey, version: this.survey.latestVersion };
-      if (submitAsUserId) {
-        try {
-          const { data: submitAsUser } = await api.get(`/users/${submitAsUserId}`);
-          createSubmissionConfig.submitAsUser = submitAsUser;
-        } catch (error) {
-          this.hasError = true;
-          this.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
-          this.loading = false;
-          return;
-        }
-      }
-
-      this.submission = createSubmissionFromSurvey(createSubmissionConfig);
-      this.$router.replace({ name: 'edit-submission', params: { surveyId, submissionId: this.submission._id } });
-    } else if (this.$route.name === 'edit-submission') {
-      const { submissionId } = this.$route.params;
-      await this.$store.dispatch('submissions/fetchLocalSubmissions');
-      const localSubmission = this.$store.getters['submissions/getSubmission'](submissionId);
-      if (localSubmission) {
-        this.submission = localSubmission;
-      } else {
-        let remoteSubmission;
-        try {
-          remoteSubmission = await this.$store.dispatch('submissions/fetchRemoteSubmission', submissionId);
-        } catch (error) {
-          // Swallow this error for now. This case is handled below where we set a 'Submission not found.' error message if there is no submission.
-        }
-        if (remoteSubmission) {
-          this.submission = remoteSubmission;
-        }
-      }
-      if (!this.submission) {
-        this.hasError = true;
-        this.errorMessage = 'Submission not found.';
-        this.loading = false;
-        return;
-      }
-    }
-
-    if (this.isResubmission()) {
-      const allowedToResubmit = checkAllowedToResubmit(
-        this.submission,
-        this.$store.getters['memberships/memberships'],
-        user._id
-      );
-      if (!allowedToResubmit) {
-        this.hasError = true;
-        this.errorMessage = 'You are not allowed to edit this submission.';
-        this.loading = false;
-        return;
-      }
-
-      const editSubmissionReason = this.$route.query.reason;
-      if (editSubmissionReason && ARCHIVE_REASONS.includes(editSubmissionReason)) {
-        this.submission.meta.archivedReason = editSubmissionReason;
-      } else {
-        this.showResubmissionDialog = true;
-      }
-    }
-
-    if (this.survey.latestVersion !== this.submission.meta.survey.version) {
-      try {
-        this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
-          id: this.submission.meta.survey.id,
-          version: this.submission.meta.survey.version,
-        });
-      } catch (error) {
-        this.hasError = true;
-        this.errorMessage = 'Survey not found.';
-        this.loading = false;
-        return;
-      }
-    }
-
-    const cleanSubmission = createSubmissionFromSurvey({
-      survey: this.survey,
-      version: this.submission.meta.survey.version,
-    });
-    // initialize data in case anything is missing from data
-    defaultsDeep(this.submission.data, cleanSubmission.data);
-
-    // Set proxy header if resubmit by proxy or admin.
-    // Otherwise, remove it
-    if (this.isProxySubmission()) {
-      api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
-    } else {
-      api.removeHeader('x-delegate-to');
-    }
-
-    await surveyResourcesLoaded;
-    this.loading = false;
+  submitAsUserId: {
+    required: false,
+    type: String,
   },
-  beforeRouteLeave(to, from, next) {
-    if (from.name === 'new-submission' && to.name === 'edit-submission') {
-      // This is a programmatic navigation that doesn't leave this component (the two routes share this component)
-      // We don't need the confirm leave dialog in this case.
-      return next(true);
-    }
-
-    if (this.submission && this.survey && !this.isSubmitted && !this.hasError) {
-      this.$refs.confirmLeaveDialog.open(next);
-      return;
-    }
-
-    api.removeHeader('x-delegate-to');
-
-    next(true);
+  id: {
+    // group id from route
+    required: true,
+    type: String,
   },
+});
+
+const { showResult, resultItems, result, reset: resetResults } = useResults();
+const router = useRouter();
+const route = useRoute();
+const store = useStore();
+const confirmLeaveDialogRef = ref();
+const queryClient = useQueryClient();
+const { isGroupVisitor } = useGroup();
+const { forceDesktopFullscreen } = useNavigation();
+
+const initialState = {
+  submission: null,
+  survey: null,
+  loading: true,
+  submitting: false,
+  isSubmitted: false,
+  hasError: false,
+  errorMessage: '',
+  showResubmissionDialog: false,
+  apiComposeErrors: [],
+  showApiComposeErrors: false,
 };
+const state = reactive({ ...initialState });
+const { isPending: allDraftsIsPending, data: allDraftsData, isError: allDraftsIsError } = useAllDrafts();
+const { mutate: syncDrafts } = useSyncDrafts();
+
+const resetComponentState = () => {
+  Object.assign(state, initialState);
+  resetResults();
+};
+
+watch(
+  [() => props.submissionId, () => props.routeAction],
+  ([newSubmissionId, newRouteAction], [oldSubmissionId, oldRouteAction]) => {
+    const isNavigatingFromEditToNew = oldRouteAction === 'edit' && newRouteAction === 'new';
+    const isNavigatingToNewSubmissionId =
+      oldRouteAction === 'edit' && newRouteAction === 'edit' && oldSubmissionId !== newSubmissionId;
+    const submissionChanged = isNavigatingFromEditToNew || isNavigatingToNewSubmissionId;
+    if (submissionChanged) {
+      resetComponentState();
+      init();
+    }
+
+    // When a visitor starts a survey, display as a full screen
+    if (oldRouteAction === 'new' && newRouteAction === 'edit') {
+      if (isGroupVisitor()) {
+        forceDesktopFullscreen.value = true;
+      }
+    }
+  }
+);
+
+const handleLeave = (next) => (isLeaving) => {
+  if (isLeaving) {
+    syncDrafts();
+  }
+  next(isLeaving);
+};
+onBeforeRouteUpdate((to, from, next) => {
+  if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
+    confirmLeaveDialogRef.value.open(handleLeave(next));
+    return;
+  }
+  api.removeHeader('x-delegate-to');
+  next(true);
+});
+onBeforeRouteLeave((to, from, next) => {
+  if (from.name === 'group-survey-submissions-new' && to.name === 'group-survey-submissions-edit') {
+    // This is a programmatic navigation that doesn't leave this component (the two routes share this component)
+    // We don't need the confirm leave dialog in this case.
+    return next(true);
+  }
+
+  if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
+    confirmLeaveDialogRef.value.open(handleLeave(next));
+    return;
+  }
+  api.removeHeader('x-delegate-to');
+  next(true);
+});
+
+function isResubmission() {
+  return state.submission.meta.isDraft === false && state.submission?.meta?.dateSubmitted;
+}
+
+function isProxySubmission() {
+  return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
+}
+
+function abortEditSubmitted() {
+  router.push(`/groups/${props.id}/my-submissions`);
+}
+
+function addReadyToSubmit(status) {
+  return [
+    ...status.filter(({ type }) => type !== 'READY_TO_SUBMIT'),
+    {
+      type: 'READY_TO_SUBMIT',
+      value: {
+        at: new Date().toISOString(),
+      },
+    },
+  ];
+}
+
+function onCloseResultDialog() {
+  // send message to parent iframe that submission was completed
+  const message = state.isSubmitted
+    ? {
+        type: 'SUBMISSION_RESULT_SUCCESS_CLOSE',
+        payload: { submissionId: state.submission._id },
+      }
+    : {
+        type: 'SUBMISSION_RESULT_ERROR_CLOSE',
+        payload: {},
+      };
+  window.parent.postMessage(message, '*');
+}
+
+async function submit({ payload }) {
+  state.apiComposeErrors = getApiComposeErrors(state.survey, payload);
+  if (state.apiComposeErrors.length > 0) {
+    state.showApiComposeErrors = true;
+    return;
+  }
+
+  state.submitting = true;
+  state.submission.meta.status = addReadyToSubmit(state.submission.meta.status || []);
+
+  let message;
+  try {
+    await uploadFileResources(store, state.survey, payload, true);
+    const response = isResubmission()
+      ? await api.put(`/submissions/${payload._id}`, payload)
+      : await api.post('/submissions', payload);
+    result({ response });
+    state.isSubmitted = true;
+    await db.deleteSubmission(state.submission._id);
+    queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+    queryClient.invalidateQueries({ queryKey: ['remoteDrafts'] });
+    message = {
+      type: 'SUBMISSION_SUBMIT_SUCCESS',
+      payload: { submissionId: state.submission._id },
+    };
+  } catch (error) {
+    console.log('Draft submit error:', error);
+    await db.persistSubmission(state.submission);
+    queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+    result({ error });
+    message = {
+      type: 'SUBMISSION_SUBMIT_ERROR',
+      payload: {},
+    };
+  } finally {
+    state.submitting = false;
+    // Sent message to parent frame that Submission succeeded or failed
+    window.parent.postMessage(message, '*');
+  }
+}
+
+async function init() {
+  state.loading = true;
+
+  try {
+    state.survey = await fetchSurvey({ id: props.surveyId });
+  } catch (error) {
+    if (!state.survey) {
+      state.hasError = true;
+      state.errorMessage = 'Survey not found.';
+      state.loading = false;
+      return;
+    }
+  }
+  const isLoginRequired = state.survey.meta.submissions === 'user' || state.survey.meta.submissions === 'group';
+  if (isLoginRequired && !store.getters['auth/isLoggedIn']) {
+    router.push({
+      name: 'auth-login',
+      query: { redirect: route.path, autoJoin: true },
+    });
+    return;
+  }
+
+  const surveyResourcesLoaded = state.survey.resources
+    ? store.dispatch('resources/fetchResources', state.survey.resources)
+    : Promise.resolve();
+
+  const user = store.getters['auth/user'];
+  try {
+    await store.dispatch('memberships/getUserMemberships', user._id);
+  } catch (error) {
+    state.hasError = true;
+    state.errorMessage = 'Error fetching user memberships. Please refresh to try again.';
+    state.loading = false;
+    return;
+  }
+
+  const allowedToSubmit = checkAllowedToSubmit(
+    state.survey,
+    store.getters['auth/isLoggedIn'],
+    store.getters['memberships/groups']
+  );
+  if (!allowedToSubmit.allowed) {
+    state.hasError = true;
+    state.errorMessage = allowedToSubmit.message;
+    state.loading = false;
+    return;
+  }
+
+  // If the user is on the group-survey-submissions-new route, initialize a new submission and then redirect to the group-survey-submissions-edit route for that submission
+  if (route.name === 'group-survey-submissions-new') {
+    const createSubmissionConfig = {
+      survey: state.survey,
+      version: state.survey.latestVersion,
+    };
+    if (props.submitAsUserId) {
+      try {
+        const { data: submitAsUser } = await api.get(`/users/${props.submitAsUserId}`);
+        createSubmissionConfig.submitAsUser = submitAsUser;
+      } catch (error) {
+        state.hasError = true;
+        state.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
+        state.loading = false;
+        return;
+      }
+    }
+    state.submission = createSubmissionFromSurvey(createSubmissionConfig);
+    await router.replace({
+      name: 'group-survey-submissions-edit',
+      params: { submissionId: state.submission._id },
+      query: route.query.minimal_ui ? { minimal_ui: route.query.minimal_ui } : undefined,
+    });
+  } else if (route.name === 'group-survey-submissions-edit') {
+    const allDraftsReady = new Promise((resolve, reject) => {
+      watch(
+        allDraftsIsPending,
+        (newValue, oldValue) => {
+          if (newValue === false) {
+            resolve();
+          }
+        },
+        { immediate: true }
+      );
+    });
+    const remoteSubmissionReady = api.get(`/submissions/${props.submissionId}?pure=1`);
+    const [allDraftsReadySettled, remoteSubmissionReadySettled] = await Promise.allSettled([
+      allDraftsReady,
+      remoteSubmissionReady,
+    ]);
+    if (remoteSubmissionReadySettled.status === 'fulfilled') {
+      state.submission = remoteSubmissionReadySettled.value.data;
+    } else {
+      state.submission = toRaw(allDraftsData.value.find((draft) => draft._id === props.submissionId));
+    }
+
+    if (!state.submission) {
+      state.hasError = true;
+      state.errorMessage = 'Submission not found.';
+      state.loading = false;
+      return;
+    }
+  }
+
+  if (isResubmission()) {
+    const allowedToResubmit = checkAllowedToResubmit(
+      state.submission,
+      store.getters['memberships/memberships'],
+      user._id
+    );
+    if (!allowedToResubmit) {
+      state.hasError = true;
+      state.errorMessage = 'You are not allowed to edit this submission.';
+      state.loading = false;
+      return;
+    }
+
+    const editSubmissionReason = route.query.reason;
+    if (editSubmissionReason && ARCHIVE_REASONS.includes(editSubmissionReason)) {
+      state.submission.meta.archivedReason = editSubmissionReason;
+    } else {
+      state.showResubmissionDialog = true;
+    }
+  }
+
+  if (state.survey.latestVersion !== state.submission.meta.survey.version) {
+    try {
+      state.survey = await fetchSurvey({
+        id: state.submission.meta.survey.id,
+        version: state.submission.meta.survey.version,
+      });
+    } catch (error) {
+      state.hasError = true;
+      state.errorMessage = 'Survey not found.';
+      state.loading = false;
+      return;
+    }
+  }
+
+  const cleanSubmission = createSubmissionFromSurvey({
+    survey: state.survey,
+    version: state.submission.meta.survey.version,
+  });
+  // initialize data in case anything is missing from data
+  defaultsDeep(state.submission.data, cleanSubmission.data);
+
+  // Set proxy header if resubmit by proxy or admin.
+  // Otherwise, remove it
+  if (isProxySubmission()) {
+    api.setHeader('x-delegate-to', state.submission.meta.submitAsUser._id);
+  } else {
+    api.removeHeader('x-delegate-to');
+  }
+
+  await surveyResourcesLoaded;
+  state.loading = false;
+}
+
+init();
 </script>

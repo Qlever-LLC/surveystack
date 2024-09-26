@@ -64,7 +64,7 @@
 
           <div v-if="survey && submission && isOnline()" class="mt-6 d-flex flex-column align-stretch">
             <a-btn color="primary" variant="flat" dense :loading="download.loading" @click="downloadSubmission">
-              Download Submission
+              Download Response
             </a-btn>
             <a-btn
               v-if="isLoggedIn"
@@ -74,7 +74,7 @@
               dense
               :loading="emailing.loading"
               @click="emailMe">
-              Email Submission
+              Email Response
             </a-btn>
           </div>
         </a-card-text>
@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import store from '@/store';
+
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
@@ -185,7 +187,7 @@ export default {
 
         if (res) {
           const disposition = parseDisposition(res.headers['content-disposition']);
-          downloadExternal(res.data, disposition.parameters.filename);
+          await downloadExternal(store, res.data, disposition.parameters.filename);
         }
       } catch (e) {
         console.error('Failed to download PDF of submission', e);

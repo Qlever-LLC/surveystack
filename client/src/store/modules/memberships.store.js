@@ -1,19 +1,17 @@
 import api from '@/services/api.service';
-import { autoSelectActiveGroup } from '@/utils/memberships';
-import { GroupService, MembershipService } from '@/services/storage.service';
-import { get } from 'lodash';
+import { MembershipService } from '@/services/storage.service';
+
+import { isOnline } from '@/utils/surveyStack';
 
 const createInitialState = () => ({
   status: MembershipService.getStatus(),
   memberships: MembershipService.getUserMemberships(),
-  activeGroup: GroupService.getActiveGroup(),
 });
 
 const initialState = createInitialState();
 
 const getters = {
   status: (state) => state.status,
-  activeGroup: (state) => state.activeGroup,
   memberships: (state) => state.memberships,
   getPrefixedMemberships:
     (state) =>
@@ -31,7 +29,7 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  getUserMemberships({ commit, rootGetters }, userId) {
+  getUserMemberships({ commit }, userId) {
     if (!userId) {
       return new Promise((resolve) => {
         resolve([]);
@@ -55,37 +53,6 @@ const actions = {
         });
     });
   },
-  setActiveGroup({ commit }, group) {
-    try {
-      GroupService.saveActiveGroup(group);
-      commit('set_active_group', group);
-    } catch (err) {
-      console.log(err);
-      GroupService.clear();
-    }
-  },
-  async tryAutoJoinAndSelectGroup(store) {
-    if (store.rootGetters['auth/isLoggedIn']) {
-      try {
-        const options = {
-          getters: store.rootGetters,
-          dispatch: (path, payload) => store.dispatch(path, payload, { root: true }),
-        };
-        // try to auto join group if this is a whitelabel
-        if (store.rootGetters['whitelabel/isWhitelabel']) {
-          const partnerId = store.rootGetters['whitelabel/partner'].id;
-          await api.post(`/memberships/join-group?id=${partnerId}`);
-          await autoSelectActiveGroup(options, partnerId);
-        } else {
-          // auto select the first group of the user
-          await autoSelectActiveGroup(options, null, true);
-        }
-      } catch (error) {
-        store.dispatch('feedback/add', get(error, 'response.data.message') || error, { root: true });
-        console.error(error);
-      }
-    }
-  },
 };
 
 const mutations = {
@@ -103,9 +70,6 @@ const mutations = {
     state.status = 'error';
     state.user = {};
     state.header = '';
-  },
-  set_active_group(state, group) {
-    state.activeGroup = group;
   },
 };
 

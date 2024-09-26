@@ -17,6 +17,7 @@ import { queryParam } from '../helpers';
 import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
 import { getServerSelfOrigin } from '../services/auth.service';
 const col = 'submissions';
+const USERS_COLLECTION = 'users';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
 
@@ -255,7 +256,7 @@ const createRelevanceStage = () => {
   };
 };
 
-export const buildPipeline = async (req, res) => {
+const buildPipeline = async (req, res) => {
   const pipeline = [];
 
   let match = {};
@@ -270,6 +271,10 @@ export const buildPipeline = async (req, res) => {
       $match: { 'meta.survey.id': new ObjectId(req.query.survey) },
     });
   }
+
+  pipeline.push({
+    $match: { 'meta.isDraft': false },
+  });
 
   // archived
   const archivedMatch = { 'meta.archived': { $ne: true } };
@@ -320,7 +325,7 @@ export const buildPipeline = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRoleForRequest(res, groupId);
 
     if (hasAdminRights) {
-      addUserDetailsStage(pipeline);
+      addUserDetailsStage(pipeline, req.query.userIdCorrespondingToSearch);
     }
   }
 
@@ -431,7 +436,7 @@ const addCreatorDetailStage = (pipeline, user) => {
   );
 };
 
-const addUserDetailsStage = (pipeline) => {
+const addUserDetailsStage = (pipeline, userIdCorrespondingToSearch) => {
   pipeline.push({
     $lookup: {
       from: 'users',
@@ -476,36 +481,35 @@ const addUserDetailsStage = (pipeline) => {
   pipeline.push({
     $unwind: { path: '$meta.resubmitterUserDetail', preserveNullAndEmptyArrays: true },
   });
+
+  if (userIdCorrespondingToSearch) {
+    const userIds = userIdCorrespondingToSearch.map((id) => ObjectId(id));
+    pipeline.push({
+      $match: {
+        'meta.creator': { $in: userIds },
+      },
+    });
+  }
 };
 
 const getSubmissionsPage = async (req, res) => {
-  let skip = 0;
-  let limit = DEFAULT_LIMIT;
-
   const pipeline = await buildPipeline(req, res);
+  const skip = getSkip(req);
+  const limit = getLimit(req);
 
-  // skip
-  if (req.query.skip) {
-    try {
-      const querySkip = Number.parseInt(req.query.skip);
-      if (querySkip > 0) {
-        skip = querySkip;
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
-    }
-  }
-
-  // limit
-  if (req.query.limit) {
-    try {
-      const queryLimit = Number.parseInt(req.query.limit);
-      if (queryLimit > 0) {
-        limit = queryLimit;
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
-    }
+  if (req.query.search) {
+    const pipelineSearchName = [
+      {
+        $match: {
+          name: {
+            $regex: req.query.search,
+            $options: 'i',
+          },
+        },
+      },
+    ];
+    const users = await db.collection(USERS_COLLECTION).aggregate(pipelineSearchName).toArray();
+    req.query.userIdCorrespondingToSearch = users.map((user) => new ObjectId(user._id));
   }
 
   // pagination stage
@@ -545,36 +549,9 @@ const getSubmissionsPage = async (req, res) => {
 };
 
 const getSubmissions = async (req, res) => {
-  let skip = 0;
-  let limit = DEFAULT_LIMIT;
-
   const pipeline = await buildPipeline(req, res);
-
-  // skip
-  if (req.query.skip) {
-    try {
-      const querySkip = Number.parseInt(req.query.skip);
-      if (querySkip > 0) {
-        skip = querySkip;
-        pipeline.push({ $skip: skip });
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
-    }
-  }
-
-  // limit
-  if (req.query.limit) {
-    try {
-      const queryLimit = Number.parseInt(req.query.limit);
-      if (queryLimit > 0) {
-        limit = queryLimit;
-        pipeline.push({ $limit: limit });
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
-    }
-  }
+  addSkipToPipeline(pipeline, req);
+  addLimitToPipeline(pipeline, req);
 
   const databaseOperationStartTime = new Date();
   const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
@@ -586,40 +563,48 @@ const getSubmissions = async (req, res) => {
   return res.send(entities);
 };
 
-const addSkipToPipeline = (pipeline, reqSkip) => {
-  let skip = 0;
-  if (reqSkip) {
+const getSkip = (req) => {
+  if (req.query.skip) {
     try {
-      const querySkip = Number.parseInt(reqSkip);
-      if (querySkip > 0) {
-        skip = querySkip;
-        pipeline.push({ $skip: skip });
-      }
+      const skip = Number.parseInt(req.query.skip);
+      return skip > 0 ? skip : 0;
     } catch (error) {
-      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${req.query.skip}`);
     }
+  }
+  return 0;
+};
+
+const getLimit = (req) => {
+  if (req.query.limit) {
+    try {
+      const limit = Number.parseInt(req.query.limit);
+      return limit > 0 ? limit : DEFAULT_LIMIT;
+    } catch (error) {
+      throw boom.badRequest(`Bad query parameter limit: ${req.query.limit}`);
+    }
+  }
+  return DEFAULT_LIMIT;
+};
+
+const addSkipToPipeline = (pipeline, req) => {
+  const skip = getSkip(req);
+  if (req.query.skip && skip > 0) {
+    pipeline.push({ $skip: skip });
   }
 };
 
-const addLimitToPipeline = (pipeline, reqLimit) => {
-  let limit = DEFAULT_LIMIT;
-  if (reqLimit) {
-    try {
-      const queryLimit = Number.parseInt(reqLimit);
-      if (queryLimit > 0) {
-        limit = queryLimit;
-        pipeline.push({ $limit: limit });
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
-    }
+const addLimitToPipeline = (pipeline, req) => {
+  const limit = getLimit(req);
+  if (req.query.limit && limit > 0) {
+    pipeline.push({ $limit: limit });
   }
 };
 
 const getSubmissionsCsv = async (req, res) => {
   const pipeline = await buildPipeline(req, res);
-  addSkipToPipeline(pipeline, req.query.skip);
-  addLimitToPipeline(pipeline, req.query.limit);
+  addSkipToPipeline(pipeline, req);
+  addLimitToPipeline(pipeline, req);
 
   const formatOptions = {
     expandAllMatrices: queryParam(req.query.expandAllMatrices),
@@ -719,8 +704,12 @@ const getSubmission = async (req, res) => {
     pipeline.push(relevanceStage);
   }
 
-  // Fetch by id
-  pipeline.push({ $match: { _id: new ObjectId(id) } });
+  pipeline.push({
+    $match: {
+      _id: new ObjectId(id),
+      'meta.isDraft': false,
+    },
+  });
 
   // Redact
   const redactStage = createRedactStage(user, roles);
@@ -757,7 +746,15 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   entity.meta.status = [];
   entity.meta.isDraft = false;
 
-  const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
+  const [existingSubmission, survey] = await Promise.all([
+    db.collection('submissions').findOne({ _id: new ObjectId(submission._id) }),
+    db.collection('surveys').findOne({ _id: entity.meta.survey.id }),
+  ]);
+
+  if (existingSubmission && !existingSubmission.meta.isDraft) {
+    throw boom.conflict('Submission already exists.');
+  }
+
   if (!survey) {
     throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
   }
@@ -798,15 +795,22 @@ const createSubmission = async (req, res) => {
     try {
       return await withTransaction(session, async () => {
         const submissionsToInsert = submissionEntities.map(({ entity }) => entity);
+        const upsertOperations = submissionsToInsert.map((submission) => ({
+          updateOne: {
+            filter: { _id: submission._id },
+            update: { $set: submission },
+            upsert: true,
+          },
+        }));
 
-        const insertResult = await db.collection(col).insertMany(submissionsToInsert);
+        const bulkWriteResult = await db.collection(col).bulkWrite(upsertOperations);
 
-        if (submissionsToInsert.length !== Object.keys(insertResult.insertedIds).length) {
+        if (!bulkWriteResult.result.ok) {
           await session.abortTransaction();
           return;
         }
 
-        return insertResult;
+        return bulkWriteResult;
       });
     } catch (error) {
       throw boom.boomify(error);
@@ -825,6 +829,9 @@ const updateSubmission = async (req, res) => {
 
   if (req.body.meta.isDraft === true) {
     throw boom.badData('Draft submissions cannot but updated with this endpoint.');
+  }
+  if (res.locals.existing.meta.isDraft === true) {
+    throw boom.conflict('Draft submissions cannot but updated with this endpoint.');
   }
 
   let newSubmission = await sanitize(req.body);
@@ -884,6 +891,10 @@ const updateSubmission = async (req, res) => {
 const bulkReassignSubmissions = async (req, res) => {
   const { group, creator, ids } = req.body;
   let submissions = res.locals.existing;
+
+  if (submissions.some((submission) => submission.meta.isDraft === true)) {
+    throw boom.conflict('You cannot reassign a draft.');
+  }
 
   const surveyIds = [
     ...new Set(submissions.map((submission) => submission.meta.survey.id.toString())),
@@ -997,6 +1008,9 @@ const reassignSubmission = async (req, res) => {
   const { body } = req;
 
   let existing = res.locals.existing;
+  if (existing.meta.isDraft) {
+    throw boom.conflict('You cannot reassign a draft.');
+  }
   const updatedRevision = existing.meta.revision + 1;
 
   const survey = await db.collection('surveys').findOne({ _id: existing.meta.survey.id });
@@ -1073,6 +1087,13 @@ const archiveSubmissions = async (req, res) => {
     ids = [id];
   }
 
+  const submissionIsDraft = Array.isArray(res.locals.existing)
+    ? res.locals.existing.some((submission) => submission.meta.isDraft === true)
+    : res.locals.existing.meta.isDraft === true;
+  if (submissionIsDraft) {
+    throw boom.conflict('You cannot archive a draft.');
+  }
+
   const { reason } = req.query;
   let archived = true;
 
@@ -1100,6 +1121,13 @@ const deleteSubmissions = async (req, res) => {
     ids = [id];
   }
 
+  const submissionIsDraft = Array.isArray(res.locals.existing)
+    ? res.locals.existing.some((submission) => submission.meta.isDraft === true)
+    : res.locals.existing.meta.isDraft === true;
+  if (submissionIsDraft) {
+    throw boom.conflict('You cannot delete a draft with this endpoint. Use /sync-draft, instead.');
+  }
+
   const idSelector = { $in: ids.map(ObjectId) };
   const submissionQuery = { _id: idSelector };
   // TODO use transactions instead of this pre-check
@@ -1113,6 +1141,9 @@ const deleteSubmissions = async (req, res) => {
 };
 
 const getSubmissionPdf = async (req, res) => {
+  if (res.locals.existing.meta.isDraft === true) {
+    throw boom.conflict('You cannot get a pdf for a draft.');
+  }
   const [submission] = await db
     .collection(col)
     .aggregate([
@@ -1211,9 +1242,10 @@ const postSubmissionPdf = async (req, res) => {
 };
 
 const sendPdfLink = async (req, res) => {
-  const submission = await db.collection(col).findOne({ _id: new ObjectId(req.params.id) });
-  if (!submission) {
-    throw boom.notFound(`No entity found for id: ${req.params.id}`);
+  const submission = res.locals.existing;
+
+  if (submission.meta.isDraft === true) {
+    throw boom.conflict('You cannot send a pdf link for a draft.');
   }
 
   // Send to submitter
@@ -1227,56 +1259,10 @@ const sendPdfLink = async (req, res) => {
     btnText: 'Download',
   });
 
-  // /* TODO: - Do we need to send pdf link to creator now ?
-  //  * Note that there's no email subscription options there in the app
-  //  * Or just comment this out this block in this release?
-  //  */
-
-  // //  Fetch creator of the survey
-  // const [survey] = await db
-  //   .collection('surveys')
-  //   .aggregate([
-  //     {
-  //       $lookup: {
-  //         from: 'users',
-  //         let: { creatorId: '$meta.creator' },
-  //         pipeline: [
-  //           { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
-  //           { $project: { email: 1 } },
-  //         ],
-  //         as: 'creator',
-  //       },
-  //     },
-  //     {
-  //       $unwind: { path: '$creator', preserveNullAndEmptyArrays: true },
-  //     },
-  //     {
-  //       $match: {
-  //         _id: new ObjectId(submission.meta.survey.id),
-  //         'meta.creator': { $ne: new ObjectId(res.locals.auth.user._id) },
-  //       },
-  //     },
-  //     { $project: { creator: 1 } },
-  //   ])
-  //   .toArray();
-
-  // // Send to creator of the survey
-  // // No error thrown even the creator was not found
-  // if (survey && survey.creator) {
-  //   await mailService.sendLink({
-  //     from: 'noreply@surveystack.io',
-  //     to: survey.creator.email,
-  //     subject: `Survey report - ${submission.meta.survey.name}`,
-  //     link: new URL(`/api/submissions/${req.params.id}/pdf`, getServerSelfOrigin(req)).toString(),
-  //     actionDescriptionHtml: `${res.locals.auth.user.name} has submitted new submission. You can download a copy by clicking the button below.`,
-  //     btnText: 'Download',
-  //   });
-  // }
-
   return res.send({ success: true });
 };
 
-export { sanitize };
+export { buildPipeline, sanitize, getSkip, getLimit, DEFAULT_LIMIT };
 
 export default {
   getSubmissions,

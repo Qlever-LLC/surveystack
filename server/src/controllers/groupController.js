@@ -118,33 +118,38 @@ const createPinnedSurveysPopulationStages = () => {
 };
 
 const getGroups = async (req, res) => {
-  const { showArchived, prefix } = req.query;
+  const { showArchived, prefix, showAll, dir, tree } = req.query;
 
   let entities;
-  let dir = '/';
 
   let archived = false;
   if (queryParam(showArchived)) {
     archived = true;
   }
 
-  if (req.query.dir) {
-    dir = req.query.dir;
-  }
+  let dirQuery;
+  if (!dir) {
+    dirQuery = `/`;
+  } else {
+    dirQuery = dir;
 
-  if (!dir.endsWith('/')) {
-    dir += '/';
-  }
+    if (!dir.endsWith('/')) {
+      dirQuery += '/';
+    }
 
-  let dirQuery = dir;
-  if (req.query.tree) {
-    dirQuery = { $regex: `^${dir}` };
+    if (queryParam(tree)) {
+      dirQuery = dir;
+    }
   }
 
   const findQuery = {
-    dir: dirQuery,
+    dir: { $regex: `^${dirQuery}` },
     'meta.archived': archived,
   };
+
+  if (showAll) {
+    delete findQuery['meta.archived'];
+  }
 
   if (prefix) {
     delete findQuery.dir;
@@ -186,6 +191,14 @@ const getGroupById = async (req, res) => {
 
   if (queryParam(req.query.populate)) {
     pipeline.push(...createPinnedSurveysPopulationStages());
+  }
+
+  if (queryParam(req.query.justPinned)) {
+    pipeline.push({
+      $project: {
+        surveys: 1,
+      },
+    });
   }
 
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();

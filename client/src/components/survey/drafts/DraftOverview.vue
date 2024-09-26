@@ -11,7 +11,7 @@
       <a-card-subtitle class="text-grey mt-n3">
         {{ submission._id }}
         <br />
-        <strong v-if="submission.meta.dateSubmitted">
+        <strong v-if="submission.meta.dateSubmitted && !submission.meta.isDraft">
           <kbd>{{ submitted }}</kbd> submitted
         </strong>
       </a-card-subtitle>

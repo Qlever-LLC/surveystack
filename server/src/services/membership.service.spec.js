@@ -51,7 +51,7 @@ describe('membership.service', () => {
         origin,
         email: pendingUser.email,
         expiresAfterDays: 7,
-        landingPath: `/g${group.path}`,
+        landingPath: `/groups/${group._id}`,
       });
       expect(createMagicLink).toHaveBeenCalledWith({
         origin,
@@ -70,7 +70,7 @@ describe('membership.service', () => {
         origin,
         email: pendingUser.email,
         expiresAfterDays: 7,
-        landingPath: `/g${path}`,
+        landingPath: `/groups/${group._id}`,
       });
       expect(createMagicLink).toHaveBeenCalledWith({
         origin,

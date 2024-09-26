@@ -2,8 +2,8 @@
   <a-container>
     <h1>Tabula Rasa</h1>
     <p>
-      This will clear all surveys and all submissions. And furthermore create an example survey with corresponding
-      submissions.
+      This will clear all surveys and all responses. And furthermore create an example survey with corresponding
+      responses.
     </p>
     <a-checkbox label="Activate" v-model="activate" />
 
@@ -39,12 +39,6 @@ export default {
       }
 
       try {
-        await db.clearAllSurveys();
-      } catch (error) {
-        console.log(error);
-      }
-
-      try {
         await db.clearAllResources();
       } catch (error) {
         console.log(error);
@@ -60,7 +54,7 @@ export default {
 
       await this.clearAll();
 
-      this.$router.push('/surveys/browse');
+      this.$router.push(this.$route.path + '/surveys');
     },
   },
 };

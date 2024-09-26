@@ -1,9 +1,9 @@
 import { render } from '@testing-library/vue';
 import { mount, shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
-import vuetify from '../src/plugins/vuetify';
+import { vuetify } from '../src/plugins/vuetify';
 import { createStoreObject } from '../src/store';
-import router from '../src/router';
+import { createAppRouter } from '../src/router';
 
 import AAlert from '../src/components/ui/elements/AAlert.vue';
 import AApp from '../src/components/ui/elements/AApp.vue';
@@ -12,7 +12,6 @@ import AAppBarNavIcon from '../src/components/ui/elements/AAppBarNavIcon.vue';
 import AAvatar from '../src/components/ui/elements/AAppBarNavIcon.vue';
 import ABadge from '../src/components/ui/elements/ABadge.vue';
 import ABanner from '../src/components/ui/elements/ABanner.vue';
-import ABreadcrumbs from '../src/components/ui/elements/ABreadcrumbs.vue';
 import ABtn from '../src/components/ui/elements/ABtn.vue';
 import ABtnToggle from '../src/components/ui/elements/ABtnToggle.vue';
 import ACard from '../src/components/ui/elements/ACard.vue';
@@ -38,6 +37,7 @@ import AFabTransition from '../src/components/ui/elements/AFabTransition.vue';
 import AFileInput from '../src/components/ui/elements/AFileInput.vue';
 import AFlex from '../src/components/ui/elements/AFlex.vue';
 import AForm from '../src/components/ui/elements/AForm.vue';
+import AHover from '../src/components/ui/elements/AHover.vue';
 import AIcon from '../src/components/ui/elements/AIcon.vue';
 import AImg from '../src/components/ui/elements/AImg.vue';
 import AInput from '../src/components/ui/elements/AInput.vue';
@@ -73,7 +73,7 @@ import ATimeline from '../src/components/ui/elements/ATimeline.vue';
 import ATimelineItem from '../src/components/ui/elements/ATimelineItem.vue';
 import AToolbar from '../src/components/ui/elements/AToolbar.vue';
 import AToolbarItems from '../src/components/ui/elements/AToolbarItems.vue';
-import AToolbarTitle from '../src/components/ui/elements/AToolbarTitle.vue';
+import AToolbarTitle from '@/components/ui/elements/AAppBarTitle.vue';
 import ATooltip from '../src/components/ui/elements/ATooltip.vue';
 import AWindow from '../src/components/ui/elements/AWindow.vue';
 import AWindowItem from '../src/components/ui/elements/AWindowItem.vue';
@@ -91,7 +91,6 @@ const components = {
   'a-avatar': AAvatar,
   'a-badge': ABadge,
   'a-banner': ABanner,
-  'a-breadcrumbs': ABreadcrumbs,
   'a-btn': ABtn,
   'a-btn-toggle': ABtnToggle,
   'a-card': ACard,
@@ -117,6 +116,7 @@ const components = {
   'a-file-input': AFileInput,
   'a-flex': AFlex,
   'a-form': AForm,
+  'a-hover': AHover,
   'a-icon': AIcon,
   'a-img': AImg,
   'a-input': AInput,
@@ -162,52 +162,42 @@ const components = {
   'app-control-error': appControlError,
 };
 
-
-const createTestUtilsWrapper = testUtilsMethod => function (component, options) {
-  const store = createStore(createStoreObject());
-  return testUtilsMethod(
-    component,
-    {
+const createTestUtilsWrapper = (testUtilsMethod) =>
+  function (component, options) {
+    const store = createStore(createStoreObject());
+    return testUtilsMethod(component, {
       ...options,
       global: {
-        plugins: [
-          vuetify,
-          store,
-        ],
+        plugins: [vuetify, store],
         components,
         ...options?.global,
-      }
-    }
-  )
-};
+      },
+    });
+  };
 const mountWithVuetify = createTestUtilsWrapper(mount);
 const shallowMountWithVuetify = createTestUtilsWrapper(shallowMount);
 
-const renderWithVuetify = function (component, options, storeOverride) {
+const renderWithVuetify = function (component, options, storeOverride, routerOverride, tanstackVueQueryOverride) {
   const root = document.createElement('div');
   root.setAttribute('data-app', 'true');
+  const router = routerOverride ?? createAppRouter();
   const store = storeOverride ?? createStore(createStoreObject());
-
-  return render(
-    component,
-    {
-      ...options,
-      container: document.body.appendChild(root),
-      global: {
-        plugins: [
-          vuetify,
-          store,
-          router,
-        ],
-        components,
-        stubs: {
-          CodeEditor: { template: '<span id="CodeEditorStub" />' },
-          InstructionsEditor: { template: '<span id="InstructionsEditor" />' },
-        },
-        ...options?.global,
+  const tanstackVueQuery = tanstackVueQueryOverride ?? undefined;
+  const renderOptions = {
+    ...options,
+    container: document.body.appendChild(root),
+    global: {
+      plugins: [vuetify, store, router, tanstackVueQuery],
+      components,
+      stubs: {
+        CodeEditor: { template: '<span id="CodeEditorStub" />' },
+        InstructionsEditor: { template: '<span id="InstructionsEditor" />' },
       },
-    }
-  );
+      ...options?.global,
+    },
+  };
+
+  return render(component, renderOptions);
 };
 
 export { renderWithVuetify, mountWithVuetify, shallowMountWithVuetify };

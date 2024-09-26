@@ -1,5 +1,5 @@
 <template>
-  <a-container>
+  <a-container class="bg-background rounded">
     <h1>Access denied</h1>
     Only {{ allowed }} are allowed on <strong>{{ to }}</strong
     >. Goodbye!

@@ -104,8 +104,14 @@ const actions = {
       throw error;
     }
   },
-  async removeLocalResource({ commit, getters, dispatch }, resourceKey) {
-    let resource = getters['getResourceByKey'](resourceKey);
+
+  async removeLocalResource({ commit, getters, dispatch }, { id, key }) {
+    let resource = undefined;
+    if (id) {
+      resource = getters['getResource'](id);
+    } else if (key) {
+      resource = getters['getResourceByKey'](key);
+    }
     if (resource) {
       try {
         await db.removeFromIndexedDB(db.stores.RESOURCES, resource._id);
@@ -120,7 +126,7 @@ const actions = {
     let resource = getters['getResourceByKey'](resourceKey);
     if (resource) {
       try {
-        await dispatch('removeLocalResource', resourceKey);
+        await dispatch('removeLocalResource', { key: resourceKey });
         await deleteFileResource(resource._id);
       } catch (error) {
         dispatch('feedback/add', error, { root: true });

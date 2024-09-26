@@ -1,8 +1,5 @@
 <template>
-  <a-container v-if="farmosEnabled" class="max-800">
-    <div class="d-flex justify-space-between align-center">
-      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
-    </div>
+  <a-container v-if="farmosEnabled" class="max-800 bg-background rounded">
     <a-alert
       v-if="successMessage"
       class="mt-4"
@@ -106,9 +103,6 @@
   </a-container>
 
   <a-container v-else>
-    <div class="d-flex justify-space-between align-center">
-      <a-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
-    </div>
     <a-row v-if="loading">
       <a-col>
         <a-progress-linear class="mb-0" />
@@ -172,8 +166,6 @@ export default {
     return {
       groupInfos: null,
       groupId: null,
-      groupPath: '',
-      suffixPart: '',
       farmosEnabled: false,
       loading: true,
       message: '',

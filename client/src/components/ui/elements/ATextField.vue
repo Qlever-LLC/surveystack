@@ -4,6 +4,7 @@
     :append-inner-icon="appendInnerIcon"
     :autocomplete="autocomplete"
     :autofocus="autofocus"
+    :bgColor="bgColor"
     :class="{ noBorder: disabled }"
     :clear-icon="clearIcon"
     :clearable="clearable"
@@ -25,6 +26,7 @@
     :primary="primary"
     :readonly="readonly"
     :required="required"
+    :rounded="rounded"
     :rules="rules"
     :single-line="singleLine"
     :suffix="suffix"
@@ -76,6 +78,7 @@ export default {
     //vuetify props
     appendInnerIcon: { type: String, required: false },
     autofocus: { type: Boolean, required: false },
+    bgColor: { type: String, required: false },
     clearIcon: { type: String, required: false },
     clearable: { type: Boolean, required: false },
     color: { type: String, required: false, default: 'focus' },
@@ -90,6 +93,7 @@ export default {
     placeholder: { type: String, required: false },
     prependInnerIcon: { type: String, required: false },
     readonly: { type: Boolean, required: false },
+    rounded: { type: [String, Number, Boolean], required: false },
     rules: { type: Array, required: false },
     singleLine: { type: Boolean, required: false },
     suffix: { type: String, required: false },
@@ -98,7 +102,7 @@ export default {
     variant: {
       type: String,
       validator: function (value) {
-        return ['outlined', 'underlined', 'filled', 'solo'].includes(value);
+        return ['outlined', 'underlined', 'filled', 'solo', 'solo-filled'].includes(value);
       },
       default: 'underlined',
       required: false,

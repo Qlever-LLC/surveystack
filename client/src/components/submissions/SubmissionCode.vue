@@ -1,6 +1,6 @@
 <template>
   <div class="pa-3">
-    <a-textarea class="textarea" :modelValue="valueString" rows="30" readonly />
+    <a-textarea class="textarea" :modelValue="valueString" rows="30" readonly hideDetails />
   </div>
 </template>
 <script>

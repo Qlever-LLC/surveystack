@@ -1,9 +1,10 @@
 import { createApp } from 'vue';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
 import store from './store';
-import vuetify from './plugins/vuetify';
+import { vuetify } from './plugins/vuetify';
 import { startToggle } from './plugins/toggle';
 import { startSentry } from './plugins/sentry';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
@@ -23,6 +24,8 @@ const app = createApp(App);
 app.use(router);
 app.use(store);
 app.use(vuetify);
+app.use(VueQueryPlugin);
+
 
 startToggle(store);
 
