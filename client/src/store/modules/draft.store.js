@@ -160,11 +160,11 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async init({ commit, dispatch, state }, { survey, submission, persist }) {
+  async init({ commit, dispatch }, { survey, submission, persist }) {
     await commit('INIT', { survey, submission, persist });
     await dispatch('calculateRelevance');
     await dispatch('next');
-    state.loading = false;
+    commit('SET_LOADING', false);
   },
   async setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
@@ -491,6 +491,9 @@ const mutations = {
     }
 
     parent[childKey] = value;
+  },
+  SET_LOADING(state, bool) {
+    state.loading = bool;
   },
   SET_NEXT_ENABLE(state, enable) {
     state.enableNext = enable;
