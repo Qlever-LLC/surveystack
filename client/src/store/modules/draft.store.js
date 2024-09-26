@@ -160,10 +160,11 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async init({ commit, dispatch }, { survey, submission, persist }) {
+  async init({ commit, dispatch, state }, { survey, submission, persist }) {
     await commit('INIT', { survey, submission, persist });
     await dispatch('calculateRelevance');
     await dispatch('next');
+    state.loading = false;
   },
   async setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
@@ -480,8 +481,6 @@ const mutations = {
       .forEach((node) => {
         // node.drop();
       });
-
-    state.loading = false;
   },
   SET_PROPERTY(state, { path, value }) {
     const keys = path.split('.');
