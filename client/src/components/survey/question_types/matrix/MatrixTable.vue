@@ -61,7 +61,7 @@
     </div>
     <div
       v-else
-      @click="$emit('addRow')"
+      @click="addRealRow"
       ref="body"
       class="mt-body pb-1"
       v-scroll.self="onScrollX"
@@ -82,6 +82,9 @@
             </slot>
           </div>
         </div>
+        <div
+          v-if="$slots.rowActions"
+          class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 bg-transparent"></div>
       </div>
     </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
@@ -204,6 +207,10 @@ export default {
     },
   },
   methods: {
+    addRealRow() {
+      this.$emit('addRow');
+      this.onScrollX();
+    },
     onScrollX() {
       // make sure it only runs once per RAF
       if (this.rafIdScrollX) {
