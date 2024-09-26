@@ -64,7 +64,7 @@ const Submission: OpenAPIV3.SchemaObject = {
           },
         },
         specVersion: { type: 'number' },
-        creator: { type: 'string', nullable: true },
+        creator: { type: 'string', format: 'objectid', nullable: true },
       },
     },
     data: {},
@@ -84,7 +84,10 @@ const DraftSubmission: OpenAPIV3.SchemaObject = {
       properties: {
         ...(Submission.properties?.meta as OpenAPIV3.SchemaObject)?.properties,
         isDraft: { type: 'boolean', enum: [true] },
-        creator: { type: 'string', nullable: false },
+        creator: {
+          ...(Submission.properties?.meta as OpenAPIV3.SchemaObject)?.properties?.creator,
+          nullable: false,
+        },
       },
     },
   },

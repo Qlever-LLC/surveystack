@@ -15,6 +15,7 @@ const { ObjectId } = jest.requireActual('mongodb');
 const {
   updateSurvey,
   getSurvey,
+  getSurveyListPage,
   cleanupSurvey,
   getSurveyAndCleanupInfo,
   deleteArchivedTestSubmissions,
@@ -560,5 +561,102 @@ describe('surveyController', () => {
         expect.stringContaining('data:application/pdf;base64,')
       );
     });
+  });
+});
+
+describe('get surveys and question set', () => {
+  let groupA, surveyPinnedToA, surveyA1, surveyA2, surveyA3;
+  beforeEach(async () => {
+    const { survey: spa } = await createSurvey([], { name: 'surveyPinnedToA' });
+    surveyPinnedToA = spa;
+    const { survey: surveyPinnedToB } = await createSurvey([], { name: 'surveyPinnedToB' });
+
+    groupA = await createGroup({ surveys: { pinned: [surveyPinnedToA._id] } });
+    const groupB = await createGroup({ surveys: { pinned: [surveyPinnedToB._id] } });
+
+    const { survey: s3 } = await createSurvey([], { name: 'surveyA3' });
+    surveyA3 = s3;
+    const { survey: s2 } = await createSurvey([], { name: 'surveyA2' });
+    surveyA2 = s2;
+    const { survey: s1 } = await createSurvey([], { name: 'surveyA1' });
+    surveyA1 = s1;
+    const { survey: surveyB1 } = await createSurvey([], { name: 'surveyB1' });
+
+    const gA = { id: groupA._id, path: groupA.path };
+    const gB = { id: groupB._id, path: groupB.path };
+
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [
+              ObjectId(surveyPinnedToA._id),
+              ObjectId(surveyA3._id),
+              ObjectId(surveyA2._id),
+              ObjectId(surveyA1._id),
+            ],
+          },
+        },
+        { $set: { meta: { group: gA } } }
+      );
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [ObjectId(surveyPinnedToB._id), ObjectId(surveyB1._id)],
+          },
+        },
+        { $set: { meta: { group: gB } } }
+      );
+
+    await getDb()
+      .collection('surveys')
+      .updateOne(
+        { _id: ObjectId(surveyA2._id) },
+        {
+          $set: {
+            meta: { isLibrary: true },
+          },
+        }
+      );
+  });
+
+  it('get survey from a group', async () => {
+    const req = createReq({
+      params: {},
+      query: {
+        groupId: groupA._id,
+        isLibrary: 'false',
+        skip: 0,
+        limit: 10,
+        prioPinned: true,
+      },
+    });
+    const res = await createRes();
+    await getSurveyListPage(req, res);
+
+    const result = res.send.mock.calls[0][0];
+    expect(result.pagination.total).toEqual(3);
+    expect(result.content[0]._id).toEqual(surveyA1._id);
+    expect(result.content[1]._id).toEqual(surveyA3._id);
+    expect(result.pinned[0]._id).toEqual(surveyPinnedToA._id);
+  });
+  it('get question set (surveys that are library)', async () => {
+    const req = createReq({
+      params: {},
+      query: {
+        isLibrary: 'true',
+        skip: 0,
+        limit: 10,
+      },
+    });
+    const res = await createRes();
+    await getSurveyListPage(req, res);
+
+    const result = res.send.mock.calls[0][0];
+    expect(result.pagination.total).toEqual(1);
+    expect(result.content[0]._id).toEqual(surveyA2._id);
   });
 });

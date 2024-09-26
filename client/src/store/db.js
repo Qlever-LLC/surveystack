@@ -5,10 +5,11 @@ const DATABASE_NAME = 'Database';
 const stores = {
   SUBMISSIONS: 'submissions',
   SURVEYS: 'surveys',
+  PINNEDSURVEYS: 'pinnedSurveys',
   RESOURCES: 'resources',
 };
 
-const db = openDB(DATABASE_NAME, 8, {
+const db = openDB(DATABASE_NAME, 10, {
   upgrade(db, oldVersion) {
     if (oldVersion < 4) {
       db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
@@ -16,6 +17,13 @@ const db = openDB(DATABASE_NAME, 8, {
     }
     if (oldVersion < 8) {
       db.createObjectStore(stores.RESOURCES, { keyPath: '_id' });
+    }
+    if (oldVersion < 9) {
+      db.deleteObjectStore(stores.SURVEYS);
+      db.createObjectStore(stores.PINNEDSURVEYS, { keyPath: '_id' });
+    }
+    if (oldVersion < 10) {
+      db.deleteObjectStore(stores.PINNEDSURVEYS);
     }
   },
   blocked(currentVersion, blockedVersion) {
@@ -38,15 +46,12 @@ async function clearObjectStore(storeName) {
 function clearAllSubmissions() {
   return clearObjectStore(stores.SUBMISSIONS);
 }
-function clearAllSurveys() {
-  return clearObjectStore(stores.SURVEYS);
-}
 function clearAllResources() {
   return clearObjectStore(stores.RESOURCES);
 }
 
 async function persist(storeName, obj) {
-  return (await db).put(storeName, isProxy(obj) ? toRaw(obj): obj);
+  return (await db).put(storeName, isProxy(obj) ? toRaw(obj) : obj);
 }
 function persistSubmission(submission) {
   return persist(stores.SUBMISSIONS, submission);
@@ -73,12 +78,16 @@ async function removeFromIndexedDB(storeName, id) {
   return (await db).delete(storeName, id);
 }
 
+function deleteSubmission(id) {
+  return removeFromIndexedDB(stores.SUBMISSIONS, id);
+}
+
 const migrateSubmissions = async () => {
   const drafts = await getAllSubmissions();
 
   const isResubmissionDraft = (draft) => draft.meta.dateSubmitted && !draft.meta.isDraft;
   const isProxyDraft = (draft) => draft.meta.submitAsUser;
-  const draftsToDelete = drafts.filter(draft => isResubmissionDraft(draft) || isProxyDraft(draft));
+  const draftsToDelete = drafts.filter((draft) => isResubmissionDraft(draft) || isProxyDraft(draft));
   const remainingDrafts = drafts.filter((draft) => !(isResubmissionDraft(draft) || isProxyDraft(draft)));
 
   const upgradeSubmissionFromVXtoV4 = (submission) => {
@@ -97,7 +106,6 @@ const migrateSubmissions = async () => {
 export {
   stores,
   clearAllSubmissions,
-  clearAllSurveys,
   clearAllResources,
   persistSubmission,
   persistResource,
@@ -105,5 +113,6 @@ export {
   getAllResources,
   getSubmission,
   removeFromIndexedDB,
+  deleteSubmission,
   migrateSubmissions,
 };

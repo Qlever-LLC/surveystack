@@ -7,26 +7,21 @@
       :initializable="control.options.initialize && control.options.initialize.enabled"
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize" />
-    <app-control-hint :value="control.hint" />
-    <a-row>
-      <div :class="{ 'mx-auto': centered }">
-        <a-date
-          :modelValue="modelValue"
-          @update:modelValue="$emit('update:modelValue', $event)"
-          :label="getLabel()"
-          :menu-props="{ offsetY: true }"
-          prepend-inner-icon="mdi-calendar"
-          :type="control.options.subtype"
-          variant="outlined"
-          readonly
-          cssminWidth290px
-          color="focus"
-          persistent-hint
-          :startMonth="getStartMonth()"
-          :startYear="getStartYear()" />
-      </div>
-    </a-row>
-
+    <a-date
+      :modelValue="modelValue"
+      @update:modelValue="$emit('update:modelValue', $event)"
+      :label="control.hint"
+      :menu-props="{ offsetY: true }"
+      prepend-inner-icon="mdi-calendar"
+      :type="control.options.subtype"
+      variant="outlined"
+      readonly
+      yearType="number"
+      cssminWidth290px
+      color="focus"
+      persistent-hint
+      :startMonth="getStartMonth()"
+      :startYear="getStartYear()" />
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -36,11 +31,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
-  props: { centered: { type: Boolean, default: true } },
   methods: {
-    getLabel() {
-      return this.control.options.subtype === 'date-year' ? 'Year' : 'Date';
-    },
     getStartMonth() {
       return this.control?.startMonth ? String(this.control.startMonth) : undefined;
     },

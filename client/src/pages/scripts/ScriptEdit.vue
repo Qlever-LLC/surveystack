@@ -1,175 +1,149 @@
 <template>
   <a-container>
-    <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
-    <span class="text-secondary">{{ this.entity._id }}</span>
-    <a-text-field v-model="entity.name" label="Name" variant="outlined" hide-details />
-    <active-group-selector
-      class="my-4"
-      label="Group"
-      v-model="entity.meta.group"
-      outlined
-      returnObject
-      adminGroupsOnly />
-    <code-editor title="" class="code-editor" :code="this.entity && this.entity.content" @change="updateCode" />
-    <div class="d-flex mt-5 justify-end">
-      <a-btn variant="text" @click="cancel">Cancel</a-btn>
-      <a-btn color="primary" @click="submit">Save</a-btn>
-    </div>
+    <a-snackbar v-model="state.notification.isVisible" :color="state.notification.type">
+      {{ state.notification.message }}
+      <template v-slot:actions="{ props }">
+        <a-btn color="white" variant="text" v-bind="props" @click="state.notification.isVisible = false">
+          Dismiss
+        </a-btn>
+      </template>
+    </a-snackbar>
+    <a-card class="pa-8" color="background">
+      <h1>{{ state.editMode ? 'Edit script' : 'Create script' }}</h1>
+      <span class="text-secondary">{{ state.entity._id }}</span>
+      <div v-if="state.errorLoadingScript" class="ma-10">
+        <a-alert color="error">
+          <v-icon class="mr-3">mdi-alert</v-icon>
+          Error loading script, please check network connectivity and refresh.
+        </a-alert>
+      </div>
+      <a-form ref="form" v-else>
+        <a-text-field v-model="state.entity.name" label="Script name" name="script name" variant="outlined" :rules=scriptNameRules />
+
+        <code-editor title="" class="code-editor mt-4" :code="state.entity && state.entity.content"
+          @change="updateCode" />
+        <div class="d-flex mt-5 justify-end">
+          <a-btn variant="text" @click.prevent="cancel">Back</a-btn>
+          <a-btn color="primary" type="submit" @click.prevent="submit">Save</a-btn>
+        </div>
+      </a-form>
+    </a-card>
   </a-container>
 </template>
 
-<script>
+<script setup>
 import ObjectId from 'bson-objectid';
-
 import api from '@/services/api.service';
-import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
-
-import { SPEC_VERSION_SCRIPT } from '@/constants';
-
+import { SPEC_VERSION_SCRIPT, DEFAULT_SCRIPT } from '@/constants';
 import codeEditor from '@/components/ui/CodeEditor.vue';
+import { useGroup } from '@/components/groups/group';
+import { reactive } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ref } from 'vue';
 
-// When lazy-loading, the code editor just keeps on growing and growing :/
-// const codeEditor = defineAsyncComponent(() => import('@/components/ui/CodeEditor.vue'));
+const { getActiveGroup } = useGroup();
+const router = useRouter();
+const route = useRoute();
+const now = new Date();
 
-export default {
-  data() {
-    const now = new Date();
-    return {
-      editMode: true,
-      entity: {
-        _id: '',
-        name: '',
-        meta: {
-          dateCreated: now,
-          dateModified: now,
-          revision: 1,
-          creator: null,
-          group: {
-            id: null,
-            path: null,
-          },
-          specVersion: SPEC_VERSION_SCRIPT,
-        },
-        content: `
-/**
- * Process
- * @param {props} props
- * @param {submission} props.submission
- * @param {state} state
- */
-export async function process(props, state) {
-  const { submission, parent, control, params } = props;
-  const { value, context } = state;
+const form = ref(null);
 
-  // do stuff
-  // ...
-
-  return {
-    context,
-    value: null,
-    status: {
-      type: statusTypes.SUCCESS,
-      message: 'script successfully executed at ' + new Date().toISOString(true),
+const state = reactive({
+  errorLoadingScript: false,
+  group: null,
+  editMode: !route.matched.some(({ name }) => name === 'group-scripts-new'),
+  entity: {
+    _id: '',
+    name: '',
+    meta: {
+      dateCreated: now,
+      dateModified: now,
+      revision: 1,
+      creator: null,
+      group: {
+        id: null,
+        path: null,
+      },
+      specVersion: SPEC_VERSION_SCRIPT,
     },
+    content: DEFAULT_SCRIPT,
+  },
+  notification: {
+    message: '',
+    type: null,
+    isVisible: false,
+  },
+});
+
+initData();
+
+function setNotification(message, type = 'error', isVisible = true) {
+  state.notification.message = message;
+  state.notification.type = type;
+  state.notification.isVisible = isVisible;
+}
+
+async function initData() {
+  state.group = await getActiveGroup();
+  state.entity._id = new ObjectId();
+
+  if (state.editMode) {
+    try {
+      const { scriptId } = route.params;
+      const { data } = await api.get(`/scripts/${scriptId}`);
+      state.entity = { ...state.entity, ...data };
+    } catch (e) {
+      console.log('something went wrong:', e);
+      setNotification(`Failed to load script. ${e}`);
+      state.errorLoadingScript = true;
+    }
+  } else {
+    state.entity.meta.group.id = state.group._id;
+    state.entity.meta.group.path = state.group.path;
   }
 }
 
-/**
- * render
- * @param {props} props
- * @param {state} state
- * @param {setState} setState
- */
-export function render(props, state, setState) {
-  const { submission, parent, control, params } = props;
-  const { value, context } = state;
-  const ui = createUI();
+function cancel() {
+  router.push(`/groups/${state.group._id}/scripts`);
+}
 
-  ui.add(
-      ui.text('Basic text'),
-      ui.markdown(\`# Markdown Headline
--------
-*italics*
-**bold**
-***bold italics***
-~~strikethrough~~
-[link]()
-> Quote
-- Unordered List
-- List Item
+function updateCode(code) {
+  state.entity.content = code;
+}
 
-1. Ordered List
-2. List Item
-    \`),
+const scriptNameRules = [
+  value => !!value || 'Required',
+  value => (value || '').length <= 35 || 'Maximum 35 characters',
+  value => (value || '').length > 4 || 'Minimum 5 characters',
+];
 
-    ui.card('my card content', {
-        header: 'Card',
-        meta: 'meta',
-        footer: 'footer',
-    }),
-    ui.message('Error', { type: 'error', header: 'Error' }),
-    ui.message('Warning', { type: 'warning', header: 'Warning' }),
-    ui.message('Plain', { header: 'Plain' }),
-    ui.message('Plain'),
-    ui.message('Info', { type: 'info', header: 'Info' }),
-    ui.message('Success', { type: 'success', header: 'Success' }),
-  );
+async function submit() {
+  state.notification.message = '';
+  state.notification.isVisible = false;
+  state.notification.type = '';
+  const { valid, errors } = await form.value.$refs.form.validate();
+  if (!valid) {
+    setNotification(`Please fix validation issue: ${errors[0].id}: ${errors[0].errorMessages[0].toLowerCase()}`);
+    return;
+  }
 
-  return ui.node;
-};
-        `,
-      },
-    };
-  },
-  components: {
-    codeEditor,
-    ActiveGroupSelector,
-  },
-  methods: {
-    cancel() {
-      this.$router.replace({ name: 'scripts-list' });
-    },
-    updateCode(code) {
-      this.entity.content = code;
-    },
-    async submit() {
-      if (this.entity.name.trim() === '') {
-        console.log('Name must not be empty');
-        return;
-      }
-
-      try {
-        if (this.editMode) {
-          await api.put(`/scripts/${this.entity._id}`, this.entity);
-        } else {
-          await api.post('/scripts', this.entity);
-          this.$router.push('/scripts');
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    },
-  },
-  async created() {
-    this.editMode = !this.$route.matched.some(({ name }) => name === 'scripts-new');
-
-    this.entity._id = new ObjectId();
-
-    if (this.editMode) {
-      try {
-        const { id } = this.$route.params;
-        const { data } = await api.get(`/scripts/${id}`);
-        this.entity = { ...this.entity, ...data };
-      } catch (e) {
-        console.log('something went wrong:', e);
-      }
+  try {
+    if (state.editMode) {
+      await api.put(`/scripts/${state.entity._id}`, state.entity);
+    } else {
+      await api.post('/scripts', state.entity);
+      await router.push(`/groups/${route.params.id}/scripts`);
     }
-  },
-};
+    setNotification('Script saved', 'success');
+  } catch (err) {
+    console.log(err);
+    setNotification(`Could not save script, please try again. ${err}`);
+  }
+}
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .code-editor {
-  height: 75vh;
+  height: 68vh;
 }
 </style>

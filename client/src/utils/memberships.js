@@ -1,3 +1,7 @@
+import api from '@/services/api.service';
+import { get } from 'lodash';
+import { getDefaultLandingPage } from '@/components/navigation';
+
 export const uuid = () => {
   const rnd = new Uint8Array(32);
   crypto.getRandomValues(rnd);
@@ -14,40 +18,53 @@ export const uuid = () => {
   return `${u}.${new Date().getTime().toString(16)}`;
 };
 
-export const autoSelectActiveGroup = async (store, preferredGroupId = null, preferFirstActivatedGroup = false) => {
+/* if a preferredGroupId is passed or user has only one group membership, redirects user to that group and returns true. Otherwise, returns false.*/
+export async function redirectAfterLogin(store, router, mobile, redirectUrl, preferredGroupId = null) {
+  if (!store.getters['auth/isLoggedIn']) {
+    return;
+  }
   const user = store.getters['auth/user'];
   const memberships = await store.dispatch('memberships/getUserMemberships', user._id);
-  if (memberships && memberships.length > 0) {
-    // default to the first membership
-    let groupId = memberships[0].group._id;
-    // try to use the preferred group (such as from call-for-submissions)
-    if (preferredGroupId) {
-      const isMemberOfPreferredGroup = memberships.some((m) => m.group._id === preferredGroupId);
-      if (isMemberOfPreferredGroup) {
-        groupId = preferredGroupId;
-      }
-    } else if (preferFirstActivatedGroup) {
-      memberships.sort((a, b) => {
-        if (a.meta.dateActivated && !b.meta.dateActivated) {
-          return -1;
-        } else if (!a.meta.dateActivated && b.meta.dateActivated) {
-          return 1;
-        } else if (a.meta.dateActivated < b.meta.dateActivated) {
-          return -1;
-        } else if (a.meta.dateActivated > b.meta.dateActivated) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-      groupId = memberships[0].group._id;
+  if (redirectUrl) {
+    router.push(redirectUrl).then(reloadPage);
+  } else if (preferredGroupId) {
+    const isMemberOfPreferredGroup = memberships.some((m) => m.group._id === preferredGroupId);
+    if (isMemberOfPreferredGroup) {
+      const landingPage = getDefaultLandingPage(preferredGroupId, mobile);
+      router.push(landingPage).then(reloadPage);
+    } else {
+      router.push('/').then(reloadPage);
     }
+  } else if (memberships && memberships.length === 1) {
+    // only one group, redirect user to that group's page
+    const landingPage = getDefaultLandingPage(memberships[0].group._id, mobile);
+    router.push(landingPage).then(reloadPage);
+  } else {
+    router.push('/').then(reloadPage);
+  }
+}
 
-    store.dispatch('memberships/setActiveGroup', groupId);
+export const reloadPage = () => {
+  window.location.reload();
+};
+
+export const autoJoinWhiteLabelGroup = async (store) => {
+  try {
+    if (store.getters['auth/isLoggedIn'] && store.getters['whitelabel/isWhitelabel']) {
+      const partnerGroupId = store.getters['whitelabel/partner'].id;
+      await api.post(`/memberships/join-group?id=${partnerGroupId}`);
+      return partnerGroupId;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    store.dispatch('feedback/add', get(error, 'response.data.message') || error, { root: true });
+    return false;
   }
 };
 
 export default {
   uuid,
-  autoSelectActiveGroup,
+  redirectAfterLogin,
+  autoJoinWhiteLabelGroup,
 };

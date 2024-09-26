@@ -236,13 +236,13 @@ export default {
         //remove duplicates
         const index = destArray.findIndex((x) => x.endsWith(resource.label));
         if (index >= 0) {
-          await this.$store.dispatch('resources/removeLocalResource', destArray[index]);
+          await this.$store.dispatch('resources/removeLocalResource', { key: destArray[index] });
           destArray.splice(index, 1);
         }
       }
       if (!allowMultiple && destArray.length > 0) {
         //remove current resource
-        await this.$store.dispatch('resources/removeLocalResource', destArray[0]);
+        await this.$store.dispatch('resources/removeLocalResource', { key: destArray[0] });
         destArray.pop();
       }
 
@@ -307,7 +307,7 @@ export default {
       return el.capture !== undefined;
     },
     async remove(index) {
-      await this.$store.dispatch('resources/removeLocalResource', this.fileResourceKeys[index]);
+      await this.$store.dispatch('resources/removeLocalResource', { key: this.fileResourceKeys[index] });
       this.fileResourceKeys.splice(index, 1);
       this.changed(this.fileResourceKeys);
     },

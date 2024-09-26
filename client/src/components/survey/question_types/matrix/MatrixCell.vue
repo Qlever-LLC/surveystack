@@ -121,14 +121,13 @@
     <template v-slot:chip="{ props, item, index }">
       <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
-
     <template v-slot:item="{ props, item }">
       <a-list-item v-bind="props" :title="undefined">
         <a-list-item-title v-html="item.raw.label" />
+        <a-list-item-subtitle v-html="item.raw.value.url" />
       </a-list-item>
     </template>
   </a-select>
-
   <a-select
     v-else-if="header.type === 'farmos_planting'"
     :multiple="header.multiple"
@@ -154,10 +153,22 @@
     <template v-slot:chip="{ props, item, index }">
       <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
-
-    <template v-slot:item="{ props, item }">
+    <template v-slot:item="{ props, item, index }">
       <a-list-item v-bind="props" :title="undefined">
-        <a-list-item-title v-html="item.raw.label" />
+        <template v-slot:prepend="{ isSelected }">
+          <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
+            <a-checkbox v-if="header.multiple" :modelValue="isSelected" color="focus" hide-details />
+            <a-radio-group v-else :modelValue="isSelected" hide-details>
+              <a-radio :value="true" color="focus" />
+            </a-radio-group>
+          </a-list-item-action>
+          <a-list-item-title :class="index > 0 ? 'mt-4' : ''">
+            {{ item.raw.label }}
+            <a-list-item-subtitle v-if="item.value.isField">
+              {{ item.raw.value.farmName }}
+            </a-list-item-subtitle>
+          </a-list-item-title>
+        </template>
       </a-list-item>
     </template>
   </a-select>
@@ -205,9 +216,11 @@ import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import { zonedTimeToUtc } from 'date-fns-tz';
+import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
 
 export default {
   components: {
+    AListItemSubtitle,
     appQrScanner,
     MatrixCellSelectionLabel,
   },
@@ -394,30 +407,4 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-:deep(.blue-chip, .orange-chip, .green-chip) {
-  display: inline-flex;
-  border: 1px rgb(var(--v-theme-focus)) solid;
-  color: rgb(var(--v-theme-focus));
-  border-radius: 0.6rem;
-  font-weight: bold;
-  font-size: 80%;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-  padding-right: 0.2rem;
-  vertical-align: middle;
-  margin-top: 0.4rem;
-  margin-bottom: 0.4rem;
-  margin-right: 0.2rem !important;
-}
-
-:deep(.green-chip) {
-  color: #46b355;
-  border: 1px #46b355 solid;
-}
-
-:deep(.orange-chip) {
-  color: #f38d49;
-  border: 1px #f38d49 solid;
-}
-</style>
+<style scoped lang="scss"></style>

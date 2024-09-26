@@ -49,9 +49,8 @@
             :validationErrors="surveyValidationErrors"
             @view-code-toggle="viewCode = !viewCode"
             @update="publish"
-            @cancel="onCancel"
             @saveDraft="saveDraft"
-            @delete="$emit('onDelete')"
+            @archive="$emit('onArchive')"
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
@@ -113,15 +112,34 @@
         </a-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
+        <a-alert
+          v-if="successMessage"
+          style="cursor: pointer"
+          type="success"
+          variant="outlined"
+          closable
+          @click:close="successMessage = null">
+          {{ successMessage }}
+        </a-alert>
+        <a-alert
+          v-if="errorMessage"
+          style="cursor: pointer"
+          type="error"
+          variant="outlined"
+          closable
+          @click:close="errorMessage = null">
+          {{ errorMessage }}
+        </a-alert>
         <code-editor
-          :saveable="true"
-          :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          :saveable="scriptIsSavable"
+          :readonly="!scriptIsSavable"
           @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
           @change="updateScriptCode"
-          @save="saveScript">
-        </code-editor>
+          @save="saveScript"
+          :isClosable="true"
+          :title="`Script: ${scriptCode.name}`" />
       </pane>
 
       <pane class="pane pane-main-code" v-if="hasCode && !hideCode">
@@ -151,8 +169,7 @@
                 :result="evaluated"
                 @change="updateSelectedCode"
                 :examples="true"
-                @examples="showExamples = true">
-              </code-editor>
+                @examples="showExamples = true" />
             </div>
           </pane>
           <pane size="20">
@@ -165,12 +182,7 @@
         class="pane pane-submission-code pane-shared-code"
         v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)">
         <div class="code-editor">
-          <code-editor
-            title="Shared Code"
-            v-if="survey"
-            class="code-editor"
-            :readonly="true"
-            :code="sharedCode"></code-editor>
+          <code-editor title="Shared Code" v-if="survey" class="code-editor" :readonly="true" :code="sharedCode" />
         </div>
       </pane>
 
@@ -205,7 +217,7 @@
               </a-btn>
 
               <a-btn @click="viewSubmission = true" class="ma-2" variant="outlined">
-                <span class="hidden-sm-and-down">submission</span>
+                <span class="hidden-sm-and-down">response</span>
                 <a-icon right>mdi-code-tags</a-icon>
               </a-btn>
             </template>
@@ -243,7 +255,6 @@ import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 import appCodeView from '@/components/builder/CodeView.vue';
 import appExamplesView from '@/components/builder/ExamplesView.vue';
-import appMixin from '@/components/mixin/appComponent.mixin';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 import slugify from '@/utils/slugify';
 import { defaultApiCompose } from '@/utils/apiCompose';
@@ -298,7 +309,6 @@ function ${variable}(submission, survey, parent) {
 const tabMap = ['relevance', 'initialize', 'calculate', 'constraint', 'apiCompose'];
 
 export default {
-  mixins: [appMixin],
   components: {
     UpdateLibraryDialog,
     Splitpanes,
@@ -356,6 +366,10 @@ export default {
       updateLibraryDialogIsVisible: false,
       updateLibraryRootGroup: null,
       updateToLibrary: null,
+      //successMessage and errorMessage for script update
+      timeoutID: undefined,
+      successMessage: null,
+      errorMessage: null,
     };
   },
   methods: {
@@ -365,13 +379,22 @@ export default {
         return;
       }
 
+      if (!this.scriptIsSavable) {
+        this.error(
+          "This script is managed by another group, so you can't save it.  If you want to make changes, contact the group who manages this script. Otherwise, you can copy the script contents and create your own script in your group which you can control directly."
+        );
+        return;
+      }
+
       try {
         if (this.scriptCode._id !== null) {
           await api.put(`/scripts/${this.scriptCode._id}`, this.scriptCode);
         } else {
           await api.post('/scripts', this.scriptCode);
         }
+        this.success('successfully saved');
       } catch (err) {
+        this.error(err);
         console.log(err);
       }
     },
@@ -382,12 +405,18 @@ export default {
       this.scriptCode.content = code;
     },
     publish() {
+      if (!this.isDraft) {
+        // handle the specific case of Version 1 to upgrade directly to Version 2
+        // Version 1 is defined at the creation stage, but is also used for rendering draft chips
+        this.createDraft();
+        this.initDirtyFlag(this.surveyUnderWork);
+      }
       this.$emit('onPublish');
     },
     saveDraft() {
       if (!this.isDraft) {
         this.createDraft();
-        this.initNavbarAndDirtyFlag(this.surveyUnderWork);
+        this.initDirtyFlag(this.surveyUnderWork);
       }
       this.$emit('onSaveDraft');
     },
@@ -497,7 +526,7 @@ export default {
       const { data } = await api.get(`/surveys/check-for-updates/${survey._id}`);
       this.availableLibraryUpdates = data;
     },
-    initNavbarAndDirtyFlag(survey) {
+    initDirtyFlag(survey) {
       if (!survey.revisions) {
         this.dirty = false;
       } else if (survey.revisions.length === 1 && !this.editMode) {
@@ -522,19 +551,6 @@ export default {
       }
 
       this.version = version;
-
-      const v = this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].version;
-      const amountQuestions = getSurveyPositions(this.surveyUnderWork, v);
-      this.setNavbarContent({
-        title: this.surveyUnderWork.name || 'Untitled Survey',
-        subtitle: `
-          <span class="question-title-chip">Version ${version}</span>
-          <!--<span class="ml-2">${amountQuestions.length} Question${
-            amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''
-          }</span>-->
-          <!--<span class="question-title-chip">${this.groupPath}</span>-->
-        `,
-      });
     },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
@@ -675,6 +691,30 @@ export default {
 
       this.scriptCode = data;
     },
+    success(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
+      window.scrollTo(0, 0);
+      setTimeout(() => {
+        this.successMessage = null;
+        this.timeoutID = null;
+      }, 15000);
+      this.successMessage = msg;
+      this.errorMessage = null;
+    },
+    error(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
+      this.errorMessage = msg;
+      this.successMessage = null;
+      window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.errorMessage = null;
+        this.timeoutID = null;
+      }, 15000);
+    },
     updateSurvey(controls) {
       this.surveyUnderWork.revisions[this.surveyUnderWork.revisions.length - 1].controls = controls;
     },
@@ -731,9 +771,6 @@ export default {
       } else {
         this.openLibrary(libraryId);
       }
-    },
-    onCancel() {
-      this.$router.push('/surveys/browse');
     },
     async setControlSource(value) {
       if (this.control.type === 'script') {
@@ -805,6 +842,23 @@ export default {
     },
   },
   computed: {
+    scriptIsSavable() {
+      if (this.control.type !== 'script') {
+        return false;
+      }
+      const scriptIsInQSL = Boolean(this.control.libraryId);
+      const scriptInQSLIsModifiable = this.control.options.allowModify;
+      const scriptIsInSameGroupAsSurvey = this.$route.params.id === this.scriptCode.meta.group.id;
+      // check that user is admin of script's group or one of it's ancestors
+      const scriptPath = this.scriptCode.meta.group.path;
+      const roles = this.$store.getters['memberships/memberships'].map((m) => `${m.role}@${m.group.path}`);
+      const targetRole = `admin@${scriptPath}`;
+      const userHasPermissionToSaveScript = roles.some((role) => targetRole.startsWith(role));
+      if (scriptIsInQSL) {
+        return scriptInQSLIsModifiable && userHasPermissionToSaveScript && scriptIsInSameGroupAsSurvey;
+      }
+      return userHasPermissionToSaveScript && scriptIsInSameGroupAsSurvey;
+    },
     surveyIsValid() {
       // return this.invalidValidations.length > 0 ? invalidValidations : true;
       return !(this.surveyValidationErrors.length > 0) && this.validateSurveyName() === true;
@@ -1006,7 +1060,7 @@ export default {
     },
     survey: {
       handler(newVal) {
-        this.initNavbarAndDirtyFlag(newVal);
+        this.initDirtyFlag(newVal);
         if (!this.initialSurvey || !this.surveyUnderWork) {
           this.surveyUnchanged = true;
         }
@@ -1032,9 +1086,20 @@ export default {
     },
   },
   created() {
-    this.initNavbarAndDirtyFlag(this.surveyUnderWork);
+    this.initDirtyFlag(this.surveyUnderWork);
     this.createInstance();
     this.checkForLibraryUpdates(this.surveyUnderWork);
+
+    // case question set to new survey from question sets list
+    const { libId, lib } = this.$route.query;
+    if (lib) {
+      this.surveyUnderWork.meta.isLibrary = true;
+      this.surveyUnderWork.meta.libraryDescription = '';
+      this.surveyUnderWork.meta.libraryApplications = '';
+      this.surveyUnderWork.meta.libraryMaintainers = '';
+      this.surveyUnderWork.meta.libraryHistory = '';
+      this.surveyUnderWork.meta.libraryLastChangeType = '';
+    } else if (libId) this.addQuestionsFromLibrary(libId);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue

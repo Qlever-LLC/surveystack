@@ -1,8 +1,7 @@
 <template>
   <vue-monaco-editor
     :value="modelValue"
-    theme="vs-dark"
-    :options="MONACO_EDITOR_OPTIONS"
+    :options="editorOptions"
     language="javascript"
     @change="emit('update:modelValue', $event)"
     @mount="handleMount"
@@ -12,7 +11,7 @@
 
 <script setup>
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor';
-import { shallowRef } from 'vue';
+import { shallowRef, computed } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -27,12 +26,19 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-const MONACO_EDITOR_OPTIONS = {
-  automaticLayout: true,
-  formatOnType: true,
-  formatOnPaste: true,
-  readOnly: props.readOnly,
-};
+const editorOptions = computed(() => {
+  return {
+    automaticLayout: true,
+    formatOnType: true,
+    formatOnPaste: true,
+    readOnly: props.readOnly,
+    minimap: { enabled: false },
+    readOnlyMessage: {
+      value: 'You don\'t have editing rights for this script. Please either go to the Group which owns this script and edit it there, ask the script authors to edit it for you, or copy the code and make your own version of the script in your group.'
+    },
+  };
+});
+
 
 const editorRef = shallowRef();
 const handleMount = (editor) => (editorRef.value = editor);

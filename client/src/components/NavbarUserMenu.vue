@@ -1,75 +1,79 @@
 <template>
-  <div>
-    <a-menu
-      v-if="isLoggedIn"
-      attach="#app-menu"
-      :close-on-content-click="false"
-      max-height="calc(100% - 100px)"
-      v-model="menuIsOpen"
-      location="bottom">
-      <template v-slot:activator="{ props }">
-        <a-btn variant="text" v-bind="props" @click="checkIsOwner()">
-          <a-icon large>mdi-account</a-icon>
-        </a-btn>
-      </template>
-      <a-list flat>
-        <a-list-item link to="/auth/profile" prepend-icon="mdi-account-circle">
-          <a-list-item-title> Profile </a-list-item-title>
-        </a-list-item>
-        <a-list-item v-if="isOwner" link to="/farmos/profile" prepend-icon="mdi-leaf-circle-outline">
-          <a-list-item-title> FarmOS Profile </a-list-item-title>
-        </a-list-item>
-        <a-divider />
-        <a-list-subheader>Active Group</a-list-subheader>
-        <active-group-selector-list />
-        <a-divider />
-        <a-list-item link @click="logout" class="mt-2" prepend-icon="mdi-logout-variant">
-          <a-list-item-title> Sign Out </a-list-item-title>
-        </a-list-item>
-      </a-list>
-    </a-menu>
+  <farm-o-s-profile v-model="state.showFarmosProfile"></farm-o-s-profile>
+  <a-menu
+    v-if="isLoggedIn"
+    :close-on-content-click="false"
+    max-height="calc(100% - 100px)"
+    v-model="state.menuIsOpen"
+    location="bottom">
+    <template v-slot:activator="{ props }">
+      <a-btn variant="text" v-bind="props" @click="checkIsOwner()" class="pa-0" style="min-width: 40px">
+        <a-icon large color="white">mdi-account</a-icon>
+      </a-btn>
+    </template>
+    <a-list flat>
+      <a-list-item link to="/auth/profile" prepend-icon="mdi-account-circle" @click="closeMenu()">
+        <a-list-item-title> Profile </a-list-item-title>
+      </a-list-item>
+      <a-list-item v-if="state.isOwner" link @click="displayFarmOSProfile" prepend-icon="mdi-leaf-circle-outline">
+        <a-list-item-title> FarmOS Profile </a-list-item-title>
+      </a-list-item>
+      <a-divider />
+      <a-list-item link @click="logout" class="mt-2" prepend-icon="mdi-logout-variant">
+        <a-list-item-title> Sign Out </a-list-item-title>
+      </a-list-item>
+    </a-list>
+  </a-menu>
 
-    <a-btn v-else :to="{ name: 'auth-login' }" variant="text">
-      <a-icon>mdi-login-variant</a-icon>
-      <span class="ml-2">Login</span>
-    </a-btn>
-  </div>
+  <a-btn v-else :to="{ name: 'home' }" variant="text" large color="white">
+    <a-icon>mdi-login-variant</a-icon>
+    <span class="ml-2">Login</span>
+  </a-btn>
 </template>
 
-<script>
-import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+<script setup>
+import { reactive, computed } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 import api from '@/services/api.service';
 
-export default {
-  components: {
-    ActiveGroupSelectorList,
-  },
-  data() {
-    return {
-      menuIsOpen: false,
-      isOwner: false,
-    };
-  },
-  computed: {
-    isLoggedIn() {
-      return this.$store.getters['auth/isLoggedIn'];
-    },
-  },
-  methods: {
-    async checkIsOwner() {
-      const user = this.$store.getters['auth/user'];
-      this.isOwner = false;
-      if (user) {
-        const userId = user._id;
-        const { data } = await api.get(`/owner/${userId}`);
-        this.isOwner = data;
-      }
-    },
-    async logout() {
-      this.$store.dispatch('auth/logout');
-      this.$router.push('/auth/login');
-    },
-  },
-};
+import FarmOSProfile from '@/pages/users/FarmOSProfile.vue';
+
+const store = useStore();
+const router = useRouter();
+
+const state = reactive({
+  menuIsOpen: false,
+  isOwner: false,
+  showFarmosProfile: false,
+});
+
+const isLoggedIn = computed(() => {
+  return store.getters['auth/isLoggedIn'];
+});
+
+function closeMenu() {
+  state.menuIsOpen = false;
+}
+
+function displayFarmOSProfile() {
+  closeMenu();
+  state.showFarmosProfile = true;
+}
+
+async function checkIsOwner() {
+  const user = store.getters['auth/user'];
+  state.isOwner = false;
+  if (user) {
+    const userId = user._id;
+    const { data } = await api.get(`/owner/${userId}`);
+    state.isOwner = data;
+  }
+}
+async function logout() {
+  closeMenu();
+  store.dispatch('auth/logout');
+  router.push('/');
+}
 </script>

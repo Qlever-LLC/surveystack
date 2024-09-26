@@ -109,6 +109,8 @@
 import { VueDraggable } from 'vue-draggable-plus';
 import api from '@/services/api.service';
 import { ref, reactive } from 'vue';
+import { useStore } from 'vuex';
+const store = useStore();
 
 const props = defineProps({
   group: {
@@ -159,6 +161,11 @@ async function addEntry() {
     };
     state.addToDescendants = false;
     await form.value.resetValidation();
+    //reload the memberships so the docs update in the left navigation too
+    const user = store.getters['auth/user'];
+    await store.dispatch('memberships/getUserMemberships', user._id);
+    //TODO replace this by making GroupDocsNavigation.vue reactive to changes of the active group
+    window.location.reload();
   }
 }
 async function cancelAddEntry() {
@@ -190,5 +197,10 @@ async function removeAt(idx) {
   });
   props.group.docs.splice(idx, 1);
   state.removeFromDescendants = false;
+  //reload the memberships so the docs update in the left navigation too
+  const user = store.getters['auth/user'];
+  await store.dispatch('memberships/getUserMemberships', user._id);
+  //TODO replace this by making GroupDocsNavigation.vue reactive to changes of the active group
+  window.location.reload();
 }
 </script>

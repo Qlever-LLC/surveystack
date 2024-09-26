@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
-import { clearAllSubmissions, clearAllResources, clearAllSurveys } from '../src/store/db';
+import { clearAllSubmissions, clearAllResources } from '../src/store/db';
 
 window.scrollTo = () => {};
 
@@ -22,9 +22,5 @@ global.TextDecoder = TextDecoder;
 
 // eslint-disable-next-line no-undef
 afterEach(async () => {
-  await Promise.all([
-    clearAllSubmissions(),
-    clearAllResources(),
-    clearAllSurveys(),
-  ]);
+  await Promise.all([clearAllSubmissions(), clearAllResources()]);
 });

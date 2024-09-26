@@ -4,16 +4,14 @@ import { createVuetify } from 'vuetify';
 const light = {
   dark: false,
   colors: {
-    primary: '#0E87CC',
+    primary: '#006CD0', //as defined in brand guide
     secondary: '#014D4E',
-    accent: '#1FA774',
-    error: '#f44336',
-    warning: '#ffc107',
+    accent: '#225034', //as defined in brand guide
+    error: '#D3400B', //as defined in brand guide
+    warning: '#F1B711', //as defined in brand guide
     info: '#82AF9C',
     success: '#8bc34a',
-    appbar: '#f5f5f5',
-    background: '#d9d9d9',
-    'on-background': '#000000',
+    background: '#EBEBEB', //background: linear-gradient(179.97deg, #F5F5F5 0.03%, #EBEBEB 61.81%);
     heading: '#212121',
     focus: '#0E87CC',
   },
@@ -22,11 +20,11 @@ const light = {
 const dark = {
   dark: true,
   colors: {
-    primary: '#0E87CC',
+    primary: '#006CD0', //as defined in brand guide
     secondary: '#014D4E',
-    accent: '#1FA774',
-    error: '#f44336',
-    warning: '#ffc107',
+    accent: '#225034', //as defined in brand guide
+    error: '#D3400B', //as defined in brand guide
+    warning: '#F1B711', //as defined in brand guide
     info: '#82AF9C',
     success: '#8bc34a',
     appbar: '#212121', // Dark background for appbar
@@ -43,7 +41,12 @@ const vuetify = createVuetify({
       light,
       dark,
     },
+    variations: {
+      colors: ['accent'],
+      lighten: 8, //add two lighten variants
+      darken: 8, //add two darken variants
+    },
   },
 });
 
-export default vuetify;
+export { vuetify };

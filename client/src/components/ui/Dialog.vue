@@ -6,7 +6,7 @@
     :max-width="maxWidth"
     :persistent="modal"
     v-bind="$attrs">
-    <a-card>
+    <a-card class="pa-2">
       <a-card-title class="headline">
         <slot name="title">{{ title }}</slot>
       </a-card-title>
@@ -15,8 +15,11 @@
       </a-card-text>
       <a-card-actions>
         <a-spacer />
-        <a-btn v-if="!hideCancel" variant="text" @click="$emit('cancel')">Cancel</a-btn>
-        <a-btn variant="text" @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</a-btn>
+        <a-btn v-if="!hideCancel" @click="$emit('cancel')" class="mr-2">Cancel</a-btn>
+        <a-btn color="primary" variant="flat" @click="$emit('confirm')">
+          <slot name="iconLeftToConfirm"></slot>
+          {{ labelConfirm ? labelConfirm : 'OK' }}
+        </a-btn>
       </a-card-actions>
     </a-card>
   </a-dialog>
@@ -45,6 +48,6 @@ export default {
       default: false,
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'cancel', 'confirm'],
 };
 </script>

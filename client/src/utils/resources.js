@@ -3,7 +3,6 @@ import slugify from '@/utils/slugify';
 import api from '@/services/api.service';
 import axios from 'axios';
 import { linearControls } from '@/utils/submissions';
-import downloadExternal from './downloadExternal';
 
 export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
@@ -76,9 +75,22 @@ export function getLabelFromKey(resourceKey) {
 }
 
 export async function openResourceInTab(store, resourceId) {
-  let resource = await store.dispatch('resources/fetchResource', resourceId);
-  let url = window.URL.createObjectURL(resource.fileData);
-  downloadExternal(url, `${resource.label}`);
+  try {
+    let resource = await store.dispatch('resources/fetchResource', resourceId);
+    let url = window.URL.createObjectURL(resource.fileData);
+
+    const element = document.createElement('a');
+    element.setAttribute('href', url);
+    element.setAttribute('target', '_blank');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('An error occurred while trying to open the file.', error);
+    store.dispatch('feedback/add', 'An error occurred while trying to open the file.', { root: true });
+  }
 }
 
 export async function getSignedDownloadUrl(resourceKey) {
@@ -115,7 +127,7 @@ export async function uploadFileResource(store, resourceKey, clearCacheAfterUplo
     //set resource to committed
     await api.put(`/resources/commit/${resource._id}`, { dummy: '' });
     if (clearCacheAfterUpload) {
-      await store.dispatch('resources/removeLocalResource', resource.key);
+      await store.dispatch('resources/removeLocalResource', { key: resource.key });
     } else {
       await store.dispatch('resources/updateResourceState', {
         resourceKey: resource.key,
