@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import _, { isError } from 'lodash';
 
 import { ObjectId } from 'mongodb';
@@ -184,6 +185,65 @@ const createRedactStage = (user, roles) => {
   };
 };
 
+function createRedactAdminApiComposeStage(roles) {
+  return [
+    {
+      $set: {
+        updatedMeta: {
+          $function: {
+            body: function (doc, roles) {
+              // Recursive function to update 'meta' objects
+              function processMeta(obj, roles) {
+                if (obj && typeof obj === 'object') {
+                  // If the object has a 'meta' property, modify its content
+                  if (obj.hasOwnProperty('meta') && typeof obj.meta === 'object') {
+                    const updatedMeta = { ...obj.meta };
+
+                    // Checks for the presence of 'apiCompose
+                    if (updatedMeta.hasOwnProperty('apiCompose')) {
+                      // example: submission_role = "admin@/oursci/lab/testing/"
+                      // A user role of "admin@/oursci/" can view, since
+                      // "admin@/oursci/lab/testing" is a regexMatch of "^admin@/oursci/"
+                      const hasAdminRole = roles.some(function (role) {
+                        const submissionRole = 'admin@' + doc.meta.group.path;
+                        const regex = new RegExp('^' + role);
+                        return regex.test(submissionRole);
+                      });
+
+                      if (!hasAdminRole) {
+                        updatedMeta.apiCompose = [];
+                      }
+                    }
+
+                    obj.meta = updatedMeta;
+                  }
+
+                  // Processes sub-objects recursively
+                  Object.keys(obj).forEach(function (key) {
+                    if (typeof obj[key] === 'object') {
+                      obj[key] = processMeta(obj[key], roles);
+                    }
+                  });
+                }
+                return obj;
+              }
+
+              return processMeta(doc, roles);
+            }.toString(),
+            args: ['$$ROOT', roles],
+            lang: 'js',
+          },
+        },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$updatedMeta',
+      },
+    },
+  ];
+}
+
 const createRelevanceStage = () => {
   return {
     $redact: {
@@ -290,6 +350,9 @@ const buildPipeline = async (req, res) => {
 
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
+
+  const apiComposeStage = createRedactAdminApiComposeStage(roles);
+  pipeline.push(...apiComposeStage);
 
   // user defined match stage
   if (req.query.match) {
@@ -651,6 +714,9 @@ const getSubmission = async (req, res) => {
   // Redact
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
+
+  const apiComposeStage = createRedactAdminApiComposeStage(roles);
+  pipeline.push(...apiComposeStage);
 
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();
   if (!entity) {
