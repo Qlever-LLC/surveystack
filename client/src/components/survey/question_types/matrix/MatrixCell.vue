@@ -1,7 +1,7 @@
 <template>
   <a-textarea
     v-if="header.type === 'text' && header?.longText"
-    rows="3"
+    rows="1"
     autoGrow
     :modelValue="value"
     @update:modelValue="onInput"

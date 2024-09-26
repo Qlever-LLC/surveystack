@@ -12,7 +12,7 @@
       <div style="flex: 1">
         <a-textarea
           v-if="control.options?.longText"
-          rows="3"
+          rows="1"
           autoGrow
           variant="outlined"
           :label="control.hint"
