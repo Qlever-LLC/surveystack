@@ -465,7 +465,6 @@ const mutations = {
     state.survey = survey;
     state.submission = submission;
     state.persist = persist;
-    state.loading = false;
 
     state.showOverview = false;
     state.showConfirmSubmission = false;
@@ -481,6 +480,8 @@ const mutations = {
       .forEach((node) => {
         // node.drop();
       });
+
+    state.loading = false;
   },
   SET_PROPERTY(state, { path, value }) {
     const keys = path.split('.');
