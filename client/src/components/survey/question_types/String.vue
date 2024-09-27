@@ -17,7 +17,7 @@
           variant="outlined"
           :label="control.hint"
           :modelValue="modelValue"
-          @update:modelValue="onInput"
+          @update:modelValue="onInput($event, false)"
           class="full-width"
           :disabled="!relevant"
           hide-details
@@ -72,8 +72,8 @@ export default {
     onQrCodeScanned(code) {
       this.changed(code);
     },
-    onInput(v) {
-      const newValue = getValueOrNull(v);
+    onInput(v, StringTrimed = true) {
+      const newValue = getValueOrNull(v, StringTrimed);
       if (this.modelValue !== newValue) {
         this.changed(newValue);
       }

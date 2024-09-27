@@ -4,7 +4,7 @@
     rows="1"
     autoGrow
     :modelValue="value"
-    @update:modelValue="onInput"
+    @update:modelValue="onInput($event, false)"
     variant="outlined"
     hide-details
     autocomplete="off"
@@ -326,8 +326,8 @@ export default {
     setToNull() {
       this.value = null;
     },
-    onInput(value) {
-      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+    onInput(value, StringTrimed = true) {
+      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value, StringTrimed);
       this.$emit('changed');
     },
     onDateInput(value, index, header) {

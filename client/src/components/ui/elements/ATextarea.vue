@@ -1,7 +1,7 @@
 <template>
   <v-textarea
     ref="refTextarea"
-    @blur="$emit('blur')"
+    @blur="trimAndEmitBlur"
     @dragleave="$emit('dragleave', $event)"
     @dragover="$emit('dragover', $event)"
     @drop="$emit('drop', $event)"
@@ -47,6 +47,14 @@ const props = defineProps({
     default: 'filled',
   },
 });
+
+function trimAndEmitBlur() {
+  if (props.modelValue) {
+    const value = props.modelValue.trim();
+    emit('update:modelValue', value);
+  }
+  emit('blur');
+}
 
 const refTextarea = ref(null);
 
