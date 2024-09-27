@@ -76,6 +76,7 @@
 
     <app-matrix-table
       :headers="headers"
+      :fakeRow="generateFakeRow()"
       :rows="rows || []"
       :fixedColumns="fixedColumns"
       :isMobile="isMobile"
@@ -203,6 +204,10 @@ export default {
     },
   },
   methods: {
+    generateFakeRow() {
+      const createdFakeRow = createRow(this.fields, this.headers);
+      return [createdFakeRow];
+    },
     add() {
       const newRow = createRow(this.fields, this.headers);
       if (this.rows === null) {
