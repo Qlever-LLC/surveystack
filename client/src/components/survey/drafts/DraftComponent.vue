@@ -124,7 +124,7 @@ import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
-import { queueAction } from '@/utils/surveyStack';
+import { queueAction, isRelevant } from '@/utils/surveyStack';
 
 export default {
   components: {
@@ -144,6 +144,7 @@ export default {
   data() {
     return {
       overflowing: false,
+      atEnd: false,
     };
   },
   computed: {
@@ -158,14 +159,6 @@ export default {
     },
     questionNumber() {
       return this.$store.getters['draft/questionNumber'];
-    },
-    atEnd: {
-      get() {
-        return this.$store.getters['draft/atEnd'];
-      },
-      set(v) {
-        queueAction(this.$store, 'draft/atEnd', v);
-      },
     },
     showOverview: {
       get() {
@@ -184,6 +177,29 @@ export default {
         this.$store.dispatch('draft/showConfirmSubmission', v);
       },
     },
+    curentLastLocalElement() {
+      return this.$store.getters['draft/lastLocalElement'];
+    },
+    pathOfLastDraftElement() {
+      const draftStructure = [];
+      const overviews = this.$store.getters['draft/overviews'];
+      for (let i = 0; i < overviews.length; i++) {
+        const overview = overviews[i];
+
+        const { node, control } = overview;
+        if (control.type === 'group' || control.type === 'page') {
+          continue;
+        }
+
+        const relevant = isRelevant(this.$store, node);
+        if (!relevant) {
+          continue;
+        }
+
+        draftStructure.push(overview.path);
+      }
+      return draftStructure[draftStructure.length - 1];
+    },
   },
   watch: {
     path() {
@@ -199,6 +215,11 @@ export default {
           vm.overflowing = false;
         }
       }, 500);
+
+      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
+        // We are on the last question
+        this.atEnd = true;
+      }
     },
     overflowing(val, oldVal) {
       if (val && !oldVal) {
@@ -222,6 +243,12 @@ export default {
       }
     },
     next() {
+      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
+        // We are on the last question
+        this.atEnd = true;
+        this.submit();
+        return;
+      }
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
       this.scrollTop();
@@ -237,6 +264,13 @@ export default {
       this.showOverview = false;
     },
     submit() {
+      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement !== this.curentLastLocalElement) {
+        // We aren't on the last question, this reactivity problem arises if the last question has an relevance Expression based on the second-last question
+        this.atEnd = false;
+        this.next();
+        return;
+      }
+
       // if group is not yet set, select the group defined by the url path
       if (!this.submission.meta.group.id) {
         const currentGroupId = this.$route.params.id;

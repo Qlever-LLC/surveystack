@@ -110,6 +110,7 @@ import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
+import { isRelevant } from '@/utils/surveyStack';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -161,17 +162,6 @@ export default {
           item.hidden = false;
         });
     },
-    isRelevant(node) {
-      const relevant = node.getPath().every((n) => {
-        const p = n
-          .getPath()
-          .map((nn) => nn.model.name)
-          .join('.');
-        const r = this.$store.getters['draft/property'](`${p}.meta.relevant`, true);
-        return r;
-      });
-      return relevant;
-    },
     refresh() {
       const [dateCreated, dateModified, dateSubmitted] = [
         this.submission.meta.dateCreated,
@@ -201,14 +191,14 @@ export default {
           continue; // eslint-disable-line no-continue
         }
 
-        const relevant = this.isRelevant(node);
+        const relevant = isRelevant(this.$store, node);
 
         let lastOfCollation = false;
 
         if (!relevant) {
           collate++;
           // end collation if there are no next nodes or next nodes are relevant again
-          if (!nextOverview || (nextOverview && this.isRelevant(nextOverview.node))) {
+          if (!nextOverview || (nextOverview && isRelevant(this.$store, nextOverview.node))) {
             lastOfCollation = true;
           }
         } else {
