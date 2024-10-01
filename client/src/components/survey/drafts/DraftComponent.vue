@@ -57,7 +57,13 @@
           <a-icon>mdi-arrow-down</a-icon>
         </a-btn>
       </a-fab-transition>
-      <app-control class="pb-1" :path="path" :control="control" :forceMobile="forceMobile" :isInBuilder="builder" />
+      <app-control
+        class="pb-1"
+        :path="path"
+        :control="control"
+        :forceMobile="forceMobile"
+        :isInBuilder="builder"
+        @updateContent="refreshFooter" />
     </div>
 
     <!-- Footer with next/prev buttons -->
@@ -216,10 +222,7 @@ export default {
         }
       }, 500);
 
-      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
-        // We are on the last question
-        this.atEnd = true;
-      }
+      this.refreshFooter();
     },
     overflowing(val, oldVal) {
       if (val && !oldVal) {
@@ -228,6 +231,14 @@ export default {
     },
   },
   methods: {
+    refreshFooter() {
+      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
+        // We are on the last question
+        this.atEnd = true;
+      } else {
+        this.atEnd = false;
+      }
+    },
     overviewClicked() {
       if (!this.showOverview) {
         this.atEnd = false;
@@ -243,13 +254,6 @@ export default {
       }
     },
     next() {
-      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
-        // We are on the last question
-        this.atEnd = true;
-        this.submit();
-        return;
-      }
-      // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
       this.scrollTop();
     },
@@ -264,13 +268,6 @@ export default {
       this.showOverview = false;
     },
     submit() {
-      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement !== this.curentLastLocalElement) {
-        // We aren't on the last question, this reactivity problem arises if the last question has an relevance Expression based on the second-last question
-        this.atEnd = false;
-        this.next();
-        return;
-      }
-
       // if group is not yet set, select the group defined by the url path
       if (!this.submission.meta.group.id) {
         const currentGroupId = this.$route.params.id;

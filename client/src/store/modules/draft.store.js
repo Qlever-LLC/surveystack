@@ -89,16 +89,36 @@ const getters = {
   atStart: (state) => state.node === state.firstNode,
   lastLocalElement: (state) => {
     /*
-    aim: in a page return last question
+    aim: return last relevant question
     struct: page:{group:{q1, q2}}
-    return page.group.q2
+    return page.group.q2 if q2 is relevant
     */
-    let lastChild = state.node;
-    while (lastChild?.hasChildren()) {
-      lastChild = lastChild?.children[lastChild?.children.length - 1];
-    }
-    if (lastChild) {
-      return getPath(lastChild).replace('[', '.').replace(']', '');
+    let currentNode = state.node;
+
+    // Recursive function to find the last child that is relevant
+    const findLastRelevantChild = (node) => {
+      let relevantNode = node;
+
+      while (relevantNode?.hasChildren()) {
+        const relevantChildren = relevantNode.children.filter((child) =>
+          surveyStackUtils.getRelevance(state.submission, getPath(child), true)
+        );
+
+        if (relevantChildren.length === 0) {
+          break; // No relevant children found, stop here
+        }
+
+        relevantNode = relevantChildren[relevantChildren.length - 1]; // Take the last relevant child
+      }
+
+      return relevantNode;
+    };
+
+    // Find the last relevant child
+    const lastRelevantChild = findLastRelevantChild(currentNode);
+
+    if (lastRelevantChild) {
+      return getPath(lastRelevantChild).replace('[', '.').replace(']', '');
     }
     return '';
   },
@@ -503,6 +523,7 @@ const mutations = {
     }
 
     parent[childKey] = value;
+    console.log('parent[childKey]', childKey, parent[childKey]);
   },
   SET_NEXT_ENABLE(state, enable) {
     state.enableNext = enable;

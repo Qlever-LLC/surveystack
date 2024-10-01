@@ -3,6 +3,7 @@
     <div v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
         <app-control
+          @updateContent="emit('updateContent')"
           :path="`${path}.${child.name}`"
           :control="child"
           :autoFocus="i === 0"
@@ -24,6 +25,7 @@
 
         <div v-for="(child, i) in control.children" :key="i">
           <app-control
+            @updateContent="emit('updateContent')"
             :path="`${path}.${child.name}`"
             :control="child"
             :autoFocus="autoFocus && i === 0"
@@ -83,6 +85,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 const store = useStore();
 const queryClient = useQueryClient();
 
+const emit = defineEmits(['updateContent']);
+
 const props = defineProps({
   path: {
     type: String,
@@ -132,29 +136,32 @@ const value = computed(() => {
   return property ? property.value : null;
 });
 
-function setProperty(value) {
+async function setProperty(value) {
   const path = `${props.path}.value`;
   // adjust modified date of the control
   const modified = new Date().toISOString();
-  store.dispatch('draft/setProperty', {
-    path: `${props.path}.meta.dateModified`,
-    value: modified,
-    calculate: false,
-    initialize: false,
-  });
-  // adjust modified date of the submission
-  store.dispatch('draft/setProperty', {
-    path: 'meta.dateModified',
-    value: modified,
-    calculate: false,
-    initialize: false,
-  });
-  // adjust value
-  store.dispatch('draft/setProperty', { path, value });
+  await Promise.all([
+    store.dispatch('draft/setProperty', {
+      path: `${props.path}.meta.dateModified`,
+      value: modified,
+      calculate: false,
+      initialize: false,
+    }),
+    // adjust modified date of the submission
+    store.dispatch('draft/setProperty', {
+      path: 'meta.dateModified',
+      value: modified,
+      calculate: false,
+      initialize: false,
+    }),
+    // adjust value
+    store.dispatch('draft/setProperty', { path, value }),
+  ]);
   if (!state.once) {
     state.once = true;
     queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
   }
+  emit('updateContent');
 }
 function setStatus({ type, message }) {
   store.dispatch('draft/setProperty', { path: `${props.path}.meta.status`, value: type });
