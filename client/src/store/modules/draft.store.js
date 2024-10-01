@@ -523,7 +523,6 @@ const mutations = {
     }
 
     parent[childKey] = value;
-    console.log('parent[childKey]', childKey, parent[childKey]);
   },
   SET_NEXT_ENABLE(state, enable) {
     state.enableNext = enable;
