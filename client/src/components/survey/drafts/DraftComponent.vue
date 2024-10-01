@@ -241,7 +241,7 @@ export default {
     },
     overviewClicked() {
       if (!this.showOverview) {
-        this.atEnd = false;
+        this.refreshFooter();
       }
       this.showOverview = !this.showOverview;
     },
