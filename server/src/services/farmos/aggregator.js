@@ -328,9 +328,12 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   };
 
   const getAdminLink = async (farmurl) => {
-    const r = await axios.get(`${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/login?`, {
-      ...opts,
-    });
+    const r = await axios.get(
+      `${apiBase}/farms/relay/${encodeURIComponent(farmurl.toLowerCase())}/api/login?`,
+      {
+        ...opts,
+      }
+    );
 
     return r.data;
   };
