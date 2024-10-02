@@ -7,7 +7,7 @@
     </div>
     <div class="instance-map mt-1 pb-1" v-for="instance in instanceMap" :key="`instance-${instance.name}`">
       <div class="instance-name ml-4">
-        <a-btn @click="$emit('open', { instanceName: instance.name, userId: user.id })" small icon>
+        <a-btn @click="$emit('open', { instanceName: instance.name.toLowerCase(), userId: user.id })" small icon>
           <a-icon small>mdi-open-in-new</a-icon>
         </a-btn>
         {{ instance.name }}
