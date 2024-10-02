@@ -560,7 +560,7 @@ describe('farmos-controller', () => {
       fullName: 'Unit tester',
       farmAddress: 'Unit Farm Address',
       units: 'metric',
-      timezone: 'US/Eastern',
+      timezone: 'America/New_York',
       planName: 'unit-plan',
       owner: user1.user._id + '',
       agree: true,
