@@ -2,12 +2,14 @@
   <v-textarea
     ref="refTextarea"
     @blur="trimAndEmitBlur"
+    @click:appendInner="$emit('click:appendInner', $event)"
     @dragleave="$emit('dragleave', $event)"
     @dragover="$emit('dragover', $event)"
     @drop="$emit('drop', $event)"
     @update:focused="$emit('update:focused', $event)"
     @update:modelValue="$emit('update:modelValue', $event)"
     :class="{ fontMonospace: cssFontMonospace, markdown: cssMarkdown }"
+    :append-inner-icon="appendInnerIcon"
     :auto-grow="autoGrow"
     :clearable="clearable"
     :disabled="disabled"
@@ -23,13 +25,22 @@
 <script setup>
 import { ref } from 'vue';
 
-const emit = defineEmits(['blur', 'dragleave', 'dragover', 'drop', 'update:focused', 'update:modelValue']);
+const emit = defineEmits([
+  'blur',
+  'click:appendInner',
+  'dragleave',
+  'dragover',
+  'drop',
+  'update:focused',
+  'update:modelValue',
+]);
 
 const props = defineProps({
   //non vuetify props
   cssFontMonospace: { type: Boolean, required: false },
   cssMarkdown: { type: Boolean, required: false },
   // //vuetify props
+  appendInnerIcon: { type: String, required: false },
   autoGrow: { type: Boolean, required: false },
   clearable: { type: Boolean, required: false },
   disabled: { type: Boolean, required: false },

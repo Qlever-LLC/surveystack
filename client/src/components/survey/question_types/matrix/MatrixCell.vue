@@ -11,7 +11,7 @@
     hide-details
     autocomplete="off"
     :disabled="disabled"
-    clearable />
+    append-inner-icon="mdi-arrow-up-drop-circle-outline" />
   <a-text-field
     v-else-if="header.type === 'text'"
     @click="clickToRevealTextArea"
@@ -21,7 +21,7 @@
     hide-details
     autocomplete="off"
     :disabled="disabled"
-    clearable />
+    :clearable="header?.longText ? false : true" />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
       <a-text-field
@@ -266,7 +266,7 @@ export default {
   data() {
     return {
       menus: {}, // object to hold v-models for v-menu
-      renderTextarea: true,
+      renderTextarea: false,
     };
   },
   computed: {
