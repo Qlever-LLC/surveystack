@@ -5,6 +5,7 @@
     :autocomplete="autocomplete"
     :autofocus="autofocus"
     :bgColor="bgColor"
+    class="textEllipsis"
     :class="{ noBorder: disabled }"
     :clear-icon="clearIcon"
     :clearable="clearable"
@@ -120,5 +121,9 @@ export default {
 <style scoped lang="scss">
 .noBorder >>> .v-input__slot::before {
   border: none !important;
+}
+
+.textEllipsis :deep(input) {
+  text-overflow: ellipsis !important;
 }
 </style>

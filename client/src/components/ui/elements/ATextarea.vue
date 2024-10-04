@@ -5,6 +5,7 @@
     @dragleave="$emit('dragleave', $event)"
     @dragover="$emit('dragover', $event)"
     @drop="$emit('drop', $event)"
+    @update:focused="$emit('update:focused', $event)"
     @update:modelValue="$emit('update:modelValue', $event)"
     :class="{ fontMonospace: cssFontMonospace, markdown: cssMarkdown }"
     :auto-grow="autoGrow"
@@ -22,7 +23,7 @@
 <script setup>
 import { ref } from 'vue';
 
-const emit = defineEmits(['blur', 'dragleave', 'dragover', 'drop', 'update:modelValue']);
+const emit = defineEmits(['blur', 'dragleave', 'dragover', 'drop', 'update:focused', 'update:modelValue']);
 
 const props = defineProps({
   //non vuetify props

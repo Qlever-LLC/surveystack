@@ -1,6 +1,8 @@
 <template>
   <a-textarea
-    v-if="header.type === 'text' && header?.longText"
+    v-if="header.type === 'text' && header?.longText && getRenderTextarea"
+    ref="textarea"
+    @update:focused="focus"
     rows="1"
     autoGrow
     :modelValue="value"
@@ -12,6 +14,7 @@
     clearable />
   <a-text-field
     v-else-if="header.type === 'text'"
+    @click="clickToRevealTextArea"
     :modelValue="value"
     @update:modelValue="onInput"
     variant="outlined"
@@ -263,6 +266,7 @@ export default {
   data() {
     return {
       menus: {}, // object to hold v-models for v-menu
+      renderTextarea: true,
     };
   },
   computed: {
@@ -291,6 +295,9 @@ export default {
         }
         this.item[this.header.value].value = newValue;
       },
+    },
+    getRenderTextarea() {
+      return this.renderTextarea;
     },
     dateForPicker() {
       if (this.value) {
@@ -325,6 +332,26 @@ export default {
     },
     setToNull() {
       this.value = null;
+    },
+    clickToRevealTextArea() {
+      if (this.header?.longText) {
+        this.renderTextarea = true;
+
+        this.$nextTick(() => {
+          const textarea = this.$refs.textarea;
+          if (textarea) {
+            const textareaElement = textarea.$el.querySelector('textarea');
+            if (textareaElement) {
+              textareaElement.focus();
+            }
+          }
+        });
+      }
+    },
+    focus(isFocused) {
+      if (!isFocused) {
+        this.renderTextarea = false;
+      }
     },
     onInput(value, StringTrimed = true) {
       this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value, StringTrimed);
