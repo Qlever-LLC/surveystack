@@ -57,6 +57,7 @@
           </a-btn>
           <a-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+            @click.stop="$emit('update-library-control', el)"
             class="align-center text-align-center text-center"
             small
             :color="
@@ -73,12 +74,7 @@
                   ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
                   : 'newest available version'
             ">
-            <a-icon
-              v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
-              @click.stop="$emit('update-library-control', el)"
-              left>
-              mdi-refresh
-            </a-icon>
+            <a-icon v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion" left> mdi-refresh </a-icon>
             Version {{ el.libraryVersion }}
           </a-chip>
           <a-btn
