@@ -1,13 +1,17 @@
 <template>
   <v-textarea
     ref="refTextarea"
-    @blur="$emit('blur')"
+    @blur="trimAndEmitBlur"
+    @click:appendInner="$emit('click:appendInner', $event)"
     @dragleave="$emit('dragleave', $event)"
     @dragover="$emit('dragover', $event)"
     @drop="$emit('drop', $event)"
+    @update:focused="$emit('update:focused', $event)"
     @update:modelValue="$emit('update:modelValue', $event)"
     :class="{ fontMonospace: cssFontMonospace, markdown: cssMarkdown }"
+    :append-inner-icon="appendInnerIcon"
     :auto-grow="autoGrow"
+    :clearable="clearable"
     :disabled="disabled"
     :hide-details="hideDetails"
     :label="label"
@@ -21,14 +25,24 @@
 <script setup>
 import { ref } from 'vue';
 
-const emit = defineEmits(['blur', 'dragleave', 'dragover', 'drop', 'update:modelValue']);
+const emit = defineEmits([
+  'blur',
+  'click:appendInner',
+  'dragleave',
+  'dragover',
+  'drop',
+  'update:focused',
+  'update:modelValue',
+]);
 
 const props = defineProps({
   //non vuetify props
   cssFontMonospace: { type: Boolean, required: false },
   cssMarkdown: { type: Boolean, required: false },
   // //vuetify props
+  appendInnerIcon: { type: String, required: false },
   autoGrow: { type: Boolean, required: false },
+  clearable: { type: Boolean, required: false },
   disabled: { type: Boolean, required: false },
   hideDetails: { type: [Boolean, String], required: false },
   label: { type: String, required: false },
@@ -45,6 +59,14 @@ const props = defineProps({
     default: 'filled',
   },
 });
+
+function trimAndEmitBlur() {
+  if (props.modelValue) {
+    const value = props.modelValue.trim();
+    emit('update:modelValue', value);
+  }
+  emit('blur');
+}
 
 const refTextarea = ref(null);
 

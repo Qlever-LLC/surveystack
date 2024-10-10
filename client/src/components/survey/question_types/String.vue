@@ -10,7 +10,21 @@
       @initialize="initialize" />
     <div style="display: flex">
       <div style="flex: 1">
+        <a-textarea
+          v-if="control.options?.longText"
+          rows="1"
+          autoGrow
+          variant="outlined"
+          :label="control.hint"
+          :modelValue="modelValue"
+          @update:modelValue="onInput($event, false)"
+          class="full-width"
+          :disabled="!relevant"
+          hide-details
+          color="focus"
+          clearable />
         <a-text-field
+          v-else
           variant="outlined"
           :label="control.hint"
           :modelValue="modelValue"
@@ -58,8 +72,8 @@ export default {
     onQrCodeScanned(code) {
       this.changed(code);
     },
-    onInput(v) {
-      const newValue = getValueOrNull(v);
+    onInput(v, StringTrimed = true) {
+      const newValue = getValueOrNull(v, StringTrimed);
       if (this.modelValue !== newValue) {
         this.changed(newValue);
       }
