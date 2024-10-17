@@ -14,7 +14,7 @@ const init = async () => {
   };
 };
 
-function mockRes(userId, isSuperAdmin) {
+function mockRes(userId, isSuperAdmin, existingGroupDB) {
   return {
     data: null,
     s: null,
@@ -33,6 +33,7 @@ function mockRes(userId, isSuperAdmin) {
           _id: userId,
         },
       },
+      existing: existingGroupDB,
     },
   };
 }
@@ -62,7 +63,7 @@ describe('group-controller', () => {
   it("user from the group can't archive it", async () => {
     const { group, user1 } = await init();
     const req = getCreateReq(group);
-    const res = mockRes(user1.user._id, false);
+    const res = mockRes(user1.user._id, false, group);
     await expect(updateGroup(req, res)).rejects.toThrow(
       'You are not authorized: admin@' + group.path
     );
@@ -71,7 +72,7 @@ describe('group-controller', () => {
   it('admin from the group can archive it', async () => {
     const { group, admin1 } = await init();
     const req = getCreateReq(group);
-    const res = mockRes(admin1.user._id, false);
+    const res = mockRes(admin1.user._id, false, group);
     await updateGroup(req, res);
   });
 
@@ -79,7 +80,7 @@ describe('group-controller', () => {
     const { group } = await init();
     const { admin1 } = await init();
     const req = getCreateReq(group);
-    const res = mockRes(admin1.user._id, false);
+    const res = mockRes(admin1.user._id, false, group);
     await expect(updateGroup(req, res)).rejects.toThrow(
       'You are not authorized: admin@' + group.path
     );
@@ -89,7 +90,7 @@ describe('group-controller', () => {
     const { group } = await init();
     const superAdmin = await createSuperAdmin();
     const req = getCreateReq(group);
-    const res = mockRes(superAdmin._id, true);
+    const res = mockRes(superAdmin._id, true, group);
     await updateGroup(req, res);
   });
 });
