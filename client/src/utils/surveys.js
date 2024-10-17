@@ -360,7 +360,7 @@ export const uuidv4 = () => {
   return u;
 };
 
-export async function executeCodeInIframe({ code, fname, submission, survey, parent }) {
+export async function executeCodeInIframe({ code, fname, submission, survey, parent, log }) {
   console.log('execute code in iframe');
 
   return new Promise((resolve, reject) => {
@@ -373,8 +373,11 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
     const scriptContent = `
       <script>
         (async function() {
+        const logBuffer = [];
           try {
             console.log('Script inside the iframe executed');
+            const log = (...args) => logBuffer.push(args.join(' '));
+
             // Injected user code
             ${code}
 
@@ -382,10 +385,10 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
             const result = await ${fname}(${JSON.stringify(submission)}, ${JSON.stringify(survey)}, ${JSON.stringify(parent)});
 
             // Send the result to the parent window
-            window.parent.postMessage({ result }, '*');
+            window.parent.postMessage({ logs: logBuffer, result }, '*');
           } catch (error) {
             console.error('Error in iframe', error);
-            window.parent.postMessage({ error: error.message }, '*');
+            window.parent.postMessage({ logs: logBuffer, error: error.message }, '*');
           }
         })();
       </script>
@@ -414,10 +417,16 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
         // Clean up the iframe after use
         document.body.removeChild(iframe);
 
-        if (event.data.error) {
-          reject(new Error(event.data.error));
+        const { logs, result, error } = event.data;
+
+        if (logs) {
+          logs.forEach((logMessage) => log(logMessage));
+        }
+
+        if (error) {
+          reject(new Error(error));
         } else {
-          resolve(event.data.result);
+          resolve(result);
         }
       }
     });

@@ -613,6 +613,9 @@ export default {
           submission: this.instance,
           survey: this.surveyUnderWork,
           parent: this.parent,
+          log: (arg) => {
+            this.log = `${this.log}${arg}\n`;
+          },
         });
         if (tab === 'apiCompose') {
           if (typeof res !== 'object') {
