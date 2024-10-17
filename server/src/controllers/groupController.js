@@ -270,7 +270,7 @@ const updateGroup = async (req, res) => {
   }
 
   try {
-    const updated = await db.collection(col).findOneAndUpdate(
+    await db.collection(col).updateOne(
       { _id: entity._id },
       { $set: { ...entity } },
       {
@@ -278,14 +278,14 @@ const updateGroup = async (req, res) => {
       }
     );
 
-    if (existing.slug !== updated.slug) {
+    if (existing.slug !== entity.slug) {
       // also find and modify descendants
       let oldPath = existing.path;
       let newPath = entity.path;
       await bulkChangePaths(oldPath, newPath);
     }
 
-    return res.send(updated);
+    return res.send(entity);
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
