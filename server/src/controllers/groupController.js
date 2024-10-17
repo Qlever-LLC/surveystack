@@ -262,12 +262,15 @@ const updateGroup = async (req, res) => {
   sanitizeGroup(entity);
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!existing) {
+    return res.status(404).send({ message: 'Group not found' });
+  }
   if (!(await rolesService.hasAdminRoleForRequest(res, existing._id))) {
     throw boom.unauthorized(`You are not authorized: admin@${existing.path}`);
   }
 
   try {
-    let updated = await db.collection(col).findOneAndUpdate(
+    const updated = await db.collection(col).findOneAndUpdate(
       { _id: entity._id },
       { $set: { ...entity } },
       {
