@@ -5,14 +5,12 @@
     </a-icon>
     <a-col class="text-truncate">
       <div class="font-weight-light text-grey-darken-2" style="line-height: 1.5rem">
-        <span class="text-truncate">{{ index }}: {{ dataName }}</span>
+        <div class="text-truncate">{{ index }}: {{ dataName }}</div>
         <a-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" variant="outlined" small :color="chipColor">
           {{ chipLabel }}
         </a-chip>
       </div>
-      <div class="text-truncate">
-        {{ title }}
-      </div>
+      <div class="text-truncate">{{ title }}</div>
     </a-col>
   </a-row>
 </template>

@@ -42,21 +42,22 @@
           :title="getDisplay(el)"
           :type="el.type"
           :dataName="el.name" />
+        <a-tooltip v-if="isQuestionSet(el) && isTooLong(el.name)" top activator="parent">{{ el.name }}</a-tooltip>
         <div class="text-grey-darken-1" v-if="el.options.hidden">
           {{ getDisplayIndex(createIndex(index, idx + 1)) }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="context-actions">
           <a-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
             <a-icon color="grey-lighten-1">mdi-content-copy</a-icon>
+            <a-tooltip bottom activator="parent">copy</a-tooltip>
           </a-btn>
-          <a-btn
-            icon
-            v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-            @mousedown.stop="toggleLibrary(el.libraryId)">
+          <a-btn icon v-if="isQuestionSet(el)" @mousedown.stop="toggleLibrary(el.libraryId)">
             <a-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</a-icon>
+            <a-tooltip bottom activator="parent">description</a-tooltip>
           </a-btn>
           <a-chip
-            v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+            v-if="isQuestionSet(el)"
+            @click.stop="$emit('update-library-control', el)"
             class="align-center text-align-center text-center"
             small
             :color="
@@ -73,13 +74,9 @@
                   ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
                   : 'newest available version'
             ">
-            <a-icon
-              v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
-              @click.stop="$emit('update-library-control', el)"
-              left>
-              mdi-refresh
-            </a-icon>
+            <a-icon v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion" left> mdi-refresh </a-icon>
             Version {{ el.libraryVersion }}
+            <a-tooltip bottom activator="parent">update notes</a-tooltip>
           </a-chip>
           <a-btn
             icon
@@ -88,6 +85,7 @@
             <a-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey-lighten-1'">
               mdi-delete
             </a-icon>
+            <a-tooltip bottom activator="parent">delete</a-tooltip>
           </a-btn>
           <a-btn
             text
@@ -342,8 +340,14 @@ function handleCardHoverChange({ control, isHovering }) {
     state.hoveredControl = null;
   }
 }
+function isTooLong(name) {
+  return name.length > 30;
+}
 function areActionsVisible(control) {
   return !props.readOnly && state.hoveredControl === control;
+}
+function isQuestionSet(control) {
+  return areActionsVisible(control) && control.isLibraryRoot && !control.libraryIsInherited;
 }
 </script>
 <style scoped lang="scss">
@@ -405,10 +409,15 @@ function areActionsVisible(control) {
   border-left: 2px solid rgb(var(--v-theme-primary));
 }
 
+.control-item:hover .context-actions {
+  position: relative !important;
+  min-width: max-content;
+}
+
 .context-actions {
-  height: 48px; /* --v-btn-height = 36px + 12px */
-  min-width: 108px;
   text-align: right;
+  position: absolute;
+  right: 0px;
 }
 
 .sortable-drag[data-control-contains-page='true']::after,
