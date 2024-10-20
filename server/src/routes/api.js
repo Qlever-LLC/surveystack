@@ -68,12 +68,7 @@ router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
 router.put(
   '/groups/:id',
-  [
-    assertAuthenticated,
-    assertNameNotEmpty,
-    assertIdsMatch,
-    assertEntityExists({ collection: 'groups' }),
-  ],
+  [assertAuthenticated, assertNameNotEmpty, assertIdsMatch],
   catchErrors(groupController.updateGroup)
 );
 router.post('/groups/add-doc-link', assertAuthenticated, catchErrors(groupController.addDocLink));
@@ -212,7 +207,11 @@ router.get(
 
 router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));
 router.get('/users/:id', catchErrors(userController.getUser));
-router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));
+router.post(
+  '/users',
+  [assertAuthenticated, assertNameNotEmpty],
+  catchErrors(userController.createUser)
+);
 router.put(
   '/users/:id',
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
@@ -540,13 +539,18 @@ router.get('/group-integrations/:id', catchErrors(groupIntegrationController.get
 
 router.post(
   '/group-integrations',
-  [assertNameNotEmpty],
+  [assertAuthenticated, assertNameNotEmpty],
   catchErrors(groupIntegrationController.createIntegration)
 );
 
 router.put(
   '/group-integrations/:id',
-  [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations.groups' })],
+  [
+    assertAuthenticated,
+    assertNameNotEmpty,
+    assertIdsMatch,
+    assertEntityExists({ collection: 'integrations.groups' }),
+  ],
   catchErrors(groupIntegrationController.updateIntegration)
 );
 router.delete(
@@ -566,12 +570,13 @@ router.get(
 );
 router.post(
   '/membership-integrations',
-  [assertNameNotEmpty],
+  [assertAuthenticated, assertNameNotEmpty],
   catchErrors(membershipIntegrationController.createIntegration)
 );
 router.put(
   '/membership-integrations/:id',
   [
+    assertAuthenticated,
     assertNameNotEmpty,
     assertIdsMatch,
     assertEntityExists({ collection: 'integrations.memberships' }),
