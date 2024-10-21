@@ -31,7 +31,7 @@
 
     <splitpanes class="pane-root bg-white" vertical>
       <pane class="pane pane-survey">
-        <div class="pane-fixed-wrapper pr-2" style="position: relative">
+        <div class="pane-fixed-wrapper pr-2">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
@@ -61,6 +61,7 @@
             @show-version-dialog="$emit('show-version-dialog')" />
           <graphical-view
             v-if="!viewCode"
+            class="pb-10"
             :selected="control"
             :modelValue="currentControls"
             @update:modelValue="updateSurvey"
@@ -69,6 +70,7 @@
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @toggle-library="toggleLibrary"
+            @mousedown="deselectControl"
             @control-removed="controlRemoved"
             @update-library-control="updateLibrary"
             @hide-control="hideControl"
@@ -659,6 +661,9 @@ export default {
         this.scriptCode = null;
       }
     },
+    async deselectControl() {
+      await this.controlSelected(null);
+    },
     async controlRemoved() {
       await this.controlSelected(null);
       this.cleanupLibraryResources();
@@ -1246,6 +1251,8 @@ export default {
   height: 100%;
   width: 100%;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 </style>
 

@@ -373,6 +373,7 @@ function isQuestionSet(control) {
   text-align: left;
   cursor: grab;
   line-height: 1.125rem;
+  flex-grow: 1;
 }
 
 .control-item:first-child {
