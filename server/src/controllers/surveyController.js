@@ -780,6 +780,9 @@ const getPinned = async (req, res) => {
 
   if (userGroupIds.length > 0) {
     userQuery['_id'] = { $in: userGroupIds };
+    if (req.query.getOnlyNonArchive === 'true') {
+      userQuery['meta.archived'] = false;
+    }
   }
 
   const adminGroupIds = memberships
@@ -800,24 +803,33 @@ const getPinned = async (req, res) => {
       adminQuery['$or'].push({
         path: { $in: adminPaths.map((p) => new RegExp(`^${p}`)) },
       });
+      if (req.query.getOnlyNonArchive === 'true') {
+        adminQuery['meta.archived'] = false;
+      }
     }
   }
 
-  if (req.query.getOnlyNonArchive === 'true') {
-    userQuery['meta.archived'] = false;
-    adminQuery['meta.archived'] = false;
+  let combinedQuery = undefined;
+
+  if (userGroupIds.length > 0 && adminGroupIds.length > 0) {
+    combinedQuery = { $or: [userQuery, adminQuery] };
+  } else if (userGroupIds.length > 0) {
+    combinedQuery = userQuery;
+  } else if (adminGroupIds.length > 0) {
+    combinedQuery = adminQuery;
   }
 
-  const combinedQuery = {
-    $or: [userQuery, adminQuery],
-  };
-
   // DB request
-  const groupsPinned = await db
-    .collection('groups')
-    .find(combinedQuery)
-    .project({ name: 1, 'surveys.pinned': 1 })
-    .toArray();
+  let groupsPinned;
+  if (combinedQuery) {
+    groupsPinned = await db
+      .collection('groups')
+      .find(combinedQuery)
+      .project({ name: 1, 'surveys.pinned': 1 })
+      .toArray();
+  } else {
+    groupsPinned = [];
+  }
 
   // process the response to extract pinned surveys in the appropriate structure
   const pinnedSurveys = groupsPinned.map((g) => {

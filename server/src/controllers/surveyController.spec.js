@@ -7,6 +7,7 @@ import {
   getSubmissionDataGenerator,
   createGroup,
   createSuperAdmin,
+  createMembership,
 } from '../testUtils';
 import _ from 'lodash';
 import { getDb } from '../db';
@@ -20,6 +21,7 @@ const {
   getSurveyAndCleanupInfo,
   deleteArchivedTestSubmissions,
   getSurveyPdf,
+  getPinned,
 } = surveyController;
 
 /**
@@ -658,5 +660,194 @@ describe('get surveys and question set', () => {
     const result = res.send.mock.calls[0][0];
     expect(result.pagination.total).toEqual(1);
     expect(result.content[0]._id).toEqual(surveyA2._id);
+  });
+});
+
+describe('get pinned surveys', () => {
+  let groupA, subGroupA, groupB, surveyPinnedToA, surveyPinnedToSubA, surveyPinnedToB;
+  beforeEach(async () => {
+    const { survey: spa } = await createSurvey([], { name: 'surveyPinnedToA' });
+    surveyPinnedToA = spa;
+    const { survey: spsuba } = await createSurvey([], { name: 'surveyPinnedToA' });
+    surveyPinnedToSubA = spsuba;
+    const { survey: spb } = await createSurvey([], { name: 'surveyPinnedToB' });
+    surveyPinnedToB = spb;
+    const { survey: surveyPinnedToSubB } = await createSurvey([], { name: 'surveyPinnedToSubB' });
+
+    groupA = await createGroup({ name: 'groupA', surveys: { pinned: [surveyPinnedToA._id] } });
+    subGroupA = await groupA.createSubGroup(
+      { name: 'subGroupA' },
+      { surveys: { pinned: [surveyPinnedToSubA._id] } }
+    );
+    groupB = await createGroup({
+      name: 'groupB',
+      surveys: { pinned: [surveyPinnedToB._id] },
+    });
+    const subGroupB = await groupB.createSubGroup(
+      { name: 'subGroupB' },
+      { surveys: { pinned: [surveyPinnedToSubB._id] } }
+    );
+
+    const { survey: surveyA1 } = await createSurvey([], { name: 'surveyA1' });
+    const { survey: surveyA2 } = await createSurvey([], { name: 'surveyA2' });
+    const { survey: surveySubA1 } = await createSurvey([], { name: 'surveySubA1' });
+    const { survey: surveyB1 } = await createSurvey([], { name: 'surveyB1' });
+
+    const gA = { id: groupA._id, path: groupA.path };
+    const gSubA = { id: subGroupA._id, path: subGroupA.path };
+    const gB = { id: groupB._id, path: groupB.path };
+    const gSubB = { id: subGroupB._id, path: subGroupB.path };
+
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [ObjectId(surveyPinnedToA._id), ObjectId(surveyA2._id), ObjectId(surveyA1._id)],
+          },
+        },
+        { $set: { meta: { group: gA } } }
+      );
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [ObjectId(surveyPinnedToSubA._id), ObjectId(surveySubA1._id)],
+          },
+        },
+        { $set: { meta: { group: gSubA } } }
+      );
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [ObjectId(surveyPinnedToB._id), ObjectId(surveyB1._id)],
+          },
+        },
+        { $set: { meta: { group: gB } } }
+      );
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [ObjectId(surveyPinnedToSubB._id)],
+          },
+        },
+        { $set: { meta: { group: gSubB } } }
+      );
+  });
+
+  it('user get pinned survey from root group but not sub-group', async () => {
+    const { user: user } = await groupA.createUserMember();
+
+    const req = createReq({
+      params: {},
+      query: {
+        getOnlyNonArchive: true,
+      },
+    });
+    const res = await createRes({ user });
+    await getPinned(req, res);
+
+    const result = res.send.mock.calls[0][0];
+    const expectedPinned = [
+      {
+        group_id: groupA._id,
+        pinned: [surveyPinnedToA._id],
+      },
+    ];
+
+    expect(result.pinned.length).toEqual(expectedPinned.length);
+
+    expectedPinned.forEach((expected) => {
+      const found = result.pinned.find((item) => item.group_id.equals(expected.group_id));
+      expect(found).toBeDefined();
+      expect(found.pinned.length).toEqual(expected.pinned.length);
+      expected.pinned.forEach((surveyId) => {
+        expect(found.pinned).toContainEqual(surveyId);
+      });
+    });
+  });
+  it('admin get pinned survey from root group and sub-group', async () => {
+    const { user: admin } = await groupA.createAdminMember();
+
+    const req = createReq({
+      params: {},
+      query: {
+        getOnlyNonArchive: true,
+      },
+    });
+    const res = await createRes({ user: admin });
+    await getPinned(req, res);
+
+    const result = res.send.mock.calls[0][0];
+    const expectedPinned = [
+      {
+        group_id: groupA._id,
+        pinned: [surveyPinnedToA._id],
+      },
+      {
+        group_id: subGroupA._id,
+        pinned: [surveyPinnedToSubA._id],
+      },
+    ];
+
+    expect(result.pinned.length).toEqual(expectedPinned.length);
+
+    expectedPinned.forEach((expected) => {
+      const found = result.pinned.find((item) => item.group_id.equals(expected.group_id));
+      expect(found).toBeDefined();
+      expect(found.pinned.length).toEqual(expected.pinned.length);
+      expected.pinned.forEach((surveyId) => {
+        expect(found.pinned).toContainEqual(surveyId);
+      });
+    });
+  });
+  it('you are admin in groupA and user in groupB, so you get pinned survey from groupA, subGroupA and groupB only', async () => {
+    const { user: tester } = await groupA.createAdminMember();
+    await createMembership({
+      user: tester,
+      group: groupB._id,
+      role: 'user',
+    });
+
+    const req = createReq({
+      params: {},
+      query: {
+        getOnlyNonArchive: true,
+      },
+    });
+    const res = await createRes({ user: tester });
+    await getPinned(req, res);
+
+    const result = res.send.mock.calls[0][0];
+    const expectedPinned = [
+      {
+        group_id: groupB._id,
+        pinned: [surveyPinnedToB._id],
+      },
+      {
+        group_id: groupA._id,
+        pinned: [surveyPinnedToA._id],
+      },
+      {
+        group_id: subGroupA._id,
+        pinned: [surveyPinnedToSubA._id],
+      },
+    ];
+
+    expect(result.pinned.length).toEqual(expectedPinned.length);
+
+    expectedPinned.forEach((expected) => {
+      const found = result.pinned.find((item) => item.group_id.equals(expected.group_id));
+      expect(found).toBeDefined();
+      expect(found.pinned.length).toEqual(expected.pinned.length);
+      expected.pinned.forEach((surveyId) => {
+        expect(found.pinned).toContainEqual(surveyId);
+      });
+    });
   });
 });
