@@ -808,21 +808,19 @@ const getPinned = async (req, res) => {
     adminQuery['meta.archived'] = false;
   }
 
-  // DB request
-  const userGroupsPinned = await db
-    .collection('groups')
-    .find(userQuery)
-    .project({ name: 1, 'surveys.pinned': 1 })
-    .toArray();
+  const combinedQuery = {
+    $or: [userQuery, adminQuery],
+  };
 
-  const adminGroupsPinned = await db
+  // DB request
+  const groupsPinned = await db
     .collection('groups')
-    .find(adminQuery)
+    .find(combinedQuery)
     .project({ name: 1, 'surveys.pinned': 1 })
     .toArray();
 
   // process the response to extract pinned surveys in the appropriate structure
-  const userPinnedSurveys = userGroupsPinned.map((g) => {
+  const pinnedSurveys = groupsPinned.map((g) => {
     if (!g.surveys || !g.surveys.pinned) {
       return [];
     }
@@ -830,20 +828,13 @@ const getPinned = async (req, res) => {
     return { group_id: g._id, group_name: g.name, pinned: g.surveys.pinned };
   });
 
-  const adminPinnedSurveys = adminGroupsPinned.map((g) => {
-    if (!g.surveys || !g.surveys.pinned) {
-      return [];
-    }
-
-    return { group_id: g._id, group_name: g.name, pinned: g.surveys.pinned };
-  });
-
-  pinned.push(...userPinnedSurveys);
-  adminPinnedSurveys.forEach((item) => {
-    if (!pinned.includes(item)) {
-      pinned.push(item);
-    }
-  });
+  const uniquePinnedSurveys = Object.values(
+    pinnedSurveys.reduce((acc, survey) => {
+      acc[survey.group_id] = survey;
+      return acc;
+    }, {})
+  );
+  pinned.push(...uniquePinnedSurveys);
 
   // console.log('pinned', pinned);
 
