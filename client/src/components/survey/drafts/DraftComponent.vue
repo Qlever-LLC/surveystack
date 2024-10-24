@@ -62,8 +62,7 @@
         :path="path"
         :control="control"
         :forceMobile="forceMobile"
-        :isInBuilder="builder"
-        @updateContent="refreshFooter" />
+        :isInBuilder="builder" />
     </div>
 
     <!-- Footer with next/prev buttons -->
@@ -150,7 +149,6 @@ export default {
   data() {
     return {
       overflowing: false,
-      atEnd: false,
     };
   },
   computed: {
@@ -206,6 +204,14 @@ export default {
       }
       return draftStructure[draftStructure.length - 1];
     },
+    atEnd() {
+      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
+        // We are on the last question
+        return true;
+      } else {
+        return false;
+      }
+    }
   },
   watch: {
     path() {
@@ -221,8 +227,6 @@ export default {
           vm.overflowing = false;
         }
       }, 500);
-
-      this.refreshFooter();
     },
     overflowing(val, oldVal) {
       if (val && !oldVal) {
@@ -231,18 +235,7 @@ export default {
     },
   },
   methods: {
-    refreshFooter() {
-      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
-        // We are on the last question
-        this.atEnd = true;
-      } else {
-        this.atEnd = false;
-      }
-    },
     overviewClicked() {
-      if (!this.showOverview) {
-        this.refreshFooter();
-      }
       this.showOverview = !this.showOverview;
     },
     scrollTop() {
@@ -258,8 +251,6 @@ export default {
       this.scrollTop();
     },
     prev() {
-      this.atEnd = false;
-      // this.$store.dispatch('draft/prev')
       queueAction(this.$store, 'draft/prev');
       this.scrollTop();
     },

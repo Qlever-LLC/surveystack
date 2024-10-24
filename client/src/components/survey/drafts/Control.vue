@@ -3,7 +3,6 @@
     <div v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
         <app-control
-          @updateContent="emit('updateContent')"
           :path="`${path}.${child.name}`"
           :control="child"
           :autoFocus="i === 0"
@@ -25,7 +24,6 @@
 
         <div v-for="(child, i) in control.children" :key="i">
           <app-control
-            @updateContent="emit('updateContent')"
             :path="`${path}.${child.name}`"
             :control="child"
             :autoFocus="autoFocus && i === 0"
@@ -84,8 +82,6 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 const store = useStore();
 const queryClient = useQueryClient();
-
-const emit = defineEmits(['updateContent']);
 
 const props = defineProps({
   path: {
@@ -161,7 +157,6 @@ async function setProperty(value) {
     state.once = true;
     queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
   }
-  emit('updateContent');
 }
 function setStatus({ type, message }) {
   store.dispatch('draft/setProperty', { path: `${props.path}.meta.status`, value: type });
