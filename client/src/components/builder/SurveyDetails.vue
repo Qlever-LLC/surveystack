@@ -22,7 +22,7 @@
                 :items="availableSubmissions"
                 item-title="text"
                 item-value="value" />
-              <a-checkbox label="Add a review page as the last page" v-model="value.meta.reviewPage" />
+              <a-checkbox label="Show submission review page at end of survey" v-model="value.meta.reviewPage" />
               <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" variant="outlined" />
             </a-card-text>
             <a-card-actions class="mr-3">
