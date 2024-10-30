@@ -624,7 +624,7 @@ const migrateSurveyMetaReviewPage_VXtoV10 = async () => {
     },
   ]);
 
-  console.log('Add false as default value for previewPage to all surveys');
+  console.log('Add false as default value for meta.reviewPage to all surveys');
 };
 
 export const getDb = () => db;
