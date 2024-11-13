@@ -296,7 +296,32 @@ function expandCells(flatSubmissions) {
     .flat();
 }
 
-function createCsv(submissions, headers) {
+function createCsv(submissions, headersAndAdditionalInfos) {
+  const headers = headersAndAdditionalInfos.headers;
+  const additionalInfos = headersAndAdditionalInfos.additionalInfos;
+
+  let labelRow = '';
+  let hintRow = '';
+  let valueRow = '';
+  let spreadsheetLabelRow = '';
+  let j = 0;
+  for (let i = 0; i < headers.length; i++) {
+    if (headers[i] === additionalInfos[j].headers) {
+      labelRow += additionalInfos[j].label ? additionalInfos[j].label + ',' : ',';
+      hintRow += additionalInfos[j].hint ? additionalInfos[j].hint + ',' : ',';
+      valueRow += additionalInfos[j].value ? additionalInfos[j].value + ',' : ',';
+      spreadsheetLabelRow += additionalInfos[j].spreadsheetLabel
+        ? additionalInfos[j].spreadsheetLabel + ','
+        : ',';
+      j++;
+    } else {
+      labelRow += ',';
+      hintRow += ',';
+      valueRow += ',';
+      spreadsheetLabelRow += ',';
+    }
+  }
+
   let items = [];
   submissions.forEach((ss) => {
     const submission = _.cloneDeep(ss);
@@ -314,9 +339,10 @@ function createCsv(submissions, headers) {
 
   let csv = '';
   try {
-    csv = papa.unparse(items, {
+    const responsePart = papa.unparse(items, {
       columns: headers,
     });
+    csv = `${labelRow}\n${hintRow}\n${valueRow}\n${spreadsheetLabelRow}\n${responsePart}`;
   } catch (error) {
     console.log(error);
   }

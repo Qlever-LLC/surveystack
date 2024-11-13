@@ -536,7 +536,7 @@ const getSubmissionsPage = async (req, res) => {
   }
 
   try {
-    const headers = await headerService.getHeaders(req.query.survey, entities.content, {
+    const { headers } = await headerService.getHeaders(req.query.survey, entities.content, {
       excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
     });
     entities.headers = headers;
@@ -632,9 +632,11 @@ const getSubmissionsCsv = async (req, res) => {
 
     const result = {
       _id: entity._id,
+      version: entity.meta.survey.version,
       data,
     };
 
+    // TODO I think this option is not available in the UI
     if (queryParam(req.query.showCsvMeta)) {
       result.meta = entity.meta;
     }
@@ -643,12 +645,17 @@ const getSubmissionsCsv = async (req, res) => {
   };
   let transformedEntities = entities.map(transformer);
 
-  const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
-    excludeDataMeta: false,
-    splitValueFieldFromQuestions: true,
-  });
+  const headersAndAdditionalInfos = await headerService.getHeaders(
+    req.query.survey,
+    transformedEntities,
+    {
+      excludeDataMeta: false,
+      splitValueFieldFromQuestions: true,
+      csvExport: true,
+    }
+  );
 
-  const csv = csvService.createCsv(transformedEntities, headers);
+  const csv = csvService.createCsv(transformedEntities, headersAndAdditionalInfos);
   res.set('Content-Type', 'text/plain');
   return res.send(csv);
 };
