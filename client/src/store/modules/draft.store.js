@@ -74,6 +74,7 @@ const createInitialState = () => ({
   errors: null,
   persist: false,
   farmOsCache: {}, // Cache for farmos resources, should be reset when survey starts
+  loading: true,
 });
 
 const initialState = createInitialState();
@@ -83,6 +84,7 @@ const getters = {
   submission: (state) => state.submission,
   property: (state) => (path, fallback) => get(state.submission, path, fallback),
   control: (state) => state.node && state.node.model, // current survey control
+  loading: (state) => state.loading,
   enableNext: (state) => state.enableNext,
   path: (state) => (state.node ? getPath(state.node).replace('[', '.').replace(']', '') : null),
   nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
@@ -197,6 +199,7 @@ const actions = {
     await commit('INIT', { survey, submission, persist });
     await dispatch('calculateRelevance');
     await dispatch('next');
+    commit('SET_LOADING', false);
   },
   async setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
@@ -523,6 +526,9 @@ const mutations = {
     }
 
     parent[childKey] = value;
+  },
+  SET_LOADING(state, bool) {
+    state.loading = bool;
   },
   SET_NEXT_ENABLE(state, enable) {
     state.enableNext = enable;

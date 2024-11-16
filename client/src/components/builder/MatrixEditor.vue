@@ -133,12 +133,20 @@
                       :rules="[isValidNumber]"
                       clearable
                       @click:clear="setToNull" />
-                    <date
-                      v-else-if="item.type === 'date'"
-                      v-model="item.defaultValue"
-                      @blur="handleDefaultValueTrim(i)"
-                      type="date"
-                      dense />
+                    <div v-else-if="item.type === 'date'">
+                      <date v-model="item.defaultValue" @blur="handleDefaultValueTrim(i)" type="date" dense />
+                      <date
+                        label="Start Year"
+                        v-model="item.startYear"
+                        @update:modelValue="$forceUpdate()"
+                        type="date-year" />
+                      <a-select
+                        label="Start Month"
+                        v-model="item.startMonth"
+                        :items="monthsList"
+                        clearable
+                        hide-details />
+                    </div>
                     <div v-else-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
                       <a-select
                         dense
@@ -150,6 +158,16 @@
                     </div>
 
                     <div class="mt-5"></div>
+
+                    <!-- LONG TEXT OPTION -->
+                    <a-checkbox
+                      v-if="item.type === 'text'"
+                      v-model="item.longText"
+                      label="Long Text"
+                      helper-text="Allow answers to flow to the next line for longer answers or paragraphs"
+                      hide-details
+                      color="grey-darken-1"
+                      class="align-center align-self-start" />
 
                     <!-- MULTIPLE -->
                     <a-checkbox
@@ -302,6 +320,20 @@ export default {
       deleteDialogIsVisible: false,
       editorDialog: false,
       editOntologyId: null,
+      monthsList: [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ],
     };
   },
   computed: {

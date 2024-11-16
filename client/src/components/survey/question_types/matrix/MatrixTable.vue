@@ -22,7 +22,12 @@
       </div>
       <div v-if="$slots.rowActions" class="mt-header-left-spacer" />
     </div>
-    <div ref="body" class="mt-body pb-1" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
+    <div
+      v-if="rows.length > 0"
+      ref="body"
+      class="mt-body pb-1"
+      v-scroll.self="onScrollX"
+      :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div
         class="mt-row"
         v-for="(item, rowIdx) in rows"
@@ -54,6 +59,34 @@
         </div>
       </div>
     </div>
+    <div
+      v-else
+      @click="addRealRow"
+      ref="body"
+      class="mt-body pb-1"
+      v-scroll.self="onScrollX"
+      :style="{ overflowX: 'auto', overflowY: 'hidden' }">
+      <div class="mt-row" v-for="(_, rowIdx) in fakeRow" :key="rowIdx">
+        <div
+          class="mt-cell-wrap"
+          v-for="(_, colIdx) in headers"
+          :key="colIdx"
+          :class="{ 'mt-elevation-shadow': isLeftFloating && colIdx === fixedColumns - 1 }"
+          :style="leftFixStyles[colIdx]">
+          <div class="mt-cell d-flex align-center bg-white px-1">
+            <slot
+              name="row-cell"
+              v-bind:header="{ type: undefined }"
+              v-bind:row="{ type: undefined }"
+              v-bind:colIdx="0">
+            </slot>
+          </div>
+        </div>
+        <div
+          v-if="$slots.rowActions"
+          class="mt-actions-wrap ml-1 mt-cell flex-grow-0 flex-shrink-0 bg-transparent"></div>
+      </div>
+    </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
       <a-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
         <a-icon left>mdi-plus</a-icon>{{ addRowLabel }}
@@ -78,6 +111,10 @@ function defaultColumnWidth(type) {
 export default {
   props: {
     headers: {
+      type: Array,
+      required: true,
+    },
+    fakeRow: {
       type: Array,
       required: true,
     },
@@ -170,6 +207,10 @@ export default {
     },
   },
   methods: {
+    addRealRow() {
+      this.$emit('addRow');
+      this.onScrollX();
+    },
     onScrollX() {
       // make sure it only runs once per RAF
       if (this.rafIdScrollX) {

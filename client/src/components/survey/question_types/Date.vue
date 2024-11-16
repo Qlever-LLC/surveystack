@@ -19,7 +19,9 @@
       yearType="number"
       cssminWidth290px
       color="focus"
-      persistent-hint />
+      persistent-hint
+      :startMonth="getStartMonth()"
+      :startYear="getStartYear()" />
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -29,5 +31,13 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
+  methods: {
+    getStartMonth() {
+      return this.control?.startMonth ? String(this.control.startMonth) : undefined;
+    },
+    getStartYear() {
+      return this.control?.startYear ? Number(this.control.startYear.substring(0, 4)) : undefined;
+    },
+  },
 };
 </script>

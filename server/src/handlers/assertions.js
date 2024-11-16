@@ -210,9 +210,6 @@ export const assertSubmissionRights = catchErrors(async (req, res, next) => {
 });
 
 export const assertNameNotEmpty = catchErrors(async (req, res, next) => {
-  if (!res.locals.auth.isAuthenticated) {
-    throw boom.unauthorized();
-  }
   const entity = req.body;
   if (!entity.name || entity.name.trim() === '') {
     throw boom.badRequest('assertNameNotEmpty: Name must not be empty');

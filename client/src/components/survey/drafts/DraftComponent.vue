@@ -1,6 +1,9 @@
 <!-- eslint-disable vue/no-deprecated-slot-attribute -->
 <template>
-  <div class="draft-component-wrapper bg-background rounded" :class="{ builder }" v-if="control" ref="wrapper">
+  <div v-if="isLoading" class="d-flex align-center justify-center" style="height: 100%">
+    <a-progress-circular :size="50" />
+  </div>
+  <div class="draft-component-wrapper bg-background rounded" :class="{ builder }" v-else-if="control" ref="wrapper">
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-if="showConfirmSubmission"
@@ -157,6 +160,9 @@ export default {
     },
     control() {
       return this.$store.getters['draft/control'];
+    },
+    isLoading() {
+      return this.$store.getters['draft/loading'];
     },
     groupPath() {
       return this.$store.getters['draft/groupPath'];

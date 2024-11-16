@@ -47,12 +47,13 @@ const createGroup = async (_overrides = {}) => {
     });
   };
 
-  const createSubGroup = async (nameObj) => {
+  const createSubGroup = async (nameObj, _overrides = {}) => {
     const { name } = nameObj;
     return await createGroup({
       name: name,
       dir: doc.path,
       path: doc.path + kebabCase(deburr(name)) + '/',
+      ..._overrides,
     });
   };
 

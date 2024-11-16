@@ -1,13 +1,27 @@
 <template>
+  <a-textarea
+    v-if="header.type === 'text' && header?.longText && getRenderTextarea"
+    ref="textarea"
+    @update:focused="focus"
+    rows="1"
+    autoGrow
+    :modelValue="value"
+    @update:modelValue="onInput($event, false)"
+    variant="outlined"
+    hide-details
+    autocomplete="off"
+    :disabled="disabled"
+    append-inner-icon="mdi-arrow-up-drop-circle-outline" />
   <a-text-field
-    v-if="header.type === 'text'"
+    v-else-if="header.type === 'text'"
+    @click="clickToRevealTextArea"
     :modelValue="value"
     @update:modelValue="onInput"
     variant="outlined"
     hide-details
     autocomplete="off"
     :disabled="disabled"
-    clearable />
+    :clearable="header?.longText ? false : true" />
   <div v-else-if="header.type === 'qrcode'" style="display: flex">
     <div style="flex: 1">
       <a-text-field
@@ -198,11 +212,14 @@
         :modelValue="dateForPicker"
         ref="datepickerRef"
         @update:modelValue="onDateInput($event, index, header)"
-        no-title />
+        no-title
+        :startMonth="getStartMonth()"
+        :startYear="getStartYear()" />
     </a-menu>
   </div>
 
-  <a-text-field v-else value="unknown cell type" variant="outlined" hide-details disabled />
+  <!-- used for fakeRow -->
+  <a-text-field v-else value="" variant="outlined" hide-details disabled />
 </template>
 
 <script>
@@ -252,6 +269,7 @@ export default {
   data() {
     return {
       menus: {}, // object to hold v-models for v-menu
+      renderTextarea: false,
     };
   },
   computed: {
@@ -280,6 +298,9 @@ export default {
         }
         this.item[this.header.value].value = newValue;
       },
+    },
+    getRenderTextarea() {
+      return this.renderTextarea;
     },
     dateForPicker() {
       if (this.value) {
@@ -315,8 +336,28 @@ export default {
     setToNull() {
       this.value = null;
     },
-    onInput(value) {
-      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+    clickToRevealTextArea() {
+      if (this.header?.longText) {
+        this.renderTextarea = true;
+
+        this.$nextTick(() => {
+          const textarea = this.$refs.textarea;
+          if (textarea) {
+            const textareaElement = textarea.$el.querySelector('textarea');
+            if (textareaElement) {
+              textareaElement.focus();
+            }
+          }
+        });
+      }
+    },
+    focus(isFocused) {
+      if (!isFocused) {
+        this.renderTextarea = false;
+      }
+    },
+    onInput(value, StringTrimed = true) {
+      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value, StringTrimed);
       this.$emit('changed');
     },
     onDateInput(value, index, header) {
@@ -326,6 +367,12 @@ export default {
       }
 
       this.menus[`${index}_${header.value}`] = false;
+    },
+    getStartMonth() {
+      return this.header?.startMonth ? String(this.header.startMonth) : undefined;
+    },
+    getStartYear() {
+      return this.header?.startYear ? Number(this.header.startYear.substring(0, 4)) : undefined;
     },
     onFarmOsInput(value) {
       if (value) {

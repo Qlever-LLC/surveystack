@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-center control-label-wrapper" :class="className">
-    <div class="control-label" v-if="value">{{ value }}</div>
+    <div class="control-label text-wrap" v-if="value">{{ value }}</div>
     <a-spacer />
     <initialize-button
       v-if="initializable"
