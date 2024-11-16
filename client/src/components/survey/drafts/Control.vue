@@ -132,25 +132,27 @@ const value = computed(() => {
   return property ? property.value : null;
 });
 
-function setProperty(value) {
+async function setProperty(value) {
   const path = `${props.path}.value`;
   // adjust modified date of the control
   const modified = new Date().toISOString();
-  store.dispatch('draft/setProperty', {
-    path: `${props.path}.meta.dateModified`,
-    value: modified,
-    calculate: false,
-    initialize: false,
-  });
-  // adjust modified date of the submission
-  store.dispatch('draft/setProperty', {
-    path: 'meta.dateModified',
-    value: modified,
-    calculate: false,
-    initialize: false,
-  });
-  // adjust value
-  store.dispatch('draft/setProperty', { path, value });
+  await Promise.all([
+    store.dispatch('draft/setProperty', {
+      path: `${props.path}.meta.dateModified`,
+      value: modified,
+      calculate: false,
+      initialize: false,
+    }),
+    // adjust modified date of the submission
+    store.dispatch('draft/setProperty', {
+      path: 'meta.dateModified',
+      value: modified,
+      calculate: false,
+      initialize: false,
+    }),
+    // adjust value
+    store.dispatch('draft/setProperty', { path, value }),
+  ]);
   if (!state.once) {
     state.once = true;
     queryClient.invalidateQueries({ queryKey: ['localDrafts'] });

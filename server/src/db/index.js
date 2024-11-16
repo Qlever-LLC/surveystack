@@ -74,6 +74,7 @@ const connectDatabase = async () => {
   await migrateSurveyControlPrintLayout_VXtoV6();
   await migrateSurveyOntologyOptions_VXtoV7();
   await migrateSurveyControlPrintLayout_VXtoV9();
+  await migrateSurveyMetaReviewPage_VXtoV10();
   await migrateSubmissions_VXtoV4();
 };
 
@@ -610,6 +611,20 @@ const changePrintLayoutShowAllOptionName = (control) => {
   }
 
   return 0;
+};
+
+// https://gitlab.com/our-sci/software/json_schema_distribution/-/issues/113
+const migrateSurveyMetaReviewPage_VXtoV10 = async () => {
+  await db.collection('surveys').updateMany({ 'meta.specVersion': { $lte: 9 } }, [
+    {
+      $set: {
+        'meta.reviewPage': false,
+        'meta.specVersion': 10,
+      },
+    },
+  ]);
+
+  console.log('Add false as default value for meta.reviewPage to all surveys');
 };
 
 export const getDb = () => db;

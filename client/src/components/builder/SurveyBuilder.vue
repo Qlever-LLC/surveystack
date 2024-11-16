@@ -890,6 +890,7 @@ export default {
       if (
         this.initialSurvey.name !== this.surveyUnderWork.name ||
         this.initialSurvey.description !== this.surveyUnderWork.description ||
+        this.initialSurvey.meta.reviewPage !== this.surveyUnderWork.meta.reviewPage ||
         this.initialSurvey.meta.submissions !== this.surveyUnderWork.meta.submissions
       ) {
         return true;

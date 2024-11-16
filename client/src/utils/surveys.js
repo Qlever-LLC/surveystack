@@ -1063,6 +1063,7 @@ export function createSurvey({ creator = null, group = null, specVersion = SPEC_
         showInstruction: true,
         showUnanswered: false,
       },
+      reviewPage: false,
     },
     resources: [],
     revisions: [

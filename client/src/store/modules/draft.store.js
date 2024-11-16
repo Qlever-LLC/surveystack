@@ -89,6 +89,41 @@ const getters = {
   path: (state) => (state.node ? getPath(state.node).replace('[', '.').replace(']', '') : null),
   nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
   atStart: (state) => state.node === state.firstNode,
+  lastLocalElement: (state) => {
+    /*
+    aim: return last relevant question
+    struct: page:{group:{q1, q2}}
+    return page.group.q2 if q2 is relevant
+    */
+    let currentNode = state.node;
+
+    // Recursive function to find the last child that is relevant
+    const findLastRelevantChild = (node) => {
+      let relevantNode = node;
+
+      while (relevantNode?.hasChildren()) {
+        const relevantChildren = relevantNode.children.filter((child) =>
+          surveyStackUtils.getRelevance(state.submission, getPath(child), true)
+        );
+
+        if (relevantChildren.length === 0) {
+          break; // No relevant children found, stop here
+        }
+
+        relevantNode = relevantChildren[relevantChildren.length - 1]; // Take the last relevant child
+      }
+
+      return relevantNode;
+    };
+
+    // Find the last relevant child
+    const lastRelevantChild = findLastRelevantChild(currentNode);
+
+    if (lastRelevantChild) {
+      return getPath(lastRelevantChild).replace('[', '.').replace(']', '');
+    }
+    return '';
+  },
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
   questionNumber: (state) => {
