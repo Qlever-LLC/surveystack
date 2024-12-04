@@ -83,6 +83,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import { get } from 'lodash';
 import { getParentPath } from '@/utils/surveyStack';
 import { toRaw } from 'vue';
+import { PLOTLY_CDN_URL } from '../../../constants';
 
 export default {
   mixins: [BaseQuestionComponent],
@@ -206,7 +207,7 @@ export default {
         },*/
         {
           name: 'Plotly2',
-          url: 'https://cdn.plot.ly/plotly-2.18.2.min.js',
+          url: PLOTLY_CDN_URL,
         },
       ];
 
