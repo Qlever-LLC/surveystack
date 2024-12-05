@@ -46,7 +46,6 @@ const getControlsBasedOnSurveyVersions = (revisions, version) => {
 // for a given path to a question in this survey, returns infos object
 const getAdditionalExportInfos = (survey, path) => {
   const parts = path.split('.');
-  let steps = parts.length - 1;
   const infos = {
     label: undefined,
     hint: undefined,
@@ -55,51 +54,43 @@ const getAdditionalExportInfos = (survey, path) => {
   };
   let children = survey.children;
 
+  const getValueDependsOnType = (block) => (block.model ? block.model.name : block.name);
+  const checkName = (block) => (block.model ? block.model.name : block.name);
+  const checkType = (block) => (block.model ? block.model.type : block.type);
+
   const searchChildren = (children) => {
     for (const el of children) {
-      const checkName = el.model ? el.model.name : el.name;
-      const checkType = el.model ? el.model.type : el.type;
-      if (parts.includes(checkName)) {
-        if (checkType === 'matrix' || checkType === 'selectSingle') {
+      if (parts.includes(checkName(el))) {
+        if (checkType(el) === 'matrix' || checkType(el) === 'selectSingle') {
           infos.label = el.model ? el.model.label : el.label;
           infos.hint = el.model ? el.model.hint : el.hint;
-          infos.value = el.model ? el.model.value : el.value;
+          infos.value = getValueDependsOnType(el);
 
           let child = undefined;
-          if (checkType === 'matrix') {
+          if (checkType(el) === 'matrix') {
             child = el.model ? el.model.options.source.content : el.options.source.content;
           } else {
             child = el.model ? el.model.options.source : el.options.source;
           }
           child.forEach((ch) => {
             if (parts.includes(ch.value)) {
-              infos.value = ch.model ? ch.model.value : ch.value;
+              infos.value = ch.value;
               infos.spreadsheetLabel = ch.model ? ch.model.spreadsheetLabel : ch.spreadsheetLabel;
             }
           });
-        } else if (el.model && (checkType === 'group' || checkType === 'page')) {
+        } else if (el.model && (checkType(el) === 'group' || checkType(el) === 'page')) {
           return searchChildren(el.model.children);
-        } else if (
-          checkType === 'ontology' ||
-          checkType === 'farmOsPlanting' ||
-          checkType === 'farmOsField' ||
-          checkType === 'farmOsUuid' ||
-          checkType === 'farmOsFarm'
-        ) {
-          infos.label = el.model ? el.model.label : el.label;
-          infos.hint = el.model ? el.model.hint : el.hint;
-          infos.value = el.model ? el.model.value : el.value;
         } else {
           infos.label = el.model ? el.model.label : el.label;
           infos.hint = el.model ? el.model.hint : el.hint;
-          infos.value = el.model ? el.model.value : el.value;
+          infos.value = getValueDependsOnType(el);
           return infos;
         }
       }
     }
   };
 
-  searchChildren(children, steps);
+  searchChildren(children);
 
   return infos;
 };
