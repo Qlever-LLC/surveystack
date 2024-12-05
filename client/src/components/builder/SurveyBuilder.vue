@@ -268,7 +268,6 @@ import {
   getPosition,
   getPreparedLibraryControls,
   getPreparedLibraryResources,
-  getSurveyPositions,
   insertControl,
   isResourceReferenced,
 } from '@/utils/surveys';
