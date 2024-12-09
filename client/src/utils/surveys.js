@@ -382,7 +382,6 @@ export function compileSandbox(src, fname) {
 }
 
 export async function executeUnsafe({ code, fname, submission, survey, parent, log }) {
-  console.log('execute unsafe called');
   const sandbox = compileSandbox(code, fname);
 
   const res = await sandbox({
@@ -392,8 +391,6 @@ export async function executeUnsafe({ code, fname, submission, survey, parent, l
     log,
     ...supplySandbox,
   });
-
-  console.log('result of sandbox', res);
 
   return res;
 }
