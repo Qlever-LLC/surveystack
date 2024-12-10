@@ -1,10 +1,10 @@
 import TreeModel from 'tree-model';
-
+import { get, debounce } from 'lodash';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
-import { get, debounce } from 'lodash';
 import api from '@/services/api.service';
+import queryClient from '../../queryClient';
 
 const getPath = (node) =>
   node
@@ -194,6 +194,7 @@ const getters = {
 const debouncedPersistSubmission = debounce(async (submission) => {
   try {
     await db.persistSubmission(submission);
+    queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
   } catch (err) {
     console.warn(err);
   }
