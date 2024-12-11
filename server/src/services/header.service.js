@@ -54,37 +54,35 @@ const getAdditionalExportInfos = (survey, path) => {
   };
   let children = survey.children;
 
-  const getValueDependsOnType = (block) => (block.model ? block.model.name : block.name);
   const checkName = (block) => (block.model ? block.model.name : block.name);
   const checkType = (block) => (block.model ? block.model.type : block.type);
+
+  const getLabel = (block) => (block.model ? block.model.label : block.label);
+  const getHint = (block) => (block.model ? block.model.hint : block.hint);
 
   const searchChildren = (children) => {
     for (const el of children) {
       if (parts.includes(checkName(el))) {
-        if (checkType(el) === 'matrix' || checkType(el) === 'selectSingle') {
-          infos.label = el.model ? el.model.label : el.label;
-          infos.hint = el.model ? el.model.hint : el.hint;
-          infos.value = getValueDependsOnType(el);
+        if (checkType(el) === 'matrix') {
+          infos.label = getLabel(el);
+          infos.hint = getHint(el);
 
-          let child = undefined;
-          if (checkType(el) === 'matrix') {
-            child = el.model ? el.model.options.source.content : el.options.source.content;
-          } else {
-            child = el.model ? el.model.options.source : el.options.source;
-          }
+          let child = el.model ? el.model.options.source.content : el.options.source.content;
           child.forEach((ch) => {
-            if (parts.includes(ch.value)) {
-              infos.value = ch.value;
+            const value = ch.model ? ch.model.value : ch.value;
+
+            if (parts.includes(value)) {
+              infos.value = value;
               infos.spreadsheetLabel = ch.model ? ch.model.spreadsheetLabel : ch.spreadsheetLabel;
             }
           });
-        } else if (el.model && (checkType(el) === 'group' || checkType(el) === 'page')) {
-          return searchChildren(el.model.children);
+        } else if (checkType(el) === 'group' || checkType(el) === 'page') {
+          const children = el.model ? el.model.children : el.children;
+          return searchChildren(children);
         } else {
-          infos.label = el.model ? el.model.label : el.label;
-          infos.hint = el.model ? el.model.hint : el.hint;
-          infos.value = getValueDependsOnType(el);
-          return infos;
+          infos.label = getLabel(el);
+          infos.hint = getHint(el);
+          infos.value = el.model ? el.model.name : el.name;
         }
       }
     }
@@ -92,7 +90,25 @@ const getAdditionalExportInfos = (survey, path) => {
 
   searchChildren(children);
 
+  infos.label = escapeCsvDelimiterValue(infos.label);
+  infos.hint = escapeCsvDelimiterValue(infos.hint);
+  infos.value = escapeCsvDelimiterValue(infos.value);
+  infos.spreadsheetLabel = escapeCsvDelimiterValue(infos.spreadsheetLabel);
+
   return infos;
+};
+
+const escapeCsvDelimiterValue = (value) => {
+  if (
+    typeof value === 'string' &&
+    (value.includes(',') || value.includes(';') || value.includes('"'))
+  ) {
+    // Escape double quotes by replacing them with two double quotes
+    value = value.replace(/"/g, '""');
+    // Add double quotes around the value
+    return `"${value}"`;
+  }
+  return value;
 };
 
 // Lists the headers that exist both in the submissions and the selected version of survey.
@@ -210,6 +226,7 @@ const getHeaders = async (
   const additionalInfos = [];
   if (options.csvExport) {
     headers.forEach((h) => {
+      console.log('header', h);
       if (
         !(
           h.startsWith('_id') ||
