@@ -1,10 +1,10 @@
 import TreeModel from 'tree-model';
-
+import { get, debounce } from 'lodash';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
-import { get } from 'lodash';
 import api from '@/services/api.service';
+import queryClient from '../../queryClient';
 
 const getPath = (node) =>
   node
@@ -191,6 +191,15 @@ const getters = {
   errors: (state) => state.errors,
 };
 
+const debouncedPersistSubmission = debounce(async (submission) => {
+  try {
+    await db.persistSubmission(submission);
+    queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+  } catch (err) {
+    console.warn(err);
+  }
+}, 1000);
+
 const actions = {
   reset({ commit }) {
     commit('RESET');
@@ -204,11 +213,7 @@ const actions = {
   async setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
-      try {
-        await db.persistSubmission(state.submission);
-      } catch (err) {
-        console.warn('unable to persist submission to IDB');
-      }
+      debouncedPersistSubmission(state.submission);
     }
     if (calculate) {
       await dispatch('calculateRelevance');

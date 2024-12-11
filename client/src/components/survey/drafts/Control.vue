@@ -76,12 +76,10 @@ export default {
 </script>
 
 <script setup>
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
-import { useQueryClient } from '@tanstack/vue-query';
 
 const store = useStore();
-const queryClient = useQueryClient();
 
 const props = defineProps({
   path: {
@@ -106,10 +104,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-});
-
-const state = reactive({
-  once: false,
 });
 
 const className = computed(() => {
@@ -153,10 +147,6 @@ async function setProperty(value) {
     // adjust value
     store.dispatch('draft/setProperty', { path, value }),
   ]);
-  if (!state.once) {
-    state.once = true;
-    queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
-  }
 }
 function setStatus({ type, message }) {
   store.dispatch('draft/setProperty', { path: `${props.path}.meta.status`, value: type });
