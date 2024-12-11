@@ -248,10 +248,6 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
     */
 
   switch (submissions) {
-    case 'user':
-      return isLoggedIn
-        ? { allowed: true }
-        : { allowed: false, message: 'You must be logged in to submit this survey.' };
     case 'group': {
       if (!isLoggedIn) {
         return { allowed: false, message: 'You must be logged in to submit this survey.' };
