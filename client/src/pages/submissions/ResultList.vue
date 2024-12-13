@@ -286,7 +286,6 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 import { createBasicQueryList } from '@/utils/surveyStack';
 import downloadExternal from '@/utils/downloadExternal';
 
-import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
 import { menuAction } from '@/utils/threeDotsMenu';
 
