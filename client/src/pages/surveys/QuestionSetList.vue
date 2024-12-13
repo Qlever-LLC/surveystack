@@ -127,7 +127,7 @@ async function initData() {
         title: 'Edit',
         icon: 'mdi-pencil',
         action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-        render: (s) => () => rightToEdit().allowed,
+        render: (s) => () => rightToEdit(s).allowed,
       },
       // {
       //   title: 'Archive',

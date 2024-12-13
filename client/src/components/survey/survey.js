@@ -93,12 +93,12 @@ export function useSurvey() {
         title: 'Start Survey as Member',
         icon: 'mdi-open-in-new',
         action: (s) => createAction(s, rightToSubmitSurvey, () => setSelectMember(s)),
-        render: (s) => () =>
+        render: (survey) => () =>
           isOnline &&
-          isGroupAdmin(getActiveGroupId()) &&
-          !isADraft(s) &&
-          !isArchived(s) &&
-          rightToSubmitSurvey(s).allowed,
+          isGroupAdmin(survey.meta.group.id) &&
+          !isADraft(survey) &&
+          !isArchived(survey) &&
+          rightToSubmitSurvey(survey).allowed,
       },
       {
         title: 'Copy Survey Link',
@@ -146,7 +146,7 @@ export function useSurvey() {
         title: 'Edit',
         icon: 'mdi-pencil',
         action: (s) => createAction(s, rightToEdit, () => editSurvey(s)),
-        render: (s) => () => isOnline && rightToEdit().allowed,
+        render: (s) => () => isOnline && rightToEdit(s).allowed,
       },
       {
         title: 'View Results',
@@ -167,7 +167,7 @@ export function useSurvey() {
         render: (s) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
-            return isOnline && !isADraft(s) && !isArchived(s) && rightToEdit().allowed && !isPinned;
+            return isOnline && !isADraft(s) && !isArchived(s) && rightToTogglePin().allowed && !isPinned;
           });
         },
       },
@@ -178,7 +178,7 @@ export function useSurvey() {
         render: (s) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
-            return isOnline && !isADraft(s) && !isArchived(s) && rightToEdit().allowed && isPinned;
+            return isOnline && !isADraft(s) && !isArchived(s) && rightToTogglePin().allowed && isPinned;
           });
         },
       },
