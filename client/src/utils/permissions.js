@@ -2,6 +2,7 @@ import { useStore } from 'vuex';
 
 import { checkAllowedToSubmit } from '@/utils/submissions';
 import { useGroup } from '@/components/groups/group';
+import { isPublished } from '../utils/surveys';
 
 export function getPermission() {
   const store = useStore();
@@ -23,7 +24,7 @@ export function getPermission() {
       : { allowed: false, message: "Sorry you can't edit this survey" };
   }
   function rightToCallForSubmissions(survey) {
-    return rightToEdit(survey).allowed && survey.latestVersion > 1
+    return rightToEdit(survey).allowed && isPublished(survey)
       ? { allowed: true, message: 'success' }
       : { allowed: false, message: "Sorry you can't call for submissions on a draft" };
   }

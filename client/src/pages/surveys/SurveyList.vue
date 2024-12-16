@@ -33,7 +33,7 @@
       </template>
       <template v-slot:preMenu="{ entity }">
         <a-chip
-          v-if="isADraft(entity)"
+          v-if="!isPublished(entity)"
           x-small
           class="mr-2 py-0 px-1"
           color="blue"
@@ -88,7 +88,7 @@ const router = useRouter();
 const { getActiveGroupId, isGroupAdmin } = useGroup();
 const { rightToEdit, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isADraft } = useSurvey();
+const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isPublished } = useSurvey();
 
 const queryClient = useQueryClient();
 

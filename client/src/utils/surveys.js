@@ -8,6 +8,14 @@ import supplySandbox from './supplySandbox';
 import ObjectID from 'bson-objectid';
 import { flatSurveyControls } from '@/utils/surveyDiff';
 
+export function isPublished(survey) {
+  return survey.latestVersion > 1;
+}
+
+export function isArchived(survey) {
+  return survey.meta?.archived ? survey.meta.archived : false;
+}
+
 function* processJsDoc(data, namespace = 'data') {
   if (!data) {
     return;

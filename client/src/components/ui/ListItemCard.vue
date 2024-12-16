@@ -18,7 +18,7 @@
             <span v-if="showPinned" @click.stop="togglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
               <a-icon v-if="pinnedSurveys" class="mr-2">mdi-pin</a-icon>
               <a-icon
-                v-if="!pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
+                v-if="!pinnedSurveys && isHovering && !mobile && isPublished(entity) && state.ableTogglePinned"
                 class="mr-2">
                 mdi-pin-outline
               </a-icon>
@@ -87,7 +87,7 @@ import { useIsSurveyPinned } from '@/queries';
 const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
-const { isADraft } = useSurvey();
+const { isPublished } = useSurvey();
 const { isGroupAdmin, getActiveGroupId, isGroupVisitor } = useGroup();
 
 const props = defineProps({

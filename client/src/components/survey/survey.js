@@ -14,6 +14,7 @@ import { useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import { usePinned, isSurveyPinned } from '@/queries';
 import copyTextToClipboard from '@/utils/copyToClipboard';
+import { isPublished, isArchived } from '../../utils/surveys';
 
 export const resolveRenderFunctionResult = (render, entity) => {
   let includeTypeFunction = false;
@@ -87,7 +88,7 @@ export function useSurvey() {
         icon: 'mdi-open-in-new',
         action: (survey) =>
           createAction(survey, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${survey._id}/submissions/new`),
-        render: (survey) => () => !isADraft(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
+        render: (survey) => () => isPublished(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
       },
       {
         title: 'Start Survey as Member',
@@ -96,7 +97,7 @@ export function useSurvey() {
         render: (survey) => () =>
           isOnline &&
           isGroupAdmin(survey.meta.group.id) &&
-          !isADraft(survey) &&
+          isPublished(survey) &&
           !isArchived(survey) &&
           rightToSubmitSurvey(survey).allowed,
       },
@@ -109,7 +110,7 @@ export function useSurvey() {
               `${window.location.origin}/groups/${getActiveGroupId()}/surveys/${survey._id}/submissions/new`
             )
           ),
-        render: (survey) => () => !isADraft(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
+        render: (survey) => () => isPublished(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
       },
       {
         title: 'Call for Responses',
@@ -135,7 +136,7 @@ export function useSurvey() {
         title: 'Print Blank Survey',
         icon: 'mdi-printer',
         action: (survey) => createAction(survey, rightToSubmitSurvey, () => downloadPrintablePdf(survey._id)),
-        render: (survey) => () => isOnline && !isADraft(survey) && rightToSubmitSurvey(survey).allowed,
+        render: (survey) => () => isOnline && isPublished(survey) && rightToSubmitSurvey(survey).allowed,
       },
       // {
       //   title: 'View',
@@ -167,7 +168,7 @@ export function useSurvey() {
         render: (survey) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), survey._id)(pinnedData.value);
-            return isOnline && !isADraft(survey) && !isArchived(survey) && rightToTogglePin().allowed && !isPinned;
+            return isOnline && isPublished(survey) && !isArchived(survey) && rightToTogglePin().allowed && !isPinned;
           });
         },
       },
@@ -178,19 +179,11 @@ export function useSurvey() {
         render: (survey) => () => {
           return computed(() => {
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), survey._id)(pinnedData.value);
-            return isOnline && !isADraft(survey) && !isArchived(survey) && rightToTogglePin().allowed && isPinned;
+            return isOnline && isPublished(survey) && !isArchived(survey) && rightToTogglePin().allowed && isPinned;
           });
         },
       },
     ];
-  }
-
-  function isADraft(survey) {
-    return survey.latestVersion === 1;
-  }
-
-  function isArchived(survey) {
-    return survey.meta?.archived ? survey.meta.archived : false;
   }
 
   async function togglePinInMenu(survey) {
@@ -287,7 +280,7 @@ export function useSurvey() {
     message,
     getSurveys,
     togglePinSurvey,
-    isADraft,
+    isPublished,
     getMenu,
   };
 }
