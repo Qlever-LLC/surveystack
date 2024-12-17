@@ -269,12 +269,3 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
 
   return { allowed: false, message: 'You are not authorized to submit this survey.' };
 };
-
-//TODO replace this by permissions.js:rightToManageSubmission which requires to refactor the using components to script setup
-export const checkAllowedToResubmit = (submission, userMemberships, userId) => {
-  const isAdminOfSubmissionGroup = userMemberships.some(
-    (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
-  );
-  const isCreatorOfSubmission = submission.meta.creator === userId;
-  return isAdminOfSubmissionGroup || isCreatorOfSubmission;
-};

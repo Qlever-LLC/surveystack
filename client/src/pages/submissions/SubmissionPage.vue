@@ -84,7 +84,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import { checkAllowedToResubmit, checkAllowedToSubmit, createSubmissionFromSurvey } from '@/utils/submissions';
+import { checkAllowedToSubmit, createSubmissionFromSurvey } from '@/utils/submissions';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
@@ -93,6 +93,7 @@ import { useResults } from '../../components/ui/results';
 import { fetchSurvey } from '@/components/survey/survey.js';
 import { useGroup } from '@/components/groups/group';
 import { useNavigation } from '@/components/navigation';
+import { getPermission } from '@/utils/permissions';
 
 const props = defineProps({
   routeAction: {
@@ -126,6 +127,7 @@ const confirmLeaveDialogRef = ref();
 const queryClient = useQueryClient();
 const { isGroupVisitor } = useGroup();
 const { forceDesktopFullscreen } = useNavigation();
+const { rightToManageSubmission } = getPermission();
 
 const initialState = {
   submission: null,
@@ -380,11 +382,7 @@ async function init() {
   }
 
   if (isResubmission()) {
-    const allowedToResubmit = checkAllowedToResubmit(
-      state.submission,
-      store.getters['memberships/memberships'],
-      user._id
-    );
+    const allowedToResubmit = rightToManageSubmission(state.submission).allowed;
     if (!allowedToResubmit) {
       state.hasError = true;
       state.errorMessage = 'You are not allowed to edit this submission.';

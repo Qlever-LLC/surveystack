@@ -46,14 +46,12 @@ export function getPermission() {
   function rightToManageSubmission(submission) {
     const user = store.getters['auth/user'];
     const memberships = store.getters['memberships/memberships'];
-    const isAdminOfCurrentGroup = isGroupAdmin();
     const isAdminOfSubmissionGroup = memberships.some(
       (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
     );
     const isCreatorOfSubmission = submission.meta.creator === user?._id;
 
-    // TODO: review this logic
-    return isAdminOfCurrentGroup || isAdminOfSubmissionGroup || isCreatorOfSubmission
+    return isAdminOfSubmissionGroup || isCreatorOfSubmission
       ? { allowed: true, message: 'success' }
       : { allowed: false, message: "Sorry you can't manage this response" };
   }

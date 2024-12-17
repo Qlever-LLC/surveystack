@@ -188,7 +188,6 @@ import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
-import { checkAllowedToResubmit } from '@/utils/submissions';
 import {
   transformMatrixHeaders,
   getCellValue,
@@ -196,9 +195,11 @@ import {
   transformGeoJsonHeaders,
   PREFERRED_HEADERS,
 } from './SubmissionTableClientCsv';
+import { getPermission } from '../../utils/permissions'
 
 const store = useStore();
 const tableRef = useTemplateRef('table');
+const { rightToManageSubmission } = getPermission();
 
 const MATRIX_SEPARATOR = '===>';
 
@@ -443,8 +444,7 @@ function isSelected(item) {
 function isSelectable(item) {
   //load original submission object, as item may miss meta data if excludeMeta is true
   const submission = props.submissions.content.find((s) => s._id === item._id);
-  const allowedToResubmit = checkAllowedToResubmit(submission, userMemberships.value, user.value._id);
-  return allowedToResubmit;
+  return rightToManageSubmission(submission).allowed;
 };
 
 function toggleSelect(item) {
