@@ -144,7 +144,7 @@
       @updateSearch="updateSearch">
       <template v-slot:title>
         <a-icon class="mr-2"> mdi-chart-bar</a-icon>
-        Results - {{ state.surveyEntity?.name }}
+        Results - {{ surveyEntity?.name }}
         <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.submissions.pagination.total }}
         </a-chip>
@@ -165,7 +165,7 @@
             outlined
             color="secondary"
             class="ml-2"
-            :disabled="state.surveyEntity && state.surveyEntity.meta.isLibrary"
+            :disabled="surveyEntity && surveyEntity.meta.isLibrary"
             :to="`/groups/${$route.params.id}/surveys/${state.survey}/submissions/new`">
             <a-icon left>mdi-plus</a-icon>
             New response
@@ -226,7 +226,7 @@
           :excludeMeta="!state.filter.showCsvMeta"
           :loading="state.loading"
           style="margin: 3px 2px"
-          :actionsAreDisabled="state.surveyEntity && state.surveyEntity.meta.isLibrary"
+          :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
           @showDeleteModal="state.showDeleteModal = true"
           @archiveSubmissions="archiveSubmissions(state.selected, '', false)"
           @showArchiveModal="state.showArchiveModal = true"
@@ -265,8 +265,8 @@
 </template>
 
 <script setup>
-import { reactive, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { reactive, computed, watch, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 /*
@@ -336,6 +336,7 @@ const props = defineProps({
   },
 });
 
+const surveyEntity = ref(null);
 const state = reactive({
   isOpen: undefined,
   apiDownloadFormat: apiDownloadFormats[0].value,
@@ -348,7 +349,6 @@ const state = reactive({
   tab: 'List',
   views: ['List', 'Table', 'Raw'],
   survey: null,
-  surveyEntity: null,
   formats: [
     { title: 'CSV', value: 'csv' },
     { title: 'JSON', value: 'json' },
@@ -373,17 +373,27 @@ const state = reactive({
   showDownloadModal: false,
   sortBy: [],
   loading: false,
+  menu: [],
+  showCopiedChip: false,
   reassignment: {
     showModal: false,
     group: null,
     user: null,
-    groups: store.getters['memberships/memberships']
-      .filter((m) => m.role === 'admin')
-      .map((m) => ({ text: m.group.name, value: m.group._id, path: m.group.path })),
+    groups: computed(() => {
+      if (surveyEntity.value) {
+        switch(surveyEntity.value.meta.submissions) {
+          case 'public':
+          case 'group':
+          default:
+            return store.getters['memberships/memberships']
+              .filter((m) => m.role === 'admin' && m.group._id === surveyEntity.value.meta.group.id)
+              .map((m) => ({ text: m.group.name, value: m.group._id, path: m.group.path }));
+        }
+      }
+      return [];
+    }),
     users: [],
   },
-  menu: [],
-  showCopiedChip: false,
 });
 
 initData();
@@ -445,10 +455,10 @@ const apiDownloadUrl = computed(() => {
   return `${window.location.origin}${apiEndpoint.value}?${apiDownloadParams.value}`;
 });
 const queryList = computed(() => {
-  if (!state.surveyEntity) {
+  if (!surveyEntity.value) {
     return null;
   }
-  const list = createBasicQueryList(state.surveyEntity, state.surveyEntity.latestVersion);
+  const list = createBasicQueryList(surveyEntity.value, surveyEntity.value.latestVersion);
   return list;
 });
 const paginationTotalPages = computed(() => {
@@ -473,8 +483,8 @@ async function initData() {
   state.loading = true;
 
   state.survey = props.surveyId;
-  const { data: surveyEntity } = await api.get(`/surveys/${state.survey}?version=latest`);
-  state.surveyEntity = surveyEntity;
+  const { data } = await api.get(`/surveys/${state.survey}?version=latest`);
+  surveyEntity.value = data;
 
   state.menu = [
     {
@@ -632,9 +642,6 @@ function reset() {
   state.basicFilters = [];
   fetchData();
 }
-function onSubmissionsSelected(submissions) {
-  state.selectedSubmissions = submissions;
-}
 function resubmit(submission) {
   router.push({
     name: 'group-survey-submissions-edit',
@@ -694,7 +701,7 @@ function onDataTablePropsChanged(props) {
   state.sortBy = props;
 }
 async function startDownload() {
-  await downloadExternal(store, apiDownloadUrl.value, `${state.surveyEntity.name}.${state.apiDownloadFormat}`);
+  await downloadExternal(store, apiDownloadUrl.value, `${surveyEntity.value.name}.${state.apiDownloadFormat}`);
 }
 
 function updateView(view) {
