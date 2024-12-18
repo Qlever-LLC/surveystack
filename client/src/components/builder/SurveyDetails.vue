@@ -237,6 +237,7 @@ import AppNavigationControl from '@/components/AppNavigationControl.vue';
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
   { value: 'group', text: 'Group members' },
+  { value: 'groupAndDescendents', text: 'Group and subgroup members' },
 ];
 
 export default {
