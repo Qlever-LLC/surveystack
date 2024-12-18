@@ -96,7 +96,7 @@ export function useSurvey() {
         action: (survey) => createAction(survey, rightToSubmitSurvey, () => setSelectMember(survey)),
         render: (survey) => () =>
           isOnline &&
-          isGroupAdmin(survey.meta.group.id) &&
+          isGroupAdmin(getActiveGroupId()) &&
           isPublished(survey) &&
           !isArchived(survey) &&
           rightToSubmitSurvey(survey).allowed,
