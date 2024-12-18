@@ -16,7 +16,7 @@
       :loading="state.loading"
       :entities="state.surveys.content"
       :buttonNew="
-        rightToEdit().allowed
+        rightToCreateSurvey().allowed
           ? {
               title: 'Create new Question Set',
               link: { name: 'group-surveys-new', query: { lib: true } },
@@ -58,7 +58,7 @@ import BasicList from '@/components/ui/BasicList2.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
 const { getActiveGroupId } = useGroup();
-const { rightToView, rightToEdit } = getPermission();
+const { rightToView, rightToCreateSurvey, rightToManageSurvey } = getPermission();
 const { message, createAction } = menuAction();
 const PAGINATION_LIMIT = 10;
 
@@ -117,24 +117,12 @@ async function initData() {
           }),
         render: (s) => () => rightToView().allowed,
       },
-      // {
-      //   title: 'View',
-      //   icon: 'mdi-file-document',
-      //   action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-      //   render: (s) => () => rightToView().allowed,
-      // },
       {
         title: 'Edit',
         icon: 'mdi-pencil',
-        action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-        render: (s) => () => rightToEdit(s).allowed,
+        action: (s) => createAction(s, rightToManageSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
+        render: (s) => () => rightToManageSurvey(s).allowed,
       },
-      // {
-      //   title: 'Archive',
-      //   icon: 'mdi-archive',
-      //   action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/...`),
-      //   render: (s) => () => rightToEdit().allowed,
-      // },
     ];
 
     await Promise.all([fetchData()]);

@@ -35,6 +35,7 @@ export function useGroup() {
   function getActiveGroupId() {
     return route.params.id;
   }
+  
   async function getActiveGroup() {
     const activeGroupId = getActiveGroupId();
     if (!activeGroupId) {
@@ -49,38 +50,23 @@ export function useGroup() {
     return groupFound;
   }
 
-  /**
-   *
-   * @param {*} groupId
-   * @returns true if super-admin OR admin of the group
-   */
   function isGroupAdmin(groupId) {
     const isSuperAdmin = store.getters['auth/isSuperAdmin'];
     if (isSuperAdmin) {
       return true;
     }
-    return isOnlyGroupAdmin(groupId);
-  }
-  /**
-   *
-   * @param {*} groupId
-   * @returns true only if admin of the group
-   */
-  function isOnlyGroupAdmin(groupId) {
     const memberships = store.getters['memberships/memberships'];
-    const activeGroupId = groupId ? groupId : getActiveGroupId();
-    return memberships.some((m) => m.group._id === activeGroupId && m.role === 'admin');
+    return memberships.some((m) => m.group._id === (groupId ?? getActiveGroupId()) && m.role === 'admin');
   }
 
-  function isGroupMember() {
+  function isGroupMember(groupId) {
     const memberships = store.getters['memberships/memberships'];
-    const activeGroupId = getActiveGroupId();
-    return memberships.some((m) => m.group._id === activeGroupId && m.role === 'user');
+    return memberships.some((m) => m.group._id === (groupId ?? getActiveGroupId()) && m.role === 'user');
   }
 
   function isGroupVisitor(groupId) {
-    // if groupId is undefined => will be set by the getActiveGroupId() in isGroupAdmin()
-    return !(isOnlyGroupAdmin(groupId) || isGroupMember());
+    const memberships = store.getters['memberships/memberships'];
+    return !memberships.some((m) => m.group._id === (groupId ?? getActiveGroupId()));
   }
 
   return {

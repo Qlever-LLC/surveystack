@@ -19,7 +19,7 @@
       :entities="state.networkOk ? state.surveys.content : surveys.content"
       showPinned
       :enableTogglePinned="rightToTogglePin().allowed && !state.showArchived"
-      :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
+      :buttonNew="rightToCreateSurvey().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
       :menu="surveyMenu"
       :loading="state.loading"
       :show-navigation-control="!$route.query.minimal_ui"
@@ -86,7 +86,7 @@ const onlineStatus = inject('onlineStatus');
 
 const router = useRouter();
 const { getActiveGroupId, isGroupAdmin } = useGroup();
-const { rightToEdit, rightToTogglePin } = getPermission();
+const { rightToCreateSurvey, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
 const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isPublished } = useSurvey();
 

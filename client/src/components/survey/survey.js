@@ -51,7 +51,7 @@ export function useSurvey() {
   const router = useRouter();
   const {
     rightToSubmitSurvey,
-    rightToEdit,
+    rightToManageSurvey,
     rightToCallForSubmissions,
     rightToViewAnonymizedResults,
     rightToView,
@@ -146,8 +146,8 @@ export function useSurvey() {
       {
         title: 'Edit',
         icon: 'mdi-pencil',
-        action: (survey) => createAction(survey, rightToEdit, () => editSurvey(survey)),
-        render: (survey) => () => isOnline && rightToEdit(survey).allowed,
+        action: (survey) => createAction(survey, rightToManageSurvey, () => editSurvey(survey)),
+        render: (survey) => () => isOnline && rightToManageSurvey(survey).allowed,
       },
       {
         title: 'View Results',
