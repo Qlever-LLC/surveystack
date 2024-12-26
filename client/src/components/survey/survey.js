@@ -225,25 +225,20 @@ export function useSurvey() {
     queryParams.append('prioPinned', showArchived ? false : true);
     queryParams.append('showArchived', showArchived);
 
-    try {
-      const { data } = await api.get(`/surveys/list-page?${queryParams}`);
+    const { data } = await api.get(`/surveys/list-page?${queryParams}`);
 
-      if (data.pinned) {
-        data.pinned.forEach((survey) => {
-          data.content.unshift(survey);
-        });
-      }
-      delete data.pinned;
-
-      if (searchString) {
-        const filterContent = data.content.sort((a, b) => a.name.localeCompare(b.name));
-        data.content = filterContent;
-      }
-      return data;
-    } catch (e) {
-      // TODO: use cached data?
-      console.log('Error fetching surveys:', e);
+    if (data.pinned) {
+      data.pinned.forEach((survey) => {
+        data.content.unshift(survey);
+      });
     }
+    delete data.pinned;
+
+    if (searchString) {
+      const filterContent = data.content.sort((a, b) => a.name.localeCompare(b.name));
+      data.content = filterContent;
+    }
+    return data;
   }
 
   function setSelectMember(survey) {

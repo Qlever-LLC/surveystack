@@ -92,7 +92,7 @@ const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isPublis
 
 const queryClient = useQueryClient();
 
-const { data: data } = useGetPinnedSurveysForGroup(getActiveGroupId());
+const { data } = useGetPinnedSurveysForGroup(getActiveGroupId());
 
 const state = reactive({
   page: 1,
