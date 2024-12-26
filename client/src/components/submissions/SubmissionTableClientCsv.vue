@@ -1,7 +1,7 @@
 <template>
   <a-card>
     <a-data-table-server
-      ref="table"
+      ref="tableRef"
       v-model="tableSelected"
       :headerProps="{ archived }"
       :headers="state.headers"
@@ -182,7 +182,7 @@
 </template>
 
 <script setup>
-import { reactive, useTemplateRef, watch, computed } from 'vue';
+import { reactive, ref, watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
@@ -198,7 +198,7 @@ import {
 import { getPermission } from '../../utils/permissions'
 
 const store = useStore();
-const tableRef = useTemplateRef('table');
+const tableRef = ref(null);
 const { rightToManageSubmission } = getPermission();
 
 const MATRIX_SEPARATOR = '===>';
@@ -339,7 +339,6 @@ function openModal(ev, cell, showCopyButton = false) {
   const [value] = cell;
   if (value.length > state.textTruncateLength) {
     state.activeTableCell = cell;
-    // TODO: fixup this $refs thing
     state.modalLeftPosition =
       ev.target.getBoundingClientRect().left - tableRef.value.$el.getBoundingClientRect().left;
     state.modalTopPosition =
@@ -363,8 +362,6 @@ function createCustomFilter(field) {
     return value.toLowerCase().startsWith(state.searchFields[field].toLowerCase());
   };
 };
-
-// TODO: get all the 'this.'s
 
 function createHeaders() {
   const headers = [];
