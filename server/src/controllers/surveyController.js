@@ -88,23 +88,17 @@ const getSurveys = async (req, res) => {
 const buildPipelineGetSurveyPinnedFromGroupId = (groupId) => {
   const pipeline = [
     { $match: { _id: ObjectId(groupId) } },
-    { $unwind: '$surveys.pinned' },
     {
-      $lookup: {
-        from: 'surveys',
-        localField: 'surveys.pinned',
-        foreignField: '_id',
-        as: 'pinnedSurveys',
-      },
+      $unwind: '$surveys.pinned',
     },
     {
-      $project: {
-        _id: {
-          $arrayElemAt: ['$pinnedSurveys._id', 0],
+      $group: {
+        _id: null,
+        allPinnedIds: {
+          $push: '$surveys.pinned',
         },
       },
     },
-    { $sort: { name: 1 } },
   ];
 
   return pipeline;
@@ -112,7 +106,7 @@ const buildPipelineGetSurveyPinnedFromGroupId = (groupId) => {
 
 const buildPipelineForGetSurveyPage = (
   { q, groupId, projections, creator, skip, limit, prefix, isLibrary, showArchived },
-  pinnedEntities,
+  pinnedSurveyIds,
   sortSurveysPrioPinnedForOneGroup = false
 ) => {
   const match = {};
@@ -164,7 +158,7 @@ const buildPipelineForGetSurveyPage = (
       {
         $addFields: {
           isInPinnedList: {
-            $in: ['$_id', pinnedEntities],
+            $in: ['$_id', pinnedSurveyIds],
           },
         },
       },
@@ -365,17 +359,16 @@ const getSurveyListPage = async (req, res) => {
 
   if (prioPinned) {
     const pipelinePinned = buildPipelineGetSurveyPinnedFromGroupId(query.groupId);
-    const pipelinePinnedEntities = await db
+    const pinnedSurveyIdsResult = await db
       .collection(GROUPS_COLLECTION)
       .aggregate(pipelinePinned)
       .toArray();
-
-    const pinnedEntities = pipelinePinnedEntities.map((obj) => obj._id);
+    const pinnedSurveyIds = pinnedSurveyIdsResult[0]?.allPinnedIds ?? [];
 
     const sortSurveysPrioPinnedForOneGroup = true;
     const pipeline = buildPipelineForGetSurveyPage(
       query,
-      pinnedEntities,
+      pinnedSurveyIds,
       sortSurveysPrioPinnedForOneGroup
     );
 
