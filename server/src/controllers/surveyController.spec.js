@@ -14,11 +14,12 @@ import { getDb } from '../db';
 import createApp from '../app.js';
 import request from 'supertest';
 
+const app = createApp();
+
 const { ObjectId } = jest.requireActual('mongodb');
 const {
   updateSurvey,
   getSurvey,
-  getSurveyListPage,
   cleanupSurvey,
   getSurveyAndCleanupInfo,
   deleteArchivedTestSubmissions,
@@ -567,26 +568,19 @@ describe('surveyController', () => {
   });
 });
 
-describe('get surveys and question set', () => {
+describe('GET /surveys/list-page', () => {
   let groupA, surveyPinnedToA, surveyA1, surveyA2, surveyA3;
   beforeEach(async () => {
-    const { survey: spa } = await createSurvey([], { name: 'surveyPinnedToA' });
-    surveyPinnedToA = spa;
+    ({ survey: surveyPinnedToA } = await createSurvey([], { name: 'surveyPinnedToA' }));
     const { survey: surveyPinnedToB } = await createSurvey([], { name: 'surveyPinnedToB' });
 
     groupA = await createGroup({ surveys: { pinned: [surveyPinnedToA._id] } });
     const groupB = await createGroup({ surveys: { pinned: [surveyPinnedToB._id] } });
 
-    const { survey: s3 } = await createSurvey([], { name: 'surveyA3' });
-    surveyA3 = s3;
-    const { survey: s2 } = await createSurvey([], { name: 'surveyA2' });
-    surveyA2 = s2;
-    const { survey: s1 } = await createSurvey([], { name: 'surveyA1' });
-    surveyA1 = s1;
+    ({ survey: surveyA3 } = await createSurvey([], { name: 'surveyA3' }));
+    ({ survey: surveyA2 } = await createSurvey([], { name: 'surveyA2' }));
+    ({ survey: surveyA1 } = await createSurvey([], { name: 'surveyA1' }));
     const { survey: surveyB1 } = await createSurvey([], { name: 'surveyB1' });
-
-    const gA = { id: groupA._id, path: groupA.path };
-    const gB = { id: groupB._id, path: groupB.path };
 
     await getDb()
       .collection('surveys')
@@ -601,7 +595,7 @@ describe('get surveys and question set', () => {
             ],
           },
         },
-        { $set: { meta: { group: gA } } }
+        { $set: { meta: { group: { id: groupA._id, path: groupA.path } } } }
       );
     await getDb()
       .collection('surveys')
@@ -611,7 +605,7 @@ describe('get surveys and question set', () => {
             $in: [ObjectId(surveyPinnedToB._id), ObjectId(surveyB1._id)],
           },
         },
-        { $set: { meta: { group: gB } } }
+        { $set: { meta: { group: { id: groupB._id, path: groupB.path } } } }
       );
 
     await getDb()
@@ -626,48 +620,32 @@ describe('get surveys and question set', () => {
       );
   });
 
-  it('get survey from a group', async () => {
-    const req = createReq({
-      params: {},
-      query: {
-        groupId: groupA._id,
-        isLibrary: 'false',
-        skip: 0,
-        limit: 10,
-        prioPinned: true,
-      },
-    });
-    const res = await createRes();
-    await getSurveyListPage(req, res);
+  it('gets surveys from a group', async () => {
+    const { body } = await request(app)
+      .get(
+        `/api/surveys/list-page?groupId=${groupA._id}&isLibrary=false&skip=0&limit=10&prioPinned=true`
+      )
+      .expect(200);
 
-    const result = res.send.mock.calls[0][0];
-    expect(result.pagination.total).toEqual(3);
-    expect(result.content[0]._id).toEqual(surveyA1._id);
-    expect(result.content[1]._id).toEqual(surveyA3._id);
-    expect(result.pinned[0]._id).toEqual(surveyPinnedToA._id);
+    expect(body.pinned.length).toEqual(1);
+    expect(body.pagination.total).toEqual(3);
+    expect(body.content[0]._id).toEqual(surveyA1._id.toString());
+    expect(body.content[1]._id).toEqual(surveyA3._id.toString());
+    expect(body.pinned[0]._id).toEqual(surveyPinnedToA._id.toString());
   });
-  it('get question set (surveys that are library)', async () => {
-    const req = createReq({
-      params: {},
-      query: {
-        isLibrary: 'true',
-        skip: 0,
-        limit: 10,
-      },
-    });
-    const res = await createRes();
-    await getSurveyListPage(req, res);
+  it('returns only question sets (surveys that are library) when isLibrary is true', async () => {
+    const { body } = await request(app)
+      .get(`/api/surveys/list-page?isLibrary=true&skip=0&limit=10`)
+      .expect(200);
 
-    const result = res.send.mock.calls[0][0];
-    expect(result.pagination.total).toEqual(1);
-    expect(result.content[0]._id).toEqual(surveyA2._id);
+    expect(body.pagination.total).toEqual(1);
+    expect(body.content[0]._id).toEqual(surveyA2._id.toString());
   });
 });
 
 describe('get pinned surveys', () => {
   let groupA, subGroupA, groupB, surveyPinnedToA, surveyPinnedToSubA, surveyPinnedToB;
 
-  const app = createApp();
   const token = '1234';
   let authHeaderValue;
 
