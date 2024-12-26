@@ -130,16 +130,21 @@ const buildPipelineForGetSurveyPage = (
       $regex: `^${prefix}`,
     };
   }
-
+  // TODO: There is another if statement with the same predicate, and which contains the same logic as this (along with other logic)
+  // They can probably be combined.
   if (isLibrary === 'true') {
     match['meta.isLibrary'] = true;
   } else if (isLibrary === 'false') {
+    // TODO: review existing data to see if there are surveys with no meta.isLibrary property.
+    // If there are, create a migration to set meta.isLibrary=false for those surveys. Then, we can simplify this line.
     match.$or = [{ 'meta.isLibrary': { $exists: false } }, { 'meta.isLibrary': false }];
   }
 
   if (showArchived === 'true') {
     match['meta.archived'] = true;
   } else {
+    // TODO: review existing data to see if there are surveys with no meta.archived property.
+    // If there are, create a migration to set meta.archived=false for those surveys. Then, we can simplify this line.
     match.$or = [{ 'meta.archived': { $exists: false } }, { 'meta.archived': false }];
   }
 
@@ -163,22 +168,7 @@ const buildPipelineForGetSurveyPage = (
         },
       },
       {
-        $addFields: {
-          sortOrder: {
-            $switch: {
-              branches: [
-                {
-                  case: { $eq: ['$isInPinnedList', true] },
-                  then: 0,
-                },
-              ],
-              default: 1,
-            },
-          },
-        },
-      },
-      {
-        $sort: { sortOrder: 1, lowercasedName: 1 },
+        $sort: { isInPinnedList: -1, lowercasedName: 1 },
       },
     ];
   }
