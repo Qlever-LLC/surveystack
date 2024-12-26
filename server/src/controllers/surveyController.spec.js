@@ -620,18 +620,18 @@ describe('GET /surveys/list-page', () => {
       );
   });
 
-  it('gets surveys from a group', async () => {
+  it('gets surveys from a group, annotating pinned surveys, and sorting first by pinned, then by name', async () => {
     const { body } = await request(app)
       .get(
         `/api/surveys/list-page?groupId=${groupA._id}&isLibrary=false&skip=0&limit=10&prioPinned=true`
       )
       .expect(200);
 
-    expect(body.pinned.length).toEqual(1);
     expect(body.pagination.total).toEqual(3);
-    expect(body.content[0]._id).toEqual(surveyA1._id.toString());
-    expect(body.content[1]._id).toEqual(surveyA3._id.toString());
-    expect(body.pinned[0]._id).toEqual(surveyPinnedToA._id.toString());
+    expect(body.content[0]._id).toEqual(surveyPinnedToA._id.toString());
+    expect(body.content[0].isInPinnedList).toEqual(true);
+    expect(body.content[1]._id).toEqual(surveyA1._id.toString());
+    expect(body.content[2]._id).toEqual(surveyA3._id.toString());
   });
   it('returns only question sets (surveys that are library) when isLibrary is true', async () => {
     const { body } = await request(app)

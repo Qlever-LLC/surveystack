@@ -367,19 +367,6 @@ const getSurveyListPage = async (req, res) => {
     if (!entities) {
       return res.send(noEntities);
     }
-
-    const pinned = [];
-
-    for (let i = entities.content.length - 1; i >= 0; i--) {
-      const entity = entities.content[i];
-      if (entity.isInPinnedList) {
-        pinned.push(entity);
-        entities.content.splice(entities.content.indexOf(entity), 1);
-      }
-      // do not delete the new isInPinnedList field; it is used to display the icon pin for a visitor
-    }
-
-    entities.pinned = pinned;
   } else {
     const pipeline = buildPipelineForGetSurveyPage(query);
     [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();

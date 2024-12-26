@@ -227,13 +227,6 @@ export function useSurvey() {
 
     const { data } = await api.get(`/surveys/list-page?${queryParams}`);
 
-    if (data.pinned) {
-      data.pinned.forEach((survey) => {
-        data.content.unshift(survey);
-      });
-    }
-    delete data.pinned;
-
     if (searchString) {
       const filterContent = data.content.sort((a, b) => a.name.localeCompare(b.name));
       data.content = filterContent;
