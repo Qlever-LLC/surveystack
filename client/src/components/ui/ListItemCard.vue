@@ -30,10 +30,10 @@
             </span>
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
+              <a-chip variant="flat" v-if="showGroupPath" xSmall class="ml-2" :style="{ 'background-color': groupColor }">
+                {{ state.entity?.path ?? group?.data?.name }}
+              </a-chip>
               <br />
-              <span v-if="showGroupPath" style="color: gray">
-                {{ state.entity.path }}
-              </span>
               <span v-if="!smallCard && groupSelectorStyle" class="subEntityName_deepCSS">{{
                 !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin(state.entity._id) ? 'Admin' : 'Member'
               }}</span>
@@ -75,14 +75,17 @@
 
 <script setup>
 import { cloneDeep } from 'lodash';
-import { reactive, onMounted, computed } from 'vue';
+import { reactive, onMounted, computed, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useStore } from 'vuex';
+import { useQuery } from '@tanstack/vue-query';
 
+import api from '@/services/api.service';
 import { useSurvey, resolveRenderFunctionResult } from '@/components/survey/survey';
 import { useGroup } from '@/components/groups/group';
 import { useIsSurveyPinned } from '@/queries';
+import { digestMessage } from '@/utils/hash';
 
 const store = useStore();
 const router = useRouter();
@@ -186,6 +189,28 @@ onMounted(async () => {
 const filteredMenu = computed(() => {
   return props.menu?.filter((m) => resolveRenderFunctionResult(m.render, props.entity));
 });
+
+const groupId = state.entity?.id ?? state.entity?.meta?.group?.id;
+
+const { data: group } = useQuery({
+  queryKey: ['group', groupId],
+  queryFn: async () => {
+    return await api.get(`/groups/${groupId}`);
+  },
+});
+const groupDigest = ref(null);
+const groupColor = ref(null);
+
+watchEffect(async () => {
+    groupDigest.value = await digestMessage(groupId.value);
+    groupColor.value = getGroupColor(groupDigest.value);
+});
+
+function getGroupColor(hexDigestString) {
+  const value = parseInt(hexDigestString, 16);
+  const hue = value % 360;
+  return `hsl(${hue}, 70%, 50%)`;
+}
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };

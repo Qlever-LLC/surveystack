@@ -23,6 +23,7 @@
       :menu="surveyMenu"
       :loading="state.loading"
       :show-navigation-control="!$route.query.minimal_ui"
+      showGroupPath
       title="">
       <template v-slot:title>
         <a-icon class="mr-2">mdi-list-box-outline</a-icon>
