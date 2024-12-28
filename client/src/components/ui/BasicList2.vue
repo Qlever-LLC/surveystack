@@ -76,6 +76,9 @@
             <template v-slot:preMenu="{ entity }">
               <slot name="preMenu" :entity="entity" />
             </template>
+            <template v-slot:afterName="{ entity }">
+              <slot name="afterName" :entity="entity" />
+            </template>
           </list-item-card>
         </a-list>
       </template>

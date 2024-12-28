@@ -22,7 +22,6 @@
         :entities="state.subgroups"
         :loading="state.isLoadingGroup"
         groupStyle
-        showGroupPath
         title="Subgroups"
         :menu="state.subgroupMenu"
         :buttonNew="{ title: 'new...', link: { name: 'groups-new', query: { dir: state.entity.path } } }">

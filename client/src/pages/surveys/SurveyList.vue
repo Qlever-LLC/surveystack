@@ -16,20 +16,24 @@
       @updateSearch="updateSearch"
       @togglePin="togglePinWithIcon"
       listType="card"
-      :entities="state.networkOk ? state.surveys.content : surveys.content"
+      :entities="state.networkOk ? decoratedSurveys : surveys.content"
       showPinned
       :enableTogglePinned="rightToTogglePin().allowed && !state.showArchived"
       :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
       :menu="surveyMenu"
       :loading="state.loading"
       :show-navigation-control="!$route.query.minimal_ui"
-      showGroupPath
       title="">
       <template v-slot:title>
         <a-icon class="mr-2">mdi-list-box-outline</a-icon>
         All Surveys
         <a-chip class="ml-4 hidden-sm-and-down" color="accent" rounded="lg" variant="flat" disabled>
           {{ state.networkOk ? state.surveys.pagination.total : surveys.pagination.total }}
+        </a-chip>
+      </template>
+      <template v-slot:afterName="{ entity }">
+        <a-chip v-if="entity.meta?.group?.name" variant="flat" xSmall class="ml-2" :style="{ 'background-color': entity.meta.group.color }">
+          {{ entity.meta?.group?.name }}
         </a-chip>
       </template>
       <template v-slot:preMenu="{ entity }">
@@ -50,7 +54,7 @@
       <template v-slot:noValue> No Surveys available </template>
       <template v-slot:pagination>
         <a-pagination
-          v-if="state.networkOk ? state.surveys.content.length > 0 : surveys.content.length > 0"
+          v-if="state.networkOk ? decoratedSurveys.length > 0 : surveys.content.length > 0"
           v-model="state.page"
           :length="activeTabPaginationLength"
           @update:modelValue="() => initData()" />
@@ -71,6 +75,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { useGroup } from '@/components/groups/group';
 import { getPermission } from '@/utils/permissions';
 import emitter from '@/utils/eventBus';
+import { useQuery } from '@tanstack/vue-query';
 
 import BasicList from '@/components/ui/BasicList2.vue';
 import MemberSelector from '@/components/shared/MemberSelector.vue';
@@ -82,6 +87,9 @@ import formatDistance from 'date-fns/formatDistance';
 
 import { useSurvey } from '@/components/survey/survey';
 import { useGetPinnedSurveysForGroup } from '@/queries';
+import { digestMessage } from '@/utils/hash';
+import getGroupColor from '@/utils/groupColor';
+import api from '@/services/api.service';
 
 const onlineStatus = inject('onlineStatus');
 
@@ -172,6 +180,34 @@ async function fetchSurveysWithPagination() {
   }
 }
 
+const groupIds = computed(() => {
+  const groupIds = Array.from(new Set(state.surveys?.content?.map((s) => s.meta.group.id))) ?? [];
+  return groupIds;
+});
+
+const shouldFetchGroups = computed(() => groupIds.value.length > 0);
+const { data: groups } = useQuery({
+  queryKey: ['group', groupIds],
+  queryFn: async ({ queryKey }) => {
+    const ids = queryKey[1];
+
+    // TODO: use allSettled instead of all
+    const res = await Promise.all(ids.map(async (id) => {
+      return api.get(`/groups/${id}`);
+    }));
+    
+    const groups = res.map(async ({ data: group }) => ({
+        id: group._id,
+        name: group.name,
+        path: group.path,
+        color: getGroupColor(await digestMessage(group._id)),
+    }));
+    return await Promise.all(groups);
+  },
+  enabled: shouldFetchGroups,
+  initialData: [],
+});
+
 async function initData() {
   state.loading = true;
   try {
@@ -183,6 +219,23 @@ async function initData() {
     state.loading = false;
   }
 }
+
+const decoratedSurveys = computed(() => {
+  if (groups.value.length === 0) {
+    return state.surveys.content;
+  }
+  return state.surveys.content.map((survey) => {
+    const group = groups.value.find((group) => group.id === survey.meta.group.id) ?? survey.meta.group;
+    console.log({ group });
+    return {
+      ...survey,
+      meta: {
+        ...survey.meta,
+        group: group,
+      },
+    };
+  });
+});
 
 function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;

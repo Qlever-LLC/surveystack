@@ -24,15 +24,14 @@
               </a-icon>
             </span>
             <span v-if="groupStyle">
-              <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
+              <a-avatar class="mr-3 entityAvatar_deepCSS" :color="state.groupColor ?? 'accent-lighten-2'" rounded="lg" size="35">
                 {{ state.avatarName }}
               </a-avatar>
             </span>
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
-              <a-chip variant="flat" v-if="showGroupPath" xSmall class="ml-2" :style="{ 'background-color': groupColor }">
-                {{ state.entity?.path ?? group?.data?.name }}
-              </a-chip>
+              <slot name="afterName" :entity="entity" />
+              &nbsp;{{ groupId }}
               <br />
               <span v-if="!smallCard && groupSelectorStyle" class="subEntityName_deepCSS">{{
                 !store.getters['auth/isLoggedIn'] ? '' : isGroupAdmin(state.entity._id) ? 'Admin' : 'Member'
@@ -79,13 +78,13 @@ import { reactive, onMounted, computed, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useStore } from 'vuex';
-import { useQuery } from '@tanstack/vue-query';
 
-import api from '@/services/api.service';
 import { useSurvey, resolveRenderFunctionResult } from '@/components/survey/survey';
 import { useGroup } from '@/components/groups/group';
 import { useIsSurveyPinned } from '@/queries';
 import { digestMessage } from '@/utils/hash';
+import getGroupColor from '@/utils/groupColor';
+import getAvatarName from '@/utils/avatarName';
 
 const store = useStore();
 const router = useRouter();
@@ -122,11 +121,6 @@ const props = defineProps({
     required: false,
     default: false,
   },
-  showGroupPath: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
   questionSetsType: {
     type: Boolean,
     required: false,
@@ -154,6 +148,7 @@ const state = reactive({
   favorite: [],
   menuIsOpen: [],
   groupStyle: {},
+  groupColor: null,
   avatarName: '',
   ableTogglePinned: props.enableTogglePinned,
   pinnedSurveys: false,
@@ -172,45 +167,14 @@ onMounted(async () => {
       marginLeft: `${treeHierarchy * defaultIndentation}px`,
     };
 
-    const name = props.entity.name;
-    const names = name.split(' ');
-    if (names.length === 1) {
-      state.avatarName = name.slice(0, 2).toUpperCase();
-    } else if (names.length >= 2) {
-      const premiereLettrePremierMot = names[0].charAt(0).toUpperCase();
-      const premiereLettreDeuxiemeMot = names[1].charAt(0).toUpperCase();
-      state.avatarName = premiereLettrePremierMot + premiereLettreDeuxiemeMot;
-    } else {
-      state.avatarName = '';
-    }
+    state.avatarName = getAvatarName(props.entity.name)
+    state.groupColor = getGroupColor(await digestMessage(props.entity._id));
   }
 });
 
 const filteredMenu = computed(() => {
   return props.menu?.filter((m) => resolveRenderFunctionResult(m.render, props.entity));
 });
-
-const groupId = state.entity?.id ?? state.entity?.meta?.group?.id;
-
-const { data: group } = useQuery({
-  queryKey: ['group', groupId],
-  queryFn: async () => {
-    return await api.get(`/groups/${groupId}`);
-  },
-});
-const groupDigest = ref(null);
-const groupColor = ref(null);
-
-watchEffect(async () => {
-    groupDigest.value = await digestMessage(groupId.value);
-    groupColor.value = getGroupColor(groupDigest.value);
-});
-
-function getGroupColor(hexDigestString) {
-  const value = parseInt(hexDigestString, 16);
-  const hue = value % 360;
-  return `hsl(${hue}, 70%, 50%)`;
-}
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };
