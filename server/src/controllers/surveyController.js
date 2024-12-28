@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { changeRecursive, changeRecursiveAsync, checkSurvey } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 import pdfService from '../services/pdf.service';
+import { getAncestorPaths } from './utils/groups';
 
 const SURVEYS_COLLECTION = 'surveys';
 const GROUPS_COLLECTION = 'groups';
@@ -85,74 +86,59 @@ const getSurveys = async (req, res) => {
   return res.send(entities);
 };
 
-const buildPipelineGetSurveyPinnedFromGroupId = (groupId) => {
-  const pipeline = [
-    { $match: { _id: ObjectId(groupId) } },
-    {
-      $unwind: '$surveys.pinned',
-    },
-    {
-      $group: {
-        _id: null,
-        allPinnedIds: {
-          $push: '$surveys.pinned',
-        },
-      },
-    },
-  ];
-
-  return pipeline;
-};
-
-const buildPipelineForGetSurveyPage = (
-  { q, groupId, projections, creator, skip, limit, prefix, isLibrary, showArchived },
-  pinnedSurveyIds,
-  sortSurveysPrioPinnedForOneGroup = false
-) => {
-  const match = {};
+const buildPipelineForGetSurveyPage = async ({
+  q,
+  activeGroupId,
+  projections,
+  creator,
+  skip,
+  limit,
+  prefix,
+  isLibrary,
+  showArchived,
+}) => {
+  const match = {
+    ...(q ? { name: { $regex: q, $options: 'i' } } : {}),
+    ...(creator ? { 'meta.creator': new ObjectId(creator) } : {}),
+    ...(prefix ? { 'meta.group.path': { $regex: `^${prefix}` } } : {}),
+    // TODO: review existing data to see if there are surveys with no meta.archived or meta.isLibrary property.
+    // If there are, create a migration to set those properties to false on those surveys. Then, we can simplify this line to check for false instead of not true.
+    ['meta.isLibrary']: isLibrary === 'true' ? true : { $ne: true },
+    ['meta.archived']: showArchived === 'true' ? true : { $ne: true },
+  };
   const project = {};
   let parsedSkip = 0;
   let parsedLimit = DEFAULT_LIMIT;
 
-  if (q) {
-    match.name = {
-      $regex: q,
-      $options: 'i',
-    };
-  }
-
-  if (creator) {
-    match['meta.creator'] = new ObjectId(creator);
-  }
-
-  if (prefix) {
-    match['meta.group.path'] = {
-      $regex: `^${prefix}`,
-    };
-  }
-  // TODO: There is another if statement with the same predicate, and which contains the same logic as this (along with other logic)
-  // They can probably be combined.
-  if (isLibrary === 'true') {
-    match['meta.isLibrary'] = true;
-  } else if (isLibrary === 'false') {
-    // TODO: review existing data to see if there are surveys with no meta.isLibrary property.
-    // If there are, create a migration to set meta.isLibrary=false for those surveys. Then, we can simplify this line.
-    match.$or = [{ 'meta.isLibrary': { $exists: false } }, { 'meta.isLibrary': false }];
-  }
-
-  if (showArchived === 'true') {
-    match['meta.archived'] = true;
-  } else {
-    // TODO: review existing data to see if there are surveys with no meta.archived property.
-    // If there are, create a migration to set meta.archived=false for those surveys. Then, we can simplify this line.
-    match.$or = [{ 'meta.archived': { $exists: false } }, { 'meta.archived': false }];
-  }
-
   let pipeline = [];
 
-  if (sortSurveysPrioPinnedForOneGroup) {
+  if (activeGroupId) {
+    const activeGroup = await db
+      .collection(GROUPS_COLLECTION)
+      .findOne({ _id: new ObjectId(activeGroupId) });
+    const pinnedSurveyIds = activeGroup.surveys.pinned.map((id) => new ObjectId(id));
+    const ancestorGroupPaths = getAncestorPaths(activeGroup.path);
+
     pipeline = [
-      { $match: { 'meta.group.id': ObjectId(groupId) } },
+      {
+        $match: {
+          $or: [
+            { 'meta.group.id': ObjectId(activeGroupId) },
+            {
+              $and: [
+                /* TODO: I believe survey group paths are not updated when group paths are updated,
+                for example when updating a group's slug. This means we could miss surveys, or
+                include the wrong surveys here, because we are matching on unreliable paths and not exact ids.
+                I want to keep this logic simple, and not work around the unreliable paths here, accepting that
+                it leads to this behavior. The unreliable paths bug should be fixed at the source(s).
+                */
+                { 'meta.group.path': { $in: ancestorGroupPaths } },
+                { 'meta.submissions': 'groupAndDescendants' },
+              ],
+            },
+          ],
+        },
+      },
       {
         $addFields: {
           lowercasedName: {
@@ -181,7 +167,7 @@ const buildPipelineForGetSurveyPage = (
     projections.forEach((projection) => {
       project[projection] = 1;
     });
-    if (sortSurveysPrioPinnedForOneGroup) {
+    if (activeGroupId) {
       pipeline.push({
         $project: { ...project, isInPinnedList: 1 },
       });
@@ -192,7 +178,7 @@ const buildPipelineForGetSurveyPage = (
     }
   }
 
-  if (!sortSurveysPrioPinnedForOneGroup) {
+  if (!activeGroupId) {
     // default sort by name (or date modified?)
     // needs aggregation for case insensitive sorting
     pipeline.push(
@@ -288,18 +274,9 @@ const buildPipelineForGetSurveyPage = (
   const paginationStages = [
     {
       $facet: {
-        content: [
-          {
-            $skip: parsedSkip,
-          },
-          {
-            $limit: parsedLimit,
-          },
-        ],
+        content: [{ $skip: parsedSkip }, { $limit: parsedLimit }],
         pagination: [
-          {
-            $count: 'total',
-          },
+          { $count: 'total' },
           {
             $addFields: {
               parsedSkip,
@@ -309,9 +286,7 @@ const buildPipelineForGetSurveyPage = (
         ],
       },
     },
-    {
-      $unwind: '$pagination',
-    },
+    { $unwind: '$pagination' },
   ];
   pipeline.push(...paginationStages);
 
@@ -336,46 +311,18 @@ const getSurveyListPage = async (req, res) => {
     ],
   };
 
-  const { prioPinned } = req.query;
-  let entities;
-  const noEntities = {
-    content: [],
-    pagination: {
-      total: 0,
-      skip: req.query.skip || 0,
-      limit: req.query.limit || DEFAULT_LIMIT,
-    },
-  };
+  const pipeline = await buildPipelineForGetSurveyPage(query);
+  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
 
-  if (prioPinned) {
-    const pipelinePinned = buildPipelineGetSurveyPinnedFromGroupId(query.groupId);
-    const pinnedSurveyIdsResult = await db
-      .collection(GROUPS_COLLECTION)
-      .aggregate(pipelinePinned)
-      .toArray();
-    const pinnedSurveyIds = pinnedSurveyIdsResult[0]?.allPinnedIds ?? [];
-
-    const sortSurveysPrioPinnedForOneGroup = true;
-    const pipeline = buildPipelineForGetSurveyPage(
-      query,
-      pinnedSurveyIds,
-      sortSurveysPrioPinnedForOneGroup
-    );
-
-    [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
-
-    if (!entities) {
-      return res.send(noEntities);
-    }
-  } else {
-    const pipeline = buildPipelineForGetSurveyPage(query);
-    [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
-
-    // empty array when there is no match
-    // however, we still want content and pagination properties
-    if (!entities) {
-      return res.send(noEntities);
-    }
+  if (!entities) {
+    return res.send({
+      content: [],
+      pagination: {
+        total: 0,
+        skip: req.query.skip || 0,
+        limit: req.query.limit || DEFAULT_LIMIT,
+      },
+    });
   }
 
   return res.send(entities);

@@ -569,18 +569,35 @@ describe('surveyController', () => {
 });
 
 describe('GET /surveys/list-page', () => {
-  let groupA, surveyPinnedToA, surveyA1, surveyA2, surveyA3;
+  let groupA, surveyPinnedToA, surveyInGroupA, questionSetLibraryInGroupA, archivedSurveyInGroupA;
+  let groupB, surveyPinnedToB, surveyInGroupB, questionSetLibraryInGroupB, archivedSurveyInGroupB;
+  let groupASubgroup, groupADescendentGroup;
   beforeEach(async () => {
     ({ survey: surveyPinnedToA } = await createSurvey([], { name: 'surveyPinnedToA' }));
-    const { survey: surveyPinnedToB } = await createSurvey([], { name: 'surveyPinnedToB' });
+    ({ survey: surveyPinnedToB } = await createSurvey([], { name: 'surveyPinnedToB' }));
 
-    groupA = await createGroup({ surveys: { pinned: [surveyPinnedToA._id] } });
-    const groupB = await createGroup({ surveys: { pinned: [surveyPinnedToB._id] } });
+    let createSubGroup, createSubSubGroup;
+    ({ createSubGroup, ...groupA } = await createGroup({
+      surveys: { pinned: [surveyPinnedToA._id] },
+    }));
+    groupB = await createGroup({ surveys: { pinned: [surveyPinnedToB._id] } });
+    ({ createSubGroup: createSubSubGroup, ...groupASubgroup } = await createSubGroup(groupA._id));
+    groupADescendentGroup = await createSubSubGroup(groupASubgroup._id);
 
-    ({ survey: surveyA3 } = await createSurvey([], { name: 'surveyA3' }));
-    ({ survey: surveyA2 } = await createSurvey([], { name: 'surveyA2' }));
-    ({ survey: surveyA1 } = await createSurvey([], { name: 'surveyA1' }));
-    const { survey: surveyB1 } = await createSurvey([], { name: 'surveyB1' });
+    ({ survey: surveyInGroupA } = await createSurvey([], { name: 'surveyInGroupA' }));
+    ({ survey: questionSetLibraryInGroupA } = await createSurvey([], {
+      name: 'questionSetLibraryInGroupA',
+    }));
+    ({ survey: archivedSurveyInGroupA } = await createSurvey([], {
+      name: 'archivedSurveyInGroupA',
+    }));
+    ({ survey: surveyInGroupB } = await createSurvey([], { name: 'surveyInGroupB' }));
+    ({ survey: questionSetLibraryInGroupB } = await createSurvey([], {
+      name: 'questionSetLibraryInGroupB',
+    }));
+    ({ survey: archivedSurveyInGroupB } = await createSurvey([], {
+      name: 'archivedSurveyInGroupB',
+    }));
 
     await getDb()
       .collection('surveys')
@@ -589,57 +606,170 @@ describe('GET /surveys/list-page', () => {
           _id: {
             $in: [
               ObjectId(surveyPinnedToA._id),
-              ObjectId(surveyA3._id),
-              ObjectId(surveyA2._id),
-              ObjectId(surveyA1._id),
+              ObjectId(surveyInGroupA._id),
+              ObjectId(questionSetLibraryInGroupA._id),
+              ObjectId(archivedSurveyInGroupA._id),
             ],
           },
         },
-        { $set: { meta: { group: { id: groupA._id, path: groupA.path } } } }
+        { $set: { 'meta.group.id': groupA._id, 'meta.group.path': groupA.path } }
       );
     await getDb()
       .collection('surveys')
       .updateMany(
         {
           _id: {
-            $in: [ObjectId(surveyPinnedToB._id), ObjectId(surveyB1._id)],
+            $in: [
+              ObjectId(surveyPinnedToB._id),
+              ObjectId(surveyInGroupB._id),
+              ObjectId(questionSetLibraryInGroupB._id),
+              ObjectId(archivedSurveyInGroupB._id),
+            ],
           },
         },
-        { $set: { meta: { group: { id: groupB._id, path: groupB.path } } } }
+        { $set: { 'meta.group.id': groupB._id, 'meta.group.path': groupB.path } }
       );
 
     await getDb()
       .collection('surveys')
-      .updateOne(
-        { _id: ObjectId(surveyA2._id) },
+      .updateMany(
+        {
+          _id: {
+            $in: [
+              ObjectId(questionSetLibraryInGroupA._id),
+              ObjectId(questionSetLibraryInGroupB._id),
+            ],
+          },
+        },
         {
           $set: {
-            meta: { isLibrary: true },
+            'meta.isLibrary': true,
+          },
+        }
+      );
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [ObjectId(archivedSurveyInGroupA._id), ObjectId(archivedSurveyInGroupB._id)],
+          },
+        },
+        {
+          $set: {
+            'meta.archived': true,
+          },
+        }
+      );
+    await getDb()
+      .collection('surveys')
+      .updateMany(
+        {
+          _id: {
+            $in: [
+              ObjectId(surveyInGroupA._id),
+              ObjectId(surveyPinnedToA._id),
+              ObjectId(surveyInGroupB._id),
+              ObjectId(surveyPinnedToB._id),
+              ObjectId(archivedSurveyInGroupA._id),
+              ObjectId(archivedSurveyInGroupB._id),
+            ],
+          },
+        },
+        {
+          $set: {
+            'meta.submissions': 'groupAndDescendants',
           },
         }
       );
   });
 
-  it('gets surveys from a group, annotating pinned surveys, and sorting first by pinned, then by name', async () => {
-    const { body } = await request(app)
-      .get(
-        `/api/surveys/list-page?groupId=${groupA._id}&isLibrary=false&skip=0&limit=10&prioPinned=true`
-      )
-      .expect(200);
+  describe('when activeGroupId query parameter is present', () => {
+    const isLibrary = false;
+    const skip = 0;
+    const limit = 10;
 
-    expect(body.pagination.total).toEqual(3);
-    expect(body.content[0]._id).toEqual(surveyPinnedToA._id.toString());
-    expect(body.content[0].isInPinnedList).toEqual(true);
-    expect(body.content[1]._id).toEqual(surveyA1._id.toString());
-    expect(body.content[2]._id).toEqual(surveyA3._id.toString());
+    describe('when showArchived query parameter is false or absent', () => {
+      const showArchived = false;
+      it('returns surveys from the active group, identifies surveys pinned to the active group, and sorts them to the front', async () => {
+        const { body } = await request(app)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupA._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(2);
+        expect(body.content).toHaveLength(2);
+        expect(body.content[0]._id).toEqual(surveyPinnedToA._id.toString());
+        expect(body.content[0].isInPinnedList).toEqual(true);
+        expect(body.content[1]._id).toEqual(surveyInGroupA._id.toString());
+      });
+
+      it('includes surveys shared with the group', async () => {
+        const { body } = await request(app)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupADescendentGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(2);
+        expect(body.content).toHaveLength(2);
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: surveyPinnedToA._id.toString(),
+            isInPinnedList: false,
+          })
+        );
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: surveyInGroupA._id.toString(),
+          })
+        );
+      });
+    });
+
+    describe('when showArchived query parameter is true', () => {
+      const showArchived = true;
+      it('returns archived surveys from the active group, but does not identify pinned surveys', async () => {
+        const { body } = await request(app)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupA._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(1);
+        expect(body.content).toHaveLength(1);
+        expect(body.content[0]._id).toEqual(archivedSurveyInGroupA._id.toString());
+      });
+
+      it('includes surveys shared with the group', async () => {
+        const { body } = await request(app)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupADescendentGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(1);
+        expect(body.content).toHaveLength(1);
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: archivedSurveyInGroupA._id.toString(),
+            isInPinnedList: false,
+          })
+        );
+      });
+    });
   });
+
   it('returns only question sets (surveys that are library) when isLibrary is true', async () => {
     const { body } = await request(app)
       .get(`/api/surveys/list-page?isLibrary=true&skip=0&limit=10`)
       .expect(200);
 
-    expect(body.pagination.total).toEqual(1);
-    expect(body.content[0]._id).toEqual(surveyA2._id.toString());
+    expect(body.pagination.total).toEqual(2);
+    expect(body.content).toHaveLength(2);
+    expect(body.content[0]._id).toEqual(questionSetLibraryInGroupA._id.toString());
+    expect(body.content[1]._id).toEqual(questionSetLibraryInGroupB._id.toString());
   });
 });
 

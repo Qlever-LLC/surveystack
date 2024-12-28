@@ -218,11 +218,10 @@ export function useSurvey() {
       queryParams.append('prefix', whitelabelPartner.value.path);
     }
 
-    queryParams.append('groupId', groupId);
+    queryParams.append('activeGroupId', groupId);
     queryParams.append('isLibrary', 'false');
     queryParams.append('skip', (page - 1) * limit);
     queryParams.append('limit', limit);
-    queryParams.append('prioPinned', showArchived ? false : true);
     queryParams.append('showArchived', showArchived);
 
     const { data } = await api.get(`/surveys/list-page?${queryParams}`);
