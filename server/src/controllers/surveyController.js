@@ -89,7 +89,7 @@ const getSurveys = async (req, res) => {
 const buildPipelineForGetSurveyPage = async ({
   q,
   activeGroupId,
-  projections,
+  projections = [],
   creator,
   skip,
   limit,
@@ -106,92 +106,55 @@ const buildPipelineForGetSurveyPage = async ({
     ['meta.isLibrary']: isLibrary === 'true' ? true : { $ne: true },
     ['meta.archived']: showArchived === 'true' ? true : { $ne: true },
   };
-  const project = {};
   let parsedSkip = 0;
   let parsedLimit = DEFAULT_LIMIT;
 
-  let pipeline = [];
+  const pipeline = [];
 
+  let pinnedSurveyIds = [];
   if (activeGroupId) {
     const activeGroup = await db
       .collection(GROUPS_COLLECTION)
       .findOne({ _id: new ObjectId(activeGroupId) });
-    const pinnedSurveyIds = activeGroup.surveys.pinned.map((id) => new ObjectId(id));
+    pinnedSurveyIds = activeGroup.surveys.pinned.map((id) => new ObjectId(id));
     const ancestorGroupPaths = getAncestorPaths(activeGroup.path);
 
-    pipeline = [
-      {
-        $match: {
-          $or: [
-            { 'meta.group.id': ObjectId(activeGroupId) },
-            {
-              $and: [
-                { 'meta.group.path': { $in: ancestorGroupPaths } },
-                { 'meta.submissions': 'groupAndDescendants' },
-              ],
-            },
-          ],
-        },
-      },
-      {
-        $addFields: {
-          lowercasedName: {
-            $toLower: '$name',
+    pipeline.push({
+      $match: {
+        $or: [
+          { 'meta.group.id': ObjectId(activeGroupId) },
+          {
+            $and: [
+              { 'meta.group.path': { $in: ancestorGroupPaths } },
+              { 'meta.submissions': 'groupAndDescendants' },
+            ],
           },
-        },
+        ],
       },
-      {
-        $addFields: {
-          isPinned: {
-            $in: ['$_id', pinnedSurveyIds],
-          },
-        },
-      },
-      {
-        $sort: { isPinned: -1, lowercasedName: 1 },
-      },
-    ];
-  }
-
-  if (Object.keys(match).length > 0) {
-    pipeline.push({ $match: match });
-  }
-
-  if (projections) {
-    projections.forEach((projection) => {
-      project[projection] = 1;
     });
-    if (activeGroupId) {
-      pipeline.push({
-        $project: { ...project, isPinned: 1 },
-      });
-    } else {
-      pipeline.push({
-        $project: { ...project },
-      });
-    }
   }
 
-  if (!activeGroupId) {
-    // default sort by name (or date modified?)
-    // needs aggregation for case insensitive sorting
-    pipeline.push(
-      { $addFields: { lowercasedName: { $toLower: '$name' } } },
-      { $sort: { lowercasedName: 1 } },
-      { $project: { lowercasedName: 0 } }
-    );
-  }
+  pipeline.push({ $match: match });
+  pipeline.push(
+    {
+      $addFields: {
+        ...(activeGroupId ? { isPinned: { $in: ['$_id', pinnedSurveyIds] } } : {}),
+      },
+    },
+    activeGroupId ? { $sort: { isPinned: -1, name: 1 } } : { $sort: { name: 1 } }
+  );
+  pipeline.push({
+    $project: {
+      ...Object.fromEntries(projections.map((p) => [p, 1])),
+      ...(activeGroupId ? { isPinned: 1 } : {}),
+    },
+  });
 
   if (isLibrary === 'true') {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
     // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
     // TODO also count revisions.controls.children.libraryId
     const aggregateCounts = [
-      {
-        $match: {
-          'meta.isLibrary': true,
-        },
-      },
       /*
       TODO Resolve #48, then uncommet this
        {
@@ -306,7 +269,10 @@ const getSurveyListPage = async (req, res) => {
   };
 
   const pipeline = await buildPipelineForGetSurveyPage(query);
-  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
+  const [entities] = await db
+    .collection(SURVEYS_COLLECTION)
+    .aggregate(pipeline, { collation: { locale: 'en' } })
+    .toArray();
 
   if (!entities) {
     return res.send({
