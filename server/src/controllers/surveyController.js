@@ -126,12 +126,6 @@ const buildPipelineForGetSurveyPage = async ({
             { 'meta.group.id': ObjectId(activeGroupId) },
             {
               $and: [
-                /* TODO: I believe survey group paths are not updated when group paths are updated,
-                for example when updating a group's slug. This means we could miss surveys, or
-                include the wrong surveys here, because we are matching on unreliable paths and not exact ids.
-                I want to keep this logic simple, and not work around the unreliable paths here, accepting that
-                it leads to this behavior. The unreliable paths bug should be fixed at the source(s).
-                */
                 { 'meta.group.path': { $in: ancestorGroupPaths } },
                 { 'meta.submissions': 'groupAndDescendants' },
               ],
@@ -764,8 +758,6 @@ const getPinned = async (req, res) => {
     }, {})
   );
   pinned.push(...uniquePinnedSurveys);
-
-  // console.log('pinned', pinned);
 
   return res.send({
     status: 'success',
