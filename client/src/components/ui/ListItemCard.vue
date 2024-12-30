@@ -158,7 +158,7 @@ const state = reactive({
 
 const { data: isSurveyPinned } = useIsSurveyPinned(getActiveGroupId(), props.entity._id);
 const pinnedSurveys = computed(() =>
-  props.showPinned ? (isGroupVisitor() ? props.entity.isInPinnedList : isSurveyPinned.value) : false
+  props.showPinned && !props.entity.archived ? (isGroupVisitor() ? props.entity.isPinned : isSurveyPinned.value) : false
 );
 
 onMounted(async () => {

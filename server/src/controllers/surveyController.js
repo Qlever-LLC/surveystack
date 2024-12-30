@@ -142,13 +142,13 @@ const buildPipelineForGetSurveyPage = async ({
       },
       {
         $addFields: {
-          isInPinnedList: {
+          isPinned: {
             $in: ['$_id', pinnedSurveyIds],
           },
         },
       },
       {
-        $sort: { isInPinnedList: -1, lowercasedName: 1 },
+        $sort: { isPinned: -1, lowercasedName: 1 },
       },
     ];
   }
@@ -163,7 +163,7 @@ const buildPipelineForGetSurveyPage = async ({
     });
     if (activeGroupId) {
       pipeline.push({
-        $project: { ...project, isInPinnedList: 1 },
+        $project: { ...project, isPinned: 1 },
       });
     } else {
       pipeline.push({
