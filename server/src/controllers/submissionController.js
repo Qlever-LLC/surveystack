@@ -645,7 +645,7 @@ const getSubmissionsCsv = async (req, res) => {
 
   const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
     excludeDataMeta: false,
-    splitValueFieldFromQuestions: true,
+    questionsHaveNoValueField: true,
   });
 
   const csv = csvService.createCsv(transformedEntities, headers);

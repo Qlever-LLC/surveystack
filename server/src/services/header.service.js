@@ -36,10 +36,14 @@ function arrayMax(arr) {
 
 // Lists the headers that exist both in the submissions and the selected version of survey.
 // It tries to select the latest survey version used by the submission. If that fails it uses the latest survey version.
-const getHeaders = async (
+export const getHeaders = async (
   surveyId,
   entities,
-  options = { excludeDataMeta: false, splitValueFieldFromQuestions: false }
+  options = {
+    excludeDataMeta: false,
+    // Set to true, when the questions in the entities don't have the `value` intermediary filed (ie. `{number_1: 1}` instead of `{number_1: { value: 1}}`)
+    questionsHaveNoValueField: false,
+  }
 ) => {
   if (!surveyId) {
     return [];
@@ -79,7 +83,7 @@ const getHeaders = async (
     if (node.model.type === 'group' || node.model.type === 'page') {
       return;
     }
-    if (options.splitValueFieldFromQuestions) {
+    if (options.questionsHaveNoValueField) {
       surveyHeaders[header] = [];
     } else {
       surveyHeaders[`${header}.value`] = [];
