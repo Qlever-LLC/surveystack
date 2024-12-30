@@ -57,7 +57,21 @@ const createGroup = async (_overrides = {}) => {
     });
   };
 
-  return { ...group, createUserMember, createAdminMember, createSubGroup };
+  const pinSurvey = (surveyId) => {
+    return getDb()
+      .collection('groups')
+      .findOneAndUpdate(
+        { _id: group._id },
+        {
+          $addToSet: { 'surveys.pinned': asMongoId(surveyId) },
+        },
+        {
+          returnDocument: 'after',
+        }
+      );
+  };
+
+  return { ...group, createUserMember, createAdminMember, createSubGroup, pinSurvey };
 };
 
 const createMembership = async (_overrides = {}) => {

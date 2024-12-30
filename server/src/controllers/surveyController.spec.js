@@ -618,118 +618,76 @@ describe('surveyController', () => {
 
 describe('GET /surveys/list-page', () => {
   let groupA, surveyPinnedToA, surveyInGroupA, questionSetLibraryInGroupA, archivedSurveyInGroupA;
-  let groupB, surveyPinnedToB, surveyInGroupB, questionSetLibraryInGroupB, archivedSurveyInGroupB;
-  let groupASubgroup, groupADescendentGroup;
+  let groupB, surveyPinnedToB, surveyInGroupB, questionSetLibraryInGroupB, archivedSurveyInGroupB; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let groupASubGroup;
+  let groupADescendentGroup;
   beforeEach(async () => {
-    ({ survey: surveyPinnedToA } = await createSurvey([], { name: 'surveyPinnedToA' }));
-    ({ survey: surveyPinnedToB } = await createSurvey([], { name: 'surveyPinnedToB' }));
+    groupA = await createGroup();
+    groupB = await createGroup();
+    groupASubGroup = await groupA.createSubGroup(groupA._id);
+    groupADescendentGroup = await groupASubGroup.createSubGroup(groupASubGroup._id);
 
-    let createSubGroup, createSubSubGroup;
-    ({ createSubGroup, ...groupA } = await createGroup({
-      surveys: { pinned: [surveyPinnedToA._id] },
+    ({ survey: surveyPinnedToA } = await createSurvey([], {
+      name: 'surveyPinnedToA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        submissions: 'groupAndDescendants',
+      }),
     }));
-    groupB = await createGroup({ surveys: { pinned: [surveyPinnedToB._id] } });
-    ({ createSubGroup: createSubSubGroup, ...groupASubgroup } = await createSubGroup(groupA._id));
-    groupADescendentGroup = await createSubSubGroup(groupASubgroup._id);
-
-    ({ survey: surveyInGroupA } = await createSurvey([], { name: 'surveyInGroupA' }));
+    await groupA.pinSurvey(surveyPinnedToA._id);
+    ({ survey: surveyInGroupA } = await createSurvey([], {
+      name: 'surveyInGroupA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        submissions: 'groupAndDescendants',
+      }),
+    }));
     ({ survey: questionSetLibraryInGroupA } = await createSurvey([], {
       name: 'questionSetLibraryInGroupA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        isLibrary: true,
+      }),
     }));
     ({ survey: archivedSurveyInGroupA } = await createSurvey([], {
       name: 'archivedSurveyInGroupA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        archived: true,
+        submissions: 'groupAndDescendants',
+      }),
     }));
-    ({ survey: surveyInGroupB } = await createSurvey([], { name: 'surveyInGroupB' }));
+
+    ({ survey: surveyPinnedToB } = await createSurvey([], {
+      name: 'surveyPinnedToB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        submissions: 'groupAndDescendants',
+      }),
+    }));
+    await groupB.pinSurvey(surveyPinnedToB._id);
+    ({ survey: surveyInGroupB } = await createSurvey([], {
+      name: 'surveyInGroupB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        submissions: 'groupAndDescendants',
+      }),
+    }));
     ({ survey: questionSetLibraryInGroupB } = await createSurvey([], {
       name: 'questionSetLibraryInGroupB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        isLibrary: true,
+      }),
     }));
     ({ survey: archivedSurveyInGroupB } = await createSurvey([], {
       name: 'archivedSurveyInGroupB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        archived: true,
+        submissions: 'groupAndDescendants',
+      }),
     }));
-
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [
-              ObjectId(surveyPinnedToA._id),
-              ObjectId(surveyInGroupA._id),
-              ObjectId(questionSetLibraryInGroupA._id),
-              ObjectId(archivedSurveyInGroupA._id),
-            ],
-          },
-        },
-        { $set: { 'meta.group.id': groupA._id, 'meta.group.path': groupA.path } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [
-              ObjectId(surveyPinnedToB._id),
-              ObjectId(surveyInGroupB._id),
-              ObjectId(questionSetLibraryInGroupB._id),
-              ObjectId(archivedSurveyInGroupB._id),
-            ],
-          },
-        },
-        { $set: { 'meta.group.id': groupB._id, 'meta.group.path': groupB.path } }
-      );
-
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [
-              ObjectId(questionSetLibraryInGroupA._id),
-              ObjectId(questionSetLibraryInGroupB._id),
-            ],
-          },
-        },
-        {
-          $set: {
-            'meta.isLibrary': true,
-          },
-        }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(archivedSurveyInGroupA._id), ObjectId(archivedSurveyInGroupB._id)],
-          },
-        },
-        {
-          $set: {
-            'meta.archived': true,
-          },
-        }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [
-              ObjectId(surveyInGroupA._id),
-              ObjectId(surveyPinnedToA._id),
-              ObjectId(surveyInGroupB._id),
-              ObjectId(surveyPinnedToB._id),
-              ObjectId(archivedSurveyInGroupA._id),
-              ObjectId(archivedSurveyInGroupB._id),
-            ],
-          },
-        },
-        {
-          $set: {
-            'meta.submissions': 'groupAndDescendants',
-          },
-        }
-      );
   });
 
   describe('when activeGroupId query parameter is present', () => {
@@ -828,78 +786,67 @@ describe('get pinned surveys', () => {
   let authHeaderValue;
 
   beforeEach(async () => {
-    const { survey: spa } = await createSurvey([], { name: 'surveyPinnedToA' });
-    surveyPinnedToA = spa;
-    const { survey: spsuba } = await createSurvey([], { name: 'surveyPinnedToA' });
-    surveyPinnedToSubA = spsuba;
-    const { survey: spb } = await createSurvey([], { name: 'surveyPinnedToB' });
-    surveyPinnedToB = spb;
-    const { survey: surveyPinnedToSubB } = await createSurvey([], { name: 'surveyPinnedToSubB' });
+    groupA = await createGroup({ name: 'groupA' });
+    subGroupA = await groupA.createSubGroup({ name: 'subGroupA' });
+    groupB = await createGroup({ name: 'groupB' });
+    const subGroupB = await groupB.createSubGroup({ name: 'subGroupB' });
 
-    groupA = await createGroup({ name: 'groupA', surveys: { pinned: [surveyPinnedToA._id] } });
-    subGroupA = await groupA.createSubGroup(
-      { name: 'subGroupA' },
-      { surveys: { pinned: [surveyPinnedToSubA._id] } }
-    );
-    groupB = await createGroup({
-      name: 'groupB',
-      surveys: { pinned: [surveyPinnedToB._id] },
+    ({ survey: surveyPinnedToA } = await createSurvey([], {
+      name: 'surveyPinnedToA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+      }),
+    }));
+    await groupA.pinSurvey(surveyPinnedToA._id);
+
+    ({ survey: surveyPinnedToSubA } = await createSurvey([], {
+      name: 'surveyPinnedToA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: subGroupA._id, path: subGroupA.path }),
+      }),
+    }));
+    await subGroupA.pinSurvey(surveyPinnedToSubA._id);
+
+    ({ survey: surveyPinnedToB } = await createSurvey([], {
+      name: 'surveyPinnedToB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+      }),
+    }));
+    await groupB.pinSurvey(surveyPinnedToB._id);
+
+    const { survey: surveyPinnedToSubB } = await createSurvey([], {
+      name: 'surveyPinnedToSubB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: subGroupB._id, path: subGroupB.path }),
+      }),
     });
-    const subGroupB = await groupB.createSubGroup(
-      { name: 'subGroupB' },
-      { surveys: { pinned: [surveyPinnedToSubB._id] } }
-    );
+    await subGroupB.pinSurvey(surveyPinnedToSubB._id);
 
-    const { survey: surveyA1 } = await createSurvey([], { name: 'surveyA1' });
-    const { survey: surveyA2 } = await createSurvey([], { name: 'surveyA2' });
-    const { survey: surveySubA1 } = await createSurvey([], { name: 'surveySubA1' });
-    const { survey: surveyB1 } = await createSurvey([], { name: 'surveyB1' });
-
-    const gA = { id: groupA._id, path: groupA.path };
-    const gSubA = { id: subGroupA._id, path: subGroupA.path };
-    const gB = { id: groupB._id, path: groupB.path };
-    const gSubB = { id: subGroupB._id, path: subGroupB.path };
-
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToA._id), ObjectId(surveyA2._id), ObjectId(surveyA1._id)],
-          },
-        },
-        { $set: { meta: { group: gA } } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToSubA._id), ObjectId(surveySubA1._id)],
-          },
-        },
-        { $set: { meta: { group: gSubA } } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToB._id), ObjectId(surveyB1._id)],
-          },
-        },
-        { $set: { meta: { group: gB } } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToSubB._id)],
-          },
-        },
-        { $set: { meta: { group: gSubB } } }
-      );
+    await createSurvey([], {
+      name: 'surveyA1',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+      }),
+    });
+    await createSurvey([], {
+      name: 'surveyA2',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+      }),
+    });
+    await createSurvey([], {
+      name: 'surveySubA1',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: subGroupA._id, path: subGroupA.path }),
+      }),
+    });
+    await createSurvey([], {
+      name: 'surveyB1',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+      }),
+    });
   });
 
   it('user get pinned survey from root group but not sub-group', async () => {

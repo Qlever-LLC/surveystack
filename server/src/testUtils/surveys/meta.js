@@ -23,6 +23,7 @@ const createSurveyMeta = ({
   specVersion = 4,
   printOptions = createSurveyMetaPrintOptions(),
   isLibrary = false,
+  archived = false,
 } = {}) => {
   const now = new Date();
   return {
@@ -34,6 +35,7 @@ const createSurveyMeta = ({
     specVersion,
     printOptions,
     isLibrary,
+    archived,
   };
 };
 
