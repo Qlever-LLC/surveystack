@@ -208,6 +208,7 @@ export function useSurvey() {
 
   async function getSurveys(groupId, searchString, page, limit, showArchived, user = null) {
     const queryParams = new URLSearchParams();
+
     if (user) {
       queryParams.append('creator', user);
     }

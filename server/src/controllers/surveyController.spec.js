@@ -8,6 +8,8 @@ import {
   createGroup,
   createSuperAdmin,
   createMembership,
+  createSurveyMeta,
+  createSurveyMetaGroup,
 } from '../testUtils';
 import _ from 'lodash';
 import { getDb } from '../db';
@@ -122,7 +124,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: user.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     await expect(getSurveyAndCleanupInfo(librarySurvey._id, res)).rejects.toThrow(
@@ -135,7 +144,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: user.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: user.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: user.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -149,7 +165,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: admin2.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin1.user._id, group: { id: group1._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin1.user._id,
+        group: createSurveyMetaGroup({
+          id: group1._id,
+          path: group1.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     await expect(getSurveyAndCleanupInfo(librarySurvey._id, res)).rejects.toThrow(
@@ -163,7 +186,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: admin2.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin1.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin1.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -176,7 +206,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: superAdmin });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -185,18 +222,25 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
 });
 
 describe('surveyController', () => {
-  let librarySurvey, admin, res;
+  let librarySurvey, admin, res, group;
 
   beforeEach(async () => {
-    const group = await createGroup();
+    group = await createGroup();
     admin = await group.createAdminMember();
     res = await createRes({ user: admin.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     librarySurvey = libraryResult.survey;
-    await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.lastedVersion);
+    await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.latestVersion);
   });
 
   describe('getSurvey', () => {
@@ -396,11 +440,15 @@ describe('surveyController', () => {
   describe('cleanup', () => {
     let librarySurvey, createSubmission;
     beforeEach(async () => {
-      const libraryResult = await mockControlsAndSubmission({
-        meta: { isLibrary: true },
-      });
-      createSubmission = libraryResult.createSubmission;
-      librarySurvey = libraryResult.survey;
+      ({ survey: librarySurvey, createSubmission } = await mockControlsAndSubmission({
+        meta: createSurveyMeta({
+          isLibrary: true,
+          group: createSurveyMetaGroup({
+            id: group._id,
+            path: group.path,
+          }),
+        }),
+      }));
       await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.latestVersion);
     });
     describe('getSurveyAndCleanupInfo', () => {
