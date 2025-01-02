@@ -1,6 +1,7 @@
 <template>
   <div class="survey-group-selector">
     <a-select
+      :disabled="disabled"
       :modelValue="getModelValue()"
       @update:modelValue="handleInput"
       :items="groupItems"
@@ -8,8 +9,10 @@
       item-value="value"
       :label="label"
       :variant="outlined ? 'outlined' : undefined"
-      hide-details
+      :hide-details="hint ? false : 'auto'"
       color="focus"
+      :hint="hint"
+      :persistent-hint="persistentHint"
       itemSlot>
       <template v-slot:item="{ props, item }">
         <a-list-item v-bind="props">
@@ -40,6 +43,17 @@ function makeTree(groups, lvl = 1) {
 
 export default {
   props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    hint: {
+      type: String,
+    },
+    persistentHint: {
+      type: Boolean,
+      default: false,
+    },
     modelValue: {
       type: [String, Object],
     },

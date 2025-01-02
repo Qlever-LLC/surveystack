@@ -160,15 +160,6 @@
             }">
             <a-icon left>mdi-note-text-outline</a-icon>
             View Survey
-          </a-btn>
-          <a-btn
-            outlined
-            color="secondary"
-            class="ml-2"
-            :disabled="surveyEntity && surveyEntity.meta.isLibrary"
-            :to="`/groups/${$route.params.id}/surveys/${state.survey}/submissions/new`">
-            <a-icon left>mdi-plus</a-icon>
-            New response
           </a-btn> -->
         <a-btn outlined color="secondary" @click="state.showDownloadModal = true">
           <a-icon left>mdi-export</a-icon>

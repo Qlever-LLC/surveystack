@@ -14,14 +14,26 @@
           <a-card>
             <a-card-title>Survey Settings</a-card-title>
             <a-card-text>
-              <group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
+              <group-selector
+                class="my-4"
+                label="Group"
+                v-model="value.meta.group"
+                outlined
+                returnObject
+                :disabled="isPublished(value)"
+                :hint="isPublished(value) ? 'Setting cannot be changed once a survey is published.' : undefined"
+                :persistent-hint="isPublished(value)"
+              />
               <a-select
                 variant="outlined"
                 v-model="value.meta.submissions"
                 label="Allow Responses for..."
                 :items="availableSubmissions"
                 item-title="text"
-                item-value="value" />
+                item-value="value"
+                :hint="isPublished(value) ? 'Setting cannot be changed once a survey is published.' : undefined"
+                :persistent-hint="isPublished(value)"
+                :disabled="isPublished(value)" />
               <a-checkbox label="Show submission review page at end of survey" v-model="value.meta.reviewPage" />
               <a-textarea v-model="value.description" label="Description" class="mt-4" rows="4" variant="outlined" />
             </a-card-text>
@@ -230,7 +242,7 @@ import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpda
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
 import PrintSettingsDialog from './SurveyPrintSettingsDialog.vue';
 
-import { calcSurveySizeMB } from '@/utils/surveys';
+import { calcSurveySizeMB, isPublished } from '@/utils/surveys';
 import api from '@/services/api.service';
 import AppNavigationControl from '@/components/AppNavigationControl.vue';
 
@@ -303,6 +315,7 @@ export default {
     appResources,
   },
   methods: {
+    isPublished,
     async getGroupNameById(id) {
       return await getGroupNameById(id);
     },
