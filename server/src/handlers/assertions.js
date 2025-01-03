@@ -172,11 +172,6 @@ export const hasSubmissionRights = async (submission, res) => {
     throw boom.unauthorized(`You must be logged in to submit to this survey`);
   }
 
-  if (submissions === 'user') {
-    // all logged in users can submit
-    return true;
-  }
-
   const userId = res.locals.auth.user._id;
   const groupId = survey.meta.group.id;
   if (!groupId) {
