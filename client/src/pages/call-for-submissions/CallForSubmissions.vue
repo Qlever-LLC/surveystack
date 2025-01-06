@@ -208,7 +208,7 @@ watch(
   async (newVal) => {
     // if the dialog will be displayed
     if (newVal) {
-      const groupId = props.selectedSurvey.group._id;
+      const groupId = props.selectedSurvey.meta.group.id;
       if (groupId) {
         state.groupId = groupId;
         await loadMembers();
