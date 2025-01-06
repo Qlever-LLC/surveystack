@@ -8,6 +8,8 @@ import {
   createGroup,
   createRequestSubmissionMeta,
   createSubmissionMeta,
+  createSurveyMeta,
+  createSurveyMetaGroup,
 } from '../testUtils';
 import mailService from '../services/mail/mail.service';
 import createApp from '../app.js';
@@ -24,7 +26,7 @@ const { ObjectId } = jest.requireActual('mongodb');
 import { withSession, withTransaction } from '../db/helpers.ts';
 const { withSession: actualWithSession, withTransaction: actualWithTransaction } =
   jest.requireActual('../db/helpers.ts');
-// by default, for each test, setup withSession and withTransaction to behave as normal (that is, use their actual implementation), but also set them up as mocks so their functionality can be overridden in individual tests, spyed on, etc.
+// by default, for each test, setup withSession and withTransaction to behave as normal (that is, use their actual implementation), but also set them up as mocks so their functionality can be overridden in individual tests, spied on, etc.
 beforeEach(() => {
   withSession.mockImplementation(actualWithSession);
   withTransaction.mockImplementation(actualWithTransaction);
@@ -1144,16 +1146,23 @@ describe('submissionController', () => {
 
   describe('createSubmission', () => {
     const app = createApp();
-    const token = '1234';
-    let authHeaderValue;
+    const memberToken = 'member-token';
+    const adminToken = 'admin-token';
+    let memberAuthHeaderValue;
+    let adminAuthHeaderValue;
     let group;
     let user;
+    let adminUser;
     beforeEach(async () => {
       group = await createGroup();
       ({ user } = await group.createUserMember({
-        userOverrides: { token },
+        userOverrides: { token: memberToken },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      ({ user: adminUser } = await group.createAdminMember({
+        userOverrides: { token: adminToken },
+      }));
+      memberAuthHeaderValue = `${user.email} ${memberToken}`;
+      adminAuthHeaderValue = `${adminUser.email} ${adminToken}`;
       handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
     });
 
@@ -1179,7 +1188,7 @@ describe('submissionController', () => {
 
       await request(app)
         .post('/api/submissions')
-        .set('Authorization', authHeaderValue)
+        .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
         .expect(200);
 
@@ -1206,7 +1215,7 @@ describe('submissionController', () => {
 
       await request(app)
         .post('/api/submissions')
-        .set('Authorization', authHeaderValue)
+        .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
         .expect(200);
 
@@ -1244,7 +1253,7 @@ describe('submissionController', () => {
 
         await request(app)
           .post('/api/submissions')
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send(requestSubmission)
           .expect(409);
 
@@ -1284,7 +1293,7 @@ describe('submissionController', () => {
 
           await request(app)
             .post('/api/submissions')
-            .set('Authorization', authHeaderValue)
+            .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
             .expect(200);
 
@@ -1329,7 +1338,7 @@ describe('submissionController', () => {
 
           await request(app)
             .post('/api/submissions')
-            .set('Authorization', authHeaderValue)
+            .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
             .expect(401);
 
@@ -1362,7 +1371,7 @@ describe('submissionController', () => {
 
         await request(app)
           .post('/api/submissions')
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send(requestSubmission)
           .expect(200);
 
@@ -1388,12 +1397,236 @@ describe('submissionController', () => {
 
         await request(app)
           .post('/api/submissions')
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send(requestSubmission)
           .expect(422);
 
         const submission = await db.collection('submissions').findOne({ _id: submissionId });
         expect(submission).toBeNull();
+      });
+
+      describe('when survey.meta.submissions is "public"', () => {
+        let createRequestSubmission;
+        let submissionId;
+        beforeEach(async () => {
+          submissionId = ObjectId();
+          ({ createRequestSubmission } = await createSurvey(['string'], {
+            meta: createSurveyMeta({ submissions: 'public' }),
+          }));
+        });
+
+        it('and the requesting user is not logged in, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: null,
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app).post('/api/submissions').send(requestSubmission).expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+
+        it('and the requesting user is logged in, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', memberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+      });
+
+      describe('when survey.meta.submissions is "group"', () => {
+        let createRequestSubmission;
+        let submissionId;
+        beforeEach(async () => {
+          submissionId = ObjectId();
+          ({ createRequestSubmission } = await createSurvey(['string'], {
+            meta: createSurveyMeta({
+              submissions: 'group',
+              group: createSurveyMetaGroup({ id: group._id, path: group.path }),
+            }),
+          }));
+        });
+
+        it('and the requesting user is not logged in, 401', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: null,
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app).post('/api/submissions').send(requestSubmission).expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('and requesting user is not a member of the group, 401', async () => {
+          const anotherGroup = await createGroup();
+          const anotherGroupUserToken = 'another-group-user-token';
+          const { user: anotherGroupUser } = await anotherGroup.createUserMember({
+            userOverrides: { token: anotherGroupUserToken },
+          });
+          const anotherGroupUserAuthHeaderValue = `${anotherGroupUser.email} ${anotherGroupUserToken}`;
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: anotherGroupUser._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', anotherGroupUserAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('and requesting user is a member of the group but not an admin, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', memberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+
+        it('and requesting user is an admin of the group, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: adminUser._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', adminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+
+        it('and the request submission has a different group than the survey, 401', async () => {
+          const subGroup = await group.createSubGroup({ name: 'subGroup' });
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: adminUser._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
+          console.log({ requestSubmissionMeta: requestSubmission.meta });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', adminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+      });
+
+      describe('when survey.meta.submissions is "groupAndDescendants"', () => {
+        it.todo('and the requesting user is not logged in, 401');
+        it.todo('and the requesting user is not a member of the group or its descendants, 401');
+        it.todo(
+          'and the requesting user is a member a descendant group but not an admin, and is submitting to the descendant group, OK'
+        );
+        it.todo(
+          'and the requesting user is a member a descendant group but not an admin, and is submitting to an ancestor group they do not belong to, 401'
+        );
+        it.todo(
+          'and the requesting user is an admin of a descendant group, and is submitting to the descendant group, OK'
+        );
+        it.todo(
+          'and the requesting user is an admin of a descendant group, and is submitting to an ancestor group they do not belong to, 401'
+        );
+        it.todo(
+          'and the requesting user is a member of the survey group but not an admin, and is submitting to the survey group, OK'
+        );
+        it.todo(
+          'and the requesting user is an admin of the survey group, and is submitting to the survey group, OK'
+        );
       });
     });
   });
@@ -1401,7 +1634,7 @@ describe('submissionController', () => {
   describe('updateSubmission', () => {
     const app = createApp();
     const token = '1234';
-    let authHeaderValue;
+    let memberAuthHeaderValue;
     let group;
     let user;
     beforeEach(async () => {
@@ -1409,7 +1642,7 @@ describe('submissionController', () => {
       ({ user } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      memberAuthHeaderValue = `${user.email} ${token}`;
     });
 
     it('removes READY_TO_SUBMIT status from the submission before updating it, and returns 200', async () => {
@@ -1437,7 +1670,7 @@ describe('submissionController', () => {
 
       await request(app)
         .put(`/api/submissions/${submissionId.toString()}`)
-        .set('Authorization', authHeaderValue)
+        .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
         .expect(200);
 
@@ -1479,7 +1712,7 @@ describe('submissionController', () => {
 
       await request(app)
         .put(`/api/submissions/${submissionId.toString()}`)
-        .set('Authorization', authHeaderValue)
+        .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
         .expect(200);
 
@@ -1514,7 +1747,7 @@ describe('submissionController', () => {
 
       await request(app)
         .put(`/api/submissions/${submissionId.toString()}`)
-        .set('Authorization', authHeaderValue)
+        .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
         .expect(422);
 
@@ -1546,13 +1779,65 @@ describe('submissionController', () => {
 
       await request(app)
         .put(`/api/submissions/${submissionId.toString()}`)
-        .set('Authorization', authHeaderValue)
+        .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
         .expect(409);
 
       const submission = await db.collection('submissions').findOne({ _id: submissionId });
       expect(submission).not.toBeNull();
       expect(submission.meta.dateModified).toEqual(existingSubmission.meta.dateModified);
+    });
+
+    describe('when survey.meta.submissions is "public"', () => {
+      it.todo('and the requesting user is not logged in, 401');
+      it.todo(
+        'and the requesting user is a member of the submission group but not the creator, 401'
+      );
+      it.todo('and the requesting user is the creator, OK');
+      it.todo('and the requesting user is an admin of the submission group, OK');
+    });
+
+    describe('when survey.meta.submissions is "group"', () => {
+      it.todo('and the requesting user is not logged in, 401');
+      it.todo('and the requesting user is not a member of the group, 401');
+      it.todo(
+        'and the requesting user is a member of the submission group but not the creator, 401'
+      );
+      it.todo('and the requesting user is the creator, OK');
+      it.todo('and the requesting user is an admin of the submission group, OK');
+      it.todo('and the request submission has a different group than the survey, 401');
+    });
+
+    describe('when survey.meta.submissions is "groupAndDescendants"', () => {
+      describe('and the existing submission is in a group that the requesting user is not a member of', () => {
+        it.todo('if the requesting user is the creator, OK');
+        it.todo('if the requesting user is not the creator, 401');
+      });
+
+      describe('and the existing submission is in a group that the requesting user is a member of', () => {
+        it.todo('if the requesting user is the creator, OK');
+        it.todo('if the requesting user is not the creator, 401');
+      });
+
+      describe('and the existing submission is in a group that the requesting user is an admin of', () => {
+        it.todo('OK');
+      });
+
+      it.todo('and the requesting user is not logged in, 401');
+      it.todo('and the requesting user is not a member of the group or its descendants, 401');
+      it.todo(
+        'and the requesting user is not a member of the group or its descendants but is the creator, OK'
+      );
+      it.todo(
+        'and the requesting user is a member of a descendant group with a submission in it, but not an admin, but is the creator, OK'
+      );
+      it.todo(
+        'and the requesting user is a member of a descendant group with a submission in it, but not an admin, 401'
+      );
+      it.todo(
+        'and the requesting user is an admin of a descendant group with a submission in it, OK'
+      );
+      it.todo('and the request submission has a different group than the survey, 401');
     });
   });
 

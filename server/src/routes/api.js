@@ -33,6 +33,7 @@ import {
   checkFeatureToggledOn,
   assertIsAtLeastOnceOwner,
   assertIsOwnerOfInstance,
+  assertHasRightToSubmitSurvey,
 } from '../handlers/assertions';
 import { catchErrors } from '../handlers/errorHandlers';
 import { handleDelegates } from '../handlers/headerHandlers';
@@ -125,7 +126,7 @@ router.get(
 router.post('/submissions/pdf', catchErrors(submissionController.postSubmissionPdf));
 router.post(
   '/submissions',
-  [catchErrors(submissionMigration), assertSubmissionRights],
+  [catchErrors(submissionMigration), assertHasRightToSubmitSurvey],
   catchErrors(handleDelegates(submissionController.createSubmission))
 );
 router.put(

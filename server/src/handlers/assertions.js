@@ -7,6 +7,68 @@ import { catchErrors } from '../handlers/errorHandlers';
 import rolesService from '../services/roles.service';
 import { db } from '../db';
 
+function getAllowedGroupIdsToSubmitTo(survey) {
+  switch (survey.meta.submissions) {
+    case 'groupAndDescendants':
+      return [
+        survey.meta.group.id.toString(),
+        ...rolesService.getDescendantGroups(survey.meta.group).map((group) => group._id.toString()),
+      ];
+    case 'public':
+    case 'group':
+    default:
+      return [survey.meta.group.id.toString()];
+  }
+}
+
+async function hasRightToSubmitToSurvey(requestSubmission, res) {
+  const [existingSubmission, survey] = await Promise.all([
+    db.collection('submissions').findOne({ _id: new ObjectId(requestSubmission._id) }),
+    db.collection('surveys').findOne({ _id: new ObjectId(requestSubmission.meta.survey.id) }),
+  ]);
+  const allowedGroupIdsToSubmitTo = getAllowedGroupIdsToSubmitTo(survey);
+  const groupIdToSubmitTo = requestSubmission.meta.group.id;
+
+  if (existingSubmission?.meta?.isDraft) {
+    if (!existingSubmission.meta.creator.equals(res.locals.auth.user._id)) {
+      throw boom.unauthorized('You are not the creator of this submission.');
+    }
+  }
+
+  if (allowedGroupIdsToSubmitTo.includes(groupIdToSubmitTo)) {
+    if (survey.meta.submissions === 'public') {
+      return true;
+    } else if (!res.locals.auth.isAuthenticated) {
+      throw boom.unauthorized(`You must be logged in to submit to this survey`);
+    }
+
+    const hasUserRole = await rolesService.hasUserRole(res.locals.auth.user._id, groupIdToSubmitTo);
+    const hasAdminRole = await rolesService.hasAdminRole(
+      res.locals.auth.user._id,
+      groupIdToSubmitTo
+    );
+    if (hasUserRole || hasAdminRole || res.locals.auth.isSuperAdmin) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export const assertHasRightToSubmitSurvey = catchErrors(async (req, res, next) => {
+  const submissions = Array.isArray(req.body) ? req.body : [req.body];
+
+  const hasRights = await Promise.all(
+    submissions.map((submission) => hasRightToSubmitToSurvey(submission, res))
+  );
+
+  if (hasRights.every((hasRight) => hasRight === true)) {
+    return next();
+  }
+
+  throw boom.unauthorized('You are not authorized to submit to this survey.');
+});
+
 export const assertAuthenticated = catchErrors(async (req, res, next) => {
   if (!res.locals.auth.isAuthenticated) {
     throw boom.unauthorized('You are not logged in.');
