@@ -156,13 +156,7 @@ export const hasSubmissionRights = async (submission, res) => {
     }
   }
 
-  const { submissions } = survey.meta;
-  if (!submissions) {
-    // no meta.submissions param set, assume everyone can submit
-    return true;
-  }
-
-  if (submissions === 'public') {
+  if (survey.meta.submissions === 'public') {
     // everyone can submit
     return true;
   }
@@ -182,7 +176,7 @@ export const hasSubmissionRights = async (submission, res) => {
   const hasUserRole = await rolesService.hasUserRole(userId, groupId);
   const hasAdminRoleForRequest = await rolesService.hasAdminRoleForRequest(res, groupId);
 
-  if (submissions === 'group' && (hasUserRole || hasAdminRoleForRequest)) {
+  if (survey.meta.submissions === 'group' && (hasUserRole || hasAdminRoleForRequest)) {
     // group members can submit
     return true;
   }

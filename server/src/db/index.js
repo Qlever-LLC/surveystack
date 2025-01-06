@@ -77,6 +77,7 @@ const connectDatabase = async () => {
   await migrateSurveyMetaReviewPage_VXtoV10();
   await migrateSubmissions_VXtoV4();
   await migrateSurveyMetaSubmissions_VXtoV11();
+  await migrateSurveyMetaSubmissions_VXtoV12();
 };
 
 /*
@@ -657,6 +658,33 @@ const migrateSurveyMetaSubmissions_VXtoV11 = async () => {
   if (updateResult.modifiedCount) {
     console.log(
       'migrateSurveyMetaSubmissions_VXtoV11: Updated',
+      updateResult.modifiedCount,
+      'surveys'
+    );
+  }
+};
+
+const migrateSurveyMetaSubmissions_VXtoV12 = async () => {
+  const updateResult = await db
+    .collection('surveys')
+    .updateMany({ 'meta.specVersion': { $lte: 11 } }, [
+      {
+        $set: {
+          'meta.specVersion': 12,
+          'meta.submissions': {
+            $cond: {
+              if: { $eq: ['$meta.submissions', null] },
+              then: 'public',
+              else: '$meta.submissions',
+            },
+          },
+        },
+      },
+    ]);
+
+  if (updateResult.modifiedCount) {
+    console.log(
+      'migrateSurveyMetaSubmissions_VXtoV12: Updated',
       updateResult.modifiedCount,
       'surveys'
     );
