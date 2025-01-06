@@ -112,7 +112,7 @@ const emit = defineEmits(['update:modelValue']);
 
 const state = reactive({
   members: [],
-  group: null,
+  groupId: null,
   selectedMembers: [],
   subject: defaultSubject,
   body: defaultBody,
@@ -149,7 +149,7 @@ const showMissingMagicLinkWarning = computed(() => {
 async function loadMembers() {
   state.isLoadingMembers = true;
   try {
-    const { data: members } = await api.get(`/memberships?group=${state.group}&populate=true`);
+    const { data: members } = await api.get(`/memberships?group=${state.groupId}&populate=true`);
     state.members = members;
   } catch (e) {
     console.error(e);
@@ -169,8 +169,11 @@ async function submit() {
       members,
       subject: state.subject,
       body: state.body,
-      group: state.group,
+      // survey group
+      group: state.groupId,
       copy: state.copy,
+      // submit CFS response to current active group
+      submitTo: route.params.id,
     });
     state.submitResults = [
       {
@@ -205,9 +208,9 @@ watch(
   async (newVal) => {
     // if the dialog will be displayed
     if (newVal) {
-      const { id } = route.params;
-      if (id) {
-        state.group = id;
+      const groupId = props.selectedSurvey.group._id;
+      if (groupId) {
+        state.groupId = groupId;
         await loadMembers();
       }
       state.subject = `Request to submit survey '${props.selectedSurvey.name}'`;
