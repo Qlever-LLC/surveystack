@@ -131,7 +131,10 @@ async function fetchRemoteSubmissions() {
     }
 
     const { data } = await api.get(`/submissions/page?${queryParams}`);
-    state.submissions = data.content;
+    // TODO: load survey group ids and decorate the submissions with it
+    const surveyIdByGroupId = await getSubmissionSurveyGroupIds(data.content);
+
+    state.submissions = decorateSubmissionsWithSurveyGroupIds(data.content, surveyIdByGroupId);
     state.submissionsPagination = data.pagination;
 
     try {
@@ -153,10 +156,42 @@ async function fetchRemoteSubmissions() {
   }
 }
 
+async function getSubmissionSurveyGroupIds(submissions) {
+  const surveyIds = submissions.map((s) => s.meta.survey.id);
+  const surveyPromises = surveyIds.map((id) => api.get(`/surveys?q=${id}&projections[]=meta.group.id`));
+  const results = await Promise.all(surveyPromises);
+  const groupIdBySurveyId = Object.fromEntries(
+    results.map((s) => [s.data[0]._id, s.data[0].meta.group.id])
+  );
+  return groupIdBySurveyId;
+}
+
+function decorateSubmissionsWithSurveyGroupIds(submissions, groupIdBySurveyId) {
+  return submissions.map((s) => {
+    return { 
+      ...s, 
+      meta: { 
+        ...s.meta, 
+        survey: { 
+          ...s.meta.survey, 
+          meta: { 
+            group: { 
+              id: groupIdBySurveyId[s.meta.survey.id] 
+            } 
+          } 
+        } 
+      } 
+    };
+  });
+}
+
+
 function resubmit(submission) {
+  const surveyGroupId = submission.meta.survey.meta.group.id;
+  const surveyId = submission.meta.survey.id;
   router.push({
     name: 'group-survey-submissions-edit',
-    params: { id: getActiveGroupId(), surveyId: submission.meta.survey.id, submissionId: submission._id },
+    params: { id: surveyGroupId, surveyId, submissionId: submission._id },
   });
 }
 </script>

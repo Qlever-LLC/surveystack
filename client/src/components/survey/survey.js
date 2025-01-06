@@ -87,7 +87,7 @@ export function useSurvey() {
         title: 'Start Survey',
         icon: 'mdi-open-in-new',
         action: (survey) =>
-          createAction(survey, rightToSubmitSurvey, `/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new`),
+          createAction(survey, rightToSubmitSurvey, `/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new?submitTo={getActiveGroupId()}`),
         render: (survey) => () => isPublished(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
       },
       {
@@ -107,7 +107,7 @@ export function useSurvey() {
         action: (survey) =>
           createAction(survey, rightToSubmitSurvey, () =>
             copyTextToClipboard(
-              `${window.location.origin}/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new`
+              `${window.location.origin}/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new?submitTo=${getActiveGroupId()}`
             )
           ),
         render: (survey) => () => isPublished(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,

@@ -57,7 +57,6 @@ import api from '@/services/api.service';
 import BasicList from '@/components/ui/BasicList2.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
-const { getActiveGroupId } = useGroup();
 const { rightToView, rightToCreateSurvey, rightToManageSurvey } = getPermission();
 const { message, createAction } = menuAction();
 const PAGINATION_LIMIT = 10;
@@ -110,18 +109,18 @@ async function initData() {
       {
         title: 'Add to New Survey',
         icon: 'mdi-file-plus',
-        action: (s) =>
-          createAction(s, rightToView, {
-            path: `/groups/${getActiveGroupId()}/surveys/new`,
-            query: { libId: s._id },
+        action: (survey) =>
+          createAction(survey, rightToView, {
+            path: `/groups/${survey.meta.group.id}/surveys/new`,
+            query: { libId: survey._id },
           }),
-        render: (s) => () => rightToView().allowed,
+        render: () => () => rightToView().allowed,
       },
       {
         title: 'Edit',
         icon: 'mdi-pencil',
-        action: (s) => createAction(s, rightToManageSurvey, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-        render: (s) => () => rightToManageSurvey(s).allowed,
+        action: (survey) => createAction(survey, rightToManageSurvey, `/groups/${survey.meta.group.id}/surveys/${survey._id}/edit`),
+        render: (survey) => () => rightToManageSurvey(survey).allowed,
       },
     ];
 
