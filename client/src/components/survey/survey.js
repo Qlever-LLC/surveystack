@@ -87,7 +87,7 @@ export function useSurvey() {
         title: 'Start Survey',
         icon: 'mdi-open-in-new',
         action: (survey) =>
-          createAction(survey, rightToSubmitSurvey, `/groups/${getActiveGroupId()}/surveys/${survey._id}/submissions/new`),
+          createAction(survey, rightToSubmitSurvey, `/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new`),
         render: (survey) => () => isPublished(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
       },
       {
@@ -107,7 +107,7 @@ export function useSurvey() {
         action: (survey) =>
           createAction(survey, rightToSubmitSurvey, () =>
             copyTextToClipboard(
-              `${window.location.origin}/groups/${getActiveGroupId()}/surveys/${survey._id}/submissions/new`
+              `${window.location.origin}/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new`
             )
           ),
         render: (survey) => () => isPublished(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
@@ -153,7 +153,7 @@ export function useSurvey() {
         title: 'View Results',
         icon: 'mdi-chart-bar',
         action: (survey) =>
-          createAction(survey, rightToViewAnonymizedResults, `/groups/${getActiveGroupId()}/surveys/${survey._id}/submissions`),
+          createAction(survey, rightToViewAnonymizedResults, `/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions`),
         render: (survey) => () => isOnline && rightToViewAnonymizedResults().allowed,
       },
       // {
@@ -259,7 +259,7 @@ export function useSurvey() {
   function editSurvey(survey) {
     router.push({
       name: 'group-surveys-edit',
-      params: { id: getActiveGroupId(), surveyId: survey._id },
+      params: { id: survey.meta.group.id, surveyId: survey._id },
     });
   }
 
