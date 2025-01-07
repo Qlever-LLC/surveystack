@@ -373,6 +373,10 @@ const state = reactive({
     groups: computed(() => {
       if (surveyEntity.value) {
         switch(surveyEntity.value.meta.submissions) {
+          case 'groupAndDescendants':
+            return store.getters['memberships/memberships']
+              .filter((m) => m.role === 'admin' && m.group.path.startsWith(surveyEntity.value.meta.group.path))
+              .map((m) => ({ text: m.group.name, value: m.group._id, path: m.group.path }));
           case 'public':
           case 'group':
           default:

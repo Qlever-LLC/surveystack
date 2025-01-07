@@ -223,6 +223,7 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
 }
 
 export const isGroupMember = (survey, userGroups) => userGroups.some((group) => group._id === survey.meta.group.id);
+export const isGroupMemberOfGroupOrDescendant = (survey, userGroups) => userGroups.some((group) => survey.meta.group.path.startsWith(group.path));
 
 export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
   const { submissions, isLibrary } = survey.meta;
@@ -248,6 +249,19 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
     */
 
   switch (submissions) {
+    case 'groupAndDescendants': {
+      if (!isLoggedIn) {
+        return { allowed: false, message: 'You must be logged in to submit this survey.' };
+      }
+      return isGroupMemberOfGroupOrDescendant(survey, userGroups)
+        ? {
+            allowed: true,
+          }
+        : {
+            allowed: false,
+            message: 'You must be a member of the group or a descendant group to submit this survey.',
+          };
+    }
     case 'group': {
       if (!isLoggedIn) {
         return { allowed: false, message: 'You must be logged in to submit this survey.' };
