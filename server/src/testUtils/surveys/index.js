@@ -2,6 +2,7 @@ import {
   createRequestSubmissionFor,
   createSubmissionDocFor,
   createSubmissionWith,
+  createPostSubmission,
 } from '../submissions';
 import getControlGenerator from './controlGenerators';
 import { createSurveyMeta, createSurveyMetaGroup, createSurveyMetaPrintOptions } from './meta';
@@ -110,12 +111,14 @@ const createSurvey = async (
   const createRequestSubmission = createRequestSubmissionFor(survey);
   const createSubmissionDoc = createSubmissionDocFor(survey);
   const createSubmission = createSubmissionWith(createSubmissionDoc);
+  const postSubmission = createPostSubmission(createRequestSubmission);
 
   return {
     survey,
     createRequestSubmission,
     createSubmissionDoc,
     createSubmission,
+    postSubmission,
   };
 };
 

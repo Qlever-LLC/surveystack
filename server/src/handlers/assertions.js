@@ -34,7 +34,10 @@ async function hasRightToSubmitToSurvey(requestSubmission, res) {
     }
   }
 
-  if (allowedGroupIdsToSubmitTo.includes(groupIdToSubmitTo)) {
+  if (
+    allowedGroupIdsToSubmitTo.includes(groupIdToSubmitTo) ||
+    existingSubmission?.meta?.group?.id?.toString() === groupIdToSubmitTo
+  ) {
     if (survey.meta.submissions === 'public') {
       return true;
     } else if (!res.locals.auth.isAuthenticated) {
@@ -66,6 +69,38 @@ export const assertHasRightToSubmitSurvey = catchErrors(async (req, res, next) =
   }
 
   throw boom.unauthorized('You are not authorized to submit to this survey.');
+});
+
+async function hasRightToManageSubmission(requestSubmission, res) {
+  const existingSubmission = await db
+    .collection('submissions')
+    .findOne({ _id: new ObjectId(requestSubmission._id) });
+  const groupOfExistingSubmission = existingSubmission.meta.group.id;
+
+  const hasAdminRoleToExistingGroup = await rolesService.hasAdminRole(
+    res.locals.auth.user._id,
+    groupOfExistingSubmission
+  );
+  const isCreator = existingSubmission.meta.creator.equals(res.locals.auth.user._id);
+  if (hasAdminRoleToExistingGroup || isCreator || res.locals.auth.isSuperAdmin) {
+    return true;
+  }
+
+  return false;
+}
+
+export const assertHasRightToManageSubmission = catchErrors(async (req, res, next) => {
+  const submissions = Array.isArray(req.body) ? req.body : [req.body];
+
+  const hasRights = await Promise.all(
+    submissions.map((submission) => hasRightToManageSubmission(submission, res))
+  );
+
+  if (hasRights.every((hasRight) => hasRight === true)) {
+    return next();
+  }
+
+  throw boom.unauthorized('You are not authorized to manage this submission.');
 });
 
 export const assertAuthenticated = catchErrors(async (req, res, next) => {
@@ -197,7 +232,7 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
     return next();
   }
 
-  throw boom.unauthorized(`No entity rights on: ${entity.id}`);
+  throw boom.unauthorized(`No entity rights on: ${entity._id}`);
 });
 
 export const hasSubmissionRights = async (submission, res) => {
@@ -244,20 +279,6 @@ export const hasSubmissionRights = async (submission, res) => {
 
   throw boom.unauthorized(`Only group members can submit to this survey`);
 };
-
-export const assertSubmissionRights = catchErrors(async (req, res, next) => {
-  const submissions = Array.isArray(req.body) ? req.body : [req.body];
-
-  const hasRights = await Promise.all(
-    submissions.map((submission) => hasSubmissionRights(submission, res))
-  );
-
-  if (hasRights.every((hasRight) => hasRight === true)) {
-    return next();
-  }
-
-  throw boom.unauthorized('You are not authorized to submit to this survey.');
-});
 
 export const assertNameNotEmpty = catchErrors(async (req, res, next) => {
   const entity = req.body;

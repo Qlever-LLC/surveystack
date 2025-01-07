@@ -25,7 +25,6 @@ import {
   assertIdsMatch,
   assertNameNotEmpty,
   assertEntityRights,
-  assertSubmissionRights,
   assertEntitiesExist,
   assertEntitiesRights,
   assertHasIds,
@@ -34,6 +33,7 @@ import {
   assertIsAtLeastOnceOwner,
   assertIsOwnerOfInstance,
   assertHasRightToSubmitSurvey,
+  assertHasRightToManageSubmission,
 } from '../handlers/assertions';
 import { catchErrors } from '../handlers/errorHandlers';
 import { handleDelegates } from '../handlers/headerHandlers';
@@ -136,8 +136,8 @@ router.put(
     assertAuthenticated,
     assertIdsMatch,
     assertEntityExists({ collection: 'submissions' }),
-    assertSubmissionRights,
-    assertEntityRights,
+    assertHasRightToManageSubmission,
+    assertHasRightToSubmitSurvey,
   ],
   catchErrors(submissionController.updateSubmission)
 );

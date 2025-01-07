@@ -1,6 +1,8 @@
+import request from 'supertest';
 import getSubmissionDataGenerator from './dataGenerators';
 const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../../db');
+import { testApp } from '../testApp';
 
 const createSubmissionMeta =
   (
@@ -133,6 +135,41 @@ const createSubmissionWith =
     };
   };
 
+const createPostSubmission =
+  (createRequestSubmission) =>
+  ({ creator = null, authHeaderValue, group, submissionId } = {}) => {
+    const requestSubmission = createRequestSubmission({
+      _id: submissionId ?? ObjectId().toString(),
+      meta: createRequestSubmissionMeta({
+        isDraft: true,
+        creator,
+        status: [
+          {
+            type: 'READY_TO_SUBMIT',
+            value: { at: new Date('2021-01-01').toISOString() },
+          },
+        ],
+        group,
+      }),
+    });
+
+    return request(testApp)
+      .post('/api/submissions')
+      .set({
+        ...(authHeaderValue ? { Authorization: authHeaderValue } : {}),
+      })
+      .send(requestSubmission)
+      .then((response) => {
+        if (response.status === 503) {
+          throw new Error(
+            'You must mock handleApiCompose to use this function. See submissionController.spec.js for an example.'
+          );
+        }
+        expect(response.status).toBe(200);
+        return response;
+      });
+  };
+
 export {
   createRequestSubmissionMeta,
   createSubmissionMeta,
@@ -141,4 +178,5 @@ export {
   createSubmissionDocFor,
   createSubmissionWith,
   getSubmissionDataGenerator,
+  createPostSubmission,
 };
