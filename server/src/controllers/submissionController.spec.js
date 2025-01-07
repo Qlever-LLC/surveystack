@@ -1593,7 +1593,6 @@ describe('submissionController', () => {
             }),
           });
           requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
-          console.log({ requestSubmissionMeta: requestSubmission.meta });
 
           await request(app)
             .post('/api/submissions')
@@ -1607,26 +1606,289 @@ describe('submissionController', () => {
       });
 
       describe('when survey.meta.submissions is "groupAndDescendants"', () => {
-        it.todo('and the requesting user is not logged in, 401');
-        it.todo('and the requesting user is not a member of the group or its descendants, 401');
-        it.todo(
-          'and the requesting user is a member a descendant group but not an admin, and is submitting to the descendant group, OK'
-        );
-        it.todo(
-          'and the requesting user is a member a descendant group but not an admin, and is submitting to an ancestor group they do not belong to, 401'
-        );
-        it.todo(
-          'and the requesting user is an admin of a descendant group, and is submitting to the descendant group, OK'
-        );
-        it.todo(
-          'and the requesting user is an admin of a descendant group, and is submitting to an ancestor group they do not belong to, 401'
-        );
-        it.todo(
-          'and the requesting user is a member of the survey group but not an admin, and is submitting to the survey group, OK'
-        );
-        it.todo(
-          'and the requesting user is an admin of the survey group, and is submitting to the survey group, OK'
-        );
+        let createRequestSubmission;
+        let submissionId;
+        let subGroupMember;
+        let subGroupAdmin;
+        let subGroupMemberAuthHeaderValue;
+        let subGroupAdminAuthHeaderValue;
+        let subGroup;
+        beforeEach(async () => {
+          const subGroupMemberToken = 'sub-group-member-token';
+          const subGroupAdminToken = 'sub-group-admin-token';
+          subGroup = await group.createSubGroup({ name: 'subGroup' });
+          ({ user: subGroupMember } = await subGroup.createUserMember({
+            userOverrides: { token: subGroupMemberToken },
+          }));
+          ({ user: subGroupAdmin } = await subGroup.createAdminMember({
+            userOverrides: { token: subGroupAdminToken },
+          }));
+          subGroupMemberAuthHeaderValue = `${subGroupMember.email} ${subGroupMemberToken}`;
+          subGroupAdminAuthHeaderValue = `${subGroupAdmin.email} ${subGroupAdminToken}`;
+          submissionId = ObjectId();
+          ({ createRequestSubmission } = await createSurvey(['string'], {
+            meta: createSurveyMeta({
+              submissions: 'groupAndDescendants',
+              group: createSurveyMetaGroup({ id: group._id, path: group.path }),
+            }),
+          }));
+        });
+
+        it('and the requesting user is not logged in, 401', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: null,
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app).post('/api/submissions').send(requestSubmission).expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('and the requesting user is not a member of the group or its descendants, 401', async () => {
+          const anotherGroup = await createGroup();
+          const anotherGroupUserToken = 'another-group-user-token';
+          const { user: anotherGroupUser } = await anotherGroup.createUserMember({
+            userOverrides: { token: anotherGroupUserToken },
+          });
+          const anotherGroupUserAuthHeaderValue = `${anotherGroupUser.email} ${anotherGroupUserToken}`;
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: anotherGroupUser._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', anotherGroupUserAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('and the requesting user is a member of a descendant group but not an admin, and is submitting to the descendant group, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: subGroupMember._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', subGroupMemberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+
+        it('and the requesting user is a member of a descendant group but not an admin, and is submitting to an ancestor group they do not belong to, 401', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: subGroupMember._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', subGroupMemberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('and the requesting user is an admin of a descendant group, and is submitting to an ancestor group they do not belong to, 401', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: subGroupAdmin._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', subGroupAdminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('and the requesting user is an admin of a descendant group, and is submitting to the descendant group, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: subGroupAdmin._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', subGroupAdminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+
+        it('and the requesting user is a member of the survey group but not an admin, and is submitting to the survey group, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', memberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+
+        it('and the requesting user is a member of the survey group but not an admin, and is submitting to a descendant group, 401', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: user._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', memberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).toBeNull();
+        });
+
+        it('and the requesting user is an admin of the survey group, and is submitting to the survey group, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: adminUser._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', adminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
+
+        it('and the requesting user is an admin of the survey group, and is submitting to a descendant group, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: adminUser._id.toString(),
+              status: [
+                {
+                  type: 'READY_TO_SUBMIT',
+                  value: { at: new Date('2021-01-01').toISOString() },
+                },
+              ],
+            }),
+          });
+          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
+
+          await request(app)
+            .post('/api/submissions')
+            .set('Authorization', adminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(submission).not.toBeNull();
+        });
       });
     });
   });

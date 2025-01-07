@@ -7,13 +7,12 @@ import { catchErrors } from '../handlers/errorHandlers';
 import rolesService from '../services/roles.service';
 import { db } from '../db';
 
-function getAllowedGroupIdsToSubmitTo(survey) {
+async function getAllowedGroupIdsToSubmitTo(survey) {
   switch (survey.meta.submissions) {
-    case 'groupAndDescendants':
-      return [
-        survey.meta.group.id.toString(),
-        ...rolesService.getDescendantGroups(survey.meta.group).map((group) => group._id.toString()),
-      ];
+    case 'groupAndDescendants': {
+      const groupAndDescendants = await rolesService.getDescendantGroups(survey.meta.group);
+      return groupAndDescendants.map((group) => group._id.toString());
+    }
     case 'public':
     case 'group':
     default:
@@ -26,7 +25,7 @@ async function hasRightToSubmitToSurvey(requestSubmission, res) {
     db.collection('submissions').findOne({ _id: new ObjectId(requestSubmission._id) }),
     db.collection('surveys').findOne({ _id: new ObjectId(requestSubmission.meta.survey.id) }),
   ]);
-  const allowedGroupIdsToSubmitTo = getAllowedGroupIdsToSubmitTo(survey);
+  const allowedGroupIdsToSubmitTo = await getAllowedGroupIdsToSubmitTo(survey);
   const groupIdToSubmitTo = requestSubmission.meta.group.id;
 
   if (existingSubmission?.meta?.isDraft) {
