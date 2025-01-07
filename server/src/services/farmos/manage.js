@@ -3,7 +3,7 @@ import { db } from '../../db';
 import { aggregator } from './aggregator';
 import uniq from 'lodash/uniq';
 import boom from '@hapi/boom';
-import { getDescendantGroups, getAscendantGroups } from '../roles.service';
+import { getGroupAndDescendants, getAscendantGroups } from '../roles.service';
 import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
 import mailService from '../../services/mail/mail.service';
 import { createMagicLink } from '../auth.service';
@@ -47,7 +47,7 @@ export const getFarmOSRootGroup = async (ascendantGroups, descendantGroups) => {
 };
 
 export const getTree = async (group) => {
-  const descendants = await getDescendantGroups(group);
+  const descendants = await getGroupAndDescendants(group);
   const ascendants = await getAscendantGroups(group);
   let domainRoot = await getFarmOSRootGroup(ascendants, descendants);
 

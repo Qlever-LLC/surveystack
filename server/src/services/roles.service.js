@@ -37,7 +37,7 @@ const getParentGroups = async (groupId) => {
   return descendants.filter((d) => isParent(d.path, group.path));
 };
 
-export const getDescendantGroups = async (group, projection = {}) => {
+export const getGroupAndDescendants = async (group, projection = {}) => {
   const descendants = await db
     .collection('groups')
     .find({ path: { $regex: `^${group.path}` } }, { projection: projection })
@@ -158,6 +158,6 @@ export default {
   hasAdminRoleForRequest,
   hasAdminRole,
   hasUserRole,
-  getDescendantGroups,
+  getGroupAndDescendants,
   getParentGroups,
 };

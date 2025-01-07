@@ -10,7 +10,7 @@ import { db } from '../db';
 async function getAllowedGroupIdsToSubmitTo(survey) {
   switch (survey.meta.submissions) {
     case 'groupAndDescendants': {
-      const groupAndDescendants = await rolesService.getDescendantGroups(survey.meta.group);
+      const groupAndDescendants = await rolesService.getGroupAndDescendants(survey.meta.group);
       return groupAndDescendants.map((group) => group._id.toString());
     }
     case 'public':

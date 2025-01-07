@@ -1,5 +1,5 @@
 import { createGroup } from '../testUtils';
-import { getDescendantGroups } from './roles.service';
+import { getGroupAndDescendants } from './roles.service';
 
 describe('rolesService', () => {
   it('test-descendants', async () => {
@@ -10,7 +10,7 @@ describe('rolesService', () => {
     const groupCommunity = await groupLabs.createSubGroup({ name: 'Community' });
     await groupCommunity.createSubGroup({ name: 'Lab' });
 
-    const a = await getDescendantGroups(groupBionutrient);
+    const a = await getGroupAndDescendants(groupBionutrient);
     expect(a._id).not.toBeNaN();
     expect.objectContaining(a[0].meta);
     expect(a[0].name).toBe('Bionutrient');
@@ -20,7 +20,7 @@ describe('rolesService', () => {
     expect.objectContaining(a[0].surveys);
     expect(a).toHaveLength(6);
 
-    const b = await getDescendantGroups(groupBionutrient, {});
+    const b = await getGroupAndDescendants(groupBionutrient, {});
     expect(b._id).not.toBeNaN();
     expect.objectContaining(b[0].meta);
     expect(b[0].name).toBe('Bionutrient');
@@ -30,7 +30,7 @@ describe('rolesService', () => {
     expect.objectContaining(b[0].surveys);
     expect(b).toHaveLength(6);
 
-    const c = await getDescendantGroups(groupBionutrient, { name: 1, dir: 1 });
+    const c = await getGroupAndDescendants(groupBionutrient, { name: 1, dir: 1 });
     expect(c._id).not.toBeNaN();
     expect(c[0].meta).toBeUndefined();
     expect(c[0].name).toBe('Bionutrient');

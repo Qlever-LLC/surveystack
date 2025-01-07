@@ -260,7 +260,7 @@ const getAdminOfSubGroups = async (entities) => {
   const adminOfSubGroups = [];
   for (const e of [...entities]) {
     if (e.role === 'admin') {
-      const subgroups = await rolesService.getDescendantGroups(e.group);
+      const subgroups = await rolesService.getGroupAndDescendants(e.group);
 
       for (const subgroup of subgroups) {
         const isEntityPresent = entities.some(
