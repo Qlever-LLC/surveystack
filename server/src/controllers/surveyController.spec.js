@@ -1,5 +1,6 @@
 import surveyController from './surveyController';
 import {
+  testApp,
   createReq,
   createRes,
   createSurvey,
@@ -13,10 +14,7 @@ import {
 } from '../testUtils';
 import _ from 'lodash';
 import { getDb } from '../db';
-import createApp from '../app.js';
 import request from 'supertest';
-
-const app = createApp();
 
 const { ObjectId } = jest.requireActual('mongodb');
 const {
@@ -698,7 +696,7 @@ describe('GET /surveys/list-page', () => {
     describe('when showArchived query parameter is false or absent', () => {
       const showArchived = false;
       it('returns surveys from the active group, identifies surveys pinned to the active group, and sorts them to the front', async () => {
-        const { body } = await request(app)
+        const { body } = await request(testApp)
           .get(
             `/api/surveys/list-page?activeGroupId=${groupA._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
           )
@@ -712,7 +710,7 @@ describe('GET /surveys/list-page', () => {
       });
 
       it('includes surveys shared with the group', async () => {
-        const { body } = await request(app)
+        const { body } = await request(testApp)
           .get(
             `/api/surveys/list-page?activeGroupId=${groupADescendantGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
           )
@@ -747,7 +745,7 @@ describe('GET /surveys/list-page', () => {
         await groupADescendantGroup.pinSurvey(surveyPinnedToA._id);
         await groupADescendantGroup.pinSurvey(surveyInGroupADescendantGroup._id);
 
-        const { body } = await request(app)
+        const { body } = await request(testApp)
           .get(
             `/api/surveys/list-page?activeGroupId=${groupADescendantGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
           )
@@ -778,7 +776,7 @@ describe('GET /surveys/list-page', () => {
     describe('when showArchived query parameter is true', () => {
       const showArchived = true;
       it('returns archived surveys from the active group, but does not identify pinned surveys', async () => {
-        const { body } = await request(app)
+        const { body } = await request(testApp)
           .get(
             `/api/surveys/list-page?activeGroupId=${groupA._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
           )
@@ -795,7 +793,7 @@ describe('GET /surveys/list-page', () => {
       });
 
       it('includes surveys shared with the group', async () => {
-        const { body } = await request(app)
+        const { body } = await request(testApp)
           .get(
             `/api/surveys/list-page?activeGroupId=${groupADescendantGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
           )
@@ -814,7 +812,7 @@ describe('GET /surveys/list-page', () => {
   });
 
   it('returns only question sets (surveys that are library) when isLibrary is true', async () => {
-    const { body } = await request(app)
+    const { body } = await request(testApp)
       .get(`/api/surveys/list-page?isLibrary=true&skip=0&limit=10`)
       .expect(200);
 
@@ -902,7 +900,7 @@ describe('get pinned surveys', () => {
 
     authHeaderValue = `${user.email} ${token}`;
 
-    const res = await request(app)
+    const res = await request(testApp)
       .get('/api/surveys/pinned?getOnlyNonArchive=true')
       .set('Authorization', authHeaderValue)
       .expect(200);
@@ -924,7 +922,7 @@ describe('get pinned surveys', () => {
 
     authHeaderValue = `${admin.email} ${token}`;
 
-    const res = await request(app)
+    const res = await request(testApp)
       .get('/api/surveys/pinned?getOnlyNonArchive=true')
       .set('Authorization', authHeaderValue)
       .expect(200);
@@ -956,7 +954,7 @@ describe('get pinned surveys', () => {
 
     authHeaderValue = `${tester.email} ${token}`;
 
-    const res = await request(app)
+    const res = await request(testApp)
       .get('/api/surveys/pinned?getOnlyNonArchive=true')
       .set('Authorization', authHeaderValue)
       .expect(200);

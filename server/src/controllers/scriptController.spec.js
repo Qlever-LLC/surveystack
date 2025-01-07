@@ -1,10 +1,13 @@
 import request from 'supertest';
-import createApp from '../app.js';
 import { getDb } from '../db';
-import { createGroup, createScript, createSuperAdmin, createMembership } from '../testUtils';
+import {
+  testApp,
+  createGroup,
+  createScript,
+  createSuperAdmin,
+  createMembership,
+} from '../testUtils';
 import { ObjectId } from 'mongodb';
-
-const app = createApp();
 
 describe('Script Endpoints', () => {
   let script;
@@ -21,7 +24,7 @@ describe('Script Endpoints', () => {
 
   describe('GET /api/scripts', () => {
     it('returns a 200 with all scripts', (done) => {
-      request(app)
+      request(testApp)
         .get('/api/scripts')
         .send()
         .end((err, res) => {
@@ -35,7 +38,7 @@ describe('Script Endpoints', () => {
         });
     });
     it('returns a 200 with the scripts of a group', (done) => {
-      request(app)
+      request(testApp)
         .get('/api/scripts?groupId=' + group._id)
         .send()
         .end((err, res) => {
@@ -55,7 +58,7 @@ describe('Script Endpoints', () => {
         });
     });
     it('returns a 200 with the an empty array for group which has no scripts', (done) => {
-      request(app)
+      request(testApp)
         .get('/api/scripts?groupId=' + new ObjectId())
         .send()
         .end((err, res) => {
@@ -72,7 +75,7 @@ describe('Script Endpoints', () => {
         userOverrides: { token: '1234' },
       });
 
-      await request(app)
+      await request(testApp)
         .delete(`/api/scripts/${script._id}`)
         .set('Authorization', `${groupAdminUser.email} 1234`)
         .send()
@@ -90,7 +93,7 @@ describe('Script Endpoints', () => {
         token: '1234',
       });
 
-      await request(app)
+      await request(testApp)
         .delete(`/api/scripts/${script._id}`)
         .set('Authorization', `${superAdminUser.email} 1234`)
         .send()
@@ -131,7 +134,7 @@ describe('Script Endpoints', () => {
         },
       });
 
-      const response = await request(app)
+      const response = await request(testApp)
         .post('/api/scripts')
         .set('Authorization', `${groupAdminUser.email} 1234`)
         .send(scriptDoc)
@@ -156,7 +159,7 @@ describe('Script Endpoints', () => {
         },
       });
 
-      return request(app)
+      return request(testApp)
         .post('/api/scripts')
         .set('Authorization', `${groupMemberUser.email} 1234`)
         .send(scriptDoc)
@@ -172,7 +175,7 @@ describe('Script Endpoints', () => {
         group: null,
       });
 
-      return await request(app)
+      return await request(testApp)
         .post('/api/scripts')
         .set('Authorization', `${groupAdminUser.email} 1234`)
         .send(scriptDoc)
@@ -203,7 +206,7 @@ describe('Script Endpoints', () => {
         content: 'new content',
       };
 
-      await request(app)
+      await request(testApp)
         .put(`/api/scripts/${script._id}`)
         .set('Authorization', `${groupAdminUser.email} 1234`)
         .send(updatedScriptDoc)
@@ -226,7 +229,7 @@ describe('Script Endpoints', () => {
         content: 'new content',
       };
 
-      return request(app)
+      return request(testApp)
         .put(`/api/scripts/${script._id}`)
         .set('Authorization', `${groupMemberUser.email} 1234`)
         .send(updatedScriptDoc)
@@ -251,7 +254,7 @@ describe('Script Endpoints', () => {
           content: 'new content',
         };
 
-        return request(app)
+        return request(testApp)
           .put(`/api/scripts/${script._id}`)
           .set('Authorization', `${groupAdminUser.email} 1234`)
           .send(updatedScriptDoc)

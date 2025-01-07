@@ -1,6 +1,7 @@
 import request from 'supertest';
 import submissionController, { buildPipeline, DEFAULT_LIMIT } from './submissionController';
 import {
+  testApp,
   createReq,
   createRes,
   createSurvey,
@@ -12,7 +13,6 @@ import {
   createSurveyMetaGroup,
 } from '../testUtils';
 import mailService from '../services/mail/mail.service';
-import createApp from '../app.js';
 import { db } from '../db';
 import handleApiCompose from './utils/handleApiCompose';
 
@@ -44,7 +44,6 @@ describe('submissionController', () => {
   });
 
   describe('syncDraft', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -64,7 +63,7 @@ describe('submissionController', () => {
         meta: createRequestSubmissionMeta({ isDraft: true }),
       });
 
-      return request(app).post('/api/submissions/sync-draft').send(draftSubmission).expect(401);
+      return request(testApp).post('/api/submissions/sync-draft').send(draftSubmission).expect(401);
     });
 
     it('returns 400 if the submission in the request is not a draft', async () => {
@@ -74,7 +73,7 @@ describe('submissionController', () => {
         meta: createRequestSubmissionMeta({ isDraft: false, creator: user._id.toString() }),
       });
 
-      return request(app)
+      return request(testApp)
         .post('/api/submissions/sync-draft')
         .set('Authorization', authHeaderValue)
         .send(nonDraftSubmission)
@@ -91,7 +90,7 @@ describe('submissionController', () => {
         }),
       });
 
-      return request(app)
+      return request(testApp)
         .post('/api/submissions/sync-draft')
         .set('Authorization', authHeaderValue)
         .send(nullCreatorSubmission)
@@ -108,7 +107,7 @@ describe('submissionController', () => {
       });
       delete requestSubmission.meta.creator;
 
-      return request(app)
+      return request(testApp)
         .post('/api/submissions/sync-draft')
         .set('Authorization', authHeaderValue)
         .send(requestSubmission)
@@ -123,7 +122,7 @@ describe('submissionController', () => {
           meta: createRequestSubmissionMeta({ isDraft: true }),
         });
 
-        return request(app)
+        return request(testApp)
           .post('/api/submissions/sync-draft')
           .set('Authorization', authHeaderValue)
           .send(submissionNotOwnedByRequestingUser)
@@ -138,7 +137,7 @@ describe('submissionController', () => {
             meta: createRequestSubmissionMeta({ isDraft: true, creator: user._id.toString() }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions/sync-draft')
             .set('Authorization', authHeaderValue)
             .send(draftSubmission)
@@ -171,7 +170,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions/sync-draft')
             .set('Authorization', authHeaderValue)
             .send(requestSubmission)
@@ -212,7 +211,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions/sync-draft')
             .set('Authorization', authHeaderValue)
             .send(requestSubmission)
@@ -251,7 +250,7 @@ describe('submissionController', () => {
           });
           handleApiCompose.mockRejectedValueOnce({});
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions/sync-draft')
             .set('Authorization', authHeaderValue)
             .send(requestSubmission)
@@ -290,7 +289,7 @@ describe('submissionController', () => {
           });
           handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions/sync-draft')
             .set('Authorization', authHeaderValue)
             .send(requestSubmission)
@@ -328,7 +327,7 @@ describe('submissionController', () => {
           });
           handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions/sync-draft')
             .set('Authorization', authHeaderValue)
             .send(requestSubmission)
@@ -353,7 +352,7 @@ describe('submissionController', () => {
           meta: createRequestSubmissionMeta({ isDraft: true, creator: user._id.toString() }),
         });
 
-        return request(app)
+        return request(testApp)
           .post('/api/submissions/sync-draft')
           .set('Authorization', authHeaderValue)
           .send(requestSubmission)
@@ -372,7 +371,7 @@ describe('submissionController', () => {
           meta: createRequestSubmissionMeta({ isDraft: true, creator: new ObjectId().toString() }),
         });
 
-        return request(app)
+        return request(testApp)
           .post('/api/submissions/sync-draft')
           .set('Authorization', authHeaderValue)
           .send(requestSubmission)
@@ -401,7 +400,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions/sync-draft')
             .set('Authorization', authHeaderValue)
             .send(requestSubmission)
@@ -459,7 +458,7 @@ describe('submissionController', () => {
                   }),
                 });
 
-                await request(app)
+                await request(testApp)
                   .post('/api/submissions/sync-draft')
                   .set('Authorization', authHeaderValue)
                   .send(requestSubmission)
@@ -508,7 +507,7 @@ describe('submissionController', () => {
                 });
                 handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-                await request(app)
+                await request(testApp)
                   .post('/api/submissions/sync-draft')
                   .set('Authorization', authHeaderValue)
                   .send(requestSubmission)
@@ -560,7 +559,7 @@ describe('submissionController', () => {
                   }),
                 });
 
-                await request(app)
+                await request(testApp)
                   .post('/api/submissions/sync-draft')
                   .set('Authorization', authHeaderValue)
                   .send(requestSubmission)
@@ -598,7 +597,7 @@ describe('submissionController', () => {
                 }),
               });
 
-              await request(app)
+              await request(testApp)
                 .post('/api/submissions/sync-draft')
                 .set('Authorization', authHeaderValue)
                 .send(requestSubmission)
@@ -631,7 +630,7 @@ describe('submissionController', () => {
                 }),
               });
 
-              await request(app)
+              await request(testApp)
                 .post('/api/submissions/sync-draft')
                 .set('Authorization', authHeaderValue)
                 .send(requestSubmission)
@@ -666,7 +665,7 @@ describe('submissionController', () => {
                 }),
               });
 
-              await request(app)
+              await request(testApp)
                 .post('/api/submissions/sync-draft')
                 .set('Authorization', authHeaderValue)
                 .send(requestSubmission)
@@ -708,7 +707,7 @@ describe('submissionController', () => {
                 }),
               });
 
-              await request(app)
+              await request(testApp)
                 .post('/api/submissions/sync-draft')
                 .set('Authorization', authHeaderValue)
                 .send(requestSubmission)
@@ -748,7 +747,7 @@ describe('submissionController', () => {
               });
               handleApiCompose.mockRejectedValueOnce({});
 
-              await request(app)
+              await request(testApp)
                 .post('/api/submissions/sync-draft')
                 .set('Authorization', authHeaderValue)
                 .send(requestSubmission)
@@ -788,7 +787,7 @@ describe('submissionController', () => {
               });
               handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-              await request(app)
+              await request(testApp)
                 .post('/api/submissions/sync-draft')
                 .set('Authorization', authHeaderValue)
                 .send(requestSubmission)
@@ -832,7 +831,7 @@ describe('submissionController', () => {
               }),
             });
 
-            await request(app)
+            await request(testApp)
               .post('/api/submissions/sync-draft')
               .set('Authorization', authHeaderValue)
               .send(requestSubmission)
@@ -859,7 +858,7 @@ describe('submissionController', () => {
               }),
             });
 
-            await request(app)
+            await request(testApp)
               .post('/api/submissions/sync-draft')
               .set('Authorization', authHeaderValue)
               .send(requestSubmission)
@@ -880,7 +879,7 @@ describe('submissionController', () => {
               }),
             });
 
-            await request(app)
+            await request(testApp)
               .post('/api/submissions/sync-draft')
               .set('Authorization', authHeaderValue)
               .send(requestSubmission)
@@ -896,7 +895,6 @@ describe('submissionController', () => {
   });
 
   describe('getDraftsPage', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -910,12 +908,12 @@ describe('submissionController', () => {
     });
 
     it('returns 401 when the request is not authenticated', async () => {
-      await request(app).get('/api/submissions/drafts/page').send().expect(401);
+      await request(testApp).get('/api/submissions/drafts/page').send().expect(401);
     });
 
     describe('when authenticated', () => {
       it('returns 200 with empty array and pagination metadata when user has no drafts', async () => {
-        const response = await request(app)
+        const response = await request(testApp)
           .get('/api/submissions/drafts/page')
           .set('Authorization', authHeaderValue)
           .send()
@@ -971,7 +969,7 @@ describe('submissionController', () => {
           }),
         });
 
-        const response = await request(app)
+        const response = await request(testApp)
           .get('/api/submissions/drafts/page')
           .set('Authorization', authHeaderValue)
           .send()
@@ -1014,12 +1012,12 @@ describe('submissionController', () => {
           }),
         });
 
-        const pageOneResponse = await request(app)
+        const pageOneResponse = await request(testApp)
           .get('/api/submissions/drafts/page?limit=1&skip=0')
           .set('Authorization', authHeaderValue)
           .send()
           .expect(200);
-        const pageTwoResponse = await request(app)
+        const pageTwoResponse = await request(testApp)
           .get('/api/submissions/drafts/page?limit=1&skip=1')
           .set('Authorization', authHeaderValue)
           .send()
@@ -1038,7 +1036,6 @@ describe('submissionController', () => {
   });
 
   describe('getSubmissions', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -1064,7 +1061,7 @@ describe('submissionController', () => {
         }),
       ]);
 
-      const response = await request(app)
+      const response = await request(testApp)
         .get('/api/submissions')
         .set('Authorization', authHeaderValue)
         .send()
@@ -1080,7 +1077,6 @@ describe('submissionController', () => {
   });
 
   describe('getSubmission', () => {
-    const app = createApp();
     const token = '1234';
     let group;
     let user;
@@ -1098,12 +1094,14 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
       });
 
-      await request(app).get(`/api/submissions/${submission._id.toString()}`).send().expect(404);
+      await request(testApp)
+        .get(`/api/submissions/${submission._id.toString()}`)
+        .send()
+        .expect(404);
     });
   });
 
   describe('getSubmissionsPage', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -1129,7 +1127,7 @@ describe('submissionController', () => {
         }),
       ]);
 
-      const response = await request(app)
+      const response = await request(testApp)
         .get('/api/submissions/page')
         .set('Authorization', authHeaderValue)
         .send()
@@ -1145,7 +1143,6 @@ describe('submissionController', () => {
   });
 
   describe('createSubmission', () => {
-    const app = createApp();
     const memberToken = 'member-token';
     const adminToken = 'admin-token';
     let memberAuthHeaderValue;
@@ -1186,7 +1183,7 @@ describe('submissionController', () => {
         meta,
       });
 
-      await request(app)
+      await request(testApp)
         .post('/api/submissions')
         .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
@@ -1213,7 +1210,7 @@ describe('submissionController', () => {
         meta,
       });
 
-      await request(app)
+      await request(testApp)
         .post('/api/submissions')
         .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
@@ -1251,7 +1248,7 @@ describe('submissionController', () => {
           }),
         });
 
-        await request(app)
+        await request(testApp)
           .post('/api/submissions')
           .set('Authorization', memberAuthHeaderValue)
           .send(requestSubmission)
@@ -1291,7 +1288,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
@@ -1336,7 +1333,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
@@ -1369,7 +1366,7 @@ describe('submissionController', () => {
           }),
         });
 
-        await request(app)
+        await request(testApp)
           .post('/api/submissions')
           .set('Authorization', memberAuthHeaderValue)
           .send(requestSubmission)
@@ -1395,7 +1392,7 @@ describe('submissionController', () => {
           }),
         });
 
-        await request(app)
+        await request(testApp)
           .post('/api/submissions')
           .set('Authorization', memberAuthHeaderValue)
           .send(requestSubmission)
@@ -1430,7 +1427,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app).post('/api/submissions').send(requestSubmission).expect(200);
+          await request(testApp).post('/api/submissions').send(requestSubmission).expect(200);
 
           const submission = await db.collection('submissions').findOne({ _id: submissionId });
           expect(submission).not.toBeNull();
@@ -1451,7 +1448,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
@@ -1490,7 +1487,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app).post('/api/submissions').send(requestSubmission).expect(401);
+          await request(testApp).post('/api/submissions').send(requestSubmission).expect(401);
 
           const submission = await db.collection('submissions').findOne({ _id: submissionId });
           expect(submission).toBeNull();
@@ -1517,7 +1514,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', anotherGroupUserAuthHeaderValue)
             .send(requestSubmission)
@@ -1542,7 +1539,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
@@ -1567,7 +1564,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', adminAuthHeaderValue)
             .send(requestSubmission)
@@ -1594,7 +1591,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', adminAuthHeaderValue)
             .send(requestSubmission)
@@ -1649,7 +1646,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app).post('/api/submissions').send(requestSubmission).expect(401);
+          await request(testApp).post('/api/submissions').send(requestSubmission).expect(401);
 
           const submission = await db.collection('submissions').findOne({ _id: submissionId });
           expect(submission).toBeNull();
@@ -1676,7 +1673,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', anotherGroupUserAuthHeaderValue)
             .send(requestSubmission)
@@ -1702,7 +1699,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', subGroupMemberAuthHeaderValue)
             .send(requestSubmission)
@@ -1727,7 +1724,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', subGroupMemberAuthHeaderValue)
             .send(requestSubmission)
@@ -1752,7 +1749,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', subGroupAdminAuthHeaderValue)
             .send(requestSubmission)
@@ -1778,7 +1775,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', subGroupAdminAuthHeaderValue)
             .send(requestSubmission)
@@ -1803,7 +1800,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
@@ -1829,7 +1826,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', memberAuthHeaderValue)
             .send(requestSubmission)
@@ -1854,7 +1851,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', adminAuthHeaderValue)
             .send(requestSubmission)
@@ -1880,7 +1877,7 @@ describe('submissionController', () => {
             }),
           });
 
-          await request(app)
+          await request(testApp)
             .post('/api/submissions')
             .set('Authorization', adminAuthHeaderValue)
             .send(requestSubmission)
@@ -1894,7 +1891,6 @@ describe('submissionController', () => {
   });
 
   describe('updateSubmission', () => {
-    const app = createApp();
     const token = '1234';
     let memberAuthHeaderValue;
     let group;
@@ -1930,7 +1926,7 @@ describe('submissionController', () => {
       });
       handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-      await request(app)
+      await request(testApp)
         .put(`/api/submissions/${submissionId.toString()}`)
         .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
@@ -1972,7 +1968,7 @@ describe('submissionController', () => {
       });
       handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-      await request(app)
+      await request(testApp)
         .put(`/api/submissions/${submissionId.toString()}`)
         .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
@@ -2007,7 +2003,7 @@ describe('submissionController', () => {
       });
       handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-      await request(app)
+      await request(testApp)
         .put(`/api/submissions/${submissionId.toString()}`)
         .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
@@ -2039,7 +2035,7 @@ describe('submissionController', () => {
       });
       handleApiCompose.mockImplementation(handleApiComposeHappyPathImplementation);
 
-      await request(app)
+      await request(testApp)
         .put(`/api/submissions/${submissionId.toString()}`)
         .set('Authorization', memberAuthHeaderValue)
         .send(requestSubmission)
@@ -2130,7 +2126,6 @@ describe('submissionController', () => {
     });
 
     describe('endpoint tests', () => {
-      const app = createApp();
       const token = '1234';
       let authHeaderValue;
       let group;
@@ -2156,7 +2151,7 @@ describe('submissionController', () => {
           }),
         ]);
 
-        const response = await request(app)
+        const response = await request(testApp)
           .get(`/api/submissions/csv?showCsvMeta=true&survey=${survey._id}`)
           .set('Authorization', authHeaderValue)
           .send()
@@ -2169,7 +2164,6 @@ describe('submissionController', () => {
   });
 
   describe('getSubmissionPdf', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -2191,7 +2185,7 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({ creator: user._id, isDraft: true }),
       });
 
-      await request(app)
+      await request(testApp)
         .get(`/api/submissions/${submission._id}/pdf?base64=1`)
         .set('Authorization', authHeaderValue)
         .send()
@@ -2204,7 +2198,7 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({ creator: user._id }),
       });
 
-      const response = await request(app)
+      const response = await request(testApp)
         .get(`/api/submissions/${submission._id}/pdf?base64=1`)
         .set('Authorization', authHeaderValue)
         .send()
@@ -2226,7 +2220,7 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({ creator: user._id }),
       });
 
-      const response = await request(app)
+      const response = await request(testApp)
         .get(`/api/submissions/${submission._id}/pdf?base64=0`)
         .set('Authorization', authHeaderValue)
         .send()
@@ -2243,7 +2237,7 @@ describe('submissionController', () => {
     });
 
     it('returns 404 when a submission with the specified id does not exist', async () => {
-      await request(app)
+      await request(testApp)
         .get(`/api/submissions/${new ObjectId()}/pdf?base64=1`)
         .set('Authorization', authHeaderValue)
         .send()
@@ -2290,7 +2284,6 @@ describe('submissionController', () => {
   });
 
   describe('sendPdfLink', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -2311,7 +2304,7 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({ isDraft: true }),
       });
 
-      await request(app)
+      await request(testApp)
         .post(`/api/submissions/${submission._id}/send-email`)
         .set('Authorization', authHeaderValue)
         .send()
@@ -2321,7 +2314,7 @@ describe('submissionController', () => {
     it('should send email correctly if success', async () => {
       const { submission } = await createSubmission();
 
-      await request(app)
+      await request(testApp)
         .post(`/api/submissions/${submission._id}/send-email`)
         .set('Authorization', authHeaderValue)
         .send()
@@ -2339,7 +2332,7 @@ describe('submissionController', () => {
     });
 
     it('should throw error if not found submission', async () => {
-      await request(app)
+      await request(testApp)
         .post(`/api/submissions/${new ObjectId()}/send-email`)
         .set('Authorization', authHeaderValue)
         .send()
@@ -2350,7 +2343,6 @@ describe('submissionController', () => {
   });
 
   describe('archiveSubmissions', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -2375,7 +2367,7 @@ describe('submissionController', () => {
           }),
         });
 
-        await request(app)
+        await request(testApp)
           .post(`/api/submissions/${existingSubmission._id}/archive`)
           .set('Authorization', authHeaderValue)
           .send()
@@ -2409,7 +2401,7 @@ describe('submissionController', () => {
           }),
         });
 
-        await request(app)
+        await request(testApp)
           .post(`/api/submissions/bulk-archive`)
           .set('Authorization', authHeaderValue)
           .send({ ids: [existingDraft._id, existingSubmission._id] })
@@ -2428,7 +2420,6 @@ describe('submissionController', () => {
   });
 
   describe('reassignSubmission', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -2453,7 +2444,7 @@ describe('submissionController', () => {
         }),
       });
 
-      await request(app)
+      await request(testApp)
         .post(`/api/submissions/${existingSubmission._id}/reassign`)
         .set('Authorization', authHeaderValue)
         .send({ group: new ObjectId().toString() })
@@ -2472,7 +2463,6 @@ describe('submissionController', () => {
   });
 
   describe('bulkReassignSubmissions', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -2505,7 +2495,7 @@ describe('submissionController', () => {
         }),
       });
 
-      await request(app)
+      await request(testApp)
         .post(`/api/submissions/bulk-reassign`)
         .set('Authorization', authHeaderValue)
         .send({
@@ -2534,7 +2524,6 @@ describe('submissionController', () => {
   });
 
   describe('deleteSubmissions', () => {
-    const app = createApp();
     const token = '1234';
     let authHeaderValue;
     let group;
@@ -2559,7 +2548,7 @@ describe('submissionController', () => {
           }),
         });
 
-        await request(app)
+        await request(testApp)
           .delete(`/api/submissions/${submission._id}`)
           .set('Authorization', authHeaderValue)
           .send()
@@ -2587,7 +2576,7 @@ describe('submissionController', () => {
           }),
         });
 
-        await request(app)
+        await request(testApp)
           .post('/api/submissions/bulk-delete')
           .set('Authorization', authHeaderValue)
           .send({ ids: [submission._id, draft._id] })
