@@ -20,7 +20,7 @@ const createSurveyMeta = ({
   // Defaulting of group when it isn't passed is handled in createSurvey
   // Because of that, this function can't be used without passing it to createSurvey unless a group is specified.
   group,
-  specVersion = 4,
+  specVersion = 12,
   printOptions = createSurveyMetaPrintOptions(),
   isLibrary = false,
   archived = false,
