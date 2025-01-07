@@ -1590,9 +1590,9 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
+              group: { id: subGroup._id, path: subGroup.path },
             }),
           });
-          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
 
           await request(app)
             .post('/api/submissions')
@@ -1698,9 +1698,9 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
+              group: { id: subGroup._id, path: subGroup.path },
             }),
           });
-          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
 
           await request(app)
             .post('/api/submissions')
@@ -1774,9 +1774,9 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
+              group: { id: subGroup._id, path: subGroup.path },
             }),
           });
-          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
 
           await request(app)
             .post('/api/submissions')
@@ -1825,9 +1825,9 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
+              group: { id: subGroup._id, path: subGroup.path },
             }),
           });
-          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
 
           await request(app)
             .post('/api/submissions')
@@ -1876,9 +1876,9 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
+              group: { id: subGroup._id, path: subGroup.path },
             }),
           });
-          requestSubmission.meta.group = { id: subGroup._id, path: subGroup.path };
 
           await request(app)
             .post('/api/submissions')

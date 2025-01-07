@@ -13,6 +13,7 @@ const createSubmissionMeta =
       archived = false,
       archivedReason = undefined,
       status = [],
+      group,
     } = {},
     { omitIsDraft = false, omitIsDeletedDraft = false } = {}
   ) =>
@@ -33,7 +34,7 @@ const createSubmissionMeta =
       ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
       status,
-      group: survey.meta.group,
+      group: group ?? survey.meta.group,
       specVersion,
       creator,
       permanentResults: [],
@@ -52,6 +53,7 @@ const createRequestSubmissionMeta =
       archived = false,
       archivedReason = undefined,
       status = [],
+      group,
     } = {},
     { omitIsDraft = false, omitIsDeletedDraft = false } = {}
   ) =>
@@ -72,7 +74,7 @@ const createRequestSubmissionMeta =
       ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
       status,
-      group: {
+      group: group ?? {
         id: survey.meta.group.id.toString(),
         path: survey.meta.group.path,
       },
