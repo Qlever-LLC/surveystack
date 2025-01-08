@@ -87,7 +87,7 @@ export function useSurvey() {
         title: 'Start Survey',
         icon: 'mdi-open-in-new',
         action: (survey) =>
-          createAction(survey, rightToSubmitSurvey, `/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new?submitTo={getActiveGroupId()}`),
+          createAction(survey, rightToSubmitSurvey, `/groups/${survey.meta.group.id}/surveys/${survey._id}/submissions/new?submitTo=${getActiveGroupId()}`),
         render: (survey) => () => isPublished(survey) && !isArchived(survey) && rightToSubmitSurvey(survey).allowed,
       },
       {

@@ -38,6 +38,10 @@ import api from '@/services/api.service';
 import { useSubmission } from '@/pages/submissions/submission';
 import { useRoute, useRouter } from 'vue-router';
 import { getPermission } from '@/utils/permissions';
+import { 
+  getSubmissionSurveyGroupIds, 
+  decorateSubmissionsWithSurveyGroupIds,
+} from '@/utils/submissions';
 import { menuAction } from '@/utils/threeDotsMenu';
 
 const store = useStore();
@@ -131,10 +135,11 @@ async function fetchRemoteSubmissions() {
     }
 
     const { data } = await api.get(`/submissions/page?${queryParams}`);
-    // TODO: load survey group ids and decorate the submissions with it
     const surveyIdByGroupId = await getSubmissionSurveyGroupIds(data.content);
-
-    state.submissions = decorateSubmissionsWithSurveyGroupIds(data.content, surveyIdByGroupId);
+    state.submissions = decorateSubmissionsWithSurveyGroupIds(
+      data.content, 
+      surveyIdByGroupId,
+    );
     state.submissionsPagination = data.pagination;
 
     try {
@@ -155,36 +160,6 @@ async function fetchRemoteSubmissions() {
     state.loading = false;
   }
 }
-
-async function getSubmissionSurveyGroupIds(submissions) {
-  const surveyIds = submissions.map((s) => s.meta.survey.id);
-  const surveyPromises = surveyIds.map((id) => api.get(`/surveys?q=${id}&projections[]=meta.group.id`));
-  const results = await Promise.all(surveyPromises);
-  const groupIdBySurveyId = Object.fromEntries(
-    results.map((s) => [s.data[0]._id, s.data[0].meta.group.id])
-  );
-  return groupIdBySurveyId;
-}
-
-function decorateSubmissionsWithSurveyGroupIds(submissions, groupIdBySurveyId) {
-  return submissions.map((s) => {
-    return { 
-      ...s, 
-      meta: { 
-        ...s.meta, 
-        survey: { 
-          ...s.meta.survey, 
-          meta: { 
-            group: { 
-              id: groupIdBySurveyId[s.meta.survey.id] 
-            } 
-          } 
-        } 
-      } 
-    };
-  });
-}
-
 
 function resubmit(submission) {
   const surveyGroupId = submission.meta.survey.meta.group.id;

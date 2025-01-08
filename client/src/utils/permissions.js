@@ -6,14 +6,19 @@ import { isPublished } from '../utils/surveys';
 
 export function getPermission() {
   const store = useStore();
-  const { isGroupAdmin } = useGroup();
+  const { isGroupAdmin, getActiveGroupId } = useGroup();
 
   /**
    * @param {*} survey
    * @returns {allowed: Boolean, message: String}
    */
   function rightToSubmitSurvey(survey) {
-    return checkAllowedToSubmit(survey, store.getters['auth/isLoggedIn'], store.getters['memberships/groups']);
+    return checkAllowedToSubmit(
+      survey, 
+      store.getters['auth/isLoggedIn'], 
+      store.getters['memberships/groups'], 
+      getActiveGroupId(),
+    );
   }
 
   function rightToManageSurvey(survey) {

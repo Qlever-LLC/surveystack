@@ -125,7 +125,7 @@ const route = useRoute();
 const store = useStore();
 const confirmLeaveDialogRef = ref();
 const queryClient = useQueryClient();
-const { isGroupVisitor } = useGroup();
+const { isGroupVisitor, getActiveGroupId } = useGroup();
 const { forceDesktopFullscreen } = useNavigation();
 const { rightToManageSubmission } = getPermission();
 
@@ -318,7 +318,8 @@ async function init() {
   const allowedToSubmit = checkAllowedToSubmit(
     state.survey,
     store.getters['auth/isLoggedIn'],
-    store.getters['memberships/groups']
+    store.getters['memberships/groups'],
+    getActiveGroupId(),
   );
   if (!allowedToSubmit.allowed) {
     state.hasError = true;

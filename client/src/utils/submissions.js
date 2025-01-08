@@ -225,7 +225,7 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
 export const isGroupMember = (survey, userGroups) => userGroups.some((group) => group._id === survey.meta.group.id);
 export const isGroupMemberOfGroupOrDescendant = (survey, userGroups) => userGroups.some((group) => survey.meta.group.path.startsWith(group.path));
 
-export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
+export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGroupId) => {
   const { submissions, isLibrary } = survey.meta;
 
   if (isLibrary) {
@@ -253,7 +253,15 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
       if (!isLoggedIn) {
         return { allowed: false, message: 'You must be logged in to submit this survey.' };
       }
+
+      console.log('userGroups', userGroups.map((group) => group._id));
+      console.log('submitToGroupId', submitToGroupId);
+      const isMemberOfSubmitToGroup = userGroups.some(
+        (group) => group._id === submitToGroupId
+      );
+      console.log('isMemberOfSubmitToGroup', isMemberOfSubmitToGroup);
       return isGroupMemberOfGroupOrDescendant(survey, userGroups)
+        && isMemberOfSubmitToGroup
         ? {
             allowed: true,
           }
@@ -283,3 +291,47 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
 
   return { allowed: false, message: 'You are not authorized to submit this survey.' };
 };
+
+/**
+ * Retrieves the group IDs for the surveys associated with the given submissions.
+ * @param {Array} submissions - An array of submission objects.
+ * @returns {Object} An object mapping survey IDs to group IDs.
+ */
+export async function getSubmissionSurveyGroupIds(submissions) {
+  const surveyIds = submissions.map((s) => s.meta.survey.id);
+  console.log('submissions', submissions, surveyIds);
+  const surveyPromises = surveyIds.map(
+    (id) => api.get(`/surveys?q=${id}&projections[]=meta.group.id`)
+  );
+  const results = await Promise.all(surveyPromises);
+  const groupIdBySurveyId = Object.fromEntries(
+    results.map((s) => [s.data[0]._id, s.data[0].meta.group.id])
+  );
+  console.log('groupIdBySurveyId', groupIdBySurveyId);
+  return groupIdBySurveyId;
+}
+
+/**
+ * Decorates the submissions with their corresponding survey group IDs.
+ * @param {Array} submissions - An array of submission objects.
+ * @param {Object} groupIdBySurveyId - An object mapping survey IDs to group IDs.
+ * @returns {Array} An array of decorated submission objects.
+ */
+export function decorateSubmissionsWithSurveyGroupIds(submissions, groupIdBySurveyId) {
+  return submissions.map((s) => {
+    return { 
+      ...s, 
+      meta: { 
+        ...s.meta, 
+        survey: { 
+          ...s.meta.survey, 
+          meta: { 
+            group: { 
+              id: groupIdBySurveyId[s.meta.survey.id] 
+            } 
+          } 
+        } 
+      } 
+    };
+  });
+}

@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import api from '../services/api.service';
 import * as db from '../store/db';
 import store from '../store';
+import { getSubmissionSurveyGroupIds } from '@/utils/submissions';
 
 const hasSyncDraftsCompleted = ref(false);
 
@@ -14,10 +15,18 @@ const fetchRemoteDrafts = async () => {
   return content;
 };
 
+
+const prefetchRemoteDraftsQueryFn = async () => {
+  const content = await fetchRemoteDrafts();
+  // cache requests for getting survey group ids
+  await getSubmissionSurveyGroupIds(content);
+  return content;
+}
+
 const prefetchRemoteDrafts = (queryClient) => {
   return queryClient.prefetchQuery({
     queryKey: ['remoteDrafts'],
-    queryFn: fetchRemoteDrafts,
+    queryFn: prefetchRemoteDraftsQueryFn,
     networkMode: 'offlineFirst',
   });
 }
