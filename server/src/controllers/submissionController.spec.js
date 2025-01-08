@@ -1470,7 +1470,7 @@ describe('submissionController', () => {
           ({ createRequestSubmission } = await createSurvey(['string'], {
             meta: createSurveyMeta({
               submissions: 'group',
-              group: createSurveyMetaGroup({ id: group._id.toString(), path: group.path }),
+              group: createSurveyMetaGroup({ id: group._id, path: group.path }),
             }),
           }));
         });
@@ -3113,19 +3113,31 @@ describe('submissionController', () => {
   });
 
   describe('deleteSubmissions', () => {
-    const token = '1234';
-    let authHeaderValue;
+    const memberToken = 'member-token';
+    const adminToken = 'admin-token';
+    let memberAuthHeaderValue;
+    let adminAuthHeaderValue;
     let group;
     let memberUser;
+    let adminUser;
     let createSubmission;
+    let postSubmission;
 
     beforeEach(async () => {
       group = await createGroup();
       ({ user: memberUser } = await group.createUserMember({
-        userOverrides: { token },
+        userOverrides: { token: memberToken },
       }));
-      authHeaderValue = `${memberUser.email} ${token}`;
-      ({ createSubmission } = await createSurvey(['string']));
+      ({ user: adminUser } = await group.createAdminMember({
+        userOverrides: { token: adminToken },
+      }));
+      memberAuthHeaderValue = `${memberUser.email} ${memberToken}`;
+      adminAuthHeaderValue = `${adminUser.email} ${adminToken}`;
+      ({ createSubmission, postSubmission } = await createSurvey(['string'], {
+        meta: createSurveyMeta({
+          group: createSurveyMetaGroup({ id: group._id, path: group.path }),
+        }),
+      }));
     });
 
     describe('DELETE /api/submissions/:id', () => {
@@ -3139,7 +3151,7 @@ describe('submissionController', () => {
 
         await request(testApp)
           .delete(`/api/submissions/${submission._id}`)
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send()
           .expect(409);
 
@@ -3150,14 +3162,113 @@ describe('submissionController', () => {
       });
 
       describe('when the submission is in a group that the requesting user is a member of', () => {
-        it.todo('and the requesting user is the creator, OK');
-        it.todo('and the requesting user is an admin of the group, OK');
-        it.todo('and the requesting user is not the creator, 401');
+        it('and the requesting user is the creator, OK', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: memberUser._id,
+            authHeaderValue: memberAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toBeNull();
+        });
+
+        it('and the requesting user is an admin of the group, OK', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: memberUser._id,
+            authHeaderValue: memberAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', adminAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toBeNull();
+        });
+
+        it('and the requesting user is not the creator, 401', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: adminUser._id,
+            authHeaderValue: adminAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(401);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).not.toBeNull();
+        });
       });
 
       describe('when the submission is in a group that the requesting user is not a member of', () => {
-        it.todo('and the requesting user is the creator, OK');
-        it.todo('and the requesting user is not the creator, 401');
+        it('and the requesting user is the creator, OK', async () => {
+          const submissionId = new ObjectId();
+          const anotherGroup = await createGroup();
+          await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              creator: memberUser._id,
+              group: { id: anotherGroup._id, path: anotherGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toBeNull();
+        });
+
+        it('and the requesting user is not the creator, 401', async () => {
+          const submissionId = new ObjectId();
+          const anotherGroup = await createGroup();
+          await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              creator: adminUser._id,
+              group: { id: anotherGroup._id, path: anotherGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(401);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).not.toBeNull();
+        });
       });
     });
 
@@ -3178,7 +3289,7 @@ describe('submissionController', () => {
 
         await request(testApp)
           .post('/api/submissions/bulk-delete')
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send({ ids: [submission._id, draft._id] })
           .expect(409);
 
