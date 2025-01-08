@@ -1463,7 +1463,7 @@ describe('submissionController', () => {
           ({ createRequestSubmission } = await createSurvey(['string'], {
             meta: createSurveyMeta({
               submissions: 'group',
-              group: createSurveyMetaGroup({ id: group._id, path: group.path }),
+              group: createSurveyMetaGroup({ id: group._id.toString(), path: group.path }),
             }),
           }));
         });
@@ -1583,7 +1583,7 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
-              group: { id: subGroup._id, path: subGroup.path },
+              group: { id: subGroup._id.toString(), path: subGroup.path },
             }),
           });
 
@@ -1691,7 +1691,7 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
-              group: { id: subGroup._id, path: subGroup.path },
+              group: { id: subGroup._id.toString(), path: subGroup.path },
             }),
           });
 
@@ -1767,7 +1767,7 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
-              group: { id: subGroup._id, path: subGroup.path },
+              group: { id: subGroup._id.toString(), path: subGroup.path },
             }),
           });
 
@@ -1818,7 +1818,7 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
-              group: { id: subGroup._id, path: subGroup.path },
+              group: { id: subGroup._id.toString(), path: subGroup.path },
             }),
           });
 
@@ -1869,7 +1869,7 @@ describe('submissionController', () => {
                   value: { at: new Date('2021-01-01').toISOString() },
                 },
               ],
-              group: { id: subGroup._id, path: subGroup.path },
+              group: { id: subGroup._id.toString(), path: subGroup.path },
             }),
           });
 
@@ -2181,7 +2181,7 @@ describe('submissionController', () => {
           meta: createRequestSubmissionMeta({
             creator: user._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
-            group: { id: anotherGroup._id, path: anotherGroup.path },
+            group: { id: anotherGroup._id.toString(), path: anotherGroup.path },
           }),
         });
 
@@ -2359,7 +2359,7 @@ describe('submissionController', () => {
           meta: createRequestSubmissionMeta({
             creator: adminUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
-            group: { id: subGroup._id, path: subGroup.path },
+            group: { id: subGroup._id.toString(), path: subGroup.path },
           }),
         });
 
@@ -2377,35 +2377,309 @@ describe('submissionController', () => {
     });
 
     describe('when survey.meta.submissions is "groupAndDescendants"', () => {
+      let createRequestSubmission;
+      let postSubmission;
+      let createSubmissionDoc;
+      let submissionId;
+      let subGroupMember;
+      let subGroupAdmin;
+      let subGroupMemberAuthHeaderValue;
+      let subGroupAdminAuthHeaderValue;
+      let subGroup;
+      beforeEach(async () => {
+        const subGroupMemberToken = 'sub-group-member-token';
+        const subGroupAdminToken = 'sub-group-admin-token';
+        subGroup = await group.createSubGroup({ name: 'subGroup' });
+        ({ user: subGroupMember } = await subGroup.createUserMember({
+          userOverrides: { token: subGroupMemberToken },
+        }));
+        ({ user: subGroupAdmin } = await subGroup.createAdminMember({
+          userOverrides: { token: subGroupAdminToken },
+        }));
+        subGroupMemberAuthHeaderValue = `${subGroupMember.email} ${subGroupMemberToken}`;
+        subGroupAdminAuthHeaderValue = `${subGroupAdmin.email} ${subGroupAdminToken}`;
+        submissionId = ObjectId();
+        ({ postSubmission, createRequestSubmission, createSubmissionDoc } = await createSurvey(
+          ['string'],
+          {
+            meta: createSurveyMeta({
+              submissions: 'groupAndDescendants',
+              group: createSurveyMetaGroup({ id: group._id, path: group.path }),
+            }),
+          }
+        ));
+      });
+
       describe('and the existing submission is in a group that the requesting user is not a member of', () => {
-        it.todo('if the requesting user is the creator, OK');
-        it.todo('if the requesting user is not the creator, 401');
+        beforeEach(async () => {
+          const submissionDoc = createSubmissionDoc({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              group: { id: group._id, path: group.path },
+              creator: subGroupMember._id,
+            }),
+          });
+          await db.collection('submissions').insertOne(submissionDoc);
+        });
+
+        it('if the requesting user is the creator, 401', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              creator: subGroupMember._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+            }),
+          });
+
+          await request(testApp)
+            .put(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', subGroupMemberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(requestSubmission.meta.dateModified).not.toEqual(
+            submission.meta.dateModified.toISOString()
+          );
+        });
+
+        it('if the requesting user is not the creator, 401', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              creator: subGroupAdmin._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+            }),
+          });
+
+          await request(testApp)
+            .put(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', subGroupAdminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(requestSubmission.meta.dateModified).not.toEqual(
+            submission.meta.dateModified.toISOString()
+          );
+        });
       });
 
       describe('and the existing submission is in a group that the requesting user is a member of', () => {
-        it.todo('if the requesting user is the creator, OK');
-        it.todo('if the requesting user is not the creator, 401');
+        beforeEach(async () => {
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: subGroupMember._id.toString(),
+            authHeaderValue: subGroupMemberAuthHeaderValue,
+            group: { id: subGroup._id.toString(), path: subGroup.path },
+          });
+        });
+
+        it('if the requesting user is the creator, OK', async () => {
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              creator: subGroupMember._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              group: { id: subGroup._id.toString(), path: subGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .put(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', subGroupMemberAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(requestSubmission.meta.dateModified).toEqual(
+            submission.meta.dateModified.toISOString()
+          );
+        });
+
+        it('if the requesting user is not the creator, 401', async () => {
+          const subGroupMember2Token = 'sub-group-member-2-token';
+          const subGroupMember2 = await subGroup.createUserMember({
+            userOverrides: { token: subGroupMember2Token },
+          });
+          const subGroupMember2AuthHeaderValue = `${subGroupMember2.email} ${subGroupMember2Token}`;
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              creator: subGroupMember._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              group: { id: subGroup._id.toString(), path: subGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .put(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', subGroupMember2AuthHeaderValue)
+            .send(requestSubmission)
+            .expect(401);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(requestSubmission.meta.dateModified).not.toEqual(
+            submission.meta.dateModified.toISOString()
+          );
+        });
       });
 
       describe('and the existing submission is in a group that the requesting user is an admin of', () => {
-        it.todo('OK');
+        it('OK', async () => {
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: subGroupMember._id.toString(),
+            authHeaderValue: subGroupMemberAuthHeaderValue,
+            group: { id: subGroup._id.toString(), path: subGroup.path },
+          });
+          const requestSubmission = createRequestSubmission({
+            _id: submissionId.toString(),
+            meta: createRequestSubmissionMeta({
+              creator: subGroupMember._id.toString(),
+              dateModified: new Date('2021-01-02').toISOString(),
+              group: { id: subGroup._id.toString(), path: subGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .put(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', subGroupAdminAuthHeaderValue)
+            .send(requestSubmission)
+            .expect(200);
+
+          const submission = await db.collection('submissions').findOne({ _id: submissionId });
+          expect(requestSubmission.meta.dateModified).toEqual(
+            submission.meta.dateModified.toISOString()
+          );
+        });
       });
 
-      it.todo('and the requesting user is not logged in, 401');
-      it.todo('and the requesting user is not a member of the group or its descendants, 401');
-      it.todo(
-        'and the requesting user is not a member of the group or its descendants but is the creator, OK'
-      );
-      it.todo(
-        'and the requesting user is a member of a descendant group with a submission in it, but not an admin, but is the creator, OK'
-      );
-      it.todo(
-        'and the requesting user is a member of a descendant group with a submission in it, but not an admin, 401'
-      );
-      it.todo(
-        'and the requesting user is an admin of a descendant group with a submission in it, OK'
-      );
-      it.todo('and the request submission has a different group than the survey, 401');
+      it('and the requesting user is not logged in, 401', async () => {
+        await postSubmission({
+          submissionId: submissionId.toString(),
+          creator: subGroupMember._id.toString(),
+          authHeaderValue: subGroupMemberAuthHeaderValue,
+          group: { id: subGroup._id.toString(), path: subGroup.path },
+        });
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({
+            creator: subGroupMember._id.toString(),
+            dateModified: new Date('2021-01-02').toISOString(),
+            group: { id: subGroup._id.toString(), path: subGroup.path },
+          }),
+        });
+
+        await request(testApp)
+          .put(`/api/submissions/${submissionId.toString()}`)
+          .send(requestSubmission)
+          .expect(401);
+
+        const submission = await db.collection('submissions').findOne({ _id: submissionId });
+        expect(requestSubmission.meta.dateModified).not.toEqual(
+          submission.meta.dateModified.toISOString()
+        );
+      });
+
+      it('and the requesting user is not a member of the group or its descendants, 401', async () => {
+        const anotherGroup = await createGroup();
+        const anotherGroupUserToken = 'another-group-user-token';
+        const { user: anotherGroupUser } = await anotherGroup.createAdminMember({
+          userOverrides: { token: anotherGroupUserToken },
+        });
+        const anotherGroupUserAuthHeaderValue = `${anotherGroupUser.email} ${anotherGroupUserToken}`;
+        await postSubmission({
+          submissionId: submissionId.toString(),
+          creator: subGroupMember._id.toString(),
+          authHeaderValue: subGroupMemberAuthHeaderValue,
+          group: { id: subGroup._id.toString(), path: subGroup.path },
+        });
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({
+            creator: subGroupMember._id.toString(),
+            dateModified: new Date('2021-01-02').toISOString(),
+            group: { id: anotherGroup._id.toString(), path: anotherGroup.path },
+          }),
+        });
+
+        await request(testApp)
+          .put(`/api/submissions/${submissionId.toString()}`)
+          .set('Authorization', anotherGroupUserAuthHeaderValue)
+          .send(requestSubmission)
+          .expect(401);
+
+        const submission = await db.collection('submissions').findOne({ _id: submissionId });
+        expect(requestSubmission.meta.dateModified).not.toEqual(
+          submission.meta.dateModified.toISOString()
+        );
+      });
+
+      it('and the requesting user is not a member of the group or its descendants but is the creator, 401', async () => {
+        const anotherGroup = await createGroup();
+        const anotherGroupUserToken = 'another-group-user-token';
+        const { user: anotherGroupUser } = await anotherGroup.createAdminMember({
+          userOverrides: { token: anotherGroupUserToken },
+        });
+        const anotherGroupUserAuthHeaderValue = `${anotherGroupUser.email} ${anotherGroupUserToken}`;
+        const submissionDoc = createSubmissionDoc({
+          _id: submissionId,
+          meta: createSubmissionMeta({
+            group: { id: subGroup._id, path: subGroup.path },
+            creator: anotherGroupUser._id,
+          }),
+        });
+        await db.collection('submissions').insertOne(submissionDoc);
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({
+            creator: anotherGroupUser._id.toString(),
+            dateModified: new Date('2021-01-02').toISOString(),
+            group: { id: subGroup._id.toString(), path: subGroup.path },
+          }),
+        });
+
+        await request(testApp)
+          .put(`/api/submissions/${submissionId.toString()}`)
+          .set('Authorization', anotherGroupUserAuthHeaderValue)
+          .send(requestSubmission)
+          .expect(401);
+
+        const submission = await db.collection('submissions').findOne({ _id: submissionId });
+        expect(requestSubmission.meta.dateModified).not.toEqual(
+          submission.meta.dateModified.toISOString()
+        );
+      });
+
+      it('and the request submission has a group outside of the survey group and its descendants, 401', async () => {
+        const anotherGroup = await createGroup({ name: 'Another Group' });
+        await postSubmission({
+          submissionId: submissionId.toString(),
+          creator: subGroupMember._id.toString(),
+          authHeaderValue: subGroupMemberAuthHeaderValue,
+          group: { id: subGroup._id.toString(), path: subGroup.path },
+        });
+        const requestSubmission = createRequestSubmission({
+          _id: submissionId.toString(),
+          meta: createRequestSubmissionMeta({
+            creator: subGroupMember._id.toString(),
+            dateModified: new Date('2021-01-02').toISOString(),
+            group: { id: anotherGroup._id.toString(), path: anotherGroup.path },
+          }),
+        });
+
+        await request(testApp)
+          .put(`/api/submissions/${submissionId.toString()}`)
+          .set('Authorization', subGroupMemberAuthHeaderValue)
+          .send(requestSubmission)
+          .expect(401);
+
+        const submission = await db.collection('submissions').findOne({ _id: submissionId });
+        expect(requestSubmission.meta.dateModified).not.toEqual(
+          submission.meta.dateModified.toISOString()
+        );
+      });
     });
   });
 
