@@ -2934,16 +2934,31 @@ describe('submissionController', () => {
   });
 
   describe('archiveSubmissions', () => {
-    const token = '1234';
-    let authHeaderValue;
+    const memberToken = 'member-token';
+    const adminToken = 'admin-token';
+    let memberAuthHeaderValue;
+    let adminAuthHeaderValue;
     let group;
     let memberUser;
+    let adminUser;
+    let createSubmission;
+    let postSubmission;
+
     beforeEach(async () => {
       group = await createGroup();
       ({ user: memberUser } = await group.createUserMember({
-        userOverrides: { token },
+        userOverrides: { token: memberToken },
       }));
-      authHeaderValue = `${memberUser.email} ${token}`;
+      ({ user: adminUser } = await group.createAdminMember({
+        userOverrides: { token: adminToken },
+      }));
+      memberAuthHeaderValue = `${memberUser.email} ${memberToken}`;
+      adminAuthHeaderValue = `${adminUser.email} ${adminToken}`;
+      ({ createSubmission, postSubmission } = await createSurvey(['string'], {
+        meta: createSurveyMeta({
+          group: createSurveyMetaGroup({ id: group._id, path: group.path }),
+        }),
+      }));
     });
 
     describe('/submissions/:id/archive', () => {
@@ -2960,7 +2975,7 @@ describe('submissionController', () => {
 
         await request(testApp)
           .post(`/api/submissions/${existingSubmission._id}/archive`)
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send()
           .expect(409);
 
@@ -2969,6 +2984,116 @@ describe('submissionController', () => {
           .findOne({ _id: existingSubmission._id });
         expect(submission).not.toBeNull();
         expect(submission.meta.archived).toBe(false);
+      });
+
+      describe('when the submission is in a group that the requesting user is a member of', () => {
+        it('and the requesting user is the creator, OK', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: memberUser._id,
+            authHeaderValue: memberAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .post(`/api/submissions/${submissionId.toString()}/archive`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toHaveProperty('meta.archived', true);
+        });
+
+        it('and the requesting user is an admin of the group, OK', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: memberUser._id,
+            authHeaderValue: memberAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .post(`/api/submissions/${submissionId.toString()}/archive`)
+            .set('Authorization', adminAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toHaveProperty('meta.archived', true);
+        });
+
+        it('and the requesting user is not the creator, 401', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: adminUser._id,
+            authHeaderValue: adminAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .post(`/api/submissions/${submissionId.toString()}/archive`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(401);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toHaveProperty('meta.archived', false);
+        });
+      });
+
+      describe('when the submission is in a group that the requesting user is not a member of', () => {
+        it('and the requesting user is the creator, OK', async () => {
+          const submissionId = new ObjectId();
+          const anotherGroup = await createGroup();
+          await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              creator: memberUser._id,
+              group: { id: anotherGroup._id, path: anotherGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .post(`/api/submissions/${submissionId.toString()}/archive`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toHaveProperty('meta.archived', true);
+        });
+
+        it('and the requesting user is not the creator, 401', async () => {
+          const submissionId = new ObjectId();
+          const anotherGroup = await createGroup();
+          await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              creator: adminUser._id,
+              group: { id: anotherGroup._id, path: anotherGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .post(`/api/submissions/${submissionId.toString()}/archive`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(401);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toHaveProperty('meta.archived', false);
+        });
       });
     });
 
@@ -2994,7 +3119,7 @@ describe('submissionController', () => {
 
         await request(testApp)
           .post(`/api/submissions/bulk-archive`)
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send({ ids: [existingDraft._id, existingSubmission._id] })
           .expect(409);
 
