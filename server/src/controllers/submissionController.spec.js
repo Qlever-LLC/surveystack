@@ -3300,8 +3300,6 @@ describe('submissionController', () => {
         expect(existingSubmission).not.toBeNull();
         expect(existingDraft).not.toBeNull();
       });
-      // it.todo('for scenarios that successfully delete, we need one test with two submissions that get deleted');
-      // it.todo('for scenarios that reject, we need one submission that would delete, and one that would reject, then assert that it rejects and nothing gets deleted');
 
       describe('when the submission is in a group that the requesting user is a member of', () => {
         it('and the requesting user is the creator, OK', async () => {
