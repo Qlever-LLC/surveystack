@@ -143,12 +143,20 @@ router.put(
 );
 router.delete(
   '/submissions/:id',
-  [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
+  [
+    assertAuthenticated,
+    assertEntityExists({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.deleteSubmissions)
 );
 router.post(
   '/submissions/bulk-delete',
-  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  [
+    assertHasIds,
+    assertEntitiesExist({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.deleteSubmissions)
 );
 router.post('/submissions/sync-draft', [assertAuthenticated], catchErrors(syncDraft));
