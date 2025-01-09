@@ -95,7 +95,11 @@ router.post(
 );
 router.post(
   '/submissions/bulk-archive',
-  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  [
+    assertHasIds,
+    assertEntitiesExist({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.archiveSubmissions)
 );
 router.post(
