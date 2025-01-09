@@ -86,7 +86,11 @@ router.get('/submissions/page', catchErrors(submissionController.getSubmissionsP
 router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCsv));
 router.post(
   '/submissions/:id/archive',
-  [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
+  [
+    assertAuthenticated,
+    assertEntityExists({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.archiveSubmissions)
 );
 router.post(
