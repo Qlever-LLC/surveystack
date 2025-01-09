@@ -32,6 +32,8 @@ export const createSubmissionFromSurvey = ({
   instance,
   submitAsUser = undefined,
   isDraft = true,
+  submitToGroupId = null,
+  submitToGroupPath = null,
 }) => {
   const submission = {};
   const dateNow = new Date().toISOString();
@@ -50,8 +52,8 @@ export const createSubmissionFromSurvey = ({
     permissions: [],
     status: [],
     group: {
-      id: survey.meta.group.id,
-      path: survey.meta.group.path,
+      id: submitToGroupId ?? survey.meta.group.id,
+      path: submitToGroupPath ?? survey.meta.group.path,
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
     submitAsUser: submitAsUser,
@@ -226,6 +228,8 @@ export const isGroupMember = (survey, userGroups) => userGroups.some((group) => 
 export const isGroupMemberOfGroupOrDescendant = (survey, userGroups) => userGroups.some((group) => survey.meta.group.path.startsWith(group.path));
 
 export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGroupId) => {
+  // fallback to survey group if submitToGroupId is not provided
+  const submitToGroup = submitToGroupId ?? survey.meta.group.id;
   const { submissions, isLibrary } = survey.meta;
 
   if (isLibrary) {
@@ -253,13 +257,9 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGro
       if (!isLoggedIn) {
         return { allowed: false, message: 'You must be logged in to submit this survey.' };
       }
-
-      console.log('userGroups', userGroups.map((group) => group._id));
-      console.log('submitToGroupId', submitToGroupId);
       const isMemberOfSubmitToGroup = userGroups.some(
-        (group) => group._id === submitToGroupId
+        (group) => group._id === submitToGroup
       );
-      console.log('isMemberOfSubmitToGroup', isMemberOfSubmitToGroup);
       return isGroupMemberOfGroupOrDescendant(survey, userGroups)
         && isMemberOfSubmitToGroup
         ? {
@@ -299,7 +299,6 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGro
  */
 export async function getSubmissionSurveyGroupIds(submissions) {
   const surveyIds = submissions.map((s) => s.meta.survey.id);
-  console.log('submissions', submissions, surveyIds);
   const surveyPromises = surveyIds.map(
     (id) => api.get(`/surveys?q=${id}&projections[]=meta.group.id`)
   );
@@ -307,7 +306,6 @@ export async function getSubmissionSurveyGroupIds(submissions) {
   const groupIdBySurveyId = Object.fromEntries(
     results.map((s) => [s.data[0]._id, s.data[0].meta.group.id])
   );
-  console.log('groupIdBySurveyId', groupIdBySurveyId);
   return groupIdBySurveyId;
 }
 

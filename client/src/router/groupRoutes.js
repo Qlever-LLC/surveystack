@@ -276,6 +276,7 @@ export default [
         surveyId: route.params.surveyId,
         submitAsUserId: route.query.submitAsUserId,
         routeAction: 'new',
+        submitToGroupId: route.query.submitTo,
       }),
       navigation: true,
     },
