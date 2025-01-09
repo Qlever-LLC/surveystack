@@ -48,13 +48,13 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
     });
 
     it('returns 401 if the request is not authenticated', async () => {
@@ -71,7 +71,7 @@ describe('submissionController', () => {
       const { createRequestSubmission } = await createSurvey(['string']);
       const nonDraftSubmission = createRequestSubmission({
         _id: ObjectId().toString(),
-        meta: createRequestSubmissionMeta({ isDraft: false, creator: user._id.toString() }),
+        meta: createRequestSubmissionMeta({ isDraft: false, creator: memberUser._id.toString() }),
       });
 
       return request(testApp)
@@ -135,7 +135,10 @@ describe('submissionController', () => {
           const { createRequestSubmission } = await createSurvey(['string']);
           const draftSubmission = createRequestSubmission({
             _id: ObjectId().toString(),
-            meta: createRequestSubmissionMeta({ isDraft: true, creator: user._id.toString() }),
+            meta: createRequestSubmissionMeta({
+              isDraft: true,
+              creator: memberUser._id.toString(),
+            }),
           });
 
           await request(testApp)
@@ -160,7 +163,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               dateModified: new Date('2021-01-02').toISOString(),
               status: [
                 {
@@ -201,7 +204,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               dateModified: new Date('2021-01-02').toISOString(),
               status: [
                 {
@@ -239,7 +242,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               dateModified: new Date('2021-01-02').toISOString(),
               status: [
                 {
@@ -278,7 +281,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               dateModified: new Date('2021-01-02').toISOString(),
               status: [
                 {
@@ -315,7 +318,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               dateModified: new Date('2021-01-02').toISOString(),
               status: [
                 {
@@ -348,7 +351,7 @@ describe('submissionController', () => {
         });
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
-          meta: createRequestSubmissionMeta({ isDraft: true, creator: user._id.toString() }),
+          meta: createRequestSubmissionMeta({ isDraft: true, creator: memberUser._id.toString() }),
         });
 
         return request(testApp)
@@ -363,7 +366,7 @@ describe('submissionController', () => {
         const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
         await createSubmission({
           _id: submissionId,
-          meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+          meta: createSubmissionMeta({ isDraft: true, creator: memberUser._id }),
         });
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
@@ -385,7 +388,7 @@ describe('submissionController', () => {
             _id: submissionId,
             meta: createSubmissionMeta({
               isDraft: false,
-              creator: user._id,
+              creator: memberUser._id,
               dateModified: new Date('2021-01-01'),
             }),
           });
@@ -393,7 +396,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               status: [{ type: 'READY_TO_SUBMIT', value: { at: new Date().toISOString() } }],
               dateModified: new Date('2021-01-02').toISOString(),
             }),
@@ -420,7 +423,7 @@ describe('submissionController', () => {
           ]);
           const { submission: databaseSubmission } = await createSubmission({
             _id: submissionId,
-            meta: createSubmissionMeta({ isDraft: true, creator: user._id, dateModified }),
+            meta: createSubmissionMeta({ isDraft: true, creator: memberUser._id, dateModified }),
           });
 
           return {
@@ -444,7 +447,7 @@ describe('submissionController', () => {
                   meta: createSubmissionMeta({
                     isDraft: true,
                     isDeletedDraft: true,
-                    creator: user._id,
+                    creator: memberUser._id,
                     dateModified: dateModified,
                   }),
                 });
@@ -452,7 +455,7 @@ describe('submissionController', () => {
                   _id: submissionId.toString(),
                   meta: createRequestSubmissionMeta({
                     isDraft: true,
-                    creator: user._id.toString(),
+                    creator: memberUser._id.toString(),
                     dateModified: new Date('2021-01-02').toISOString(),
                   }),
                 });
@@ -486,7 +489,7 @@ describe('submissionController', () => {
                   meta: createSubmissionMeta({
                     isDraft: true,
                     isDeletedDraft: true,
-                    creator: user._id,
+                    creator: memberUser._id,
                     dateModified: dateModified,
                   }),
                 });
@@ -494,7 +497,7 @@ describe('submissionController', () => {
                   _id: submissionId.toString(),
                   meta: createRequestSubmissionMeta({
                     isDraft: true,
-                    creator: user._id.toString(),
+                    creator: memberUser._id.toString(),
                     dateModified: new Date('2021-01-02').toISOString(),
                     status: [
                       {
@@ -538,7 +541,7 @@ describe('submissionController', () => {
                   meta: createSubmissionMeta({
                     isDraft: true,
                     isDeletedDraft: true,
-                    creator: user._id,
+                    creator: memberUser._id,
                     dateModified: dateModified,
                   }),
                 });
@@ -546,7 +549,7 @@ describe('submissionController', () => {
                   _id: submissionId.toString(),
                   meta: createRequestSubmissionMeta({
                     isDraft: true,
-                    creator: user._id.toString(),
+                    creator: memberUser._id.toString(),
                     dateModified: new Date('2021-01-02').toISOString(),
                     status: [
                       {
@@ -584,7 +587,7 @@ describe('submissionController', () => {
                 _id: submissionId.toString(),
                 meta: createRequestSubmissionMeta({
                   isDraft: true,
-                  creator: user._id.toString(),
+                  creator: memberUser._id.toString(),
                   dateModified: new Date('2021-01-02').toISOString(),
                   status: [
                     {
@@ -623,7 +626,7 @@ describe('submissionController', () => {
                 _id: submissionId.toString(),
                 meta: createRequestSubmissionMeta({
                   isDraft: true,
-                  creator: user._id.toString(),
+                  creator: memberUser._id.toString(),
                   dateModified: new Date('2021-01-02').toISOString(),
                 }),
               });
@@ -652,7 +655,7 @@ describe('submissionController', () => {
                 _id: submissionId.toString(),
                 meta: createRequestSubmissionMeta({
                   isDraft: true,
-                  creator: user._id.toString(),
+                  creator: memberUser._id.toString(),
                   dateModified: new Date('2021-01-02').toISOString(),
                   status: [
                     {
@@ -694,7 +697,7 @@ describe('submissionController', () => {
                 _id: submissionId.toString(),
                 meta: createRequestSubmissionMeta({
                   isDraft: true,
-                  creator: user._id.toString(),
+                  creator: memberUser._id.toString(),
                   dateModified: new Date('2021-01-02').toISOString(),
                   status: [
                     {
@@ -733,7 +736,7 @@ describe('submissionController', () => {
                 _id: submissionId.toString(),
                 meta: createRequestSubmissionMeta({
                   isDraft: true,
-                  creator: user._id.toString(),
+                  creator: memberUser._id.toString(),
                   dateModified: new Date('2021-01-02').toISOString(),
                   status: [
                     {
@@ -773,7 +776,7 @@ describe('submissionController', () => {
                 _id: submissionId.toString(),
                 meta: createRequestSubmissionMeta({
                   isDraft: true,
-                  creator: user._id.toString(),
+                  creator: memberUser._id.toString(),
                   dateModified: new Date('2021-01-02').toISOString(),
                   status: [
                     {
@@ -817,7 +820,7 @@ describe('submissionController', () => {
               _id: submissionId.toString(),
               meta: createRequestSubmissionMeta({
                 isDraft: true,
-                creator: user._id.toString(),
+                creator: memberUser._id.toString(),
                 dateModified: new Date('2021-01-01').toISOString(),
                 status: [
                   {
@@ -844,7 +847,7 @@ describe('submissionController', () => {
               _id: submissionId.toString(),
               meta: createRequestSubmissionMeta({
                 isDraft: true,
-                creator: user._id.toString(),
+                creator: memberUser._id.toString(),
                 dateModified: new Date('2021-01-01').toISOString(),
                 status: [
                   {
@@ -871,7 +874,7 @@ describe('submissionController', () => {
               _id: submissionId.toString(),
               meta: createRequestSubmissionMeta({
                 isDraft: true,
-                creator: user._id.toString(),
+                creator: memberUser._id.toString(),
                 dateModified: new Date('2021-01-01').toISOString(),
               }),
             });
@@ -895,13 +898,13 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
     });
 
     it('returns 401 when the request is not authenticated', async () => {
@@ -931,7 +934,11 @@ describe('submissionController', () => {
         const draftBelongingToRequestingUserId = new ObjectId();
         await createSubmission({
           _id: draftBelongingToRequestingUserId,
-          meta: createSubmissionMeta({ isDraft: true, isDeletedDraft: false, creator: user._id }),
+          meta: createSubmissionMeta({
+            isDraft: true,
+            isDeletedDraft: false,
+            creator: memberUser._id,
+          }),
         });
 
         // Should not return...
@@ -942,7 +949,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: true,
             isDeletedDraft: true,
-            creator: user._id,
+            creator: memberUser._id,
           }),
         });
         // submitted submissions belonging to the requesting user
@@ -952,7 +959,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: false,
             isDeletedDraft: false,
-            creator: user._id,
+            creator: memberUser._id,
           }),
         });
         // drafts NOT belonging to requesting user
@@ -995,7 +1002,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: true,
             isDeletedDraft: false,
-            creator: user._id,
+            creator: memberUser._id,
             dateModified: new Date('2021-01-02').toISOString(),
           }),
         });
@@ -1004,7 +1011,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: true,
             isDeletedDraft: false,
-            creator: user._id,
+            creator: memberUser._id,
             dateModified: new Date('2021-01-03').toISOString(),
           }),
         });
@@ -1036,13 +1043,13 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
     });
 
     it('does not return drafts', async () => {
@@ -1050,11 +1057,11 @@ describe('submissionController', () => {
       const [{ submission }, { submission: draft }] = await Promise.all([
         createSubmission({
           _id: new ObjectId(),
-          meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
+          meta: createSubmissionMeta({ isDraft: false, creator: memberUser._id }),
         }),
         createSubmission({
           _id: new ObjectId(),
-          meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+          meta: createSubmissionMeta({ isDraft: true, creator: memberUser._id }),
         }),
       ]);
 
@@ -1076,10 +1083,10 @@ describe('submissionController', () => {
   describe('getSubmission', () => {
     const token = '1234';
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
     });
@@ -1088,7 +1095,7 @@ describe('submissionController', () => {
       const { createSubmission } = await createSurvey(['string']);
       const { submission } = await createSubmission({
         _id: new ObjectId(),
-        meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+        meta: createSubmissionMeta({ isDraft: true, creator: memberUser._id }),
       });
 
       await request(testApp)
@@ -1102,13 +1109,13 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
     });
 
     it('does not return drafts', async () => {
@@ -1116,11 +1123,11 @@ describe('submissionController', () => {
       const [{ submission }, { submission: draft }] = await Promise.all([
         createSubmission({
           _id: new ObjectId(),
-          meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
+          meta: createSubmissionMeta({ isDraft: false, creator: memberUser._id }),
         }),
         createSubmission({
           _id: new ObjectId(),
-          meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+          meta: createSubmissionMeta({ isDraft: true, creator: memberUser._id }),
         }),
       ]);
 
@@ -1145,17 +1152,17 @@ describe('submissionController', () => {
     let memberAuthHeaderValue;
     let adminAuthHeaderValue;
     let group;
-    let user;
+    let memberUser;
     let adminUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token: memberToken },
       }));
       ({ user: adminUser } = await group.createAdminMember({
         userOverrides: { token: adminToken },
       }));
-      memberAuthHeaderValue = `${user.email} ${memberToken}`;
+      memberAuthHeaderValue = `${memberUser.email} ${memberToken}`;
       adminAuthHeaderValue = `${adminUser.email} ${adminToken}`;
     });
 
@@ -1163,7 +1170,7 @@ describe('submissionController', () => {
       const submissionId = ObjectId();
       const { createRequestSubmission } = await createSurvey(['string']);
       const meta = createRequestSubmissionMeta({
-        creator: user._id.toString(),
+        creator: memberUser._id.toString(),
         specVersion: 3,
         status: [
           {
@@ -1194,7 +1201,7 @@ describe('submissionController', () => {
       const submissionId = ObjectId();
       const { createRequestSubmission } = await createSurvey(['string']);
       const meta = createRequestSubmissionMeta({
-        creator: user._id.toString(),
+        creator: memberUser._id.toString(),
         specVersion: 3,
         archived: true,
         archivedReason: 'SUBMISSION_FROM_BUILDER',
@@ -1225,7 +1232,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: false,
             isDeletedDraft: false,
-            creator: user._id,
+            creator: memberUser._id,
             dateModified: new Date('2021-01-01').toISOString(),
           }),
         });
@@ -1233,7 +1240,7 @@ describe('submissionController', () => {
           _id: existingSubmission._id,
           meta: createRequestSubmissionMeta({
             isDraft: true,
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
             status: [
               {
@@ -1265,7 +1272,7 @@ describe('submissionController', () => {
             meta: createSubmissionMeta({
               isDraft: true,
               isDeletedDraft: false,
-              creator: user._id,
+              creator: memberUser._id,
               dateModified: new Date('2021-01-01').toISOString(),
             }),
           });
@@ -1273,7 +1280,7 @@ describe('submissionController', () => {
             _id: existingSubmission._id,
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               dateModified: new Date('2021-01-02').toISOString(),
               status: [
                 {
@@ -1318,7 +1325,7 @@ describe('submissionController', () => {
             _id: existingSubmission._id,
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               dateModified: new Date('2021-01-02').toISOString(),
               status: [
                 {
@@ -1352,7 +1359,7 @@ describe('submissionController', () => {
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
             isDraft: true,
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             status: [
               {
                 type: 'READY_TO_SUBMIT',
@@ -1383,7 +1390,7 @@ describe('submissionController', () => {
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
             isDraft: true,
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             status: [],
           }),
         });
@@ -1434,7 +1441,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               status: [
                 {
                   type: 'READY_TO_SUBMIT',
@@ -1463,7 +1470,7 @@ describe('submissionController', () => {
           ({ createRequestSubmission } = await createSurvey(['string'], {
             meta: createSurveyMeta({
               submissions: 'group',
-              group: createSurveyMetaGroup({ id: group._id.toString(), path: group.path }),
+              group: createSurveyMetaGroup({ id: group._id, path: group.path }),
             }),
           }));
         });
@@ -1525,7 +1532,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               status: [
                 {
                   type: 'READY_TO_SUBMIT',
@@ -1786,7 +1793,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               status: [
                 {
                   type: 'READY_TO_SUBMIT',
@@ -1811,7 +1818,7 @@ describe('submissionController', () => {
             _id: submissionId.toString(),
             meta: createRequestSubmissionMeta({
               isDraft: true,
-              creator: user._id.toString(),
+              creator: memberUser._id.toString(),
               status: [
                 {
                   type: 'READY_TO_SUBMIT',
@@ -1889,20 +1896,20 @@ describe('submissionController', () => {
   describe('updateSubmission', () => {
     const memberToken = 'member-token';
     const adminToken = 'admin-token';
-    let user;
+    let memberUser;
     let adminUser;
     let memberAuthHeaderValue;
     let adminAuthHeaderValue;
     let group;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token: memberToken },
       }));
       ({ user: adminUser } = await group.createAdminMember({
         userOverrides: { token: adminToken },
       }));
-      memberAuthHeaderValue = `${user.email} ${memberToken}`;
+      memberAuthHeaderValue = `${memberUser.email} ${memberToken}`;
       adminAuthHeaderValue = `${adminUser.email} ${adminToken}`;
     });
 
@@ -1911,13 +1918,13 @@ describe('submissionController', () => {
       const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
       await createSubmission({
         _id: submissionId,
-        meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
+        meta: createSubmissionMeta({ isDraft: false, creator: memberUser._id }),
       });
       const requestSubmission = createRequestSubmission({
         _id: submissionId.toString(),
         meta: createRequestSubmissionMeta({
           isDraft: false,
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           dateModified: new Date('2021-01-01').toISOString(),
           status: [
             {
@@ -1948,7 +1955,7 @@ describe('submissionController', () => {
       const submissionId = ObjectId();
       const { createRequestSubmission, createSubmission } = await createSurvey(['string']);
       const submissionMeta = createSubmissionMeta(
-        { creator: user._id, specVersion: 3 },
+        { creator: memberUser._id, specVersion: 3 },
         { omitIsDeletedDraft: true, omitIsDraft: true }
       );
       const { submission: createdSubmission } = await createSubmission({
@@ -1957,7 +1964,7 @@ describe('submissionController', () => {
       });
       const requestSubmissionMeta = createRequestSubmissionMeta(
         {
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           dateModified: new Date('2021-01-01').toISOString(),
           dateSubmitted: createdSubmission.meta.dateSubmitted,
           specVersion: 3,
@@ -1989,7 +1996,7 @@ describe('submissionController', () => {
       const { submission: existingSubmission } = await createSubmission({
         _id: submissionId,
         meta: createSubmissionMeta({
-          creator: user._id,
+          creator: memberUser._id,
           isDraft: false,
           dateModified: new Date('2024-01-01'),
         }),
@@ -1997,7 +2004,7 @@ describe('submissionController', () => {
       const requestSubmission = createRequestSubmission({
         _id: submissionId.toString(),
         meta: createRequestSubmissionMeta({
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           isDraft: true,
           dateModified: new Date('2024-01-02'),
         }),
@@ -2020,7 +2027,7 @@ describe('submissionController', () => {
       const { submission: existingSubmission } = await createSubmission({
         _id: submissionId,
         meta: createSubmissionMeta({
-          creator: user._id,
+          creator: memberUser._id,
           isDraft: true,
           dateModified: new Date('2024-01-01'),
         }),
@@ -2028,7 +2035,7 @@ describe('submissionController', () => {
       const requestSubmission = createRequestSubmission({
         _id: submissionId.toString(),
         meta: createRequestSubmissionMeta({
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           isDraft: false,
           dateModified: new Date('2024-01-02'),
         }),
@@ -2095,7 +2102,7 @@ describe('submissionController', () => {
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
           }),
         });
@@ -2115,13 +2122,13 @@ describe('submissionController', () => {
       it('and the requesting user is the creator, OK', async () => {
         await postSubmission({
           submissionId: submissionId.toString(),
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           authHeaderValue: memberAuthHeaderValue,
         });
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
           }),
         });
@@ -2141,13 +2148,13 @@ describe('submissionController', () => {
       it('and the requesting user is an admin of the submission group, OK', async () => {
         await postSubmission({
           submissionId: submissionId.toString(),
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           authHeaderValue: memberAuthHeaderValue,
         });
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
           }),
         });
@@ -2172,14 +2179,14 @@ describe('submissionController', () => {
           _id: submissionId,
           meta: createSubmissionMeta({
             group: { id: anotherGroup._id, path: anotherGroup.path },
-            creator: user._id,
+            creator: memberUser._id,
           }),
         });
         await db.collection('submissions').insertOne(submissionDoc);
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
             group: { id: anotherGroup._id.toString(), path: anotherGroup.path },
           }),
@@ -2215,7 +2222,7 @@ describe('submissionController', () => {
       it('and the requesting user is not logged in, 401', async () => {
         await postSubmission({
           submissionId: submissionId.toString(),
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           authHeaderValue: memberAuthHeaderValue,
         });
         const requestSubmission = createRequestSubmission({
@@ -2246,7 +2253,7 @@ describe('submissionController', () => {
         const anotherGroupUserAuthHeaderValue = `${anotherGroupUser.email} ${anotherGroupUserToken}`;
         await postSubmission({
           submissionId: submissionId.toString(),
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           authHeaderValue: memberAuthHeaderValue,
         });
         const requestSubmission = createRequestSubmission({
@@ -2298,13 +2305,13 @@ describe('submissionController', () => {
       it('and the requesting user is the creator, OK', async () => {
         await postSubmission({
           submissionId: submissionId.toString(),
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           authHeaderValue: memberAuthHeaderValue,
         });
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
           }),
         });
@@ -2324,13 +2331,13 @@ describe('submissionController', () => {
       it('and the requesting user is an admin of the submission group, OK', async () => {
         await postSubmission({
           submissionId: submissionId.toString(),
-          creator: user._id.toString(),
+          creator: memberUser._id.toString(),
           authHeaderValue: memberAuthHeaderValue,
         });
         const requestSubmission = createRequestSubmission({
           _id: submissionId.toString(),
           meta: createRequestSubmissionMeta({
-            creator: user._id.toString(),
+            creator: memberUser._id.toString(),
             dateModified: new Date('2021-01-02').toISOString(),
           }),
         });
@@ -2713,13 +2720,13 @@ describe('submissionController', () => {
       const token = '1234';
       let authHeaderValue;
       let group;
-      let user;
+      let memberUser;
       beforeEach(async () => {
         group = await createGroup();
-        ({ user } = await group.createUserMember({
+        ({ user: memberUser } = await group.createUserMember({
           userOverrides: { token },
         }));
-        authHeaderValue = `${user.email} ${token}`;
+        authHeaderValue = `${memberUser.email} ${token}`;
       });
 
       it('does not return drafts', async () => {
@@ -2727,11 +2734,11 @@ describe('submissionController', () => {
         const [{ submission }, { submission: draft }] = await Promise.all([
           createSubmission({
             _id: new ObjectId(),
-            meta: createSubmissionMeta({ isDraft: false, creator: user._id }),
+            meta: createSubmissionMeta({ isDraft: false, creator: memberUser._id }),
           }),
           createSubmission({
             _id: new ObjectId(),
-            meta: createSubmissionMeta({ isDraft: true, creator: user._id }),
+            meta: createSubmissionMeta({ isDraft: true, creator: memberUser._id }),
           }),
         ]);
 
@@ -2751,22 +2758,22 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     let createSubmission;
 
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
       ({ createSubmission } = await createSurvey(['instructions', 'string', 'ontology']));
     });
 
     it('should return 409 if the submission is a draft', async () => {
       const { submission } = await createSubmission({
         _id: new ObjectId(),
-        meta: createSubmissionMeta({ creator: user._id, isDraft: true }),
+        meta: createSubmissionMeta({ creator: memberUser._id, isDraft: true }),
       });
 
       await request(testApp)
@@ -2779,7 +2786,7 @@ describe('submissionController', () => {
     it('should return PDF base64 when `base64=1` if success', async () => {
       const { submission } = await createSubmission({
         _id: new ObjectId(),
-        meta: createSubmissionMeta({ creator: user._id }),
+        meta: createSubmissionMeta({ creator: memberUser._id }),
       });
 
       const response = await request(testApp)
@@ -2801,7 +2808,7 @@ describe('submissionController', () => {
     it('should return PDF buffer when `base64=0` if success', async () => {
       const { submission } = await createSubmission({
         _id: new ObjectId(),
-        meta: createSubmissionMeta({ creator: user._id }),
+        meta: createSubmissionMeta({ creator: memberUser._id }),
       });
 
       const response = await request(testApp)
@@ -2871,15 +2878,15 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     let createSubmission;
 
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
       ({ createSubmission } = await createSurvey(['string']));
     });
 
@@ -2907,7 +2914,7 @@ describe('submissionController', () => {
       expect(mailService.sendLink).toHaveBeenCalledWith(
         expect.objectContaining({
           from: 'noreply@surveystack.io',
-          to: user.email,
+          to: memberUser.email,
           subject: 'Survey report - Mock Survey Name',
           link: expect.stringContaining(`/api/submissions/${submission._id}/pdf`),
         })
@@ -2930,13 +2937,13 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
     });
 
     describe('/submissions/:id/archive', () => {
@@ -2947,7 +2954,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: true,
             isDeletedDraft: false,
-            creator: user._id,
+            creator: memberUser._id,
           }),
         });
 
@@ -2973,7 +2980,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: true,
             isDeletedDraft: false,
-            creator: user._id,
+            creator: memberUser._id,
           }),
         });
         const { submission: existingSubmission } = await createSubmission({
@@ -2981,7 +2988,7 @@ describe('submissionController', () => {
           meta: createSubmissionMeta({
             isDraft: false,
             isDeletedDraft: false,
-            creator: user._id,
+            creator: memberUser._id,
           }),
         });
 
@@ -3007,13 +3014,13 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
     });
 
     it('returns 409 if the existing submission is a draft', async () => {
@@ -3023,7 +3030,7 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({
           isDraft: true,
           isDeletedDraft: false,
-          creator: user._id,
+          creator: memberUser._id,
         }),
       });
 
@@ -3049,13 +3056,13 @@ describe('submissionController', () => {
     const token = '1234';
     let authHeaderValue;
     let group;
-    let user;
+    let memberUser;
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
+      ({ user: memberUser } = await group.createUserMember({
         userOverrides: { token },
       }));
-      authHeaderValue = `${user.email} ${token}`;
+      authHeaderValue = `${memberUser.email} ${token}`;
     });
 
     it('returns 409 if any of the existing submissions are drafts', async () => {
@@ -3065,7 +3072,7 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({
           isDraft: true,
           isDeletedDraft: false,
-          creator: user._id,
+          creator: memberUser._id,
         }),
       });
       const { submission: existingSubmission } = await createSubmission({
@@ -3073,7 +3080,7 @@ describe('submissionController', () => {
         meta: createSubmissionMeta({
           isDraft: false,
           isDeletedDraft: false,
-          creator: user._id,
+          creator: memberUser._id,
         }),
       });
 
@@ -3106,33 +3113,45 @@ describe('submissionController', () => {
   });
 
   describe('deleteSubmissions', () => {
-    const token = '1234';
-    let authHeaderValue;
+    const memberToken = 'member-token';
+    const adminToken = 'admin-token';
+    let memberAuthHeaderValue;
+    let adminAuthHeaderValue;
     let group;
-    let user;
+    let memberUser;
+    let adminUser;
     let createSubmission;
+    let postSubmission;
 
     beforeEach(async () => {
       group = await createGroup();
-      ({ user } = await group.createUserMember({
-        userOverrides: { token },
+      ({ user: memberUser } = await group.createUserMember({
+        userOverrides: { token: memberToken },
       }));
-      authHeaderValue = `${user.email} ${token}`;
-      ({ createSubmission } = await createSurvey(['string']));
+      ({ user: adminUser } = await group.createAdminMember({
+        userOverrides: { token: adminToken },
+      }));
+      memberAuthHeaderValue = `${memberUser.email} ${memberToken}`;
+      adminAuthHeaderValue = `${adminUser.email} ${adminToken}`;
+      ({ createSubmission, postSubmission } = await createSurvey(['string'], {
+        meta: createSurveyMeta({
+          group: createSurveyMetaGroup({ id: group._id, path: group.path }),
+        }),
+      }));
     });
 
     describe('DELETE /api/submissions/:id', () => {
       it('returns 409 when the submission is a draft', async () => {
         const { submission } = await createSubmission({
           meta: createSubmissionMeta({
-            creator: user._id,
+            creator: memberUser._id,
             isDraft: true,
           }),
         });
 
         await request(testApp)
           .delete(`/api/submissions/${submission._id}`)
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send()
           .expect(409);
 
@@ -3141,26 +3160,136 @@ describe('submissionController', () => {
           .findOne({ _id: submission._id });
         expect(existingSubmission).not.toBeNull();
       });
+
+      describe('when the submission is in a group that the requesting user is a member of', () => {
+        it('and the requesting user is the creator, OK', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: memberUser._id,
+            authHeaderValue: memberAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toBeNull();
+        });
+
+        it('and the requesting user is an admin of the group, OK', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: memberUser._id,
+            authHeaderValue: memberAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', adminAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toBeNull();
+        });
+
+        it('and the requesting user is not the creator, 401', async () => {
+          const submissionId = new ObjectId();
+          await postSubmission({
+            submissionId: submissionId.toString(),
+            creator: adminUser._id,
+            authHeaderValue: adminAuthHeaderValue,
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(401);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).not.toBeNull();
+        });
+      });
+
+      describe('when the submission is in a group that the requesting user is not a member of', () => {
+        it('and the requesting user is the creator, OK', async () => {
+          const submissionId = new ObjectId();
+          const anotherGroup = await createGroup();
+          await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              creator: memberUser._id,
+              group: { id: anotherGroup._id, path: anotherGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(200);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).toBeNull();
+        });
+
+        it('and the requesting user is not the creator, 401', async () => {
+          const submissionId = new ObjectId();
+          const anotherGroup = await createGroup();
+          await createSubmission({
+            _id: submissionId,
+            meta: createSubmissionMeta({
+              creator: adminUser._id,
+              group: { id: anotherGroup._id, path: anotherGroup.path },
+            }),
+          });
+
+          await request(testApp)
+            .delete(`/api/submissions/${submissionId.toString()}`)
+            .set('Authorization', memberAuthHeaderValue)
+            .send()
+            .expect(401);
+
+          const existingSubmission = await db
+            .collection('submissions')
+            .findOne({ _id: submissionId });
+          expect(existingSubmission).not.toBeNull();
+        });
+      });
     });
 
     describe('DELETE /api/submissions/bulk-delete', () => {
       it('returns 409 when any of the submissions are drafts', async () => {
         const { submission: draft } = await createSubmission({
           meta: createSubmissionMeta({
-            creator: user._id,
+            creator: memberUser._id,
             isDraft: true,
           }),
         });
         const { submission } = await createSubmission({
           meta: createSubmissionMeta({
-            creator: user._id,
+            creator: memberUser._id,
             isDraft: false,
           }),
         });
 
         await request(testApp)
           .post('/api/submissions/bulk-delete')
-          .set('Authorization', authHeaderValue)
+          .set('Authorization', memberAuthHeaderValue)
           .send({ ids: [submission._id, draft._id] })
           .expect(409);
 

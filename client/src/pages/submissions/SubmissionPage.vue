@@ -321,19 +321,6 @@ async function init() {
 
   // If the user is on the group-survey-submissions-new route, initialize a new submission and then redirect to the group-survey-submissions-edit route for that submission
   if (route.name === 'group-survey-submissions-new') {
-    const allowedToSubmit = checkAllowedToSubmit(
-      state.survey,
-      store.getters['auth/isLoggedIn'],
-      store.getters['memberships/groups'],
-      props.submitToGroupId,
-    );
-    if (!allowedToSubmit.allowed) {
-      state.hasError = true;
-      state.errorMessage = allowedToSubmit.message;
-      state.loading = false;
-      return;
-    }
-
     const createSubmissionConfig = {
       survey: state.survey,
       version: state.survey.latestVersion,
@@ -394,20 +381,19 @@ async function init() {
       state.loading = false;
       return;
     }
+  }
 
-    // submission must be loaded before we can check allowed to submit for Edit
-    const allowedToSubmit = checkAllowedToSubmit(
-      state.survey,
-      store.getters['auth/isLoggedIn'],
-      store.getters['memberships/groups'],
-      state.submission.meta.group.id,
-    );
-    if (!allowedToSubmit.allowed) {
-      state.hasError = true;
-      state.errorMessage = allowedToSubmit.message;
-      state.loading = false;
-      return;
-    }
+  const allowedToSubmit = checkAllowedToSubmit(
+    state.survey,
+    store.getters['auth/isLoggedIn'],
+    store.getters['memberships/groups'],
+    props.submitToGroupId ?? state.submission.meta.group.id,
+  );
+  if (!allowedToSubmit.allowed) {
+    state.hasError = true;
+    state.errorMessage = allowedToSubmit.message;
+    state.loading = false;
+    return;
   }
 
   if (isResubmission()) {
