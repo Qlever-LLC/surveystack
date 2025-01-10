@@ -636,7 +636,6 @@ const getSubmissionsCsv = async (req, res) => {
       data,
     };
 
-    // TODO I think this option is not available in the UI
     if (queryParam(req.query.showCsvMeta)) {
       result.meta = entity.meta;
     }
