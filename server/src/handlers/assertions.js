@@ -71,10 +71,7 @@ export const assertHasRightToSubmitSurvey = catchErrors(async (req, res, next) =
   throw boom.unauthorized('You are not authorized to submit to this survey.');
 });
 
-async function hasRightToManageSubmission(requestSubmission, res) {
-  const existingSubmission = await db
-    .collection('submissions')
-    .findOne({ _id: new ObjectId(requestSubmission._id) });
+async function hasRightToManageSubmission(existingSubmission, res) {
   const groupOfExistingSubmission = existingSubmission.meta.group.id;
 
   const hasAdminRoleToExistingGroup = await rolesService.hasAdminRole(
@@ -90,10 +87,17 @@ async function hasRightToManageSubmission(requestSubmission, res) {
 }
 
 export const assertHasRightToManageSubmission = catchErrors(async (req, res, next) => {
-  const submissions = Array.isArray(req.body) ? req.body : [req.body];
+  const existingSubmissions = Array.isArray(res.locals.existing)
+    ? res.locals.existing
+    : [res.locals.existing];
+  if (existingSubmissions.length === 0) {
+    throw boom.internal(
+      'This assertion requires assertEntityExists or assertEntitiesExist to be run before it.'
+    );
+  }
 
   const hasRights = await Promise.all(
-    submissions.map((submission) => hasRightToManageSubmission(submission, res))
+    existingSubmissions.map((submission) => hasRightToManageSubmission(submission, res))
   );
 
   if (hasRights.every((hasRight) => hasRight === true)) {
