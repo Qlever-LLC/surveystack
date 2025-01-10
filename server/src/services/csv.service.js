@@ -332,7 +332,7 @@ function createCsv(submissions, headersAndAdditionalInfos) {
     const dataCsv = papa.unparse(items, { columns: headers });
 
     // Combine the additional rows and the main data into the final CSV
-    csv = `${additionalHeadersCsv}\n${dataCsv}`;
+    csv = `${additionalHeadersCsv}\r\n${dataCsv}`;
   } catch (error) {
     console.log(error);
   }

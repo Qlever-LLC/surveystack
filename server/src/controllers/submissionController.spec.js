@@ -1565,7 +1565,7 @@ describe('submissionController', () => {
         const mockRes = await createRes();
         await getSubmissionsCsv(mockReq, mockRes);
         const expected =
-          ',,,,,,,,,,,,,,,,,,Map 1,Map 1,\n,,,,,,,,,,,,,,,,,,,,\n,,,,,,,,,,,,,,,,,,map_1,map_1,\n,,,,,,,,,,,,,,,,,,,,\n_id,meta.isDraft,meta.isDeletedDraft,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.name,meta.survey.version,meta.revision,meta.archived,meta.permissions,meta.status,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
+          ',,,,,,,,,,,,,,,,,,Map 1,Map 1\r\n,,,,,,,,,,,,,,,,,,,\r\n,,,,,,,,,,,,,,,,,,map_1,map_1\r\n,,,,,,,,,,,,,,,,,,,\r\n_id,meta.isDraft,meta.isDeletedDraft,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.name,meta.survey.version,meta.revision,meta.archived,meta.permissions,meta.status,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
           `${submission._id},` +
           `false,` +
           `false,` +
