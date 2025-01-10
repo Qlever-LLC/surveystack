@@ -300,27 +300,13 @@ function createCsv(submissions, headersAndAdditionalInfos) {
   const headers = headersAndAdditionalInfos.headers;
   const additionalInfos = headersAndAdditionalInfos.additionalInfos;
 
-  let labelRow = '';
-  let hintRow = '';
-  let valueRow = '';
-  let spreadsheetLabelRow = '';
-  let j = 0;
-  for (let i = 0; i < headers.length; i++) {
-    if (headers[i] === additionalInfos[j].headers) {
-      labelRow += additionalInfos[j].label ? additionalInfos[j].label + ',' : ',';
-      hintRow += additionalInfos[j].hint ? additionalInfos[j].hint + ',' : ',';
-      valueRow += additionalInfos[j].value ? additionalInfos[j].value + ',' : ',';
-      spreadsheetLabelRow += additionalInfos[j].spreadsheetLabel
-        ? additionalInfos[j].spreadsheetLabel + ','
-        : ',';
-      j++;
-    } else {
-      labelRow += ',';
-      hintRow += ',';
-      valueRow += ',';
-      spreadsheetLabelRow += ',';
-    }
-  }
+  // Prepare additional rows (labelRow, hintRow, valueRow, spreadsheetLabelRow)
+  const additionalRows = ['label', 'hint', 'value', 'spreadsheetLabel'].map((key) => {
+    return headers.map((header) => {
+      const info = additionalInfos.find((addRow) => addRow.headers === header);
+      return info ? info[key] || '' : '';
+    });
+  });
 
   let items = [];
   submissions.forEach((ss) => {
@@ -339,10 +325,14 @@ function createCsv(submissions, headersAndAdditionalInfos) {
 
   let csv = '';
   try {
-    const responsePart = papa.unparse(items, {
-      columns: headers,
-    });
-    csv = `${labelRow}\n${hintRow}\n${valueRow}\n${spreadsheetLabelRow}\n${responsePart}`;
+    // Generate CSV for additional rows (e.g., labels, hints, values, spreadsheetLabel)
+    const additionalHeadersCsv = papa.unparse(additionalRows, { columns: headers });
+
+    // Generate CSV for submission data
+    const dataCsv = papa.unparse(items, { columns: headers });
+
+    // Combine the additional rows and the main data into the final CSV
+    csv = `${additionalHeadersCsv}\n${dataCsv}`;
   } catch (error) {
     console.log(error);
   }

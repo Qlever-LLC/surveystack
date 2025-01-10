@@ -90,25 +90,7 @@ const getAdditionalExportInfos = (survey, path) => {
 
   searchChildren(children);
 
-  infos.label = escapeCsvDelimiterValue(infos.label);
-  infos.hint = escapeCsvDelimiterValue(infos.hint);
-  infos.value = escapeCsvDelimiterValue(infos.value);
-  infos.spreadsheetLabel = escapeCsvDelimiterValue(infos.spreadsheetLabel);
-
   return infos;
-};
-
-const escapeCsvDelimiterValue = (value) => {
-  if (
-    typeof value === 'string' &&
-    (value.includes(',') || value.includes(';') || value.includes('"'))
-  ) {
-    // Escape double quotes by replacing them with two double quotes
-    value = value.replace(/"/g, '""');
-    // Add double quotes around the value
-    return `"${value}"`;
-  }
-  return value;
 };
 
 // Lists the headers that exist both in the submissions and the selected version of survey.
