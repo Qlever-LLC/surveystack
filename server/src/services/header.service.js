@@ -226,7 +226,6 @@ const getHeaders = async (
   const additionalInfos = [];
   if (options.csvExport) {
     headers.forEach((h) => {
-      console.log('header', h);
       if (
         !(
           h.startsWith('_id') ||
