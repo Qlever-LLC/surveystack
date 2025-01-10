@@ -138,7 +138,9 @@
     <template v-slot:item="{ props, item }">
       <a-list-item v-bind="props" :title="undefined">
         <a-list-item-title v-html="item.raw.label" />
-        <a-list-item-subtitle v-html="item.raw.value.url" />
+        <a-list-item-subtitle>
+          {{ this.getFirstSectionOfFarmURL(item.raw.value.url) }}
+        </a-list-item-subtitle>
       </a-list-item>
     </template>
   </a-select>
@@ -168,18 +170,28 @@
       <matrix-cell-selection-label v-bind="props" :html="item.raw.label" :index="index" :value="value" />
     </template>
     <template v-slot:item="{ props, item, index }">
-      <a-list-item v-bind="props" :title="undefined">
-        <template v-slot:prepend="{ isSelected }">
-          <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
-            <a-checkbox v-if="header.multiple" :modelValue="isSelected" color="focus" hide-details />
-            <a-radio-group v-else :modelValue="isSelected" hide-details>
-              <a-radio :value="true" color="focus" />
+      <a-list-item
+        v-bind="props"
+        :title="undefined"
+        :key="`item_${index}`"
+        :disabled="!header.multiple && item.value.isField"
+        :active="activeFieldBelongsToSelectedPlanting(item, value)">
+        <template v-slot:prepend="{}">
+          <a-list-item-action class="ml-2 mr-2">
+            <a-checkbox
+              v-if="header.multiple"
+              :modelValue="activeFieldBelongsToSelectedPlanting(item, value)"
+              color="focus"
+              :class="{ tabForChild: !item.value.isField }"
+              hide-details />
+            <a-radio-group v-else :modelValue="activeFieldBelongsToSelectedPlanting(item, value)" hide-details>
+              <a-radio :value="true" color="focus" :class="{ tabForChild: !item.value.isField }" />
             </a-radio-group>
           </a-list-item-action>
           <a-list-item-title :class="index > 0 ? 'mt-4' : ''">
             {{ item.raw.label }}
             <a-list-item-subtitle v-if="item.value.isField">
-              {{ item.raw.value.farmName }}
+              {{ this.getFirstSectionOfFarmURL(item.value.farmName) }}
             </a-list-item-subtitle>
           </a-list-item-title>
         </template>
@@ -232,6 +244,7 @@ import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
+import farmosBase from './../FarmOsBase';
 
 export default {
   components: {
@@ -239,6 +252,7 @@ export default {
     appQrScanner,
     MatrixCellSelectionLabel,
   },
+  mixins: [farmosBase],
   props: {
     // TODO imho remove header.autocomplete because we merged v-select and v-autocomplete
     header: {

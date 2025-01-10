@@ -28,16 +28,12 @@ export default {
       const item = this.farms.find((x) => x.value === value);
       return (item && item.label) || value;
     },
-    getLabelForItemValue2(value) {
-      const item = this.farms.find((x) => x.value === value);
-      return (item && item.label) || value;
-    },
     async fetchFarms() {
       this.loading = true;
       try {
         const farms = await this.$store.dispatch('draft/getFarmOsResource', 'farms');
         this.farms = farms.map(({ instanceName }) => ({
-          label: instanceName,
+          label: this.getFirstSectionOfFarmURL(instanceName),
           value: {
             url: instanceName,
           },
@@ -309,6 +305,30 @@ export default {
       }
 
       return `ASSET:${value.farmName}.${value.id}`;
+    },
+    /**
+     * Extracts the farm name from a URL by retrieving the substring before the first dot
+     * @param {string} url - The full URL in the format "farmName.farmosSomething.XX".
+     */
+    getFirstSectionOfFarmURL(url) {
+      // [^.]: Matches any character except a dot
+      return url.match(/^[^.]+/)[0];
+    },
+    /**
+     * return true if the field belongs to the selecteed planting or if the selected planting is the item
+     * @param item an item in the dropdown
+     */
+    activeFieldBelongsToSelectedPlanting(item, modelValue) {
+      if (modelValue === null) {
+        return false;
+      }
+      if (Array.isArray(modelValue)) {
+        return modelValue.some(
+          (planting) => item.value.location.id === planting.location[0].id || planting.hash === item.value.hash
+        );
+      } else {
+        return item.value.location.id === modelValue.location[0].id || modelValue.hash === item.value.hash;
+      }
     },
   },
   computed: {
