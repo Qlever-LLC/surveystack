@@ -336,11 +336,10 @@ async function init() {
         return;
       }
     }
-    if (props.submitTo) {
-      createSubmissionConfig.submitToGroupId = props.submitTo;
+    if (props.submitToGroupId) {
+      createSubmissionConfig.submitToGroupId = props.submitToGroupId;
       const submitToGroup = store.getters['memberships/groups']
-        .find((group) => group._id === props.submitTo);
-      // TODO: ensure this path will be present
+      .find((group) => group._id === props.submitToGroupId);
       if (submitToGroup) {
         createSubmissionConfig.submitToGroupPath = submitToGroup.path;
       }
