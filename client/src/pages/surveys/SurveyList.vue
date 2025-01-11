@@ -190,17 +190,13 @@ const { data: groups } = useQuery({
   queryKey: ['group', groupIds],
   queryFn: async ({ queryKey }) => {
     const ids = queryKey[1];
-
-    // TODO: use allSettled instead of all
-    const res = await Promise.all(ids.map(async (id) => {
-      return api.get(`/groups/${id}`);
-    }));
-    
-    const groups = res.map(async ({ data: group }) => ({
-        id: group._id,
-        name: group.name,
-        path: group.path,
-        color: getGroupColor(await digestMessage(group._id)),
+    const requests = await Promise.allSettled(ids.map((id) => api.get(`/groups/${id}`)));
+    const successfulResponses = requests.filter((r) => r.status === 'fulfilled');
+    const groups = successfulResponses.map(async ({ value: { data: group } }) => ({
+      id: group._id,
+      name: group.name,
+      path: group.path,
+      color: getGroupColor(await digestMessage(group._id)),
     }));
     return await Promise.all(groups);
   },
@@ -226,7 +222,6 @@ const decoratedSurveys = computed(() => {
   }
   return state.surveys.content.map((survey) => {
     const group = groups.value.find((group) => group.id === survey.meta.group.id) ?? survey.meta.group;
-    console.log({ group });
     return {
       ...survey,
       meta: {
