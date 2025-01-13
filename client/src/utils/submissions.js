@@ -228,8 +228,6 @@ export const isGroupMember = (survey, userGroups) => userGroups.some((group) => 
 export const isGroupMemberOfGroupOrDescendant = (survey, userGroups) => userGroups.some((group) => survey.meta.group.path.startsWith(group.path));
 
 export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGroupId) => {
-  // fallback to survey group if submitToGroupId is not provided
-  const submitToGroup = submitToGroupId ?? survey.meta.group.id;
   const { submissions, isLibrary } = survey.meta;
 
   if (isLibrary) {
@@ -258,7 +256,7 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGro
         return { allowed: false, message: 'You must be logged in to submit this survey.' };
       }
       const isMemberOfSubmitToGroup = userGroups.some(
-        (group) => group._id === submitToGroup
+        (group) => group._id === submitToGroupId
       );
       return isGroupMemberOfGroupOrDescendant(survey, userGroups)
         && isMemberOfSubmitToGroup
