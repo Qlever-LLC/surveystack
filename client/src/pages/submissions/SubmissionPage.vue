@@ -386,7 +386,7 @@ async function init() {
     state.survey,
     store.getters['auth/isLoggedIn'],
     store.getters['memberships/groups'],
-    props.submitToGroupId ?? state.submission.meta.group.id,
+    state.submission.meta.group.id,
   );
   if (!allowedToSubmit.allowed) {
     state.hasError = true;

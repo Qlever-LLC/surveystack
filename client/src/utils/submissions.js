@@ -225,7 +225,7 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
 }
 
 export const isGroupMember = (survey, userGroups) => userGroups.some((group) => group._id === survey.meta.group.id);
-export const isGroupMemberOfGroupOrDescendant = (survey, userGroups) => userGroups.some((group) => survey.meta.group.path.startsWith(group.path));
+export const isGroupMemberOfGroupOrDescendant = (survey, userGroups) => userGroups.some((group) => group.path.startsWith(survey.meta.group.path));;
 
 export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGroupId) => {
   const { submissions, isLibrary } = survey.meta;
