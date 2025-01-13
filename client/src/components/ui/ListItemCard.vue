@@ -24,12 +24,14 @@
               </a-icon>
             </span>
             <span v-if="groupStyle">
-              <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
+              <a-avatar class="mr-3 entityAvatar_deepCSS" :color="state.groupColor ?? 'accent-lighten-2'" rounded="lg" size="35">
                 {{ state.avatarName }}
               </a-avatar>
             </span>
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
+              <slot name="afterName" :entity="entity" />
+              &nbsp;{{ groupId }}
               <br />
               <span v-if="showGroupPath" style="color: gray">
                 {{ state.entity.path }}
@@ -75,7 +77,7 @@
 
 <script setup>
 import { cloneDeep } from 'lodash';
-import { reactive, onMounted, computed } from 'vue';
+import { reactive, onMounted, computed, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useStore } from 'vuex';
@@ -83,6 +85,9 @@ import { useStore } from 'vuex';
 import { useSurvey, resolveRenderFunctionResult } from '@/components/survey/survey';
 import { useGroup } from '@/components/groups/group';
 import { useIsSurveyPinned } from '@/queries';
+import { digestMessage } from '@/utils/hash';
+import getGroupColor from '@/utils/groupColor';
+import getAvatarName from '@/utils/avatarName';
 
 const store = useStore();
 const router = useRouter();
@@ -151,6 +156,7 @@ const state = reactive({
   favorite: [],
   menuIsOpen: [],
   groupStyle: {},
+  groupColor: null,
   avatarName: '',
   ableTogglePinned: props.enableTogglePinned,
   pinnedSurveys: false,
@@ -169,17 +175,8 @@ onMounted(async () => {
       marginLeft: `${treeHierarchy * defaultIndentation}px`,
     };
 
-    const name = props.entity.name;
-    const names = name.split(' ');
-    if (names.length === 1) {
-      state.avatarName = name.slice(0, 2).toUpperCase();
-    } else if (names.length >= 2) {
-      const premiereLettrePremierMot = names[0].charAt(0).toUpperCase();
-      const premiereLettreDeuxiemeMot = names[1].charAt(0).toUpperCase();
-      state.avatarName = premiereLettrePremierMot + premiereLettreDeuxiemeMot;
-    } else {
-      state.avatarName = '';
-    }
+    state.avatarName = getAvatarName(props.entity.name)
+    state.groupColor = getGroupColor(await digestMessage(props.entity._id));
   }
 });
 
