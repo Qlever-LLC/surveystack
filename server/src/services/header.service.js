@@ -73,7 +73,7 @@ const getAdditionalExportInfos = (survey, path) => {
 
             if (parts.includes(value)) {
               infos.value = value;
-              infos.spreadsheetLabel = ch.model ? ch.model.spreadsheetLabel : ch.spreadsheetLabel;
+              infos.spreadsheetLabel = ch.model ? ch.model.label : ch.label;
             }
           });
         } else if (checkType(el) === 'group' || checkType(el) === 'page') {
