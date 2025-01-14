@@ -13,8 +13,8 @@
       @submit="submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
-      :isDraft="submission.meta.isDraft" />
-
+      :isDraft="submission.meta.isDraft" 
+    />
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
       :groupPath="groupPath"
@@ -24,7 +24,9 @@
       :questionNumber="questionNumber"
       :showNavigationControl="!builder && !$route.query.minimal_ui"
       :surveyName="!builder ? survey.name : undefined"
-      @showOverviewClicked="overviewClicked">
+      @showOverviewClicked="overviewClicked"
+      :handleClose="handleClose"
+    >
       <!-- forward all the slots -->
       <template v-for="(_, name) in $slots" v-slot:[name]="{ props }">
         <slot :name="name" :props="props" />
@@ -148,6 +150,7 @@ export default {
     persist: { type: Boolean },
     builder: { type: Boolean, default: false },
     forceMobile: { type: Boolean, default: false },
+    handleClose: { type: Function },
   },
   data() {
     return {

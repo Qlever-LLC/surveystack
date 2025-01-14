@@ -8,7 +8,9 @@
       :survey="state.survey"
       :submission="state.submission"
       :persist="!isResubmission() && !isProxySubmission()"
-      @submit="submit" />
+      @submit="submit"
+      :handleClose="handleClose"
+    />
     <div v-else-if="state.loading && !state.hasError" class="d-flex align-center justify-center" style="height: 100%">
       <a-progress-circular :size="50" />
     </div>
@@ -68,7 +70,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, toRaw, watch } from 'vue';
+import { reactive, ref, toRaw, watch, computed } from 'vue';
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -125,7 +127,7 @@ const route = useRoute();
 const store = useStore();
 const confirmLeaveDialogRef = ref();
 const queryClient = useQueryClient();
-const { isGroupVisitor, getActiveGroupId } = useGroup();
+const { isGroupVisitor } = useGroup();
 const { forceDesktopFullscreen } = useNavigation();
 const { rightToManageSubmission } = getPermission();
 
@@ -150,11 +152,11 @@ const resetComponentState = () => {
   resetResults();
 };
 
-const resultDialogTo = window.history.state.back ?? {
+const resultDialogTo = computed(() => window.history.state.back ?? {
   name: 'group-surveys',
-  params: { id: props.id },
+  params: { id: state.submission?.meta?.group?.id },
   query: { minimal_ui: route.query.minimal_ui },
-}
+});
 
 watch(
   [() => props.submissionId, () => props.routeAction],
@@ -183,6 +185,29 @@ const handleLeave = (next) => (isLeaving) => {
   }
   next(isLeaving);
 };
+
+const handleClose = () => {
+  if (route.name === 'group-survey-submissions-new') {
+    router.push({
+      name: 'group-surveys',
+      params: { id: props.submitToGroupId ?? props.id },
+      query: { minimal_ui: route.query.minimal_ui },
+    });
+    return;
+  }
+  if (route.name === 'group-survey-submissions-edit') {
+    const submissionGroupId = state.submission?.meta?.group?.id;
+    const submissionGroupSurveysPage = {
+      name: 'group-surveys',
+      params: { id: submissionGroupId },
+      query: { minimal_ui: route.query.minimal_ui },
+    };
+    
+    router.push(submissionGroupId ? submissionGroupSurveysPage : '/');
+    return;
+  }
+}
+
 onBeforeRouteUpdate((to, from, next) => {
   if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
     confirmLeaveDialogRef.value.open(handleLeave(next));
@@ -386,7 +411,7 @@ async function init() {
     state.survey,
     store.getters['auth/isLoggedIn'],
     store.getters['memberships/groups'],
-    state.submission.meta.group.id,
+    state.submission.meta.group.id
   );
   if (!allowedToSubmit.allowed) {
     state.hasError = true;
