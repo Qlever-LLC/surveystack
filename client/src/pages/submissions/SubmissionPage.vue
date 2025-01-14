@@ -52,11 +52,7 @@
       :items="resultItems"
       title="Survey Result"
       persistent
-      :to="{
-        name: 'group-surveys',
-        params: { id },
-        query: { minimal_ui: route.query.minimal_ui },
-      }"
+      :to="resultDialogTo"
       :survey="state.survey"
       :submission="state.submission"
       @close="onCloseResultDialog" />
@@ -153,6 +149,12 @@ const resetComponentState = () => {
   Object.assign(state, initialState);
   resetResults();
 };
+
+const resultDialogTo = window.history.state.back ?? {
+  name: 'group-surveys',
+  params: { id: props.id },
+  query: { minimal_ui: route.query.minimal_ui },
+}
 
 watch(
   [() => props.submissionId, () => props.routeAction],
@@ -338,12 +340,10 @@ async function init() {
     }
     if (props.submitToGroupId) {
       createSubmissionConfig.submitToGroupId = props.submitToGroupId;
-      const submitToGroup = store.getters['memberships/groups']
-      .find((group) => group._id === props.submitToGroupId);
+      const submitToGroup = store.getters['memberships/groups'].find((group) => group._id === props.submitToGroupId);
       if (submitToGroup) {
         createSubmissionConfig.submitToGroupPath = submitToGroup.path;
       }
-    
     }
     state.submission = createSubmissionFromSurvey(createSubmissionConfig);
     await router.replace({
