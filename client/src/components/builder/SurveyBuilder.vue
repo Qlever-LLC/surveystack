@@ -31,7 +31,7 @@
 
     <splitpanes class="pane-root bg-white" vertical>
       <pane class="pane pane-survey">
-        <div class="pane-fixed-wrapper pr-2">
+        <div class="pane-fixed-wrapper pr-2" style="display: block !important">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
