@@ -188,22 +188,25 @@ const handleLeave = (next) => (isLeaving) => {
 
 const handleClose = () => {
   if (route.name === 'group-survey-submissions-new') {
-    router.push({
+    const returnTo = window.history.state.back ?? {
       name: 'group-surveys',
       params: { id: props.submitToGroupId ?? props.id },
       query: { minimal_ui: route.query.minimal_ui },
-    });
+    }
+    router.replace(returnTo);
     return;
   }
   if (route.name === 'group-survey-submissions-edit') {
     const submissionGroupId = state.submission?.meta?.group?.id;
-    const submissionGroupSurveysPage = {
-      name: 'group-surveys',
-      params: { id: submissionGroupId },
-      query: { minimal_ui: route.query.minimal_ui },
-    };
-    
-    router.push(submissionGroupId ? submissionGroupSurveysPage : '/');
+    const defaultReturnTo = submissionGroupId
+      ? {
+          name: 'group-surveys',
+          params: { id: submissionGroupId },
+          query: { minimal_ui: route.query.minimal_ui },
+        }
+      : '/';
+    const returnTo = window.history.state.back ?? defaultReturnTo;
+    router.replace(returnTo);
     return;
   }
 }
