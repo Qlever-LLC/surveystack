@@ -286,6 +286,8 @@ function startHandler(ev) {
   state.drag = true;
 }
 function endHandler() {
+  emit('control-selected', null);
+
   state.drag = false;
   state.pageInPageHintIsVisible = false;
 }
