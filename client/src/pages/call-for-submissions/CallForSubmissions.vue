@@ -47,7 +47,7 @@
       <div class="d-flex justify-end align-center mt-3">
         <span v-if="!submittable" class="mr-2">Select at least one member below</span>
         <a-btn variant="text" @click="closeDialog">Cancel</a-btn>
-        <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send...</a-btn>
+        <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send</a-btn>
       </div>
     </template>
     <template v-slot:more>
