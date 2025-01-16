@@ -175,7 +175,8 @@
         :title="undefined"
         :key="`item_${index}`"
         :disabled="!header.multiple && item.value.isField"
-        :active="activeFieldBelongsToSelectedPlanting(item, value)">
+        :active="activeFieldBelongsToSelectedPlanting(item, value)"
+        style="opacity: 1 !important">
         <template v-slot:prepend="{}">
           <a-list-item-action class="ml-2 mr-2">
             <a-checkbox

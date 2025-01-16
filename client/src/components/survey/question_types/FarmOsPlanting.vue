@@ -38,7 +38,8 @@
         :title="undefined"
         :key="`item_${index}`"
         :disabled="!control.options.hasMultipleSelections && item.value.isField"
-        :active="activeFieldBelongsToSelectedPlanting(item, getValue)">
+        :active="activeFieldBelongsToSelectedPlanting(item, getValue)"
+        style="opacity: 1 !important">
         <template v-slot:prepend="{}">
           <a-list-item-action class="ml-2 mr-2">
             <a-checkbox
@@ -151,9 +152,5 @@ export default {
 <style scoped lang="scss">
 .chip-no-wrap {
   white-space: nowrap;
-}
-
-.v-list-item--disabled {
-  opacity: 1;
 }
 </style>
