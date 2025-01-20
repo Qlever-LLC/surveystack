@@ -296,7 +296,18 @@ function expandCells(flatSubmissions) {
     .flat();
 }
 
-function createCsv(submissions, headers) {
+function createCsv(submissions, headersAndAdditionalInfos) {
+  const headers = headersAndAdditionalInfos.headers;
+  const additionalInfos = headersAndAdditionalInfos.additionalInfos;
+
+  // Prepare additional rows (labelRow, hintRow, valueRow, spreadsheetLabelRow)
+  const additionalRows = ['label', 'hint', 'value', 'spreadsheetLabel'].map((key) => {
+    return headers.map((header) => {
+      const info = additionalInfos.find((addRow) => addRow.headers === header);
+      return info ? info[key] || '' : '';
+    });
+  });
+
   let items = [];
   submissions.forEach((ss) => {
     const submission = _.cloneDeep(ss);
@@ -314,9 +325,14 @@ function createCsv(submissions, headers) {
 
   let csv = '';
   try {
-    csv = papa.unparse(items, {
-      columns: headers,
-    });
+    // Generate CSV for additional rows (e.g., labels, hints, values, spreadsheetLabel)
+    const additionalHeadersCsv = papa.unparse(additionalRows, { columns: headers });
+
+    // Generate CSV for submission data
+    const dataCsv = papa.unparse(items, { columns: headers });
+
+    // Combine the additional rows and the main data into the final CSV
+    csv = `${additionalHeadersCsv}\r\n${dataCsv}`;
   } catch (error) {
     console.log(error);
   }
