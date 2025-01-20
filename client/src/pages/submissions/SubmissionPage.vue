@@ -37,7 +37,7 @@
       v-model="state.showResubmissionDialog"
       maxWidth="50rem"
       labelConfirm="Edit anyway"
-      @cancel="abortEditSubmitted"
+      @cancel="handleClose"
       @confirm="(reason) => (state.submission.meta.archivedReason = reason)"
       reason="RESUBMIT"
       persistent>
@@ -240,10 +240,6 @@ function isResubmission() {
 
 function isProxySubmission() {
   return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
-}
-
-function abortEditSubmitted() {
-  router.push(`/groups/${props.id}/my-submissions`);
 }
 
 function addReadyToSubmit(status) {
