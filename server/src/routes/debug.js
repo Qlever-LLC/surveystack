@@ -130,7 +130,7 @@ router.get('/roles/check', async (req, res) => {
 router.get('/headers/get', async (req, res) => {
   console.log('/headers/get ...');
 
-  const headers = await headerService.getHeaders(req.query.id);
+  const { headers } = await headerService.getHeaders(req.query.id);
 
   return res.send(headers);
 });

@@ -34,12 +34,71 @@ function arrayMax(arr) {
   return max;
 }
 
+const getControlsBasedOnSurveyVersions = (revisions, version) => {
+  const { controls } = revisions.find((r) => r.version === version) ?? {
+    controls: [],
+  };
+  const tree = new TreeModel();
+  const root = tree.parse({ name: 'data', children: controls });
+  return root;
+};
+
+// for a given path to a question in this survey, returns infos object
+const getAdditionalExportInfos = (survey, path) => {
+  const parts = path.split('.');
+  const infos = {
+    label: undefined,
+    hint: undefined,
+    value: undefined,
+    spreadsheetLabel: undefined,
+  };
+  let children = survey.children;
+
+  const checkName = (block) => (block.model ? block.model.name : block.name);
+  const checkType = (block) => (block.model ? block.model.type : block.type);
+
+  const getLabel = (block) => (block.model ? block.model.label : block.label);
+  const getHint = (block) => (block.model ? block.model.hint : block.hint);
+
+  const searchChildren = (children) => {
+    for (const el of children) {
+      if (parts.includes(checkName(el))) {
+        if (checkType(el) === 'matrix') {
+          infos.label = getLabel(el);
+          infos.hint = getHint(el);
+
+          let child = el.model ? el.model.options.source.content : el.options.source.content;
+          child.forEach((ch) => {
+            const value = ch.model ? ch.model.value : ch.value;
+
+            if (parts.includes(value)) {
+              infos.value = value;
+              infos.spreadsheetLabel = ch.model ? ch.model.label : ch.label;
+            }
+          });
+        } else if (checkType(el) === 'group' || checkType(el) === 'page') {
+          const children = el.model ? el.model.children : el.children;
+          return searchChildren(children);
+        } else {
+          infos.label = getLabel(el);
+          infos.hint = getHint(el);
+          infos.value = el.model ? el.model.name : el.name;
+        }
+      }
+    }
+  };
+
+  searchChildren(children);
+
+  return infos;
+};
+
 // Lists the headers that exist both in the submissions and the selected version of survey.
 // It tries to select the latest survey version used by the submission. If that fails it uses the latest survey version.
 const getHeaders = async (
   surveyId,
   entities,
-  options = { excludeDataMeta: false, splitValueFieldFromQuestions: false }
+  options = { excludeDataMeta: false, splitValueFieldFromQuestions: false, csvExport: false }
 ) => {
   if (!surveyId) {
     return [];
@@ -91,9 +150,19 @@ const getHeaders = async (
 
   let mergedObject = { _id: null };
 
+  const headersVersion = [];
+
   entities.forEach((entity) => {
     stringifyObjectIds(entity);
     mergedObject = { ...mergedObject, ...flatten(entity) };
+    delete mergedObject.version;
+    if (options.csvExport) {
+      Object.keys(mergedObject).forEach((param) => {
+        if (!headersVersion[param] || headersVersion[param] < entity.version) {
+          headersVersion[param] = entity.version;
+        }
+      });
+    }
   });
 
   const submissionHeaders = Object.keys(mergedObject);
@@ -136,7 +205,23 @@ const getHeaders = async (
     return headersWithoutDataMeta;
   }
 
-  return headers;
+  const additionalInfos = [];
+  if (options.csvExport) {
+    headers.forEach((h) => {
+      if (
+        !(
+          h.startsWith('_id') ||
+          (h.startsWith('data') && (h.includes('.meta.') || h.endsWith('.meta')))
+        )
+      ) {
+        const localRoot = getControlsBasedOnSurveyVersions(survey.revisions, headersVersion[h]);
+        const result = getAdditionalExportInfos(localRoot, h);
+        additionalInfos.push({ headers: h, ...result });
+      }
+    });
+  }
+
+  return { headers, additionalInfos };
 };
 
 export default {
