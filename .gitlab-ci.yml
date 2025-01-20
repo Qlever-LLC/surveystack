@@ -177,8 +177,8 @@ deploy to stage:
     name: staging
     url: http://18.206.205.172:3000
   when: manual
-  #only:
-    # - master
+  only:
+    - master
   image: docker:19.03.12
   services:
     - docker:19.03.12-dind
