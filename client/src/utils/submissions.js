@@ -6,63 +6,7 @@ import * as constants from '@/constants';
 import api from '@/services/api.service';
 import { AuthService } from '@/services/storage.service';
 import { get } from 'lodash';
-
-function* processPositions(data, position = []) {
-  if (!data) {
-    return;
-  }
-
-  for (let i = 0; i < data.length; i++) {
-    const val = data[i];
-    yield [...position, i];
-
-    if (val.children) {
-      yield* processPositions(val.children, [...position, i]);
-    }
-  }
-}
-
-const getControlPositions = (controls) => {
-  const it = processPositions(controls);
-  let res = it.next();
-  const positions = [];
-  while (!res.done) {
-    positions.push(res.value);
-    res = it.next();
-  }
-
-  return positions;
-};
-
-const getFlatName = (controls, position) => {
-  let flatName = '';
-  let control;
-  let currentControls = controls;
-  position.forEach((i) => {
-    control = currentControls[i];
-    currentControls = control.children;
-    flatName += `.${control.name}`;
-  });
-
-  return flatName.substring(1);
-};
-
-const getControl = (controls, position) => {
-  let control;
-  let currentControls = controls;
-  position.forEach((i) => {
-    control = currentControls[i];
-    currentControls = control.children;
-  });
-
-  if (control.type !== 'group' && control.type !== 'page') {
-    if (control.value === undefined) {
-      control.value = null;
-    }
-  }
-
-  return control;
-};
+import { getControlPositions, getControl, getFlatName } from './surveys';
 
 const getBreadcrumbsForSubmission = (controls, position) => {
   let currentControls = controls;
@@ -304,10 +248,6 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
     */
 
   switch (submissions) {
-    case 'user':
-      return isLoggedIn
-        ? { allowed: true }
-        : { allowed: false, message: 'You must be logged in to submit this survey.' };
     case 'group': {
       if (!isLoggedIn) {
         return { allowed: false, message: 'You must be logged in to submit this survey.' };

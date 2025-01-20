@@ -1,10 +1,11 @@
 export const GROUP_PATH_DELIMITER = '/';
-export const SPEC_VERSION_SURVEY = 4;
+export const SPEC_VERSION_SURVEY = 11;
 export const SPEC_VERSION_SUBMISSION = 4;
 export const SPEC_VERSION_SCRIPT = 2;
 export const SPEC_VERSION_GROUP = 2;
 export const ASELECT_MAX_ITEMS_TOBE_VSELECT = 15;
 export const ARCHIVE_REASONS = ['TEST_DATA', 'INCORRECT_DATA', 'EQUIPMENT_ERROR', 'USER_ERROR', 'RESUBMIT', 'OTHER'];
+export const PLOTLY_CDN_URL = 'https://cdn.plot.ly/plotly-2.18.2.min.js';
 export const DEFAULT_SCRIPT = `
 /**
  * Process

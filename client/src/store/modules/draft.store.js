@@ -1,10 +1,10 @@
 import TreeModel from 'tree-model';
-
+import { get, debounce } from 'lodash';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
-import { get } from 'lodash';
 import api from '@/services/api.service';
+import queryClient from '../../queryClient';
 
 const getPath = (node) =>
   node
@@ -89,6 +89,41 @@ const getters = {
   path: (state) => (state.node ? getPath(state.node).replace('[', '.').replace(']', '') : null),
   nodeByControl: (state) => (controlId) => state.root.first(({ model }) => model.id === controlId),
   atStart: (state) => state.node === state.firstNode,
+  lastLocalElement: (state) => {
+    /*
+    aim: return last relevant question
+    struct: page:{group:{q1, q2}}
+    return page.group.q2 if q2 is relevant
+    */
+    let currentNode = state.node;
+
+    // Recursive function to find the last child that is relevant
+    const findLastRelevantChild = (node) => {
+      let relevantNode = node;
+
+      while (relevantNode?.hasChildren()) {
+        const relevantChildren = relevantNode.children.filter((child) =>
+          surveyStackUtils.getRelevance(state.submission, getPath(child), true)
+        );
+
+        if (relevantChildren.length === 0) {
+          break; // No relevant children found, stop here
+        }
+
+        relevantNode = relevantChildren[relevantChildren.length - 1]; // Take the last relevant child
+      }
+
+      return relevantNode;
+    };
+
+    // Find the last relevant child
+    const lastRelevantChild = findLastRelevantChild(currentNode);
+
+    if (lastRelevantChild) {
+      return getPath(lastRelevantChild).replace('[', '.').replace(']', '');
+    }
+    return '';
+  },
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
   questionNumber: (state) => {
@@ -156,6 +191,15 @@ const getters = {
   errors: (state) => state.errors,
 };
 
+const debouncedPersistSubmission = debounce(async (submission) => {
+  try {
+    await db.persistSubmission(submission);
+    queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
+  } catch (err) {
+    console.warn(err);
+  }
+}, 1000);
+
 const actions = {
   reset({ commit }) {
     commit('RESET');
@@ -169,11 +213,7 @@ const actions = {
   async setProperty({ commit, dispatch, state }, { path, value, calculate = true, initialize = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
-      try {
-        await db.persistSubmission(state.submission);
-      } catch (err) {
-        console.warn('unable to persist submission to IDB');
-      }
+      debouncedPersistSubmission(state.submission);
     }
     if (calculate) {
       await dispatch('calculateRelevance');

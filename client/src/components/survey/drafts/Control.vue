@@ -76,12 +76,10 @@ export default {
 </script>
 
 <script setup>
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
-import { useQueryClient } from '@tanstack/vue-query';
 
 const store = useStore();
-const queryClient = useQueryClient();
 
 const props = defineProps({
   path: {
@@ -108,10 +106,6 @@ const props = defineProps({
   },
 });
 
-const state = reactive({
-  once: false,
-});
-
 const className = computed(() => {
   return {
     'mx-0 px-0': true,
@@ -132,29 +126,27 @@ const value = computed(() => {
   return property ? property.value : null;
 });
 
-function setProperty(value) {
+async function setProperty(value) {
   const path = `${props.path}.value`;
   // adjust modified date of the control
   const modified = new Date().toISOString();
-  store.dispatch('draft/setProperty', {
-    path: `${props.path}.meta.dateModified`,
-    value: modified,
-    calculate: false,
-    initialize: false,
-  });
-  // adjust modified date of the submission
-  store.dispatch('draft/setProperty', {
-    path: 'meta.dateModified',
-    value: modified,
-    calculate: false,
-    initialize: false,
-  });
-  // adjust value
-  store.dispatch('draft/setProperty', { path, value });
-  if (!state.once) {
-    state.once = true;
-    queryClient.invalidateQueries({ queryKey: ['localDrafts'] });
-  }
+  await Promise.all([
+    store.dispatch('draft/setProperty', {
+      path: `${props.path}.meta.dateModified`,
+      value: modified,
+      calculate: false,
+      initialize: false,
+    }),
+    // adjust modified date of the submission
+    store.dispatch('draft/setProperty', {
+      path: 'meta.dateModified',
+      value: modified,
+      calculate: false,
+      initialize: false,
+    }),
+    // adjust value
+    store.dispatch('draft/setProperty', { path, value }),
+  ]);
 }
 function setStatus({ type, message }) {
   store.dispatch('draft/setProperty', { path: `${props.path}.meta.status`, value: type });

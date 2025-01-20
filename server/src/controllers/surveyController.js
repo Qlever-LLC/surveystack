@@ -765,25 +765,74 @@ const getPinned = async (req, res) => {
   const memberships = await db
     .collection('memberships')
     .find({ user: new ObjectId(userId) })
-    .project({ group: 1 })
+    .project({ group: 1, role: 1 })
     .toArray();
 
-  const groupIds = _.uniq(memberships.map((m) => m.group)).map((g) => new ObjectId(g));
+  // If the user has the "user" role/membership with the group, the group's _id must be in the list of groupIds.
+  // If the user has the "admin" role/membership with the group, the group's 'path' must contain the path of one of the groups where the user holds an admin membership. Because an admin registered in a groupA is automatically admin in all subgroups of groupA without documents for each memberships in the DB .
 
-  const query = {
-    _id: { $in: groupIds },
-  };
-  if (req.query.getOnlyNonArchive === 'true') {
-    query['meta.archived'] = false;
+  // query creation
+  const userQuery = {};
+  const adminQuery = {};
+  const userGroupIds = _.uniq(
+    memberships.filter((m) => m.role === 'user').map((m) => new ObjectId(m.group))
+  );
+
+  if (userGroupIds.length > 0) {
+    userQuery['_id'] = { $in: userGroupIds };
+    if (req.query.getOnlyNonArchive === 'true') {
+      userQuery['meta.archived'] = false;
+    }
   }
 
-  const groupsPinned = await db
-    .collection('groups')
-    .find(query)
-    .project({ name: 1, 'surveys.pinned': 1 })
-    .toArray();
+  const adminGroupIds = memberships
+    .filter((m) => m.role === 'admin')
+    .map((m) => new ObjectId(m.group));
 
-  const r = groupsPinned.map((g) => {
+  if (adminGroupIds.length > 0) {
+    const adminGroups = await db
+      .collection('groups')
+      .find({ _id: { $in: adminGroupIds } })
+      .project({ path: 1 }) // On récupère juste les paths
+      .toArray();
+
+    const adminPaths = adminGroups.map((g) => g.path);
+
+    if (adminPaths.length > 0) {
+      adminQuery['$or'] = adminQuery['$or'] || [];
+      adminQuery['$or'].push({
+        path: { $in: adminPaths.map((p) => new RegExp(`^${p}`)) },
+      });
+      if (req.query.getOnlyNonArchive === 'true') {
+        adminQuery['meta.archived'] = false;
+      }
+    }
+  }
+
+  let combinedQuery = undefined;
+
+  if (userGroupIds.length > 0 && adminGroupIds.length > 0) {
+    combinedQuery = { $or: [userQuery, adminQuery] };
+  } else if (userGroupIds.length > 0) {
+    combinedQuery = userQuery;
+  } else if (adminGroupIds.length > 0) {
+    combinedQuery = adminQuery;
+  }
+
+  // DB request
+  let groupsPinned;
+  if (combinedQuery) {
+    groupsPinned = await db
+      .collection('groups')
+      .find(combinedQuery)
+      .project({ name: 1, 'surveys.pinned': 1 })
+      .toArray();
+  } else {
+    groupsPinned = [];
+  }
+
+  // process the response to extract pinned surveys in the appropriate structure
+  const pinnedSurveys = groupsPinned.map((g) => {
     if (!g.surveys || !g.surveys.pinned) {
       return [];
     }
@@ -791,7 +840,13 @@ const getPinned = async (req, res) => {
     return { group_id: g._id, group_name: g.name, pinned: g.surveys.pinned };
   });
 
-  pinned.push(...r);
+  const uniquePinnedSurveys = Object.values(
+    pinnedSurveys.reduce((acc, survey) => {
+      acc[survey.group_id] = survey;
+      return acc;
+    }, {})
+  );
+  pinned.push(...uniquePinnedSurveys);
 
   // console.log('pinned', pinned);
 
