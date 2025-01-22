@@ -4,7 +4,6 @@
 
 import { cloneDeep, set } from 'lodash';
 import { SPEC_VERSION_SURVEY } from '@/constants';
-import supplySandbox from './supplySandbox';
 import ObjectID from 'bson-objectid';
 import { flatSurveyControls } from '@/utils/surveyDiff';
 
@@ -362,6 +361,8 @@ export const uuidv4 = () => {
 
 export async function executeCodeInIframe({ code, fname, submission, survey, parent, log }) {
   console.log('execute code in iframe');
+  const baseURL = window.location.origin;
+  const sandboxUtilsSource = await (await fetch(`${baseURL}/sandboxUtils.js`)).text();
 
   return new Promise((resolve, reject) => {
     // Create a sandboxed iframe
@@ -371,7 +372,9 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
 
     // Script to inject into the iframe, using srcdoc
     const scriptContent = `
-      <script>
+      <script type="module">
+        ${sandboxUtilsSource}
+
         (async function() {
         const logBuffer = [];
           try {
