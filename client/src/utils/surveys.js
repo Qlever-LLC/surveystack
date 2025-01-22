@@ -420,7 +420,7 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
         const { logs, result, error, done } = event.data;
 
         if (logs) {
-          logs.forEach((logMessage) => log(logMessage));
+          logs.forEach(log);
         }
 
         if (done || error) {
