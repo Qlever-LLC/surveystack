@@ -359,7 +359,8 @@ export const uuidv4 = () => {
   return u;
 };
 
-export async function executeCodeInIframe({ code, fname, submission, survey, parent, log }) {
+
+export async function executeCodeInIframe({ code, fname, submission, survey, parent, log = () => {} }) {
   console.log('execute code in iframe');
   const baseURL = window.location.origin;
   const sandboxUtilsSource = await (await fetch(`${baseURL}/sandboxUtils.js`)).text();
@@ -370,28 +371,31 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
     iframe.style.display = 'none';
     iframe.sandbox = 'allow-scripts';
 
+
     // Script to inject into the iframe, using srcdoc
     const scriptContent = `
       <script type="module">
         ${sandboxUtilsSource}
 
         (async function() {
-        const logBuffer = [];
           try {
             console.log('Script inside the iframe executed');
-            const log = (...args) => logBuffer.push(args.join(' '));
+            const log = (...args) => {
+              console.log(...args);
+              window.parent.postMessage({ logs: args }, '*')
+            };
 
             // Injected user code
             ${code}
 
             // Call the user-provided function with parameters
             const result = await ${fname}(${JSON.stringify(submission)}, ${JSON.stringify(survey)}, ${JSON.stringify(parent)});
-
-            // Send the result to the parent window
-            window.parent.postMessage({ logs: logBuffer, result }, '*');
           } catch (error) {
             console.error('Error in iframe', error);
-            window.parent.postMessage({ logs: logBuffer, error: error.message }, '*');
+            window.parent.postMessage({ error: error.message }, '*');
+          } finally {
+            // Clean up the iframe after use
+            window.parent.postMessage({ done: true }, '*');
           }
         })();
       </script>
@@ -410,20 +414,20 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; connect-src ${window.location.origin}/; img-src 'none'; child-src 'none'; object-src 'none';">
     <body>${scriptContent}</body>
     </html>`;
-    document.body.appendChild(iframe);
 
-    // Listen for the iframe's response via postMessage
-    window.addEventListener('message', function listener(event) {
+    function listener(event) {
       if (event.source === iframe.contentWindow) {
-        // Remove listener after receiving message
-        window.removeEventListener('message', listener);
-        // Clean up the iframe after use
-        document.body.removeChild(iframe);
-
-        const { logs, result, error } = event.data;
+        const { logs, result, error, done } = event.data;
 
         if (logs) {
           logs.forEach((logMessage) => log(logMessage));
+        }
+
+        if (done || error) {
+          // Remove listener after receiving message
+          window.removeEventListener('message', listener);
+          // Clean up the iframe after use
+          document.body.removeChild(iframe);
         }
 
         if (error) {
@@ -432,7 +436,10 @@ export async function executeCodeInIframe({ code, fname, submission, survey, par
           resolve(result);
         }
       }
-    });
+    }
+    // Listen for the iframe's response via postMessage
+    window.addEventListener('message', listener);
+    document.body.appendChild(iframe);
   });
 }
 
