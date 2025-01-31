@@ -8,7 +8,8 @@
       labelConfirm="Close"
       :hideCancel="true"
       v-model="showAndroidInstallDialog"
-      v-bind="dialogProps"
+      :attach="dialogAttach"
+      :hide-overlay="dialogHideOverlay"
       @cancel="showAndroidInstallDialog = false"
       @confirm="showAndroidInstallDialog = false">
       <template v-slot:title>Installing Android App</template>
@@ -111,6 +112,13 @@ export default {
       const parentPath = getParentPath(this.$.vnode.key);
       const parentData = get(this.submission, parentPath);
       return parentData;
+    },
+    dialogAttach() {
+      const dom = document.querySelector('#previewSurvey');
+      return dom ? '#previewSurvey' : undefined;
+    },
+    dialogHideOverlay() {
+      return Boolean(this.dialogAttach);
     },
   },
   data() {

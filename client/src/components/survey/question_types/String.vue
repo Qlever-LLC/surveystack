@@ -5,7 +5,7 @@
       :value="control.label"
       :redacted="redacted"
       :required="required"
-      :initializable="control.options.initialize && control.options.initialize.enabled && value"
+      :initializable="control.options.initialize && control.options.initialize.enabled && modelValue"
       :is-modified="meta && !!meta.dateModified"
       @initialize="initialize" />
     <div style="display: flex">
