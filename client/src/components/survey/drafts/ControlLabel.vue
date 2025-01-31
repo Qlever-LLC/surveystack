@@ -8,8 +8,8 @@
       @initialize="$emit('initialize')"
       :highlight="isModified"
       :tooltip="initializeTooltip" />
-    <app-redacted v-if="redacted" bottom />
-    <app-required v-if="required" bottom />
+    <app-redacted v-if="redacted" />
+    <app-required v-if="required" />
   </div>
 </template>
 
