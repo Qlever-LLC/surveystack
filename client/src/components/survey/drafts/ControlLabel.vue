@@ -1,6 +1,8 @@
 <template>
   <div class="d-flex align-center control-label-wrapper" :class="className">
     <div class="control-label text-wrap" v-if="value">{{ value }}</div>
+    <app-redacted v-if="redacted" />
+    <app-required v-if="required" />
     <a-spacer />
     <initialize-button
       v-if="initializable"
@@ -8,8 +10,6 @@
       @initialize="$emit('initialize')"
       :highlight="isModified"
       :tooltip="initializeTooltip" />
-    <app-redacted v-if="redacted" />
-    <app-required v-if="required" />
   </div>
 </template>
 

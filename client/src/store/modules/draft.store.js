@@ -337,7 +337,7 @@ const actions = {
           }
           return false;
         });
-
+ 
       if (hasIrrelevantParents) {
         continue;
       }

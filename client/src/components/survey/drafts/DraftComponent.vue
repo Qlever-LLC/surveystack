@@ -4,7 +4,6 @@
     <a-progress-circular :size="50" />
   </div>
   <div class="draft-component-wrapper bg-background rounded" :class="{ builder }" v-else-if="control" ref="wrapper">
-    <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-if="showConfirmSubmission"
       v-model="showConfirmSubmission"
@@ -15,7 +14,6 @@
       :dateSubmitted="submission.meta.dateSubmitted"
       :isDraft="submission.meta.isDraft" />
 
-    <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
       :groupPath="groupPath"
       :required="control && control.options && control.options.required"
@@ -31,7 +29,6 @@
       </template>
     </app-draft-toolbar>
 
-    <!-- Overview -->
     <div v-if="showOverview" class="draft-overview">
       <app-draft-overview
         v-if="showOverview"
@@ -43,33 +40,60 @@
         class="maxw-60 mx-auto" />
     </div>
 
-    <!-- Content with questions -->
-    <div class="draft-content" v-else>
-      <a-fab-transition>
-        <a-btn
-          v-show="overflowing"
-          color="primary"
-          fab
-          small
-          position="fixed"
-          style="bottom: 76px; right: 12px; z-index: 150"
-          @click="
-            scrollY(500);
-            overflowing = false;
-          ">
-          <a-icon>mdi-arrow-down</a-icon>
-        </a-btn>
-      </a-fab-transition>
-      <app-control
-        class="pb-1"
-        :path="path"
-        :control="control"
-        :forceMobile="forceMobile"
-        :isInBuilder="builder" />
-    </div>
+    <v-form
+      v-else
+      class="d-flex flex-column h-100"
+      @submit="submit"
+      validate-on="invalid-input"
+    >
+      <div class="draft-content">
+        <a-fab-transition>
+          <a-btn
+            v-show="overflowing"
+            color="primary"
+            fab
+            small
+            position="fixed"
+            style="bottom: 76px; right: 12px; z-index: 150"
+            @click="
+              scrollY(500);
+              overflowing = false;
+            ">
+            <a-icon>mdi-arrow-down</a-icon>
+          </a-btn>
+        </a-fab-transition>
+        <app-control
+          class="pb-1"
+          :path="path"
+          :control="control"
+          :forceMobile="forceMobile"
+          :isInBuilder="builder"
+        />
+      </div>
+      <footer class="draft-footer d-flex align-center">
+        <div class="w-100 maxw-60 mx-auto">
+          <a-btn
+            v-if="!$store.getters['draft/atStart']"
+            @click="prev"
+            outlined
+            variant="outlined"
+            large
+            color="primary"
+            class="w-50"
+          >Previous</a-btn>
+          <a-btn
+            type="submit"
+            variant="flat"
+            large
+            color="primary"
+            class="w-50"
+          >
+          {{ atEnd ? 'Submit' : 'Next' }}
+          </a-btn>
+        </div>
+      </footer>
 
-    <!-- Footer with next/prev buttons -->
-    <app-draft-footer
+    <!-- <app-draft-footer
       class="draft-footer px-0 bg-background"
       :class="{ 'show-submit': showOverview }"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
@@ -77,10 +101,10 @@
       :enableSubmit="!$store.getters['draft/errors']"
       :showSubmitWithoutReview="!survey.meta?.reviewPage && atEnd && !$store.getters['draft/hasRequiredUnanswered']"
       :showReviewPage="showOverview"
-      :showNav="true"
       @next="next"
       @prev="prev"
-      @submit="submit" />
+      @submit="submit" /> -->
+    </v-form>
   </div>
   <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
     <a-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
@@ -187,7 +211,7 @@ export default {
         this.$store.dispatch('draft/showConfirmSubmission', v);
       },
     },
-    curentLastLocalElement() {
+    currentLastLocalElement() {
       return this.$store.getters['draft/lastLocalElement'];
     },
     pathOfLastDraftElement() {
@@ -211,7 +235,7 @@ export default {
       return draftStructure[draftStructure.length - 1];
     },
     atEnd() {
-      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
+      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.currentLastLocalElement) {
         // We are on the last question
         return true;
       } else {
@@ -264,19 +288,33 @@ export default {
       this.$store.dispatch('draft/goto', path);
       this.showOverview = false;
     },
-    submit() {
-      // if group is not yet set, select the group defined by the url path
-      if (!this.submission.meta.group.id) {
-        const currentGroupId = this.$route.params.id;
-        const allGroups = this.$store.getters['memberships/groups'];
-        const currentGroup = allGroups.find(({ _id }) => _id === currentGroupId);
-        if (currentGroup) {
-          this.submission.meta.group.id = currentGroup._id;
-          this.submission.meta.group.path = currentGroup.path;
+    async submit(event, somethingElse) {
+      event.preventDefault();
+      event.stopPropagation();
+      const isValid = (await event).valid;
+      console.log({ isValid, event, somethingElse });
+      console.log('in submit()');
+      if (this.atEnd) {
+        if (isValid) {
+          this.showConfirmSubmission = true;
+        }
+      } else {
+        if (isValid) {
+          this.next();
         }
       }
+      // if group is not yet set, select the group defined by the url path
+      // if (!this.submission.meta.group.id) {
+      //   const currentGroupId = this.$route.params.id;
+      //   const allGroups = this.$store.getters['memberships/groups'];
+      //   const currentGroup = allGroups.find(({ _id }) => _id === currentGroupId);
+      //   if (currentGroup) {
+      //     this.submission.meta.group.id = currentGroup._id;
+      //     this.submission.meta.group.path = currentGroup.path;
+      //   }
+      // }
 
-      this.showConfirmSubmission = true;
+      // this.showConfirmSubmission = true;
     },
     async submitConfirmed() {
       this.$emit('submit', {
@@ -396,13 +434,6 @@ export default {
   height: 68px;
   width: 100%;
   position: sticky;
-  bottom: 16px;
-}
-
-@media (max-width: 1280px) {
-  .draft-footer {
-    width: calc(100% - 12px);
-    bottom: 12px;
-  }
+  bottom: 0;
 }
 </style>

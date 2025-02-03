@@ -12,6 +12,10 @@
       <div style="flex: 1">
         <a-textarea
           v-if="control.options?.longText"
+          :rules="[
+            val => required ? !!val || 'Required' : true,
+            val => val !== 'pass' ? 'Must be the string pass' : true,
+          ]"
           rows="1"
           autoGrow
           variant="outlined"
@@ -19,13 +23,16 @@
           :modelValue="modelValue"
           @update:modelValue="onInput($event, false)"
           class="full-width"
+          hint="Required"
+          :persistent-hint="true"
           :disabled="!relevant"
-          hide-details
+          hide-details="auto"
           color="focus"
           clearable />
         <a-text-field
           v-else
           variant="outlined"
+          :rules="[val => required ? !!val || 'Required' : true]"
           :label="control.hint"
           :modelValue="modelValue"
           @update:modelValue="onInput"
@@ -84,8 +91,6 @@ export default {
         return true;
       }
       return false;
-      // could we use this instead?
-      // this.$nextTick(() => this.$refs.textField.focus());
     },
   },
   mounted() {

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 import { clearAllSubmissions, clearAllResources } from '../src/store/db';
@@ -20,7 +21,21 @@ global.structuredClone = structuredClone;
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
-// eslint-disable-next-line no-undef
+// https://github.com/jsdom/jsdom/issues/3522
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // Deprecated
+    removeListener: jest.fn(), // Deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 afterEach(async () => {
   await Promise.all([clearAllSubmissions(), clearAllResources()]);
 });
