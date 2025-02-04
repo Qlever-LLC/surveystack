@@ -70,8 +70,8 @@
           :isInBuilder="builder"
         />
       </div>
-      <footer class="draft-footer d-flex align-center">
-        <div class="w-100 maxw-60 mx-auto">
+      <footer class="draft-footer bg-background d-flex align-center">
+        <div class="w-100 maxw-60 mx-auto d-flex justify-end">
           <a-btn
             v-if="!$store.getters['draft/atStart']"
             @click="prev"
@@ -79,6 +79,7 @@
             variant="outlined"
             large
             color="primary"
+            rounded="xs"
             class="w-50"
           >Previous</a-btn>
           <a-btn
@@ -86,7 +87,8 @@
             variant="flat"
             large
             color="primary"
-            class="w-50"
+            rounded="xs"
+            class="w-50 ml-2"
           >
           {{ atEnd ? 'Submit' : 'Next' }}
           </a-btn>
