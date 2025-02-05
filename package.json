@@ -32,5 +32,6 @@
     "server:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run lint-all --no-prefix --stream",
     "client:scaffold-partner": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run scaffold-partner --no-prefix --stream",
     "client:chromatic": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run chromatic --no-prefix --stream"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
