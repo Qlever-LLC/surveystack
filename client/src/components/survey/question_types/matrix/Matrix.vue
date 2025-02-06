@@ -2,7 +2,8 @@
   <div>
     <app-dialog
       v-model="showConfirmDeletionDialog"
-      v-bind="dialogProps"
+      :attach="dialogAttach"
+      :hide-overlay="dialogHideOverlay"
       v-if="rowToBeDeleted >= 0"
       @confirm="remove(rowToBeDeleted)"
       @cancel="rowToBeDeleted = -1"
@@ -14,7 +15,8 @@
 
     <app-dialog
       v-model="showConfirmInitializeDialog"
-      v-bind="dialogProps"
+      :attach="dialogAttach"
+      :hide-overlay="dialogHideOverlay"
       @confirm="
         showConfirmInitializeDialog = false;
         initialize();
@@ -201,6 +203,13 @@ export default {
     },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };
+    },
+    dialogAttach() {
+      const dom = document.querySelector('#previewSurvey');
+      return dom ? '#previewSurvey' : undefined;
+    },
+    dialogHideOverlay() {
+      return Boolean(this.dialogAttach);
     },
   },
   methods: {

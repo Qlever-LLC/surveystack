@@ -91,7 +91,7 @@ import {
   QuestionComponentProps,
   useQuestionComponent,
 } from '@/components/survey/question_types/questionComponent';
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, watch } from 'vue';
 
 const MAP_STYLES = [
   'mapbox://styles/mapbox/satellite-v9',

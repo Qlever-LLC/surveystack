@@ -3,7 +3,6 @@ import _Date from './Date.vue';
 import FarmOsFarm from './FarmOsFarm.vue';
 import FarmOsField from './FarmOsField.vue';
 import FarmOsPlanting from './FarmOsPlanting.vue';
-import Group from './Group.vue';
 import Instructions from './Instructions.vue';
 import Matrix from './matrix/Matrix.vue';
 import MatrixCell from './matrix/MatrixCell.vue';
@@ -35,8 +34,6 @@ export default function addQuestionTypesComponents(app) {
   app.component('AppControlFarmOsPlanting', FarmOsPlanting);
 
   app.component('AppControlGeoJSON', GeoJSON);
-
-  app.component('AppControlGroup', Group);
 
   app.component('AppControlInstructions', Instructions);
 

@@ -19,7 +19,8 @@
     :readonly="readonly"
     :rows="rows"
     :rules="rules"
-    :variant="variant" />
+    :variant="variant"
+  />
 </template>
 
 <script setup>

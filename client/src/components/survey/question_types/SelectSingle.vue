@@ -95,17 +95,6 @@ export default {
     },
 
     handleCustomSelectionInput() {
-      // set submission question value if the current question value doesn't match one of the entries in `control.options.source`
-      // TODO: did the previous removal of this block break any functionality?
-      /*
-      if (
-        this.control.options.source
-        && Array.isArray(this.control.options.source)
-        && this.valueIsCustom
-      ) {
-        this.changed(this.getValueOrNull(value));
-      }
-      */
       this.changed(getNextValue(this.customSelection, false));
     },
 

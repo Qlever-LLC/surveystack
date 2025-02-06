@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip v-if="tooltip" max-width="400" transition="slide-x-transition" right>
+  <a-tooltip v-if="tooltip" max-width="400" transition="fade-transition" right>
     <template v-slot:activator="{ props }">
       <v-icon
         :color="color"
@@ -20,7 +20,8 @@
     :start="left"
     :end="right"
     :size="size ? size : xSmall ? 'x-small' : small ? 'small' : large ? 'large' : xLarge ? 'x-large' : 'default'"
-    v-bind="$attrs">
+    v-bind="$attrs"
+  >
     <slot />
   </v-icon>
 </template>
@@ -44,5 +45,3 @@ export default {
   },
 };
 </script>
-
-<style scoped lang="scss"></style>

@@ -1,5 +1,5 @@
 <template>
-  <footer v-if="showNav" class="d-flex align-center">
+  <footer class="d-flex align-center">
     <div class="full maxw-60 mx-auto">
       <div v-if="showReviewPage" class="d-flex flex-row">
         <div class="half px-1">
@@ -57,7 +57,7 @@
 
 <script>
 export default {
-  props: ['showPrev', 'enableNext', 'enableSubmit', 'showSubmitWithoutReview', 'showReviewPage', 'showNav'],
+  props: ['showPrev', 'enableNext', 'enableSubmit', 'showSubmitWithoutReview', 'showReviewPage'],
 };
 </script>
 <style scoped lang="scss">
