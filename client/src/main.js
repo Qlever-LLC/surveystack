@@ -7,7 +7,6 @@ import router from './router';
 import store from './store';
 import { vuetify } from './plugins/vuetify';
 import { startToggle } from './plugins/toggle';
-import { startSentry } from './plugins/sentry';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
@@ -29,8 +28,6 @@ app.use(VueQueryPlugin, { queryClient });
 
 
 startToggle(store);
-
-startSentry(app, store, router);
 
 addQuestionTypesComponents(app);
 app.component('app-control-label', appControlLabel);
