@@ -42,7 +42,6 @@ After a toggle has been enabled for a while and the feature seems to be stable w
  1. Remove the toggle conditions from the app. Since we always have to use the toggle name when reading its state, searching for it should return every usage of the toggle.
  2. Deploy a new version of the app.
  3. After you are sure that most of the clients are updated to the new version, remove the feature flag from the GitLab dashboard.
-    - You can use sentry.io to check how many of the users are updated to the new version.
     - Probably a good practice to mark the date of removal on the GitLab dashboard, in the feature flag description. 
 
 ## Local development
