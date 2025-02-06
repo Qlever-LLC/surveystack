@@ -47,21 +47,6 @@
       validate-on="invalid-input"
     >
       <div class="draft-content">
-        <a-fab-transition>
-          <a-btn
-            v-show="overflowing"
-            color="primary"
-            fab
-            small
-            position="fixed"
-            style="bottom: 76px; right: 12px; z-index: 150"
-            @click="
-              scrollY(500);
-              overflowing = false;
-            ">
-            <a-icon>mdi-arrow-down</a-icon>
-          </a-btn>
-        </a-fab-transition>
         <app-control
           class="pb-1"
           :path="path"
@@ -175,11 +160,6 @@ export default {
     builder: { type: Boolean, default: false },
     forceMobile: { type: Boolean, default: false },
   },
-  data() {
-    return {
-      overflowing: false,
-    };
-  },
   computed: {
     path() {
       return this.$store.getters['draft/path'];
@@ -244,27 +224,6 @@ export default {
         return false;
       }
     }
-  },
-  watch: {
-    path() {
-      const vm = this;
-      vm.overflowing = false;
-      setTimeout(() => {
-        const previewDom = document.querySelector('#previewSurvey');
-        const el = previewDom || document.body;
-        const { clientHeight, scrollHeight } = el;
-        if (scrollHeight - 100 > clientHeight) {
-          vm.overflowing = true;
-        } else {
-          vm.overflowing = false;
-        }
-      }, 500);
-    },
-    overflowing(val, oldVal) {
-      if (val && !oldVal) {
-        this.scrollTop();
-      }
-    },
   },
   methods: {
     overviewClicked() {
@@ -340,14 +299,6 @@ export default {
     },
     isOverflown({ clientWidth, clientHeight, scrollWidth, scrollHeight }) {
       return scrollHeight > clientHeight || scrollWidth > clientWidth;
-    },
-    scrollY(val) {
-      const previewDom = document.querySelector('#previewSurvey');
-      if (previewDom) {
-        previewDom.scrollBy({ top: val, left: 0, behavior: 'smooth' });
-      } else {
-        window.scrollBy({ top: val, left: 0, behavior: 'smooth' });
-      }
     },
   },
   created() {
