@@ -56,7 +56,7 @@
         />
       </div>
       <footer class="draft-footer bg-background d-flex align-center">
-        <div class="w-100 maxw-60 mx-auto d-flex justify-end">
+        <div class="w-100 maxw-60 mx-auto d-flex justify-end ga-2">
           <a-btn
             v-if="!$store.getters['draft/atStart']"
             @click="prev"
@@ -65,17 +65,20 @@
             large
             color="primary"
             rounded="xs"
-            class="w-50"
-          >Previous</a-btn>
+            class="flex-grow-1 w-max-half"
+          >
+            Previous
+          </a-btn>
           <a-btn
             type="submit"
             variant="flat"
             large
             color="primary"
             rounded="xs"
-            class="w-50 ml-2"
+            class="flex-grow-1 w-max-half"
+            :class="{ 'draft-submit-button': atEnd }"
           >
-          {{ atEnd ? 'Submit' : 'Next' }}
+            {{ atEnd ? 'Submit' : 'Next' }}
           </a-btn>
         </div>
       </footer>
@@ -309,49 +312,50 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.draft-component-wrapper.builder >>> .draft-footer.show-submit .full {
-  position: relative;
-}
-
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after {
-  background-color: gray;
+.draft-component-wrapper.builder .draft-footer .draft-submit-button::after {
+  background-color: #444;
   position: absolute;
-  content: "Builder responses not visible in 'Results'.  Check 'archived' to view.";
-  white-space: pre-wrap;
+  content: "Builder responses are submitted as Archived";
+  white-space: nowrap;
   padding: 8px;
-  border-radius: 5px;
   text-transform: none;
   font-weight: normal;
   text-align: center;
   letter-spacing: 0;
-  top: -65px;
-  width: 100%;
+  top: -58px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
   color: white;
   font-size: 14px;
   opacity: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
+.draft-component-wrapper.builder .draft-footer .draft-submit-button::before {
   position: absolute;
   content: '';
   text-transform: none;
-  top: -10px;
-  left: 111px;
+  top: -15px;
+  left: 50%;
   opacity: 0;
   width: 0;
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 10px solid gray;
+  border-top: 10px solid #444;
 }
 
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after,
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
+.draft-component-wrapper.builder .draft-footer .draft-submit-button::after,
+.draft-component-wrapper.builder .draft-footer .draft-submit-button::before {
   transition: opacity 0.25s;
 }
 
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary:hover::after,
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary:hover::before {
+.draft-component-wrapper.builder .draft-footer .draft-submit-button:hover::after,
+.draft-component-wrapper.builder .draft-footer .draft-submit-button:hover::before {
   opacity: 1;
 }
 
@@ -388,5 +392,9 @@ export default {
   width: 100%;
   position: sticky;
   bottom: 0;
+}
+
+.w-max-half {
+  max-width: 50%;
 }
 </style>
