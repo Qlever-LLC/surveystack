@@ -253,19 +253,19 @@ const actions = {
         }
       }
 
-      const hasIrrelevantParents = nextNode
+      const hasIrrelevantAncestors = nextNode
         .getPath()
         .slice(1)
         .slice(0, -1)
-        .some((parent) => {
-          const parentPath = getPath(parent);
-          if (!get(state.submission, `${parentPath}.meta.relevant`, true)) {
+        .some((ancestor) => {
+          const ancestorPath = getPath(ancestor);
+          if (!get(state.submission, `${ancestorPath}.meta.relevant`, true)) {
             return true;
           }
           return false;
         });
 
-      if (hasIrrelevantParents) {
+      if (hasIrrelevantAncestors) {
         continue;
       }
 
@@ -378,6 +378,7 @@ const actions = {
   showConfirmSubmission({ commit }, show) {
     commit('SHOW_CONFIRM_SUBMISSION', show);
   },
+  // skip page if it is empty or all questions are irrelevant
   async isSkipPage(commit, index, traversal, state) {
     let i = index + 1;
     let skipPage = true;
