@@ -35,7 +35,9 @@
     <template v-slot:item="{ props, item }">
       <a-list-item v-bind="props" :title="undefined">
         <a-list-item-title v-html="item.raw.label" />
-        <a-list-item-subtitle v-html="item.raw.value.url" />
+        <a-list-item-subtitle>
+          {{ this.getFirstSectionOfFarmURL(item.raw.value.url) }}
+        </a-list-item-subtitle>
       </a-list-item>
     </template>
   </a-select>

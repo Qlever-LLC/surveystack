@@ -161,6 +161,10 @@ body {
   padding: 16px !important;
 }
 
+.tabForChild {
+  margin-left: 32px;
+}
+
 @media (max-width: 1280px) {
   .basicListContainer {
     padding: 8px !important;

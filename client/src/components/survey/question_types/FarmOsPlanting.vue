@@ -37,22 +37,25 @@
         v-bind="props"
         :title="undefined"
         :key="`item_${index}`"
-        :disabled="!control.options.hasMultipleSelections && item.value.isField">
-        <template v-slot:prepend="{ isSelected }">
-          <a-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
+        :disabled="!control.options.hasMultipleSelections && item.value.isField"
+        :active="activeFieldBelongsToSelectedPlanting(item, getValue)"
+        style="opacity: 1 !important">
+        <template v-slot:prepend="{}">
+          <a-list-item-action class="ml-2 mr-2">
             <a-checkbox
               v-if="control.options.hasMultipleSelections"
-              :modelValue="isSelected"
+              :modelValue="activeFieldBelongsToSelectedPlanting(item, getValue)"
               color="focus"
+              :class="{ tabForChild: !item.value.isField }"
               hide-details />
-            <a-radio-group v-else :modelValue="isSelected" hide-details>
-              <a-radio :value="true" color="focus" />
+            <a-radio-group v-else :modelValue="activeFieldBelongsToSelectedPlanting(item, getValue)" hide-details>
+              <a-radio :value="true" color="focus" :class="{ tabForChild: !item.value.isField }" />
             </a-radio-group>
           </a-list-item-action>
           <a-list-item-title>
             {{ item.raw.label }}
             <a-list-item-subtitle v-if="item.value.isField">
-              {{ item.value.farmName }}
+              {{ this.getFirstSectionOfFarmURL(item.value.farmName) }}
             </a-list-item-subtitle>
           </a-list-item-title>
         </template>
@@ -149,9 +152,5 @@ export default {
 <style scoped lang="scss">
 .chip-no-wrap {
   white-space: nowrap;
-}
-
-.v-list-item--disabled {
-  opacity: 1;
 }
 </style>

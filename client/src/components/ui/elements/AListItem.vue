@@ -1,5 +1,6 @@
 <template>
   <v-list-item
+    :active="active"
     :append-icon="appendIcon"
     :color="color"
     :density="dense ? 'compact' : 'default'"
@@ -33,6 +34,7 @@
 <script>
 export default {
   props: {
+    active: { type: Boolean, required: false },
     appendIcon: { type: String, required: false },
     color: { type: String, required: false },
     dense: { type: Boolean, required: false },
