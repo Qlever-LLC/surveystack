@@ -5,6 +5,16 @@ import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtil
 import { createRow } from '@/components/survey/question_types/matrix/matrixUtils';
 import { defaultControlOptions, availableControls } from '@/utils/surveyConfig';
 
+const executeCodeInIframe_initResult = 'foo bar';
+jest.mock('@/utils/surveys', () => ({
+  ...jest.requireActual('@/utils/surveys'), // Keep the real implementations for the rest
+  executeCodeInIframe: jest.fn().mockImplementation(() => {
+    // must be mocked because window.addEventListener receives no message
+    // Implements the desired behavior here
+    return executeCodeInIframe_initResult;
+  }),
+}));
+
 const { actions, mutations, getters } = draftStore;
 
 // marker control ID's to setup the initial state
@@ -131,7 +141,7 @@ describe('draft store', () => {
           options: {
             initialize: {
               enabled: true,
-              code: "function initialize(submission, survey, parent) {return 'foo bar';}",
+              code: `function initialize(submission, survey, parent) {return ${executeCodeInIframe_initResult};}`,
             },
           },
         });
