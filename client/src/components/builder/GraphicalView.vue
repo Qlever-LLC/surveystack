@@ -286,6 +286,8 @@ function startHandler(ev) {
   state.drag = true;
 }
 function endHandler() {
+  emit('control-selected', null);
+
   state.drag = false;
   state.pageInPageHintIsVisible = false;
 }
@@ -373,6 +375,12 @@ function isQuestionSet(control) {
   text-align: left;
   cursor: grab;
   line-height: 1.125rem;
+  flex-grow: 1;
+  cursor: default;
+}
+
+.draggable > * {
+  cursor: grab;
 }
 
 .control-item:first-child {
