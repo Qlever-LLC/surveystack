@@ -25,7 +25,6 @@ import {
   assertIdsMatch,
   assertNameNotEmpty,
   assertEntityRights,
-  assertSubmissionRights,
   assertEntitiesExist,
   assertEntitiesRights,
   assertHasIds,
@@ -33,6 +32,8 @@ import {
   checkFeatureToggledOn,
   assertIsAtLeastOnceOwner,
   assertIsOwnerOfInstance,
+  assertHasRightToSubmitSurvey,
+  assertHasRightToManageSubmission,
 } from '../handlers/assertions';
 import { catchErrors } from '../handlers/errorHandlers';
 import { handleDelegates } from '../handlers/headerHandlers';
@@ -85,12 +86,20 @@ router.get('/submissions/page', catchErrors(submissionController.getSubmissionsP
 router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCsv));
 router.post(
   '/submissions/:id/archive',
-  [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
+  [
+    assertAuthenticated,
+    assertEntityExists({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.archiveSubmissions)
 );
 router.post(
   '/submissions/bulk-archive',
-  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  [
+    assertHasIds,
+    assertEntitiesExist({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.archiveSubmissions)
 );
 router.post(
@@ -125,7 +134,7 @@ router.get(
 router.post('/submissions/pdf', catchErrors(submissionController.postSubmissionPdf));
 router.post(
   '/submissions',
-  [catchErrors(submissionMigration), assertSubmissionRights],
+  [catchErrors(submissionMigration), assertHasRightToSubmitSurvey],
   catchErrors(handleDelegates(submissionController.createSubmission))
 );
 router.put(
@@ -135,19 +144,27 @@ router.put(
     assertAuthenticated,
     assertIdsMatch,
     assertEntityExists({ collection: 'submissions' }),
-    assertSubmissionRights,
-    assertEntityRights,
+    assertHasRightToManageSubmission,
+    assertHasRightToSubmitSurvey,
   ],
   catchErrors(submissionController.updateSubmission)
 );
 router.delete(
   '/submissions/:id',
-  [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
+  [
+    assertAuthenticated,
+    assertEntityExists({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.deleteSubmissions)
 );
 router.post(
   '/submissions/bulk-delete',
-  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  [
+    assertHasIds,
+    assertEntitiesExist({ collection: 'submissions' }),
+    assertHasRightToManageSubmission,
+  ],
   catchErrors(submissionController.deleteSubmissions)
 );
 router.post('/submissions/sync-draft', [assertAuthenticated], catchErrors(syncDraft));

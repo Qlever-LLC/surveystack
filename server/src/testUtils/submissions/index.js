@@ -1,6 +1,8 @@
+import request from 'supertest';
 import getSubmissionDataGenerator from './dataGenerators';
 const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../../db');
+import { testApp } from '../testApp';
 
 const createSubmissionMeta =
   (
@@ -13,6 +15,7 @@ const createSubmissionMeta =
       archived = false,
       archivedReason = undefined,
       status = [],
+      group,
     } = {},
     { omitIsDraft = false, omitIsDeletedDraft = false } = {}
   ) =>
@@ -33,7 +36,7 @@ const createSubmissionMeta =
       ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
       status,
-      group: survey.meta.group,
+      group: group ?? survey.meta.group,
       specVersion,
       creator,
       permanentResults: [],
@@ -52,6 +55,7 @@ const createRequestSubmissionMeta =
       archived = false,
       archivedReason = undefined,
       status = [],
+      group,
     } = {},
     { omitIsDraft = false, omitIsDeletedDraft = false } = {}
   ) =>
@@ -72,7 +76,7 @@ const createRequestSubmissionMeta =
       ...(archivedReason === undefined ? {} : { archivedReason }),
       permissions: [],
       status,
-      group: {
+      group: group ?? {
         id: survey.meta.group.id.toString(),
         path: survey.meta.group.path,
       },
@@ -131,6 +135,41 @@ const createSubmissionWith =
     };
   };
 
+const createPostSubmission =
+  (createRequestSubmission) =>
+  ({ creator = null, authHeaderValue, group, submissionId } = {}) => {
+    const requestSubmission = createRequestSubmission({
+      _id: submissionId ?? ObjectId().toString(),
+      meta: createRequestSubmissionMeta({
+        isDraft: true,
+        creator,
+        status: [
+          {
+            type: 'READY_TO_SUBMIT',
+            value: { at: new Date('2021-01-01').toISOString() },
+          },
+        ],
+        group,
+      }),
+    });
+
+    return request(testApp)
+      .post('/api/submissions')
+      .set({
+        ...(authHeaderValue ? { Authorization: authHeaderValue } : {}),
+      })
+      .send(requestSubmission)
+      .then((response) => {
+        if (response.status === 503) {
+          throw new Error(
+            'You must mock handleApiCompose to use this function. See submissionController.spec.js for an example.'
+          );
+        }
+        expect(response.status).toBe(200);
+        return response;
+      });
+  };
+
 export {
   createRequestSubmissionMeta,
   createSubmissionMeta,
@@ -139,4 +178,5 @@ export {
   createSubmissionDocFor,
   createSubmissionWith,
   getSubmissionDataGenerator,
+  createPostSubmission,
 };

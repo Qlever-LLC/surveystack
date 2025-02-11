@@ -19,7 +19,7 @@
       :entities="state.networkOk ? decoratedSurveys : surveys.content"
       showPinned
       :enableTogglePinned="rightToTogglePin().allowed && !state.showArchived"
-      :buttonNew="rightToEdit().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
+      :buttonNew="rightToCreateSurvey().allowed ? { title: 'Create new Survey', link: { name: 'group-surveys-new' } } : {}"
       :menu="surveyMenu"
       :loading="state.loading"
       :show-navigation-control="!$route.query.minimal_ui"
@@ -38,7 +38,7 @@
       </template>
       <template v-slot:preMenu="{ entity }">
         <a-chip
-          v-if="isADraft(entity)"
+          v-if="!isPublished(entity)"
           x-small
           class="mr-2 py-0 px-1"
           color="blue"
@@ -95,13 +95,13 @@ const onlineStatus = inject('onlineStatus');
 
 const router = useRouter();
 const { getActiveGroupId, isGroupAdmin } = useGroup();
-const { rightToEdit, rightToTogglePin } = getPermission();
+const { rightToCreateSurvey, rightToTogglePin } = getPermission();
 const PAGINATION_LIMIT = 10;
-const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isADraft } = useSurvey();
+const { stateComposable, getMenu, getSurveys, togglePinSurvey, message, isPublished } = useSurvey();
 
 const queryClient = useQueryClient();
 
-const { data: data } = useGetPinnedSurveysForGroup(getActiveGroupId());
+const { data } = useGetPinnedSurveysForGroup(getActiveGroupId());
 
 const state = reactive({
   page: 1,
@@ -236,8 +236,10 @@ function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;
   if (selectedMember.user && stateComposable.selectedSurvey) {
     const surveyId = stateComposable.selectedSurvey._id;
+    const groupId = stateComposable.selectedSurvey.meta.group.id;
+    const submitToGroupId = getActiveGroupId();
     router.push(
-      `/groups/${getActiveGroupId()}/surveys/${surveyId}/submissions/new?submitAsUserId=${selectedMember.user._id}`
+      `/groups/${groupId}/surveys/${surveyId}/submissions/new?submitAsUserId=${selectedMember.user._id}&submitTo=${submitToGroupId}`
     );
   }
   stateComposable.selectedSurvey = undefined;

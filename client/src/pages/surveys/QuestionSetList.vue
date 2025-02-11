@@ -16,7 +16,7 @@
       :loading="state.loading"
       :entities="state.surveys.content"
       :buttonNew="
-        rightToEdit().allowed
+        rightToCreateSurvey().allowed
           ? {
               title: 'Create new Question Set',
               link: { name: 'group-surveys-new', query: { lib: true } },
@@ -57,8 +57,7 @@ import api from '@/services/api.service';
 import BasicList from '@/components/ui/BasicList2.vue';
 import SurveyDescription from '@/pages/surveys/SurveyDescription.vue';
 
-const { getActiveGroupId } = useGroup();
-const { rightToView, rightToEdit } = getPermission();
+const { rightToView, rightToCreateSurvey, rightToManageSurvey } = getPermission();
 const { message, createAction } = menuAction();
 const PAGINATION_LIMIT = 10;
 
@@ -110,31 +109,19 @@ async function initData() {
       {
         title: 'Add to New Survey',
         icon: 'mdi-file-plus',
-        action: (s) =>
-          createAction(s, rightToView, {
-            path: `/groups/${getActiveGroupId()}/surveys/new`,
-            query: { libId: s._id },
+        action: (survey) =>
+          createAction(survey, rightToView, {
+            path: `/groups/${survey.meta.group.id}/surveys/new`,
+            query: { libId: survey._id },
           }),
-        render: (s) => () => rightToView().allowed,
+        render: () => () => rightToView().allowed,
       },
-      // {
-      //   title: 'View',
-      //   icon: 'mdi-file-document',
-      //   action: (s) => createAction(s, rightToView, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-      //   render: (s) => () => rightToView().allowed,
-      // },
       {
         title: 'Edit',
         icon: 'mdi-pencil',
-        action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/edit`),
-        render: (s) => () => rightToEdit().allowed,
+        action: (survey) => createAction(survey, rightToManageSurvey, `/groups/${survey.meta.group.id}/surveys/${survey._id}/edit`),
+        render: (survey) => () => rightToManageSurvey(survey).allowed,
       },
-      // {
-      //   title: 'Archive',
-      //   icon: 'mdi-archive',
-      //   action: (s) => createAction(s, rightToEdit, `/groups/${getActiveGroupId()}/surveys/${s._id}/...`),
-      //   render: (s) => () => rightToEdit().allowed,
-      // },
     ];
 
     await Promise.all([fetchData()]);

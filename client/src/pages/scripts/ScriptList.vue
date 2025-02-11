@@ -41,7 +41,7 @@ import { reactive } from 'vue';
 import ScriptDescription from '@/pages/scripts/ScriptDescription.vue';
 
 const { getActiveGroupId, isGroupAdmin } = useGroup();
-const { rightToEdit, rightToView } = getPermission();
+const { rightToEditScript, rightToView } = getPermission();
 const { message, createAction } = menuAction();
 
 const state = reactive({
@@ -68,12 +68,12 @@ async function initData() {
         }),
       render: (e) => () => rightToView(e).allowed,
     });
-    if (isGroupAdmin()) {
+    if (isGroupAdmin()) { // TODO: this if statement seems unnecessary, since the render function is already checking isGroupAdmin as part of rightToEditScript
       state.menu.push({
         title: 'Edit Script',
         icon: 'mdi-pencil',
-        action: (e) => createAction(e, rightToEdit, `/groups/${getActiveGroupId()}/scripts/${e._id}/edit`),
-        render: (e) => () => rightToEdit(e).allowed,
+        action: (e) => createAction(e, rightToEditScript, `/groups/${getActiveGroupId()}/scripts/${e._id}/edit`),
+        render: (e) => () => rightToEditScript(e).allowed,
       });
     }
 

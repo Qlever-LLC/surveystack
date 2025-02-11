@@ -48,11 +48,12 @@
 </template>
 <script setup>
 import BasicList from '@/components/ui/BasicList2.vue';
-import { computed, ref, toRaw } from 'vue';
+import { computed, ref, toRaw, watchEffect } from 'vue';
 import formatDistance from 'date-fns/formatDistance';
 import parseISO from 'date-fns/parseISO';
 import { useAllDrafts, useDeleteDraft } from '../../queries';
 import ConfirmDialog from '../../components/shared/ConfirmDialog.vue';
+import { decorateSubmissionsWithSurveyGroupIds, getSubmissionSurveyGroupIds } from '@/utils/submissions';
 
 const props = defineProps({
   // group id from route param
@@ -63,7 +64,14 @@ const PAGINATION_LIMIT = 10;
 const { data: allDrafts, isPending } = useAllDrafts();
 const { isPending: deleteDraftIsPending, mutate: deleteDraft, reset: resetDeleteDraft } = useDeleteDraft();
 
-const groupDrafts = computed(() => allDrafts.value.filter((draft) => draft.meta.group?.id === props.id));
+const groupDrafts = computed(() => allDrafts.value.filter(
+    (draft) => draft.meta.group?.id === props.id
+  ));
+
+const groupIdBySurveyId = ref({});
+watchEffect(async () => {
+  groupIdBySurveyId.value = await getSubmissionSurveyGroupIds(allDrafts.value);
+});
 const currentPageDrafts = computed(() =>
   groupDrafts.value.slice((paginationPage.value - 1) * PAGINATION_LIMIT, paginationPage.value * PAGINATION_LIMIT)
 );
@@ -79,8 +87,16 @@ const menu = computed(() => [
   {
     title: 'Continue',
     icon: 'mdi-open-in-new',
-    action: (e) => `/groups/${props.id}/surveys/${e.meta.survey.id}/submissions/${e._id}/edit`,
-    render: (e) => () => true,
+    action: (e) => {
+      const surveyId = e.meta.survey.id;
+      const groupId = groupIdBySurveyId.value[surveyId];
+      return `/groups/${groupId}/surveys/${surveyId}/submissions/${e._id}/edit`
+    },
+    render: (e) => () => {
+      const surveyId = e.meta.survey.id;
+      const groupId = groupIdBySurveyId.value[surveyId];
+      return Boolean(groupId);
+    },
     color: 'green',
     buttonFixed: true,
   },

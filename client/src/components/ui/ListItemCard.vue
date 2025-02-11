@@ -18,7 +18,7 @@
             <span v-if="showPinned" @click.stop="togglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
               <a-icon v-if="pinnedSurveys" class="mr-2">mdi-pin</a-icon>
               <a-icon
-                v-if="!pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
+                v-if="!pinnedSurveys && isHovering && !mobile && isPublished(entity) && state.ableTogglePinned"
                 class="mr-2">
                 mdi-pin-outline
               </a-icon>
@@ -31,7 +31,6 @@
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
               <slot name="afterName" :entity="entity" />
-              &nbsp;{{ groupId }}
               <br />
               <span v-if="showGroupPath" style="color: gray">
                 {{ state.entity.path }}
@@ -92,7 +91,7 @@ import getAvatarName from '@/utils/avatarName';
 const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
-const { isADraft } = useSurvey();
+const { isPublished } = useSurvey();
 const { isGroupAdmin, getActiveGroupId, isGroupVisitor } = useGroup();
 
 const props = defineProps({
@@ -164,7 +163,7 @@ const state = reactive({
 
 const { data: isSurveyPinned } = useIsSurveyPinned(getActiveGroupId(), props.entity._id);
 const pinnedSurveys = computed(() =>
-  props.showPinned ? (isGroupVisitor() ? props.entity.isInPinnedList : isSurveyPinned.value) : false
+  props.showPinned && !props.entity.archived ? (isGroupVisitor() ? props.entity.isPinned : isSurveyPinned.value) : false
 );
 
 onMounted(async () => {

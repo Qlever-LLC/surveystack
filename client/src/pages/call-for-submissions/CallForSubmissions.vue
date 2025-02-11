@@ -47,7 +47,7 @@
       <div class="d-flex justify-end align-center mt-3">
         <span v-if="!submittable" class="mr-2">Select at least one member below</span>
         <a-btn variant="text" @click="closeDialog">Cancel</a-btn>
-        <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send...</a-btn>
+        <a-btn color="primary" :disabled="!submittable" @click="state.showConfirmDialog = true">Send</a-btn>
       </div>
     </template>
     <template v-slot:more>
@@ -112,7 +112,6 @@ const emit = defineEmits(['update:modelValue']);
 
 const state = reactive({
   members: [],
-  group: null,
   selectedMembers: [],
   subject: defaultSubject,
   body: defaultBody,
@@ -149,7 +148,7 @@ const showMissingMagicLinkWarning = computed(() => {
 async function loadMembers() {
   state.isLoadingMembers = true;
   try {
-    const { data: members } = await api.get(`/memberships?group=${state.group}&populate=true`);
+    const { data: members } = await api.get(`/memberships?group=${route.params.id}&populate=true`);
     state.members = members;
   } catch (e) {
     console.error(e);
@@ -169,8 +168,11 @@ async function submit() {
       members,
       subject: state.subject,
       body: state.body,
-      group: state.group,
+      // survey group
+      group: props.selectedSurvey.meta.group.id,
       copy: state.copy,
+      // submit CFS response to current active group
+      submitTo: route.params.id,
     });
     state.submitResults = [
       {
@@ -205,11 +207,7 @@ watch(
   async (newVal) => {
     // if the dialog will be displayed
     if (newVal) {
-      const { id } = route.params;
-      if (id) {
-        state.group = id;
-        await loadMembers();
-      }
+      await loadMembers();
       state.subject = `Request to submit survey '${props.selectedSurvey.name}'`;
     }
   }

@@ -1,5 +1,6 @@
 import surveyController from './surveyController';
 import {
+  testApp,
   createReq,
   createRes,
   createSurvey,
@@ -8,17 +9,17 @@ import {
   createGroup,
   createSuperAdmin,
   createMembership,
+  createSurveyMeta,
+  createSurveyMetaGroup,
 } from '../testUtils';
 import _ from 'lodash';
 import { getDb } from '../db';
-import createApp from '../app.js';
 import request from 'supertest';
 
 const { ObjectId } = jest.requireActual('mongodb');
 const {
   updateSurvey,
   getSurvey,
-  getSurveyListPage,
   cleanupSurvey,
   getSurveyAndCleanupInfo,
   deleteArchivedTestSubmissions,
@@ -121,7 +122,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: user.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     await expect(getSurveyAndCleanupInfo(librarySurvey._id, res)).rejects.toThrow(
@@ -134,7 +142,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: user.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: user.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: user.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -148,7 +163,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: admin2.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin1.user._id, group: { id: group1._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin1.user._id,
+        group: createSurveyMetaGroup({
+          id: group1._id,
+          path: group1.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     await expect(getSurveyAndCleanupInfo(librarySurvey._id, res)).rejects.toThrow(
@@ -162,7 +184,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: admin2.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin1.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin1.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -175,7 +204,14 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
     const res = await createRes({ user: superAdmin });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     const librarySurvey = libraryResult.survey;
     const result = await getSurveyAndCleanupInfo(librarySurvey._id, res);
@@ -184,18 +220,25 @@ describe('surveyController access role for getSurveyAndCleanupInfo()', () => {
 });
 
 describe('surveyController', () => {
-  let librarySurvey, admin, res;
+  let librarySurvey, admin, res, group;
 
   beforeEach(async () => {
-    const group = await createGroup();
+    group = await createGroup();
     admin = await group.createAdminMember();
     res = await createRes({ user: admin.user });
 
     const libraryResult = await mockControlsAndSubmission({
-      meta: { isLibrary: true, creator: admin.user._id, group: { id: group._id } },
+      meta: createSurveyMeta({
+        isLibrary: true,
+        creator: admin.user._id,
+        group: createSurveyMetaGroup({
+          id: group._id,
+          path: group.path,
+        }),
+      }),
     });
     librarySurvey = libraryResult.survey;
-    await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.lastedVersion);
+    await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.latestVersion);
   });
 
   describe('getSurvey', () => {
@@ -395,11 +438,15 @@ describe('surveyController', () => {
   describe('cleanup', () => {
     let librarySurvey, createSubmission;
     beforeEach(async () => {
-      const libraryResult = await mockControlsAndSubmission({
-        meta: { isLibrary: true },
-      });
-      createSubmission = libraryResult.createSubmission;
-      librarySurvey = libraryResult.survey;
+      ({ survey: librarySurvey, createSubmission } = await mockControlsAndSubmission({
+        meta: createSurveyMeta({
+          isLibrary: true,
+          group: createSurveyMetaGroup({
+            id: group._id,
+            path: group.path,
+          }),
+        }),
+      }));
       await mockControlsAndSubmission(undefined, librarySurvey._id, librarySurvey.latestVersion);
     });
     describe('getSurveyAndCleanupInfo', () => {
@@ -567,183 +614,283 @@ describe('surveyController', () => {
   });
 });
 
-describe('get surveys and question set', () => {
-  let groupA, surveyPinnedToA, surveyA1, surveyA2, surveyA3;
+describe('GET /surveys/list-page', () => {
+  let groupA, surveyPinnedToA, surveyInGroupA, questionSetLibraryInGroupA, archivedSurveyInGroupA;
+  let groupB, surveyPinnedToB, surveyInGroupB, questionSetLibraryInGroupB, archivedSurveyInGroupB; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let groupASubGroup;
+  let groupADescendantGroup;
   beforeEach(async () => {
-    const { survey: spa } = await createSurvey([], { name: 'surveyPinnedToA' });
-    surveyPinnedToA = spa;
-    const { survey: surveyPinnedToB } = await createSurvey([], { name: 'surveyPinnedToB' });
+    groupA = await createGroup();
+    groupB = await createGroup();
+    groupASubGroup = await groupA.createSubGroup(groupA._id);
+    groupADescendantGroup = await groupASubGroup.createSubGroup(groupASubGroup._id);
 
-    groupA = await createGroup({ surveys: { pinned: [surveyPinnedToA._id] } });
-    const groupB = await createGroup({ surveys: { pinned: [surveyPinnedToB._id] } });
+    ({ survey: surveyPinnedToA } = await createSurvey([], {
+      name: 'surveyPinnedToA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        submissions: 'groupAndDescendants',
+      }),
+    }));
+    await groupA.pinSurvey(surveyPinnedToA._id);
+    ({ survey: surveyInGroupA } = await createSurvey([], {
+      name: 'surveyInGroupA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        submissions: 'groupAndDescendants',
+      }),
+    }));
+    ({ survey: questionSetLibraryInGroupA } = await createSurvey([], {
+      name: 'questionSetLibraryInGroupA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        isLibrary: true,
+      }),
+    }));
+    ({ survey: archivedSurveyInGroupA } = await createSurvey([], {
+      name: 'archivedSurveyInGroupA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+        archived: true,
+        submissions: 'groupAndDescendants',
+      }),
+    }));
 
-    const { survey: s3 } = await createSurvey([], { name: 'surveyA3' });
-    surveyA3 = s3;
-    const { survey: s2 } = await createSurvey([], { name: 'surveyA2' });
-    surveyA2 = s2;
-    const { survey: s1 } = await createSurvey([], { name: 'surveyA1' });
-    surveyA1 = s1;
-    const { survey: surveyB1 } = await createSurvey([], { name: 'surveyB1' });
-
-    const gA = { id: groupA._id, path: groupA.path };
-    const gB = { id: groupB._id, path: groupB.path };
-
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [
-              ObjectId(surveyPinnedToA._id),
-              ObjectId(surveyA3._id),
-              ObjectId(surveyA2._id),
-              ObjectId(surveyA1._id),
-            ],
-          },
-        },
-        { $set: { meta: { group: gA } } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToB._id), ObjectId(surveyB1._id)],
-          },
-        },
-        { $set: { meta: { group: gB } } }
-      );
-
-    await getDb()
-      .collection('surveys')
-      .updateOne(
-        { _id: ObjectId(surveyA2._id) },
-        {
-          $set: {
-            meta: { isLibrary: true },
-          },
-        }
-      );
+    ({ survey: surveyPinnedToB } = await createSurvey([], {
+      name: 'surveyPinnedToB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        submissions: 'groupAndDescendants',
+      }),
+    }));
+    await groupB.pinSurvey(surveyPinnedToB._id);
+    ({ survey: surveyInGroupB } = await createSurvey([], {
+      name: 'surveyInGroupB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        submissions: 'groupAndDescendants',
+      }),
+    }));
+    ({ survey: questionSetLibraryInGroupB } = await createSurvey([], {
+      name: 'questionSetLibraryInGroupB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        isLibrary: true,
+      }),
+    }));
+    ({ survey: archivedSurveyInGroupB } = await createSurvey([], {
+      name: 'archivedSurveyInGroupB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+        archived: true,
+        submissions: 'groupAndDescendants',
+      }),
+    }));
   });
 
-  it('get survey from a group', async () => {
-    const req = createReq({
-      params: {},
-      query: {
-        groupId: groupA._id,
-        isLibrary: 'false',
-        skip: 0,
-        limit: 10,
-        prioPinned: true,
-      },
-    });
-    const res = await createRes();
-    await getSurveyListPage(req, res);
+  describe('when activeGroupId query parameter is present', () => {
+    const isLibrary = false;
+    const skip = 0;
+    const limit = 10;
 
-    const result = res.send.mock.calls[0][0];
-    expect(result.pagination.total).toEqual(3);
-    expect(result.content[0]._id).toEqual(surveyA1._id);
-    expect(result.content[1]._id).toEqual(surveyA3._id);
-    expect(result.pinned[0]._id).toEqual(surveyPinnedToA._id);
+    describe('when showArchived query parameter is false or absent', () => {
+      const showArchived = false;
+      it('returns surveys from the active group, identifies surveys pinned to the active group, and sorts them to the front', async () => {
+        const { body } = await request(testApp)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupA._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(2);
+        expect(body.content).toHaveLength(2);
+        expect(body.content[0]._id).toEqual(surveyPinnedToA._id.toString());
+        expect(body.content[0].isPinned).toEqual(true);
+        expect(body.content[1]._id).toEqual(surveyInGroupA._id.toString());
+      });
+
+      it('includes surveys shared with the group', async () => {
+        const { body } = await request(testApp)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupADescendantGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(2);
+        expect(body.content).toHaveLength(2);
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: surveyPinnedToA._id.toString(),
+            isPinned: false,
+          })
+        );
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: surveyInGroupA._id.toString(),
+          })
+        );
+      });
+
+      it('identifies pinned surveys in the active group, regardless of the group they are in', async () => {
+        const { survey: surveyInGroupADescendantGroup } = await createSurvey([], {
+          name: 'surveyInGroupADescendantGroup',
+          meta: createSurveyMeta({
+            group: createSurveyMetaGroup({
+              id: groupADescendantGroup._id,
+              path: groupADescendantGroup.path,
+            }),
+            submissions: 'group',
+          }),
+        });
+        await groupADescendantGroup.pinSurvey(surveyPinnedToA._id);
+        await groupADescendantGroup.pinSurvey(surveyInGroupADescendantGroup._id);
+
+        const { body } = await request(testApp)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupADescendantGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(3);
+        expect(body.content).toHaveLength(3);
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: surveyPinnedToA._id.toString(),
+            isPinned: true,
+          })
+        );
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: surveyInGroupADescendantGroup._id.toString(),
+            isPinned: true,
+          })
+        );
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: surveyInGroupA._id.toString(),
+          })
+        );
+      });
+    });
+
+    describe('when showArchived query parameter is true', () => {
+      const showArchived = true;
+      it('returns archived surveys from the active group, but does not identify pinned surveys', async () => {
+        const { body } = await request(testApp)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupA._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(1);
+        expect(body.content).toHaveLength(1);
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: archivedSurveyInGroupA._id.toString(),
+            isPinned: false,
+          })
+        );
+      });
+
+      it('includes surveys shared with the group', async () => {
+        const { body } = await request(testApp)
+          .get(
+            `/api/surveys/list-page?activeGroupId=${groupADescendantGroup._id}&isLibrary=${isLibrary}&skip=${skip}&limit=${limit}&showArchived=${showArchived}`
+          )
+          .expect(200);
+
+        expect(body.pagination.total).toEqual(1);
+        expect(body.content).toHaveLength(1);
+        expect(body.content).toContainEqual(
+          expect.objectContaining({
+            _id: archivedSurveyInGroupA._id.toString(),
+            isPinned: false,
+          })
+        );
+      });
+    });
   });
-  it('get question set (surveys that are library)', async () => {
-    const req = createReq({
-      params: {},
-      query: {
-        isLibrary: 'true',
-        skip: 0,
-        limit: 10,
-      },
-    });
-    const res = await createRes();
-    await getSurveyListPage(req, res);
 
-    const result = res.send.mock.calls[0][0];
-    expect(result.pagination.total).toEqual(1);
-    expect(result.content[0]._id).toEqual(surveyA2._id);
+  it('returns only question sets (surveys that are library) when isLibrary is true', async () => {
+    const { body } = await request(testApp)
+      .get(`/api/surveys/list-page?isLibrary=true&skip=0&limit=10`)
+      .expect(200);
+
+    expect(body.pagination.total).toEqual(2);
+    expect(body.content).toHaveLength(2);
+    expect(body.content[0]._id).toEqual(questionSetLibraryInGroupA._id.toString());
+    expect(body.content[1]._id).toEqual(questionSetLibraryInGroupB._id.toString());
   });
 });
 
 describe('get pinned surveys', () => {
   let groupA, subGroupA, groupB, surveyPinnedToA, surveyPinnedToSubA, surveyPinnedToB;
 
-  const app = createApp();
   const token = '1234';
   let authHeaderValue;
 
   beforeEach(async () => {
-    const { survey: spa } = await createSurvey([], { name: 'surveyPinnedToA' });
-    surveyPinnedToA = spa;
-    const { survey: spsuba } = await createSurvey([], { name: 'surveyPinnedToA' });
-    surveyPinnedToSubA = spsuba;
-    const { survey: spb } = await createSurvey([], { name: 'surveyPinnedToB' });
-    surveyPinnedToB = spb;
-    const { survey: surveyPinnedToSubB } = await createSurvey([], { name: 'surveyPinnedToSubB' });
+    groupA = await createGroup({ name: 'groupA' });
+    subGroupA = await groupA.createSubGroup({ name: 'subGroupA' });
+    groupB = await createGroup({ name: 'groupB' });
+    const subGroupB = await groupB.createSubGroup({ name: 'subGroupB' });
 
-    groupA = await createGroup({ name: 'groupA', surveys: { pinned: [surveyPinnedToA._id] } });
-    subGroupA = await groupA.createSubGroup(
-      { name: 'subGroupA' },
-      { surveys: { pinned: [surveyPinnedToSubA._id] } }
-    );
-    groupB = await createGroup({
-      name: 'groupB',
-      surveys: { pinned: [surveyPinnedToB._id] },
+    ({ survey: surveyPinnedToA } = await createSurvey([], {
+      name: 'surveyPinnedToA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+      }),
+    }));
+    await groupA.pinSurvey(surveyPinnedToA._id);
+
+    ({ survey: surveyPinnedToSubA } = await createSurvey([], {
+      name: 'surveyPinnedToA',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: subGroupA._id, path: subGroupA.path }),
+      }),
+    }));
+    await subGroupA.pinSurvey(surveyPinnedToSubA._id);
+
+    ({ survey: surveyPinnedToB } = await createSurvey([], {
+      name: 'surveyPinnedToB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+      }),
+    }));
+    await groupB.pinSurvey(surveyPinnedToB._id);
+
+    const { survey: surveyPinnedToSubB } = await createSurvey([], {
+      name: 'surveyPinnedToSubB',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: subGroupB._id, path: subGroupB.path }),
+      }),
     });
-    const subGroupB = await groupB.createSubGroup(
-      { name: 'subGroupB' },
-      { surveys: { pinned: [surveyPinnedToSubB._id] } }
-    );
+    await subGroupB.pinSurvey(surveyPinnedToSubB._id);
 
-    const { survey: surveyA1 } = await createSurvey([], { name: 'surveyA1' });
-    const { survey: surveyA2 } = await createSurvey([], { name: 'surveyA2' });
-    const { survey: surveySubA1 } = await createSurvey([], { name: 'surveySubA1' });
-    const { survey: surveyB1 } = await createSurvey([], { name: 'surveyB1' });
-
-    const gA = { id: groupA._id, path: groupA.path };
-    const gSubA = { id: subGroupA._id, path: subGroupA.path };
-    const gB = { id: groupB._id, path: groupB.path };
-    const gSubB = { id: subGroupB._id, path: subGroupB.path };
-
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToA._id), ObjectId(surveyA2._id), ObjectId(surveyA1._id)],
-          },
-        },
-        { $set: { meta: { group: gA } } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToSubA._id), ObjectId(surveySubA1._id)],
-          },
-        },
-        { $set: { meta: { group: gSubA } } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToB._id), ObjectId(surveyB1._id)],
-          },
-        },
-        { $set: { meta: { group: gB } } }
-      );
-    await getDb()
-      .collection('surveys')
-      .updateMany(
-        {
-          _id: {
-            $in: [ObjectId(surveyPinnedToSubB._id)],
-          },
-        },
-        { $set: { meta: { group: gSubB } } }
-      );
+    await createSurvey([], {
+      name: 'surveyA1',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+      }),
+    });
+    await createSurvey([], {
+      name: 'surveyA2',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupA._id, path: groupA.path }),
+      }),
+    });
+    await createSurvey([], {
+      name: 'surveySubA1',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: subGroupA._id, path: subGroupA.path }),
+      }),
+    });
+    await createSurvey([], {
+      name: 'surveyB1',
+      meta: createSurveyMeta({
+        group: createSurveyMetaGroup({ id: groupB._id, path: groupB.path }),
+      }),
+    });
   });
 
   it('user get pinned survey from root group but not sub-group', async () => {
@@ -753,7 +900,7 @@ describe('get pinned surveys', () => {
 
     authHeaderValue = `${user.email} ${token}`;
 
-    const res = await request(app)
+    const res = await request(testApp)
       .get('/api/surveys/pinned?getOnlyNonArchive=true')
       .set('Authorization', authHeaderValue)
       .expect(200);
@@ -775,7 +922,7 @@ describe('get pinned surveys', () => {
 
     authHeaderValue = `${admin.email} ${token}`;
 
-    const res = await request(app)
+    const res = await request(testApp)
       .get('/api/surveys/pinned?getOnlyNonArchive=true')
       .set('Authorization', authHeaderValue)
       .expect(200);
@@ -807,7 +954,7 @@ describe('get pinned surveys', () => {
 
     authHeaderValue = `${tester.email} ${token}`;
 
-    const res = await request(app)
+    const res = await request(testApp)
       .get('/api/surveys/pinned?getOnlyNonArchive=true')
       .set('Authorization', authHeaderValue)
       .expect(200);

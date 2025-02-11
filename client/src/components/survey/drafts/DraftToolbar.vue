@@ -3,7 +3,7 @@
     <a-toolbar flat class="bg-background">
       <div class="flex-grow-1 d-flex flex-row mx-4">
         <div v-if="showNavigationControl" class="flex-shrink-1 flex-grow-0 align-content-center">
-          <AppNavigationControl />
+          <AppNavigationControl :handleClickCloseCallback="handleClose" />
         </div>
 
         <div class="flex-shrink-1 flex-grow-0 align-content-center mx-2">
@@ -40,7 +40,16 @@ import AppNavigationControl from '@/components/AppNavigationControl.vue';
 
 export default {
   components: { AppNavigationControl },
-  props: ['showOverviewIcon', 'surveyName', 'questionNumber', 'required', 'anon', 'groupPath', 'showNavigationControl'],
+  props: [
+    'showOverviewIcon',
+    'surveyName',
+    'questionNumber',
+    'required',
+    'anon',
+    'groupPath',
+    'showNavigationControl',
+    'handleClose',
+  ],
 };
 </script>
 

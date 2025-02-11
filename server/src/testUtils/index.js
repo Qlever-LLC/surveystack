@@ -1,3 +1,4 @@
+export * from './testApp';
 export * from './express';
 export * from './groups';
 export * from './scripts';

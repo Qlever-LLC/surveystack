@@ -38,6 +38,10 @@ import api from '@/services/api.service';
 import { useSubmission } from '@/pages/submissions/submission';
 import { useRoute, useRouter } from 'vue-router';
 import { getPermission } from '@/utils/permissions';
+import { 
+  getSubmissionSurveyGroupIds, 
+  decorateSubmissionsWithSurveyGroupIds,
+} from '@/utils/submissions';
 import { menuAction } from '@/utils/threeDotsMenu';
 
 const store = useStore();
@@ -131,7 +135,11 @@ async function fetchRemoteSubmissions() {
     }
 
     const { data } = await api.get(`/submissions/page?${queryParams}`);
-    state.submissions = data.content;
+    const surveyIdByGroupId = await getSubmissionSurveyGroupIds(data.content);
+    state.submissions = decorateSubmissionsWithSurveyGroupIds(
+      data.content, 
+      surveyIdByGroupId,
+    );
     state.submissionsPagination = data.pagination;
 
     try {
@@ -154,9 +162,11 @@ async function fetchRemoteSubmissions() {
 }
 
 function resubmit(submission) {
+  const surveyGroupId = submission.meta.survey.meta.group.id;
+  const surveyId = submission.meta.survey.id;
   router.push({
     name: 'group-survey-submissions-edit',
-    params: { id: getActiveGroupId(), surveyId: submission.meta.survey.id, submissionId: submission._id },
+    params: { id: surveyGroupId, surveyId, submissionId: submission._id },
   });
 }
 </script>

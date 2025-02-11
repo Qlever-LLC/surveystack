@@ -1,20 +1,20 @@
 <template>
   <a-card>
     <a-data-table-server
-      ref="table"
+      ref="tableRef"
       v-model="tableSelected"
       :headerProps="{ archived }"
-      :headers="headers"
+      :headers="state.headers"
       :items="items"
       itemValue="_id"
       :loading="loading"
-      :search="search"
+      :search="state.search"
       :items-length="submissions.pagination.total"
       :sortBy="sortBy"
       @update:sortBy="onUpdateSortBy"
-      :showSelect="headers.length !== 0"
+      :showSelect="state.headers.length !== 0"
       multiSort
-      :headerSlot="headers.length !== 0">
+      :headerSlot="state.headers.length !== 0">
       <template v-slot:top>
         <a-toolbar flat class="" cssBackgroundCream>
           <a-row>
@@ -27,8 +27,8 @@
                     label="Show metadata"
                     class="mt-2" />
                   <a-switch
-                    :modelValue="isExpandMatrix"
-                    @update:modelValue="isExpandMatrix = $event"
+                    :modelValue="state.isExpandMatrix"
+                    @update:modelValue="state.isExpandMatrix = $event"
                     label="Expand matrix questions"
                     class="mt-2 ml-5" />
                 </div>
@@ -108,7 +108,7 @@
 
       <template v-slot:item="{ item, index }">
         <tr :key="item._id">
-          <td :class="{ 'expand-cell': isExpandMatrix }">
+          <td :class="{ 'expand-cell': state.isExpandMatrix }">
             <a-checkbox
               :modelValue="isSelected(item)"
               :disabled="!isSelectable(item)"
@@ -119,12 +119,12 @@
               role="checkbox" />
           </td>
           <td
-            v-for="(header, indx) in headers"
+            v-for="(header, indx) in state.headers"
             :key="header.title"
             @click.stop="openModal($event, [getCellValue(item, indx, header.value), index, header.value], true)"
             :class="{
               active: isModalOpen([getCellValue(item, indx, header.value), index, header.value]),
-              'expand-cell': isExpandMatrix,
+              'expand-cell': state.isExpandMatrix,
             }">
             <table v-if="Array.isArray(item[header.value])" width="100%" cellSpacing="0" class="mt-6">
               <tr
@@ -161,12 +161,12 @@
     <submission-table-cell-modal
       v-if="cellText"
       :value="cellText"
-      :left="modalLeftPosition"
-      :top="modalTopPosition"
-      :showCopyButton="modalShowCopyButton"
+      :left="state.modalLeftPosition"
+      :top="state.modalTopPosition"
+      :showCopyButton="state.modalShowCopyButton"
       @close="closeModal" />
 
-    <a-dialog :modelValue="downloadingResource" persistent width="300" role="downloadingResourceProgressDialog">
+    <a-dialog :modelValue="state.downloadingResource" persistent width="300" role="downloadingResourceProgressDialog">
       <a-card>
         <a-card-text class="pa-4">
           <span>Downloading file resource</span>
@@ -175,364 +175,298 @@
       </a-card>
     </a-dialog>
 
-    <a-alert v-if="openResourceError" type="warning" closable>
-      {{ openResourceError }}
+    <a-alert v-if="state.openResourceError" type="warning" closable>
+      {{ state.openResourceError }}
     </a-alert>
   </a-card>
 </template>
-<script>
+
+<script setup>
+import { reactive, ref, watch, computed } from 'vue';
+import { useStore } from 'vuex';
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
-import { checkAllowedToResubmit } from '@/utils/submissions';
-import parseISO from 'date-fns/parseISO';
-import isValid from 'date-fns/isValid';
-import format from 'date-fns/format';
-import cloneDeep from 'lodash/cloneDeep';
-import omit from 'lodash/omit';
+import {
+  transformMatrixHeaders,
+  getCellValue,
+  getPropertiesFromMatrix,
+  transformGeoJsonHeaders,
+  PREFERRED_HEADERS,
+} from './SubmissionTableClientCsv';
+import { getPermission } from '../../utils/permissions'
+
+const store = useStore();
+const tableRef = ref(null);
+const { rightToManageSubmission } = getPermission();
 
 const MATRIX_SEPARATOR = '===>';
 
-export function getPropertiesFromMatrix(headers, matrix) {
-  if (!Array.isArray(headers) || typeof matrix !== 'string') {
+const emit = defineEmits([
+  'excludeMetaChange',
+  'showDeleteModal',
+  'archiveSubmissions',
+  'showArchiveModal',
+  'reassignment',
+  'resubmit',
+  'update:selected',
+  'onDataTablePropsChanged',
+]);
+
+const props = defineProps({
+  actionsAreDisabled: {
+    type: Boolean,
+  },
+  submissions: {
+    type: Object,
+  },
+  selected: {
+    type: Array,
+    required: true,
+  },
+  archived: {
+    type: Boolean,
+    default: false,
+  },
+  sortBy: {
+    type: Array,
+    required: false,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  excludeMeta: {
+    type: Boolean,
+    default: true,
+  },
+});
+
+const state = reactive({
+  activeTableCell: [],
+  textTruncateLength: 36,
+  csv: null,
+  parsed: null,
+  search: '',
+  searchFields: {
+    survey: '',
+  },
+  headers: [],
+  modalLeftPosition: null,
+  modalTopPosition: null,
+  modalShowCopyButton: false,
+  downloadingResource: false,
+  openResourceError: false,
+  isExpandMatrix: true,
+});
+
+const items = computed(() => {
+  if (!state.parsed) {
     return [];
   }
-  const key = `${matrix}.0.`;
-  const matches = headers.filter((header) => header.startsWith(key));
-  const properties = matches.map((header) => header.substring(key.length));
-  return properties;
-}
-
-export function transformGeoJsonHeaders(headers) {
-  if (!Array.isArray(headers)) {
-    return headers;
-  }
-
-  // Remove GeoJSON question type paths from headers
-  const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
-  return [...new Set(headers.map(replaceGeoJsonPath))];
-}
-
-function matrixHeadersFromSubmission(submission, parentKey = '') {
-  const headers = [];
-  Object.entries(submission.data || {}).forEach(([key, value]) => {
-    const type = typeof value.meta === 'object' ? value.meta.type : '';
-    if (type === 'page' || type === 'group') {
-      const data = cloneDeep(omit(value, 'meta'));
-      headers.push(...matrixHeadersFromSubmission({ data }, key));
-    } else if (type === 'matrix') {
-      headers.push(`data${parentKey ? `.${parentKey}` : ''}.${key}.value`);
-    }
-  });
-  return headers;
-}
-
-export function transformMatrixHeaders(headers, submissions) {
-  // Get matrix headers from submissions raw data by filtering "meta.type" = "matrix"
-  let matrixHeaders = [];
-  submissions.forEach((submission) => {
-    matrixHeaders = [...new Set([...matrixHeaders, ...matrixHeadersFromSubmission(submission)])];
-  });
-
-  const result = [];
-  headers.forEach((header) => {
-    const matched = matrixHeaders.find((h) => header.startsWith(h));
-    if (!matched) {
-      result.push(header);
-    } else if (!result.includes(matched)) {
-      result.push(matched);
-    }
-  });
-
-  return result;
-}
-
-export function getCellValue(item, index, header) {
-  const value = typeof item === 'string' ? item : typeof item[header] === 'string' ? item[header] : null;
-  const isoDateRegex = /^(\d{4}-\d{2}-\d{2}([T\s](\d{2}:\d{2}:\d{2}(\.\d+)?(Z|([+-]\d{2}:\d{2})))?)?)?$/;
-
-  // Parse date
-  if (value == null || value === '') {
-    return ' ';
-  } else if (!isoDateRegex.test(value)) {
-    return value;
-  } else {
-    let parsedDate = parseISO(value);
-    if (index < PREFERRED_HEADERS.length && isValid(parsedDate) && parsedDate.toISOString() === value) {
-      // In PREFERRED_HEADERS dateSubmitted is displayed depending on the user's time zone.
-      return format(parsedDate, 'MMM d, yyyy h:mm a');
-    } else if (isValid(parsedDate)) {
-      // In the results of the survey for the date types, we are only interested in days and not hours. We avoid timezone modifications: June 1, 2024 is June 1. 2024 anywhere
-      // extract YYYY-MM-DD from YYYY-MM-DDTHH:mm:ss.sssZ
-      const date = value.slice(0, 10);
-      parsedDate = parseISO(date);
-      return format(parsedDate, 'MMM d, yyyy');
-    } else {
-      return value;
-    }
-  }
-}
-
-const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted', 'meta.archived'];
-
-export default {
-  components: {
-    SubmissionTableCellModal,
-  },
-  props: {
-    actionsAreDisabled: {
-      type: Boolean,
-    },
-    submissions: {
-      type: Object,
-    },
-    selected: {
-      type: Array,
-      required: true,
-    },
-    archived: {
-      type: Boolean,
-      default: false,
-    },
-    sortBy: {
-      type: Array,
-      required: false,
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    excludeMeta: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  data() {
-    return {
-      newData: this.archived,
-      activeTableCell: [],
-      textTruncateLength: 36,
-      csv: null,
-      parsed: null,
-      search: '',
-      searchFields: {
-        survey: '',
-      },
-      headers: [],
-      modalLeftPosition: null,
-      modalTopPosition: null,
-      modalShowCopyButton: false,
-      downloadingResource: false,
-      openResourceError: false,
-      isExpandMatrix: true,
-    };
-  },
-  computed: {
-    items() {
-      if (!this.parsed) {
-        return [];
-      }
-      return this.parsed.data.map((item) => {
-        const row = {};
-        let count = 1;
-        const columns = this.headers.map((header) => header.value);
-        columns.forEach((header) => {
-          if (header in item) {
-            row[header] = item[header];
-          } else {
-            const [matrix, property] = header.split(MATRIX_SEPARATOR);
-            const children = this.parsed.meta.fields
-              .filter((r) => {
-                const matrixMatch = r.startsWith(matrix);
-                const propertyMatch = r.endsWith(property) && /^.\d.$/g.test(r.slice(matrix.length, -property.length));
-                return matrixMatch && propertyMatch;
-              })
-              .sort((a, b) => {
-                const aIndex = Number(a.substring(matrix.length + 1, a.length - property.length - 1));
-                const bIndex = Number(b.substring(matrix.length + 1, b.length - property.length - 1));
-                if (isNaN(aIndex) || isNaN(bIndex)) {
-                  return a.localeCompare(b);
-                } else {
-                  return aIndex - bIndex;
-                }
-              })
-              .map((key) => item[key]);
-            row[header] = this.isExpandMatrix ? children : JSON.stringify(children);
-            if (this.isExpandMatrix && children.length > count) {
-              count = children.length;
+  return state.parsed.data.map((item) => {
+    const row = {};
+    let count = 1;
+    const columns = state.headers.map((header) => header.value);
+    columns.forEach((header) => {
+      if (header in item) {
+        row[header] = item[header];
+      } else {
+        const [matrix, property] = header.split(MATRIX_SEPARATOR);
+        const children = state.parsed.meta.fields
+          .filter((r) => {
+            const matrixMatch = r.startsWith(matrix);
+            const propertyMatch = r.endsWith(property) && /^.\d.$/g.test(r.slice(matrix.length, -property.length));
+            return matrixMatch && propertyMatch;
+          })
+          .sort((a, b) => {
+            const aIndex = Number(a.substring(matrix.length + 1, a.length - property.length - 1));
+            const bIndex = Number(b.substring(matrix.length + 1, b.length - property.length - 1));
+            if (isNaN(aIndex) || isNaN(bIndex)) {
+              return a.localeCompare(b);
+            } else {
+              return aIndex - bIndex;
             }
-          }
-        });
-        row.count = count;
-        return row;
-      });
-    },
-    tableSelected: {
-      get() {
-        return this.selected;
-      },
-      set(newValue) {
-        this.$emit('update:selected', newValue);
-      },
-    },
-    cellText() {
-      const [value] = this.activeTableCell;
-      return value || '';
-    },
-    selectableItems() {
-      return this.items.filter((item) => this.isSelectable(item));
-    },
-    user() {
-      return this.$store.getters['auth/user'];
-    },
-    userMemberships() {
-      return this.$store.getters['memberships/memberships'];
-    },
-  },
-  watch: {
-    excludeMeta() {
-      this.createHeaders();
-    },
-    submissions() {
-      this.fetchData();
-    },
-  },
-  methods: {
-    getLabelFromKey,
-    getCellValue,
-    shouldTruncate(value) {
-      return value.length > this.textTruncateLength;
-    },
-    isModalOpen(value) {
-      return JSON.stringify(this.activeTableCell) === JSON.stringify(value);
-    },
-    /*
-     ** ev - event
-     ** value - Array [text, row index, col name, cell array index]
-     */
-    openModal(ev, cell, showCopyButton = false) {
-      const [value] = cell;
-      if (value.length > this.textTruncateLength) {
-        this.activeTableCell = cell;
-        this.modalLeftPosition =
-          ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
-        this.modalTopPosition =
-          ev.target.getBoundingClientRect().top - this.$refs.table.$el.getBoundingClientRect().top;
-        this.modalShowCopyButton = showCopyButton;
-      }
-    },
-    closeModal() {
-      this.activeTableCell = [];
-      this.modalLeftPosition = null;
-      this.modalTopPosition = null;
-      this.modalShowCopyButton = false;
-    },
-    createCustomFilter(field) {
-      return (value) => {
-        if (!this.searchFields[field]) {
-          return true;
+          })
+          .map((key) => item[key]);
+        row[header] = state.isExpandMatrix ? children : JSON.stringify(children);
+        if (state.isExpandMatrix && children.length > count) {
+          count = children.length;
         }
-        return value.toLowerCase().startsWith(this.searchFields[field].toLowerCase());
-      };
-    },
-    createHeaders() {
-      const headers = [];
-      if (this.parsed) {
-        const rawHeaders = this.parsed.meta.fields;
-        const matrixHeaders = transformMatrixHeaders(rawHeaders, this.submissions.content);
-        PREFERRED_HEADERS.forEach((header) => {
-          headers.push({
-            title: header,
-            value: header,
-            filter: this.createCustomFilter(header),
-          });
-        });
-        matrixHeaders.forEach((header) => {
-          if (
-            PREFERRED_HEADERS.includes(header) ||
-            (this.excludeMeta && (header.startsWith('meta') || header.includes('meta')))
-          ) {
-            return;
-          }
-          this.searchFields[header] = ''; // v-data-table search/filter is not used at this moment
-
-          if (rawHeaders.includes(header)) {
-            headers.push({
-              title: header,
-              value: header,
-              filter: this.createCustomFilter(header),
-            });
-          } else {
-            const properties = getPropertiesFromMatrix(rawHeaders, header);
-            headers.push(
-              ...properties.map((h) => ({
-                title: `${header}.${h}`,
-                value: [header, h].join(MATRIX_SEPARATOR),
-                filter: this.createCustomFilter([header, h].join(MATRIX_SEPARATOR)),
-              }))
-            );
-          }
-        });
       }
-      this.headers = headers;
-    },
-    onUpdateSortBy(value) {
-      this.$emit('onDataTablePropsChanged', value);
-    },
-    async fetchData() {
-      if (!this.submissions) {
+    });
+    row.count = count;
+    return row;
+  });
+})
+
+const tableSelected = computed({
+  get() {
+    return props.selected;
+  },
+  set(newValue) {
+    emit('update:selected', newValue);
+  },
+});
+
+const cellText = computed(() => {
+  const [value] = state.activeTableCell;
+  return value || '';
+});
+
+const selectableItems = computed(() => {
+  return items.value.filter((item) => isSelectable(item));
+});
+
+const user = computed(() => {
+  return store.getters['auth/user'];
+});
+
+const userMemberships = computed(() => {
+  return store.getters['memberships/memberships'];
+});
+
+function shouldTruncate(value) {
+  return value.length > state.textTruncateLength;
+};
+
+function isModalOpen(value) {
+  return JSON.stringify(state.activeTableCell) === JSON.stringify(value);
+};
+
+function openModal(ev, cell, showCopyButton = false) {
+  const [value] = cell;
+  if (value.length > state.textTruncateLength) {
+    state.activeTableCell = cell;
+    state.modalLeftPosition =
+      ev.target.getBoundingClientRect().left - tableRef.value.$el.getBoundingClientRect().left;
+    state.modalTopPosition =
+      ev.target.getBoundingClientRect().top - tableRef.value.$el.getBoundingClientRect().top;
+    state.modalShowCopyButton = showCopyButton;
+  }
+};
+
+function closeModal() {
+  state.activeTableCell = [];
+  state.modalLeftPosition = null;
+  state.modalTopPosition = null;
+  state.modalShowCopyButton = false;
+};
+
+function createCustomFilter(field) {
+  return (value) => {
+    if (!state.searchFields[field]) {
+      return true;
+    }
+    return value.toLowerCase().startsWith(state.searchFields[field].toLowerCase());
+  };
+};
+
+function createHeaders() {
+  const headers = [];
+  if (state.parsed) {
+    const rawHeaders = state.parsed.meta.fields;
+    const matrixHeaders = transformMatrixHeaders(rawHeaders, props.submissions.content);
+    PREFERRED_HEADERS.forEach((header) => {
+      headers.push({
+        title: header,
+        value: header,
+        filter: createCustomFilter(header),
+      });
+    });
+    matrixHeaders.forEach((header) => {
+      if (
+        PREFERRED_HEADERS.includes(header) ||
+        (props.excludeMeta && (header.startsWith('meta') || header.includes('meta')))
+      ) {
         return;
       }
-      const headers = transformGeoJsonHeaders(this.submissions.headers);
-      if (this.submissions.content.length > 0) {
-        this.csv = csvService.createCsv(this.submissions.content, headers);
-        this.parsed = papa.parse(this.csv, { header: true });
-      }
-      this.createHeaders();
-    },
-    async openResource(value) {
-      this.downloadingResource = true;
-      let resourceKeyParts = value.split('/');
-      let resourceId = resourceKeyParts[resourceKeyParts.length - 2]; //resourceId is second last part of key
-      try {
-        await openResourceInTab(this.$store, resourceId);
-      } catch (error) {
-        this.openResourceError = 'File could not be opened';
-      } finally {
-        this.downloadingResource = false;
-      }
-    },
-    isSelected(item) {
-      return this.tableSelected.some((selected) => selected._id === item._id);
-    },
-    isSelectable(item) {
-      //load original submission object, as item may miss meta data if excludeMeta is true
-      const submission = this.submissions.content.find((s) => s._id === item._id);
-      const allowedToResubmit = checkAllowedToResubmit(submission, this.userMemberships, this.user._id);
-      return allowedToResubmit;
-    },
-    toggleSelect(item) {
-      if (this.isSelected(item)) {
-        this.tableSelected = this.tableSelected.filter((selectedItem) => selectedItem._id !== item._id);
+      state.searchFields[header] = ''; // v-data-table search/filter is not used at this moment
+
+      if (rawHeaders.includes(header)) {
+        headers.push({
+          title: header,
+          value: header,
+          filter: createCustomFilter(header),
+        });
       } else {
-        this.tableSelected.push(item);
+        const properties = getPropertiesFromMatrix(rawHeaders, header);
+        headers.push(
+          ...properties.map((h) => ({
+            title: `${header}.${h}`,
+            value: [header, h].join(MATRIX_SEPARATOR),
+            filter: createCustomFilter([header, h].join(MATRIX_SEPARATOR)),
+          }))
+        );
       }
-    },
-    toggleSelectAllItems() {
-      if (this.selected.length > 0) {
-        //de-select all
-        this.tableSelected = [];
-      } else {
-        //select all
-        this.tableSelected = this.selectableItems;
-      }
-    },
-  },
-  async created() {
-    this.fetchData();
-  },
+    });
+  }
+  state.headers = headers;
 };
+
+function onUpdateSortBy(value) {
+  emit('onDataTablePropsChanged', value);
+};
+
+async function fetchData() {
+  if (!props.submissions) {
+    return;
+  }
+  const headers = transformGeoJsonHeaders(props.submissions.headers);
+  if (props.submissions.content.length > 0) {
+    state.csv = csvService.createCsv(props.submissions.content, headers);
+    state.parsed = papa.parse(state.csv, { header: true });
+  }
+  createHeaders();
+};
+
+async function openResource(value) {
+  state.downloadingResource = true;
+  let resourceKeyParts = value.split('/');
+  let resourceId = resourceKeyParts[resourceKeyParts.length - 2]; //resourceId is second last part of key
+  try {
+    await openResourceInTab(store, resourceId);
+  } catch (error) {
+    state.openResourceError = 'File could not be opened';
+  } finally {
+    state.downloadingResource = false;
+  }
+};
+
+function isSelected(item) {
+  return tableSelected.value.some((selected) => selected._id === item._id);
+};
+
+function isSelectable(item) {
+  //load original submission object, as item may miss meta data if excludeMeta is true
+  const submission = props.submissions.content.find((s) => s._id === item._id);
+  return rightToManageSubmission(submission).allowed;
+};
+
+function toggleSelect(item) {
+  if (isSelected(item)) {
+    tableSelected.value = tableSelected.value.filter((selectedItem) => selectedItem._id !== item._id);
+  } else {
+    tableSelected.value.push(item);
+  }
+};
+
+function toggleSelectAllItems() {
+  if (props.selected.length > 0) {
+    //de-select all
+    tableSelected.value = [];
+  } else {
+    //select all
+    tableSelected.value = selectableItems.value;
+  }
+};
+
+watch([() => props.excludeMeta], createHeaders);
+watch([() => props.submissions], fetchData);
+
+fetchData();
+
 </script>
 
 <style scoped lang="scss">

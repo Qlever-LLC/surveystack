@@ -357,7 +357,7 @@ const addDocLink = async (req, res) => {
 
     if (addToDescendants) {
       // find all descendant sub groups and add doc too
-      const groupAndSubgroups = await rolesService.getDescendantGroups(existing);
+      const groupAndSubgroups = await rolesService.getGroupAndDescendants(existing);
       for (const subgroup of groupAndSubgroups) {
         groupIdsToUpdate.push(subgroup._id);
       }
@@ -387,7 +387,7 @@ const removeDocLink = async (req, res) => {
 
     if (removeFromDescendants) {
       // find all descendant sub groups and add doc too
-      const groupAndSubgroups = await rolesService.getDescendantGroups(existing);
+      const groupAndSubgroups = await rolesService.getGroupAndDescendants(existing);
       for (const subgroup of groupAndSubgroups) {
         groupIdsToUpdate.push(subgroup._id);
       }

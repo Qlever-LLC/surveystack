@@ -37,7 +37,7 @@ const getParentGroups = async (groupId) => {
   return descendants.filter((d) => isParent(d.path, group.path));
 };
 
-export const getDescendantGroups = async (group, projection = {}) => {
+export const getGroupAndDescendants = async (group, projection = {}) => {
   const descendants = await db
     .collection('groups')
     .find({ path: { $regex: `^${group.path}` } }, { projection: projection })
@@ -87,7 +87,16 @@ export const hasRole = async (userId, groupId, role) => {
   const groupEntity = await db.collection('groups').findOne({ _id: groupObjectId });
   const targetRole = `${role}@${groupEntity.path}`;
 
-  return roles.some((role) => targetRole.startsWith(role));
+  switch (role) {
+    case 'user':
+      // a membership with role user grants membership to an exact group
+      return roles.some((role) => targetRole === role);
+    case 'admin':
+      // a membership with role admin grants admin membership the a group and its descendants
+      return roles.some((role) => targetRole.startsWith(role));
+    default:
+      throw new Error(`Role ${role} not supported`);
+  }
 };
 
 const hasSuperAdminRole = async (userId) => {
@@ -149,6 +158,6 @@ export default {
   hasAdminRoleForRequest,
   hasAdminRole,
   hasUserRole,
-  getDescendantGroups,
+  getGroupAndDescendants,
   getParentGroups,
 };

@@ -6,15 +6,15 @@ import mailService from '../services/mail/mail.service';
 import { db } from '../db';
 import { createMagicLink } from '../services/auth.service';
 
-const createText = async (text, { origin, survey, group, email }) => {
-  const landingPath = `/groups/${group}/surveys/${survey}/submissions/new`;
+const createText = async (text, { origin, survey, group, email, submitTo }) => {
+  const landingPath = `/groups/${group}/surveys/${survey}/submissions/new?submitTo=${submitTo}`;
   const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 14, landingPath });
 
   return text.replace(/%CFS_MAGIC_LINK%/g, magicLink);
 };
 
 const send = async (req, res) => {
-  const { subject, body, survey, members, group, copy } = req.body;
+  const { subject, body, survey, members, group, copy, submitTo } = req.body;
   const { origin } = req.headers;
 
   const memberships = await db
@@ -29,7 +29,7 @@ const send = async (req, res) => {
 
   for (const membership of memberships) {
     const { email } = membership.user;
-    const text = await createText(body, { origin, survey, group, email });
+    const text = await createText(body, { origin, survey, group, email, submitTo });
 
     // TODO: find a better way to send bulk emails
     await mailService.send({

@@ -8,7 +8,9 @@
       :survey="state.survey"
       :submission="state.submission"
       :persist="!isResubmission() && !isProxySubmission()"
-      @submit="submit" />
+      @submit="submit"
+      :handleClose="handleClose"
+    />
     <div v-else-if="state.loading && !state.hasError" class="d-flex align-center justify-center" style="height: 100%">
       <a-progress-circular :size="50" />
     </div>
@@ -35,7 +37,7 @@
       v-model="state.showResubmissionDialog"
       maxWidth="50rem"
       labelConfirm="Edit anyway"
-      @cancel="abortEditSubmitted"
+      @cancel="handleClose"
       @confirm="(reason) => (state.submission.meta.archivedReason = reason)"
       reason="RESUBMIT"
       persistent>
@@ -52,11 +54,7 @@
       :items="resultItems"
       title="Survey Result"
       persistent
-      :to="{
-        name: 'group-surveys',
-        params: { id },
-        query: { minimal_ui: route.query.minimal_ui },
-      }"
+      :to="resultDialogTo"
       :survey="state.survey"
       :submission="state.submission"
       @close="onCloseResultDialog" />
@@ -72,7 +70,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, toRaw, watch } from 'vue';
+import { reactive, ref, toRaw, watch, computed } from 'vue';
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -84,7 +82,7 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import { checkAllowedToResubmit, checkAllowedToSubmit, createSubmissionFromSurvey } from '@/utils/submissions';
+import { checkAllowedToSubmit, createSubmissionFromSurvey } from '@/utils/submissions';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import { ARCHIVE_REASONS } from '@/constants';
@@ -93,6 +91,7 @@ import { useResults } from '../../components/ui/results';
 import { fetchSurvey } from '@/components/survey/survey.js';
 import { useGroup } from '@/components/groups/group';
 import { useNavigation } from '@/components/navigation';
+import { getPermission } from '@/utils/permissions';
 
 const props = defineProps({
   routeAction: {
@@ -116,6 +115,10 @@ const props = defineProps({
     required: true,
     type: String,
   },
+  submitToGroupId: {
+    required: false,
+    type: String,
+  },
 });
 
 const { showResult, resultItems, result, reset: resetResults } = useResults();
@@ -126,6 +129,7 @@ const confirmLeaveDialogRef = ref();
 const queryClient = useQueryClient();
 const { isGroupVisitor } = useGroup();
 const { forceDesktopFullscreen } = useNavigation();
+const { rightToManageSubmission } = getPermission();
 
 const initialState = {
   submission: null,
@@ -147,6 +151,12 @@ const resetComponentState = () => {
   Object.assign(state, initialState);
   resetResults();
 };
+
+const resultDialogTo = computed(() => window.history.state.back ?? {
+  name: 'group-surveys',
+  params: { id: state.submission?.meta?.group?.id },
+  query: { minimal_ui: route.query.minimal_ui },
+});
 
 watch(
   [() => props.submissionId, () => props.routeAction],
@@ -175,6 +185,32 @@ const handleLeave = (next) => (isLeaving) => {
   }
   next(isLeaving);
 };
+
+const handleClose = () => {
+  if (route.name === 'group-survey-submissions-new') {
+    const returnTo = window.history.state.back ?? {
+      name: 'group-surveys',
+      params: { id: props.submitToGroupId ?? props.id },
+      query: { minimal_ui: route.query.minimal_ui },
+    }
+    router.replace(returnTo);
+    return;
+  }
+  if (route.name === 'group-survey-submissions-edit') {
+    const submissionGroupId = state.submission?.meta?.group?.id;
+    const defaultReturnTo = submissionGroupId
+      ? {
+          name: 'group-surveys',
+          params: { id: submissionGroupId },
+          query: { minimal_ui: route.query.minimal_ui },
+        }
+      : '/';
+    const returnTo = window.history.state.back ?? defaultReturnTo;
+    router.replace(returnTo);
+    return;
+  }
+}
+
 onBeforeRouteUpdate((to, from, next) => {
   if (state.submission && state.survey && !state.isSubmitted && !state.hasError) {
     confirmLeaveDialogRef.value.open(handleLeave(next));
@@ -204,10 +240,6 @@ function isResubmission() {
 
 function isProxySubmission() {
   return state.submission && state.submission.meta && state.submission.meta.submitAsUser;
-}
-
-function abortEditSubmitted() {
-  router.push(`/groups/${props.id}/my-submissions`);
 }
 
 function addReadyToSubmit(status) {
@@ -313,18 +345,6 @@ async function init() {
     return;
   }
 
-  const allowedToSubmit = checkAllowedToSubmit(
-    state.survey,
-    store.getters['auth/isLoggedIn'],
-    store.getters['memberships/groups']
-  );
-  if (!allowedToSubmit.allowed) {
-    state.hasError = true;
-    state.errorMessage = allowedToSubmit.message;
-    state.loading = false;
-    return;
-  }
-
   // If the user is on the group-survey-submissions-new route, initialize a new submission and then redirect to the group-survey-submissions-edit route for that submission
   if (route.name === 'group-survey-submissions-new') {
     const createSubmissionConfig = {
@@ -340,6 +360,13 @@ async function init() {
         state.errorMessage = 'Error fetching user to submit as. Please refresh to try again.';
         state.loading = false;
         return;
+      }
+    }
+    if (props.submitToGroupId) {
+      createSubmissionConfig.submitToGroupId = props.submitToGroupId;
+      const submitToGroup = store.getters['memberships/groups'].find((group) => group._id === props.submitToGroupId);
+      if (submitToGroup) {
+        createSubmissionConfig.submitToGroupPath = submitToGroup.path;
       }
     }
     state.submission = createSubmissionFromSurvey(createSubmissionConfig);
@@ -379,12 +406,21 @@ async function init() {
     }
   }
 
+  const allowedToSubmit = checkAllowedToSubmit(
+    state.survey,
+    store.getters['auth/isLoggedIn'],
+    store.getters['memberships/groups'],
+    state.submission.meta.group.id
+  );
+  if (!allowedToSubmit.allowed) {
+    state.hasError = true;
+    state.errorMessage = allowedToSubmit.message;
+    state.loading = false;
+    return;
+  }
+
   if (isResubmission()) {
-    const allowedToResubmit = checkAllowedToResubmit(
-      state.submission,
-      store.getters['memberships/memberships'],
-      user._id
-    );
+    const allowedToResubmit = rightToManageSubmission(state.submission).allowed;
     if (!allowedToResubmit) {
       state.hasError = true;
       state.errorMessage = 'You are not allowed to edit this submission.';

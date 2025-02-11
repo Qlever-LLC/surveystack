@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { changeRecursive, changeRecursiveAsync, checkSurvey } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 import pdfService from '../services/pdf.service';
+import { getAncestorPaths } from './utils/groups';
 
 const SURVEYS_COLLECTION = 'surveys';
 const GROUPS_COLLECTION = 'groups';
@@ -85,149 +86,75 @@ const getSurveys = async (req, res) => {
   return res.send(entities);
 };
 
-const buildPipelineGetSurveyPinnedFromGroupId = (groupId) => {
-  const pipeline = [
-    { $match: { _id: ObjectId(groupId) } },
-    { $unwind: '$surveys.pinned' },
-    {
-      $lookup: {
-        from: 'surveys',
-        localField: 'surveys.pinned',
-        foreignField: '_id',
-        as: 'pinnedSurveys',
-      },
-    },
-    {
-      $project: {
-        _id: {
-          $arrayElemAt: ['$pinnedSurveys._id', 0],
-        },
-      },
-    },
-    { $sort: { name: 1 } },
-  ];
-
-  return pipeline;
-};
-
-const buildPipelineForGetSurveyPage = (
-  { q, groupId, projections, creator, skip, limit, prefix, isLibrary, showArchived },
-  pinnedEntities,
-  sortSurveysPrioPinnedForOneGroup = false
-) => {
-  const match = {};
-  const project = {};
+const buildPipelineForGetSurveyPage = async ({
+  q,
+  activeGroupId,
+  projections = [],
+  creator,
+  skip,
+  limit,
+  prefix,
+  isLibrary,
+  showArchived,
+}) => {
+  const match = {
+    ...(q ? { name: { $regex: q, $options: 'i' } } : {}),
+    ...(creator ? { 'meta.creator': new ObjectId(creator) } : {}),
+    ...(prefix ? { 'meta.group.path': { $regex: `^${prefix}` } } : {}),
+    // TODO: review existing data to see if there are surveys with no meta.archived or meta.isLibrary property.
+    // If there are, create a migration to set those properties to false on those surveys. Then, we can simplify this line to check for false instead of not true.
+    ['meta.isLibrary']: isLibrary === 'true' ? true : { $ne: true },
+    ['meta.archived']: showArchived === 'true' ? true : { $ne: true },
+  };
   let parsedSkip = 0;
   let parsedLimit = DEFAULT_LIMIT;
 
-  if (q) {
-    match.name = {
-      $regex: q,
-      $options: 'i',
-    };
-  }
+  const pipeline = [];
 
-  if (creator) {
-    match['meta.creator'] = new ObjectId(creator);
-  }
+  let pinnedSurveyIds = [];
+  if (activeGroupId) {
+    const activeGroup = await db
+      .collection(GROUPS_COLLECTION)
+      .findOne({ _id: new ObjectId(activeGroupId) });
+    pinnedSurveyIds = activeGroup.surveys.pinned.map((id) => new ObjectId(id));
+    const ancestorGroupPaths = getAncestorPaths(activeGroup.path);
 
-  if (prefix) {
-    match['meta.group.path'] = {
-      $regex: `^${prefix}`,
-    };
-  }
-
-  if (isLibrary === 'true') {
-    match['meta.isLibrary'] = true;
-  } else if (isLibrary === 'false') {
-    match.$or = [{ 'meta.isLibrary': { $exists: false } }, { 'meta.isLibrary': false }];
-  }
-
-  if (showArchived === 'true') {
-    match['meta.archived'] = true;
-  } else {
-    match.$or = [{ 'meta.archived': { $exists: false } }, { 'meta.archived': false }];
-  }
-
-  let pipeline = [];
-
-  if (sortSurveysPrioPinnedForOneGroup) {
-    pipeline = [
-      { $match: { 'meta.group.id': ObjectId(groupId) } },
-      {
-        $addFields: {
-          lowercasedName: {
-            $toLower: '$name',
+    pipeline.push({
+      $match: {
+        $or: [
+          { 'meta.group.id': ObjectId(activeGroupId) },
+          {
+            $and: [
+              { 'meta.group.path': { $in: ancestorGroupPaths } },
+              { 'meta.submissions': 'groupAndDescendants' },
+            ],
           },
-        },
+        ],
       },
-      {
-        $addFields: {
-          isInPinnedList: {
-            $in: ['$_id', pinnedEntities],
-          },
-        },
-      },
-      {
-        $addFields: {
-          sortOrder: {
-            $switch: {
-              branches: [
-                {
-                  case: { $eq: ['$isInPinnedList', true] },
-                  then: 0,
-                },
-              ],
-              default: 1,
-            },
-          },
-        },
-      },
-      {
-        $sort: { sortOrder: 1, lowercasedName: 1 },
-      },
-    ];
-  }
-
-  if (Object.keys(match).length > 0) {
-    pipeline.push({ $match: match });
-  }
-
-  if (projections) {
-    projections.forEach((projection) => {
-      project[projection] = 1;
     });
-    if (sortSurveysPrioPinnedForOneGroup) {
-      pipeline.push({
-        $project: { ...project, isInPinnedList: 1 },
-      });
-    } else {
-      pipeline.push({
-        $project: { ...project },
-      });
-    }
   }
 
-  if (!sortSurveysPrioPinnedForOneGroup) {
-    // default sort by name (or date modified?)
-    // needs aggregation for case insensitive sorting
-    pipeline.push(
-      { $addFields: { lowercasedName: { $toLower: '$name' } } },
-      { $sort: { lowercasedName: 1 } },
-      { $project: { lowercasedName: 0 } }
-    );
-  }
+  pipeline.push({ $match: match });
+  pipeline.push(
+    {
+      $addFields: {
+        ...(activeGroupId ? { isPinned: { $in: ['$_id', pinnedSurveyIds] } } : {}),
+      },
+    },
+    activeGroupId ? { $sort: { isPinned: -1, name: 1 } } : { $sort: { name: 1 } }
+  );
+  pipeline.push({
+    $project: {
+      ...Object.fromEntries(projections.map((p) => [p, 1])),
+      ...(activeGroupId ? { isPinned: 1 } : {}),
+    },
+  });
 
   if (isLibrary === 'true') {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
     // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
     // TODO also count revisions.controls.children.libraryId
     const aggregateCounts = [
-      {
-        $match: {
-          'meta.isLibrary': true,
-        },
-      },
       /*
       TODO Resolve #48, then uncommet this
        {
@@ -304,18 +231,9 @@ const buildPipelineForGetSurveyPage = (
   const paginationStages = [
     {
       $facet: {
-        content: [
-          {
-            $skip: parsedSkip,
-          },
-          {
-            $limit: parsedLimit,
-          },
-        ],
+        content: [{ $skip: parsedSkip }, { $limit: parsedLimit }],
         pagination: [
-          {
-            $count: 'total',
-          },
+          { $count: 'total' },
           {
             $addFields: {
               parsedSkip,
@@ -325,9 +243,7 @@ const buildPipelineForGetSurveyPage = (
         ],
       },
     },
-    {
-      $unwind: '$pagination',
-    },
+    { $unwind: '$pagination' },
   ];
   pipeline.push(...paginationStages);
 
@@ -352,60 +268,21 @@ const getSurveyListPage = async (req, res) => {
     ],
   };
 
-  const { prioPinned } = req.query;
-  let entities;
-  const noEntities = {
-    content: [],
-    pagination: {
-      total: 0,
-      skip: req.query.skip || 0,
-      limit: req.query.limit || DEFAULT_LIMIT,
-    },
-  };
+  const pipeline = await buildPipelineForGetSurveyPage(query);
+  const [entities] = await db
+    .collection(SURVEYS_COLLECTION)
+    .aggregate(pipeline, { collation: { locale: 'en' } })
+    .toArray();
 
-  if (prioPinned) {
-    const pipelinePinned = buildPipelineGetSurveyPinnedFromGroupId(query.groupId);
-    const pipelinePinnedEntities = await db
-      .collection(GROUPS_COLLECTION)
-      .aggregate(pipelinePinned)
-      .toArray();
-
-    const pinnedEntities = pipelinePinnedEntities.map((obj) => obj._id);
-
-    const sortSurveysPrioPinnedForOneGroup = true;
-    const pipeline = buildPipelineForGetSurveyPage(
-      query,
-      pinnedEntities,
-      sortSurveysPrioPinnedForOneGroup
-    );
-
-    [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
-
-    if (!entities) {
-      return res.send(noEntities);
-    }
-
-    const pinned = [];
-
-    for (let i = entities.content.length - 1; i >= 0; i--) {
-      const entity = entities.content[i];
-      if (entity.isInPinnedList) {
-        pinned.push(entity);
-        entities.content.splice(entities.content.indexOf(entity), 1);
-      }
-      // do not delete the new isInPinnedList field; it is used to display the icon pin for a visitor
-    }
-
-    entities.pinned = pinned;
-  } else {
-    const pipeline = buildPipelineForGetSurveyPage(query);
-    [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
-
-    // empty array when there is no match
-    // however, we still want content and pagination properties
-    if (!entities) {
-      return res.send(noEntities);
-    }
+  if (!entities) {
+    return res.send({
+      content: [],
+      pagination: {
+        total: 0,
+        skip: req.query.skip || 0,
+        limit: req.query.limit || DEFAULT_LIMIT,
+      },
+    });
   }
 
   return res.send(entities);
@@ -847,8 +724,6 @@ const getPinned = async (req, res) => {
     }, {})
   );
   pinned.push(...uniquePinnedSurveys);
-
-  // console.log('pinned', pinned);
 
   return res.send({
     status: 'success',

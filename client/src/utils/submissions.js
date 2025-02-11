@@ -32,6 +32,8 @@ export const createSubmissionFromSurvey = ({
   instance,
   submitAsUser = undefined,
   isDraft = true,
+  submitToGroupId = null,
+  submitToGroupPath = null,
 }) => {
   const submission = {};
   const dateNow = new Date().toISOString();
@@ -50,8 +52,8 @@ export const createSubmissionFromSurvey = ({
     permissions: [],
     status: [],
     group: {
-      id: survey.meta.group.id,
-      path: survey.meta.group.path,
+      id: submitToGroupId ?? survey.meta.group.id,
+      path: submitToGroupPath ?? survey.meta.group.path,
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
     submitAsUser: submitAsUser,
@@ -223,8 +225,9 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
 }
 
 export const isGroupMember = (survey, userGroups) => userGroups.some((group) => group._id === survey.meta.group.id);
+export const isGroupMemberOfGroupOrDescendant = (survey, userGroups) => userGroups.some((group) => group.path.startsWith(survey.meta.group.path));;
 
-export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
+export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups, submitToGroupId) => {
   const { submissions, isLibrary } = survey.meta;
 
   if (isLibrary) {
@@ -248,6 +251,23 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
     */
 
   switch (submissions) {
+    case 'groupAndDescendants': {
+      if (!isLoggedIn) {
+        return { allowed: false, message: 'You must be logged in to submit this survey.' };
+      }
+      const isMemberOfSubmitToGroup = userGroups.some(
+        (group) => group._id === submitToGroupId
+      );
+      return isGroupMemberOfGroupOrDescendant(survey, userGroups)
+        && isMemberOfSubmitToGroup
+        ? {
+            allowed: true,
+          }
+        : {
+            allowed: false,
+            message: 'You must be a member of the group or a descendant group to submit this survey.',
+          };
+    }
     case 'group': {
       if (!isLoggedIn) {
         return { allowed: false, message: 'You must be logged in to submit this survey.' };
@@ -270,11 +290,44 @@ export const checkAllowedToSubmit = (survey, isLoggedIn, userGroups) => {
   return { allowed: false, message: 'You are not authorized to submit this survey.' };
 };
 
-//TODO replace this by permissions.js:rightToManageSubmission which requires to refactor the using components to script setup
-export const checkAllowedToResubmit = (submission, userMemberships, userId) => {
-  const isAdminOfSubmissionGroup = userMemberships.some(
-    (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
+/**
+ * Retrieves the group IDs for the surveys associated with the given submissions.
+ * @param {Array} submissions - An array of submission objects.
+ * @returns {Object} An object mapping survey IDs to group IDs.
+ */
+export async function getSubmissionSurveyGroupIds(submissions) {
+  const surveyIds = submissions.map((s) => s.meta.survey.id);
+  const surveyPromises = surveyIds.map(
+    (id) => api.get(`/surveys?q=${id}&projections[]=meta.group.id`)
   );
-  const isCreatorOfSubmission = submission.meta.creator === userId;
-  return isAdminOfSubmissionGroup || isCreatorOfSubmission;
-};
+  const results = await Promise.all(surveyPromises);
+  const groupIdBySurveyId = Object.fromEntries(
+    results.map((s) => [s.data[0]._id, s.data[0].meta.group.id])
+  );
+  return groupIdBySurveyId;
+}
+
+/**
+ * Decorates the submissions with their corresponding survey group IDs.
+ * @param {Array} submissions - An array of submission objects.
+ * @param {Object} groupIdBySurveyId - An object mapping survey IDs to group IDs.
+ * @returns {Array} An array of decorated submission objects.
+ */
+export function decorateSubmissionsWithSurveyGroupIds(submissions, groupIdBySurveyId) {
+  return submissions.map((s) => {
+    return { 
+      ...s, 
+      meta: { 
+        ...s.meta, 
+        survey: { 
+          ...s.meta.survey, 
+          meta: { 
+            group: { 
+              id: groupIdBySurveyId[s.meta.survey.id] 
+            } 
+          } 
+        } 
+      } 
+    };
+  });
+}

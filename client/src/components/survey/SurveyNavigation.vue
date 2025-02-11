@@ -96,8 +96,11 @@ function startDraftAs(selectedMember) {
   stateComposable.showSelectMember = false;
   if (selectedMember.user && stateComposable.selectedSurvey) {
     const surveyId = stateComposable.selectedSurvey._id;
+    const groupId = stateComposable.selectedSurvey.meta.group.id;
+    const submitToGroupId = getActiveGroupId();
+    const userId = selectedMember.user._id;
     router.push(
-      `/groups/${getActiveGroupId()}/surveys/${surveyId}/submissions/new?submitAsUserId=${selectedMember.user._id}`
+      `/groups/${groupId}/surveys/${surveyId}/submissions/new?submitAsUserId=${userId}&submitTo=${submitToGroupId}`
     );
   }
   stateComposable.selectedSurvey = undefined;

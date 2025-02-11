@@ -276,6 +276,7 @@ export default [
         surveyId: route.params.surveyId,
         submitAsUserId: route.query.submitAsUserId,
         routeAction: 'new',
+        submitToGroupId: route.query.submitTo,
       }),
       navigation: true,
     },
@@ -284,12 +285,9 @@ export default [
     path: '/groups/:id/surveys/:surveyId/submissions/:submissionId/edit',
     name: 'group-survey-submissions-edit',
     components: {
-      header: AppHeader,
-      navigation: AppNavigationGroup,
       main: SubmissionPage,
     },
     props: {
-      navigation: true,
       main: (route) => ({
         routeAction: 'edit',
         id: route.params.id,

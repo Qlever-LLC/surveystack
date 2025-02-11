@@ -1,9 +1,10 @@
-import SubmissionTableClientCsv, {
+import {
   getPropertiesFromMatrix,
   transformGeoJsonHeaders,
   transformMatrixHeaders,
   getCellValue,
-} from './SubmissionTableClientCsv.vue';
+} from './SubmissionTableClientCsv.js';
+import SubmissionTableClientCsv from './SubmissionTableClientCsv.vue'
 import { fireEvent } from '@testing-library/vue';
 import { within } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
