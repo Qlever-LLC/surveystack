@@ -152,6 +152,8 @@ export default {
     handleScriptHasLoaded() {
       if (this.modelValue) {
         this.requestRenderScript();
+      } else {
+        this.requestRunScript();
       }
     },
     handleRequestSetQuestionValue({ value }) {
