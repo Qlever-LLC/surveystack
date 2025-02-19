@@ -1,35 +1,69 @@
+import { uploadFileResource } from '@/utils/resources';
 import resourcesStore from './resources.store';
-//import resourcesStore from '@/store/modules/resources.store';
-//import draftStore from './draft.store';
+import { Blob } from 'buffer';
 
-const { actions } = resourcesStore;
+jest.mock('@/utils/resources');
+
+const { actions, mutations } = resourcesStore;
+
+export function getMockFile(fileName) {
+  let content = 'test-data';
+  let contentType = 'text/plain';
+
+  let blob = new Blob([content], { type: contentType });
+  blob['lastModifiedDate'] = '';
+  blob['name'] = fileName;
+  return blob;
+}
 
 describe('resources store', () => {
   describe('actions', () => {
     describe('initFromIndexedDB', () => {
-      it.todo('does not throw');
-      /*it('does not throw', () => {
+      it('does not throw', async () => {
         const call = jest.fn();
         const dispatch = call.bind(null, 'dispatch');
         const commit = call.bind(null, 'commit');
-        expect(actions.initFromIndexedDB({ dispatch, commit })).toThrowError();
-      });*/
-      it.todo('loads the content from idb to the state');
+        await expect(actions.initFromIndexedDB({ dispatch, commit })).resolves.not.toThrowError();
+      });
     });
     describe('addRemoteResource', () => {
-      it.todo('');
+      const mockFile = getMockFile('test-file-name.txt');
+
+      it('calls addLocalResource', async () => {
+        const dispatch = jest.fn().mockReturnValue({ _id: 'mocked-id', key: 'mocked-key' });
+        const commit = jest.fn();
+        await actions.addRemoteResource({ dispatch, commit }, mockFile);
+        expect(dispatch).toHaveBeenCalledWith('addLocalResource', mockFile);
+      });
+      it('calls uploadFileResource', async () => {
+        const dispatch = jest.fn().mockReturnValue({ _id: 'mocked-id', key: 'mocked-key' });
+        const commit = jest.fn();
+        await actions.addRemoteResource({ dispatch, commit }, mockFile);
+        expect(uploadFileResource).toHaveBeenCalled();
+      });
+      it('loads the newly created remote resource into cache', async () => {
+        const dispatch = jest.fn().mockReturnValue({ _id: 'mocked-id', key: 'mocked-key' });
+        const commit = jest.fn();
+        await actions.addRemoteResource({ dispatch, commit }, mockFile);
+        expect(dispatch).toHaveBeenCalledWith('fetchResource', 'mocked-id');
+      });
     });
     describe('addLocalResource', () => {
-      it.todo('');
+      it.todo('stores the resource to the store state');
+      it.todo('persists the resource to indexeddb');
     });
     describe('updateResourceLabel', () => {
-      it.todo('');
+      it.todo('returns resource with changed label and name');
+      it.todo('persists the changed resource to indexeddb');
+      it.todo('updates the resource in the store state');
     });
     describe('updateResourceState', () => {
-      it.todo('');
+      it.todo('persists the changed resource to indexeddb');
+      it.todo('updates the resource in the store state');
     });
     describe('removeLocalResource', () => {
-      it.todo('');
+      it.todo('removes the resource from indexedb');
+      it.todo('removes the resource from the store state');
     });
     describe('fetchResource', () => {
       it.todo('');
