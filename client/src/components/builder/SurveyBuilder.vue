@@ -797,9 +797,20 @@ export default {
         this.control.options.source = value;
       }
     },
+    removeDuplicates(resourcesArray) {
+      const uniqueElements = {};
+      return resourcesArray.filter((element) => {
+        // If the 'id' is not in uniqueElements, keep the element
+        if (!uniqueElements[element.id]) {
+          uniqueElements[element.id] = true;
+          return true; // Keep this element
+        }
+        return false; // Ignore duplicates
+      });
+    },
     setSurveyResources(resources) {
-      //TODO do not mutate survey prop
-      this.surveyUnderWork.resources = resources;
+      const uniqueResources = this.removeDuplicates(resources);
+      this.surveyUnderWork.resources = uniqueResources;
     },
     setControlParams(params) {
       this.control.options.params = params;
@@ -1100,6 +1111,9 @@ export default {
       this.surveyUnderWork.meta.libraryHistory = '';
       this.surveyUnderWork.meta.libraryLastChangeType = '';
     } else if (libId) this.addQuestionsFromLibrary(libId);
+
+    const uniqueResources = this.removeDuplicates(this.surveyUnderWork.resources);
+    this.surveyUnderWork.resources = uniqueResources;
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue
