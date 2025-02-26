@@ -4,7 +4,6 @@
 
 import { cloneDeep, set } from 'lodash';
 import { SPEC_VERSION_SURVEY } from '@/constants';
-import supplySandbox from './supplySandbox';
 import ObjectID from 'bson-objectid';
 import { flatSurveyControls } from '@/utils/surveyDiff';
 
@@ -360,39 +359,88 @@ export const uuidv4 = () => {
   return u;
 };
 
-// eslint-disable-next-line no-unused-vars
-function _has(target, key) {
-  return true;
-}
 
-function _get(target, key) {
-  if (key === Symbol.unscopables) return undefined;
-  return target[key];
-}
+export async function executeCodeInIframe({ code, fname, submission, survey, parent, log = () => {} }) {
+  console.log('execute code in iframe');
+  const baseURL = window.location.origin;
+  const sandboxUtilsSource = await (await fetch(`${baseURL}/sandboxUtils.js`)).text();
 
-export function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2, arg3); }`;
-  let AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-  const code = new AsyncFunction('sandbox', wrappedSource);
+  return new Promise((resolve, reject) => {
+    // Create a sandboxed iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.sandbox = 'allow-scripts';
 
-  return async function (sandbox) {
-    const sandboxProxy = new Proxy(sandbox, { _has, _get });
-    return await code(sandboxProxy);
-  };
-}
 
-export async function executeUnsafe({ code, fname, submission, survey, parent, log }) {
-  const sandbox = compileSandbox(code, fname);
+    // Script to inject into the iframe, using srcdoc
+    const scriptContent = `
+      <script type="module">
+        ${sandboxUtilsSource}
 
-  const res = await sandbox({
-    arg1: submission,
-    arg2: survey,
-    arg3: parent,
-    log,
-    ...supplySandbox,
+        (async function() {
+          try {
+            console.log('Script inside the iframe executed');
+            const log = (...args) => {
+              console.log(...args);
+              window.parent.postMessage({ logs: args }, '*')
+            };
+
+            // Injected user code
+            ${code}
+
+            // Call the user-provided function with parameters
+            const result = await ${fname}(${JSON.stringify(submission)}, ${JSON.stringify(survey)}, ${JSON.stringify(parent)});
+          } catch (error) {
+            console.error('Error in iframe', error);
+            window.parent.postMessage({ error: error.message }, '*');
+          } finally {
+            // Clean up the iframe after use
+            window.parent.postMessage({ done: true }, '*');
+          }
+        })();
+      </script>
+    `;
+
+    // Use srcdoc to inject the HTML with Content Security Policy + script into the iframe
+    /*
+      default-src 'none': Disallows all resource loading by default.
+      script-src 'self' 'unsafe-inline': Allows scripts from the same origin and inline scripts (less secure, use with caution).
+      connect-src https://app.surveystack.io/: Limits network requests (fetch, XHR, WebSockets) to the specified domain.
+      img-src 'none': Disallows loading of any images.
+      child-src 'none': Prevents loading of nested iframes or embedded objects.
+      object-src 'none': Disallows <object>, <embed>, or <applet> elements for enhanced security.
+    */
+    iframe.srcdoc = `<html>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; connect-src ${window.location.origin}/; img-src 'none'; child-src 'none'; object-src 'none';">
+    <body>${scriptContent}</body>
+    </html>`;
+
+    function listener(event) {
+      if (event.source === iframe.contentWindow) {
+        const { logs, result, error, done } = event.data;
+
+        if (logs) {
+          logs.forEach(log);
+        }
+
+        if (done || error) {
+          // Remove listener after receiving message
+          window.removeEventListener('message', listener);
+          // Clean up the iframe after use
+          document.body.removeChild(iframe);
+        }
+
+        if (error) {
+          reject(new Error(error));
+        } else {
+          resolve(result);
+        }
+      }
+    }
+    // Listen for the iframe's response via postMessage
+    window.addEventListener('message', listener);
+    document.body.appendChild(iframe);
   });
-
-  return res;
 }
 
 /**

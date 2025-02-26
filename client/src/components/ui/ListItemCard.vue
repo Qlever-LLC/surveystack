@@ -31,7 +31,6 @@
             <span class="entityName_deepCSS">
               <span> {{ state.entity.name }}</span>
               <slot name="afterName" :entity="entity" />
-              &nbsp;{{ groupId }}
               <br />
               <span v-if="showGroupPath" style="color: gray">
                 {{ state.entity.path }}
