@@ -1,4 +1,4 @@
-import mung from 'express-mung';
+import { jsonMiddleware } from 'express-response-middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { log } from '../services/logging.service';
 
@@ -41,13 +41,12 @@ function appendDatabaseOperationDurationToLoggingMessage(res, duration) {
 
 // Logging response bodies can use significant amounts of storage.
 // Consider log volume, index lifecycle policy (duration to keep logs), and available storage before using this middleware.
-const appendResponseBodyToLoggingMessage = mung.json(
+const appendResponseBodyToLoggingMessage = jsonMiddleware(
   (resBody, req, res) => {
     if (process.env.ELASTIC_ENABLE_LOGGING === 'true') {
       res.locals.loggingMessage.resBody = JSON.stringify(resBody);
     }
-  },
-  { mungError: true }
+  }
 );
 
 export {
