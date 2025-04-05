@@ -374,6 +374,12 @@ router.post(
   catchErrors(farmosController.superAdminUnMapFarmosInstance)
 );
 
+router.delete(
+  '/farmos/multitenant-instance/:id',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUnmapMultitenantInstance)
+);
+
 router.post(
   '/farmos/user-map-instance',
   [assertIsSuperAdmin],
@@ -441,6 +447,12 @@ router.get(
 );
 
 router.get(
+  '/farmos/group-manage/:groupId/organizations-in-multitenant/:multitenantName',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getOrganizationsInMultitenant)
+);
+
+router.get(
   '/farmos/group-manage/:groupId/plans',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.getPlanForGroup)
@@ -450,6 +462,12 @@ router.post(
   '/farmos/group-manage/:groupId/mapUser',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.mapUser)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/map-user-to-organization',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.mapUserToOrganizationInMultitenantInstance)
 );
 
 router.post(

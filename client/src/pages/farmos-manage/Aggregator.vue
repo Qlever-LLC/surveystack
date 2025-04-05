@@ -40,48 +40,59 @@
         Group Mappings for
         <a-chip>{{ state.selectedInstance }}</a-chip>
       </h2>
+      <template v-if="state.isSelectedInstanceMappedAsMultitenant">
+        <p>
+          This instance is mapped as a multitenant instance to {{ state.selectedInstanceMultitenantGroupName }}.
+        </p>
+        <p>
+          You can map organizations within the multitenant instance to users via the FarmOS Settings page within the group.
+        </p>
+        <p>
+          You can manage the multitenant instance to group mapping on the "Map Multitenant Instance" tab in the Super Admin area.
+        </p>
+      </template>
+      <template v-else>
+        <div class="d-flex my-2 align-baseline">
+          <a-select
+            variant="outlined"
+            primary
+            label="Map Group to Instance"
+            v-model="state.selectedGroup"
+            :item-title="(g) => `${g.name} (${g.path})`"
+            item-value="_id"
+            :items="state.activeGroups"
+            class="mt-4 mr-4" />
+          <a-btn
+            :disabled="!state.selectedGroup"
+            color="primary"
+            @click="$emit('map-group', state.selectedGroup, state.selectedInstance)"
+            >Map</a-btn
+          >
+        </div>
 
-      <div class="d-flex my-2 align-baseline">
-        <a-select
-          variant="outlined"
-          primary
-          label="Map Group to Instance"
-          v-model="state.selectedGroup"
-          :item-title="(g) => `${g.name} (${g.path})`"
-          item-value="_id"
-          :items="state.activeGroups"
-          class="mt-4 mr-4" />
-        <a-btn
-          :disabled="!state.selectedGroup"
-          color="primary"
-          @click="$emit('map-group', state.selectedGroup, state.selectedInstance)"
-          >Map</a-btn
-        >
-      </div>
-
-      <a-label class="vy-4">Current Group Mappings</a-label>
-
-      <a-table v-if="state.mappedGroups.length > 0">
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">Group Name</th>
-              <th class="text-left">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(group, idx) in state.mappedGroups" :key="`grp-${idx}`">
-              <td>{{ group.name }} <span v-if="group.meta.archived">(archived)</span></td>
-              <td>
-                <a-btn color="red" @click="$emit('unmap-group', group._id, state.selectedInstance)">Unmap</a-btn>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </a-table>
-      <a-alert v-else class="mt-4" mode="fade" variant="text" type="warning">
-        No Group Mappings exist for {{ state.selectedInstance }}
-      </a-alert>
+        <a-label class="vy-4">Current Group Mappings</a-label>
+        <a-table v-if="state.mappedGroups.length > 0">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Group Name</th>
+                <th class="text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(group, idx) in state.mappedGroups" :key="`grp-${idx}`">
+                <td>{{ group.name }} <span v-if="group.meta.archived">(archived)</span></td>
+                <td>
+                  <a-btn color="red" @click="$emit('unmap-group', group._id, state.selectedInstance)">Unmap</a-btn>
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </a-table>
+        <a-alert v-else class="mt-4" mode="fade" variant="text" type="warning">
+          No Group Mappings exist for {{ state.selectedInstance }}
+        </a-alert>
+      </template>
 
       <a-divider class="my-8" />
 
@@ -90,7 +101,10 @@
         <a-chip>{{ state.selectedInstance }}</a-chip>
       </h2>
 
-      <div class="d-flex my-2 justify-space-between align-baseline">
+      <div
+        v-if="!state.isSelectedInstanceMappedAsMultitenant"
+        class="d-flex my-2 justify-space-between align-baseline"
+      >
         <a-select
           v-if="!loading && !!groups"
           class="mt-4"
@@ -116,6 +130,7 @@
           <thead>
             <tr>
               <th class="text-left">User</th>
+              <th class="text-left">Organization (multitenant)</th>
               <th class="text-left">Owner</th>
               <th class="text-left">Action</th>
             </tr>
@@ -123,9 +138,10 @@
           <tbody>
             <tr v-for="(mapping, idx) in state.mappedUsers" :key="`user-${idx}`">
               <td>{{ `${mapping.user.name} (${mapping.user.email})` }}</td>
+              <td>{{ mapping.organizationName }}</td>
               <td>{{ mapping.owner }}</td>
               <td>
-                <a-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)">Unmap</a-btn>
+                <a-btn color="red" @click="$emit('unmap-user', mapping.id)">Unmap</a-btn>
               </td>
             </tr>
           </tbody>
@@ -185,7 +201,7 @@
       <p class="text-grey-darken-2">
         These instances are likely self hosted or have not been added to a payment plan of a group.
       </p>
-      <a-table v-if="!loading">
+      <a-table>
         <template v-slot:default>
           <thead>
             <tr>
@@ -210,6 +226,31 @@
               </td>
               <td>
                 <a-textarea v-if="farm.note" readonly rows="3" v-model="farm.note" />
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </a-table>
+    </div>
+
+    <div v-if="!loading">
+      <h2>Multitenant Instances</h2>
+      <p v-if="!mappings?.multitenantInstances?.length">
+        No multitenant instance mappings exist.
+      </p>
+      <a-table v-else>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">Instance Name</th>
+              <th class="text-left">Group</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(instance, idx) in mappings.multitenantInstances" :key="`instance-${idx}`">
+              <td>{{ `${instance.instanceName}` }}</td>
+              <td>
+                {{ getGroupNameById(instance.groupId) }}
               </td>
             </tr>
           </tbody>
@@ -257,6 +298,14 @@ const state = reactive({
   selectedInstanceInfo: computed(() => {
     return props.mappings.aggregatorFarms.find((e) => e.url === state.selectedInstance);
   }),
+  selectedInstanceMultitenantMapping: computed(() => {
+    return props.mappings.multitenantInstances.find((mtInstance) => mtInstance.instanceName === state.selectedInstance);
+  }),
+  selectedInstanceMultitenantGroupName: computed(() => state.selectedInstanceMultitenantMapping ?
+    getGroupNameById(state.selectedInstanceMultitenantMapping.groupId) :
+    null
+  ),
+  isSelectedInstanceMappedAsMultitenant: computed(() => state.selectedInstanceMultitenantMapping !== undefined),
   farmsNotInAggregator: computed(() => {
     if (!props.mappings) {
       return [];
@@ -303,7 +352,10 @@ const state = reactive({
     const surveyStackFarms = _.uniq(union);
 
     // farms without mapping
-    const farms = props.mappings.aggregatorFarms.filter((f) => !surveyStackFarms.some((s) => f.url === s));
+    const farms = props.mappings.aggregatorFarms.filter((f) =>
+      !surveyStackFarms.some((s) => f.url === s) &&
+      !props.mappings.multitenantInstances.some(mti => mti.instanceName === f.url)
+    );
 
     const mappings = [];
 
@@ -347,12 +399,16 @@ const state = reactive({
       .filter((farm) => farm.instanceName === state?.selectedInstance)
       .map((farm) => ({
         instanceName: farm.instanceName,
+        organizationName: farm.organizationName,
         owner: farm.owner,
         userId: farm.userId,
         user: props.users.find((u) => u._id === farm.userId),
+        id: farm._id,
       }));
   }),
 });
+
+const getGroupNameById = (id) => props.groups.find(g => g._id === id)?.name;
 
 function mapUser(instanceName) {
   state.selectedInstance = instanceName;

@@ -6,6 +6,7 @@
       :key="`user-${member.id}`"
       :user="member"
       :instance-map="member.farms"
+      @success="() => $emit('success')"
       @open="(item) => $emit('open', item)"
       @connect="(item) => $emit('connect', item)"
       @disconnect="(item) => $emit('disconnect', item)" />
@@ -25,14 +26,16 @@ export default {
     remappedMembers() {
       return this.members.map((m) => {
         const farms = m.connectedFarms
-          .filter((f) => f.groups && f.groups.length > 0)
+          .filter((f) => f.groups && f.groups.length > 0 || f.organizationId)
           .map((f) => ({
-            name: f.instanceName,
+            name: f.organizationName ? `${f.organizationName} (${f.instanceName})` : f.instanceName,
+            organizationId: f.organizationId,
             groups: f.groups.map((g) => ({
               name: g.name,
               id: g.groupId,
               path: g.path,
             })),
+            id: f._id,
           }));
 
         return {

@@ -52,7 +52,7 @@
           <a-list-item-title>
             {{ item.raw.label }}
             <a-list-item-subtitle v-if="item.value.isField">
-              {{ item.value.farmName }}
+              {{ item.value.farmName }} {{ item.value?.location?.organizationName ? `(${item.value.location.organizationName})` : '' }}
             </a-list-item-subtitle>
           </a-list-item-title>
         </template>

@@ -30,11 +30,20 @@
           </a-btn>
         </div>
         <a-btn
+          v-if="!instance.organizationId"
           text
           small
           dense
           @click="$emit('disconnect', { groupId: null, userId: user.id, instanceName: instance.name })">
           manage
+        </a-btn>
+        <a-btn
+          v-else
+          text
+          small
+          dense
+          @click="unmap(instance.id)">
+          Unmap
         </a-btn>
       </div>
     </div>
@@ -46,6 +55,8 @@
 </template>
 
 <script>
+import api from '@/services/api.service';
+
 export default {
   data() {
     return {
@@ -58,6 +69,14 @@ export default {
     showMore(user, instance) {
       this.more.push(`${user.id}-${instance.name}`);
     },
+    async unmap(id) {
+      try {
+        await api.post('/farmos/user-unmap-instance', { id });
+        this.$emit('success');
+      } catch (error) {
+        console.error('Error unmapping instance:', error);
+      }
+    }
   },
 };
 </script>

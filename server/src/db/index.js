@@ -40,6 +40,8 @@ const connectDatabase = async () => {
 
   await db.collection('farmos-instances').createIndex({ userId: 1 });
   await db.collection('farmos-instances').createIndex({ instanceName: 1 });
+  await db.collection('farmos-multitenant-instances').createIndex({ instanceName: 1 });
+  await db.collection('farmos-multitenant-instances').createIndex({ groupId: 1 });
 
   await db.collection('farmos-instance-notes').createIndex({ instanceName: 1 }, { unique: true });
 
@@ -77,6 +79,7 @@ const connectDatabase = async () => {
   await migrateSurveyMetaReviewPage_VXtoV10();
   await migrateSubmissions_VXtoV4();
   await migrateSurveyMetaSubmissions_VXtoV11();
+  await migrateFarmosInstancesToSupportOrganizationsWithinMultitenantInstances();
 };
 
 /*
@@ -659,6 +662,28 @@ const migrateSurveyMetaSubmissions_VXtoV11 = async () => {
       'migrateSurveyMetaSubmissions_VXtoV11: Updated',
       updateResult.modifiedCount,
       'surveys'
+    );
+  }
+};
+
+const migrateFarmosInstancesToSupportOrganizationsWithinMultitenantInstances = async () => {
+  const updateResult = await db
+    .collection('farmos-instances')
+    .updateMany({ meta: { $exists: false } }, [
+      {
+        $set: {
+          meta: { specVersion: 1 },
+          organizationName: null,
+          organizationId: null,
+        },
+      },
+    ]);
+
+  if (updateResult.modifiedCount) {
+    console.log(
+      'migrateFarmosInstancesToSupportOrganizationsWithinMultitenantInstances: Updated',
+      updateResult.modifiedCount,
+      'farmos-instances'
     );
   }
 };

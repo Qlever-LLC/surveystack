@@ -28,6 +28,7 @@
           <tr>
             <th class="text-left">Instance Name</th>
             <th class="text-left">Mappings</th>
+            <th class="text-left">Organization</th>
             <th class="text-left">Owner</th>
             <th class="text-left">Action</th>
           </tr>
@@ -46,6 +47,7 @@
                 item-title="instanceName"
                 :items="instances" />
             </td>
+            <td></td>
             <td></td>
             <td>
               <a-checkbox v-model="owner" label="owner" />
@@ -80,6 +82,7 @@
                 </a-chip>
               </div>
             </td>
+            <td>{{ instance.organizationName }}</td>
             <td>{{ instance.owner }}</td>
             <td>
               <a-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)">Unmap</a-btn>
@@ -118,12 +121,14 @@ export default {
         .filter((farm) => farm.userId === this.selectedUser)
         .map((farm) => ({
           instanceName: farm.instanceName,
+          organizationName: farm.organizationName,
           owner: farm.owner,
         }));
 
       const mappings = [];
 
       for (const farm of farms) {
+        console.log({ farm });
         const userMappings = this.mappings.surveystackUserFarms
           .filter((f) => f.instanceName === farm.instanceName)
           .map((m) => ({
@@ -141,6 +146,7 @@ export default {
 
         mappings.push({
           instanceName: farm.instanceName,
+          organizationName: farm.organizationName,
           owner: farm.owner,
           userMappings,
           groupMappings,

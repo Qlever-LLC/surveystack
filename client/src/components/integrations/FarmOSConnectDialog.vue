@@ -2,12 +2,12 @@
   <a-dialog
     :modelValue="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
-    max-width="400"
+    max-width="800"
     max-height="1000">
     <a-card class="pa-4">
       <a-card-title class="headline"> Connect Existing Farm </a-card-title>
       <a-card-text>
-        Select Farm from this Member's profile to include in this group.
+        Select farm from this Member's profile to include in this group.
 
         <br />
         <a-select
@@ -54,6 +54,43 @@
         </a-btn>
       </a-card-text>
 
+      <template v-if="multitenantInstances.length > 0">
+        <a-card-title class="headline">Connect Farm from Multitenant Instance</a-card-title>
+
+        <a-card-text>
+          Select farm from this group's multitenant instances to make available to this user.
+          <br />
+          <a-select
+            class="mt-6"
+            variant="outlined"
+            primary
+            label="Select Multitenant Instance"
+            v-model="selectedMultitenantInstance"
+            :items="multitenantInstances"
+          />
+          <a-select
+            :loading="isPending"
+            class="mt-4"
+            variant="outlined"
+            primary
+            label="Select Farm from Multitenant Instance"
+            v-model="selectedOrganization"
+            return-object
+            :items="organizationsInMultitenantInstance"
+            :item-title="(org) => `${org.name} (${org.id})`"
+          />
+          <a-btn
+            block
+            class="mt-4"
+            color="primary"
+            @click="connectOrganization"
+            :disabled="!selectedMultitenantInstance || !selectedOrganization"
+          >
+            Connect Farm
+          </a-btn>
+        </a-card-text>
+      </template>
+
       <template v-if="allowCreate">
         <a-card-title class="headline"> Connect New Farm </a-card-title>
 
@@ -73,6 +110,8 @@
 
 <script>
 import { ref } from 'vue';
+import { useQuery } from '@tanstack/vue-query';
+import api from '@/services/api.service';
 import './css/button.css';
 
 export default {
@@ -82,6 +121,11 @@ export default {
       type: Array,
       required: true,
     },
+    multitenantInstances: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
     allowCreate: {
       type: Boolean,
       required: true,
@@ -90,19 +134,54 @@ export default {
       type: Boolean,
       required: true,
     },
+    groupId: {
+      type: String,
+      required: true,
+    }
   },
-  emits: ['connect', 'addExisting', 'create', 'update:modelValue'],
+  emits: ['connect', 'connectOrganization', 'addExisting', 'create', 'update:modelValue'],
   setup(props, { emit }) {
     const selectedFarms = ref([]);
+    const selectedMultitenantInstance = ref(null);
+    const selectedOrganization = ref(null);
+
+    const { isPending, isError, data: organizationsInMultitenantInstance, error } = useQuery({
+      queryKey: ['organizationsInMultitenantInstance', selectedMultitenantInstance],
+      queryFn: () => {
+        if (!selectedMultitenantInstance.value) return [];
+        return api.get(`/farmos/group-manage/${props.groupId}/organizations-in-multitenant/${encodeURIComponent(selectedMultitenantInstance.value)}`)
+          .then(res => res?.data || []);
+      },
+      retry: false,
+      initialData: [],
+    });
 
     const connect = () => {
       emit('connect', [...selectedFarms.value]);
       selectedFarms.value = [];
     };
 
+    const connectOrganization = () => {
+      if (!selectedMultitenantInstance.value || !selectedOrganization.value) return;
+      console.log({ selectedOrganization})
+      emit('connectOrganization', {
+        instanceName: selectedMultitenantInstance.value,
+        organizationName: selectedOrganization.value.name,
+        organizationId: selectedOrganization.value.id,
+      });
+      selectedOrganization.value = null;
+      selectedMultitenantInstance.value = null;
+    }
+
     return {
       selectedFarms,
+      selectedMultitenantInstance,
+      organizationsInMultitenantInstance,
+      isPending,
+      isError,
       connect,
+      connectOrganization,
+      selectedOrganization,
     };
   },
 };
