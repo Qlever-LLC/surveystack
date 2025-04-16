@@ -377,6 +377,7 @@ function isQuestionSet(control) {
   line-height: 1.125rem;
   flex-grow: 1;
   cursor: default;
+  overflow: auto;
 }
 
 .draggable > * {
