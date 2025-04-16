@@ -202,6 +202,9 @@ export function useSurvey() {
 
   async function togglePinSurvey(survey) {
     const group = groups.value.find((g) => g._id === getActiveGroupId());
+    if (!group) {
+      return;
+    }
     const index = group.surveys.pinned.indexOf(survey._id);
     if (index > -1) {
       group.surveys.pinned.splice(index, 1);
