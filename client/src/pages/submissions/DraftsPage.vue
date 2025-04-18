@@ -60,7 +60,7 @@ const props = defineProps({
 });
 
 const PAGINATION_LIMIT = 10;
-const { data: allDrafts, isPending, isError } = useAllDrafts();
+const { data: allDrafts, isPending } = useAllDrafts();
 const { isPending: deleteDraftIsPending, mutate: deleteDraft, reset: resetDeleteDraft } = useDeleteDraft();
 
 const groupDrafts = computed(() => allDrafts.value.filter((draft) => draft.meta.group?.id === props.id));

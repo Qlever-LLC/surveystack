@@ -56,8 +56,6 @@
 </template>
 <script setup>
 import { computed, ref, toRaw } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 import parseISO from 'date-fns/parseISO';
 import formatDistance from 'date-fns/formatDistance';
 import { useAllDrafts, useDeleteDraft } from '../../queries';
@@ -69,9 +67,6 @@ const props = defineProps({
   id: String,
 });
 
-const router = useRouter();
-const route = useRoute();
-const store = useStore();
 const { data: allDrafts } = useAllDrafts();
 const {
   isPending: deleteDraftIsPending,

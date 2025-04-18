@@ -290,7 +290,7 @@ async function init() {
       return;
     }
   }
-  const isLoginRequired = state.survey.meta.submissions === 'user' || state.survey.meta.submissions === 'group';
+  const isLoginRequired = state.survey.meta.submissions === 'group';
   if (isLoginRequired && !store.getters['auth/isLoggedIn']) {
     router.push({
       name: 'auth-login',

@@ -74,7 +74,9 @@ const connectDatabase = async () => {
   await migrateSurveyControlPrintLayout_VXtoV6();
   await migrateSurveyOntologyOptions_VXtoV7();
   await migrateSurveyControlPrintLayout_VXtoV9();
+  await migrateSurveyMetaReviewPage_VXtoV10();
   await migrateSubmissions_VXtoV4();
+  await migrateSurveyMetaSubmissions_VXtoV11();
 };
 
 /*
@@ -610,6 +612,55 @@ const changePrintLayoutShowAllOptionName = (control) => {
   }
 
   return 0;
+};
+
+// https://gitlab.com/our-sci/software/json_schema_distribution/-/issues/113
+const migrateSurveyMetaReviewPage_VXtoV10 = async () => {
+  const updateResult = await db
+    .collection('surveys')
+    .updateMany({ 'meta.specVersion': { $lte: 9 } }, [
+      {
+        $set: {
+          'meta.reviewPage': false,
+          'meta.specVersion': 10,
+        },
+      },
+    ]);
+
+  if (updateResult.modifiedCount) {
+    console.log(
+      'migrateSurveyMetaReviewPage_VXtoV10: Updated',
+      updateResult.modifiedCount,
+      'surveys'
+    );
+  }
+};
+
+const migrateSurveyMetaSubmissions_VXtoV11 = async () => {
+  const updateResult = await db
+    .collection('surveys')
+    .updateMany({ 'meta.specVersion': { $lte: 10 } }, [
+      {
+        $set: {
+          'meta.specVersion': 11,
+          'meta.submissions': {
+            $cond: {
+              if: { $eq: ['$meta.submissions', 'user'] },
+              then: 'public',
+              else: '$meta.submissions',
+            },
+          },
+        },
+      },
+    ]);
+
+  if (updateResult.modifiedCount) {
+    console.log(
+      'migrateSurveyMetaSubmissions_VXtoV11: Updated',
+      updateResult.modifiedCount,
+      'surveys'
+    );
+  }
 };
 
 export const getDb = () => db;

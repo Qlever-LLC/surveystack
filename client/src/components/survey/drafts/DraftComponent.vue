@@ -24,7 +24,7 @@
       :questionNumber="questionNumber"
       :showNavigationControl="!builder && !$route.query.minimal_ui"
       :surveyName="!builder ? survey.name : undefined"
-      @showOverviewClicked="showOverview = !showOverview">
+      @showOverviewClicked="overviewClicked">
       <!-- forward all the slots -->
       <template v-for="(_, name) in $slots" v-slot:[name]="{ props }">
         <slot :name="name" :props="props" />
@@ -60,7 +60,12 @@
           <a-icon>mdi-arrow-down</a-icon>
         </a-btn>
       </a-fab-transition>
-      <app-control class="pb-1" :path="path" :control="control" :forceMobile="forceMobile" :isInBuilder="builder" />
+      <app-control
+        class="pb-1"
+        :path="path"
+        :control="control"
+        :forceMobile="forceMobile"
+        :isInBuilder="builder" />
     </div>
 
     <!-- Footer with next/prev buttons -->
@@ -70,7 +75,8 @@
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered'] && $store.getters['draft/enableNext']"
       :enableSubmit="!$store.getters['draft/errors']"
-      :showSubmit="showOverview"
+      :showSubmitWithoutReview="!survey.meta?.reviewPage && atEnd && !$store.getters['draft/hasRequiredUnanswered']"
+      :showReviewPage="showOverview"
       :showNav="true"
       @next="next"
       @prev="prev"
@@ -126,7 +132,7 @@ import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
-import { queueAction } from '@/utils/surveyStack';
+import { queueAction, isRelevant } from '@/utils/surveyStack';
 
 export default {
   components: {
@@ -181,6 +187,37 @@ export default {
         this.$store.dispatch('draft/showConfirmSubmission', v);
       },
     },
+    curentLastLocalElement() {
+      return this.$store.getters['draft/lastLocalElement'];
+    },
+    pathOfLastDraftElement() {
+      const draftStructure = [];
+      const overviews = this.$store.getters['draft/overviews'];
+      for (let i = 0; i < overviews.length; i++) {
+        const overview = overviews[i];
+
+        const { node, control } = overview;
+        if (control.type === 'group' || control.type === 'page') {
+          continue;
+        }
+
+        const relevant = isRelevant(this.$store, node);
+        if (!relevant) {
+          continue;
+        }
+
+        draftStructure.push(overview.path);
+      }
+      return draftStructure[draftStructure.length - 1];
+    },
+    atEnd() {
+      if (!this.survey.meta?.reviewPage && this.pathOfLastDraftElement === this.curentLastLocalElement) {
+        // We are on the last question
+        return true;
+      } else {
+        return false;
+      }
+    }
   },
   watch: {
     path() {
@@ -204,6 +241,9 @@ export default {
     },
   },
   methods: {
+    overviewClicked() {
+      this.showOverview = !this.showOverview;
+    },
     scrollTop() {
       const previewDom = document.querySelector('#previewSurvey');
       if (previewDom) {
@@ -213,12 +253,10 @@ export default {
       }
     },
     next() {
-      // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
       this.scrollTop();
     },
     prev() {
-      // this.$store.dispatch('draft/prev')
       queueAction(this.$store, 'draft/prev');
       this.scrollTop();
     },

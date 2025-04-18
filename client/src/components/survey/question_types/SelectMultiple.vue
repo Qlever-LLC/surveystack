@@ -92,7 +92,6 @@ export default {
       // fill pre-defined
       this.selections.forEach((s) => {
         if (this.modelValue && Array.isArray(this.modelValue)) {
-          console.log(this.modelValue);
           const valueFound = this.modelValue.find((v) => s.value === v);
           s.selected = !!valueFound;
         } else {
@@ -147,7 +146,6 @@ export default {
     if (!Array.isArray(this.modelValue)) {
       return;
     }
-    console.log(this.modelValue);
     this.initSelections();
   },
   watch: {

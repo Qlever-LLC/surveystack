@@ -1,12 +1,12 @@
 import { createApp } from 'vue';
 import { VueQueryPlugin } from '@tanstack/vue-query';
+import queryClient from './queryClient';
 import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import { vuetify } from './plugins/vuetify';
 import { startToggle } from './plugins/toggle';
-import { startSentry } from './plugins/sentry';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
@@ -24,12 +24,10 @@ const app = createApp(App);
 app.use(router);
 app.use(store);
 app.use(vuetify);
-app.use(VueQueryPlugin);
+app.use(VueQueryPlugin, { queryClient });
 
 
 startToggle(store);
-
-startSentry(app, store, router);
 
 addQuestionTypesComponents(app);
 app.component('app-control-label', appControlLabel);

@@ -28,7 +28,7 @@
           style="min-height: 0px !important">
           <a-list-subheader style="width: inherit" class="pr-0">
             <span style="display: flex !important; align-items: center !important">
-              <a-avatar class="mr-3 entityAvatar_deepCSS" color="accent-lighten-2" rounded="lg" size="35">
+              <a-avatar class="mr-3 entityAvatar_deepCSS" :color="state.groupColor ?? 'accent-lighten-2'" rounded="lg" size="35">
                 {{ state.avatarName }}
               </a-avatar>
               <span class="panelTitle" style="cursor: pointer">
@@ -100,6 +100,9 @@ import { useGroup } from '@/components/groups/group';
 import { useDisplay } from 'vuetify';
 
 import { getDefaultLandingPage } from '@/components/navigation';
+import { digestMessage } from '@/utils/hash';
+import getGroupColor from '@/utils/groupColor';
+import getAvatarName from '@/utils/avatarName';
 
 const store = useStore();
 const router = useRouter();
@@ -117,6 +120,7 @@ const props = defineProps({
 const state = reactive({
   activeGroup: null,
   avatarName: '',
+  groupColor: null,
   expanded: false,
   myGroups: undefined,
   selectedGroupRole: computed(() => {
@@ -151,17 +155,8 @@ async function initData() {
   state.myGroups = getMyGroups({ getOnlyNotArchived: true }).sort((a, b) => a.path.localeCompare(b.path));
 
   if (state.activeGroup) {
-    const name = state.activeGroup.name;
-    const names = name.split(' ');
-    if (names.length === 1) {
-      state.avatarName = name.slice(0, 2).toUpperCase();
-    } else if (names.length >= 2) {
-      const premiereLettrePremierMot = names[0].charAt(0).toUpperCase();
-      const premiereLettreDeuxiemeMot = names[1].charAt(0).toUpperCase();
-      state.avatarName = premiereLettrePremierMot + premiereLettreDeuxiemeMot;
-    } else {
-      state.avatarName = '';
-    }
+    state.avatarName = getAvatarName(state.activeGroup.name)
+    state.groupColor = getGroupColor(await digestMessage(state.activeGroup._id));    
   }
 }
 

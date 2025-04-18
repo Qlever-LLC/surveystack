@@ -34,7 +34,7 @@ const createRes = async ({ user = null } = {}) => ({
   locals: {
     auth: {
       isAuthenticated: !!user,
-      isSuperAdmin: user && user.permissions.includes('super-admin'),
+      isSuperAdmin: user && user.permissions?.includes('super-admin'),
       user,
       roles: user ? await getRoles(user._id) : [],
     },

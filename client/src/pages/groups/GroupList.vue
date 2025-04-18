@@ -7,7 +7,9 @@
       groupStyle
       :buttonNew="{ title: 'Create a Group', link: { name: 'groups-new', query: { dir: rootDir() } } }"
       :menu="state.groupMenu"
-      @updateSearch="updateSearch">
+      @updateSearch="updateSearch"
+      showGroupPath
+    >
       <template v-slot:title>
         <template v-if="props.scope === 'user'">
           <a-icon class="mr-2 mt-n1">mdi-account-group</a-icon>All my groups

@@ -49,6 +49,18 @@ export function getRelevance(submission, path, fallback = true) {
   return fallback;
 }
 
+export function isRelevant(store, node) {
+  const relevant = node.getPath().every((n) => {
+    const p = n
+      .getPath()
+      .map((nn) => nn.model.name)
+      .join('.');
+    const r = store.getters['draft/property'](`${p}.meta.relevant`, true);
+    return r;
+  });
+  return relevant;
+}
+
 export function queueAction(store, action, payload = null) {
   const hasCustomOntologies = document.querySelector('.custom-ontology');
   if (hasCustomOntologies) {
