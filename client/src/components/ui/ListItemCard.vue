@@ -18,7 +18,14 @@
             <span v-if="showPinned" @click.stop="togglePin(entity)" :class="{ 'cursor-pointer': !mobile }">
               <a-icon v-if="pinnedSurveys" class="mr-2">mdi-pin</a-icon>
               <a-icon
-                v-if="!pinnedSurveys && isHovering && !mobile && !isADraft(entity) && state.ableTogglePinned"
+                v-else-if="
+                  isInOneOfMyGroups() &&
+                  !pinnedSurveys &&
+                  isHovering &&
+                  !mobile &&
+                  !isADraft(entity) &&
+                  state.ableTogglePinned
+                "
                 class="mr-2">
                 mdi-pin-outline
               </a-icon>
@@ -88,7 +95,7 @@ const store = useStore();
 const router = useRouter();
 const { mobile } = useDisplay();
 const { isADraft } = useSurvey();
-const { isGroupAdmin, getActiveGroupId, isGroupVisitor } = useGroup();
+const { isGroupAdmin, getActiveGroupId, isGroupVisitor, getMyGroups } = useGroup();
 
 const props = defineProps({
   entity: {
@@ -189,6 +196,14 @@ const filteredMenu = computed(() => {
 
 function getTextColor(itemMenu) {
   return { color: itemMenu.color };
+}
+
+function isInOneOfMyGroups() {
+  const group = getMyGroups(false).find((g) => g._id === getActiveGroupId());
+  if (!group) {
+    return false;
+  }
+  return true;
 }
 
 function togglePin(entity) {
