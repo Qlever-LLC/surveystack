@@ -58,7 +58,7 @@ export function nameIsUnique(resourceNames, resource) {
 
 export function nameHasValidCharacters(val) {
   const namePattern = /^[\w]*$/;
-  return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+  return namePattern.test(val) ? true : 'Must only contain alphanumeric and underscores';
 }
 
 export function nameHasValidLength(val) {
