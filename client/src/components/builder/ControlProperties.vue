@@ -803,6 +803,15 @@ export default {
     },
   },
   watch: {
+    'currentControl.name': {
+      handler(newVal) {
+        // Replace all spaces with underscores
+        const withUnderscores = newVal.replace(/ /g, '_');
+        // Replace multiple underscores with a single one
+        const cleaned = withUnderscores.replace(/_+/g, '_');
+        this.currentControl.name = cleaned;
+      },
+    },
     'currentControl.id': {
       handler(newVal, oldVal) {
         if (this.isScript && newVal !== oldVal) {
