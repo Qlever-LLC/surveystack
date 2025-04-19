@@ -145,6 +145,7 @@
 <script>
 import { isEqual, uniqWith } from 'lodash';
 import ObjectId from 'bson-objectid';
+import { nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 
@@ -213,14 +214,8 @@ export default {
         ? 'Name already exists'
         : true;
     },
-    nameHasValidCharacters(val) {
-      const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Must only contain alphanumeric and underscores';
-    },
-    nameHasValidLength(val) {
-      const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
-      return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
-    },
+    nameHasValidCharacters,
+    nameHasValidLength,
     moveItemDown({ id }) {
       const index = this.resource.content.findIndex((item) => item.id === id);
       if (index < this.resource.content.length - 1) {
