@@ -156,9 +156,11 @@ export default {
       return mappings;
     },
     instances() {
-      return this.mappings.aggregatorFarms.map((farm) => ({
-        instanceName: farm.url,
-      }));
+      return this.mappings.aggregatorFarms
+        .filter(f => !this.mappings.multitenantInstances.some(mti => mti.instanceName === f.url))
+        .map((farm) => ({
+          instanceName: farm.url,
+        }));
     },
   },
 };
