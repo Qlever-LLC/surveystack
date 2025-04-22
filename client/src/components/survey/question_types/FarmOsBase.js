@@ -144,6 +144,8 @@ export default {
               value: {
                 farmName: asset.instanceName,
                 url: asset.instanceName,
+                organizationName: asset.organizationName,
+                organizationId: asset.organizationId,
                 name: asset.name.trim(),
                 id: asset.id,
                 archived: asset.archived,
@@ -243,7 +245,6 @@ export default {
           return asset.value.location.some((loc) => loc.id === area.location.id);
         });
 
-        console.log('loc', area);
         const field = {
           value: {
             farmName: area.farmName,
