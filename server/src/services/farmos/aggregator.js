@@ -3,6 +3,8 @@ import axios from 'axios';
 import https from 'https';
 import _ from 'lodash';
 
+const ORGANIZATION_PAGINATION_LIMIT = 500;
+
 export const aggregator = (aggregatorURL, aggregatorKey) => {
   const apiBase = `https://${aggregatorURL}/api/v2`;
 
@@ -35,7 +37,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       .get(
         `${apiBase}/farms/relay/${encodeURIComponent(
           multitenantInstanceUrl
-        )}/api/organization/farm`,
+        )}/api/organization/farm?page[limit]=${ORGANIZATION_PAGINATION_LIMIT}&fields[organization--farm]=id,name`,
         opts
       )
       .then((resp) => resp?.data?.data);
