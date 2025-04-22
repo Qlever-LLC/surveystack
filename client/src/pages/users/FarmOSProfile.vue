@@ -304,6 +304,7 @@
                       </span>
                       <span v-else>
                         <a-btn
+                          v-if="!instance.organizationName"
                           text
                           x-small
                           class="px-1 mx-1"
