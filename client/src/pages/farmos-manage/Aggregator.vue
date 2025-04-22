@@ -42,13 +42,13 @@
       </h2>
       <template v-if="state.isSelectedInstanceMappedAsMultitenant">
         <p>
-          This instance is mapped as a multitenant instance to {{ state.selectedInstanceMultitenantGroupName }}.
+          This instance is mapped as a multi-farm instance to {{ state.selectedInstanceMultitenantGroupName }}.
         </p>
         <p>
-          You can map organizations within the multitenant instance to users via the FarmOS Settings page within the group.
+          You can map organizations within the multi-farm instance to users via the FarmOS Settings page within the group.
         </p>
         <p>
-          You can manage the multitenant instance to group mapping on the "Map Multitenant Instance" tab in the Super Admin area.
+          You can manage the multi-farm instance to group mapping on the "Map Multi-Farm Instance" tab in the Super Admin area.
         </p>
       </template>
       <template v-else>
@@ -130,7 +130,7 @@
           <thead>
             <tr>
               <th class="text-left">User</th>
-              <th class="text-left">Organization (multitenant)</th>
+              <th class="text-left">Organization (multi-farm)</th>
               <th class="text-left">Owner</th>
               <th class="text-left">Action</th>
             </tr>
@@ -234,9 +234,9 @@
     </div>
 
     <div v-if="!loading">
-      <h2>Multitenant Instances</h2>
+      <h2>Multi-Farm Instances</h2>
       <p v-if="!mappings?.multitenantInstances?.length">
-        No multitenant instance mappings exist.
+        No multi-farm instance mappings exist.
       </p>
       <a-table v-else>
         <template v-slot:default>

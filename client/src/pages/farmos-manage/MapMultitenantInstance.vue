@@ -1,7 +1,7 @@
 <template>
   <a-container>
     <div class="d-flex justify-space-between align-center ma-4">
-      <h1>Map Multitenant Instance to Group</h1>
+      <h1>Map Multi-Farm Instance to Group</h1>
 
       <a-progress-circular v-if="loading" class="my-8 align-center mt-6" />
     </div>
@@ -37,9 +37,9 @@
     </a-btn>
 
     <div v-if="!loading">
-      <h2>Multitenant Instances</h2>
+      <h2>Multi-Farm Instances</h2>
       <p v-if="!mappings?.multitenantInstances?.length">
-        No multitenant instance mappings exist.
+        No multi-farm instance mappings exist.
       </p>
       <a-table v-else>
         <template v-slot:default>
@@ -72,9 +72,9 @@
 
     <confirm-dialog
       v-model="showUnmapDialog"
-      title="Unmap Multitenant Instance"
+      title="Unmap Multi-Farm Instance"
       :error="unmapError"
-      message="Unmapping this multitenant instance will also unmap all users from organizations within the multitenant instance. Are you sure you want to proceed?"
+      message="Unmapping this multi-farm instance will also unmap all users from organizations within the multi-farm instance. Are you sure you want to proceed?"
       button="Unmap"
       button-color="error"
       :loading="unmapIsLoading"

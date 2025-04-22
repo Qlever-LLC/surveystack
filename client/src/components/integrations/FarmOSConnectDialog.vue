@@ -55,16 +55,16 @@
       </a-card-text>
 
       <template v-if="multitenantInstances.length > 0">
-        <a-card-title class="headline">Connect Farm from Multitenant Instance</a-card-title>
+        <a-card-title class="headline">Connect Farm from Multi-Farm Instance</a-card-title>
 
         <a-card-text>
-          Select farm from this group's multitenant instances to make available to this user.
+          Select farm from this group's multi-farm instances to make available to this user.
           <br />
           <a-select
             class="mt-6"
             variant="outlined"
             primary
-            label="Select Multitenant Instance"
+            label="Select Multi-Farm Instance"
             v-model="selectedMultitenantInstance"
             :items="multitenantInstances"
           />
@@ -73,7 +73,7 @@
             class="mt-4"
             variant="outlined"
             primary
-            label="Select Farm from Multitenant Instance"
+            label="Select Farm from Multi-Farm Instance"
             v-model="selectedOrganization"
             return-object
             :items="organizationsInMultitenantInstance"

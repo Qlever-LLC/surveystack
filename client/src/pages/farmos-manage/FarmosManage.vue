@@ -125,7 +125,7 @@ export default {
           },
         },
         {
-          name: 'Map Multitenant Instance',
+          name: 'Map Multi-Farm Instance',
           id: 'map-multitenant-instance',
           component: MapMultitenantInstance,
         }
