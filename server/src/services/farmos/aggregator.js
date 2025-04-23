@@ -3,7 +3,7 @@ import axios from 'axios';
 import https from 'https';
 import _ from 'lodash';
 
-const ORGANIZATION_PAGINATION_LIMIT = 500;
+const ORGANIZATION_PAGINATION_LIMIT = 50;
 
 export const aggregator = (aggregatorURL, aggregatorKey) => {
   const apiBase = `https://${aggregatorURL}/api/v2`;
@@ -32,15 +32,30 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     return r;
   };
 
-  const getOrganizations = async (multitenantInstanceUrl) =>
-    axios
-      .get(
-        `${apiBase}/farms/relay/${encodeURIComponent(
-          multitenantInstanceUrl
-        )}/api/organization/farm?page[limit]=${ORGANIZATION_PAGINATION_LIMIT}&fields[organization--farm]=id,name`,
-        opts
-      )
-      .then((resp) => resp?.data?.data);
+  const getOrganizations = async (multitenantInstanceUrl) => {
+    const response = await axios.get(
+      `${apiBase}/farms/relay/${encodeURIComponent(
+        multitenantInstanceUrl
+      )}/api/organization/farm?page[limit]=${ORGANIZATION_PAGINATION_LIMIT}&fields[organization--farm]=id,name`,
+      opts
+    );
+    let next = response?.data?.links?.next?.href;
+    const organizations = response?.data?.data;
+    try {
+      while (next) {
+        const nextUrl = `${apiBase}/farms/relay/${next.split('https://')[1]}`;
+        const nextResponse = await axios.get(nextUrl, opts);
+        const data = nextResponse.data?.data || [];
+        next = nextResponse.data?.links?.next?.href;
+
+        organizations.push(...data);
+      }
+
+      return organizations;
+    } catch (error) {
+      throw boom.internal(`Failed to fetch organizations`);
+    }
+  };
 
   // TODO: change to take a single object instead of 3 args
   // TODO: update existing calls to match new signature
