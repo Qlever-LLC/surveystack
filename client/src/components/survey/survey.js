@@ -58,7 +58,7 @@ export function useSurvey() {
   } = getPermission();
   const { message, createAction } = menuAction();
 
-  const { getActiveGroupId, isGroupAdmin } = useGroup();
+  const { getActiveGroupId, isGroupAdmin, getMyGroups } = useGroup();
 
   const queryClient = useQueryClient();
   const { data: pinnedData, isPending } = usePinned();
@@ -75,9 +75,6 @@ export function useSurvey() {
   });
   const whitelabelPartner = computed(() => {
     return store.getters['whitelabel/partner'];
-  });
-  const groups = computed(() => {
-    return store.getters['memberships/groups'];
   });
 
   function getMenu(isOnline) {
@@ -166,6 +163,10 @@ export function useSurvey() {
         action: (s) => createAction(s, rightToTogglePin, () => togglePinInMenu(s)),
         render: (s) => () => {
           return computed(() => {
+            const group = getMyGroups(false).find((g) => g._id === getActiveGroupId());
+            if (!group) {
+              return false;
+            }
             const isPinned = isPending.value ? false : isSurveyPinned(getActiveGroupId(), s._id)(pinnedData.value);
             return isOnline && !isADraft(s) && !isArchived(s) && rightToEdit().allowed && !isPinned;
           });
@@ -201,7 +202,10 @@ export function useSurvey() {
   }
 
   async function togglePinSurvey(survey) {
-    const group = groups.value.find((g) => g._id === getActiveGroupId());
+    const group = getMyGroups(false).find((g) => g._id === getActiveGroupId());
+    if (!group) {
+      return;
+    }
     const index = group.surveys.pinned.indexOf(survey._id);
     if (index > -1) {
       group.surveys.pinned.splice(index, 1);
