@@ -17,13 +17,13 @@ const config = () => {
   return aggregator(process.env.FARMOS_AGGREGATOR_URL, process.env.FARMOS_AGGREGATOR_APIKEY);
 };
 
-function allowed(instanceName, user) {
+function allowed(instanceName, user, organizationId) {
   const url = instanceName;
   if (typeof url != 'string') {
     throw boom.badData(`url is not a string: ${url}`);
   }
 
-  return hasPermission(user, url);
+  return hasPermission(user, url, organizationId);
 }
 
 async function flushlogs(instanceName, user, id) {
@@ -37,6 +37,7 @@ async function flushlogs(instanceName, user, id) {
   }
 
   if (!allowed(instanceName, user)) {
+    // TODO: update this to take organizationId if appropriate
     throw boom.unauthorized('No Access to farm');
   }
 
@@ -77,15 +78,28 @@ export const substitue = (entity, terms) => {
 };
 
 async function execute(aggregator, apiCompose, info, terms, user, submission) {
-  // console.log('executing apiCompose', apiCompose);
-
-  const url = apiCompose.url;
+  const { url, organizationId } = apiCompose;
   if (typeof url != 'string') {
     throw boom.badData(`url is not a string: ${url}`);
   }
 
-  if (!allowed(url, user)) {
-    throw boom.unauthorized(`User has no access to farm: ${url}`);
+  if (!allowed(url, user, organizationId)) {
+    const farm = `${url}${organizationId ? ` (Organization: ${organizationId})` : ''}`;
+    throw boom.unauthorized(`User has no access to farm: ${farm}`);
+  }
+
+  if (organizationId) {
+    const referencedOrganizationsMatchTopLevelOrganization = Object.values(
+      apiCompose.entity.relationships
+    ).every((relationship) => {
+      const organizationData = relationship.data.filter((d) => d.type === 'organization--farm');
+      return organizationData.every((d) => d.id === organizationId);
+    });
+    if (!referencedOrganizationsMatchTopLevelOrganization) {
+      throw boom.unauthorized(
+        `organizationId in relationships does not match top level organizationId`
+      );
+    }
   }
 
   if (!apiCompose.entity || !apiCompose.entity.type) {
@@ -165,8 +179,6 @@ export const getTerms = (apiCompose) => {
 
 export const handle = async ({ submission, survey, user }) => {
   const surveyVersion = submission.meta.survey.version;
-
-  // console.log('submission', JSON.stringify(submission, null, 2));
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
   const positions = utils.getControlPositions(controls);

@@ -100,6 +100,7 @@
     </div>
     <FarmOSGroupTable
       :members="filteredMembers"
+      @success="() => $emit('success')"
       @open="(item) => $emit('open', item)"
       @connect="(item) => $emit('connect', item)"
       @disconnect="(item) => $emit('disconnect', item)" />

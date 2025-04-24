@@ -34,6 +34,7 @@
           :users="users"
           :loading="loading"
           :viewModel="item.viewModel || {}"
+          @success="reload"
           @check-url="checkUrl"
           @create-instance="createInstance"
           @create-plan="createPlan"
@@ -54,6 +55,7 @@ import Groups from './Groups.vue';
 import Users from './Users.vue';
 import FarmOSRegister from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
+import MapMultitenantInstance from './MapMultitenantInstance.vue';
 import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
@@ -122,6 +124,11 @@ export default {
             count: 1,
           },
         },
+        {
+          name: 'Map Multi-Farm Instance',
+          id: 'map-multitenant-instance',
+          component: MapMultitenantInstance,
+        }
       ],
     };
   },
@@ -136,8 +143,6 @@ export default {
       const { data: groups } = await api.get('/groups/all?populate=0&prefix=/&showAll=true');
       const { data: users } = await api.get('/users');
       const { data: plans } = await api.get('/farmos/plans');
-
-      console.log('mappings', mappings);
 
       this.loading = false;
       this.notes = notes;
@@ -181,7 +186,6 @@ export default {
       }
     },
     async unmapGroup(group, instanceName) {
-      console.log('unmap group instanceName', instanceName);
       try {
         this.loading = true;
 
@@ -221,14 +225,11 @@ export default {
         this.loading = false;
       }
     },
-    async unmapUser(user, instanceName) {
+    async unmapUser(mappingId) {
       try {
         this.loading = true;
 
-        await api.post('/farmos/user-unmap-instance', {
-          user,
-          instanceName,
-        });
+        await api.post('/farmos/user-unmap-instance', { id: mappingId });
         await this.reload();
         this.success('Sucessfully unmapped user');
       } catch (error) {

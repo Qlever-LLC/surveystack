@@ -103,6 +103,7 @@ const getOwnership = async (req, res) => {
   instances.map((obj) => {
     data.push({
       instanceName: obj.instanceName,
+      organizationName: obj.organizationName,
       isOwner: !!obj.owner,
     });
   });

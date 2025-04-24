@@ -3,6 +3,8 @@ import axios from 'axios';
 import https from 'https';
 import _ from 'lodash';
 
+const ORGANIZATION_PAGINATION_LIMIT = 50;
+
 export const aggregator = (aggregatorURL, aggregatorKey) => {
   const apiBase = `https://${aggregatorURL}/api/v2`;
 
@@ -30,90 +32,83 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     return r;
   };
 
-  const getAssets = async (farmurl, bundle) => {
-    const r = await axios.get(
+  const getOrganizations = async (multitenantInstanceUrl) => {
+    const response = await axios.get(
+      `${apiBase}/farms/relay/${encodeURIComponent(
+        multitenantInstanceUrl
+      )}/api/organization/farm?page[limit]=${ORGANIZATION_PAGINATION_LIMIT}&fields[organization--farm]=id,name`,
+      opts
+    );
+    let next = response?.data?.links?.next?.href;
+    const organizations = response?.data?.data;
+    try {
+      while (next) {
+        const nextUrl = `${apiBase}/farms/relay/${next.split('https://')[1]}`;
+        const nextResponse = await axios.get(nextUrl, opts);
+        const data = nextResponse.data?.data || [];
+        next = nextResponse.data?.links?.next?.href;
+
+        organizations.push(...data);
+      }
+
+      return organizations;
+    } catch (error) {
+      throw boom.internal(`Failed to fetch organizations`);
+    }
+  };
+
+  // TODO: change to take a single object instead of 3 args
+  // TODO: update existing calls to match new signature
+  const getAssets = async (farmurl, bundle, organizationId = null) =>
+    axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(
         farmurl
-      )}/api/asset/${bundle}?&fields[asset--${bundle}]=id,name,status,location`,
-      {
-        ...opts,
-      }
+      )}/api/asset/${bundle}?fields[asset--${bundle}]=id,name,status,location${
+        organizationId ? `&filter[farm.id]=${organizationId}` : ''
+      }`,
+      opts
     );
-
-    return r;
-  };
 
   const getLogs = async (farmurl, bundle) => {
     const r = await axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(
         farmurl
       )}/api/log/${bundle}?&fields[log--${bundle}]=id,name`,
-      {
-        ...opts,
-      }
+      opts
     );
 
     return r;
   };
 
-  const createLog = async (farmurl, bundle, log) => {
-    const r = await axios.post(
+  const createLog = async (farmurl, bundle, log) =>
+    axios.post(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/log/${bundle}?`,
       log,
-      {
-        ...opts,
-      }
+      opts
     );
 
-    return r;
-  };
-
-  const createAsset = async (farmurl, bundle, asset) => {
-    const r = await axios.post(
+  const createAsset = async (farmurl, bundle, asset) =>
+    axios.post(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/asset/${bundle}?`,
       asset,
-      {
-        ...opts,
-      }
+      opts
     );
 
-    return r;
-  };
-
-  const create = async (farmurl, endpoint, bundle, entity) => {
-    const r = await axios.post(
+  const create = async (farmurl, endpoint, bundle, entity) =>
+    axios.post(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/${endpoint}/${bundle}`,
       entity,
-      {
-        ...opts,
-      }
+      opts
     );
 
-    return r;
-  };
+  const subrequest = async (farmurl, req) =>
+    axios.post(`${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/subrequests?`, req, opts);
 
-  const subrequest = async (farmurl, req) => {
-    const r = await axios.post(
-      `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/subrequests?`,
-      req,
-      {
-        ...opts,
-      }
-    );
-
-    return r;
-  };
-
-  const getTaxonomy = async (farmurl, bundle) => {
-    const r = await axios.get(
+  const getTaxonomy = async (farmurl, bundle) =>
+    axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/taxonomy_term/${bundle}?`,
-      {
-        ...opts,
-      }
+      opts
     );
-
-    return r;
-  };
 
   const getAllTerms = async (farmurl, items) => {
     const body = items.map((item) => {
@@ -133,9 +128,11 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       return {};
     }
 
-    const r = await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, body, {
-      ...opts,
-    });
+    const r = await axios.post(
+      `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
+      body,
+      opts
+    );
 
     const responses = [];
 
@@ -184,9 +181,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       const createdTypes = await axios.post(
         `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
         createBody,
-        {
-          ...opts,
-        }
+        opts
       );
 
       const createResponses = [];
@@ -211,9 +206,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   };
 
   const getEndpointsAndBundles = async (farmurl) => {
-    const { data: apiResponse } = await axios.get(`${apiBase}/farms/relay/${farmurl}/api`, {
-      ...opts,
-    });
+    const { data: apiResponse } = await axios.get(`${apiBase}/farms/relay/${farmurl}/api`, opts);
 
     return _.uniq(_.keys(apiResponse.links).filter((k) => k.includes('--')));
   };
@@ -261,9 +254,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     const r = await axios.post(
       `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
       bodies,
-      {
-        ...opts,
-      }
+      opts
     );
 
     // console.log('data', r.data);
@@ -302,14 +293,12 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     return await axios.post(
       `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
       deleteBody,
-      {
-        ...opts,
-      }
+      opts
     );
   };
 
   const getFarmsWithTag = async (tag) => {
-    const r = await axios.get(`${apiBase}/farms`, { ...opts });
+    const r = await axios.get(`${apiBase}/farms`, opts);
     if (!r.data) {
       return [];
     }
@@ -317,7 +306,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   };
 
   const getAllFarmsWithTags = async () => {
-    const r = await axios.get(`${apiBase}/farms`, { ...opts });
+    const r = await axios.get(`${apiBase}/farms`, opts);
     if (!r.data) {
       return [];
     }
@@ -330,9 +319,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   const getAdminLink = async (farmurl) => {
     const r = await axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl.toLowerCase())}/api/login?`,
-      {
-        ...opts,
-      }
+      opts
     );
 
     return r.data;
@@ -354,5 +341,6 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     getEndpointsAndBundles,
     createBodiesForSurveystackGetId,
     getAdminLink,
+    getOrganizations,
   };
 };
