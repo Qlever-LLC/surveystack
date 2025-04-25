@@ -85,7 +85,7 @@
             <td>{{ instance.organizationName }}</td>
             <td>{{ instance.owner }}</td>
             <td>
-              <a-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)">Unmap</a-btn>
+              <a-btn color="red" @click="$emit('unmap-user', instance.userMappings.find(m => m.userId === this.selectedUser)._id)">Unmap</a-btn>
             </td>
           </tr>
         </tbody>
@@ -132,6 +132,8 @@ export default {
         const userMappings = this.mappings.surveystackUserFarms
           .filter((f) => f.instanceName === farm.instanceName)
           .map((m) => ({
+            _id: m._id,
+            userId: m.userId,
             instanceName: m.instanceName,
             user: this.users.find((u) => u._id === m.userId).email,
           }));
