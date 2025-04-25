@@ -47,11 +47,10 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
         const nextResponse = await axios.get(nextUrl, opts);
         const data = nextResponse.data?.data || [];
         next = nextResponse.data?.links?.next?.href;
-
         organizations.push(...data);
       }
 
-      return organizations;
+      return organizations.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name));
     } catch (error) {
       throw boom.internal(`Failed to fetch organizations`);
     }
