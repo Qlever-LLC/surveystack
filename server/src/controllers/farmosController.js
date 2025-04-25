@@ -402,7 +402,6 @@ export const superAdminMapFarmosInstance = async (req, res) => {
 
 export const superAdminUnmapMultitenantInstance = async (req, res) => {
   const { id } = req.params;
-  console.log('superAdminUnmapMultitenantInstance', { id });
 
   if (!id) {
     throw boom.badData('id is required');
