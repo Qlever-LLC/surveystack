@@ -839,6 +839,14 @@ export const getMemberInformationForDomain = async (descendants) => {
         as: 'group_mappings',
       },
     },
+    {
+      $lookup: {
+        from: 'farmos-multitenant-instances',
+        localField: 'farmos_instances.instanceName',
+        foreignField: 'instanceName',
+        as: 'group_multitenant_mappings',
+      },
+    },
   ];
 
   const res = await db.collection('memberships').aggregate(aggregation).toArray();
@@ -862,12 +870,11 @@ export const getMemberInformationForDomain = async (descendants) => {
     )
     .toArray();
 
-  // console.log('descendant groups', domainGroups);
-
-  // console.log(JSON.stringify(res, null, 2));
-
-  const groupIds = uniq(res.flatMap((item) => item['group_mappings'].map((gm) => gm.groupId)));
-  // console.log("groupIds", groupIds);
+  const groupIds = uniq(
+    res.flatMap((item) =>
+      [...item['group_mappings'], ...item['group_multitenant_mappings']].map((gm) => gm.groupId)
+    )
+  );
 
   const groups = await db
     .collection('groups')
@@ -876,9 +883,6 @@ export const getMemberInformationForDomain = async (descendants) => {
     })
     .toArray();
 
-  // console.log("present groups", JSON.stringify(groups, null, 2));
-  // console.log("descendants", descendantsIds);
-  // console.log("res", res);
   const prj = res
     .filter((r) => r.user !== null && r.user.length != 0)
     .map((item) => {
@@ -895,10 +899,7 @@ export const getMemberInformationForDomain = async (descendants) => {
             .map((g) => g.groupId);
           let skip = true;
 
-          if (
-            ins.organizationId ||
-            groupIds.some((id) => descendantsIds.map((iid) => iid + '').includes(id + ''))
-          ) {
+          if (groupIds.some((id) => descendantsIds.map((iid) => iid + '').includes(id + ''))) {
             skip = false;
           }
 
@@ -909,7 +910,7 @@ export const getMemberInformationForDomain = async (descendants) => {
             owner: ins.owner,
             _id: ins._id,
             skip,
-            groups: item.group_mappings
+            groups: [...item.group_mappings, ...item.group_multitenant_mappings]
               .filter((g) => g.instanceName == ins.instanceName)
               .map((g) => ({
                 groupId: g.groupId,
@@ -931,12 +932,9 @@ export const getMemberInformationForDomain = async (descendants) => {
     })
     .toArray();
 
-  // console.log("mappedInstances", mappedInstances);
-  // console.log("farmosInstancesMappedToAllGroups", farmosInstancesMappedToAllGroups);
   const unassignedInstances = farmosInstancesMappedToAllGroups.filter(
     (instance) => !mappedInstances.some((m) => m == instance.instanceName)
   );
-  // console.log("unassignedInstances", unassignedInstances);
 
   // strip out all unrelated groups from members.connectedFarms.groups
 
@@ -944,8 +942,6 @@ export const getMemberInformationForDomain = async (descendants) => {
     m.connectedFarms.forEach((f) => {
       f.groups = f.groups.filter((g) => descendants.some((d) => d._id + '' == g.groupId + ''));
     });
-
-    // m.connectedFarms = m.connectedFarms.filter((f) => f.groups.length > 0);
   });
 
   return {
