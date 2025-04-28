@@ -26,7 +26,7 @@ export default {
     remappedMembers() {
       return this.members.map((m) => {
         const farms = m.connectedFarms
-          .filter((f) => f.groups && f.groups.length > 0 || f.organizationId)
+          .filter((f) => f.groups && f.groups.length > 0)
           .map((f) => ({
             name: f.organizationName ? `${f.organizationName} (${f.instanceName})` : f.instanceName,
             organizationId: f.organizationId,
