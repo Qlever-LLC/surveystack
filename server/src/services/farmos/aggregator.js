@@ -36,7 +36,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     const response = await axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(
         multitenantInstanceUrl
-      )}/api/organization/farm?page[limit]=${ORGANIZATION_PAGINATION_LIMIT}&fields[organization--farm]=id,name`,
+      )}/api/organization/farm?page[limit]=${ORGANIZATION_PAGINATION_LIMIT}&fields[organization--farm]=id,name&sort=name`,
       opts
     );
     let next = response?.data?.links?.next?.href;
@@ -50,7 +50,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
         organizations.push(...data);
       }
 
-      return organizations.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name));
+      return organizations;
     } catch (error) {
       throw boom.internal(`Failed to fetch organizations`);
     }
