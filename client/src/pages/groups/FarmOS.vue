@@ -483,12 +483,13 @@ export default {
       await this.init();
     },
     async openFarm(item) {
-      const { instanceName, userId } = item;
+      const { instanceName, userId, organizationName } = item;
       try {
         this.showLinkDialog = true;
         const { data: link } = await api.post(`/farmos/group-manage/${this.groupId}/get-admin-link`, {
           instanceName,
           userId,
+          organizationName,
         });
         this.adminLink = link;
         this.linkReady = true;

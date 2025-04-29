@@ -30,6 +30,8 @@ export default {
           .map((f) => ({
             name: f.organizationName ? `${f.organizationName} (${f.instanceName})` : f.instanceName,
             organizationId: f.organizationId,
+            organizationName: f.organizationName,
+            instanceName: f.instanceName,
             groups: f.groups.map((g) => ({
               name: g.name,
               id: g.groupId,
@@ -43,6 +45,8 @@ export default {
           admin: m.admin,
           email: m.email,
           name: m.name,
+          instanceName: m.instanceName,
+          organizationName: m.organizationName,
           farms,
         };
       });
