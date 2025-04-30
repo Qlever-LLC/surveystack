@@ -1576,10 +1576,11 @@ export const updateGroupsForUser = async (req, res) => {
   });
 };
 
-const assertFarmMappedToUser = async (instanceName, userId) => {
+const assertFarmMappedToUser = async (instanceName, userId, organizationName) => {
   const res = await db.collection('farmos-instances').findOne({
     userId: new ObjectId(userId),
     instanceName,
+    organizationName,
   });
 
   if (!res) {
@@ -1587,8 +1588,9 @@ const assertFarmMappedToUser = async (instanceName, userId) => {
   }
 };
 
-const assertFarmInSubGroup = async (instanceName, tree) => {
-  const res = await db.collection('farmos-group-mapping').findOne({
+const assertFarmInSubGroup = async (instanceName, tree, organizationName) => {
+  const collection = organizationName ? 'farmos-multitenant-instances' : 'farmos-group-mapping';
+  const res = await db.collection(collection).findOne({
     instanceName,
     groupId: {
       $in: tree.descendants.map((d) => new ObjectId(d._id)),
@@ -1685,17 +1687,18 @@ export const removeMembershipHook = async (membership, origin) => {
 };
 
 export const getAdminLink = async (req, res) => {
-  const { userId, instanceName, tree } = await requireGroup(req, {
+  const { userId, instanceName, tree, organizationName } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
+    organizationName: Joi.string().allow(null),
   });
 
   await assertUserInSubGroup(userId, tree);
-  await assertFarmInSubGroup(instanceName, tree);
-  await assertFarmMappedToUser(instanceName, userId);
+  await assertFarmInSubGroup(instanceName, tree, organizationName);
+  await assertFarmMappedToUser(instanceName, userId, organizationName);
 
   const { getAdminLink } = config();
-  const link = await getAdminLink(instanceName);
+  const link = await getAdminLink(instanceName, organizationName);
 
   return res.send(link);
 };
