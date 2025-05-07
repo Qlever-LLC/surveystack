@@ -1,25 +1,5 @@
 export const types = {};
 
-export function getLibraries() {
-  window.parent.postMessage(
-    {
-      type: 'REQUEST_LIBRARIES',
-      payload: {},
-    },
-    '*'
-  );
-
-  return new Promise(function (resolve, reject) {
-    const handler = function (event) {
-      if (event.data && event.data.type === 'RETURN_LIBRARIES' && event.data.payload) {
-        resolve(event.data.payload);
-        window.removeEventListener('message', handler);
-      }
-    };
-    window.addEventListener('message', handler);
-  });
-}
-
 export function requestFetchSubmissions() {
   // let origin;
 

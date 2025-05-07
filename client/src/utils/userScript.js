@@ -1,3 +1,4 @@
+import { PLOTLY_CDN_URL } from "@/constants";
 // TODO: validate origin, pass in as arg
 // TODO: return value to allow removeEventListener
 export function onMessage(type, callback) {
@@ -43,17 +44,10 @@ export default function buildScriptQuestionIframeContents({
         ${sandboxUtilsSource}
         ${iframeMessagingSource}
 
-        async function loadLibs() {
-          const libraries = await getLibraries();
-          for await (const lib of libraries) {
-            await import(/* webpackIgnore: true */'data:text/javascript;base64,'+lib);
-          }
-        }
+        await import('${PLOTLY_CDN_URL}');
 
         window.log = requestLogMessage;
         window.runSurveyStackKit = requestRunSurveyStackKit;
-        
-        loadLibs();
 
         function getInitialState() {
           return {
