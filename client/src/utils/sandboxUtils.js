@@ -382,7 +382,7 @@ export const unstable = {
     let surveyId = _surveyId ? _surveyId : submission.meta.survey.id;
     try {
       // search in archived surveys first
-      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`;
+      let url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}&showArchived=true`; // <-- Brian can you review/update this based on new path?
       prettyLog('check submission in archived url', 'info');
       prettyLog(url);
       let response = await fetch(url);
@@ -390,7 +390,7 @@ export const unstable = {
       result = JSON.parse(result);
       // if not present, search in non-archived surveys
       if (result.length === 0 || !result[0] || !result[0].data) {
-        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`;
+        url = `https://app.surveystack.io/api/submissions?survey=${surveyId}&match={"_id":{"$oid":"${submissionId}"}}`; // <-- Brian can you review/update this based on new path?
         prettyLog('check submission in non archived url', 'info');
         prettyLog(url);
         response = await fetch(url);
@@ -739,13 +739,15 @@ export const unstable = {
   },
 
   /** findUrl
-   * Find a URL in a list of objects.
+   * Find a URL in a list of objects, optionally identify organizationId and organizationName if multi-farm
    * Will search each object in order, starting with the first
    * In a survey with spreadsheet (matrix) questions pass (row, spreadsheet, submission) to search from this object outward
-   * @locations {object} the object to be searchedfor URLs (could be submission, parent, row, matrix, etc.)
+   * @locations {object} the object to be searched for URLs (could be submission, parent, row, matrix, etc.)
    */
-  findUrl(...locations) {
+findUrl(...locations) {
     let url;
+    let organizationId;
+    let organizationName;
     if (Array.isArray(locations)) {
       for (let z = 0; z < locations.length; z++) {
         prettyLog('Looking for URL...', 'info');
@@ -758,7 +760,10 @@ export const unstable = {
             this.isValidURL(locationFlat[objectKeys[i]])
           ) {
             url = locationFlat[objectKeys[i]];
-            prettyLog(`found URL ${url} in survey here: ${objectKeys[i]}`, 'success');
+            // safely check for presence of multi-farm orgId and orgName in the same location (returns null if misisng)
+            organizationId = locationFlat?.[objectKeys[i].split('.').slice(0, -1).concat(`organizationId`).join('.')];
+            organizationName  = locationFlat?.[objectKeys[i].split('.').slice(0, -1).concat(`organizationName`).join('.')];
+            prettyLog(`found URL ${url} optional orgId:${organizationId}; orgName: ${organizationName} in survey here: ${objectKeys[i]}`, 'success');
             break; // found answer, exit loop
           }
         }
@@ -768,7 +773,7 @@ export const unstable = {
     if (!url) {
       prettyLog(`no URL found.`, `warning`);
     }
-    return url;
+    return { url: url, organizationId: organizationId, organizationName: organizationName };
   },
 
   /**
