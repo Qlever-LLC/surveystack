@@ -793,7 +793,6 @@ findUrl(...locations) {
     const quantity = {
       type: apiComposeType,
       url: url,
-      organizationId: organizationId,
       time: Date.now(),
       entity: {
         type: type,
@@ -813,6 +812,7 @@ findUrl(...locations) {
       };
     if (value !== null && value !== '') quantity.entity.attributes.value = { decimal: value }; // 0 is allowable
     if (label) quantity.entity.attributes.label = label;
+    if (organizationId) quantity.organizationId = organizationId;
     return quantity;
   },
 
