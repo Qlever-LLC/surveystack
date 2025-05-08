@@ -787,11 +787,13 @@ findUrl(...locations) {
    * @param {label} label for the quantity
    * @param {units} units for te quantity
    * @param {apiComposeType} setting to determine where this object is sent (farmos / other)
+   * @param {organizationId} name of the farm organization this is submitted to (only if set to multi-farm farmos) 
    */
-  getQuantity(url, uuid, type, value = null, label = null, units = null, apiComposeType = 'farmos') {
+  getQuantity(url, uuid, type, value = null, label = null, units = null, apiComposeType = 'farmos', organizationId = null) {
     const quantity = {
       type: apiComposeType,
       url: url,
+      organizationId: organizationId,
       time: Date.now(),
       entity: {
         type: type,
