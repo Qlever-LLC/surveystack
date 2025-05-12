@@ -43,10 +43,24 @@ export default function buildScriptQuestionIframeContents({
         ${sandboxUtilsSource}
         ${iframeMessagingSource}
 
+        
+
         async function loadLibs() {
           const libraries = await getLibraries();
           for await (const lib of libraries) {
-            await import(/* webpackIgnore: true */'data:text/javascript;base64,'+lib);
+            try {
+              // Create a Blob from the base64 content
+              const decodedCode = atob(lib);
+              const blob = new Blob([decodedCode], {type: 'text/javascript'});
+              // Create a URL for the Blob
+              const blobUrl = URL.createObjectURL(blob);
+              // Import the script using the Blob URL
+              await import(/* webpackIgnore: true */blobUrl);
+              // Clean up by revoking the Blob URL
+              URL.revokeObjectURL(blobUrl);
+            } catch (err) {
+              console.error('Failed to load library:', err);
+            }
           }
         }
 
