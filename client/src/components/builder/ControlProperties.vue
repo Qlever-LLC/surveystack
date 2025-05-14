@@ -9,7 +9,6 @@
         label="Value"
         :disabled="!!currentControl.libraryId && !currentControl.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        hide-details
         @focusout="convertNameToKey()" />
       <a-text-field v-model="currentControl.hint" label="Hint" hide-details />
       <markdown-editor
