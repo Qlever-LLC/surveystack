@@ -12,7 +12,7 @@
       :modelValue="getValue"
       @update:modelValue="onChange"
       :items="farms || []"
-      item-title="label"
+      :item-title="getTitle"
       item-value="value"
       variant="outlined"
       :label="control.hint"
@@ -23,16 +23,11 @@
       class="autocomplete"
       clearable
       :chipSlot="!!control.options.hasMultipleSelections"
-      itemSlot>
+      >
       <template v-slot:chip="{ props, item }">
         <a-chip v-bind="props" closable>
           {{ item.title }}
         </a-chip>
-      </template>
-      <template v-slot:item="{ props, item }">
-        <a-list-item v-bind="props">
-          <a-list-item-title>{{ item.label }} </a-list-item-title>
-        </a-list-item>
       </template>
     </a-select>
     <app-control-more-info :value="control.moreInfo" />
@@ -45,10 +40,15 @@ import farmosBase from './FarmOsBase';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase],
-
   async created() {
     await this.fetchFarms();
   },
+  methods: {
+    getTitle(item) {
+      const { url, organizationName } = item.value ?? {};
+      return `${url}${organizationName ? ` (${organizationName})` : ''}`;
+    }
+  }
 };
 </script>
 

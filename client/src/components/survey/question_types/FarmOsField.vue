@@ -34,8 +34,12 @@
     </template>
     <template v-slot:item="{ props, item }">
       <a-list-item v-bind="props" :title="undefined">
-        <a-list-item-title v-html="item.raw.label" />
-        <a-list-item-subtitle v-html="item.raw.value.url" />
+        <a-list-item-title>
+          {{ item.raw.label }}
+        </a-list-item-title>
+        <a-list-item-subtitle>
+          {{ getSubtitle(item) }}
+        </a-list-item-subtitle>
       </a-list-item>
     </template>
   </a-select>
@@ -51,10 +55,15 @@ import AListItemSubtitle from '@/components/ui/elements/AListItemSubtitle.vue';
 export default {
   components: { AListItemSubtitle },
   mixins: [baseQuestionComponent, farmosBase],
-
   async created() {
     await this.fetchAreas();
   },
+  methods: {
+    getSubtitle(item) {
+      const { url, organizationName } = item.raw.value;
+      return `${url}${organizationName ? ` (${organizationName})` : ''}`;
+    },
+  }
 };
 </script>
 

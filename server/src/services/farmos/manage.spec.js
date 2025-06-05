@@ -392,11 +392,11 @@ describe('manageFarmOS', () => {
       true,
       origin
     );
-    await addFarmToSurveystackGroupAndSendNotification(
-      admin1_farmOSInstance2,
-      groupMichigan._id,
-      origin
-    );
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: admin1_farmOSInstance2,
+      groupId: groupMichigan._id,
+      origin,
+    });
     const admin1_farmOSInstance3 = 'ourscinet.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
       admin1.user._id,
@@ -405,26 +405,26 @@ describe('manageFarmOS', () => {
       false,
       origin
     );
-    await addFarmToSurveystackGroupAndSendNotification(
-      admin1_farmOSInstance3,
-      groupMichigan._id,
-      origin
-    );
-    await addFarmToSurveystackGroupAndSendNotification(
-      admin1_farmOSInstance3,
-      groupEurope._id,
-      origin
-    );
-    await addFarmToSurveystackGroupAndSendNotification(
-      admin1_farmOSInstance3,
-      groupCommunity._id,
-      origin
-    );
-    await addFarmToSurveystackGroupAndSendNotification(
-      admin1_farmOSInstance3,
-      groupCommunityLab._id,
-      origin
-    );
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: admin1_farmOSInstance3,
+      groupId: groupMichigan._id,
+      origin,
+    });
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: admin1_farmOSInstance3,
+      groupId: groupEurope._id,
+      origin,
+    });
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: admin1_farmOSInstance3,
+      groupId: groupCommunity._id,
+      origin,
+    });
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: admin1_farmOSInstance3,
+      groupId: groupCommunityLab._id,
+      origin,
+    });
     const admin1_farmOSInstance4 = 'coffeeshop.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
       admin1.user._id,
@@ -464,11 +464,11 @@ describe('manageFarmOS', () => {
       true,
       origin
     );
-    const { _id: idExternal1 } = await addFarmToSurveystackGroupAndSendNotification(
-      userext_farmOSInstance1,
-      groupMichigan._id,
-      origin
-    );
+    const { _id: idExternal1 } = await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: userext_farmOSInstance1,
+      groupId: groupMichigan._id,
+      origin,
+    });
     const userext_data2 = { userOverrides: { name: 'Ext ernal2', email: 'external2@bj.net' } };
     const userext2 = await groupExt.createUserMember(userext_data2);
     const userext_farmOSInstance2 = 'external2.farmos.net';
@@ -479,11 +479,11 @@ describe('manageFarmOS', () => {
       true,
       origin
     );
-    const { _id: idExternal2 } = await addFarmToSurveystackGroupAndSendNotification(
-      userext_farmOSInstance2,
-      groupMichigan._id,
-      origin
-    );
+    const { _id: idExternal2 } = await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: userext_farmOSInstance2,
+      groupId: groupMichigan._id,
+      origin,
+    });
 
     //FederalMills
     const groupFederalMills = await createGroup({ name: 'FederalMills' });

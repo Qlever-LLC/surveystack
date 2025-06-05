@@ -65,9 +65,12 @@
     <FarmOSConnectDialog
       v-model="showConnectDialog"
       :farmInstances="farmInstances"
+      :multitenantInstances="groupInfos.multitenantInstances"
       :allowCreate="allowCreate"
       :loadingOwners="loadingOwners"
+      :groupId="groupId"
       @connect="connectFarms"
+      @connectOrganization="connectOrganization"
       @create="createFarm" />
 
     <FarmOSDisconnectDialog
@@ -96,6 +99,7 @@
       @plansChanged="plansChanged"
       @seatsChanged="seatsChanged"
       @deactivate="showDeactivateDialog = true"
+      @success="init"
       :plans="plans"
       :groupInfos="groupInfos"
       :superAdmin="superAdmin">
@@ -199,8 +203,6 @@ export default {
     };
   },
   async created() {
-    // setup function
-    // fetch group settings
     await this.init();
 
     try {
@@ -210,24 +212,6 @@ export default {
     } catch (e) {
       console.log('something went wrong:', e);
     }
-
-    /*
-    this.groupInfos.value.members.forEach((el) => {
-      if (el.connectedFarms[0] == undefined) {
-        el.connectedFarms.push({});
-      }
-    });
-    this.groupInfos.value.nonMembers.forEach((el) => {
-      // without this if-check, we have an infinite loop
-      if (!el.connectedFarms) {
-        el.connectedFarms = [];
-        let memberships = [];
-        memberships.push({ groupId: el.groupId, fgm_id: el.fgm_id, path: el.path });
-        el.connectedFarms.push({ instanceName: el.instanceName, memberships: memberships });
-        this.groupInfos.value.members.push(el);
-      }
-    });
-    */
   },
   methods: {
     updateGroupConfig() {},
@@ -391,6 +375,24 @@ export default {
 
       await this.init();
     },
+    async connectOrganization({ instanceName, organizationName, organizationId }) {
+      this.loading = true;
+      this.showConnectDialog = false;
+
+      try {
+        await api.post(`/farmos/group-manage/${this.groupId}/map-user-to-organization`, {
+          instanceName,
+          organizationName,
+          organizationId,
+          userId: this.selectedUser.user,
+        });
+        this.success(`Successfully connected ${this.selectedUser.name} to ${organizationName} on ${instanceName}`);
+      } catch (error) {
+        this.error(String(error));
+      }
+
+      await this.init();
+    },
     async showDisconnectGroupsDialog(item) {
       const { userId, instanceName } = item;
 
@@ -481,12 +483,13 @@ export default {
       await this.init();
     },
     async openFarm(item) {
-      const { instanceName, userId } = item;
+      const { instanceName, userId, organizationName } = item;
       try {
         this.showLinkDialog = true;
         const { data: link } = await api.post(`/farmos/group-manage/${this.groupId}/get-admin-link`, {
           instanceName,
           userId,
+          organizationName,
         });
         this.adminLink = link;
         this.linkReady = true;

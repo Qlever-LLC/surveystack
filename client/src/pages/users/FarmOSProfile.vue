@@ -254,7 +254,7 @@
               <tbody>
                 <tr v-for="(instance, idx) in state.instances" :key="`grp-${idx}`">
                   <td>
-                    <div class="pt-3" style="white-space: nowrap">{{ instance.instanceName }}</div>
+                    <div class="pt-3" style="white-space: nowrap">{{ instance.organizationName ? `${instance.organizationName} (${instance.instanceName})` : instance.instanceName }}</div>
                     <div class="pb-3">
                       <span v-if="instance.isOwner">
                         <a-btn
@@ -304,6 +304,7 @@
                       </span>
                       <span v-else>
                         <a-btn
+                          v-if="!instance.organizationName"
                           text
                           x-small
                           class="px-1 mx-1"
@@ -316,6 +317,7 @@
                         </a-btn>
 
                         <a-btn
+                          v-if="!instance.organizationName"
                           text
                           x-small
                           class="px-1 mx-1"

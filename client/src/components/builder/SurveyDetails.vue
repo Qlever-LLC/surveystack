@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <a-card style="flex-shrink: 0">
     <a-card-title class="d-block py-0">
       <div class="d-flex">
         <AppNavigationControl class="align-self-center mr-2 ml-n4 mt-n4" />
