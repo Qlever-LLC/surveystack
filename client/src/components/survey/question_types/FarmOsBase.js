@@ -312,7 +312,7 @@ export default {
      */
     getFirstSectionOfFarmURL(url) {
       // [^.]: Matches any character except a dot
-      return url.match(/^[^.]+/)[0];
+      return url ? url.match(/^[^.]+/)[0] : '';
     },
     /**
      * return true if the field belongs to the selecteed planting or if the selected planting is the item
@@ -324,10 +324,10 @@ export default {
       }
       if (Array.isArray(modelValue)) {
         return modelValue.some(
-          (planting) => item.value.location.id === planting.location[0].id || planting.hash === item.value.hash
+          (planting) => item.value.location?.id === planting.location[0]?.id || item.value.hash === planting.hash
         );
       } else {
-        return item.value.location.id === modelValue.location[0].id || modelValue.hash === item.value.hash;
+        return item.value.location?.id === modelValue.location[0]?.id || item.value.hash === modelValue.hash;
       }
     },
   },
