@@ -1,68 +1,70 @@
 <template>
-  <app-control-label
-    :value="control.label"
-    :redacted="redacted"
-    :required="required"
-    :initializable="control.options.initialize && control.options.initialize.enabled"
-    :is-modified="meta && !!meta.dateModified"
-    @initialize="initialize" />
-  <a-select
+  <div>
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
+      :is-modified="meta && !!meta.dateModified"
+      @initialize="initialize" />
+    <a-select
       :disabled="localLoading"
-    :modelValue="getValue"
-    @update:modelValue="localChange"
-    :items="transformed"
-    item-title="label"
-    item-value="value"
-    variant="outlined"
-    :label="control.hint"
-    :multiple="control.options.hasMultipleSelections"
-    @keyup.enter.prevent="submit"
+      :modelValue="getValue"
+      @update:modelValue="localChange"
+      :items="transformed"
+      item-title="label"
+      item-value="value"
+      variant="outlined"
+      :label="control.hint"
+      :multiple="control.options.hasMultipleSelections"
+      @keyup.enter.prevent="submit"
       :loading="localLoading"
-    color="focus"
-    clearable
-    :selectionSlot="!control.options.hasMultipleSelections"
-    :chipSlot="control.options.hasMultipleSelections"
-    itemSlot
-    cssFlexWrap>
-    <template v-slot:selection="{ props, item }">
-      <span v-bind="props" v-html="item.raw.label" />
-    </template>
-    <template v-slot:chip="{ props, item }">
-      <a-chip v-bind="props" closable style="margin-top: -3px">
-        <span>{{ item.raw.label }}</span>
-      </a-chip>
-    </template>
-    <template v-slot:item="{ props, item, index }">
-      <a-list-item
-        v-bind="props"
-        :title="undefined"
-        :key="`item_${index}`"
-        :disabled="!control.options.hasMultipleSelections && item.value.isField"
-        :active="activeFieldBelongsToSelectedPlanting(item, getValue)"
-        style="opacity: 1 !important">
-        <template v-slot:prepend="{}">
-          <a-list-item-action class="ml-2 mr-2">
-            <a-checkbox
-              v-if="control.options.hasMultipleSelections"
-              :modelValue="activeFieldBelongsToSelectedPlanting(item, getValue)"
-              color="focus"
-              :class="{ tabForChild: !item.value.isField }"
-              hide-details />
-            <a-radio-group v-else :modelValue="activeFieldBelongsToSelectedPlanting(item, getValue)" hide-details>
-              <a-radio :value="true" color="focus" :class="{ tabForChild: !item.value.isField }" />
-            </a-radio-group>
-          </a-list-item-action>
-          <a-list-item-title>
-            {{ item.raw.label }}
-            <a-list-item-subtitle v-if="item.value.isField">
-              {{ this.getFirstSectionOfFarmURL(item.value.farmName) }}
-            </a-list-item-subtitle>
-          </a-list-item-title>
-        </template>
-      </a-list-item>
-    </template>
-  </a-select>
-  <app-control-more-info :value="control.moreInfo" />
+      color="focus"
+      clearable
+      :selectionSlot="!control.options.hasMultipleSelections"
+      :chipSlot="control.options.hasMultipleSelections"
+      itemSlot
+      cssFlexWrap>
+      <template v-slot:selection="{ props, item }">
+        <span v-bind="props" v-html="item.raw.label" />
+      </template>
+      <template v-slot:chip="{ props, item }">
+        <a-chip v-bind="props" closable style="margin-top: -3px">
+          <span>{{ item.raw.label }}</span>
+        </a-chip>
+      </template>
+      <template v-slot:item="{ props, item, index }">
+        <a-list-item
+          v-bind="props"
+          :title="undefined"
+          :key="`item_${index}`"
+          :disabled="!control.options.hasMultipleSelections && item.value.isField"
+          :active="activeFieldBelongsToSelectedPlanting(item, getValue)"
+          style="opacity: 1 !important">
+          <template v-slot:prepend="{}">
+            <a-list-item-action class="ml-2 mr-2">
+              <a-checkbox
+                v-if="control.options.hasMultipleSelections"
+                :modelValue="activeFieldBelongsToSelectedPlanting(item, getValue)"
+                color="focus"
+                :class="{ tabForChild: !item.value.isField }"
+                hide-details />
+              <a-radio-group v-else :modelValue="activeFieldBelongsToSelectedPlanting(item, getValue)" hide-details>
+                <a-radio :value="true" color="focus" :class="{ tabForChild: !item.value.isField }" />
+              </a-radio-group>
+            </a-list-item-action>
+            <a-list-item-title>
+              {{ item.raw.label }}
+              <a-list-item-subtitle v-if="item.value.isField">
+                {{ this.getFirstSectionOfFarmURL(item.value.farmName) }}
+              </a-list-item-subtitle>
+            </a-list-item-title>
+          </template>
+        </a-list-item>
+      </template>
+    </a-select>
+    <app-control-more-info :value="control.moreInfo" />
+  </div>
 </template>
 
 <script>
