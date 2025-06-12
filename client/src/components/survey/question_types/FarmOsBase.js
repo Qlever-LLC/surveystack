@@ -4,7 +4,7 @@ import { linearControls } from '@/utils/submissions';
 export default {
   data() {
     return {
-      loading: false,
+      localLoading: false,
       farms: [],
       assets: [],
     };
@@ -29,7 +29,7 @@ export default {
       return (item && item.label) || value;
     },
     async fetchFarms() {
-      this.loading = true;
+      this.localLoading = true;
       try {
         const farms = await this.$store.dispatch('draft/getFarmOsResource', 'farms');
         this.farms = farms.map(({ instanceName }) => ({
@@ -41,10 +41,10 @@ export default {
       } catch (err) {
         console.error(err);
       }
-      this.loading = false;
+      this.localLoading = false;
     },
     async fetchAreas() {
-      this.loading = true;
+      this.localLoading = true;
       try {
         const assets = await this.$store.dispatch('draft/getFarmOsResource', 'assets');
 
@@ -105,10 +105,10 @@ export default {
       }
 
       this.farms = [...localAreas, ...this.farms];
-      this.loading = false;
+      this.localLoading = false;
     },
     async fetchAssets() {
-      this.loading = true;
+      this.localLoading = true;
 
       try {
         const [locationAssets, plantAssets] = await Promise.all([
@@ -194,7 +194,7 @@ export default {
       }
 
       this.assets = [...localPlantings, ...this.assets];
-      this.loading = false;
+      this.localLoading = false;
     },
     transform(assets) {
       const withoutArea = [];

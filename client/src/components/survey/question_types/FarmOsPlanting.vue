@@ -7,7 +7,7 @@
     :is-modified="meta && !!meta.dateModified"
     @initialize="initialize" />
   <a-select
-    :disabled="loading"
+      :disabled="localLoading"
     :modelValue="getValue"
     @update:modelValue="localChange"
     :items="transformed"
@@ -17,7 +17,7 @@
     :label="control.hint"
     :multiple="control.options.hasMultipleSelections"
     @keyup.enter.prevent="submit"
-    :loading="loading"
+      :loading="localLoading"
     color="focus"
     clearable
     :selectionSlot="!control.options.hasMultipleSelections"
