@@ -17,7 +17,7 @@
     />
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
-      :groupPath="groupPath"
+      :groupId="submission.meta.group.id"
       :required="control && control.options && control.options.required"
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"

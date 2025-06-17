@@ -26,7 +26,10 @@
           </div>
         </div>
         <a-toolbar-title id="draft-toolbar" class="flex-grow-1 flex-shrink-0 align-content-center text-center">
-          <b>{{ surveyName }}</b>
+          <div class="d-flex flex-column">
+            <b>{{ surveyName }}</b>
+            <span v-if="group" class="text-subtitle-2">{{ group.name }}</span>
+          </div>
         </a-toolbar-title>
 
         <slot name="toolbar-actions"></slot>
@@ -35,22 +38,29 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import AppNavigationControl from '@/components/AppNavigationControl.vue';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 
-export default {
-  components: { AppNavigationControl },
-  props: [
-    'showOverviewIcon',
-    'surveyName',
-    'questionNumber',
-    'required',
-    'anon',
-    'groupPath',
-    'showNavigationControl',
-    'handleClose',
-  ],
-};
+const store = useStore();
+
+const props = defineProps([
+  'showOverviewIcon',
+  'surveyName',
+  'questionNumber',
+  'required',
+  'anon',
+  'groupId',
+  'showNavigationControl',
+  'handleClose',
+]);
+
+const group = computed(() => {
+  if (!props.groupId) return null;
+  return store.getters['memberships/groups'].find(group => group._id === props.groupId);
+});
+
 </script>
 
 <style scoped lang="scss">
