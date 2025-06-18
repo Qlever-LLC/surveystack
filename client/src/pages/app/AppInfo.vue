@@ -12,9 +12,11 @@
       </a-card-title>
       <a-card-text>
         <p>
-          Current commit: <strong>{{ state.lcl.shortHash }}</strong>
+          Commit Hash: <strong>{{ lcl.shortHash }}</strong>
         </p>
-
+        <p>
+          Release Date: <strong>{{ releaseDate }}</strong>
+        </p>
         SurveyStack is an open source project by
         <a href="https://our-sci.net" target="_blank">Our Sci</a>.
         <br />
@@ -26,7 +28,6 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
 import { useDisplay } from 'vuetify';
 
 const { mobile } = useDisplay();
@@ -40,9 +41,18 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-const state = reactive({
-  lcl: JSON.parse(process.env.VUE_APP_LCL),
-});
+const lcl = JSON.parse(process.env.VUE_APP_LCL);
+
+const releaseDate = lcl?.committer?.date ?
+  new Date(lcl.committer.date * 1000).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }) :
+  '';
 
 function closeDialog() {
   emit('update:modelValue', false);
