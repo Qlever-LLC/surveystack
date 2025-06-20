@@ -46,7 +46,7 @@
                 @click="state.showAppInfo = true"
                 prepend-icon="mdi-information-outline"
                 class="pa-0 text-white">
-                <a-list-item-title class="text-white">Release Date {{ releaseDate }}</a-list-item-title>
+                <a-list-item-title class="text-white">Release Date: {{ releaseDate }}</a-list-item-title>
               </a-list-item>
             </a-list>
           </a-expansion-panel-text>
@@ -75,12 +75,8 @@ const state = reactive({
 
 const releaseDate = lcl?.committer?.date ?
   new Date(lcl.committer.date * 1000).toLocaleString(undefined, {
-    year: 'numeric',
     month: 'short',
     day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
   }) :
   '';
 
