@@ -7,6 +7,7 @@ import { getDescendantGroups, getAscendantGroups } from '../roles.service';
 import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
 import mailService from '../../services/mail/mail.service';
 import { createMagicLink } from '../auth.service';
+import { SPEC_VERSION_FARMOS_INSTANCES } from '../../db/constants';
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -315,6 +316,9 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
     userId: new ObjectId(userId),
     instanceName,
     owner: isOwner,
+    meta: {
+      specVersion: SPEC_VERSION_FARMOS_INSTANCES,
+    },
   });
 
   await sendEmailToNewlyMappedUserAndOwners(user, instanceName, origin);
@@ -409,11 +413,13 @@ export const getSuperAllFarmosMappings = async () => {
   const aggregatorFarms = await getAllFarmsWithTags();
   const surveystackFarms = await db.collection('farmos-group-mapping').find().toArray();
   const surveystackUserFarms = await db.collection('farmos-instances').find().toArray();
+  const multitenantInstances = await db.collection('farmos-multitenant-instances').find().toArray();
 
   return {
     aggregatorFarms,
     surveystackFarms,
     surveystackUserFarms,
+    multitenantInstances,
   };
 };
 
@@ -422,37 +428,19 @@ export const getSuperAllFarmosNotes = async () => {
   return allNotes;
 };
 
-export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = async (
-  instanceName,
-  oldGroupIds,
-  newGroupIds,
-  origin
-) => {
-  await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
-    instanceName,
-    oldGroupIds,
-    newGroupIds,
-    origin
-  );
-  for (const oldGroupId of oldGroupIds) {
-    await removeFarmFromSurveystackGroup(instanceName, oldGroupId);
-  }
-  for (const newGroupId of newGroupIds) {
-    await addFarmToSurveystackGroup(instanceName, newGroupId);
-  }
-};
-
-export const addFarmToSurveystackGroupAndSendNotification = async (
+export const addFarmToSurveystackGroupAndSendNotification = async ({
   instanceName,
   groupId,
-  origin
-) => {
-  try {
-    await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
-  } catch (error) {
-    console.log(error);
-  }
-  return await addFarmToSurveystackGroup(instanceName, groupId);
+  origin,
+  multiTenant = false,
+}) => {
+  const result = multiTenant
+    ? await addMultitenantInstanceToGroup(instanceName, groupId)
+    : await addFarmToSurveystackGroup(instanceName, groupId);
+
+  sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin).catch(console.log);
+
+  return result;
 };
 
 export const createFarmOSInstanceForUserAndGroup = async (
@@ -463,7 +451,38 @@ export const createFarmOSInstanceForUserAndGroup = async (
   origin
 ) => {
   await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner, origin);
-  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId, origin);
+  return await addFarmToSurveystackGroupAndSendNotification({ instanceName, groupId, origin });
+};
+
+const addMultitenantInstanceToGroup = async (instanceName, groupId) => {
+  const group = await db.collection('groups').findOne({
+    _id: asMongoId(groupId),
+  });
+
+  if (!group) {
+    throw boom.badData('group not found');
+  }
+
+  const existing = await db
+    .collection('farmos-multitenant-instances')
+    .find({
+      instanceName,
+      groupId: asMongoId(groupId),
+    })
+    .toArray();
+
+  if (existing.length > 0) {
+    return { _id: existing[0]._id };
+  }
+
+  const _id = new ObjectId();
+  await db.collection('farmos-multitenant-instances').insertOne({
+    _id,
+    instanceName,
+    groupId: asMongoId(groupId),
+  });
+
+  return { _id };
 };
 
 const addFarmToSurveystackGroup = async (instanceName, groupId) => {
@@ -820,6 +839,14 @@ export const getMemberInformationForDomain = async (descendants) => {
         as: 'group_mappings',
       },
     },
+    {
+      $lookup: {
+        from: 'farmos-multitenant-instances',
+        localField: 'farmos_instances.instanceName',
+        foreignField: 'instanceName',
+        as: 'group_multitenant_mappings',
+      },
+    },
   ];
 
   const res = await db.collection('memberships').aggregate(aggregation).toArray();
@@ -843,12 +870,11 @@ export const getMemberInformationForDomain = async (descendants) => {
     )
     .toArray();
 
-  // console.log('descendant groups', domainGroups);
-
-  // console.log(JSON.stringify(res, null, 2));
-
-  const groupIds = uniq(res.flatMap((item) => item['group_mappings'].map((gm) => gm.groupId)));
-  // console.log("groupIds", groupIds);
+  const groupIds = uniq(
+    res.flatMap((item) =>
+      [...item['group_mappings'], ...item['group_multitenant_mappings']].map((gm) => gm.groupId)
+    )
+  );
 
   const groups = await db
     .collection('groups')
@@ -857,9 +883,6 @@ export const getMemberInformationForDomain = async (descendants) => {
     })
     .toArray();
 
-  // console.log("present groups", JSON.stringify(groups, null, 2));
-  // console.log("descendants", descendantsIds);
-  // console.log("res", res);
   const prj = res
     .filter((r) => r.user !== null && r.user.length != 0)
     .map((item) => {
@@ -882,10 +905,12 @@ export const getMemberInformationForDomain = async (descendants) => {
 
           return {
             instanceName: ins.instanceName,
+            organizationId: ins.organizationId,
+            organizationName: ins.organizationName,
             owner: ins.owner,
             _id: ins._id,
             skip,
-            groups: item.group_mappings
+            groups: [...item.group_mappings, ...item.group_multitenant_mappings]
               .filter((g) => g.instanceName == ins.instanceName)
               .map((g) => ({
                 groupId: g.groupId,
@@ -907,12 +932,9 @@ export const getMemberInformationForDomain = async (descendants) => {
     })
     .toArray();
 
-  // console.log("mappedInstances", mappedInstances);
-  // console.log("farmosInstancesMappedToAllGroups", farmosInstancesMappedToAllGroups);
   const unassignedInstances = farmosInstancesMappedToAllGroups.filter(
     (instance) => !mappedInstances.some((m) => m == instance.instanceName)
   );
-  // console.log("unassignedInstances", unassignedInstances);
 
   // strip out all unrelated groups from members.connectedFarms.groups
 
@@ -920,8 +942,6 @@ export const getMemberInformationForDomain = async (descendants) => {
     m.connectedFarms.forEach((f) => {
       f.groups = f.groups.filter((g) => descendants.some((d) => d._id + '' == g.groupId + ''));
     });
-
-    // m.connectedFarms = m.connectedFarms.filter((f) => f.groups.length > 0);
   });
 
   return {
@@ -942,7 +962,7 @@ export const getGroupInformation = async (groupId) => {
   const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
 
   if (!group) {
-    throw boom.notFound();
+    throw boom.notFound(`No group found: ${groupId}`);
   }
 
   //know if groupId is a RootGroup or not (=> define setting in JSON response)
@@ -1018,7 +1038,14 @@ export const getGroupInformation = async (groupId) => {
 
     for (const m of memberships) {
       for (const connectedFarm of m.connectedFarms) {
-        if (!connectedFarms.find((cf) => cf.instanceName == connectedFarm.instanceName)) {
+        if (
+          !connectedFarms.find((cf) =>
+            cf.organizationId
+              ? cf.organizationId === connectedFarm.organizationId &&
+                cf.instanceName === connectedFarm.instanceName
+              : cf.instanceName == connectedFarm.instanceName
+          )
+        ) {
           connectedFarms.push(connectedFarm);
         }
       }
@@ -1036,6 +1063,14 @@ export const getGroupInformation = async (groupId) => {
       ...currentUser,
     });
   }
+  const multitenantInstances = await db
+    .collection('farmos-multitenant-instances')
+    .find({
+      groupId: {
+        $in: tree.ascendants.map((a) => a._id),
+      },
+    })
+    .toArray();
 
   groupInformation = {
     ...groupSettings,
@@ -1043,6 +1078,7 @@ export const getGroupInformation = async (groupId) => {
     members,
     unassignedInstances: membersRawData.unassignedInstances,
     domainGroups: membersRawData.domainGroups,
+    multitenantInstances: multitenantInstances?.map((instance) => instance.instanceName) ?? [],
   };
   return groupInformation;
 };

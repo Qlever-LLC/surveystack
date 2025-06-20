@@ -36,7 +36,8 @@ import {
   sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
-import { hasAdminRoleForRequest } from '../services/roles.service';
+import { hasAdminRoleForRequest, getAscendantGroups } from '../services/roles.service';
+import { SPEC_VERSION_FARMOS_INSTANCES } from '../db/constants';
 
 export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
@@ -240,7 +241,6 @@ export const getFarmOSInstances = async (req, res) => {
    */
 
   const userId = requireUserId(res);
-  // console.log('userid', userId);
 
   const r = await listFarmOSInstancesForUser(userId);
 
@@ -281,13 +281,19 @@ export const getAssets = async (req, res) => {
 
   for (const instance of instances) {
     try {
-      const axiosResponse = await cfg.getAssets(instance.instanceName, bundle);
+      const axiosResponse = await cfg.getAssets(
+        instance.instanceName,
+        bundle,
+        instance.organizationId
+      );
 
       const assetList = axiosResponse.data.data.map((a) => {
         return {
           name: a.attributes.name,
           id: a.id,
           instanceName: instance.instanceName,
+          organizationName: instance.organizationName,
+          organizationId: instance.organizationId,
           archived: a.attributes.status == 'archived',
           location:
             a.relationships && a.relationships.location ? a.relationships.location.data : undefined,
@@ -296,7 +302,6 @@ export const getAssets = async (req, res) => {
       assets.push(...assetList);
     } catch (error) {
       if (error.data) {
-        // console.log(error.data);
         errors.push(error.data);
       } else if (error.message) {
         const msg = `${instance.instanceName}: ${error.message}`;
@@ -373,22 +378,46 @@ export const superAdminGetAllNotes = async (req, res) => {
 };
 
 export const superAdminMapFarmosInstance = async (req, res) => {
-  const { group } = req.body;
+  const { group, instanceName, multiTenant = false } = req.body;
   if (!group) {
     throw boom.badData('group missing');
   }
 
-  const { instanceName } = req.body;
   if (!instanceName) {
     throw boom.badData('instance name missing');
   }
 
   const { origin } = req.headers;
 
-  await addFarmToSurveystackGroupAndSendNotification(instanceName, group, origin);
+  await addFarmToSurveystackGroupAndSendNotification({
+    instanceName,
+    groupId: group,
+    origin,
+    multiTenant,
+  });
   return res.send({
     status: 'success',
   });
+};
+
+export const superAdminUnmapMultitenantInstance = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    throw boom.badData('id is required');
+  }
+
+  const instance = await db
+    .collection('farmos-multitenant-instances')
+    .findOne({ _id: asMongoId(id) });
+
+  await db.collection('farmos-multitenant-instances').deleteOne({ _id: asMongoId(id) });
+  await db.collection('farmos-instances').deleteMany({
+    instanceName: instance.instanceName,
+    organizationId: { $exists: true, $ne: null },
+  });
+
+  return res.status(200).send();
 };
 
 export const superAdminUnMapFarmosInstance = async (req, res) => {
@@ -431,16 +460,13 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
 };
 
 export const superAdminUnMapFarmosInstanceFromUser = async (req, res) => {
-  const { user, instanceName } = req.body;
-  if (!user) {
-    throw boom.badData('user missing');
+  const { id } = req.body;
+  if (!id) {
+    throw boom.badData('Missing mapping id');
   }
 
-  if (!instanceName) {
-    throw boom.badData('instance name missing');
-  }
+  await db.collection('farmos-instances').deleteOne({ _id: asMongoId(id) });
 
-  await removeFarmFromUser(instanceName, user);
   return res.send({
     status: 'success',
   });
@@ -591,7 +617,6 @@ export const webhookCallback = async (req, res, next) => {
   try {
     const { key } = req.query;
 
-    //console.log("req", req)
     if (!key) {
       throw boom.unauthorized('key missing');
     }
@@ -858,7 +883,6 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 
   const { path: groupPath } = groupEntity;
   // also add instances to users
-  // console.log('groupPath', groupPath);
 
   try {
     const r = await createInstance(
@@ -876,7 +900,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
     const { origin } = req.headers;
     await mapFarmOSInstanceToUser(owner, url, true, origin);
 
-    await addFarmToSurveystackGroupAndSendNotification(url, groupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification({ instanceName: url, groupId, origin });
 
     await db.collection('farmos.fields').insertOne({
       url,
@@ -946,18 +970,45 @@ export const getDomain = async (req, res) => {
 };
 
 export const groupAdminMinimumGetGroupInformation = async (req, res) => {
-  const groupId = asMongoId(req.params.groupId);
-  const group = await db.collection('groups').findOne({ _id: groupId });
-  if (!group) {
-    // group not found, boom!
-    throw boom.notFound(`No group found: ${groupId}`);
-  }
-
-  const r = await getGroupInformation(groupId, res.locals.auth.isSuperAdmin);
+  const r = await getGroupInformation(asMongoId(req.params.groupId));
   return res.send({
     status: 'success',
     response: r,
   });
+};
+
+export const getOrganizationsInMultitenant = async (req, res) => {
+  const group = await db.collection('groups').findOne({
+    _id: asMongoId(req.params.groupId),
+  });
+  const ascendantGroups = await getAscendantGroups(group);
+  const multitenantInstance = await db.collection('farmos-multitenant-instances').findOne({
+    instanceName: req.params.multitenantName,
+    groupId: {
+      $in: ascendantGroups.map((g) => g._id),
+    },
+  });
+
+  if (!multitenantInstance) {
+    throw boom.unauthorized('Group does not have access to this multitenant instance');
+  }
+
+  const aggregatorInstance = config();
+
+  try {
+    const organizations = await aggregatorInstance.getOrganizations(
+      multitenantInstance.instanceName
+    );
+
+    return res.send(
+      organizations.map((org) => ({
+        id: org.id,
+        name: org.attributes.name,
+      }))
+    );
+  } catch (error) {
+    throw boom.internal('Error fetching organizations from aggregator', error);
+  }
 };
 
 export const superAdminUpdateFarmOSAccess = async (req, res) => {
@@ -1036,6 +1087,73 @@ export const groupAdminMinimumUpdateCreateFarmOSInstances = async (req, res) => 
   });
 };
 
+export const mapUserToOrganizationInMultitenantInstance = async (req, res) => {
+  const { groupId } = req.params;
+  const { instanceName, organizationId, organizationName, userId } = req.body;
+
+  if (!instanceName || !organizationId || !organizationName || !userId) {
+    throw boom.badData('instanceName, organizationId, organizationName and userId are required');
+  }
+
+  const group = await db.collection('groups').findOne({
+    _id: asMongoId(groupId),
+  });
+  const ancestorGroups = await getAscendantGroups(group);
+
+  const [user, memberships, multitenantInstance, organization] = await Promise.all([
+    db.collection('users').findOne({ _id: new ObjectId(userId) }),
+    db
+      .collection('memberships')
+      .find({
+        group: new ObjectId(groupId),
+        user: new ObjectId(userId),
+      })
+      .toArray(),
+    db.collection('farmos-multitenant-instances').findOne({
+      instanceName,
+      groupId: {
+        $in: ancestorGroups.map((g) => g._id),
+      },
+    }),
+    db.collection('farmos-instances').findOne({
+      instanceName,
+      userId: new ObjectId(userId),
+      organizationId: organizationId,
+      organizationName: organizationName,
+    }),
+  ]);
+
+  if (!group) {
+    throw boom.notFound(`Group not found`);
+  }
+  if (!user) {
+    throw boom.notFound(`User not found`);
+  }
+  if (memberships.length <= 0) {
+    throw boom.badData(`User is not a member of group.`);
+  }
+  if (!multitenantInstance) {
+    throw boom.notFound(`Multitenant instance not found for group.`);
+  }
+
+  if (!organization) {
+    db.collection('farmos-instances').insertOne({
+      _id: new ObjectId(),
+      instanceName,
+      userId: new ObjectId(userId),
+      organizationId,
+      organizationName,
+      owner: false,
+      meta: {
+        specVersion: SPEC_VERSION_FARMOS_INSTANCES,
+      },
+    });
+    return res.status(201).send();
+  }
+
+  return res.status(200).send();
+};
+
 export const mapUser = async (req, res) => {
   const { groupId, userId, instanceName } = await requireGroup(req, {
     userId: Joi.objectId().required(),
@@ -1092,7 +1210,7 @@ export const mapUser = async (req, res) => {
   }
 
   if (mapToGroup) {
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification({ instanceName, groupId, origin });
   }
 
   if (mapToUser) {
@@ -1220,7 +1338,6 @@ const assertGroupsInTree = async (groupIds, tree) => {
   // do we have permission to manage unmapping these groups?
   // are we top-level admin and are these groups in the farmos domain?
 
-  // console.log('descendants', tree.descendants);
   const unauthorized = groupIds.filter(
     (gid) => !tree.descendants.map((d) => d._id).some((id) => id + '' === gid)
   );
@@ -1459,10 +1576,11 @@ export const updateGroupsForUser = async (req, res) => {
   });
 };
 
-const assertFarmMappedToUser = async (instanceName, userId) => {
+const assertFarmMappedToUser = async (instanceName, userId, organizationName) => {
   const res = await db.collection('farmos-instances').findOne({
     userId: new ObjectId(userId),
     instanceName,
+    organizationName,
   });
 
   if (!res) {
@@ -1470,8 +1588,9 @@ const assertFarmMappedToUser = async (instanceName, userId) => {
   }
 };
 
-const assertFarmInSubGroup = async (instanceName, tree) => {
-  const res = await db.collection('farmos-group-mapping').findOne({
+const assertFarmInSubGroup = async (instanceName, tree, organizationName) => {
+  const collection = organizationName ? 'farmos-multitenant-instances' : 'farmos-group-mapping';
+  const res = await db.collection(collection).findOne({
     instanceName,
     groupId: {
       $in: tree.descendants.map((d) => new ObjectId(d._id)),
@@ -1568,17 +1687,18 @@ export const removeMembershipHook = async (membership, origin) => {
 };
 
 export const getAdminLink = async (req, res) => {
-  const { userId, instanceName, tree } = await requireGroup(req, {
+  const { userId, instanceName, tree, organizationName } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
+    organizationName: Joi.string().allow(null),
   });
 
   await assertUserInSubGroup(userId, tree);
-  await assertFarmInSubGroup(instanceName, tree);
-  await assertFarmMappedToUser(instanceName, userId);
+  await assertFarmInSubGroup(instanceName, tree, organizationName);
+  await assertFarmMappedToUser(instanceName, userId, organizationName);
 
   const { getAdminLink } = config();
-  const link = await getAdminLink(instanceName);
+  const link = await getAdminLink(instanceName, organizationName);
 
   return res.send(link);
 };

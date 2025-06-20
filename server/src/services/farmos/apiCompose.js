@@ -3,12 +3,48 @@ import { db } from '../../db';
 /**
  * Does user have permission to push to instance?
  */
-export const hasPermission = async (userId, instanceName) => {
+export const hasPermission = async (userId, instanceName, organizationId) => {
   if (!userId) {
     return false;
   }
 
   if (!instanceName) {
+    return false;
+  }
+
+  if (organizationId) {
+    const organizationMappings = await db
+      .collection('farmos-instances')
+      .find({
+        organizationId,
+        instanceName,
+        userId,
+      })
+      .toArray();
+    if (organizationMappings.length > 0) {
+      return true;
+    }
+
+    const adminOfGroups = (
+      await db
+        .collection('memberships')
+        .find({
+          user: userId,
+          role: 'admin',
+        })
+        .toArray()
+    ).map((a) => a.group + '');
+    const multitenantMappings = await db
+      .collection('farmos-multitenant-instances')
+      .find({
+        groupId: { $in: adminOfGroups.map((membership) => membership.group) },
+        instanceName,
+      })
+      .toArray();
+    if (multitenantMappings.length > 0) {
+      return true;
+    }
+
     return false;
   }
 

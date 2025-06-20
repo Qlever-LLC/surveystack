@@ -1,0 +1,1 @@
+export const SPEC_VERSION_FARMOS_INSTANCES = 1;

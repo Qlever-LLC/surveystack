@@ -137,7 +137,11 @@ const createFarmOSDomain = async (gs) => {
     }
   }
   for (const farm of _.uniq(farms)) {
-    await addFarmToSurveystackGroupAndSendNotification(farm, group._id, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName: farm,
+      groupId: group._id,
+      origin,
+    });
   }
 
   return res;
@@ -197,8 +201,16 @@ describe('farmos-controller', () => {
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: parentGroupId,
+      origin,
+    });
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: groupAA._id,
+      origin,
+    });
     const affectedGroupIds = [parentGroupId, groupAA._id];
 
     const req = createReq({
@@ -233,8 +245,16 @@ describe('farmos-controller', () => {
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: parentGroupId,
+      origin,
+    });
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: groupAA._id,
+      origin,
+    });
     const affectedGroupIds = [parentGroupId, groupAA._id];
 
     const res = await createRes({ status: 'ok' });
@@ -281,8 +301,16 @@ describe('farmos-controller', () => {
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: parentGroupId,
+      origin,
+    });
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: groupAA._id,
+      origin,
+    });
     const affectedGroupIds = [parentGroupId, groupAA._id, extGroup._id];
 
     const req = createReq({
@@ -312,7 +340,11 @@ describe('farmos-controller', () => {
     const superAdmin = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: parentGroupId,
+      origin,
+    });
 
     const req = createReq({
       body: {
@@ -340,7 +372,11 @@ describe('farmos-controller', () => {
     const superAdmin = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: parentGroupId,
+      origin,
+    });
 
     const res = await createRes({ status: 'ok' });
     const req1 = createReq({
@@ -770,57 +806,6 @@ describe('farmos-controller', () => {
     expect(usersInstancesAfter).toEqual(expect.arrayContaining(['test1@farmos.net']));
   });
 
-  it('map-user', async () => {
-    // check that user is in group
-    // check that user has access to instance and is owner
-    // or that instance is assigned to group
-    // check instance not already mapped
-    // const group = await createGroup({ name: 'Bionutrient' });
-    // const admin = await group.createAdminMember();
-    // const user = await group.createUserMember();
-    // await mapFarmOSInstanceToUser(user.user._id, 'userinstance.farmos.net', true, origin);
-    // const req = {
-    //   params: { groupId: group._id + "" },
-    //   body: {
-    //     instanceName: "userinstance.farmos.net",
-    //     userId: admin.user._id + "",
-    //   }
-    // };
-    // const res = {
-    //   send: jest.fn(),
-    //   locals: {
-    //     auth: {
-    //       user: {
-    //         _id: admin,
-    //       },
-    //     },
-    //   },
-    // }
-    // await mapUser(req, res);
-    // expect(res.send).toHaveBeenCalledWith({ status: "ok" })
-  });
-
-  /*it('get-assets', async () => {
-    mockAxios.get.mockImplementation(() => Promise.resolve({ data: assetResponse }));
-
-    const user = await createUser();
-    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true, origin);
-
-    const res = mockRes(user._id);
-    const send = jest.fn();
-    res.send = send;
-    await getAssets(
-      {
-        body: {
-          bundle: 'plant',
-        },
-        query: {
-          bundle: 'plant',
-        },
-      },
-      res
-    );*/
-
   it('update Ownership success', async () => {
     const instanceName = 'instanceName';
     const user1 = await createUser();
@@ -924,7 +909,11 @@ describe('farmos-controller', () => {
     const { group, user1 } = await init();
     const user = user1.user;
     await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, group._id, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: group._id,
+      origin,
+    });
 
     const req = createReq({
       body: {
@@ -993,7 +982,11 @@ describe('farmos-controller', () => {
     const { group, user1 } = await init();
     const user = user1.user;
     await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, group._id, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: group._id,
+      origin,
+    });
 
     const req = createReq({
       body: {
@@ -1176,7 +1169,11 @@ describe('farmos-controller', () => {
 
     const parentGroupId = parentGroup._id;
 
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification({
+      instanceName,
+      groupId: parentGroupId,
+      origin,
+    });
 
     const addMethod = sendUserAddFarmToMultipleSurveystackGroupNotification;
     const moveMethod = sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification;
@@ -1185,7 +1182,11 @@ describe('farmos-controller', () => {
     const runWithGroups = async (initial, updated, expectedMethod) => {
       // initialization process
       for (const grp of initial) {
-        await addFarmToSurveystackGroupAndSendNotification(instanceName, grp._id, origin);
+        await addFarmToSurveystackGroupAndSendNotification({
+          instanceName,
+          groupId: grp._id,
+          origin,
+        });
       }
       const res = mockRes(admin.user._id);
       const req = createReq({

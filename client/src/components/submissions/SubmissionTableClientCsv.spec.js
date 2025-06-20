@@ -11,6 +11,20 @@ import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 const mockSubmissions = () => {
   return {
     content: [

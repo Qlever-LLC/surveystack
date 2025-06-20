@@ -36,10 +36,12 @@ export default {
       this.loading = true;
       try {
         const farms = await this.$store.dispatch('draft/getFarmOsResource', 'farms');
-        this.farms = farms.map(({ instanceName }) => ({
+        this.farms = farms.map(({ instanceName, organizationName, organizationId }) => ({
           label: instanceName,
           value: {
             url: instanceName,
+            organizationName,
+            organizationId,
           },
         }));
       } catch (err) {
@@ -59,6 +61,8 @@ export default {
               archived: f.archived,
               farmName: f.instanceName,
               url: f.instanceName,
+              organizationName: f.organizationName,
+              organizationId: f.organizationId,
               name: f.name.trim(),
               id: f.id,
             },
@@ -128,6 +132,8 @@ export default {
 
                   return {
                     id,
+                    organizationName: match?.organizationName,
+                    organizationId: match?.organizationId,
                     name: match ? match.name : '(No Area Associated)',
                   };
                 })
@@ -138,6 +144,8 @@ export default {
               value: {
                 farmName: asset.instanceName,
                 url: asset.instanceName,
+                organizationName: asset.organizationName,
+                organizationId: asset.organizationId,
                 name: asset.name.trim(),
                 id: asset.id,
                 archived: asset.archived,
@@ -237,7 +245,6 @@ export default {
           return asset.value.location.some((loc) => loc.id === area.location.id);
         });
 
-        console.log('loc', area);
         const field = {
           value: {
             farmName: area.farmName,
